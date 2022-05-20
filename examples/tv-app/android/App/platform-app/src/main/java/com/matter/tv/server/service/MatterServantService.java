@@ -26,7 +26,8 @@ public class MatterServantService extends Service {
 
     // Register for packages updates
     ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
-    for (ContentApp app : ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
+    for (ContentApp app :
+        ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
       app.setEndpointId(MatterServant.get().addContentApp(app));
     }
   }

@@ -22,15 +22,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
-import com.matter.tv.server.service.ContentAppAgentService;
 import com.matter.tv.server.service.MatterServant;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -111,7 +107,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
-    ArrayList<String> lst = new ArrayList<String>(ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().keySet());
+    ArrayList<String> lst =
+        new ArrayList<String>(
+            ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().keySet());
     ContentAppListAdapter adapter = new ContentAppListAdapter(this, R.layout.applist_item, lst);
 
     pkgUpdatesView = findViewById(R.id.pkgUpdates);
@@ -126,9 +124,13 @@ public class MainActivity extends AppCompatActivity {
           public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String packageName = intent.getStringExtra("com.matter.tv.server.appagent.add.pkg");
-            if (action.equals("com.matter.tv.server.appagent.add") || action.equals("com.matter.tv.server.appagent.remove")) {
+            if (action.equals("com.matter.tv.server.appagent.add")
+                || action.equals("com.matter.tv.server.appagent.remove")) {
               adapter.clear();
-              adapter.addAll(ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().entrySet());
+              adapter.addAll(
+                  ContentAppDiscoveryService.getReceiverInstance()
+                      .getDiscoveredContentApps()
+                      .entrySet());
               adapter.notifyDataSetChanged();
             }
           }
@@ -142,9 +144,7 @@ public class MainActivity extends AppCompatActivity {
     private int layout;
 
     public ContentAppListAdapter(
-        @NonNull Context context,
-        int resource,
-        @NonNull ArrayList<String> packages) {
+        @NonNull Context context, int resource, @NonNull ArrayList<String> packages) {
       super(context, resource, packages);
       layout = resource;
     }
@@ -166,10 +166,13 @@ public class MainActivity extends AppCompatActivity {
               @Override
               public void onClick(View view) {
                 Log.i(TAG, "Button was clicked for " + position);
-                for (ContentApp app : ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
-                    if (app.getAppName().equals(getItem(position))) {
-                        MatterServant.get().sendTestMessage(app.getEndpointId(), "My Native Message");
-                    }
+                for (ContentApp app :
+                    ContentAppDiscoveryService.getReceiverInstance()
+                        .getDiscoveredContentApps()
+                        .values()) {
+                  if (app.getAppName().equals(getItem(position))) {
+                    MatterServant.get().sendTestMessage(app.getEndpointId(), "My Native Message");
+                  }
                 }
               }
             });

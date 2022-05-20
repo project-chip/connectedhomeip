@@ -27,7 +27,6 @@ import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
-
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
 import com.tcl.chip.tvapp.ChannelManagerStub;
@@ -149,7 +148,13 @@ public class MatterServant {
   }
 
   public int addContentApp(ContentApp app) {
-    return mTvApp.addContentApp(app.getVendorName(), app.getVendorId(), app.getAppName(), app.getProductId(), "1.0", new ContentAppEndpointManagerImpl(context));
+    return mTvApp.addContentApp(
+        app.getVendorName(),
+        app.getVendorId(),
+        app.getAppName(),
+        app.getProductId(),
+        "1.0",
+        new ContentAppEndpointManagerImpl(context));
   }
 
   public void sendTestMessage(int endpoint, String message) {

@@ -9,14 +9,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.JsonReader;
 import android.util.Log;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.app.api.SupportedCluster;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.utils.ResourceUtils;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,9 +28,11 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   static final String MATTER_VENDOR_ID_METADATA_KEY = "com.matter.tv.app.api.vendor_id";
   static final String MATTER_PRODUCT_ID_METADATA_KEY = "com.matter.tv.app.api.product_id";
 
-  private static final String ANDROID_PACKAGE_REMOVED_ACTION = "android.intent.action.PACKAGE_REMOVED";
+  private static final String ANDROID_PACKAGE_REMOVED_ACTION =
+      "android.intent.action.PACKAGE_REMOVED";
   private static final String ANDROID_PACKAGE_ADDED_ACTION = "android.intent.action.PACKAGE_ADDED";
-  private static final String ANDROID_PACKAGE_REPLACED_ACTION = "android.intent.action.PACKAGE_REPLACED";
+  private static final String ANDROID_PACKAGE_REPLACED_ACTION =
+      "android.intent.action.PACKAGE_REPLACED";
 
   private static ResourceUtils resourceUtils = ResourceUtils.getInstance();
 
@@ -90,13 +89,12 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
       int productId = appInfo.metaData.getInt(MATTER_PRODUCT_ID_METADATA_KEY, -1);
       String vendorName = appInfo.metaData.getString(MATTER_VENDOR_NAME_METADATA_KEY, "");
 
-
-      if(vendorId == -1 || productId == -1) {
+      if (vendorId == -1 || productId == -1) {
         return;
       }
 
       Set<SupportedCluster> supportedClusters;
-              Log.d(TAG, "got static capability for package " + pkg + ", resourceId: " + resId);
+      Log.d(TAG, "got static capability for package " + pkg + ", resourceId: " + resId);
       if (resId != 0) {
         Resources res = pm.getResourcesForApplication(appInfo);
         supportedClusters = resourceUtils.getSupportedClusters(res, resId);

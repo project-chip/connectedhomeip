@@ -1,13 +1,9 @@
 package com.matter.tv.server.utils;
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.util.JsonReader;
 import android.util.Log;
-
 import com.matter.tv.app.api.SupportedCluster;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -31,19 +27,8 @@ public class ResourceUtils {
   }
 
   /**
-       {
-        "clusters": [
-        {
-          "identifier": 1234,
-          "features": ["CS"]
-        },
-        {
-          "identifier": 1235,
-          "features": ["AS"],
-          "optionalCommands" : [4, 5]
-        }
-      ]
-      }
+   * { "clusters": [ { "identifier": 1234, "features": ["CS"] }, { "identifier": 1235, "features":
+   * ["AS"], "optionalCommands" : [4, 5] } ] }
    */
 
   /**
@@ -52,8 +37,8 @@ public class ResourceUtils {
    *
    * @param resources Resources object containing the resource
    * @param resId resourceId
-   * @return Set<SupportedCluster> containing the clusters defined in the resource file.
-   * Empty set if there is a parsing error.
+   * @return Set<SupportedCluster> containing the clusters defined in the resource file. Empty set
+   *     if there is a parsing error.
    */
   public Set<SupportedCluster> getSupportedClusters(final Resources resources, final int resId) {
     Set<SupportedCluster> supportedClusters = new HashSet<>();
