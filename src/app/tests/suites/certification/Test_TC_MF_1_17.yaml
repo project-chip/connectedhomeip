@@ -59,7 +59,7 @@ tests:
           On 2nd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing manualcode 1 36217551633
+          ./chip-tool pairing code 1 36217551633
       disabled: true
 
     - label: "Repeat step3 to commission TH_CR3"
@@ -73,7 +73,7 @@ tests:
 
 
 
-          ./chip-tool pairing manualcode 1 36217551633
+          ./chip-tool pairing code 1 36217551633
       disabled: true
 
     - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
@@ -189,7 +189,7 @@ tests:
           On 2nd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing manualcode 1 36217551633
+          ./chip-tool pairing code 1 36217551633
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"

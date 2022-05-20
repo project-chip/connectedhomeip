@@ -117,9 +117,10 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
     VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     PeerId peer = PeerIdForNode(mInitParams.mFabricTable, fabric, node);
     VerifyOrReturnError(peer.GetNodeId() != kUndefinedNodeId, CHIP_ERROR_NOT_FOUND);
-    CHIP_ERROR error =
-        mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    if (error == CHIP_ERROR_NO_MEMORY)
+
+    mLastSessionEstablishmentError = CHIP_NO_ERROR;
+    mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
         // TODO: Some reference counting mechanism shall be added the CASESessionManager
@@ -132,11 +133,11 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
             PeerId lruPeer = PeerIdForNode(mInitParams.mFabricTable, fabricToRemove, nodeToRemove);
             mInitParams.mCASESessionManager->ReleaseSession(lruPeer);
             // Now retry
-            error =
-                mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+            mLastSessionEstablishmentError = CHIP_NO_ERROR;
+            mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
         }
     }
-    return error;
+    return mLastSessionEstablishmentError;
 }
 
 void BindingManager::HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
@@ -178,6 +179,7 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     mInitParams.mCASESessionManager->ReleaseSession(peerId);
+    mLastSessionEstablishmentError = error;
 }
 
 void BindingManager::FabricRemoved(FabricIndex fabricIndex)

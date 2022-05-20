@@ -79,7 +79,7 @@ tests:
     - label: "Commission the provider from alpha"
       identity: "alpha"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -116,8 +116,8 @@ tests:
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
-                      Targets: null,
-                      [{ Cluster: 41, Endpoint: null, DeviceType: null }],
+                      Targets:
+                          [{ Cluster: 41, Endpoint: null, DeviceType: null }],
                   },
               ]
 

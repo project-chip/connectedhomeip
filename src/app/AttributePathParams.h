@@ -96,6 +96,15 @@ struct AttributePathParams
         return true;
     }
 
+    bool Intersects(const AttributePathParams & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || other.HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || other.HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || other.HasWildcardAttributeId() || mAttributeId == other.mAttributeId,
+                            false);
+        return true;
+    }
+
     bool IncludesAttributesInCluster(const DataVersionFilter & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);

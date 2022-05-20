@@ -21,31 +21,18 @@
 constexpr uint16_t kPayloadMaxSize = 64;
 
 CHIP_ERROR
-CommissionerCommands::PairWithQRCode(const char * identity,
-                                     const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
+CommissionerCommands::PairWithCode(const char * identity,
+                                   const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value)
 {
     VerifyOrReturnError(value.payload.size() > 0 && value.payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     GetCommissioner(identity).RegisterPairingDelegate(this);
 
-    char qrCode[kPayloadMaxSize];
-    memset(qrCode, '\0', sizeof(qrCode));
-    memcpy(qrCode, value.payload.data(), value.payload.size());
-    ChipLogError(chipTool, "QRCode is %s", qrCode);
-    return GetCommissioner(identity).PairDevice(value.nodeId, qrCode);
-}
-
-CHIP_ERROR CommissionerCommands::PairWithManualCode(
-    const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithManualCode::Type & value)
-{
-    VerifyOrReturnError(value.payload.size() > 0 && value.payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
-
-    GetCommissioner(identity).RegisterPairingDelegate(this);
-
-    char manualCode[kPayloadMaxSize];
-    memset(manualCode, '\0', sizeof(manualCode));
-    memcpy(manualCode, value.payload.data(), value.payload.size());
-    return GetCommissioner(identity).PairDevice(value.nodeId, manualCode);
+    char code[kPayloadMaxSize];
+    memset(code, '\0', sizeof(code));
+    memcpy(code, value.payload.data(), value.payload.size());
+    ChipLogError(chipTool, "Pairing Code is %s", code);
+    return GetCommissioner(identity).PairDevice(value.nodeId, code);
 }
 
 CHIP_ERROR CommissionerCommands::Unpair(const char * identity,

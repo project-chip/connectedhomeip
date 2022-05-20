@@ -91,15 +91,14 @@ void TestMaximumValues(nlTestSuite * inSuite, void * inContext)
     inPayload.discriminator = static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1);
     inPayload.setUpPINCode  = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
 
-    NL_TEST_ASSERT(inSuite, inPayload.isValidQRCodePayload());
-    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload, /* allowInvalidPayload */ true));
 }
 
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 101";
+    string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000";
     NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 

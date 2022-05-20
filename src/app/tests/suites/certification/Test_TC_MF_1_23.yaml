@@ -61,7 +61,7 @@ tests:
           On nth controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing manualcode 1 36217551633
+          ./chip-tool pairing code 1 36217551633
       disabled: true
 
     - label:
@@ -76,7 +76,7 @@ tests:
           On nth controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing manualcode 1 36217551633
+          ./chip-tool pairing code 1 36217551633
       disabled: true
 
     - label: "DUT_CR1 removes FabricIndex2"

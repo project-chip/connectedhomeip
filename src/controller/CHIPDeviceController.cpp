@@ -2179,16 +2179,11 @@ OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerI
 
 OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
 {
-    CHIP_ERROR err = mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
-                                                                            &mOnDeviceConnectionFailureCallback);
+    mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
+                                                           &mOnDeviceConnectionFailureCallback);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to establish new session: %" CHIP_ERROR_FORMAT, err.Format());
-        return nullptr;
-    }
-
-    // session should have been created now, expect this to return non-null
+    // If there is an OperationalDeviceProxy for this peerId now the call to the
+    // superclass will return it.
     return DeviceController::GetDeviceSession(peerId);
 }
 

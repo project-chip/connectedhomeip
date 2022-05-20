@@ -157,7 +157,12 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                        VerifyOrDie(chip::Inet::IPAddress::FromString(ipStrBuf, event.InternetConnectivityChange.ipAddress));
+
+                        if (!chip::Inet::IPAddress::FromString(ipStrBuf, event.InternetConnectivityChange.ipAddress))
+                        {
+                            ChipLogDetail(DeviceLayer, "Failed to report IP address - ip address parsing failed");
+                            continue;
+                        }
 
                         CHIP_ERROR status = PlatformMgr().PostEvent(&event);
                         if (status != CHIP_NO_ERROR)

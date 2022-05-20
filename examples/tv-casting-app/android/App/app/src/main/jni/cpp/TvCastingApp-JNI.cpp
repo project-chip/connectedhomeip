@@ -99,6 +99,8 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 
 JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint duration)
 {
+    chip::DeviceLayer::StackLock lock;
+
     ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
 
     CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow();
@@ -151,16 +153,14 @@ JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCo
 {
     ChipLogProgress(AppServer, "JNI_METHOD initServer called");
     CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
-    if (err == CHIP_NO_ERROR)
-    {
-        CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
-        return true;
-    }
-    else
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "initServer error: %s", err.AsString());
         return false;
     }
+
+    CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
+    return true;
 }
 
 JNI_METHOD(void, contentLauncherLaunchURL)(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr)

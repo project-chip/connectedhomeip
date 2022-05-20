@@ -1098,15 +1098,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
             {
                 ThreadNetworkDiagnostics::Structs::NeighborTable::Type neighborTable;
+                app::DataModel::Nullable<int8_t> averageRssi;
+                app::DataModel::Nullable<int8_t> lastRssi;
 
+                averageRssi.SetNonNull(neighInfo.mAverageRssi);
+                lastRssi.SetNonNull(neighInfo.mLastRssi);
+
+                neighborTable.averageRssi      = averageRssi;
+                neighborTable.lastRssi         = lastRssi;
                 neighborTable.extAddress       = Encoding::BigEndian::Get64(neighInfo.mExtAddress.m8);
                 neighborTable.age              = neighInfo.mAge;
                 neighborTable.rloc16           = neighInfo.mRloc16;
                 neighborTable.linkFrameCounter = neighInfo.mLinkFrameCounter;
                 neighborTable.mleFrameCounter  = neighInfo.mMleFrameCounter;
                 neighborTable.lqi              = neighInfo.mLinkQualityIn;
-                neighborTable.averageRssi      = neighInfo.mAverageRssi;
-                neighborTable.lastRssi         = neighInfo.mLastRssi;
                 neighborTable.frameErrorRate   = neighInfo.mFrameErrorRate;
                 neighborTable.messageErrorRate = neighInfo.mMessageErrorRate;
                 neighborTable.rxOnWhenIdle     = neighInfo.mRxOnWhenIdle;

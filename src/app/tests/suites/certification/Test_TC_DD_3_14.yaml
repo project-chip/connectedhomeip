@@ -57,7 +57,7 @@ tests:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:.24J0AFN00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:.24J0AFN00KA0648G00
           ...
 
           Device TH:
@@ -85,7 +85,7 @@ tests:
           This test step is not valid and is addressed in PR#893
 
           DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:86PS06VO00KA0648G00
+          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:86PS06VO00KA0648G00
           ...
 
           Device TH:
@@ -118,7 +118,7 @@ tests:
           This test step is not valid because the scenario here should always be supported for standard commissioning flow. This is addressed in PR#893
 
           DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
           ...
 
           Device TH:
@@ -140,7 +140,7 @@ tests:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J08UL01KA0648G00
+          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J08UL01KA0648G00
           ...
 
           Device TH:
@@ -163,7 +163,7 @@ tests:
           step, using the DUT"
       verification: |
           DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J048N01KA0648G00
+          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J048N01KA0648G00
           ...
 
           Device TH:
@@ -186,7 +186,7 @@ tests:
           step, using the DUT"
       verification: |
           DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234  MT:-24J00OO01KA0648G00
+          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234  MT:-24J00OO01KA0648G00
           ...
 
           Device TH:
@@ -219,7 +219,7 @@ tests:
           chip-all-clusters-app BUG: chip-all-clusters-app advertises over BLE when the discovery capability should not be advertising with capabilites set to '0'
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
           ...
 
           Device TH:
@@ -255,7 +255,7 @@ tests:
           chip-all-clusters-app BUG: chip-all-clusters-app advertises over IP when the discovery capability should not be advertising with capabilites set to '0'
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J0AFN00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J0AFN00KA0648G00
           ...
 
           Device TH:

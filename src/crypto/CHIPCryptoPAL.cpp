@@ -21,6 +21,8 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
@@ -33,6 +35,8 @@ using chip::ByteSpan;
 using chip::MutableByteSpan;
 using chip::Encoding::BufferWriter;
 using chip::Encoding::LittleEndian::Reader;
+
+using namespace chip::ASN1;
 
 namespace {
 
@@ -867,6 +871,187 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
         }
     }
     return CHIP_NO_ERROR;
+}
+
+// Generates the to-be-signed portion of a PKCS#10 CSR (`CertificationRequestInformation`)
+// that contains the
+static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, const Crypto::P256PublicKey & pubkey)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    /**
+     *
+     *  CertificationRequestInfo ::=
+     *     SEQUENCE {
+     *        version       INTEGER { v1(0) } (v1,...),
+     *        subject       Name,
+     *        subjectPKInfo SubjectPublicKeyInfo{{ PKInfoAlgorithms }},
+     *        attributes    [0] Attributes{{ CRIAttributes }}
+     * }
+     */
+    ASN1_START_SEQUENCE
+    {
+        ASN1_ENCODE_INTEGER(0); // version INTEGER { v1(0) }
+
+        // subject Name
+        ASN1_START_SEQUENCE
+        {
+            ASN1_START_SET
+            {
+                ASN1_START_SEQUENCE
+                {
+                    // Any subject, placeholder is good, since this
+                    // is going to usually be ignored
+                    ASN1_ENCODE_OBJECT_ID(kOID_AttributeType_OrganizationalUnitName);
+                    ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, "CSA", static_cast<uint16_t>(strlen("CSA")));
+                }
+                ASN1_END_SEQUENCE;
+            }
+            ASN1_END_SET;
+        }
+        ASN1_END_SEQUENCE;
+
+        // subjectPKInfo
+        ASN1_START_SEQUENCE
+        {
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_PubKeyAlgo_ECPublicKey);
+                ASN1_ENCODE_OBJECT_ID(kOID_EllipticCurve_prime256v1);
+            }
+            ASN1_END_SEQUENCE;
+            ReturnErrorOnFailure(writer.PutBitString(0, pubkey, static_cast<uint8_t>(pubkey.Length())));
+        }
+        ASN1_END_SEQUENCE;
+
+        // attributes [0]
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
+        {
+            // Using a plain empty attributes request
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_Extension_CSRRequest);
+                ASN1_START_SET
+                {
+                    ASN1_START_SEQUENCE {}
+                    ASN1_END_SEQUENCE;
+                }
+                ASN1_END_SET;
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_CONSTRUCTED;
+    }
+    ASN1_END_SEQUENCE;
+exit:
+    return err;
+}
+
+CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span)
+{
+    VerifyOrReturnError(keypair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csr_span.size() >= kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // First pass: Generate the CertificatioRequestInformation inner
+    // encoding one time, to sign it, before re-generating it within the
+    // full ASN1 writer later, since it's easier than trying to
+    // figure-out the span we need to sign of the overall object.
+    P256ECDSASignature signature;
+
+    {
+        // The first pass will just generate a signature, so we can use the
+        // output buffer as scratch to avoid needing more stack space. There
+        // are no secrets here and the contents is not reused since all we
+        // need is the signature which is already separately stored.
+        ASN1Writer toBeSignedWriter;
+        toBeSignedWriter.Init(csr_span);
+        CHIP_ERROR err = GenerateCertificationRequestInformation(toBeSignedWriter, keypair->Pubkey());
+        ReturnErrorOnFailure(err);
+
+        size_t encodedLen = (uint16_t) toBeSignedWriter.GetLengthWritten();
+        // This should not/will not happen
+        if (encodedLen > csr_span.size())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        err = keypair->ECDSA_sign_msg(csr_span.data(), encodedLen, signature);
+        ReturnErrorOnFailure(err);
+    }
+
+    // Second pass: Generate the entire CSR body, restarting a new write
+    // of the CertificationRequestInformation (cheap) and adding the
+    // signature.
+    //
+    // See RFC2986 for ASN.1 module, repeated here in snippets
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ASN1Writer writer;
+    writer.Init(csr_span);
+
+    ASN1_START_SEQUENCE
+    {
+
+        /*  CertificationRequestInfo ::=
+         *     SEQUENCE {
+         *        version       INTEGER { v1(0) } (v1,...),
+         *        subject       Name,
+         *        subjectPKInfo SubjectPublicKeyInfo{{ PKInfoAlgorithms }},
+         *        attributes    [0] Attributes{{ CRIAttributes }}
+         *     }
+         */
+        GenerateCertificationRequestInformation(writer, keypair->Pubkey());
+
+        // algorithm  AlgorithmIdentifier
+        ASN1_START_SEQUENCE
+        {
+            // See RFC5480 sec 2.1
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
+        ASN1_END_SEQUENCE;
+
+        // signature  BIT STRING --> ECDSA-with-SHA256 signature with P256 key with R,S integers format
+        // (see RFC3279 sec 2.2.3 ECDSA Signature Algorithm)
+        ASN1_START_BIT_STRING_ENCAPSULATED
+        {
+            // Convert raw signature to embedded signature
+            FixedByteSpan<Crypto::kP256_ECDSA_Signature_Length_Raw> rawSig(signature.Bytes());
+
+            uint8_t derInt[kP256_FE_Length + kEmitDerIntegerWithoutTagOverhead];
+
+            // Ecdsa-Sig-Value ::= SEQUENCE
+            ASN1_START_SEQUENCE
+            {
+                using P256IntegerSpan = FixedByteSpan<Crypto::kP256_FE_Length>;
+                // r INTEGER
+                {
+                    MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+                    ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data()), derIntSpan));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+                }
+
+                // s INTEGER
+                {
+                    MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+                    ReturnErrorOnFailure(
+                        ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+                }
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_ENCAPSULATED;
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    // Update size of output buffer on success
+    if (err == CHIP_NO_ERROR)
+    {
+        csr_span.reduce_size(writer.GetLengthWritten());
+    }
+    return err;
 }
 
 } // namespace Crypto

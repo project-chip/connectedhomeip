@@ -57,9 +57,7 @@ tests:
       command: "readAttribute"
       attribute: "NetworkName"
       response:
-          constraints:
-              type: string
-              maxLength: 16
+          value: ""
 
     - label:
           "read NetworkName attribute from DUT and verify response value, If
