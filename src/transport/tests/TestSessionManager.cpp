@@ -58,13 +58,6 @@ const char PAYLOAD[] = "Hello!";
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 
-class TestSessionReleaseCallback : public SessionDelegate
-{
-public:
-    void OnSessionReleased() override { mOldConnectionDropped = true; }
-    bool mOldConnectionDropped = false;
-};
-
 class TestSessMgrCallback : public SessionMessageDelegate
 {
 public:
@@ -663,7 +656,7 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
     const int bound = rand() % max;
     for (int i = 0; i < bound; ++i)
     {
-        auto handle = sessionManager.AllocateSession();
+        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         sessionManager.ExpirePairing(handle.Value());
     }
@@ -672,14 +665,14 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
 void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
-    TestSessionReleaseCallback callback;
 
     // Allocate a session.
     uint16_t sessionId1;
     {
-        auto handle = sessionManager.AllocateSession();
+        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
         NL_TEST_ASSERT(inSuite, handle.HasValue());
-        SessionHolderWithDelegate session(handle.Value(), callback);
+        SessionHolder session;
+        session.GrabPairing(handle.Value());
         sessionId1 = session->AsSecureSession()->GetLocalSessionId();
     }
 
@@ -688,7 +681,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     auto prevSessionId = sessionId1;
     for (uint32_t i = 0; i < 10; ++i)
     {
-        auto handle = sessionManager.AllocateSession();
+        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
         if (!handle.HasValue())
         {
             break;
@@ -709,7 +702,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     // sessions are immediately freed.
     for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
     {
-        auto handle = sessionManager.AllocateSession();
+        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
@@ -730,7 +723,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         for (size_t h = 0; h < numHandles; ++h)
         {
             constexpr int maxOffset = 5000;
-            handles[h]              = sessionManager.AllocateSession();
+            handles[h]              = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
             NL_TEST_ASSERT(inSuite, handles[h].HasValue());
             sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
             RandomSessionIdAllocatorOffset(inSuite, sessionManager, maxOffset);
@@ -746,7 +739,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         // these collide either.
         for (int j = 0; j < UINT16_MAX; ++j)
         {
-            auto handle = sessionManager.AllocateSession();
+            auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
             NL_TEST_ASSERT(inSuite, handle.HasValue());
             auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
             for (size_t h = 0; h < numHandles; ++h)
