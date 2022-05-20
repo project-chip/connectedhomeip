@@ -113,15 +113,9 @@ CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, c
     auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    error = commandSender->AddRequestData(commandPath, requestCommandData);
-    SuccessOrExit(error);
 
-    error = commandSender->SendGroupCommandRequest(SessionHandle(session));
-    SuccessOrExit(error);
-
-exit:
-    chip::Platform::Delete(commandSender.release());
-    return error;
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    return commandSender->SendGroupCommandRequest(SessionHandle(session));
 }
 
 template <typename RequestObjectT>
