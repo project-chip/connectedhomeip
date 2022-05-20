@@ -10,7 +10,7 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 -   [MW320 All Clusters Example Application](#mw320-all-clusters-example-application)
 -   [Introduction](#introduction)
 -   [Building](#building)
--   [Flashing and debugging](#flashdebug)
+-   [Flashing](#flashing)
 -   [Testing the example](#testing-the-example)
 
 <hr>
@@ -48,11 +48,35 @@ Note:
 
 <a name="flashdebug"></a>
 
-## Flashing and debugging
+## Flashing
 
-Connected to Universal Asynchronous Receiver/Transmitter port on MW320 platform
-to Ubuntu 20 USB port and open Linux text-based serial port communications
-program at second USB interface. ex. /dev/ttyUSB1.
+Connect MW320 to Ubuntu USB port and open Linux text-based serial port communications
+program at second USB interface (/dev/ttyUSB1):
+```
+TERM=linux minicom -D /dev/ttyUSB1 -b 115200
+```
+
+Prepare MW320 download firmware image:
+```
+ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
+mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F000100
+cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
+```
+
+Install OpenOCD (Open On-Chip Debugger):
+```
+sudo apt-get install openocd
+```
+
+Flashing firmware image to MW320:
+```
+cd mw320_sdk/mw320_matter_flash
+sudo python2 flashprog.py -l Matter/layout-4m.txt --boot2 Matter/boot2.bin --wififw Matter/mw32x_uapsta_W14.88.36.p172.bin --mcufw Matter/all-cluster-mw320.mcufw.bin -r
+```
+
+After MW320 is reset, console will allow you to enter commands:
+
+![MW320_CONSOLE](../../../platform/nxp/mw320/doc/images/mw320_console.jpg)
 
 ## Testing the example
 
