@@ -70,7 +70,7 @@ class ValidateMandatoryServerClusterAttributes(Mutator):
         self._replace_if_storage_nvm = replace_if_storage_nvm
         super().__init__()
 
-    def _addMissingManditoryAttribute(self, candidate: object):
+    def _addMissingMandatoryAttribute(self, candidate: object):
         attributes = candidate.get("attributes", [])
         insert_index = 0
         for attribute in attributes:
@@ -107,31 +107,31 @@ class ValidateMandatoryServerClusterAttributes(Mutator):
         for attribute in candidate.get("attributes", []):
             if attribute["code"] != self._attribute_entry["code"]:
                 continue
+
             if attribute["name"] != self._attribute_entry["name"]:
                 print(
                     "WARNING: attribute 0x%X has mismatching name %s (should be %s)" %
                     (self._attribute_entry["code"], attribute["name"],
                      self._attribute_entry["name"]))
-                # TODO what do we want to do here?
-                continue
-            else:
-                if not attribute["included"]:
-                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but included is false" %
-                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
-                    if self._forces_include:
-                        attribute["included"] = self._attribute_entry["included"]
-                if attribute["storageOption"] == "NVM":
-                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but storageOption was NVM" %
-                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
-                    if self._replace_if_storage_nvm:
-                        attribute["storageOption"] = self._attribute_entry["storageOption"]
-                break
+
+            if not attribute["included"]:
+                print("WARNING: attribute 0x%X(%s) in cluster %s found, but included is false" %
+                      (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
+                if self._forces_include:
+                    attribute["included"] = self._attribute_entry["included"]
+
+            if attribute["storageOption"] == "NVM":
+                print("WARNING: attribute 0x%X(%s) in cluster %s found, but storageOption was NVM" %
+                      (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
+                if self._replace_if_storage_nvm:
+                    attribute["storageOption"] = self._attribute_entry["storageOption"]
+            break
         else:
             print(
                 "WARNING: Did not find mandatory attribute %s in cluster %s (0x%X)" %
                 (self._attribute_entry["name"], candidate["name"], candidate["code"]))
             if self._add_if_missing:
-                self._addMissingManditoryAttribute(candidate)
+                self._addMissingMandatoryAttribute(candidate)
 
 
 def loadZapfile(filename: str):
