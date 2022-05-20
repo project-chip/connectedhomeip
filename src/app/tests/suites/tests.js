@@ -218,8 +218,6 @@ function getManualTests() {
     'Test_TC_MF_1_26',
     'Test_TC_MF_1_27',
     'Test_TC_MF_1_28',
-    'Test_TC_MF_1_29',
-    'Test_TC_MF_1_30',
   ];
 
   const ModeSelect = [
@@ -552,8 +550,8 @@ function getTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_1',
-    'Test_TC_LC_2_2',
+    'Test_TC_ULABEL_1_1',
+    'Test_TC_ULABEL_2_2',
   ];
 
   const MediaControl = [
