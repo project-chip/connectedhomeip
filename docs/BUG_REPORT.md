@@ -76,7 +76,7 @@ Try to provide as much information as seems relevant. At a minimum this could
 look like
 `Failed to commission nrf board using chip-tool running on linux. Used build on SHA abcde...`.
 This provides basic information (use nrf board, use chip-tool on linux, default
-build) that can get started. Beyond that, you can refine if more items seem
+build) to get started. Beyond that, you can refine if more items seem
 relevant:
 
 -   `Tested on TE9` or `Tested on interop branch xyz` gives a build reference
