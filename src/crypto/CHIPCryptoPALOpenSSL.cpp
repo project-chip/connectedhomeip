@@ -609,7 +609,7 @@ static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
     return *SafePointerCast<const EC_KEY * const *>(context);
 }
 
-CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -620,7 +620,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     return ECDSA_sign_hash(&digest[0], sizeof(digest), out_signature);
 }
 
-CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature) const
 {
     ERR_clear_error();
 
@@ -1110,7 +1110,7 @@ P256Keypair::~P256Keypair()
     Clear();
 }
 
-CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
+CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     ERR_clear_error();
     CHIP_ERROR error     = CHIP_NO_ERROR;
