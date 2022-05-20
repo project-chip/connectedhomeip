@@ -341,8 +341,8 @@ typedef void (*CHIPColorControlClusterColorTemperatureAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorModeAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorControlOptionsAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterOptionsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::Options::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterNumberOfPrimariesAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterPrimary1XAttributeCallbackType)(
@@ -419,10 +419,10 @@ typedef void (*CHIPColorControlClusterColorLoopStoredEnhancedHueAttributeCallbac
     void *, chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorCapabilitiesAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTempPhysicalMinAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTempPhysicalMaxAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTempPhysicalMinMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMinMireds::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTempPhysicalMaxMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMaxMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterCoupleColorTempToLevelMinMiredsAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterStartUpColorTemperatureMiredsAttributeCallbackType)(

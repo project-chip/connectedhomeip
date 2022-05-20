@@ -5440,9 +5440,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
@@ -5473,9 +5473,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 

@@ -3708,9 +3708,9 @@ namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace ColorMode
 
-namespace ColorControlOptions {
+namespace Options {
 static constexpr AttributeId Id = 0x0000000F;
-} // namespace ColorControlOptions
+} // namespace Options
 
 namespace NumberOfPrimaries {
 static constexpr AttributeId Id = 0x00000010;
@@ -3864,13 +3864,13 @@ namespace ColorCapabilities {
 static constexpr AttributeId Id = 0x0000400A;
 } // namespace ColorCapabilities
 
-namespace ColorTempPhysicalMin {
+namespace ColorTempPhysicalMinMireds {
 static constexpr AttributeId Id = 0x0000400B;
-} // namespace ColorTempPhysicalMin
+} // namespace ColorTempPhysicalMinMireds
 
-namespace ColorTempPhysicalMax {
+namespace ColorTempPhysicalMaxMireds {
 static constexpr AttributeId Id = 0x0000400C;
-} // namespace ColorTempPhysicalMax
+} // namespace ColorTempPhysicalMaxMireds
 
 namespace CoupleColorTempToLevelMinMireds {
 static constexpr AttributeId Id = 0x0000400D;

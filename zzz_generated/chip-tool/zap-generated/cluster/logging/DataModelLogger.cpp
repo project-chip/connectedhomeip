@@ -5175,262 +5175,262 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ColorControl::Attributes::CurrentHue::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current hue", 1, value);
+            return DataModelLogger::LogValue("CurrentHue", 1, value);
         }
         case ColorControl::Attributes::CurrentSaturation::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current saturation", 1, value);
+            return DataModelLogger::LogValue("CurrentSaturation", 1, value);
         }
         case ColorControl::Attributes::RemainingTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("remaining time", 1, value);
+            return DataModelLogger::LogValue("RemainingTime", 1, value);
         }
         case ColorControl::Attributes::CurrentX::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current x", 1, value);
+            return DataModelLogger::LogValue("CurrentX", 1, value);
         }
         case ColorControl::Attributes::CurrentY::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current y", 1, value);
+            return DataModelLogger::LogValue("CurrentY", 1, value);
         }
         case ColorControl::Attributes::DriftCompensation::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("drift compensation", 1, value);
+            return DataModelLogger::LogValue("DriftCompensation", 1, value);
         }
         case ColorControl::Attributes::CompensationText::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("compensation text", 1, value);
+            return DataModelLogger::LogValue("CompensationText", 1, value);
         }
         case ColorControl::Attributes::ColorTemperature::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color temperature", 1, value);
+            return DataModelLogger::LogValue("ColorTemperature", 1, value);
         }
         case ColorControl::Attributes::ColorMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color mode", 1, value);
+            return DataModelLogger::LogValue("ColorMode", 1, value);
         }
-        case ColorControl::Attributes::ColorControlOptions::Id: {
+        case ColorControl::Attributes::Options::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color control options", 1, value);
+            return DataModelLogger::LogValue("Options", 1, value);
         }
         case ColorControl::Attributes::NumberOfPrimaries::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("number of primaries", 1, value);
+            return DataModelLogger::LogValue("NumberOfPrimaries", 1, value);
         }
         case ColorControl::Attributes::Primary1X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 1 x", 1, value);
+            return DataModelLogger::LogValue("Primary1X", 1, value);
         }
         case ColorControl::Attributes::Primary1Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 1 y", 1, value);
+            return DataModelLogger::LogValue("Primary1Y", 1, value);
         }
         case ColorControl::Attributes::Primary1Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 1 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary1Intensity", 1, value);
         }
         case ColorControl::Attributes::Primary2X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 2 x", 1, value);
+            return DataModelLogger::LogValue("Primary2X", 1, value);
         }
         case ColorControl::Attributes::Primary2Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 2 y", 1, value);
+            return DataModelLogger::LogValue("Primary2Y", 1, value);
         }
         case ColorControl::Attributes::Primary2Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 2 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary2Intensity", 1, value);
         }
         case ColorControl::Attributes::Primary3X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 3 x", 1, value);
+            return DataModelLogger::LogValue("Primary3X", 1, value);
         }
         case ColorControl::Attributes::Primary3Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 3 y", 1, value);
+            return DataModelLogger::LogValue("Primary3Y", 1, value);
         }
         case ColorControl::Attributes::Primary3Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 3 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary3Intensity", 1, value);
         }
         case ColorControl::Attributes::Primary4X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 4 x", 1, value);
+            return DataModelLogger::LogValue("Primary4X", 1, value);
         }
         case ColorControl::Attributes::Primary4Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 4 y", 1, value);
+            return DataModelLogger::LogValue("Primary4Y", 1, value);
         }
         case ColorControl::Attributes::Primary4Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 4 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary4Intensity", 1, value);
         }
         case ColorControl::Attributes::Primary5X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 5 x", 1, value);
+            return DataModelLogger::LogValue("Primary5X", 1, value);
         }
         case ColorControl::Attributes::Primary5Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 5 y", 1, value);
+            return DataModelLogger::LogValue("Primary5Y", 1, value);
         }
         case ColorControl::Attributes::Primary5Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 5 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary5Intensity", 1, value);
         }
         case ColorControl::Attributes::Primary6X::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 6 x", 1, value);
+            return DataModelLogger::LogValue("Primary6X", 1, value);
         }
         case ColorControl::Attributes::Primary6Y::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 6 y", 1, value);
+            return DataModelLogger::LogValue("Primary6Y", 1, value);
         }
         case ColorControl::Attributes::Primary6Intensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("primary 6 intensity", 1, value);
+            return DataModelLogger::LogValue("Primary6Intensity", 1, value);
         }
         case ColorControl::Attributes::WhitePointX::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("white point x", 1, value);
+            return DataModelLogger::LogValue("WhitePointX", 1, value);
         }
         case ColorControl::Attributes::WhitePointY::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("white point y", 1, value);
+            return DataModelLogger::LogValue("WhitePointY", 1, value);
         }
         case ColorControl::Attributes::ColorPointRX::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point r x", 1, value);
+            return DataModelLogger::LogValue("ColorPointRX", 1, value);
         }
         case ColorControl::Attributes::ColorPointRY::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point r y", 1, value);
+            return DataModelLogger::LogValue("ColorPointRY", 1, value);
         }
         case ColorControl::Attributes::ColorPointRIntensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point r intensity", 1, value);
+            return DataModelLogger::LogValue("ColorPointRIntensity", 1, value);
         }
         case ColorControl::Attributes::ColorPointGX::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point g x", 1, value);
+            return DataModelLogger::LogValue("ColorPointGX", 1, value);
         }
         case ColorControl::Attributes::ColorPointGY::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point g y", 1, value);
+            return DataModelLogger::LogValue("ColorPointGY", 1, value);
         }
         case ColorControl::Attributes::ColorPointGIntensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point g intensity", 1, value);
+            return DataModelLogger::LogValue("ColorPointGIntensity", 1, value);
         }
         case ColorControl::Attributes::ColorPointBX::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point b x", 1, value);
+            return DataModelLogger::LogValue("ColorPointBX", 1, value);
         }
         case ColorControl::Attributes::ColorPointBY::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point b y", 1, value);
+            return DataModelLogger::LogValue("ColorPointBY", 1, value);
         }
         case ColorControl::Attributes::ColorPointBIntensity::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color point b intensity", 1, value);
+            return DataModelLogger::LogValue("ColorPointBIntensity", 1, value);
         }
         case ColorControl::Attributes::EnhancedCurrentHue::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("enhanced current hue", 1, value);
+            return DataModelLogger::LogValue("EnhancedCurrentHue", 1, value);
         }
         case ColorControl::Attributes::EnhancedColorMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("enhanced color mode", 1, value);
+            return DataModelLogger::LogValue("EnhancedColorMode", 1, value);
         }
         case ColorControl::Attributes::ColorLoopActive::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color loop active", 1, value);
+            return DataModelLogger::LogValue("ColorLoopActive", 1, value);
         }
         case ColorControl::Attributes::ColorLoopDirection::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color loop direction", 1, value);
+            return DataModelLogger::LogValue("ColorLoopDirection", 1, value);
         }
         case ColorControl::Attributes::ColorLoopTime::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color loop time", 1, value);
+            return DataModelLogger::LogValue("ColorLoopTime", 1, value);
         }
         case ColorControl::Attributes::ColorLoopStartEnhancedHue::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color loop start enhanced hue", 1, value);
+            return DataModelLogger::LogValue("ColorLoopStartEnhancedHue", 1, value);
         }
         case ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color loop stored enhanced hue", 1, value);
+            return DataModelLogger::LogValue("ColorLoopStoredEnhancedHue", 1, value);
         }
         case ColorControl::Attributes::ColorCapabilities::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color capabilities", 1, value);
+            return DataModelLogger::LogValue("ColorCapabilities", 1, value);
         }
-        case ColorControl::Attributes::ColorTempPhysicalMin::Id: {
+        case ColorControl::Attributes::ColorTempPhysicalMinMireds::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color temp physical min", 1, value);
+            return DataModelLogger::LogValue("ColorTempPhysicalMinMireds", 1, value);
         }
-        case ColorControl::Attributes::ColorTempPhysicalMax::Id: {
+        case ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("color temp physical max", 1, value);
+            return DataModelLogger::LogValue("ColorTempPhysicalMaxMireds", 1, value);
         }
         case ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("couple color temp to level min-mireds", 1, value);
+            return DataModelLogger::LogValue("CoupleColorTempToLevelMinMireds", 1, value);
         }
         case ColorControl::Attributes::StartUpColorTemperatureMireds::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start up color temperature mireds", 1, value);
+            return DataModelLogger::LogValue("StartUpColorTemperatureMireds", 1, value);
         }
         case ColorControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

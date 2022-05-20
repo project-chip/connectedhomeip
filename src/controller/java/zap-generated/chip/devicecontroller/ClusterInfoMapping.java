@@ -8583,18 +8583,18 @@ public class ClusterInfoMapping {
         "rate", colorControlmoveColorTemperaturerateCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMinimum", Integer.class);
+        colorControlmoveColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMinimumMireds", Integer.class);
     colorControlmoveColorTemperatureCommandParams.put(
-        "colorTemperatureMinimum",
-        colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
+        "colorTemperatureMinimumMireds",
+        colorControlmoveColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMaximum", Integer.class);
+        colorControlmoveColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMaximumMireds", Integer.class);
     colorControlmoveColorTemperatureCommandParams.put(
-        "colorTemperatureMaximum",
-        colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
+        "colorTemperatureMaximumMireds",
+        colorControlmoveColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo);
 
     CommandParameterInfo colorControlmoveColorTemperatureoptionsMaskCommandParameterInfo =
         new CommandParameterInfo("optionsMask", Integer.class);
@@ -8614,8 +8614,8 @@ public class ClusterInfoMapping {
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("moveMode"),
                       (Integer) commandArguments.get("rate"),
-                      (Integer) commandArguments.get("colorTemperatureMinimum"),
-                      (Integer) commandArguments.get("colorTemperatureMaximum"),
+                      (Integer) commandArguments.get("colorTemperatureMinimumMireds"),
+                      (Integer) commandArguments.get("colorTemperatureMaximumMireds"),
                       (Integer) commandArguments.get("optionsMask"),
                       (Integer) commandArguments.get("optionsOverride"));
             },
@@ -8954,18 +8954,18 @@ public class ClusterInfoMapping {
         "transitionTime", colorControlstepColorTemperaturetransitionTimeCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMinimum", Integer.class);
+        colorControlstepColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMinimumMireds", Integer.class);
     colorControlstepColorTemperatureCommandParams.put(
-        "colorTemperatureMinimum",
-        colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
+        "colorTemperatureMinimumMireds",
+        colorControlstepColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMaximum", Integer.class);
+        colorControlstepColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMaximumMireds", Integer.class);
     colorControlstepColorTemperatureCommandParams.put(
-        "colorTemperatureMaximum",
-        colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
+        "colorTemperatureMaximumMireds",
+        colorControlstepColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo);
 
     CommandParameterInfo colorControlstepColorTemperatureoptionsMaskCommandParameterInfo =
         new CommandParameterInfo("optionsMask", Integer.class);
@@ -8986,8 +8986,8 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("stepMode"),
                       (Integer) commandArguments.get("stepSize"),
                       (Integer) commandArguments.get("transitionTime"),
-                      (Integer) commandArguments.get("colorTemperatureMinimum"),
-                      (Integer) commandArguments.get("colorTemperatureMaximum"),
+                      (Integer) commandArguments.get("colorTemperatureMinimumMireds"),
+                      (Integer) commandArguments.get("colorTemperatureMaximumMireds"),
                       (Integer) commandArguments.get("optionsMask"),
                       (Integer) commandArguments.get("optionsOverride"));
             },
