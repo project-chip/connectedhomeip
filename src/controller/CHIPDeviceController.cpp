@@ -1184,8 +1184,9 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.NOCValue      = nocCertBuf;
     request.ICACValue     = icaCertBuf;
     request.IPKValue      = ipk;
-    request.caseAdminNode = adminSubject;
+    request.caseAdminSubject = adminSubject;
     request.adminVendorId = mVendorId;
+    
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
@@ -1212,6 +1213,8 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
+    case OperationalCertStatus::kInvalidAdminSubject:
+        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:

@@ -15512,11 +15512,11 @@ public:
 namespace AddNOC {
 enum class Fields
 {
-    kNOCValue      = 0,
-    kICACValue     = 1,
-    kIPKValue      = 2,
-    kCaseAdminNode = 3,
-    kAdminVendorId = 4,
+    kNOCValue         = 0,
+    kICACValue        = 1,
+    kIPKValue         = 2,
+    kCaseAdminSubject = 3,
+    kAdminVendorId    = 4,
 };
 
 struct Type
@@ -15529,8 +15529,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminNode   = static_cast<chip::NodeId>(0);
-    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
+    chip::NodeId caseAdminSubject = static_cast<chip::NodeId>(0);
+    chip::VendorId adminVendorId  = static_cast<chip::VendorId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15548,8 +15548,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminNode   = static_cast<chip::NodeId>(0);
-    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
+    chip::NodeId caseAdminSubject = static_cast<chip::NodeId>(0);
+    chip::VendorId adminVendorId  = static_cast<chip::VendorId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddNOC

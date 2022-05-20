@@ -14191,6 +14191,7 @@ class OperationalCredentials(Cluster):
             kInvalidNOC = 0x03
             kMissingCsr = 0x04
             kTableFull = 0x05
+            kInvalidAdminSubject = 0x06
             kInsufficientPrivilege = 0x08
             kFabricConflict = 0x09
             kLabelConflict = 0x0A
@@ -14344,14 +14345,14 @@ class OperationalCredentials(Cluster):
                             ClusterObjectFieldDescriptor(Label="NOCValue", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="ICACValue", Tag=1, Type=typing.Optional[bytes]),
                             ClusterObjectFieldDescriptor(Label="IPKValue", Tag=2, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="caseAdminNode", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="caseAdminSubject", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=4, Type=uint),
                     ])
 
             NOCValue: 'bytes' = b""
             ICACValue: 'typing.Optional[bytes]' = None
             IPKValue: 'bytes' = b""
-            caseAdminNode: 'uint' = 0
+            caseAdminSubject: 'uint' = 0
             adminVendorId: 'uint' = 0
 
         @dataclass

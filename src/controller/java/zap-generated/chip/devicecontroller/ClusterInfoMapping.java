@@ -11012,10 +11012,10 @@ public class ClusterInfoMapping {
     operationalCredentialsaddNOCCommandParams.put(
         "IPKValue", operationalCredentialsaddNOCIPKValueCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo =
-        new CommandParameterInfo("caseAdminNode", Long.class);
+    CommandParameterInfo operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo =
+        new CommandParameterInfo("caseAdminSubject", Long.class);
     operationalCredentialsaddNOCCommandParams.put(
-        "caseAdminNode", operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo);
+        "caseAdminSubject", operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialsaddNOCadminVendorIdCommandParameterInfo =
         new CommandParameterInfo("adminVendorId", Integer.class);
@@ -11031,7 +11031,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("NOCValue"),
                       (Optional<byte[]>) commandArguments.get("ICACValue"),
                       (byte[]) commandArguments.get("IPKValue"),
-                      (Long) commandArguments.get("caseAdminNode"),
+                      (Long) commandArguments.get("caseAdminSubject"),
                       (Integer) commandArguments.get("adminVendorId"));
             },
             () -> new DelegatedNOCResponseCallback(),

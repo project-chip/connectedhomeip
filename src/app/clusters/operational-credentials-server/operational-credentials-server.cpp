@@ -726,7 +726,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // Creating the initial ACL must occur after the PASE session has adopted the fabric index
     // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
     err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
-                                                            commandData.caseAdminNode);
+                                                            commandData.caseAdminSubject);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.

@@ -2906,6 +2906,7 @@ client cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -2955,7 +2956,7 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    NODE_ID caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
