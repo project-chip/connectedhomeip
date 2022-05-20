@@ -135,6 +135,11 @@ int main(int argc, char * argv[])
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
+    // Enter commissioning mode, open commissioning window
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
+
     // Send discover commissioners request
     SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
