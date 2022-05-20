@@ -175,3 +175,27 @@ JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean
 {
     return LevelManager::SetLevel(endpoint, value);
 }
+
+JNI_METHOD(jint, addContentApp)
+(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jobject manager)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    const char * nVendorName = env->GetStringUTFChars(vendorName, 0);
+    const char * nAppName    = env->GetStringUTFChars(appName, 0);
+    const char * nAppVersion = env->GetStringUTFChars(appVersion, 0);
+    EndpointId epId = AddContentApp(nVendorName, static_cast<uint16_t>(vendorId), nAppName, static_cast<uint16_t>(productId),
+                                    nAppVersion, manager);
+    env->ReleaseStringUTFChars(vendorName, nVendorName);
+    env->ReleaseStringUTFChars(appName, nAppName);
+    env->ReleaseStringUTFChars(appVersion, nAppVersion);
+    return static_cast<uint16_t>(epId);
+}
+
+JNI_METHOD(void, sendTestMessage)(JNIEnv *, jobject, jint endpoint, jstring message)
+{
+    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+    const char * nmessage = env->GetStringUTFChars(message, 0);
+    ChipLogProgress(Zcl, "TvApp-JNI SendTestMessage called with message %s", nmessage);
+    SendTestMessage(static_cast<EndpointId>(endpoint), nmessage);
+}

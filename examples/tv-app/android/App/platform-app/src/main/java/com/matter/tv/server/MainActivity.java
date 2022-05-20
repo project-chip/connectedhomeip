@@ -22,13 +22,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
+import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
-import com.matter.tv.server.service.ContentAppAgentService;
 import com.matter.tv.server.service.MatterServant;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,14 +38,9 @@ public class MainActivity extends AppCompatActivity {
   private BroadcastReceiver broadcastReceiver;
   private ListView pkgUpdatesView;
 
-  private LinkedHashMap<String, String> packages = new LinkedHashMap<>();
-
   @Override
   protected void onRestart() {
     super.onRestart();
-    packages.clear();
-    ContentAppDiscoveryService.getReceiverInstance()
-        .initializeMatterApps(this.getApplicationContext());
   }
 
   @Override
@@ -113,9 +106,10 @@ public class MainActivity extends AppCompatActivity {
       e.printStackTrace();
     }
 
-    ArrayList<Entry<String, String>> lst =
-        new ArrayList<Entry<String, String>>(packages.entrySet());
-
+    ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
+    ArrayList<String> lst =
+        new ArrayList<String>(
+            ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().keySet());
     ContentAppListAdapter adapter = new ContentAppListAdapter(this, R.layout.applist_item, lst);
 
     pkgUpdatesView = findViewById(R.id.pkgUpdates);
@@ -130,37 +124,27 @@ public class MainActivity extends AppCompatActivity {
           public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String packageName = intent.getStringExtra("com.matter.tv.server.appagent.add.pkg");
-            if (action.equals("com.matter.tv.server.appagent.add")) {
-              packages.put(
-                  packageName, intent.getStringExtra("com.matter.tv.server.appagent.add.clusters"));
+            if (action.equals("com.matter.tv.server.appagent.add")
+                || action.equals("com.matter.tv.server.appagent.remove")) {
               adapter.clear();
-              adapter.addAll(packages.entrySet().toArray());
+              adapter.addAll(
+                  ContentAppDiscoveryService.getReceiverInstance()
+                      .getDiscoveredContentApps()
+                      .entrySet());
               adapter.notifyDataSetChanged();
-            } else if (action.equals("com.matter.tv.server.appagent.remove")) {
-              if (packages.remove(packageName) != null) {
-                adapter.clear();
-                adapter.addAll(packages.entrySet().toArray());
-                adapter.notifyDataSetChanged();
-              }
             }
           }
         };
     registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.add"));
     registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
-
-    ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
-    ContentAppDiscoveryService.getReceiverInstance()
-        .initializeMatterApps(this.getApplicationContext());
   }
 
-  private class ContentAppListAdapter extends ArrayAdapter<Entry<String, String>> {
+  private class ContentAppListAdapter extends ArrayAdapter<String> {
 
     private int layout;
 
     public ContentAppListAdapter(
-        @NonNull Context context,
-        int resource,
-        @NonNull ArrayList<Entry<String, String>> packages) {
+        @NonNull Context context, int resource, @NonNull ArrayList<String> packages) {
       super(context, resource, packages);
       layout = resource;
     }
@@ -174,9 +158,7 @@ public class MainActivity extends AppCompatActivity {
         convertView = inflator.inflate(layout, parent, false);
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.appName = (TextView) convertView.findViewById(R.id.appNameTextView);
-        viewHolder.appDetails = (TextView) convertView.findViewById(R.id.appDetailsTextView);
-        viewHolder.appName.setText(getItem(position).getKey());
-        viewHolder.appDetails.setText(getItem(position).getValue());
+        viewHolder.appName.setText(getItem(position));
         viewHolder.sendMessageButton = (Button) convertView.findViewById(R.id.sendMessageButton);
         viewHolder.sendMessageButton.setText(R.string.send_command);
         viewHolder.sendMessageButton.setOnClickListener(
@@ -184,15 +166,20 @@ public class MainActivity extends AppCompatActivity {
               @Override
               public void onClick(View view) {
                 Log.i(TAG, "Button was clicked for " + position);
-                ContentAppAgentService.sendCommand(
-                    getApplicationContext(), getItem(position).getKey());
+                for (ContentApp app :
+                    ContentAppDiscoveryService.getReceiverInstance()
+                        .getDiscoveredContentApps()
+                        .values()) {
+                  if (app.getAppName().equals(getItem(position))) {
+                    MatterServant.get().sendTestMessage(app.getEndpointId(), "My Native Message");
+                  }
+                }
               }
             });
         convertView.setTag(viewHolder);
       } else {
         mainViewHolder = (ViewHolder) convertView.getTag();
-        mainViewHolder.appName.setText(getItem(position).getKey());
-        mainViewHolder.appDetails.setText(getItem(position).getValue());
+        mainViewHolder.appName.setText(getItem(position));
       }
       return convertView;
     }
@@ -200,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
   public class ViewHolder {
     TextView appName;
-    TextView appDetails;
     Button sendMessageButton;
   }
 }
