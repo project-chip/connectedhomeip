@@ -111,6 +111,20 @@ typedef struct _ModeOptionStruct
     /* TYPE WARNING: array array defaults to */ uint8_t * SemanticTags;
 } ModeOptionStruct;
 
+// Struct for AttributeValuePair
+typedef struct _AttributeValuePair
+{
+    chip::AttributeId AttributeId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * AttributeValue;
+} AttributeValuePair;
+
+// Struct for ExtensionFieldSet
+typedef struct _ExtensionFieldSet
+{
+    chip::ClusterId ClusterId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * AttributeValueList;
+} ExtensionFieldSet;
+
 // Struct for NestedStructList
 typedef struct _NestedStructList
 {
@@ -486,21 +500,6 @@ typedef struct _RouteTable
     bool Allocated;
     bool LinkEstablished;
 } RouteTable;
-
-// Struct for SceneExtensionAttributeInfo
-typedef struct _SceneExtensionAttributeInfo
-{
-    uint8_t attributeType;
-    uint8_t * attributeLocation;
-} SceneExtensionAttributeInfo;
-
-// Struct for SceneExtensionFieldSet
-typedef struct _SceneExtensionFieldSet
-{
-    chip::ClusterId clusterId;
-    uint8_t length;
-    uint8_t value;
-} SceneExtensionFieldSet;
 
 // Struct for ScheduledPhase
 typedef struct _ScheduledPhase

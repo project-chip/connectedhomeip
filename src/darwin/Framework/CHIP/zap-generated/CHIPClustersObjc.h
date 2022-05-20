@@ -21343,6 +21343,10 @@ typedef NS_OPTIONS(uint32_t, CHIPOnOffFeature) {
     CHIPOnOffFeatureLighting = 0x1,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPOnOffSceneFeatures) {
+    CHIPOnOffSceneFeaturesSceneNames = 0x1,
+};
+
 typedef NS_ENUM(uint8_t, CHIPLevelControlMoveMode) {
     CHIPLevelControlMoveModeUp = 0x00,
     CHIPLevelControlMoveModeDown = 0x01,

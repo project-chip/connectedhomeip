@@ -7623,7 +7623,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ScenesCluster) cluster)
-                  .readCurrentGroupAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readCurrentGroupAttribute(
+                      (ChipClusters.ScenesCluster.CurrentGroupAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readScenesCurrentGroupCommandParams);

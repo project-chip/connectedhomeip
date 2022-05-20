@@ -15593,7 +15593,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets) {
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets) {
       addScene(
           chipClusterPtr,
           callback,
@@ -15611,7 +15611,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets,
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
         int timedInvokeTimeoutMs) {
       addScene(
           chipClusterPtr,
@@ -15634,7 +15634,10 @@ public class ChipClusters {
     }
 
     public void recallScene(
-        DefaultClusterCallback callback, Integer groupId, Integer sceneId, Integer transitionTime) {
+        DefaultClusterCallback callback,
+        Integer groupId,
+        Integer sceneId,
+        @Nullable Optional<Integer> transitionTime) {
       recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, null);
     }
 
@@ -15642,7 +15645,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer groupId,
         Integer sceneId,
-        Integer transitionTime,
+        @Nullable Optional<Integer> transitionTime,
         int timedInvokeTimeoutMs) {
       recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, timedInvokeTimeoutMs);
     }
@@ -15700,7 +15703,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets,
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getSceneMembership(
@@ -15714,7 +15717,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer groupId,
         Integer sceneId,
-        Integer transitionTime,
+        @Nullable Optional<Integer> transitionTime,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeAllScenes(
@@ -15753,10 +15756,9 @@ public class ChipClusters {
     public interface GetSceneMembershipResponseCallback {
       void onSuccess(
           Integer status,
-          Integer capacity,
+          @Nullable Integer capacity,
           Integer groupId,
-          Integer sceneCount,
-          ArrayList<Integer> sceneList);
+          Optional<ArrayList<Integer>> sceneList);
 
       void onError(Exception error);
     }
@@ -15784,11 +15786,19 @@ public class ChipClusters {
           Integer status,
           Integer groupId,
           Integer sceneId,
-          Integer transitionTime,
-          String sceneName,
-          ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets);
+          Optional<Integer> transitionTime,
+          Optional<String> sceneName,
+          Optional<ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>> extensionFieldSets);
 
       void onError(Exception error);
+    }
+
+    public interface CurrentGroupAttributeCallback {
+      void onSuccess(Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -15833,12 +15843,12 @@ public class ChipClusters {
       subscribeCurrentSceneAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readCurrentGroupAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentGroupAttribute(CurrentGroupAttributeCallback callback) {
       readCurrentGroupAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCurrentGroupAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        CurrentGroupAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentGroupAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -15909,10 +15919,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readCurrentGroupAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentGroupAttributeCallback callback);
 
     private native void subscribeCurrentGroupAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        CurrentGroupAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readSceneValidAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

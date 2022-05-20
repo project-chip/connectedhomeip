@@ -42,6 +42,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,
                         Json::Value & value);
@@ -95,6 +99,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request,
                         Json::Value & value);
 
@@ -187,10 +195,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThreadNetworkDi
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & request,
                         Json::Value & value);
 

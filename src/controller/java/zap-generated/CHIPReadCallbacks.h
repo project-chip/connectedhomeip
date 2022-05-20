@@ -7449,6 +7449,35 @@ private:
     bool keepAlive;
 };
 
+class CHIPScenesCurrentGroupAttributeCallback : public chip::Callback::Callback<CHIPScenesClusterCurrentGroupAttributeCallbackType>
+{
+public:
+    CHIPScenesCurrentGroupAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPScenesCurrentGroupAttributeCallback();
+
+    static void maybeDestroy(CHIPScenesCurrentGroupAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPScenesCurrentGroupAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::GroupId value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPScenesCurrentGroupAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPScenesGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPScenesClusterGeneratedCommandListAttributeCallbackType>
 {
