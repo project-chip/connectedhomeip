@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CommissioningFragment">
+    tools:context=".CommissioningFragment"
+    android:padding="10sp">
 
     <TextView
         android:id="@+id/commissioningWindowStatus"

@@ -41,43 +41,44 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
-    void InitServer(std::function<CHIP_ERROR()> commissioningCompleteCallback);
+    void Init();
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
-    CHIP_ERROR OpenBasicCommissioningWindow();
+    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    CHIP_ERROR InitBindingHandlers();
     TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
-    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
-                                         std::function<CHIP_ERROR()> commissioningCompleteCallback);
+    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
     void ReadServerClusters(chip::EndpointId endpointId);
     void ReadServerClustersForNode(chip::NodeId nodeId);
-
     static void OnDescriptorReadSuccessResponse(void * context,
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
-    CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
+
+    CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+                                        std::function<void(CHIP_ERROR)> launchURLResponseCallback);
     static void OnContentLauncherSuccessResponse(
         void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & response);
     static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
-    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
     chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
-    void PrintBindings();
     chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
-    void SetDefaultFabricIndex(std::function<CHIP_ERROR()> commissioningCompleteCallback);
+    void SetDefaultFabricIndex();
 
 private:
+    CHIP_ERROR InitBindingHandlers();
+    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     static CastingServer * castingServer_;
     CastingServer();
 
     bool mInited = false;
     TargetVideoPlayerInfo mTargetVideoPlayerInfo;
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
-    std::function<CHIP_ERROR()> mCommissioningCompleteCallback;
+    std::function<void(CHIP_ERROR)> mLaunchURLResponseCallback;
+    std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
 };
