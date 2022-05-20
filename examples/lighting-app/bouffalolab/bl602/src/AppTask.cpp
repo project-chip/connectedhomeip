@@ -138,7 +138,9 @@ void AppTask::AppTaskMain(void * pvParameter)
     log_info("App Task entered\r\n");
 
     sWiFiNetworkCommissioningInstance.Init();
-    chip::Server::GetInstance().Init();
+    chip::CommonCaseDeviceServerInitParams initParams;
+    initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

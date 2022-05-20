@@ -213,7 +213,7 @@ template("bl602_sdk") {
       #dump backtrace
       "CONF_ENABLE_FRAME_PTR=1",
       "CONF_ENABLE_FUNC_BACKTRACE_ELF=connectedhomeip/examples/lock-app/bl602/out/debug/chip-bl602-lock-example.out",
-      "CHIP_SYSTEM_HEADER_RESERVE_SIZE=134",
+      "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=128",
     ]
 
     if (bl602_board == "BL-HWC-G1") {
@@ -265,6 +265,7 @@ template("bl602_sdk") {
     ]
 
     cflags_cc = [ "-fpermissive" ]
+    cflags_cc += [ "-std=c++17" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
