@@ -24,10 +24,10 @@ shared_library("jni") {
 
   sources = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
-    "App/app/src/main/jni/cpp/CallbackHelper.cpp",
-    "App/app/src/main/jni/cpp/CallbackHelper.h",
     "App/app/src/main/jni/cpp/JNIDACProvider.cpp",
     "App/app/src/main/jni/cpp/JNIDACProvider.h",
+    "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.cpp",
+    "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.h",
     "App/app/src/main/jni/cpp/TvCastingApp-JNI.cpp",
   ]
 
@@ -61,8 +61,8 @@ android_library("java") {
   sources = [
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
     "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
+    "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
-    "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
