@@ -115,7 +115,13 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Target Set
 
-To set IDF target, run set-target with one of the commands.
+To set IDF target, first:
+
+        ```
+        $ cd {path-to-connectedhomeip}/examples/all-clusters-app/esp32/
+        ```
+
+Then run set-target with one of the commands.
 
         ```
         $ idf.py set-target esp32
