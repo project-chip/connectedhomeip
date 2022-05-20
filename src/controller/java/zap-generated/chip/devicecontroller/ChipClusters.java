@@ -15096,15 +15096,6 @@ public class ChipClusters {
       subscribeControlModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readAlarmMaskAttribute(IntegerAttributeCallback callback) {
-      readAlarmMaskAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeAlarmMaskAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeAlarmMaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -15347,12 +15338,6 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeControlModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readAlarmMaskAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeAlarmMaskAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(

@@ -1911,7 +1911,7 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16u maxConstFlow = 10;
   readonly attribute nullable int16s minConstTemp = 11;
   readonly attribute nullable int16s maxConstTemp = 12;
-  readonly attribute bitmap16 pumpStatus = 16;
+  readonly attribute PumpStatus pumpStatus = 16;
   readonly attribute PumpOperationMode effectiveOperationMode = 17;
   readonly attribute PumpControlMode effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
@@ -1921,7 +1921,6 @@ server cluster PumpConfigurationAndControl = 512 {
   attribute access(write: manage) nullable int32u lifetimeEnergyConsumed = 23;
   attribute access(write: manage) PumpOperationMode operationMode = 32;
   attribute access(write: manage) PumpControlMode controlMode = 33;
-  readonly attribute bitmap16 alarmMask = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2808,7 +2807,6 @@ endpoint 0 {
     ram      attribute lifetimeEnergyConsumed;
     ram      attribute operationMode;
     ram      attribute controlMode;
-    ram      attribute alarmMask;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }

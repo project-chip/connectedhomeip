@@ -7375,18 +7375,6 @@ public class ClusterReadMapping {
     readPumpConfigurationAndControlInteractionInfo.put(
         "readControlModeAttribute",
         readPumpConfigurationAndControlControlModeAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPumpConfigurationAndControlAlarmMaskCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPumpConfigurationAndControlAlarmMaskAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readAlarmMaskAttribute((ChipClusters.IntegerAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPumpConfigurationAndControlAlarmMaskCommandParams);
-    readPumpConfigurationAndControlInteractionInfo.put(
-        "readAlarmMaskAttribute", readPumpConfigurationAndControlAlarmMaskAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
         readPumpConfigurationAndControlGeneratedCommandListCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();

@@ -15863,7 +15863,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15970,24 +15970,6 @@ using namespace chip::app::Clusters;
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedIntValue;
             }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAlarmMaskWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

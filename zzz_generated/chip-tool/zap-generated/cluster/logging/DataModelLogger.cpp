@@ -8178,7 +8178,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
@@ -8226,11 +8226,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ControlMode", 1, value);
-        }
-        case PumpConfigurationAndControl::Attributes::AlarmMask::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AlarmMask", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

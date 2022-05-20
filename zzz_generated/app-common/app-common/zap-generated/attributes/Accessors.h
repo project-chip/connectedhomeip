@@ -3077,8 +3077,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace MaxConstTemp
 
 namespace PumpStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> * value); // PumpStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {
@@ -3139,11 +3140,6 @@ EmberAfStatus Get(chip::EndpointId endpoint,
                   chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value); // PumpControlMode
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
 } // namespace ControlMode
-
-namespace AlarmMask {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace AlarmMask
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

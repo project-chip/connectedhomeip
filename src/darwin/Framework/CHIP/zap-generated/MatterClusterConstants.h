@@ -983,7 +983,6 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID = 0x00000017,
     kMatterClusterPumpConfigurationAndControlAttributeOperationModeID = 0x00000020,
     kMatterClusterPumpConfigurationAndControlAttributeControlModeID = 0x00000021,
-    kMatterClusterPumpConfigurationAndControlAttributeAlarmMaskID = 0x00000022,
     kMatterClusterPumpConfigurationAndControlAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
     kMatterClusterPumpConfigurationAndControlAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
     kMatterClusterPumpConfigurationAndControlAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,

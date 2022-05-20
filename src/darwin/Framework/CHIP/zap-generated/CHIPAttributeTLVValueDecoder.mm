@@ -11569,7 +11569,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::EffectiveOperationMode::Id: {
@@ -11689,17 +11689,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-            return value;
-        }
-        case Attributes::AlarmMask::Id: {
-            using TypeInfo = Attributes::AlarmMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

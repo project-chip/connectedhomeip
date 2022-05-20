@@ -19293,7 +19293,6 @@ class PumpConfigurationAndControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="lifetimeEnergyConsumed", Tag=0x00000017, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="operationMode", Tag=0x00000020, Type=PumpConfigurationAndControl.Enums.PumpOperationMode),
                 ClusterObjectFieldDescriptor(Label="controlMode", Tag=0x00000021, Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]),
-                ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x00000022, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -19324,7 +19323,6 @@ class PumpConfigurationAndControl(Cluster):
     lifetimeEnergyConsumed: 'typing.Union[None, Nullable, uint]' = None
     operationMode: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = None
     controlMode: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
-    alarmMask: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -19717,22 +19715,6 @@ class PumpConfigurationAndControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode])
 
             value: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
-
-        @dataclass
-        class AlarmMask(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0200
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000022
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

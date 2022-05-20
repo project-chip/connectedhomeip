@@ -21282,9 +21282,9 @@ struct TypeInfo
 namespace PumpStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
@@ -21399,18 +21399,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ControlMode
-namespace AlarmMask {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AlarmMask
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -21493,7 +21481,8 @@ struct TypeInfo
         Attributes::MaxConstFlow::TypeInfo::DecodableType maxConstFlow;
         Attributes::MinConstTemp::TypeInfo::DecodableType minConstTemp;
         Attributes::MaxConstTemp::TypeInfo::DecodableType maxConstTemp;
-        Attributes::PumpStatus::TypeInfo::DecodableType pumpStatus = static_cast<uint16_t>(0);
+        Attributes::PumpStatus::TypeInfo::DecodableType pumpStatus =
+            static_cast<chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>>(0);
         Attributes::EffectiveOperationMode::TypeInfo::DecodableType effectiveOperationMode =
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
         Attributes::EffectiveControlMode::TypeInfo::DecodableType effectiveControlMode =
@@ -21507,7 +21496,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
         Attributes::ControlMode::TypeInfo::DecodableType controlMode =
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

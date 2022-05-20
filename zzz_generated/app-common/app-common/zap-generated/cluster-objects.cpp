@@ -15545,9 +15545,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ControlMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, controlMode));
         break;
-    case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
-        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
