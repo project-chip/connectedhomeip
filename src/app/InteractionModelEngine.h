@@ -377,13 +377,12 @@ private:
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
-     * the Read Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * the Read Request are handled entirely within this function.  If the
+     * status returned is not Status::Success, the caller will send a status
+     * response message with that status.
      */
-
-    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType,
-                                    Protocols::InteractionModel::Status & aStatus);
+    Status OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
