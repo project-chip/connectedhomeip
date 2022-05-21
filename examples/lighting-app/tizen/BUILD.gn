@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 assert(chip_build_tools)
 
@@ -41,8 +43,18 @@ executable("chip-lighting-app") {
   output_dir = root_out_dir
 }
 
+tizen_sdk_package("chip-lighting-app:tpk") {
+  deps = [ ":chip-lighting-app" ]
+  manifest = rebase_path("tizen-manifest.xml")
+  sign_security_profile = "CHIP"
+}
+
 group("tizen") {
   deps = [ ":chip-lighting-app" ]
+}
+
+group("tizen:tpk") {
+  deps = [ ":chip-lighting-app:tpk" ]
 }
 
 group("default") {

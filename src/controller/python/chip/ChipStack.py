@@ -318,6 +318,9 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
+        # Make sure PersistentStorage is destructed before chipStack
+        # to avoid accessing builtins.chipStack after destruction.
+        self._persistentStorage = None
         self.Call(lambda: self._ChipStackLib.pychip_Stack_Shutdown())
         self.networkLock = None
         self.completeEvent = None

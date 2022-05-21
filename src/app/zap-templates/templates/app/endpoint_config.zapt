@@ -5,7 +5,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
-{{#endpoint_config allowUnknownStorageOption="false"}}
+{{#endpoint_config allowUnknownStorageOption="false" spaceForDefaultValue=4}}
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
@@ -22,8 +22,8 @@
 #define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
 #define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
-#define ZAP_EMPTY_DEFAULT() {(uint16_t) 0}
-#define ZAP_SIMPLE_DEFAULT(x) {(uint16_t) x}
+#define ZAP_EMPTY_DEFAULT() {(uint32_t) 0}
+#define ZAP_SIMPLE_DEFAULT(x) {(uint32_t) x}
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT {{endpoint_attribute_min_max_count}}

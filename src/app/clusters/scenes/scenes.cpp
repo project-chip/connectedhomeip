@@ -750,8 +750,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 
 bool emberAfPluginScenesServerParseAddScene(
     app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-    const CharSpan & sceneName,
-    const app::DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> & extensionFieldSets)
+    const CharSpan & sceneName, const app::DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> & extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry;

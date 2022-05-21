@@ -29,10 +29,8 @@
 enum class PairingMode
 {
     None,
-    QRCode,
-    ManualCode,
-    QRCodePaseOnly,
-    ManualCodePaseOnly,
+    Code,
+    CodePaseOnly,
     Ble,
     SoftAP,
     Ethernet,
@@ -79,10 +77,8 @@ public:
         {
         case PairingMode::None:
             break;
-        case PairingMode::QRCode:
-        case PairingMode::ManualCode:
-        case PairingMode::QRCodePaseOnly:
-        case PairingMode::ManualCodePaseOnly:
+        case PairingMode::Code:
+        case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:

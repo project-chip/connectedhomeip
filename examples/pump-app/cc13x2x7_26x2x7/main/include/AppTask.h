@@ -57,6 +57,8 @@ private:
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
+    static void UpdateCluster(intptr_t context);
+
     void DispatchEvent(AppEvent * event);
 
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);

@@ -52,12 +52,12 @@ tests:
       verification: |
           1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times.
 
-          ./chip-tool pairing manualcode 1 36177160938  (With wrong manual code)
+          ./chip-tool pairing code 1 36177160938  (With wrong manual code)
       disabled: true
 
     - label: "TH_CR2 starts a 21st commissioning process"
       verification: |
           1. On 2nd controller using chip tool connect using correct passcode.
 
-          ./chip-tool pairing manualcode 1 36177160937 (correct passcode)
+          ./chip-tool pairing code 1 36177160937 (correct passcode)
       disabled: true

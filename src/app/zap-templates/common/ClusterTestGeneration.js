@@ -257,7 +257,9 @@ function setDefaultResponse(test, useSynthesizeWaitForReport)
     return;
   }
 
-  const defaultResponse = {};
+  test.expectMultipleResponses = test.isEvent;
+
+  const defaultResponse = test.expectMultipleResponses ? [] : {};
   setDefault(test, kResponseName, defaultResponse);
 
   // There is different syntax for expressing the expected response, but in the
@@ -363,8 +365,6 @@ function setDefaultResponse(test, useSynthesizeWaitForReport)
 
       setDefault(expectedValue, 'name', defaultName);
     });
-
-    test.expectMultipleResponses = test[kResponseName].length > 1;
 
     setDefault(response, kCommandName, test.command);
     setDefault(response, responseType, test[responseType]);
@@ -861,32 +861,6 @@ function ensureIsArray(value, options)
   }
 }
 
-function chip_tests_item_has_list(options)
-{
-  function hasList(args)
-  {
-    for (let i = 0; i < args.length; i++) {
-      if (args[i].isArray) {
-        return true;
-      }
-
-      if (args[i].isStruct && hasList(args[i].items)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  return assertCommandOrAttributeOrEvent(this).then(item => {
-    if (this.isWriteAttribute || this.isCommand) {
-      return hasList(item.arguments);
-    }
-
-    return false;
-  });
-}
-
 function checkIsInsideTestOnlyClusterBlock(conditions, name)
 {
   conditions.forEach(condition => {
@@ -1000,7 +974,6 @@ async function chip_tests_only_cluster_response_parameters(options)
 //
 exports.chip_tests                                  = chip_tests;
 exports.chip_tests_items                            = chip_tests_items;
-exports.chip_tests_item_has_list                    = chip_tests_item_has_list;
 exports.chip_tests_item_parameters                  = chip_tests_item_parameters;
 exports.chip_tests_item_responses                   = chip_tests_item_responses;
 exports.chip_tests_item_response_parameters         = chip_tests_item_response_parameters;

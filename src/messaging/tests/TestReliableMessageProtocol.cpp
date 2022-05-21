@@ -283,7 +283,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     BackoffComplianceTestVector * expectedBackoff;
     System::Clock::Timestamp now, startTime;
     System::Clock::Timeout timeoutTime, margin;
-    margin = System::Clock::Timeout(5);
+    margin = System::Clock::Timeout(15);
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());

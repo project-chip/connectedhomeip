@@ -62,6 +62,8 @@ public:
                 break;
             }
 
+            ReturnErrorOnFailure(err);
+
             TLV::Tag tag = mTlvReader.GetTag();
             if (!TLV::IsContextTag(tag))
                 break;

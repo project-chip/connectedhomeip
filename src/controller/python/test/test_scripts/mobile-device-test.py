@@ -70,10 +70,10 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
     else:
         address = address.decode("utf-8")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=address,
-                                   setuppin=setup_pin,
-                                   nodeid=device_nodeid),
+    logger.info("Testing commissioning")
+    FailIfNot(test.TestCommissioning(ip=address,
+                                     setuppin=setup_pin,
+                                     nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     ok = asyncio.run(test.TestMultiFabric(ip=address,

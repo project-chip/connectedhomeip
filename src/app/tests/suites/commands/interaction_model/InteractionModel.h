@@ -64,27 +64,30 @@ protected:
 
     CHIP_ERROR ReadEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                          std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                         const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
                          const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
-                           eventNumber);
+                           fabricFiltered, eventNumber);
     }
 
     CHIP_ERROR SubscribeEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                               std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
                               uint16_t minInterval = 0, uint16_t maxInterval = 0,
+                              const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
                               const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
                               const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                           minInterval, maxInterval, eventNumber, keepSubscriptions);
+                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions);
     }
 
     CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
                            chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
-                           uint16_t maxInterval = 0, const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                           const chip::Optional<bool> & keepSubscriptions = chip::NullOptional);
+                           uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
+                           const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
+                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
     void Shutdown()
     {
@@ -106,10 +109,10 @@ protected:
     template <class T>
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::CommandId commandId, const T & value,
-                           chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional,
-                           chip::Optional<uint16_t> repeatCount               = chip::NullOptional,
-                           chip::Optional<uint16_t> repeatDelayInMs           = chip::NullOptional,
-                           chip::Optional<bool> suppressResponse              = chip::NullOptional)
+                           const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
+                           const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
+                           const chip::Optional<uint16_t> & repeatCount               = chip::NullOptional,
+                           const chip::Optional<uint16_t> & repeatDelayInMs           = chip::NullOptional)
     {
         uint16_t repeat = repeatCount.ValueOr(1);
         while (repeat--)
@@ -249,25 +252,31 @@ public:
     virtual chip::DeviceProxy * GetDevice(const char * identity)                             = 0;
 
     CHIP_ERROR ReadAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                             chip::AttributeId attributeId, bool fabricFiltered = true);
+                             chip::AttributeId attributeId, bool fabricFiltered = true,
+                             const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional);
 
     CHIP_ERROR SubscribeAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                   chip::AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval,
-                                  bool fabricFiltered = true);
+                                  bool fabricFiltered                                   = true,
+                                  const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional,
+                                  const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
     CHIP_ERROR ReadEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
-                         const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
+                         bool fabricFiltered = true, const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
 
     CHIP_ERROR SubscribeEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
-                              uint16_t minInterval, uint16_t maxInterval,
-                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
+                              uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered = true,
+                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
+                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
     CHIP_ERROR WaitForReport() { return CHIP_NO_ERROR; }
 
     template <class T>
     CHIP_ERROR WriteAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
                               chip::AttributeId attributeId, const T & value,
-                              chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
+                              const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
+                              const chip::Optional<chip::DataVersion> & dataVersion      = chip::NullOptional)
     {
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -277,23 +286,26 @@ public:
 
     template <class T>
     CHIP_ERROR WriteGroupAttribute(const char * identity, chip::GroupId groupId, chip::ClusterId clusterId,
-                                   chip::AttributeId attributeId, const T & value)
+                                   chip::AttributeId attributeId, const T & value,
+                                   const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional)
     {
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::FabricIndex fabricIndex = device->GetSecureSession().Value()->GetFabricIndex();
-        return InteractionModelWriter::WriteGroupAttribute(groupId, fabricIndex, clusterId, attributeId, value);
+        return InteractionModelWriter::WriteGroupAttribute(groupId, fabricIndex, clusterId, attributeId, value, dataVersion);
     }
 
     template <class T>
     CHIP_ERROR SendCommand(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                           const T & value, chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+                           const T & value, chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional,
+                           const chip::Optional<bool> & suppressResponse = chip::NullOptional)
     {
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, timedInteractionTimeoutMs);
+        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, timedInteractionTimeoutMs,
+                                                     suppressResponse);
     }
 
     template <class T>

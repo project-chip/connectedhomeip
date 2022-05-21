@@ -65,7 +65,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return InteractionModelCommands::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload,
-                                                     mTimedInteractionTimeoutMs, mRepeatCount, mRepeatDelayInMs, mSuppressResponse);
+                                                     mTimedInteractionTimeoutMs, mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
     }
 
     template <class T>
@@ -73,7 +73,7 @@ public:
                            chip::CommandId commandId, const T & value)
     {
         return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, mTimedInteractionTimeoutMs,
-                                                     mRepeatCount, mRepeatDelayInMs, mSuppressResponse);
+                                                     mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override

@@ -69,6 +69,33 @@ def main():
         metavar="<device-addr>",
     )
     optParser.add_option(
+        "--setup-payload",
+        action="store",
+        dest="setupPayload",
+        default='',
+        type='str',
+        help="Setup Payload (manual pairing code or QR code content)",
+        metavar="<setup-payload>"
+    )
+    optParser.add_option(
+        "--nodeid",
+        action="store",
+        dest="nodeid",
+        default=1,
+        type=int,
+        help="The Node ID issued to the device",
+        metavar="<nodeid>"
+    )
+    optParser.add_option(
+        "--discriminator",
+        action="store",
+        dest="discriminator",
+        default=TEST_DISCRIMINATOR,
+        type=int,
+        help="Discriminator of the device",
+        metavar="<nodeid>"
+    )
+    optParser.add_option(
         "-p",
         "--paa-trust-store-path",
         action="store",
@@ -88,20 +115,28 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
+    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1),
-              "Failed to finish key exchange")
+    if options.deviceAddress:
+        logger.info("Testing commissioning (IP)")
+        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+                                         setuppin=20202021,
+                                         nodeid=options.nodeid),
+                  "Failed to finish commissioning")
+    elif options.setupPayload:
+        logger.info("Testing commissioning (w/ Setup Payload)")
+        FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
+                                                         nodeid=options.nodeid),
+                  "Failed to finish commissioning")
+    else:
+        TestFail("Must provide device address or setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
+    FailIfNot(test.TestOnOffCluster(nodeid=options.nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 

@@ -61,14 +61,14 @@ limitations under the License.
       <arg name="errorCode" type="CommissioningError"/>
       <arg name="debugText" type="CHAR_STRING"/>
     </command>
-    <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfig">
+    <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Set the regulatory configuration to be used during commissioning</description>
       <arg name="NewRegulatoryConfig" type="RegulatoryLocationType"/>
       <arg name="countryCode" type="CHAR_STRING"/>
       <arg name="breadcrumb" type="INT64U"/>
       <access op="invoke" privilege="administer"/>
     </command>
-    <command source="server" code="0x03" name="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfigresponse">
+    <command source="server" code="0x03" name="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Success/failure response for SetRegulatoryConfig command</description>
       <arg name="errorCode" type="CommissioningError"/>
       <arg name="debugText" type="CHAR_STRING"/>

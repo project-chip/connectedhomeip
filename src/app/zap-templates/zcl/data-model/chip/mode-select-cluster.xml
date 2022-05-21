@@ -27,9 +27,7 @@ limitations under the License.
     <cluster code="0x0050"/>
     <item name="Label" type="CHAR_STRING" optional="false" length="32"/>
     <item name="Mode" type="INT8U" optional="false"/>
-    <!-- TODO: A list of list is not supported yet. Otherwise this should be a list of SemanticTags -->
-    <!-- <item name="SemanticTags" type="SemanticTag" array="true" optional="false"/> -->
-    <item name="SemanticTag" type="INT32U" optional="false"/>
+    <item name="SemanticTags" type="SemanticTag" array="true" optional="false"/>
   </struct>
 
   <cluster>
