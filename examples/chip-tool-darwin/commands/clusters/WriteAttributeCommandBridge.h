@@ -30,8 +30,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        ModelCommand::AddArguments();
+        AddArguments();
     }
 
     WriteAttribute(chip::ClusterId clusterId)
@@ -40,15 +39,7 @@ public:
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    WriteAttribute(const char * _Nonnull attributeName)
-        : ModelCommand("write")
-    {
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArguments();
     }
 
     ~WriteAttribute() {}
@@ -103,6 +94,20 @@ public:
     }
 
 protected:
+    WriteAttribute(const char * _Nonnull attributeName)
+        : ModelCommand("write")
+    {
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        // Subclasses are responsible for calling AddArguments.
+    }
+
+    void AddArguments()
+    {
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
+            "If provided, do a timed write with the given timed interaction timeout.");
+        ModelCommand::AddArguments();
+    }
+
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<uint32_t> mDataVersion;
 
