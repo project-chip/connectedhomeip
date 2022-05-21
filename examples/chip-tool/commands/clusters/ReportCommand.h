@@ -122,8 +122,8 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ReportCommand::AddArguments();
     }
 
@@ -131,8 +131,8 @@ public:
         ReportCommand("read-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ReportCommand::AddArguments();
     }
 
@@ -142,8 +142,8 @@ public:
         mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {
         AddArgument("attr-name", attributeName);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ReportCommand::AddArguments();
     }
 
@@ -170,8 +170,8 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
@@ -182,8 +182,8 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
@@ -196,8 +196,8 @@ public:
         AddArgument("attr-name", attributeName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
@@ -245,6 +245,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
@@ -253,6 +254,7 @@ public:
         ReportCommand("read-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
@@ -263,6 +265,7 @@ public:
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
@@ -271,12 +274,13 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds, mEventNumber);
+        return ReportCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds, mFabricFiltered, mEventNumber);
     }
 
 private:
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::EventId> mEventIds;
+    chip::Optional<bool> mFabricFiltered;
     chip::Optional<chip::EventNumber> mEventNumber;
 };
 
@@ -289,8 +293,9 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -300,8 +305,9 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -310,14 +316,15 @@ public:
         ReportCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
-        AddArgument("event-name", eventName, 0, "Event name.");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0,
+        AddArgument("event-name", eventName, "Event name.");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
                     "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0,
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
                     "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -325,8 +332,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval, mEventNumber,
-                                             mKeepSubscriptions);
+        return ReportCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
+                                             mFabricFiltered, mEventNumber, mKeepSubscriptions);
     }
 
     void OnSubscription() override
@@ -352,6 +359,7 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mFabricFiltered;
     chip::Optional<chip::EventNumber> mEventNumber;
+    chip::Optional<bool> mKeepSubscriptions;
 };

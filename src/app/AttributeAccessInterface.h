@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,7 +111,7 @@ public:
         template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(T && aArg) const
         {
-            VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+            VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.

@@ -456,8 +456,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CurrentScene
 
 namespace CurrentGroup {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::GroupId * value); // group_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::GroupId value);
 } // namespace CurrentGroup
 
 namespace SceneValid {
@@ -471,8 +471,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace NameSupport
 
 namespace LastConfiguredBy {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * value); // node_id
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::NodeId> & value); // node_id
 EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value);
 } // namespace LastConfiguredBy
 
 namespace FeatureMap {
@@ -1613,33 +1615,45 @@ namespace ThreadNetworkDiagnostics {
 namespace Attributes {
 
 namespace Channel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
 } // namespace Channel
 
 namespace RoutingRole {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
 } // namespace RoutingRole
 
 namespace NetworkName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
 } // namespace NetworkName
 
 namespace PanId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
 } // namespace PanId
 
 namespace ExtendedPanId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace ExtendedPanId
 
 namespace MeshLocalPrefix {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
 } // namespace MeshLocalPrefix
 
 namespace OverrunCount {
@@ -3065,8 +3079,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace MaxConstTemp
 
 namespace PumpStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> * value); // PumpStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {
@@ -3127,11 +3142,6 @@ EmberAfStatus Get(chip::EndpointId endpoint,
                   chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value); // PumpControlMode
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
 } // namespace ControlMode
-
-namespace AlarmMask {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace AlarmMask
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

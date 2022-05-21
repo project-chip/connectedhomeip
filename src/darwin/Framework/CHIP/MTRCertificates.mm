@@ -114,6 +114,8 @@ struct AutoPlatformMemory {
 
 + (BOOL)keypair:(id<CHIPKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
+    AutoPlatformMemory platformMemory;
+
     P256PublicKey keypairPubKey;
     CHIP_ERROR err = CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.pubkey, &keypairPubKey);
     if (err != CHIP_NO_ERROR) {
@@ -135,6 +137,8 @@ struct AutoPlatformMemory {
 
 + (BOOL)isCertificate:(NSData *)certificate1 equalTo:(NSData *)certificate2
 {
+    AutoPlatformMemory platformMemory;
+
     P256PublicKey pubKey1;
     CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
     if (err != CHIP_NO_ERROR) {
@@ -170,6 +174,36 @@ struct AutoPlatformMemory {
     }
 
     return subject1.IsEqual(subject2);
+}
+
++ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    AutoPlatformMemory platformMemory;
+
+    CHIPP256KeypairBridge keypairBridge;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    do {
+        err = keypairBridge.Init(keypair);
+        if (err != CHIP_NO_ERROR) {
+            break;
+        }
+        CHIPP256KeypairNativeBridge nativeKeypair(keypairBridge);
+
+        uint8_t buf[kMAX_CSR_Length];
+        MutableByteSpan csr(buf);
+        err = GenerateCertificateSigningRequest(&nativeKeypair, csr);
+        if (err != CHIP_NO_ERROR) {
+            break;
+        }
+
+        return AsData(csr);
+    } while (0);
+
+    if (error) {
+        *error = [CHIPError errorForCHIPErrorCode:err];
+    }
+    return nil;
 }
 
 @end

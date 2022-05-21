@@ -13,6 +13,9 @@
 # limitations under the License.
 
 declare_args() {
-  # Root directory for tizen.
+  # Root directory for Tizen.
   tizen_root = "//third_party/connectedhomeip/config/tizen/chip-gn/platform"
+
+  # Root directory for Tizen SDK build support.
+  tizen_sdk_build_root = "//third_party/connectedhomeip/third_party/tizen"
 }

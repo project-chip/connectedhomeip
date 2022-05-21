@@ -58,11 +58,6 @@ void CastingServer::InitServer(std::function<CHIP_ERROR()> commissioningComplete
 
     mCommissioningCompleteCallback = commissioningCompleteCallback;
 
-    // Enter commissioning mode, open commissioning window
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
     // Initialize binding handlers
     ReturnOnFailure(InitBindingHandlers());
 

@@ -45,14 +45,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::None:
         err = Unpair(remoteId);
         break;
-    case PairingMode::QRCode:
+    case PairingMode::Code:
         err = PairWithCode(remoteId);
         break;
-    case PairingMode::ManualCode:
-        err = PairWithCode(remoteId);
-        break;
-    case PairingMode::QRCodePaseOnly:
-    case PairingMode::ManualCodePaseOnly:
+    case PairingMode::CodePaseOnly:
         err = PaseWithCode(remoteId);
         break;
     case PairingMode::Ble:
@@ -160,7 +156,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        if (mPairingMode == PairingMode::QRCodePaseOnly || mPairingMode == PairingMode::ManualCodePaseOnly)
+        if (mPairingMode == PairingMode::CodePaseOnly)
         {
             SetCommandExitStatus(err);
         }

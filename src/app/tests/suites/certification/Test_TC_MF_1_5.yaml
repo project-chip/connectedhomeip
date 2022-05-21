@@ -105,7 +105,7 @@ tests:
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -140,7 +140,7 @@ tests:
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -193,7 +193,7 @@ tests:
       PICS: PICS_SKIP_SAMPLE_APP
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -204,7 +204,7 @@ tests:
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"

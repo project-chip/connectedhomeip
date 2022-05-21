@@ -64,8 +64,19 @@
 
 #define HSM_ECC_KEYID 0x11223344
 
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPTLV.h>
+
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 using namespace chip;
 using namespace chip::Crypto;
+using namespace chip::TLV;
 
 namespace {
 
@@ -1286,7 +1297,51 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
 }
 
-static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
+void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t csrBuf[kMAX_CSR_Length];
+    ClearSecretData(csrBuf);
+    MutableByteSpan csrSpan(csrBuf);
+
+    Test_P256Keypair keypair;
+
+    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+
+    // Validate case of buffer too small
+    uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
+    MutableByteSpan csrSpanTooSmall(csrBufTooSmall);
+    NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(&keypair, csrSpanTooSmall) == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Validate case of null keypair
+    NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(nullptr, csrSpan) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Validate normal case
+    ClearSecretData(csrBuf);
+    NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(&keypair, csrSpan) == CHIP_NO_ERROR);
+
+    P256PublicKey pubkey;
+
+    CHIP_ERROR err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey);
+    if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, pubkey.Length() == kP256_PublicKey_Length);
+        NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
+
+        // Let's corrupt the CSR buffer and make sure it fails to verify
+        size_t length      = csrSpan.size();
+        csrBuf[length - 2] = (uint8_t)(csrBuf[length - 2] + 1);
+        csrBuf[length - 1] = (uint8_t)(csrBuf[length - 1] + 1);
+
+        NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey) != CHIP_NO_ERROR);
+    }
+    else
+    {
+        ChipLogError(Crypto, "The current platform does not support CSR parsing.");
+    }
+}
+
+static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     uint8_t csr[kMAX_CSR_Length];
@@ -2363,7 +2418,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),
-    NL_TEST_DEF("Test CSR Generation", TestCSR_Gen),
+    NL_TEST_DEF("Test CSR Generation via P256Keypair method", TestCSR_GenByKeypair),
+    NL_TEST_DEF("Test Direct CSR Generation", TestCSR_GenDirect),
     NL_TEST_DEF("Test Keypair Serialize", TestKeypair_Serialize),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),

@@ -503,7 +503,7 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
     return SafePointerCast<const mbedtls_ecp_keypair *>(context);
 }
 
-CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
 #if defined(MBEDTLS_ECDSA_C)
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -519,7 +519,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 #endif
 }
 
-CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature) const
 {
 #if defined(MBEDTLS_ECDSA_C)
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -545,7 +545,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) || (mbedtls_mpi_size(&s) <= kP256_FE_Length),
+    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) && (mbedtls_mpi_size(&s) <= kP256_FE_Length),
                  error = CHIP_ERROR_INTERNAL);
 
     // Concatenate r and s to output. Sizes were checked above.
@@ -812,7 +812,7 @@ P256Keypair::~P256Keypair()
     Clear();
 }
 
-CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
+CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 

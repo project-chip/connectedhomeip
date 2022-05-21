@@ -316,6 +316,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         const uint8_t * maxBytes;
         if (dataLen <= 2)
         {
+            static_assert(sizeof(minv.defaultValue) == 2, "if statement relies on size of minv.defaultValue being 2");
+            static_assert(sizeof(maxv.defaultValue) == 2, "if statement relies on size of maxv.defaultValue being 2");
             minBytes = reinterpret_cast<const uint8_t *>(&(minv.defaultValue));
             maxBytes = reinterpret_cast<const uint8_t *>(&(maxv.defaultValue));
 // On big endian cpu with length 1 only the second byte counts

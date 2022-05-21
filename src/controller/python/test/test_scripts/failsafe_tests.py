@@ -94,10 +94,10 @@ def main():
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1),
+    logger.info("Testing commissioning")
+    FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+                                     setuppin=20202021,
+                                     nodeid=1),
               "Failed to finish key exchange")
 
     FailIfNot(test.TestFailsafe(nodeid=1), "Failed failsafe test")

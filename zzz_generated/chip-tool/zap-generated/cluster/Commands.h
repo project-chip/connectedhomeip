@@ -2031,7 +2031,7 @@ public:
 
 private:
     chip::app::Clusters::Scenes::Commands::AddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>>
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
@@ -2254,7 +2254,7 @@ public:
 
 private:
     chip::app::Clusters::Scenes::Commands::EnhancedAddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>>
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
@@ -9712,7 +9712,6 @@ private:
 | * LifetimeEnergyConsumed                                            | 0x0017 |
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
-| * AlarmMask                                                         | 0x0022 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -22485,7 +22484,6 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<ReadAttribute>(Id, "lifetime-energy-consumed", Attributes::LifetimeEnergyConsumed::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
@@ -22522,7 +22520,6 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

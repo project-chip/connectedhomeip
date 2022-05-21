@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -237,7 +237,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     // Get Group Info
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kUndefinedFabricIndex, 0, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_INDEX == provider->GetGroupInfoAt(kUndefinedFabricIndex, 0, group));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 999, group));
 
     NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo2_3);
@@ -583,7 +583,7 @@ void TestGroupKeys(nlTestSuite * apSuite, void * apContext)
 
     // Get Group Info
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupKeyAt(kUndefinedFabricIndex, 0, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_INDEX == provider->GetGroupKeyAt(kUndefinedFabricIndex, 0, pair));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 999, pair));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric1, 3, pair));

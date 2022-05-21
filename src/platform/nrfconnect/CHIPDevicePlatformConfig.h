@@ -70,7 +70,7 @@
 #ifndef CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
 /// Time to sleep after running server shutdown actions to let lower layers complete the actions.
 /// This may include transmitting packets created by the actions.
-#define CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS 10
+#define CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS 500
 #endif // CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
 
 #ifndef CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO

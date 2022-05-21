@@ -49,6 +49,7 @@ constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
 constexpr EndpointId kRootEndpointId        = 0;
 constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
+constexpr KeysetId kInvalidKeysetId         = 0xFFFF;
 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.

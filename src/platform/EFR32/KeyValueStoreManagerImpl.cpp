@@ -117,8 +117,9 @@ void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
         During commissioning, the key map will be modified multiples times subsequently.
         Commit the key map in nvm once it as stabilized.
     */
-    SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(5)),
-                             KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
+    SystemLayer().StartTimer(
+        std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(EFR32_KVS_SAVE_DELAY_SECONDS)),
+        KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,

@@ -179,7 +179,6 @@ public:
     virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
     virtual CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     virtual CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-    virtual CHIP_ERROR SetCurrentHeapHighWatermark(uint64_t heapHighWatermark);
     virtual CHIP_ERROR ResetWatermarks();
 
     /*
@@ -264,11 +263,6 @@ inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapUsed(uint64_t & currentH
 }
 
 inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-inline CHIP_ERROR DiagnosticDataProvider::SetCurrentHeapHighWatermark(uint64_t heapHighWatermark)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

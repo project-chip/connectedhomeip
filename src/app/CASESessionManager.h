@@ -55,13 +55,21 @@ public:
     void Shutdown() {}
 
     /**
-     * Find an existing session for the given node ID, or trigger a new session request.
-     * The caller can optionally provide `onConnection` and `onFailure` callback objects. If provided,
-     * these will be used to inform the caller about successful or failed connection establishment.
-     * If the connection is already established, the `onConnection` callback will be immediately called.
+     * Find an existing session for the given node ID, or trigger a new session
+     * request.
+     *
+     * The caller can optionally provide `onConnection` and `onFailure` callback
+     * objects. If provided, these will be used to inform the caller about
+     * successful or failed connection establishment.
+     *
+     * If the connection is already established, the `onConnection` callback
+     * will be immediately called, before FindOrEstablishSession returns.
+     *
+     * The `onFailure` callback may be called before the FindOrEstablishSession
+     * call returns, for error cases that are detected synchronously.
      */
-    CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    void FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
 

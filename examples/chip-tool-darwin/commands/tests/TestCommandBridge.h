@@ -143,8 +143,8 @@ public:
     }
 
     /////////// CommissionerCommands-like Interface /////////
-    CHIP_ERROR PairWithQRCode(
-        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
+    CHIP_ERROR PairWithCode(
+        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value)
     {
         CHIPDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
@@ -442,7 +442,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
     }
-    if (CHIP_ERROR_INVALID_FABRIC_ID == err) {
+    if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
     }
 
