@@ -28,6 +28,17 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
 NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
 
+// Class for holding on to a CHIP_ERROR that we can use as the value
+// in a dictionary.
+@interface CHIPErrorHolder : NSObject
+@property (nonatomic, readonly) CHIP_ERROR error;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+- (instancetype)initWithError:(CHIP_ERROR)error;
+@end
+
 @implementation CHIPError
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
@@ -75,15 +86,7 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
         }];
     }
 
-#if CHIP_CONFIG_ERROR_SOURCE
-    if (errorCode.GetFile()) {
-        userInfo[@"errorFile"] = [NSString stringWithUTF8String:errorCode.GetFile()];
-    }
-
-    if (errorCode.GetLine()) {
-        userInfo[@"errorLine"] = @(errorCode.GetLine());
-    }
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    userInfo[@"underlyingError"] = [[CHIPErrorHolder alloc] initWithError:errorCode];
 
     return [NSError errorWithDomain:CHIPErrorDomain code:code userInfo:userInfo];
     ;
@@ -226,6 +229,13 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
         return CHIP_ERROR_INTERNAL;
     }
 
+    if (error.userInfo != nil) {
+        id underlyingError = error.userInfo[@"underlyingError"];
+        if (underlyingError != nil && [underlyingError isKindOfClass:[CHIPErrorHolder class]]) {
+            return ((CHIPErrorHolder *) underlyingError).error;
+        }
+    }
+
     chip::ChipError::StorageType code;
     switch (error.code) {
     case CHIPErrorCodeInvalidStringLength:
@@ -261,17 +271,21 @@ NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
     }
     }
 
-    const char * file = nullptr;
-    unsigned int line = 0;
-    if (error.userInfo != nil) {
-        if (error.userInfo[@"errorFile"] != nil) {
-            file = [error.userInfo[@"errorFile"] cStringUsingEncoding:NSUTF8StringEncoding];
-        }
-        if (error.userInfo[@"errorLine"] != nil) {
-            line = [error.userInfo[@"errorLine"] unsignedIntValue];
-        }
+    return chip::ChipError(code);
+}
+
+@end
+
+@implementation CHIPErrorHolder
+
+- (instancetype)initWithError:(CHIP_ERROR)error
+{
+    if (!(self = [super init])) {
+        return nil;
     }
-    return chip::ChipError(code, file, line);
+
+    _error = error;
+    return self;
 }
 
 @end

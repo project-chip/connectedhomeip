@@ -44,15 +44,7 @@ public:
 
     void SetCommandExitStatus(CHIP_ERROR status)
     {
-#if CHIP_CONFIG_ERROR_SOURCE
-        // If there is a filename in the status makes a copy of the filename as the pointer may be released
-        // when the autorelease pool is drained.
-        strncpy(mCommandExitStatusFilename, status.GetFile(), sizeof(mCommandExitStatusFilename));
-        mCommandExitStatusFilename[sizeof(mCommandExitStatusFilename) - 1] = '\0';
-        mCommandExitStatus = chip::ChipError(status.AsInteger(), mCommandExitStatusFilename, status.GetLine());
-#else
         mCommandExitStatus = status;
-#endif // CHIP_CONFIG_ERROR_SOURCE
         ShutdownCommissioner();
         StopWaiting();
     }
@@ -90,9 +82,6 @@ private:
     CHIP_ERROR ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
-#if CHIP_CONFIG_ERROR_SOURCE
-    char mCommandExitStatusFilename[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-#endif // CHIP_CONFIG_ERROR_SOURCE
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
