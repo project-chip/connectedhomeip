@@ -92,8 +92,8 @@ struct ResolveContext : public GenericContext
     char mInstanceName[Common::kInstanceNameMaxLength + 1];
     DnssdResolveCallback mResolveCb;
     DnssdService * mService;
-    Inet::IPAddress * mExtraIPs;
-    size_t mExtraIPSize;
+    Inet::IPAddress * mAddresses;
+    size_t mAddressCount;
 
     enum class ResolveState
     {
@@ -119,8 +119,8 @@ struct ResolveContext : public GenericContext
         mResolveState                                 = ResolveState::QuerySrv;
         mResult                                       = nullptr;
         mService                                      = nullptr;
-        mExtraIPs                                     = nullptr;
-        mExtraIPSize                                  = 0;
+        mAddresses                                    = nullptr;
+        mAddressCount                                 = 0;
     }
 
     ~ResolveContext()
@@ -133,9 +133,9 @@ struct ResolveContext : public GenericContext
             }
             chip::Platform::MemoryFree(mService);
         }
-        if (mExtraIPs)
+        if (mAddresses)
         {
-            chip::Platform::MemoryFree(mExtraIPs);
+            chip::Platform::MemoryFree(mAddresses);
         }
         if (mResult)
         {

@@ -217,10 +217,12 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
 {
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
-    const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr) {
+    const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr,
+                                                          Inet::IPAddress * address = nullptr) {
         DeviceLayer::StackLock lock;
         DnssdResolveCallback callback = reinterpret_cast<DnssdResolveCallback>(callbackHandle);
-        callback(reinterpret_cast<void *>(contextHandle), service, Span<Inet::IPAddress>(), error);
+        size_t addr_count             = (address == nullptr) ? 0 : 1;
+        callback(reinterpret_cast<void *>(contextHandle), service, Span<Inet::IPAddress>(address, addr_count), error);
     };
 
     VerifyOrReturn(address != nullptr && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));
@@ -239,10 +241,9 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
-    service.mAddress.SetValue(ipAddress);
     service.mPort = static_cast<uint16_t>(port);
 
-    dispatch(CHIP_NO_ERROR, &service);
+    dispatch(CHIP_NO_ERROR, &service, &ipAddress);
 }
 
 } // namespace Dnssd

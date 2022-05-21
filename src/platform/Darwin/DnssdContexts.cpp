@@ -326,9 +326,6 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
-        // Use the first IP we got for the DnssdService.
-        interface.second.service.mAddress.SetValue(ips.front());
-        ips.erase(ips.begin());
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
