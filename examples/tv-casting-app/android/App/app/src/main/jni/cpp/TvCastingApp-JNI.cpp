@@ -17,9 +17,9 @@
  */
 
 #include "TvCastingApp-JNI.h"
-#include "MatterCallbackHandler.h"
 #include "CastingServer.h"
 #include "JNIDACProvider.h"
+#include "MatterCallbackHandler.h"
 
 #include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
