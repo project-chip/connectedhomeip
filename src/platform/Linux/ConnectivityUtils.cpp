@@ -326,11 +326,6 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
 
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ifa->ifa_addr->sa_data == NULL)
-            {
-                continue;
-            }
-
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
             {
                 if (strcmp(ifname, ifa->ifa_name) == 0)
@@ -340,12 +335,21 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
                     memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
                     ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
                     index++;
-                    err = CHIP_NO_ERROR;
+
+                    if (index >= kMaxIPv4AddrCount)
+                    {
+                        break;
+                    }
                 }
             }
         }
 
-        size = index;
+        if (index > 0)
+        {
+            err  = CHIP_NO_ERROR;
+            size = index;
+        }
+
         freeifaddrs(ifaddr);
     }
 
@@ -368,11 +372,6 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
 
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ifa->ifa_addr->sa_data == NULL)
-            {
-                continue;
-            }
-
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
             {
                 if (strcmp(ifname, ifa->ifa_name) == 0)
@@ -382,12 +381,21 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
                     memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
                     ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
                     index++;
-                    err = CHIP_NO_ERROR;
+
+                    if (index >= kMaxIPv6AddrCount)
+                    {
+                        break;
+                    }
                 }
             }
         }
 
-        size = index;
+        if (index > 0)
+        {
+            err  = CHIP_NO_ERROR;
+            size = index;
+        }
+
         freeifaddrs(ifaddr);
     }
 
