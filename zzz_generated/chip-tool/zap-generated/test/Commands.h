@@ -38436,12 +38436,12 @@ private:
         }
         case 1: {
             LogStep(1, "Read attribute Audio Output list");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Read attribute current audio output");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Attributes::CurrentOutput::Id, true,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::CurrentOutput::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
@@ -38449,7 +38449,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
             value.index = 1;
-            return SendCommand(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
                                chip::NullOptional
 
             );
@@ -38460,14 +38460,14 @@ private:
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
-            return SendCommand(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
                                chip::NullOptional
 
             );
         }
         case 5: {
             LogStep(5, "Read attribute Audio Output list");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         }
