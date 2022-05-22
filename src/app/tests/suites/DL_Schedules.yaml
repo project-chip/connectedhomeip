@@ -771,16 +771,12 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "holidayIndex"
                 value: 0
-              - name: "userIndex"
-                value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "holidayIndex"
                 value: 0
-              - name: "userIndex"
-                value: 1
               - name: "status"
                 value: 0x85
 
@@ -788,11 +784,11 @@ tests:
       command: "GetHolidaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "holidayIndex"
                 value: NumberOfHolidaySchedulesSupported + 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "holidayIndex"
                 value: NumberOfHolidaySchedulesSupported + 1
               - name: "status"
                 value: 0x85
@@ -1988,13 +1984,13 @@ tests:
 
     # Start clearing holiday schedules
     - label: "Clear a single holiday schedule"
-      command: "ClearYearDaySchedule"
+      command: "ClearHolidaySchedule"
       arguments:
           values:
               - name: "holidayIndex"
                 value: 2
 
-    - label: "Make sure that first holiday schedule was deleted"
+    - label: "Make sure that first holiday schedule was not deleted"
       command: "GetHolidaySchedule"
       arguments:
           values:
@@ -2004,33 +2000,27 @@ tests:
           values:
               - name: "holidayIndex"
                 value: 1
-              - name: "status"
-                value: 0x8B
-              - name: "localStartTime"
-                value: null
-              - name: "localEndTime"
-                value: null
-              - name: "operatingMode"
-                value: null
-
-    - label: "Make sure that second holiday schedule was not deleted"
-      command: "GetHolidaySchedule"
-      arguments:
-          values:
-              - name: "holidayIndex"
-                value: 2
-      response:
-          values:
-              - name: "holidayIndex"
-                value: 2
               - name: "status"
                 value: 0x0
               - name: "localStartTime"
-                value: 123456
+                value: 12345
               - name: "localEndTime"
-                value: 1234567
+                value: 12345689
               - name: "operatingMode"
-                value: 1
+                value: 0
+
+    - label: "Make sure that second holiday schedule was deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x8B
 
     - label: "Make sure that third holiday schedule was not deleted"
       command: "GetHolidaySchedule"
@@ -2057,9 +2047,9 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value: 4
+                value: 1
               - name: "userIndex"
-                value: 2
+                value: 1
       response:
           values:
               - name: "weekDayIndex"
@@ -2102,7 +2092,7 @@ tests:
                 value: 888888888
 
     - label: "Clear all remaining holiday schedules"
-      command: "ClearYearDaySchedule"
+      command: "ClearHolidaySchedule"
       arguments:
           values:
               - name: "holidayIndex"
@@ -2120,12 +2110,6 @@ tests:
                 value: 1
               - name: "status"
                 value: 0x8B
-              - name: "localStartTime"
-                value: null
-              - name: "localEndTime"
-                value: null
-              - name: "operatingMode"
-                value: null
 
     - label: "Make sure that second holiday schedule was deleted"
       command: "GetHolidaySchedule"
@@ -2139,12 +2123,6 @@ tests:
                 value: 2
               - name: "status"
                 value: 0x8B
-              - name: "localStartTime"
-                value: null
-              - name: "localEndTime"
-                value: null
-              - name: "operatingMode"
-                value: null
 
     - label: "Make sure that third holiday schedule was not deleted"
       command: "GetHolidaySchedule"
@@ -2158,12 +2136,6 @@ tests:
                 value: NumberOfHolidaySchedulesSupported
               - name: "status"
                 value: 0x8B
-              - name: "localStartTime"
-                value: null
-              - name: "localEndTime"
-                value: null
-              - name: "operatingMode"
-                value: null
 
     - label:
           "Make sure clearing holiday schedule did not clear week day schedule"
@@ -2171,9 +2143,9 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value: 4
+                value: 1
               - name: "userIndex"
-                value: 2
+                value: 1
       response:
           values:
               - name: "weekDayIndex"

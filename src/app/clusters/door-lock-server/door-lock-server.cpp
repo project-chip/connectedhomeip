@@ -2374,7 +2374,7 @@ void DoorLockServer::sendHolidayScheduleResponse(chip::app::CommandHandler * com
 {
     VerifyOrDie(nullptr != commandObj);
 
-    auto response = Commands::GetHolidayScheduleResponse::Type{ holidayIndex, DlStatus::kSuccess };
+    auto response = Commands::GetHolidayScheduleResponse::Type{ holidayIndex, status };
     if (DlStatus::kSuccess == status)
     {
         response.localStartTime = Optional<uint32_t>(localStartTime);
@@ -2740,6 +2740,16 @@ void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, 
         return;
     }
 
+    if (operatingMode > DlOperatingMode::kPassage)
+    {
+        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - operating mode is out of range"
+                                      "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
+                                      ", operatingMode=%d]",
+                                      endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
     auto status = emberAfPluginDoorLockSetSchedule(endpointId, holidayIndex, DlScheduleStatus::kOccupied, localStartTime,
                                                    localEndTime, operatingMode);
     if (DlStatus::kSuccess != status)
@@ -2751,8 +2761,9 @@ void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, 
     }
 
     emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Successfully created new schedule "
-                                  "[endpointId=%d,scheduleIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32 "]",
-                                  endpointId, holidayIndex, localStartTime, localEndTime);
+                                  "[endpointId=%d,scheduleIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32
+                                  ",operatingMode=%d]",
+                                  endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -2788,7 +2799,7 @@ void DoorLockServer::getHolidaySchedule(chip::app::CommandHandler * commandObj, 
         return;
     }
     sendHolidayScheduleResponse(commandObj, commandPath, holidayIndex, DlStatus::kSuccess, scheduleInfo.localStartTime,
-                                scheduleInfo.localEndTime);
+                                scheduleInfo.localEndTime, scheduleInfo.operatingMode);
 }
 
 void DoorLockServer::clearHolidaySchedule(chip::app::CommandHandler * commandObj,
@@ -3446,8 +3457,8 @@ DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId
     return DlStatus::kFailure;
 }
 
-DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
-                                                                EmberAfPluginDoorLockHolidaySchedule & schedule)
+DlStatus __attribute__((weak))
+emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
     return DlStatus::kFailure;
 }
