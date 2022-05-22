@@ -158,15 +158,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-<<<<<<< HEAD
-<<<<<<< HEAD
 #define GENERATED_ATTRIBUTE_COUNT 338
-=======
-#define GENERATED_ATTRIBUTE_COUNT 304
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
-=======
-#define GENERATED_ATTRIBUTE_COUNT 308
->>>>>>> 6254e48d5 (Fix build issues)
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -1253,7 +1245,7 @@
   { \
       /* Endpoint: 1, Cluster: Media Playback (server) */ \
       .clusterId = 0x00000506,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(208), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(227), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1308,7 +1300,7 @@
   { \
       /* Endpoint: 1, Cluster: Audio Output (server) */ \
       .clusterId = 0x0000050B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(219), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(239), \
       .attributeCount = 4, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1319,11 +1311,7 @@
   { \
       /* Endpoint: 1, Cluster: Application Launcher (server) */ \
       .clusterId = 0x0000050C,  \
-<<<<<<< HEAD
-      .attributes = ZAP_ATTRIBUTE_INDEX(239), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(223), \
->>>>>>> 6254e48d5 (Fix build issues)
+      .attributes = ZAP_ATTRIBUTE_INDEX(243), \
       .attributeCount = 4, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1334,15 +1322,9 @@
   { \
       /* Endpoint: 2, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
-<<<<<<< HEAD
-      .attributes = ZAP_ATTRIBUTE_INDEX(243), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(247), \
       .attributeCount = 3, \
       .clusterSize = 7, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(227), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
->>>>>>> 6254e48d5 (Fix build issues)
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
@@ -1351,11 +1333,7 @@
   { \
       /* Endpoint: 2, Cluster: Level Control (server) */ \
       .clusterId = 0x00000008,  \
-<<<<<<< HEAD
-      .attributes = ZAP_ATTRIBUTE_INDEX(246), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(229), \
->>>>>>> 6254e48d5 (Fix build issues)
+      .attributes = ZAP_ATTRIBUTE_INDEX(250), \
       .attributeCount = 16, \
       .clusterSize = 27, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
@@ -1366,30 +1344,12 @@
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-<<<<<<< HEAD
-      .attributes = ZAP_ATTRIBUTE_INDEX(262), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(266), \
       .attributeCount = 6, \
       .clusterSize = 4, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(245), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
->>>>>>> 6254e48d5 (Fix build issues)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
-    },\
-  { \
-<<<<<<< HEAD
-      /* Endpoint: 2, Cluster: Audio Output (server) */ \
-      .clusterId = 0x0000050B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(268), \
-      .attributeCount = 4, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 102 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1398,13 +1358,6 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(272), \
       .attributeCount = 6, \
       .clusterSize = 4, \
-=======
-      /* Endpoint: 3, Cluster: Descriptor (server) */ \
-      .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(250), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1413,15 +1366,7 @@
   { \
       /* Endpoint: 3, Cluster: Media Playback (server) */ \
       .clusterId = 0x00000506,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(278), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(251), \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(255), \
->>>>>>> 6254e48d5 (Fix build issues)
       .attributeCount = 9, \
       .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1432,15 +1377,7 @@
   { \
       /* Endpoint: 3, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(287), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(260), \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(264), \
->>>>>>> 6254e48d5 (Fix build issues)
       .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1451,19 +1388,9 @@
   { \
       /* Endpoint: 3, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(291), \
       .attributeCount = 10, \
       .clusterSize = 110, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(264), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(268), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 9, \
-      .clusterSize = 106, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1472,19 +1399,9 @@
   { \
       /* Endpoint: 3, Cluster: Account Login (server) */ \
       .clusterId = 0x0000050E,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(301), \
       .attributeCount = 2, \
       .clusterSize = 6, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(273), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(277), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 1, \
-      .clusterSize = 2, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 124 ) ,\
@@ -1493,19 +1410,9 @@
   { \
       /* Endpoint: 4, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(303), \
       .attributeCount = 6, \
       .clusterSize = 4, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(274), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(278), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 5, \
-      .clusterSize = 0, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1514,19 +1421,9 @@
   { \
       /* Endpoint: 4, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(309), \
       .attributeCount = 4, \
       .clusterSize = 10, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(279), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(283), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 3, \
-      .clusterSize = 6, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 130 ) ,\
@@ -1535,19 +1432,9 @@
   { \
       /* Endpoint: 4, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(313), \
       .attributeCount = 10, \
       .clusterSize = 110, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(282), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(286), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 9, \
-      .clusterSize = 106, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1556,19 +1443,9 @@
   { \
       /* Endpoint: 5, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(323), \
       .attributeCount = 6, \
       .clusterSize = 4, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(291), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(295), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 5, \
-      .clusterSize = 0, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1577,19 +1454,9 @@
   { \
       /* Endpoint: 5, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-<<<<<<< HEAD
-<<<<<<< HEAD
       .attributes = ZAP_ATTRIBUTE_INDEX(329), \
       .attributeCount = 9, \
       .clusterSize = 110, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(296), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(300), \
->>>>>>> 6254e48d5 (Fix build issues)
-      .attributeCount = 8, \
-      .clusterSize = 106, \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1606,17 +1473,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-<<<<<<< HEAD
-<<<<<<< HEAD
-        { ZAP_CLUSTER_INDEX(0), 26, 501 }, { ZAP_CLUSTER_INDEX(26), 10, 98 }, { ZAP_CLUSTER_INDEX(36), 4, 45 },                    \
-            { ZAP_CLUSTER_INDEX(40), 5, 173 }, { ZAP_CLUSTER_INDEX(45), 3, 124 }, { ZAP_CLUSTER_INDEX(48), 2, 114 },               \
-=======
-        { ZAP_CLUSTER_INDEX(0), 26, 439 }, { ZAP_CLUSTER_INDEX(26), 12, 82 }, { ZAP_CLUSTER_INDEX(38), 3, 30 },                    \
-=======
-        { ZAP_CLUSTER_INDEX(0), 26, 439 }, { ZAP_CLUSTER_INDEX(26), 12, 89 }, { ZAP_CLUSTER_INDEX(38), 3, 30 },                    \
->>>>>>> 6254e48d5 (Fix build issues)
-            { ZAP_CLUSTER_INDEX(41), 5, 161 }, { ZAP_CLUSTER_INDEX(46), 3, 112 }, { ZAP_CLUSTER_INDEX(49), 2, 106 },               \
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
+        { ZAP_CLUSTER_INDEX(0), 26, 501 }, { ZAP_CLUSTER_INDEX(26), 12, 105 }, { ZAP_CLUSTER_INDEX(38), 3, 38 },                   \
+            { ZAP_CLUSTER_INDEX(41), 5, 173 }, { ZAP_CLUSTER_INDEX(46), 3, 124 }, { ZAP_CLUSTER_INDEX(49), 2, 114 },               \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1628,15 +1486,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-<<<<<<< HEAD
-<<<<<<< HEAD
 #define ATTRIBUTE_MAX_SIZE (1055)
-=======
-#define ATTRIBUTE_MAX_SIZE (930)
->>>>>>> 2aedd08ee (Move Audio and Media Player endpoints)
-=======
-#define ATTRIBUTE_MAX_SIZE (937)
->>>>>>> 6254e48d5 (Fix build issues)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (6)
