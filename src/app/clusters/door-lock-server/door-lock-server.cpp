@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/EventLogging.h>
+#include <app/server/Server.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <cinttypes>
@@ -51,6 +52,29 @@ static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / (2 * MILLISECOND_TICKS_PER_SECOND);
 
 DoorLockServer DoorLockServer::instance;
+
+class DoorLockCLusterFabricDelegate : public chip::FabricTable::Delegate
+{
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        for (auto endpointId : EnabledEndpointsWithServerCluster(chip::app::Clusters::DoorLock::Id))
+        {
+            if (!DoorLockServer::Instance().OnFabricRemoved(endpointId, fabricIndex))
+            {
+                ChipLogError(Zcl,
+                             "Unable to handle fabric removal from the Door Lock Server instance [endpointId=%d,fabricIndex=%d]",
+                             endpointId, fabricIndex);
+            }
+        }
+    }
+
+    // Intentionally left blank
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override {}
+
+    // Intentionally left blank
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override {}
+};
+static DoorLockCLusterFabricDelegate gFabricDelegate;
 
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
@@ -1217,6 +1241,13 @@ bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature fea
     bool success        = GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, featureMap);
 
     return success && ((featureMap & to_underlying(feature)) != 0);
+}
+
+bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
+{
+    emberAfDoorLockClusterPrintln("[OnFabricRemoved] Removing a fabric from the door lock server [endpointId=%d,fabricIndex=%d]",
+                                  endpointId, fabricIndex);
+    return true;
 }
 
 /**********************************************************
@@ -3340,6 +3371,7 @@ void emberAfPluginDoorLockServerRelockEventHandler(void) {}
 void MatterDoorLockPluginServerInitCallback()
 {
     emberAfDoorLockClusterPrintln("Door Lock server initialized");
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
