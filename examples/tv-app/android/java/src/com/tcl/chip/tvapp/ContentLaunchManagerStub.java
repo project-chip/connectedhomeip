@@ -49,7 +49,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchResponse launchUrl(
       String url, String display, ContentLaunchBrandingInformation branding) {
-    Log.d(TAG, "launchUrl:" + url + " display=" + display + " branding.providerName=" 
+    Log.d(TAG, "launchUrl:" + url + " display=" + display + " branding.providerName="
       + (branding == null ? "NULL" : branding.providerName)+ " at " + endpoint);
 
     if ("err".equals(display)) {
