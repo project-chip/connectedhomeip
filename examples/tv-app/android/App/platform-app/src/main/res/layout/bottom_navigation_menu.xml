@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/qr_code"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_qr_code_scanner_24"
+        android:title="@string/qr_code"/>
+    <item
+        android:id="@+id/content_app"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_content_copy_24"
+        android:title="@string/content_app"/>
+    <item
+        android:id="@+id/terminal"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_text_snippet_24"
+        android:title="@string/terminal"/>
+</menu>
