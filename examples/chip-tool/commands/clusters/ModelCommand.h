@@ -32,7 +32,9 @@ public:
 
     void AddArguments()
     {
-        AddArgument("node-id/group-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument(
+            "destination-id", 0, UINT64_MAX, &mDestinationId,
+            "64-bit node or group identifier.\n  Group identifiers are detected by being in the 0xFFFF'FFFF'FFFF'xxxx range.");
         AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
@@ -51,7 +53,7 @@ protected:
     chip::Optional<uint16_t> mTimeout;
 
 private:
-    chip::NodeId mNodeId;
+    chip::NodeId mDestinationId;
     std::vector<chip::EndpointId> mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
