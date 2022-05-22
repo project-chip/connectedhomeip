@@ -1,16 +1,13 @@
 package com.matter.tv.server;
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.matter.tv.server.fragments.TerminalFragment;
-import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.ContentAppFragment;
+import com.matter.tv.server.fragments.QrCodeFragment;
+import com.matter.tv.server.fragments.TerminalFragment;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
-
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,27 +22,27 @@ public class MainActivity extends AppCompatActivity {
         .initializeMatterApps(this.getApplicationContext());
   }
 
-  private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+  private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+      item -> {
+        Fragment selectedFragment = null;
+        switch (item.getItemId()) {
+          case R.id.content_app:
+            selectedFragment = new ContentAppFragment();
+            break;
+          case R.id.qr_code:
+            selectedFragment = new QrCodeFragment();
+            break;
+          case R.id.terminal:
+            selectedFragment = new TerminalFragment();
+            break;
+        }
 
-    Fragment selectedFragment = null;
-    switch (item.getItemId()) {
-      case R.id.content_app:
-        selectedFragment = new ContentAppFragment();
-        break;
-      case R.id.qr_code:
-        selectedFragment = new QrCodeFragment();
-        break;
-      case R.id.terminal:
-        selectedFragment = new TerminalFragment();
-        break;
-    }
-
-    getSupportFragmentManager()
+        getSupportFragmentManager()
             .beginTransaction()
             .replace(R.id.fragment_container_view, selectedFragment)
             .commit();
-    return true;
-  };
+        return true;
+      };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
     bottomNavigationView.setOnItemSelectedListener(navListener);
 
-    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view, new QrCodeFragment()).commit();
+    getSupportFragmentManager()
+        .beginTransaction()
+        .replace(R.id.fragment_container_view, new QrCodeFragment())
+        .commit();
   }
 }
