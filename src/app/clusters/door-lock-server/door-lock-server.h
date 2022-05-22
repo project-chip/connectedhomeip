@@ -175,6 +175,8 @@ public:
         return HasFeature(endpointId, DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
     }
 
+    bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
+
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     chip::NodeId getNodeId(const chip::app::CommandHandler * commandObj);
