@@ -19,7 +19,6 @@ package com.matter.tv.server.service;
 
 import android.content.Context;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
