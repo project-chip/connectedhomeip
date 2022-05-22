@@ -76,8 +76,9 @@ bool MediaInputManager::HandleShowInputStatus()
     {
         string name(inputInfo.name.data(), inputInfo.name.size());
         string desc(inputInfo.description.data(), inputInfo.description.size());
-        ChipLogProgress(Zcl, " [%d] type=%hhu selected=%d name=%s desc=%s", inputInfo.index, inputInfo.inputType,
-                        (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(), desc.c_str());
+        ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputInfo.index,
+                        static_cast<uint16_t>(inputInfo.inputType), (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(),
+                        desc.c_str());
     }
     return true;
 }
