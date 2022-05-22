@@ -72,9 +72,18 @@ public class MediaInputManagerStub implements MediaInputManager {
   public boolean showInputStatus() {
     Log.d(TAG, "showInputStatus at " + endpoint);
     for (MediaInputInfo mii : info) {
-      Log.d(TAG, " ["+mii.index+"] type="+mii.type+" selected="+(currentInput == mii.index ? 1 : 0)
-        +" name="+(mii.name == null ? "null" : mii.name)
-        +" desc="+(mii.description == null ? "null" : mii.description));
+      Log.d(
+          TAG,
+          " ["
+              + mii.index
+              + "] type="
+              + mii.type
+              + " selected="
+              + (currentInput == mii.index ? 1 : 0)
+              + " name="
+              + (mii.name == null ? "null" : mii.name)
+              + " desc="
+              + (mii.description == null ? "null" : mii.description));
     }
     return true;
   }
