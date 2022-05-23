@@ -17,7 +17,6 @@
  */
 package com.chip.casting;
 
-
 public class TvCastingApp {
   private static final String TAG = TvCastingApp.class.getSimpleName();
 
