@@ -37,7 +37,7 @@ tests:
       verification: |
           Using your DUT Controller connect to the accessory.
 
-          Below is the example when using chip tool as controller 
+          Below is the example when using chip tool as controller
           ./chip-tool pairing onnetwork 1 20202021
 
           Verify you got below message
