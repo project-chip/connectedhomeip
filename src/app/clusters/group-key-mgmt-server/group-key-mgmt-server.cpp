@@ -122,6 +122,8 @@ public:
         {
         case GroupKeyManagement::Attributes::ClusterRevision::Id:
             return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+        case Attributes::FeatureMap::Id:
+            return aEncoder.Encode(static_cast<uint32_t>(0));
         case GroupKeyManagement::Attributes::GroupKeyMap::Id:
             return ReadGroupKeyMap(aPath.mEndpointId, aEncoder);
         case GroupKeyManagement::Attributes::GroupTable::Id:

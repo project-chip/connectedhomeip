@@ -2406,8 +2406,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
                     VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
-                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -13626,8 +13628,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
                     VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
-                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -14262,8 +14266,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 7));
                     VerifyOrReturn(CheckValue("attributeList[7]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 8));
-                    VerifyOrReturn(CheckValue("attributeList[8]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 9));
+                    VerifyOrReturn(CheckValue("attributeList[8]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 9));
+                    VerifyOrReturn(CheckValue("attributeList[9]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 10));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -16391,8 +16397,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
                     VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
-                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 5));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -17162,8 +17170,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
                     VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
-                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -17943,8 +17953,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
                     VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
-                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -18148,8 +18160,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 10));
                     VerifyOrReturn(CheckValue("attributeList[10]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 11));
-                    VerifyOrReturn(CheckValue("attributeList[11]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 12));
+                    VerifyOrReturn(CheckValue("attributeList[11]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 12));
+                    VerifyOrReturn(CheckValue("attributeList[12]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 13));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -18344,8 +18358,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
                     VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
-                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -18528,8 +18544,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
                     VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
-                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 5));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -51379,8 +51397,10 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 22));
                     VerifyOrReturn(CheckValue("attributeList[22]", iter_0.GetValue(), 65531UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 23));
-                    VerifyOrReturn(CheckValue("attributeList[23]", iter_0.GetValue(), 65533UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 24));
+                    VerifyOrReturn(CheckValue("attributeList[23]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 24));
+                    VerifyOrReturn(CheckValue("attributeList[24]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 25));
                 }
             }
             break;
