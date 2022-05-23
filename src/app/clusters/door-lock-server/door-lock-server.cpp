@@ -1245,8 +1245,25 @@ bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature fea
 
 bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
 {
-    emberAfDoorLockClusterPrintln("[OnFabricRemoved] Removing a fabric from the door lock server [endpointId=%d,fabricIndex=%d]",
-                                  endpointId, fabricIndex);
+    emberAfDoorLockClusterPrintln(
+        "[OnFabricRemoved] Handling a fabric removal from the door lock server [endpointId=%d,fabricIndex=%d]", endpointId,
+        fabricIndex);
+
+    // Iterate over all the users and clean up the deleted fabric
+    if (!cleanFabricFromUsers(endpointId, fabricIndex))
+    {
+        ChipLogError(Zcl, "[OnFabricRemoved] Unable to cleanup fabric from users - internal error [endpointId=%d,fabricIndex=%d]",
+                     endpointId, fabricIndex);
+    }
+
+    // Iterate over all the credentials and clean up the fabrics
+    if (!clearFabricFromCredentials(endpointId, fabricIndex))
+    {
+        ChipLogError(Zcl,
+                     "[OnFabricRemoved] Unable to cleanup fabric from credentials - internal error [endpointId=%d,fabricIndex=%d]",
+                     endpointId, fabricIndex);
+    }
+
     return true;
 }
 
@@ -1758,6 +1775,43 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
                                  modifierFabricId, userIndex, userIndex);
     }
     return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+bool DoorLockServer::cleanFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
+{
+    uint16_t maxNumberOfUsers;
+    VerifyOrReturnError(GetAttribute(endpointId, Attributes::NumberOfTotalUsersSupported::Id,
+                                     Attributes::NumberOfTotalUsersSupported::Get, maxNumberOfUsers),
+                        false);
+
+    for (uint16_t userIndex = 1; userIndex <= maxNumberOfUsers; ++userIndex)
+    {
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+        {
+            ChipLogError(Zcl,
+                         "[OnFabricRemoved] Unable to get the user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                         endpointId, fabricIndex, userIndex);
+            continue;
+        }
+
+        // Filter out unoccupied slots and users that don't have corresponding fabricIndex in the created/modified fields
+        if (DlUserStatus::kAvailable == user.userStatus || (fabricIndex != user.createdBy && fabricIndex != user.lastModifiedBy))
+        {
+            continue;
+        }
+
+        if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, user.userName,
+                                          user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
+                                          user.credentials.data(), user.credentials.size()))
+        {
+            ChipLogError(
+                Zcl,
+                "[OnFabricRemoved] Unable to update the user fabrics - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                endpointId, fabricIndex, userIndex);
+        }
+    }
+    return true;
 }
 
 DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
@@ -2688,6 +2742,83 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
                              modifier, 0xFFFE, 0xFFFE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, DlCredentialType credentialType,
+                                                chip::FabricIndex fabricToRemove)
+{
+    uint16_t maxNumberOfCredentials = 0;
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxNumberOfCredentials))
+    {
+        ChipLogError(
+            Zcl,
+            "[clearFabricFromCredentials] Unable to get max number of credentials to clear - can't get max number of credentials "
+            "[endpointId=%d,credentialType=%u]",
+            endpointId, to_underlying(credentialType));
+        return false;
+    }
+
+    for (uint16_t credentialIndex = 1; credentialIndex < maxNumberOfCredentials; ++credentialIndex)
+    {
+        EmberAfPluginDoorLockCredentialInfo credential;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
+        {
+            ChipLogError(
+                Zcl,
+                "[clearFabricFromCredentials] Unable to clear fabric from credential - couldn't read credential from database "
+                "[endpointId=%d,credentialType=%u,credentialIndex=%d,fabricIdToRemove=%d]",
+                endpointId, to_underlying(credentialType), credentialIndex, fabricToRemove);
+
+            // Go on and try to clear all the remaining credentials
+            continue;
+        }
+
+        if (DlCredentialStatus::kAvailable == credential.status ||
+            (credential.createdBy != fabricToRemove && credential.lastModifiedBy != fabricToRemove))
+        {
+            continue;
+        }
+
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
+                                                credential.status, credential.credentialType, credential.credentialData))
+        {
+            ChipLogError(Zcl,
+                         "[clearFabricFromCredentials] Unable to clear fabric from credential - internal error "
+                         "[endpointId=%d,credentialType=%u,credentialIndex=%d,fabricIdToRemove=%d]",
+                         endpointId, to_underlying(credentialType), credentialIndex, fabricToRemove);
+            continue;
+        }
+    }
+
+    return true;
+}
+
+bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, chip::FabricIndex fabricToRemove)
+{
+    if (SupportsPFID(endpointId))
+    {
+        clearFabricFromCredentials(endpointId, DlCredentialType::kRfid, fabricToRemove);
+    }
+
+    if (SupportsPIN(endpointId))
+    {
+        clearFabricFromCredentials(endpointId, DlCredentialType::kPin, fabricToRemove);
+    }
+
+    if (SupportsFingers(endpointId))
+    {
+        clearFabricFromCredentials(endpointId, DlCredentialType::kFingerprint, fabricToRemove);
+        clearFabricFromCredentials(endpointId, DlCredentialType::kFingerVein, fabricToRemove);
+    }
+
+    if (SupportsFace(endpointId))
+    {
+        clearFabricFromCredentials(endpointId, DlCredentialType::kFace, fabricToRemove);
+    }
+
+    clearFabricFromCredentials(endpointId, DlCredentialType::kProgrammingPIN, fabricToRemove);
+
+    return true;
 }
 
 bool DoorLockServer::sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
