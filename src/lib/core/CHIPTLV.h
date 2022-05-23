@@ -840,11 +840,18 @@ public:
     uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
 
     /**
+     * Return the total number of bytes for the TLV data
+     * @return the total number of bytes for the TLV data
+     */
+    uint32_t GetTotalLength() const { return mMaxLen; }
+
+    /**
      * Returns the stored backing store.
      *
      * @return the stored backing store.
      */
     TLVBackingStore * GetBackingStore() { return mBackingStore; }
+
     /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.
      *

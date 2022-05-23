@@ -39,13 +39,13 @@ const uint32_t kOptionalDefaultIntValue = 12;
 constexpr char kSerialNumberDefaultStringValue[] = "123456789";
 const uint32_t kSerialNumberDefaultUInt32Value   = 123456789;
 
-constexpr const char * kDefaultPayloadQRCode = "MT:R5L90MP500K64J00000";
+constexpr const char * kDefaultPayloadQRCode = "MT:M5L90MP500K64J00000";
 
 inline SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
-    payload.version               = 5;
+    payload.version               = 0;
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.commissioningFlow     = CommissioningFlow::kStandard;
@@ -132,14 +132,16 @@ inline bool CompareBinary(SetupPayload & payload, std::string & expectedBinary)
     return (expectedBinary == resultBinary);
 }
 
-inline bool CheckWriteRead(SetupPayload & inPayload)
+inline bool CheckWriteRead(SetupPayload & inPayload, bool allowInvalidPayload = false)
 {
     SetupPayload outPayload;
     std::string result;
 
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     memset(optionalInfo, 0xFF, sizeof(optionalInfo));
-    QRCodeSetupPayloadGenerator(inPayload).payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
+    auto generator = QRCodeSetupPayloadGenerator(inPayload);
+    generator.SetAllowInvalidPayload(allowInvalidPayload);
+    generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
 
     outPayload = {};
     QRCodeSetupPayloadParser(result).populatePayload(outPayload);

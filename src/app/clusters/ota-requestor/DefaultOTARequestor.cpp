@@ -376,15 +376,9 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
-    CHIP_ERROR err =
-        mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
-                                                    &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format());
-        RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
+
+    mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
+                                                &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -406,7 +400,9 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
+    PeerId peerID = fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID);
+    mCASESessionManager->FindExistingSession(peerID)->Disconnect();
+    mCASESessionManager->ReleaseSession(peerID);
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is

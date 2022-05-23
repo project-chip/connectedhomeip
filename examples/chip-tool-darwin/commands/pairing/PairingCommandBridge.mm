@@ -61,8 +61,7 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     case PairingMode::None:
         Unpair();
         break;
-    case PairingMode::QRCode:
-    case PairingMode::ManualCode:
+    case PairingMode::Code:
         PairWithPayload(&error);
         break;
     case PairingMode::Ethernet:

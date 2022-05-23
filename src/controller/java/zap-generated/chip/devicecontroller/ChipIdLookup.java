@@ -2059,9 +2059,6 @@ public final class ChipIdLookup {
       if (attributeId == 33L) {
         return "ControlMode";
       }
-      if (attributeId == 34L) {
-        return "AlarmMask";
-      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }

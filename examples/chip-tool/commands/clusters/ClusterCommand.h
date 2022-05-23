@@ -32,11 +32,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
+        AddArguments();
     }
 
     ClusterCommand(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
@@ -44,20 +40,7 @@ public:
     {
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
-    }
-
-    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelCommands(this), ModelCommand(commandName, credsIssuerConfig)
-    {
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        AddArguments();
     }
 
     ~ClusterCommand() {}
@@ -65,7 +48,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return InteractionModelCommands::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload,
-                                                     mTimedInteractionTimeoutMs, mRepeatCount, mRepeatDelayInMs, mSuppressResponse);
+                                                     mTimedInteractionTimeoutMs, mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
     }
 
     template <class T>
@@ -73,7 +56,7 @@ public:
                            chip::CommandId commandId, const T & value)
     {
         return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, mTimedInteractionTimeoutMs,
-                                                     mRepeatCount, mRepeatDelayInMs, mSuppressResponse);
+                                                     mSuppressResponse, mRepeatCount, mRepeatDelayInMs);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
@@ -139,6 +122,23 @@ public:
         {
             SetCommandExitStatus(mError);
         }
+    }
+
+protected:
+    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelCommands(this), ModelCommand(commandName, credsIssuerConfig)
+    {
+        // Subclasses are responsible for calling AddArguments.
+    }
+
+    void AddArguments()
+    {
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
+                    "If provided, do a timed invoke with the given timed interaction timeout.");
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
+        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
+        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        ModelCommand::AddArguments();
     }
 
 private:

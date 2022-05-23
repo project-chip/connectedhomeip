@@ -31,6 +31,8 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::DecodableType & value);
@@ -56,6 +58,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -104,8 +108,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value);
@@ -127,6 +129,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value);

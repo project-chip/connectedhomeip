@@ -24,13 +24,8 @@
  *
  */
 
-const PairWithQRCode = {
-  name : 'PairWithQRCode',
-  arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
-};
-
-const PairWithManualCode = {
-  name : 'PairWithManualCode',
+const PairWithCode = {
+  name : 'PairWithCode',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
 };
 
@@ -40,7 +35,7 @@ const Unpair = {
 };
 
 const name     = 'CommissionerCommands';
-const commands = [ PairWithQRCode, PairWithManualCode, Unpair ];
+const commands = [ PairWithCode, Unpair ];
 
 const CommissionerCommands = {
   name,

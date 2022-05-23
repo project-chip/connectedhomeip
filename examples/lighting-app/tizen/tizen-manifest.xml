@@ -6,6 +6,7 @@
     </service-application>
     <privileges>
         <privilege>http://tizen.org/privilege/bluetooth</privilege>
+        <privilege>http://tizen.org/privilege/internet</privilege>
     </privileges>
     <feature name="http://tizen.org/feature/network.bluetooth.le.gatt.server">true</feature>
 </manifest>

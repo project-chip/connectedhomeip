@@ -25,9 +25,9 @@ namespace chip {
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
 {
-    auto handle = sessionManager.AllocateSession();
+    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
-    mSecureSessionHolder.Grab(handle.Value());
+    VerifyOrReturnError(mSecureSessionHolder.GrabPairing(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
     return CHIP_NO_ERROR;
 }
@@ -48,8 +48,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
     // Call Activate last, otherwise errors on anything after would lead to
     // a partially valid session.
-    secureSession->Activate(GetSecureSessionType(), GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId,
-                            mRemoteMRPConfig);
+    secureSession->Activate(GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
 
     ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
@@ -154,19 +153,7 @@ void PairingSession::Clear()
         mExchangeCtxt = nullptr;
     }
 
-    if (mSecureSessionHolder)
-    {
-        auto session = mSecureSessionHolder.Get();
-        // Call Release before ExpirePairing because we don't want to receive OnSessionReleased() event here
-        mSecureSessionHolder.Release();
-        if (!session.Value()->AsSecureSession()->IsActiveSession() && mSessionManager != nullptr)
-        {
-            // Make sure to clean up our pending session, since we're the only
-            // ones who have access to it do do so.
-            mSessionManager->ExpirePairing(session.Value());
-        }
-    }
-
+    mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
 }

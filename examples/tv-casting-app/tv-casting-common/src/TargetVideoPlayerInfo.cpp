@@ -42,13 +42,7 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
 
     PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-    CHIP_ERROR err =
-        server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Could not establish a session to the peer");
-        return err;
-    }
+    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 
     if (mOperationalDeviceProxy == nullptr)
     {

@@ -35,6 +35,9 @@
 #define KVS_MAX_ENTRIES 75 // Available key slot count for Kvs Key mapping.
 #endif
 
+// Delay before Key/Value is actually saved in NVM
+#define EFR32_KVS_SAVE_DELAY_SECONDS 5
+
 static_assert((KVS_MAX_ENTRIES <= 255), "Implementation supports up to 255 Kvs entries");
 static_assert((KVS_MAX_ENTRIES >= 30), "Mininimal Kvs entries requirement is not met");
 

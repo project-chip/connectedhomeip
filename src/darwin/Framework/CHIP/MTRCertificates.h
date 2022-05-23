@@ -111,6 +111,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (BOOL)isCertificate:(NSData *)certificate1 equalTo:(NSData *)certificate2;
 
+/**
+ * Generate a PKCS#10 certificate signing request from a CHIPKeypair.  This can
+ * then be used to request an operational or ICA certificate from an external
+ * certificate authority.
+ *
+ * The CSR will have the subject OU DN set to 'CSA', because omitting all
+ * identifying information altogether often trips up CSR parsing code.  The CA
+ * being used should expect this and ignore the request subject, producing a
+ * subject that matches the rules for Matter certificates.
+ *
+ * On failure returns nil and if "error" is not null sets *error to the relevant
+ * error.
+ */
++ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+
 @end
 
 NS_ASSUME_NONNULL_END

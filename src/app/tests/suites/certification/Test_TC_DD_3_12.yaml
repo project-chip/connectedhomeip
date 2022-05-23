@@ -57,7 +57,7 @@ tests:
     - label: "Scan the QR code, generated in the previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:.24J0AFN00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:.24J0AFN00KA0648G00
           ...
 
           Device TH:
@@ -83,7 +83,7 @@ tests:
           This test step is not valid and is addressed in PR#893
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:86PS06VO00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:86PS06VO00KA0648G00
           ...
 
           Device TH:
@@ -117,7 +117,7 @@ tests:
           chip-all-clusters-app BUG: chip-all-clusters-app advertises over BLE when the discovery capability should not be advertising with capabilites set to '0'
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
           ...
 
           Device TH:
@@ -142,7 +142,7 @@ tests:
           the previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J06VO00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J06VO00KA0648G00
           ...
 
           Device TH:
@@ -167,7 +167,7 @@ tests:
           previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J029Q00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J029Q00KA0648G00
           ...
 
           Device TH:
@@ -217,7 +217,7 @@ tests:
           chip-all-clusters-app BUG: chip-all-clusters-app advertises over BLE when the discovery capability should not be advertising with capabilites set to '0'
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
           ...
 
           Device TH:
@@ -248,7 +248,7 @@ tests:
           chip-all-clusters-app BUG: chip-all-clusters-app advertises over IP when the discovery capability should not be advertising with capabilites set to '0'
 
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J0AFN00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J0AFN00KA0648G00
           ...
 
           Device TH:
@@ -329,7 +329,7 @@ tests:
     - label: "Scan the QR code, generated in the previous step, using the DUT"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 AB:-24J0W2T00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 AB:-24J0W2T00KA0648G00
           ...
           [1646266501236] [53666:29430483] CHIP: [IN] TransportMgr initialized
           [1646266501236] [53666:29430485] CHIP: [DL] _OnPlatformEvent

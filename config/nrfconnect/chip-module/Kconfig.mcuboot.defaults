@@ -36,10 +36,6 @@ config BOOT_ENCRYPT_X25519
     bool
     default n
 
-choice BOOT_IMAGE_UPGRADE_MODE
-    default BOOT_UPGRADE_ONLY
-endchoice
-
 config BOOT_BOOTSTRAP
     bool
     default n
@@ -118,6 +114,11 @@ config PCD_APP
 config UPDATEABLE_IMAGE_NUMBER
     int
     default 2
+
+# Multi-image updates do not support image swapping yet.
+choice BOOT_IMAGE_UPGRADE_MODE
+    default BOOT_UPGRADE_ONLY
+endchoice
 
 # The network core cannot access external flash directly. The flash simulator must be used to
 # provide a memory region that is used to forward the new firmware to the network core.

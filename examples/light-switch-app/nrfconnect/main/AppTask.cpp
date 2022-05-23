@@ -153,7 +153,10 @@ CHIP_ERROR AppTask::Init()
     // Initialize DFU
 #ifdef CONFIG_MCUMGR_SMP_BT
     GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+#ifndef CONFIG_CHIP_OTA_REQUESTOR
+    // When OTA Requestor is enabled, it is responsible for confirming new images.
     GetDFUOverSMP().ConfirmNewImage();
+#endif
 #endif
 
     // Print initial configs

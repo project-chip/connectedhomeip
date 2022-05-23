@@ -143,8 +143,8 @@ public:
     }
 
     /////////// CommissionerCommands-like Interface /////////
-    CHIP_ERROR PairWithQRCode(
-        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
+    CHIP_ERROR PairWithCode(
+        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value)
     {
         CHIPDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);

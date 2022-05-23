@@ -19,6 +19,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/GroupId.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <string.h>

@@ -15,7 +15,8 @@
 name: Build example - TI CC26X2X7
 
 on:
-    workflow_dispatch:
+    push:
+    pull_request:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -33,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ti:0.5.61
+            image: connectedhomeip/chip-build-ti:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
