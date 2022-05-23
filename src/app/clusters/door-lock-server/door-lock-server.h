@@ -217,6 +217,8 @@ private:
     EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
                             uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
+    bool cleanFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
+
     DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                                         const DlCredential & credential, const chip::ByteSpan & credentialData,
@@ -248,6 +250,9 @@ private:
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
                                    DlCredentialType credentialType);
+
+    bool clearFabricFromCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, chip::FabricIndex fabricToRemove);
+    bool clearFabricFromCredentials(chip::EndpointId endpointId, chip::FabricIndex fabricToRemove);
 
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
