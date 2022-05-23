@@ -296,7 +296,7 @@ void ReportCallback::OnError(CHIP_ERROR aError)
     ReportError(nullptr, aError);
 }
 
-void ReportCallback::OnDone()
+void ReportCallback::OnDone(app::ReadClient *)
 {
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }

@@ -1575,7 +1575,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 }
 
 // ClusterStateCache::Callback impl
-void DeviceCommissioner::OnDone()
+void DeviceCommissioner::OnDone(app::ReadClient *)
 {
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;

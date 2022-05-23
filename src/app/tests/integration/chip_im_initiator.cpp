@@ -151,8 +151,13 @@ public:
 
     void OnError(CHIP_ERROR aError) override { printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format()); }
 
-    void OnDone() override
+    void OnDone(chip::app::ReadClient * apReadClient) override
     {
+        if (apReadClient != mReadClient.get())
+        {
+            printf("Unexpected read client.");
+        }
+
         if (!mReadClient->IsSubscriptionType())
         {
             HandleReadComplete();

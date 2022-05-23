@@ -150,7 +150,7 @@ public:
 
     void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
 
-    void OnDone() override;
+    void OnDone(app::ReadClient * apReadClient) override;
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
@@ -222,7 +222,7 @@ void TestReadCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::T
     mEventCount++;
 }
 
-void TestReadCallback::OnDone() {}
+void TestReadCallback::OnDone(app::ReadClient *) {}
 
 class TestAttrAccess : public app::AttributeAccessInterface
 {

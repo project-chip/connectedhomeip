@@ -203,7 +203,7 @@ public:
 
     void OnReportEnd() override { gOnReportEndCallback(mAppContext); }
 
-    void OnDone() override
+    void OnDone(ReadClient *) override
     {
         gOnReadDoneCallback(mAppContext);
 

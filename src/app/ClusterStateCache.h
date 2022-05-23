@@ -563,10 +563,10 @@ private:
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnDone() override
+    void OnDone(ReadClient * apReadClient) override
     {
         mRequestPathSet.clear();
-        return mCallback.OnDone();
+        return mCallback.OnDone(apReadClient);
     }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override

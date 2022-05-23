@@ -75,7 +75,7 @@ private:
         return mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
-    void OnDone() override { return mCallback.OnDone(); }
+    void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         mCallback.OnSubscriptionEstablished(aSubscriptionId);

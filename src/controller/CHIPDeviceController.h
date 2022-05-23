@@ -600,7 +600,7 @@ public:
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
     // ClusterStateCache::Callback impl
-    void OnDone() override;
+    void OnDone(app::ReadClient *) override;
 
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;

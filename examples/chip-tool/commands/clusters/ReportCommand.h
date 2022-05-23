@@ -96,7 +96,7 @@ public:
         mError = error;
     }
 
-    void OnDone() override
+    void OnDone(chip::app::ReadClient *) override
     {
         InteractionModelReports::Shutdown();
         SetCommandExitStatus(mError);
