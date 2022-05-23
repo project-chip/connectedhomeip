@@ -34,6 +34,12 @@ class ContentAppCommandDelegate
 public:
     ContentAppCommandDelegate(jobject manager)
     {
+
+        if(manager == nullptr) {
+            // To support the existing hardcoded sample apps.
+            return;
+        }
+
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
 
