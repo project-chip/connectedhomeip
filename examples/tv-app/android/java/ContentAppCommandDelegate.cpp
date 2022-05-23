@@ -33,7 +33,8 @@ namespace AppPlatform {
 const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
 {   
     // to support the hardcoded sample apps.
-    if (mSendCommandMethod == nullptr) {
+    if (mSendCommandMethod == nullptr) 
+    {
         return "Failed";
     }
 
