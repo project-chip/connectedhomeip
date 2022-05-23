@@ -127,6 +127,8 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
 
 void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
+    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::HandleIdleStateEnter IdleStateReason %d", reason);
+
     switch (reason)
     {
     case IdleStateReason::kUnknown:
@@ -306,6 +308,8 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
 
 void DefaultOTARequestorDriver::SendQueryImage()
 {
+    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::SendQueryImage");
+
     OTAUpdateStateEnum currentUpdateState;
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);
