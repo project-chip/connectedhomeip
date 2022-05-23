@@ -97,7 +97,7 @@ tests:
           Verify that the BDX Idle timeout on DUT should be no less than 5 minutes.
           [1651269360125] [23256:35291938] CHIP: [BDX] Transfer timed out
 
-          Relaunch the OTA Requestor App and initiate another query 
+          Relaunch the OTA Requestor App and initiate another query
           chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           Verify that a new transfer of software image is started from DUT when sending another QueryImage request

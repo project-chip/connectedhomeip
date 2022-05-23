@@ -34,7 +34,7 @@ tests:
       verification: |
           On the 2nd controller using chip tool, open commissioning window using ECM
 
-          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840 
+          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840
 
           Controller:
 
@@ -66,7 +66,7 @@ tests:
           "Set up a DUT_CR1 to start attempting to do PASE to TH_CE and failing
           20 times. This can be done using an invalid passcode"
       verification: |
-          1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times. 
+          1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times.
 
           ./chip-tool pairing manualcode 1 36177160938  (With wrong manual code)
 
@@ -80,7 +80,7 @@ tests:
           "DUT_CR1 starts a 21st commissioning process using a commissioning
           timeout of PIXIT_COMM_WIN seconds using ECM"
       verification: |
-          1. On 2nd controller using chip tool connect using correct passcode.  
+          1. On 2nd controller using chip tool connect using correct passcode.
 
           ./chip-tool pairing manualcode 1 36177160937 (correct passcode)
 
@@ -94,7 +94,7 @@ tests:
           "TH_CR3 starts a commissioning process with TH_CE using the correct
           PAKEVerifier"
       verification: |
-          1. On 3rdd controller using chip-tool connect using correct passcode 
+          1. On 3rdd controller using chip-tool connect using correct passcode
 
           ./chip-tool pairing manualcode 1 36177160938  (With wrong manual code)
 
