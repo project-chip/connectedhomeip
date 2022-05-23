@@ -9234,7 +9234,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readLocalTemperatureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readLocalTemperatureAttribute(
+                      (ChipClusters.ThermostatCluster.LocalTemperatureAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatLocalTemperatureCommandParams);

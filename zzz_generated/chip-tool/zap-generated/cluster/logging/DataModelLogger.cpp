@@ -2222,6 +2222,39 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TransitionTime", indent + 1, value.transitionTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HeatSetpoint", indent + 1, value.heatSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatSetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CoolSetpoint", indent + 1, value.coolSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CoolSetpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value)
@@ -4264,7 +4297,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         DataModelLogger::LogValue("numberOfTransitionsForSequence", indent + 1, value.numberOfTransitionsForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("payload", indent + 1, value.payload));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("transitions", indent + 1, value.transitions));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -9015,219 +9048,254 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Thermostat::Attributes::LocalTemperature::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("local temperature", 1, value);
+            return DataModelLogger::LogValue("LocalTemperature", 1, value);
         }
         case Thermostat::Attributes::OutdoorTemperature::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("outdoor temperature", 1, value);
+            return DataModelLogger::LogValue("OutdoorTemperature", 1, value);
         }
         case Thermostat::Attributes::Occupancy::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupancy", 1, value);
+            return DataModelLogger::LogValue("Occupancy", 1, value);
         }
         case Thermostat::Attributes::AbsMinHeatSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("abs min heat setpoint limit", 1, value);
+            return DataModelLogger::LogValue("AbsMinHeatSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("abs max heat setpoint limit", 1, value);
+            return DataModelLogger::LogValue("AbsMaxHeatSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::AbsMinCoolSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("abs min cool setpoint limit", 1, value);
+            return DataModelLogger::LogValue("AbsMinCoolSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("abs max cool setpoint limit", 1, value);
+            return DataModelLogger::LogValue("AbsMaxCoolSetpointLimit", 1, value);
         }
-        case Thermostat::Attributes::PiCoolingDemand::Id: {
+        case Thermostat::Attributes::PICoolingDemand::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("pi cooling demand", 1, value);
+            return DataModelLogger::LogValue("PICoolingDemand", 1, value);
         }
-        case Thermostat::Attributes::PiHeatingDemand::Id: {
+        case Thermostat::Attributes::PIHeatingDemand::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("pi heating demand", 1, value);
+            return DataModelLogger::LogValue("PIHeatingDemand", 1, value);
         }
-        case Thermostat::Attributes::HvacSystemTypeConfiguration::Id: {
+        case Thermostat::Attributes::HVACSystemTypeConfiguration::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("HVAC system type configuration", 1, value);
+            return DataModelLogger::LogValue("HVACSystemTypeConfiguration", 1, value);
         }
         case Thermostat::Attributes::LocalTemperatureCalibration::Id: {
             int8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("local temperature calibration", 1, value);
+            return DataModelLogger::LogValue("LocalTemperatureCalibration", 1, value);
         }
         case Thermostat::Attributes::OccupiedCoolingSetpoint::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupied cooling setpoint", 1, value);
+            return DataModelLogger::LogValue("OccupiedCoolingSetpoint", 1, value);
         }
         case Thermostat::Attributes::OccupiedHeatingSetpoint::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("occupied heating setpoint", 1, value);
+            return DataModelLogger::LogValue("OccupiedHeatingSetpoint", 1, value);
         }
         case Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("unoccupied cooling setpoint", 1, value);
+            return DataModelLogger::LogValue("UnoccupiedCoolingSetpoint", 1, value);
         }
         case Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("unoccupied heating setpoint", 1, value);
+            return DataModelLogger::LogValue("UnoccupiedHeatingSetpoint", 1, value);
         }
         case Thermostat::Attributes::MinHeatSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min heat setpoint limit", 1, value);
+            return DataModelLogger::LogValue("MinHeatSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::MaxHeatSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max heat setpoint limit", 1, value);
+            return DataModelLogger::LogValue("MaxHeatSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::MinCoolSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min cool setpoint limit", 1, value);
+            return DataModelLogger::LogValue("MinCoolSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::MaxCoolSetpointLimit::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("max cool setpoint limit", 1, value);
+            return DataModelLogger::LogValue("MaxCoolSetpointLimit", 1, value);
         }
         case Thermostat::Attributes::MinSetpointDeadBand::Id: {
             int8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("min setpoint dead band", 1, value);
+            return DataModelLogger::LogValue("MinSetpointDeadBand", 1, value);
         }
         case Thermostat::Attributes::RemoteSensing::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("remote sensing", 1, value);
+            return DataModelLogger::LogValue("RemoteSensing", 1, value);
         }
         case Thermostat::Attributes::ControlSequenceOfOperation::Id: {
             chip::app::Clusters::Thermostat::ThermostatControlSequence value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("control sequence of operation", 1, value);
+            return DataModelLogger::LogValue("ControlSequenceOfOperation", 1, value);
         }
         case Thermostat::Attributes::SystemMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("system mode", 1, value);
+            return DataModelLogger::LogValue("SystemMode", 1, value);
         }
         case Thermostat::Attributes::AlarmMask::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("alarm mask", 1, value);
+            return DataModelLogger::LogValue("AlarmMask", 1, value);
         }
         case Thermostat::Attributes::ThermostatRunningMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("thermostat running mode", 1, value);
+            return DataModelLogger::LogValue("ThermostatRunningMode", 1, value);
         }
         case Thermostat::Attributes::StartOfWeek::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start of week", 1, value);
+            return DataModelLogger::LogValue("StartOfWeek", 1, value);
         }
         case Thermostat::Attributes::NumberOfWeeklyTransitions::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("number of weekly transitions", 1, value);
+            return DataModelLogger::LogValue("NumberOfWeeklyTransitions", 1, value);
         }
         case Thermostat::Attributes::NumberOfDailyTransitions::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("number of daily transitions", 1, value);
+            return DataModelLogger::LogValue("NumberOfDailyTransitions", 1, value);
         }
         case Thermostat::Attributes::TemperatureSetpointHold::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("temperature setpoint hold", 1, value);
+            return DataModelLogger::LogValue("TemperatureSetpointHold", 1, value);
         }
         case Thermostat::Attributes::TemperatureSetpointHoldDuration::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("temperature setpoint hold duration", 1, value);
+            return DataModelLogger::LogValue("TemperatureSetpointHoldDuration", 1, value);
         }
         case Thermostat::Attributes::ThermostatProgrammingOperationMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("thermostat programming operation mode", 1, value);
+            return DataModelLogger::LogValue("ThermostatProgrammingOperationMode", 1, value);
         }
         case Thermostat::Attributes::ThermostatRunningState::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("thermostat running state", 1, value);
+            return DataModelLogger::LogValue("ThermostatRunningState", 1, value);
         }
         case Thermostat::Attributes::SetpointChangeSource::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("setpoint change source", 1, value);
+            return DataModelLogger::LogValue("SetpointChangeSource", 1, value);
         }
         case Thermostat::Attributes::SetpointChangeAmount::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("setpoint change amount", 1, value);
+            return DataModelLogger::LogValue("SetpointChangeAmount", 1, value);
         }
         case Thermostat::Attributes::SetpointChangeSourceTimestamp::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("setpoint change source timestamp", 1, value);
+            return DataModelLogger::LogValue("SetpointChangeSourceTimestamp", 1, value);
         }
-        case Thermostat::Attributes::AcType::Id: {
+        case Thermostat::Attributes::OccupiedSetback::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupiedSetback", 1, value);
+        }
+        case Thermostat::Attributes::OccupiedSetbackMin::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupiedSetbackMin", 1, value);
+        }
+        case Thermostat::Attributes::OccupiedSetbackMax::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupiedSetbackMax", 1, value);
+        }
+        case Thermostat::Attributes::UnoccupiedSetback::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnoccupiedSetback", 1, value);
+        }
+        case Thermostat::Attributes::UnoccupiedSetbackMin::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnoccupiedSetbackMin", 1, value);
+        }
+        case Thermostat::Attributes::UnoccupiedSetbackMax::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnoccupiedSetbackMax", 1, value);
+        }
+        case Thermostat::Attributes::EmergencyHeatDelta::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac type", 1, value);
+            return DataModelLogger::LogValue("EmergencyHeatDelta", 1, value);
         }
-        case Thermostat::Attributes::AcCapacity::Id: {
+        case Thermostat::Attributes::ACType::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ACType", 1, value);
+        }
+        case Thermostat::Attributes::ACCapacity::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac capacity", 1, value);
+            return DataModelLogger::LogValue("ACCapacity", 1, value);
         }
-        case Thermostat::Attributes::AcRefrigerantType::Id: {
+        case Thermostat::Attributes::ACRefrigerantType::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac refrigerant type", 1, value);
+            return DataModelLogger::LogValue("ACRefrigerantType", 1, value);
         }
-        case Thermostat::Attributes::AcCompressorType::Id: {
+        case Thermostat::Attributes::ACCompressorType::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac compressor type", 1, value);
+            return DataModelLogger::LogValue("ACCompressorType", 1, value);
         }
-        case Thermostat::Attributes::AcErrorCode::Id: {
+        case Thermostat::Attributes::ACErrorCode::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac error code", 1, value);
+            return DataModelLogger::LogValue("ACErrorCode", 1, value);
         }
-        case Thermostat::Attributes::AcLouverPosition::Id: {
+        case Thermostat::Attributes::ACLouverPosition::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac louver position", 1, value);
+            return DataModelLogger::LogValue("ACLouverPosition", 1, value);
         }
-        case Thermostat::Attributes::AcCoilTemperature::Id: {
-            int16_t value;
+        case Thermostat::Attributes::ACCoilTemperature::Id: {
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac coil temperature", 1, value);
+            return DataModelLogger::LogValue("ACCoilTemperature", 1, value);
         }
-        case Thermostat::Attributes::AcCapacityFormat::Id: {
+        case Thermostat::Attributes::ACCapacityformat::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac capacity format", 1, value);
+            return DataModelLogger::LogValue("ACCapacityformat", 1, value);
         }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

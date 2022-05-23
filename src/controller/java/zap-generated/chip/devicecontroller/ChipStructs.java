@@ -1844,6 +1844,36 @@ public class ChipStructs {
     }
   }
 
+  public static class ThermostatClusterThermostatScheduleTransition {
+    public Integer transitionTime;
+    public @Nullable Integer heatSetpoint;
+    public @Nullable Integer coolSetpoint;
+
+    public ThermostatClusterThermostatScheduleTransition(
+        Integer transitionTime, @Nullable Integer heatSetpoint, @Nullable Integer coolSetpoint) {
+      this.transitionTime = transitionTime;
+      this.heatSetpoint = heatSetpoint;
+      this.coolSetpoint = coolSetpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ThermostatClusterThermostatScheduleTransition {\n");
+      output.append("\ttransitionTime: ");
+      output.append(transitionTime);
+      output.append("\n");
+      output.append("\theatSetpoint: ");
+      output.append(heatSetpoint);
+      output.append("\n");
+      output.append("\tcoolSetpoint: ");
+      output.append(coolSetpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class ThreadNetworkDiagnosticsClusterNeighborTable {
     public Long extAddress;
     public Long age;

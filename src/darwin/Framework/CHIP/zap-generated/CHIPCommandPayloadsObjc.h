@@ -4817,7 +4817,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull payload;
+@property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4844,7 +4844,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull payload;
+@property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

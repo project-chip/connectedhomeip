@@ -5958,7 +5958,9 @@ class ChipClusters:
                         "numberOfTransitionsForSequence": "int",
                         "dayOfWeekForSequence": "int",
                         "modeForSequence": "int",
-                        "payload": "int",
+                        "transitionTime": "int",
+                        "heatSetpoint": "int",
+                        "coolSetpoint": "int",
                     },
                 },
             0x00000000: {

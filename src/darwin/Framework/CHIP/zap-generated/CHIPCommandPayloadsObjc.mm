@@ -2776,7 +2776,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2793,7 +2793,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;

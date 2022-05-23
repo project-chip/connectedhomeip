@@ -239,6 +239,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TestCluster::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request,
                         Json::Value & value);

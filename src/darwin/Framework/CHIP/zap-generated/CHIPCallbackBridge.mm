@@ -13506,11 +13506,22 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
     {
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.payload.begin();
+            auto iter_0 = data.transitions.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                CHIPThermostatClusterThermostatScheduleTransition * newElement_0;
+                newElement_0 = [CHIPThermostatClusterThermostatScheduleTransition new];
+                newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
+                if (entry_0.heatSetpoint.IsNull()) {
+                    newElement_0.heatSetpoint = nil;
+                } else {
+                    newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint.Value()];
+                }
+                if (entry_0.coolSetpoint.IsNull()) {
+                    newElement_0.coolSetpoint = nil;
+                } else {
+                    newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint.Value()];
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -13518,7 +13529,7 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
                 OnFailureFn(context, err);
                 return;
             }
-            response.payload = array_0;
+            response.transitions = array_0;
         }
     }
     DispatchSuccess(context, response);
@@ -13532,7 +13543,7 @@ void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
         response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
     }
     {
-        response.relayStatus = [NSNumber numberWithUnsignedShort:data.relayStatus];
+        response.relayStatus = [NSNumber numberWithUnsignedChar:data.relayStatus];
     }
     {
         response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
