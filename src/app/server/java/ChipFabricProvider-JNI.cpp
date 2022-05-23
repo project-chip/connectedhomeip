@@ -40,7 +40,6 @@ using namespace chip;
 
 namespace {
 JavaVM * sJVM;
-// jclass sFabricProviderCls = NULL;
 } // namespace
 
 CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -60,14 +59,11 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    ChipLogProgress(DeviceLayer, "Loading Java class references.");
-
     chip::InitializeTracing();
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // JniReferences::GetInstance().ThrowError(env, sFabricProviderCls, err);
         JNI_OnUnload(jvm, reserved);
     }
 
@@ -80,51 +76,54 @@ void AndroidChipFabricProviderJNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-int GetFabricCount()
+CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self)
 {
-    return chip::Server::GetInstance().GetFabricTable().FabricCount();
-}
-
-jobject ReadFabricList(JNIEnv * env, jobject self)
-{
-    jobject jFabricList;
-    JniReferences::GetInstance().CreateArrayList(jFabricList);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     jclass jFabricCls = env->FindClass("chip/appserver/Fabric");
-    VerifyOrExit(jFabricCls != nullptr, ChipLogError(NotSpecified, "unfind Class Fabric"));
+    VerifyOrExit(self != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrExit(jFabricCls != nullptr, ChipLogError(NotSpecified, "could not find Class Fabric"));
+    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
     {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
-        {
-            // see src/app/clusters/operational-credentials-server/operational-credentials-server.cpp#ReadFabricsList
-            if (!fabricInfo.IsInitialized())
-                continue;
+        // see src/app/clusters/operational-credentials-server/operational-credentials-server.cpp#ReadFabricsList
+        if (!fabricInfo.IsInitialized())
+            continue;
 
-            jmethodID jFabricMethod = env->GetMethodID(jFabricCls, "<init>", "()V");
-            jobject jFabric         = env->NewObject(jFabricCls, jFabricMethod);
-            jfieldID jvendorId      = env->GetFieldID(jFabricCls, "vendorId", "I");
-            jfieldID jnodeId        = env->GetFieldID(jFabricCls, "nodeId", "J");
-            jfieldID jfabricIndex   = env->GetFieldID(jFabricCls, "fabricIndex", "S");
-            jfieldID jlabel         = env->GetFieldID(jFabricCls, "label", "Ljava/lang/String;");
-            env->SetIntField(jFabric, jvendorId, fabricInfo.GetVendorId());
-            env->SetLongField(jFabric, jnodeId, fabricInfo.GetNodeId());
-            env->SetShortField(jFabric, jfabricIndex, fabricInfo.GetFabricIndex());
-            UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
-            env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());
+        jmethodID constructor = env->GetMethodID(jFabricCls, "<init>", "()V");
+        VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+        jobject jFabric = env->NewObject(jFabricCls, constructor);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        jfieldID jvendorId = env->GetFieldID(jFabricCls, "vendorId", "I");
+        VerifyOrExit(jvendorId != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jfieldID jnodeId = env->GetFieldID(jFabricCls, "nodeId", "J");
+        VerifyOrExit(jnodeId != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jfieldID jfabricIndex = env->GetFieldID(jFabricCls, "fabricIndex", "S");
+        VerifyOrExit(jfabricIndex != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jfieldID jlabel = env->GetFieldID(jFabricCls, "label", "Ljava/lang/String;");
+        VerifyOrExit(jlabel != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
 
-            JniReferences::GetInstance().AddToList(jFabricList, jFabric);
-        }
-        return jFabricList;
+        env->SetIntField(jFabric, jvendorId, fabricInfo.GetVendorId());
+        env->SetLongField(jFabric, jnodeId, fabricInfo.GetNodeId());
+        env->SetShortField(jFabric, jfabricIndex, fabricInfo.GetFabricIndex());
+        UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
+        env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());
+
+        JniReferences::GetInstance().AddToList(self, jFabric);
     }
 
 exit:
-    return jFabricList;
+    return err;
 }
 
 JNI_METHOD(jint, getFabricCount)(JNIEnv * env, jobject self)
 {
-    return GetFabricCount();
+    // a simplified way to get fabric count,see /src/credentials/FabricTable.h#FabricCount
+    return chip::Server::GetInstance().GetFabricTable().FabricCount();
 }
 
 JNI_METHOD(jobject, getFabricList)(JNIEnv * env, jobject self)
 {
-    return ReadFabricList(env, self);
+    jobject jFabricList;
+    JniReferences::GetInstance().CreateArrayList(jFabricList);
+    ReadFabricList(env, jFabricList);
+    return jFabricList;
 }

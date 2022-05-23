@@ -25,7 +25,4 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved);
 
 void AndroidChipFabricProviderJNI_OnUnload(JavaVM * jvm, void * reserved);
 
-// a simplified way to get fabric count,see /src/credentials/FabricTable.h#FabricCount
-int GetFabricCount();
-
-jobject ReadFabricList(JNIEnv * env, jobject self);
+CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self);
