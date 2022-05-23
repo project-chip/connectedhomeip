@@ -23,6 +23,20 @@ config:
 
 tests:
     - label:
+          "DUT sends a write request for the DefaultOTAProviders Attribute to
+          the TH."
+      verification: |
+          Verify that the OTA Requestor App receives the write command and does not reject the value as invalid.
+      disabled: true
+
+    - label:
+          "DUT sends a read request to read the DefaultOTAProviders Attribute to
+          the TH."
+      verification: |
+          Verify that the OTA Requestor App responds to the read command
+      disabled: true
+
+    - label:
           "DUT sends a read request to read the UpdatePossible attribute from
           the TH."
       verification: |

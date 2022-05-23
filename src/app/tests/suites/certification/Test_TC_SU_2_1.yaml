@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    31.2.1. [TC-SU-2.1] DUT will send a QueryImage Command to OTA-P to check for
-    software update.
+    3.2.1. [TC-SU-2.1] DUT will send a QueryImage Command to OTA-P to check for
+    software update
 
 config:
     nodeId: 0x12344321
@@ -23,6 +23,39 @@ config:
     endpoint: 0
 
 tests:
+    - label: "DUT sends a QueryImage command to the TH/OTA-P"
+      verification: |
+          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+
+          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Verify on the OTA Provider logs:
+
+          [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
+          [1645743053317] [97806:20280749] CHIP: [ZCL]     0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   HardwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   Location: XX
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   RequestorCanConsent: 0
+      disabled: true
+
+    - label:
+          "DUT sends a QueryImage command to the TH/OTA-P. Wait for 1 minute."
+      verification: |
+          Run the OTA Provider App using the command:
+          chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy
+
+          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
+
+          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Verify on the OTA Provider logs that the QueryImage command is sent only once in that 1 minute interval.
+      disabled: true
+
     - label:
           "TH2/Administrator sends an AnnounceOTAProvider command to the DUT."
       verification: |
