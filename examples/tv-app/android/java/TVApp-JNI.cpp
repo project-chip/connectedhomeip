@@ -37,6 +37,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -181,14 +182,11 @@ JNI_METHOD(jint, addContentApp)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    const char * nVendorName = env->GetStringUTFChars(vendorName, 0);
-    const char * nAppName    = env->GetStringUTFChars(appName, 0);
-    const char * nAppVersion = env->GetStringUTFChars(appVersion, 0);
-    EndpointId epId = AddContentApp(nVendorName, static_cast<uint16_t>(vendorId), nAppName, static_cast<uint16_t>(productId),
-                                    nAppVersion, manager);
-    env->ReleaseStringUTFChars(vendorName, nVendorName);
-    env->ReleaseStringUTFChars(appName, nAppName);
-    env->ReleaseStringUTFChars(appVersion, nAppVersion);
+    JniUtfString vName(env, vendorName);
+    JniUtfString aName(env, appName);
+    JniUtfString aVersion(env, appVersion);
+    EndpointId epId = AddContentApp(vName.c_str(), static_cast<uint16_t>(vendorId), aName.c_str(), static_cast<uint16_t>(productId),
+                                    aVersion.c_str(), manager);
     return static_cast<uint16_t>(epId);
 }
 

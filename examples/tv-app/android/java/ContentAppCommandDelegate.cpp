@@ -31,7 +31,12 @@ namespace chip {
 namespace AppPlatform {
 
 const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
-{
+{   
+    // to support the hardcoded sample apps.
+    if (mSendCommandMethod == nullptr) {
+        return "Failed";
+    }
+
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jCommandPayload(env, commandPayload.c_str());
     ChipLogProgress(Zcl, "ContentAppCommandDelegate::sendCommand with payload %s", commandPayload.c_str());
@@ -42,6 +47,7 @@ const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::
         ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
         env->ExceptionDescribe();
         env->ExceptionClear();
+        // TODO : Need to have proper errors passed back.
         return "Failed";
     }
     const char * ret = env->GetStringUTFChars(resp, 0);
