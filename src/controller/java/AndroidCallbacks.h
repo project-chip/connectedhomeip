@@ -57,7 +57,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnError(CHIP_ERROR aError) override;
 
-    void OnDone() override;
+    void OnDone(app::ReadClient *) override;
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 

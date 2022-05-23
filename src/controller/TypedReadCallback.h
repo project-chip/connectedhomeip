@@ -96,7 +96,7 @@ private:
 
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone() override { mOnDone(this); }
+    void OnDone(app::ReadClient *) override { mOnDone(this); }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
@@ -173,7 +173,7 @@ private:
 
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone() override { mOnDone(this); }
+    void OnDone(app::ReadClient *) override { mOnDone(this); }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {

@@ -145,8 +145,9 @@ public:
         virtual void OnError(CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
-         * allocated CommandSender object.
+         * OnDone will be called when ReadClient has finished all work and it is
+         * safe to destroy and free the allocated ReadClient object and any
+         * other objects associated with the Read or Subscribe interaction.
          *
          * This function will:
          *      - Always be called exactly *once* for a given ReadClient instance.
@@ -154,8 +155,9 @@ public:
          *      - Only be called after a successful call to SendRequest has been
          *        made, when the read completes or the subscription is shut down.
          *
+         * @param[in] apReadClient the ReadClient for the completed interaction.
          */
-        virtual void OnDone() = 0;
+        virtual void OnDone(ReadClient * apReadClient) = 0;
 
         /**
          * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
