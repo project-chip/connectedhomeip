@@ -553,7 +553,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     ChipLogError(DeviceLayer, "WiFiConnect() failed: %s", chip::ErrorStr(err));
                 }
                 SuccessOrExit(err);
-                
+
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
 

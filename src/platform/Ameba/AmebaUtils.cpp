@@ -139,4 +139,3 @@ CHIP_ERROR AmebaUtils::WiFiConnect(void)
     err = (ameba_err == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     return err;
 }
-
