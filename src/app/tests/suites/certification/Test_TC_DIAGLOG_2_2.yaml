@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    54.3. [TC-Diag Log-2.2] Diagnostic Logs Cluster Commands Checks without BDX
+    54.2.2. [TC-DIAGLOG-2.2] Diagnostic Logs Cluster Commands Checks without BDX
     [DUT Server]
 
 config:
@@ -29,10 +29,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RetrieveLogsRequest Command (Intent = EndUserSupport,
-          TransferFileDesignator = ''test.txt'',RequestedProtocol= BDX) to DUT"
+          "TH sends RetrieveLogsRequest Command (Intent =
+          EndUserSupport,TransferFileDesignator = 'test.txt',RequestedProtocol=
+          BDX) to DUT"
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
 
           [1646209207.288823][3223:3228] CHIP:DMG: InvokeResponseMessage =
           [1646209207.288859][3223:3228] CHIP:DMG: {

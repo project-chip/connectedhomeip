@@ -63,17 +63,10 @@ function getManualTests() {
   ];
 
   const BulkDataExchangeProtocol = [
-    'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
-    'Test_TC_BDX_1_3',
     'Test_TC_BDX_1_4',
-    'Test_TC_BDX_1_5',
-    'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
     'Test_TC_BDX_2_2',
-    'Test_TC_BDX_2_3',
-    'Test_TC_BDX_2_4',
-    'Test_TC_BDX_2_5',
   ];
 
   const bridge = [
@@ -123,13 +116,16 @@ function getManualTests() {
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_Diag_Log_2_1',
-    'Test_TC_Diag_Log_2_2',
-    'Test_TC_Diag_Log_2_3',
+    'Test_TC_DIAGLOG_1_1',
+    'Test_TC_DIAGLOG_2_1',
+    'Test_TC_DIAGLOG_2_2',
+    'Test_TC_DIAGLOG_3_1',
   ];
 
   const Descriptor = [
     'Test_TC_DESC_1_1',
+    'Test_TC_DESC_2_1',
+    'Test_TC_DESC_2_2',
   ];
 
   const EthernetNetworkDiagnostics = [
@@ -216,8 +212,6 @@ function getManualTests() {
     'Test_TC_MF_1_24',
     'Test_TC_MF_1_25',
     'Test_TC_MF_1_26',
-    'Test_TC_MF_1_27',
-    'Test_TC_MF_1_28',
   ];
 
   const ModeSelect = [
@@ -338,6 +332,8 @@ function getManualTests() {
 
   const LocalizationConfiguration = [
     'Test_TC_LO_1_1',
+    'Test_TC_LO_2_1',
+    'Test_TC_LO_3_1',
   ];
 
   const LevelControl = [
