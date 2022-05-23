@@ -74,10 +74,9 @@ public:
     void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
     void ShutdownLoopbackTransport()
     {
-        // TODO: remove these after #17624 (Ensure tests drain all message in loopback transport) being fixed
-        // Packets are allocated from platform memory, we should release them before Platform::MemoryShutdown
-        while (!mPendingMessageQueue.empty())
-            mPendingMessageQueue.pop();
+        // Make sure no one left packets hanging out that they thought got
+        // delivered but actually didn't.
+        VerifyOrDie(mPendingMessageQueue.empty());
     }
 
     /// Transports are required to have a constructor that takes exactly one argument
