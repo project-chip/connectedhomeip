@@ -1,4 +1,4 @@
-# MW320 All Clusters Example Application
+# Matter MW320 All Clusters Example Application
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and the NXP MW320 SDK
@@ -7,7 +7,7 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 
 <hr>
 
--   [MW320 All Clusters Example Application](#mw320-all-clusters-example-application)
+-   [Matter MW320 All Clusters Example Application](#matter-mw320-all-clusters-example-application)
 -   [Introduction](#introduction)
 -   [Building](#building)
 -   [Flashing](#flashing)
