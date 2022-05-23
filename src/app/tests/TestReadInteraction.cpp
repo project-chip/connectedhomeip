@@ -168,6 +168,7 @@ public:
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
+            mReceivedAttributePaths.push_back(aPath);
             mNumAttributeResponse++;
             mGotReport = true;
         }
@@ -209,6 +210,7 @@ public:
     chip::app::ReadHandler * mpReadHandler = nullptr;
     chip::app::StatusIB mLastStatusReceived;
     CHIP_ERROR mError = CHIP_NO_ERROR;
+    std::vector<chip::app::ConcreteAttributePath> mReceivedAttributePaths;
 };
 
 //
@@ -1907,6 +1909,9 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mClusterId == Test::MockClusterId(3));
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mAttributeId == Test::MockAttributeId(1));
         }
     }
 
@@ -1977,6 +1982,9 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mEndpointId == Test::kMockEndpoint2);
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mClusterId == Test::MockClusterId(3));
+            NL_TEST_ASSERT(apSuite, delegate.mReceivedAttributePaths[0].mAttributeId == Test::MockAttributeId(1));
         }
     }
 
