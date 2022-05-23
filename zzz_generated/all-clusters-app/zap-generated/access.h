@@ -389,6 +389,7 @@
     60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
@@ -439,6 +440,7 @@
     2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
     12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
@@ -489,6 +491,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \

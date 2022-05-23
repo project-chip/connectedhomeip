@@ -333,6 +333,7 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace TestCluster
 
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

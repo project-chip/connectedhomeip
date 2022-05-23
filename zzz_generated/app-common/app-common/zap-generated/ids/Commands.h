@@ -27,6 +27,9 @@ namespace Clusters {
 
 // Matter does not have global commands
 
+
+
+
 namespace Identify {
 namespace Commands {
 
@@ -207,6 +210,7 @@ static constexpr CommandId Id = 0x00000042;
 } // namespace Commands
 } // namespace OnOff
 
+
 namespace LevelControl {
 namespace Commands {
 
@@ -274,6 +278,8 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace Alarms
+
+
 
 namespace PowerProfile {
 namespace Commands {
@@ -403,6 +409,10 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace ApplianceControl
 
+
+
+
+
 namespace PollControl {
 namespace Commands {
 
@@ -529,6 +539,11 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
 
+
+
+
+
+
 namespace GeneralCommissioning {
 namespace Commands {
 
@@ -615,6 +630,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 
@@ -654,6 +670,9 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
+
+
+
 
 namespace AdministratorCommissioning {
 namespace Commands {
@@ -761,6 +780,12 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+
+
+
+
+
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -770,6 +795,7 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace ModeSelect
+
 
 namespace DoorLock {
 namespace Commands {
@@ -1001,6 +1027,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace BarrierControl
 
+
 namespace Thermostat {
 namespace Commands {
 
@@ -1034,6 +1061,9 @@ static constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace Thermostat
+
+
+
 
 namespace ColorControl {
 namespace Commands {
@@ -1116,6 +1146,43 @@ static constexpr CommandId Id = 0x0000004C;
 
 } // namespace Commands
 } // namespace ColorControl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 namespace IasZone {
 namespace Commands {
@@ -1246,6 +1313,7 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace IasWd
+
 
 namespace Channel {
 namespace Commands {
@@ -1436,6 +1504,7 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace ApplicationLauncher
+
 
 namespace AccountLogin {
 namespace Commands {
@@ -1634,6 +1703,8 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace Messaging
+
+
 
 namespace ApplianceEventsAndAlert {
 namespace Commands {
