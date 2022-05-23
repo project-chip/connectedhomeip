@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-filter.h>
@@ -31,15 +31,10 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-void IdentifyClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                     chip::Callback::Cancelable * onFailureCallback);
-typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void OnOffClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                  chip::Callback::Cancelable * onFailureCallback);
-typedef void (*OnOffAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void ScenesClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                   chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void IdentifyClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*IdentifyAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void OnOffClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OnOffAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void ScenesClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*ScenesAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+

@@ -1222,6 +1222,11 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 1;
   }
 
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
   request struct SetYearDayScheduleRequest {
     INT8U yearDayIndex = 0;
     INT16U userIndex = 1;
@@ -1299,6 +1304,7 @@ server cluster DoorLock = 257 {
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
   command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
   command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
   command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
   command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;

@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-filter.h>
@@ -31,19 +31,10 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                chip::Callback::Cancelable * onFailureCallback);
-typedef void (*AccessControlAclListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        data);
-void AccessControlClusterExtensionListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                      chip::Callback::Cancelable * onFailureCallback);
-typedef void (*AccessControlExtensionListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
-void AccessControlClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                          chip::Callback::Cancelable * onSuccessCallback,
-                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*AccessControlAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*AccessControlAclListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> & data);
+void AccessControlClusterExtensionListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*AccessControlExtensionListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
+void AccessControlClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*AccessControlAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+

@@ -24,12 +24,45 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+
+
+
+
+
+
+
+
+
+
+
 @interface CHIPScenesClusterSceneExtensionFieldSet : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 @property (strong, nonatomic) NSNumber * _Nonnull length;
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 - (instancetype)init;
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @interface CHIPPowerProfileClusterPowerProfileRecord : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
@@ -55,11 +88,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
+
+
+
+
+
+
 @interface CHIPDescriptorClusterDeviceType : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSNumber * _Nonnull revision;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPBindingClusterTargetStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable node;
@@ -69,6 +114,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPAccessControlClusterTarget : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
@@ -92,6 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
 @interface CHIPAccessControlClusterAccessControlEntryChangedEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable adminNodeID;
 @property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
@@ -107,6 +156,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPAccessControlClusterExtensionEntry * _Nullable latestValue;
 @property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
 @end
+
+
+
+
+
 
 @interface CHIPBridgedActionsClusterActionStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull actionID;
@@ -126,6 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
 @interface CHIPBridgedActionsClusterStateChangedEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull actionID;
 @property (strong, nonatomic) NSNumber * _Nonnull invokeID;
@@ -139,11 +194,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull error;
 @end
 
+
+
 @interface CHIPBasicClusterCapabilityMinimaStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull caseSessionsPerFabric;
 @property (strong, nonatomic) NSNumber * _Nonnull subscriptionsPerFabric;
 - (instancetype)init;
 @end
+
 
 @interface CHIPBasicClusterStartUpEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
@@ -159,12 +217,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull reachableNewValue;
 @end
 
+
+
+
+
+
 @interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull providerNodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
+
 
 @interface CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull previousState;
@@ -185,6 +249,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable platformCode;
 @end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @interface CHIPPowerSourceClusterBatChargeFaultChangeType : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull current;
 @property (strong, nonatomic) NSArray * _Nonnull previous;
@@ -203,10 +281,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPNetworkCommissioningClusterNetworkInfo : NSObject
 @property (strong, nonatomic) NSData * _Nonnull networkID;
@@ -236,6 +320,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
+
+
+
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSNumber * _Nonnull isOperational;
@@ -247,6 +337,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;
 @end
+
 
 @interface CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull current;
@@ -267,6 +358,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull bootReason;
 @end
 
+
+
 @interface CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
 @property (strong, nonatomic) NSString * _Nonnull name;
@@ -283,9 +376,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
 @interface CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject
 @property (strong, nonatomic) CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull softwareFault;
 @end
+
+
 
 @interface CHIPThreadNetworkDiagnosticsClusterNeighborTable : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull extAddress;
@@ -341,9 +437,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
 @interface CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull connectionStatus;
 @end
+
+
+
 
 @interface CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull reasonCode;
@@ -358,6 +458,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull connectionStatus;
 @end
 
+
+
+
+
+
+
+
+
+
 @interface CHIPBridgedDeviceBasicClusterStartUpEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
 @end
@@ -371,6 +480,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBridgedDeviceBasicClusterReachableChangedEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull reachableNewValue;
 @end
+
+
+
 
 @interface CHIPSwitchClusterSwitchLatchedEvent : NSObject
 @property (strong, nonatomic, getter=getNewPosition) NSNumber * _Nonnull newPosition;
@@ -402,6 +514,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull totalNumberOfPressesCounted;
 @end
 
+
+
+
+
+
 @interface CHIPOperationalCredentialsClusterFabricDescriptor : NSObject
 @property (strong, nonatomic) NSData * _Nonnull rootPublicKey;
 @property (strong, nonatomic) NSNumber * _Nonnull vendorId;
@@ -418,6 +535,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPGroupKeyManagementClusterGroupInfoMapStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
@@ -446,11 +566,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPFixedLabelClusterLabelStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSString * _Nonnull value;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPUserLabelClusterLabelStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
@@ -458,9 +584,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 @interface CHIPBooleanStateClusterStateChangeEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull stateValue;
 @end
+
+
 
 @interface CHIPModeSelectClusterModeOptionStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
@@ -475,11 +616,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
+
+
+
 @interface CHIPDoorLockClusterDlCredential : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull credentialType;
 @property (strong, nonatomic) NSNumber * _Nonnull credentialIndex;
 - (instancetype)init;
 @end
+
 
 @interface CHIPDoorLockClusterDoorLockAlarmEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull alarmCode;
@@ -517,6 +665,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable sourceNode;
 @property (strong, nonatomic) NSNumber * _Nullable dataIndex;
 @end
+
+
+
+
+
+
+
+
+
 
 @interface CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent : NSObject
 @end
@@ -569,11 +726,151 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject
 @end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 @property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;
 - (instancetype)init;
 @end
+
+
+
+
+
+
+
+
+
 
 @interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
@@ -592,17 +889,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPTargetNavigatorClusterTargetInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull identifier;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPMediaPlaybackClusterPlaybackPosition : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull updatedAt;
 @property (strong, nonatomic) NSNumber * _Nullable position;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPMediaInputClusterInputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
@@ -611,6 +917,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull descriptionString;
 - (instancetype)init;
 @end
+
+
+
+
+
+
+
+
+
 
 @interface CHIPContentLauncherClusterDimension : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull width;
@@ -654,12 +969,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPAudioOutputClusterOutputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 @property (strong, nonatomic) NSNumber * _Nonnull outputType;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
+
+
+
 
 @interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
@@ -673,11 +994,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
+
+
 @interface CHIPApplicationBasicClusterApplicationBasicApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
+
+
+
+
+
+
 
 @interface CHIPTestClusterClusterSimpleStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull a;
@@ -748,6 +1078,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+
 @interface CHIPTestClusterClusterTestEventEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
@@ -760,6 +1091,27 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestFabricScopedEventEvent : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 NS_ASSUME_NONNULL_END
 
