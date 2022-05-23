@@ -593,7 +593,7 @@ inline void chipDie(void)
     } while (false)
 
 /**
- *  @def VerifyOrdo(expr, ...)
+ *  @def VerifyOrDo(expr, ...)
  *
  *  @brief
  *    do something if expression evaluates to false
@@ -601,12 +601,12 @@ inline void chipDie(void)
  *  Example usage:
  *
  * @code
- *    VerifyOrdo(param != nullptr, LogError("param is nullptr"));
+ *    VerifyOrDo(param != nullptr, LogError("param is nullptr"));
  *  @endcode
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
  */
-#define VerifyOrdo(expr, ...)                                                                                                      \
+#define VerifyOrDo(expr, ...)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \

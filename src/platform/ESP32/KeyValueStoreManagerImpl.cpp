@@ -78,7 +78,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
-    VerifyOrdo(HashIfLongKey(key, keyHash) == false, key = keyHash);
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
 
     ReturnMappedErrorOnFailure(nvs_get_blob(handle, key, value, &value_size));
 
@@ -98,7 +98,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
-    VerifyOrdo(HashIfLongKey(key, keyHash) == false, key = keyHash);
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
 
     ReturnMappedErrorOnFailure(nvs_set_blob(handle, key, value, value_size));
 
@@ -115,7 +115,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
-    VerifyOrdo(HashIfLongKey(key, keyHash) == false, key = keyHash);
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
 
     ReturnMappedErrorOnFailure(nvs_erase_key(handle, key));
 
