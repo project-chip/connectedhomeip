@@ -17,8 +17,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <limits>
@@ -40,8 +40,8 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
-    rtw_wifi_config_t config = {0};
-    err = chip::DeviceLayer::Internal::AmebaUtils::GetWiFiConfig(&config);
+    rtw_wifi_config_t config = { 0 };
+    err                      = chip::DeviceLayer::Internal::AmebaUtils::GetWiFiConfig(&config);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
@@ -64,7 +64,7 @@ CHIP_ERROR AmebaWiFiDriver::Shutdown()
 
 CHIP_ERROR AmebaWiFiDriver::CommitConfiguration()
 {
-    rtw_wifi_config_t config = {0};
+    rtw_wifi_config_t config = { 0 };
     memcpy(config.ssid, mStagingNetwork.ssid, mStagingNetwork.ssidLen);
     memcpy(config.password, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
     ReturnErrorOnFailure(chip::DeviceLayer::Internal::AmebaUtils::SetWiFiConfig(&config));
@@ -349,7 +349,7 @@ bool AmebaWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     if (err == CHIP_NO_ERROR)
     {
         bool isConnected = false;
-        err = chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(isConnected);
+        err              = chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(isConnected);
 
         if (isConnected && configuredNetwork.networkIDLen == item.networkIDLen &&
             memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)

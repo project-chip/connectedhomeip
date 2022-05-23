@@ -35,7 +35,7 @@ BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
-}
+} // namespace
 
 extern "C" void amebaQueryImageCmdHandler()
 {

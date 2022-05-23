@@ -63,7 +63,6 @@ void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 }
 #endif
 
-
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     switch (event->Type)

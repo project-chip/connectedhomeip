@@ -32,8 +32,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
-#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -60,7 +60,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mLastStationConnectFailTime   = System::Clock::kZero;
     mLastAPDemandTime             = System::Clock::kZero;

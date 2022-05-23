@@ -32,8 +32,8 @@ public:
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR EnableStationMode(void);
-    static CHIP_ERROR SetWiFiConfig(rtw_wifi_config_t *config);
-    static CHIP_ERROR GetWiFiConfig(rtw_wifi_config_t *config);
+    static CHIP_ERROR SetWiFiConfig(rtw_wifi_config_t * config);
+    static CHIP_ERROR GetWiFiConfig(rtw_wifi_config_t * config);
     static CHIP_ERROR ClearWiFiConfig(void);
     static CHIP_ERROR WiFiDisconnect(void);
     static CHIP_ERROR WiFiConnect(void);
