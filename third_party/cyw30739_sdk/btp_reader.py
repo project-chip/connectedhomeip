@@ -26,17 +26,24 @@ def main():
                 else:
                     items[key] = int(value, 0)
 
-    items["XS_LOCATION_ACTIVE"] = 0x0052E000
+    ds_len = items["ConfigDS2Location"] - items["ConfigDSLocation"]
+    xs_location_end = 0x00600000
+
+    items["ConfigXS1Location"] = items["ConfigDS2Location"] + ds_len
 
     if option.enable_ota:
-        items["XS_LOCATION_UPGRADE"] = 0x005A3000
+        items["ConfigXS1Length"] = 0x00076000
+        items["ConfigXS2Location"] = (
+            items["ConfigXS1Location"] + items["ConfigXS1Length"]
+        )
+        items["ConfigXS2Length"] = xs_location_end - items["ConfigXS2Location"]
     else:
-        items["XS_LOCATION_UPGRADE"] = 0x00600000
+        items["ConfigXS1Length"] = xs_location_end - items["ConfigXS1Location"]
+        items["ConfigXS2Length"] = 0
+        items["ConfigXS2Location"] = xs_location_end
 
-    items["XIP_DS_OFFSET"] = items["XS_LOCATION_ACTIVE"] - \
+    items["ConfigXS1DS1Offset"] = items["ConfigXS1Location"] - \
         items["ConfigDSLocation"]
-    items["XIP_LEN"] = items["XS_LOCATION_UPGRADE"] - \
-        items["XS_LOCATION_ACTIVE"]
 
     for key in items:
         if type(items[key]) is int:

@@ -23,6 +23,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/CYW30739/DeviceInfoProviderImpl.h>
 #include <platform/CYW30739/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.ipp>
@@ -47,7 +48,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
     /* Initialize LwIP. */
     lwip_init();
 

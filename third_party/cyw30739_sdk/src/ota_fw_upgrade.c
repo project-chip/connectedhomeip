@@ -222,8 +222,7 @@ typedef struct upgrade_xs
 
 extern const CONFIG_INFO_t g_config_Info;
 
-static uint32_t upgrade_location_write(uint32_t offset, uint8_t * data, uint32_t len);
-static bool upgrade_location_erase(uint32_t offset, uint8_t * data);
+static uint32_t upgrade_location_write(uint32_t offset, const uint8_t * data, uint32_t len);
 static bool lzss_decompress(const void * src, size_t n, bool (*data_writer)(uint32_t, int))
     __attribute__((section(".text_in_ram")));
 static bool xs_data_writer(uint32_t data_offset, int c) __attribute__((section(".text_in_ram")));
@@ -274,21 +273,36 @@ reset:
 
 bool wiced_firmware_upgrade_prepare(void)
 {
-    const uint32_t ds1_location = g_config_Info.layout.failsafe_ds_base;
-    const uint32_t ds1_length   = g_config_Info.layout.upgradable_ds_base - g_config_Info.layout.failsafe_ds_base;
-    const uint32_t ds2_location = g_config_Info.layout.upgradable_ds_base;
-    const uint32_t ds2_length   = XS_LOCATION_ACTIVE - g_config_Info.layout.upgradable_ds_base;
+    const uint32_t ds1_length = g_config_Info.layout.upgradable_ds_base - g_config_Info.layout.failsafe_ds_base;
+    const uint32_t ds2_length = XS_LOCATION_ACTIVE - g_config_Info.layout.upgradable_ds_base;
 
-    printf("DS1: 0x%08lx, len: 0x%08lx\n", ds1_location, ds1_length);
-    printf("DS2: 0x%08lx, len: 0x%08lx\n", ds2_location, ds2_length);
-    printf("Active  DS: 0x%08x\n", g_config_Info.active_ds_base);
-    printf("Active  XS: 0x%08x\n", XS_LOCATION_ACTIVE);
-    printf("Upgrade XS: 0x%08x\n", XS_LOCATION_UPGRADE);
+    printf("Active DS: 0x%08x\n", g_config_Info.active_ds_base);
+    printf("Active XS: 0x%08x\n", XS_LOCATION_ACTIVE);
 
-    return upgrade_ds_location() != 0;
+    if (upgrade_ds_location() == 0 || ds1_length != ds2_length)
+    {
+        return false;
+    }
+
+    printf("Erasing Upgrade DS: 0x%08lx, len: 0x%08lx\n", upgrade_ds_location(), ds1_length);
+    if (WICED_SUCCESS != wiced_hal_eflash_erase(ef_offset(upgrade_ds_location()), ds1_length))
+    {
+        printf("ERROR erase\n");
+        return false;
+    }
+
+    const uint32_t upgrade_xs_length = FLASH_SIZE - ef_offset(XS_LOCATION_UPGRADE);
+    printf("Erasing Upgrade XS: 0x%08x, len: 0x%08lx\n", XS_LOCATION_UPGRADE, upgrade_xs_length);
+    if (WICED_SUCCESS != wiced_hal_eflash_erase(ef_offset(XS_LOCATION_UPGRADE), upgrade_xs_length))
+    {
+        printf("ERROR erase\n");
+        return false;
+    }
+
+    return true;
 }
 
-uint32_t wiced_firmware_upgrade_process_block(uint32_t offset, uint8_t * data, uint32_t len)
+uint32_t wiced_firmware_upgrade_process_block(uint32_t offset, const uint8_t * data, uint32_t len)
 {
     const ds_header_t * ds_header = (const ds_header_t *) upgrade_ds_location();
 
@@ -337,44 +351,8 @@ uint32_t wiced_firmware_upgrade_process_block(uint32_t offset, uint8_t * data, u
     return byte_written;
 }
 
-bool upgrade_location_erase(uint32_t offset, uint8_t * data)
+uint32_t upgrade_location_write(uint32_t offset, const uint8_t * data, uint32_t len)
 {
-    uint32_t erase_length;
-    if (offset == upgrade_ds_location())
-    {
-        const ds_header_t * ds_header = (const ds_header_t *) data;
-        erase_length                  = sizeof(*ds_header) + ds_header->length;
-    }
-    else if (offset == XS_LOCATION_UPGRADE)
-    {
-        const upgrade_xs_t * upgrade_xs = (const upgrade_xs_t *) data;
-        erase_length                    = sizeof(*upgrade_xs) + upgrade_xs->compressed_data_length;
-    }
-    else
-    {
-        return true;
-    }
-
-    if (erase_length != 0)
-    {
-        printf("Erasing 0x%08lx, len: %lu\n", offset, erase_length);
-        if (WICED_SUCCESS != wiced_hal_eflash_erase(ef_offset(offset), erase_length))
-        {
-            printf("ERROR erase\n");
-            return false;
-        }
-    }
-
-    return true;
-}
-
-uint32_t upgrade_location_write(uint32_t offset, uint8_t * data, uint32_t len)
-{
-    if (!upgrade_location_erase(offset, data))
-    {
-        return 0;
-    }
-
     // reserve first 4 bytes of download to commit when complete, in case of unexpected power loss
     // boot rom checks this signature to validate DS
     uint32_t offset_adjustment;
@@ -392,7 +370,7 @@ uint32_t upgrade_location_write(uint32_t offset, uint8_t * data, uint32_t len)
 
     printf("write: offset: 0x%08lx len: %lu\n", offset, len);
     /* write length should in words */
-    if (wiced_hal_eflash_write(ef_offset(offset), data, (len + 3) & 0xfffffffc) == WICED_SUCCESS)
+    if (wiced_hal_eflash_write(ef_offset(offset), (uint8_t *) data, (len + 3) & 0xfffffffc) == WICED_SUCCESS)
     {
         return len + offset_adjustment;
     }
@@ -564,7 +542,7 @@ uint32_t calc_crc32(const uint8_t * buf, uint32_t len)
 
 uint32_t ef_offset(uint32_t offset)
 {
-    return offset - 0x00500000u;
+    return offset - FLASH_BASE_ADDRESS;
 }
 
 uint32_t upgrade_ds_location(void)
