@@ -19,12 +19,8 @@ import androidx.fragment.app.Fragment;
 import com.matter.tv.server.R;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
-import com.matter.tv.server.service.ContentAppAgentService;
 import com.matter.tv.server.service.MatterServant;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link ContentAppFragment#newInstance} factory method
@@ -67,7 +63,8 @@ public class ContentAppFragment extends Fragment {
     super.onResume();
 
     ContentAppDiscoveryService.getReceiverInstance().registerSelf(getContext());
-    ArrayList<String> lst = new ArrayList<String>(
+    ArrayList<String> lst =
+        new ArrayList<String>(
             ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().keySet());
     ContentAppListAdapter adapter =
         new ContentAppListAdapter(getContext(), R.layout.applist_item, lst);
@@ -86,10 +83,10 @@ public class ContentAppFragment extends Fragment {
 
   private class ContentAppListAdapter extends ArrayAdapter<String> {
 
-  private int layout;
+    private int layout;
 
     public ContentAppListAdapter(
-            @NonNull Context context, int resource, @NonNull ArrayList<String> packages) {
+        @NonNull Context context, int resource, @NonNull ArrayList<String> packages) {
       super(context, resource, packages);
       layout = resource;
     }
@@ -111,9 +108,9 @@ public class ContentAppFragment extends Fragment {
             view -> {
               Log.i(TAG, "Button was clicked for " + position);
               for (ContentApp app :
-                      ContentAppDiscoveryService.getReceiverInstance()
-                              .getDiscoveredContentApps()
-                              .values()) {
+                  ContentAppDiscoveryService.getReceiverInstance()
+                      .getDiscoveredContentApps()
+                      .values()) {
                 if (app.getAppName().equals(getItem(position))) {
                   MatterServant.get().sendTestMessage(app.getEndpointId(), "My Native Message");
                 }
@@ -130,24 +127,27 @@ public class ContentAppFragment extends Fragment {
 
   private void registerReceiver(ArrayAdapter adapter) {
     broadcastReceiver =
-            new BroadcastReceiver() {
-              @Override
-              public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                String packageName = intent.getStringExtra("com.matter.tv.server.appagent.add.pkg");
-                if (action.equals("com.matter.tv.server.appagent.add")
-                        || action.equals("com.matter.tv.server.appagent.remove")) {
-                  adapter.clear();
-                  adapter.addAll(
-                          ContentAppDiscoveryService.getReceiverInstance()
-                                  .getDiscoveredContentApps()
-                                  .entrySet());
-                  adapter.notifyDataSetChanged();
-                }
-              }
-            };
-    getContext().registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.add"));
-    getContext().registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
+        new BroadcastReceiver() {
+          @Override
+          public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String packageName = intent.getStringExtra("com.matter.tv.server.appagent.add.pkg");
+            if (action.equals("com.matter.tv.server.appagent.add")
+                || action.equals("com.matter.tv.server.appagent.remove")) {
+              adapter.clear();
+              adapter.addAll(
+                  ContentAppDiscoveryService.getReceiverInstance()
+                      .getDiscoveredContentApps()
+                      .entrySet());
+              adapter.notifyDataSetChanged();
+            }
+          }
+        };
+    getContext()
+        .registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.add"));
+    getContext()
+        .registerReceiver(
+            broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
   }
 
   public class ViewHolder {
