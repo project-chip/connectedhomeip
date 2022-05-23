@@ -226,6 +226,9 @@ server cluster AudioOutput = 1291 {
 
   readonly attribute OutputInfo outputList[] = 0;
   readonly attribute int8u currentOutput = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -2340,6 +2343,9 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster MediaPlayback {
+  }
+
   server cluster MediaInput {
     callback attribute inputList;
     ram      attribute currentInput;
@@ -2361,6 +2367,16 @@ endpoint 1 {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
     ram      attribute featureMap default = 0x0003;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AudioOutput {
+    callback attribute outputList;
+    ram      attribute currentOutput;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x001;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2406,13 +2422,6 @@ endpoint 2 {
     callback attribute partsList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
-  }
-
-  server cluster AudioOutput {
-    callback attribute outputList;
-    ram      attribute currentOutput;
-    ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 1;
   }
 }
 
