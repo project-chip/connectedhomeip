@@ -35,7 +35,7 @@ public:
     ContentAppCommandDelegate(jobject manager)
     {
 
-        if(manager == nullptr) 
+        if(manager == nullptr)
         {
             // To support the existing hardcoded sample apps.
             return;
