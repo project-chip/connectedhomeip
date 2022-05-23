@@ -300,7 +300,8 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
     switch (stage)
     {
     case CommissioningStage::kWiFiNetworkEnable:
-        ChipLogError(Controller, "Setting wifi connection time min = %u", mDeviceCommissioningInfo.network.wifi.minConnectionTime);
+        ChipLogProgress(Controller, "Setting wifi connection time min = %u",
+                        mDeviceCommissioningInfo.network.wifi.minConnectionTime);
         seconds = std::max(mDeviceCommissioningInfo.network.wifi.minConnectionTime, seconds);
         break;
     case CommissioningStage::kThreadNetworkEnable:
