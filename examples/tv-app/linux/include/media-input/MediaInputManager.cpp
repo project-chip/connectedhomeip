@@ -17,6 +17,7 @@
 
 #include "MediaInputManager.h"
 
+using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 
@@ -70,13 +71,21 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
 
 bool MediaInputManager::HandleShowInputStatus()
 {
-    // TODO: Insert code here
+    ChipLogProgress(Zcl, " MediaInputManager::HandleShowInputStatus()");
+    for (auto const & inputInfo : this->mInputs)
+    {
+        string name(inputInfo.name.data(), inputInfo.name.size());
+        string desc(inputInfo.description.data(), inputInfo.description.size());
+        ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputInfo.index,
+                        static_cast<uint16_t>(inputInfo.inputType), (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(),
+                        desc.c_str());
+    }
     return true;
 }
 
 bool MediaInputManager::HandleHideInputStatus()
 {
-    // TODO: Insert code here
+    ChipLogProgress(Zcl, " MediaInputManager::HandleHideInputStatus()");
     return true;
 }
 
