@@ -70,13 +70,7 @@ bool DnssdServer::HaveOperationalCredentials()
     VerifyOrDie(mFabricTable != nullptr);
 
     // Look for any fabric info that has a useful operational identity.
-    for (const FabricInfo & fabricInfo : *mFabricTable)
-    {
-        (void) fabricInfo;
-        return true;
-    }
-
-    return false;
+    return mFabricTable->FabricCount() != 0;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
