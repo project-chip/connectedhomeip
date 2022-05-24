@@ -648,9 +648,6 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
 
 void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
-    bool handleIdleStateEnter       = true;
-    IdleStateReason idleStateReason = IdleStateReason::kUnknown;
-
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
 
@@ -673,24 +670,20 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
 
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
-        idleStateReason      = MapErrorToIdleStateReason(error);
-        handleIdleStateEnter = true;
+        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
+        // Update the new state before handling the state transition
+        mCurrentUpdateState = newState;
+        mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
     }
     else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {
-        handleIdleStateEnter = false;
-    }
-
-    // Update the new state before handling the state transition
-    mCurrentUpdateState = newState;
-
-    if (handleIdleStateEnter)
-    {
-        mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
+        // Update the new state before handling the state transition
+        mCurrentUpdateState = newState;
+        mOtaRequestorDriver->HandleIdleStateExit();
     }
     else
     {
-        mOtaRequestorDriver->HandleIdleStateExit();
+        mCurrentUpdateState = newState;
     }
 }
 
