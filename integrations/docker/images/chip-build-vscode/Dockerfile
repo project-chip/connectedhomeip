@@ -57,6 +57,14 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && : # last line
+
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
