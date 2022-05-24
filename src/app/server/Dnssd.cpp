@@ -72,7 +72,7 @@ bool DnssdServer::HaveOperationalCredentials()
     // Look for any fabric info that has a useful operational identity.
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
-        (void)fabricInfo;
+        (void) fabricInfo;
         return true;
     }
 
