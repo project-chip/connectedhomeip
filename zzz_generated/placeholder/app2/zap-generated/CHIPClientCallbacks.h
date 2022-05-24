@@ -97,4 +97,3 @@ void ThermostatUserInterfaceConfigurationClusterAcceptedCommandListListAttribute
 typedef void (*ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void ThermostatUserInterfaceConfigurationClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

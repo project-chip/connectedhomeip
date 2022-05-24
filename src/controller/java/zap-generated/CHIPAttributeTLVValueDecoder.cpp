@@ -34,7 +34,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     switch (aPath.mClusterId)
     {
         case app::Clusters::AccessControl::Id: {
@@ -51,7 +51,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -70,7 +70,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         newElement_0_subjects = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_subjects);
-        
+
           auto iter_newElement_0_subjects_NaN = entry_0.subjects.Value().begin();
           while (iter_newElement_0_subjects_NaN.Next())
           {
@@ -87,7 +87,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         newElement_0_targets = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_targets);
-        
+
           auto iter_newElement_0_targets_NaN = entry_0.targets.Value().begin();
           while (iter_newElement_0_targets_NaN.Next())
           {
@@ -143,7 +143,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass accessControlEntryStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntry", accessControlEntryStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -178,7 +178,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -192,7 +192,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass extensionEntryStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AccessControlClusterExtensionEntry", extensionEntryStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -266,7 +266,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -289,7 +289,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -312,7 +312,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -359,7 +359,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -382,7 +382,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -405,7 +405,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -494,7 +494,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -517,7 +517,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -540,7 +540,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -700,7 +700,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -723,7 +723,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -746,7 +746,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -769,7 +769,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -816,7 +816,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -907,7 +907,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -930,7 +930,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -953,7 +953,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1000,7 +1000,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1063,7 +1063,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1086,7 +1086,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1109,7 +1109,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1212,7 +1212,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1235,7 +1235,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1258,7 +1258,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1554,7 +1554,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string value_subscriptionsPerFabricClassName = "java/lang/Integer";
         std::string value_subscriptionsPerFabricCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(value_subscriptionsPerFabricClassName.c_str(), value_subscriptionsPerFabricCtorSignature.c_str(), cppValue.subscriptionsPerFabric, value_subscriptionsPerFabric);
-      
+
     jclass capabilityMinimaStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$BasicClusterCapabilityMinimaStruct", capabilityMinimaStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -1584,7 +1584,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1607,7 +1607,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1630,7 +1630,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1719,7 +1719,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1742,7 +1742,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1765,7 +1765,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1812,7 +1812,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1862,7 +1862,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass targetStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$BindingClusterTargetStruct", targetStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -1897,7 +1897,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1920,7 +1920,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -1943,7 +1943,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2004,7 +2004,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2027,7 +2027,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2050,7 +2050,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2097,7 +2097,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2161,7 +2161,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2179,7 +2179,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
       chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), static_cast<uint8_t>(entry_0.type), newElement_0_type);
       jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
-      
+
         auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
         while (iter_newElement_0_endpoints_NaN.Next())
         {
@@ -2236,7 +2236,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2259,7 +2259,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2282,7 +2282,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2517,7 +2517,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2540,7 +2540,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2563,7 +2563,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2610,7 +2610,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2808,7 +2808,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2831,7 +2831,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -2854,7 +2854,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3627,7 +3627,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3650,7 +3650,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3673,7 +3673,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3720,7 +3720,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3755,7 +3755,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3778,7 +3778,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3801,7 +3801,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3848,7 +3848,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3862,7 +3862,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_revisionClassName = "java/lang/Integer";
         std::string newElement_0_revisionCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_revisionClassName.c_str(), newElement_0_revisionCtorSignature.c_str(), entry_0.revision, newElement_0_revision);
-      
+
     jclass deviceTypeStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceType", deviceTypeStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -3894,7 +3894,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3917,7 +3917,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3940,7 +3940,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3963,7 +3963,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -3986,7 +3986,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4009,7 +4009,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4056,7 +4056,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4079,7 +4079,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4102,7 +4102,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4477,7 +4477,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4500,7 +4500,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4523,7 +4523,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4724,7 +4724,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4747,7 +4747,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4770,7 +4770,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4955,7 +4955,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -4978,7 +4978,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5001,7 +5001,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5216,7 +5216,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5239,7 +5239,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5262,7 +5262,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5323,7 +5323,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5365,7 +5365,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5388,7 +5388,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5411,7 +5411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5526,7 +5526,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5549,7 +5549,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5572,7 +5572,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5636,7 +5636,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string value_failSafeExpiryLengthSecondsClassName = "java/lang/Integer";
         std::string value_failSafeExpiryLengthSecondsCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(value_failSafeExpiryLengthSecondsClassName.c_str(), value_failSafeExpiryLengthSecondsCtorSignature.c_str(), cppValue.failSafeExpiryLengthSeconds, value_failSafeExpiryLengthSeconds);
-      
+
     jclass basicCommissioningInfoStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$GeneralCommissioningClusterBasicCommissioningInfo", basicCommissioningInfoStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -5707,7 +5707,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5730,7 +5730,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5753,7 +5753,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5800,7 +5800,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5834,7 +5834,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         newElement_0_hardwareAddress = newElement_0_hardwareAddressByteArray;
       jobject newElement_0_IPv4Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv4Addresses);
-      
+
         auto iter_newElement_0_IPv4Addresses_NaN = entry_0.IPv4Addresses.begin();
         while (iter_newElement_0_IPv4Addresses_NaN.Next())
         {
@@ -5847,7 +5847,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
       jobject newElement_0_IPv6Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
-      
+
         auto iter_newElement_0_IPv6Addresses_NaN = entry_0.IPv6Addresses.begin();
         while (iter_newElement_0_IPv6Addresses_NaN.Next())
         {
@@ -5956,7 +5956,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -5979,7 +5979,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6002,7 +6002,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6025,7 +6025,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6048,7 +6048,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6071,7 +6071,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6118,7 +6118,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6136,7 +6136,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass groupKeyMapStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct", groupKeyMapStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -6169,7 +6169,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6181,7 +6181,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupIdClassName.c_str(), newElement_0_groupIdCtorSignature.c_str(), entry_0.groupId, newElement_0_groupId);
             jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
-      
+
         auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
         while (iter_newElement_0_endpoints_NaN.Next())
         {
@@ -6204,7 +6204,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass groupInfoMapStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct", groupInfoMapStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -6266,7 +6266,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6289,7 +6289,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6312,7 +6312,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6373,7 +6373,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6396,7 +6396,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6419,7 +6419,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6494,7 +6494,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6517,7 +6517,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6540,7 +6540,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6673,7 +6673,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6696,7 +6696,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6719,7 +6719,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6766,7 +6766,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6789,7 +6789,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -6812,7 +6812,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7075,7 +7075,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7098,7 +7098,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7121,7 +7121,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7194,7 +7194,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7215,7 +7215,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7238,7 +7238,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7285,7 +7285,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7308,7 +7308,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7331,7 +7331,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7378,7 +7378,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7444,7 +7444,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7467,7 +7467,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7490,7 +7490,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7682,7 +7682,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7705,7 +7705,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7728,7 +7728,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7805,7 +7805,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7821,7 +7821,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_semanticTagClassName = "java/lang/Long";
         std::string newElement_0_semanticTagCtorSignature = "(J)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_semanticTagClassName.c_str(), newElement_0_semanticTagCtorSignature.c_str(), entry_0.semanticTag, newElement_0_semanticTag);
-      
+
     jclass modeOptionStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ModeSelectClusterModeOptionStruct", modeOptionStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -7904,7 +7904,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7927,7 +7927,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -7950,7 +7950,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8025,7 +8025,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8039,7 +8039,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_connectedClassName = "java/lang/Boolean";
         std::string newElement_0_connectedCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_connectedClassName.c_str(), newElement_0_connectedCtorSignature.c_str(), entry_0.connected, newElement_0_connected);
-      
+
     jclass networkInfoStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -8167,7 +8167,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8190,7 +8190,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8251,7 +8251,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8298,7 +8298,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8316,7 +8316,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass providerLocationStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation", providerLocationStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -8395,7 +8395,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8484,7 +8484,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8507,7 +8507,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8530,7 +8530,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8651,7 +8651,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8674,7 +8674,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8697,7 +8697,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8786,7 +8786,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8809,7 +8809,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8832,7 +8832,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8879,7 +8879,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8901,7 +8901,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass NOCStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterNOCStruct", NOCStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -8934,7 +8934,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -8962,7 +8962,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass fabricDescriptorStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptor", fabricDescriptorStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -9026,7 +9026,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9063,7 +9063,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9086,7 +9086,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9109,7 +9109,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9252,7 +9252,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9289,7 +9289,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9312,7 +9312,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9335,7 +9335,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9396,7 +9396,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9419,7 +9419,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9442,7 +9442,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9465,7 +9465,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -9566,7 +9566,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10021,7 +10021,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10044,7 +10044,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10067,7 +10067,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10196,7 +10196,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10219,7 +10219,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10242,7 +10242,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10359,7 +10359,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10382,7 +10382,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10405,7 +10405,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10452,7 +10452,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10476,7 +10476,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_stackSizeClassName = "java/lang/Long";
         std::string newElement_0_stackSizeCtorSignature = "(J)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackSizeClassName.c_str(), newElement_0_stackSizeCtorSignature.c_str(), entry_0.stackSize, newElement_0_stackSize);
-      
+
     jclass threadMetricsStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetrics", threadMetricsStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -10553,7 +10553,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10576,7 +10576,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10599,7 +10599,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10702,7 +10702,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10725,7 +10725,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10748,7 +10748,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10809,7 +10809,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10867,7 +10867,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10890,7 +10890,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -10913,7 +10913,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11028,7 +11028,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11439,7 +11439,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11462,7 +11462,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11485,7 +11485,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11611,7 +11611,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -11709,7 +11709,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_nullableStruct_hClassName = "java/lang/Double";
         std::string newElement_0_nullableStruct_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_nullableStruct_hClassName.c_str(), newElement_0_nullableStruct_hCtorSignature.c_str(), entry_0.nullableStruct.Value().h, newElement_0_nullableStruct_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -11769,7 +11769,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_optionalStructInsideOptional_hClassName = "java/lang/Double";
         std::string newElement_0_optionalStructInsideOptional_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_optionalStructInsideOptional_hClassName.c_str(), newElement_0_optionalStructInsideOptional_hCtorSignature.c_str(), entry_0.optionalStruct.Value().h, newElement_0_optionalStructInsideOptional_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -11833,7 +11833,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_nullableOptionalStructInsideOptional_hClassName = "java/lang/Double";
         std::string newElement_0_nullableOptionalStructInsideOptional_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_nullableOptionalStructInsideOptional_hClassName.c_str(), newElement_0_nullableOptionalStructInsideOptional_hCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().h, newElement_0_nullableOptionalStructInsideOptional_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -11865,7 +11865,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         newElement_0_nullableList = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableList);
-        
+
           auto iter_newElement_0_nullableList_NaN = entry_0.nullableList.Value().begin();
           while (iter_newElement_0_nullableList_NaN.Next())
           {
@@ -11883,7 +11883,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
       } else {
         jobject newElement_0_optionalListInsideOptional;
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalListInsideOptional);
-        
+
           auto iter_newElement_0_optionalListInsideOptional_NaN = entry_0.optionalList.Value().begin();
           while (iter_newElement_0_optionalListInsideOptional_NaN.Next())
           {
@@ -11905,7 +11905,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
           newElement_0_nullableOptionalListInsideOptional = nullptr;
         } else {
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalListInsideOptional);
-          
+
             auto iter_newElement_0_nullableOptionalListInsideOptional_NaN = entry_0.nullableOptionalList.Value().Value().begin();
             while (iter_newElement_0_nullableOptionalListInsideOptional_NaN.Next())
             {
@@ -12004,7 +12004,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string value_hClassName = "java/lang/Double";
         std::string value_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(value_hClassName.c_str(), value_hCtorSignature.c_str(), cppValue.h, value_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12096,7 +12096,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -12119,7 +12119,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -12194,7 +12194,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricSensitiveStruct_hClassName = "java/lang/Double";
         std::string newElement_0_fabricSensitiveStruct_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_fabricSensitiveStruct_hClassName.c_str(), newElement_0_fabricSensitiveStruct_hCtorSignature.c_str(), entry_0.fabricSensitiveStruct.h, newElement_0_fabricSensitiveStruct_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12220,7 +12220,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
     );
       jobject newElement_0_fabricSensitiveInt8uList;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_fabricSensitiveInt8uList);
-      
+
         auto iter_newElement_0_fabricSensitiveInt8uList_NaN = entry_0.fabricSensitiveInt8uList.begin();
         while (iter_newElement_0_fabricSensitiveInt8uList_NaN.Next())
         {
@@ -12235,7 +12235,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass testFabricScopedStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestFabricScoped", testFabricScopedStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12863,7 +12863,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string value_hClassName = "java/lang/Double";
         std::string value_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(value_hClassName.c_str(), value_hCtorSignature.c_str(), cppValue.Value().h, value_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12972,7 +12972,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -12995,7 +12995,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13018,7 +13018,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13303,7 +13303,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13406,7 +13406,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13429,7 +13429,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13452,7 +13452,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13595,7 +13595,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13657,7 +13657,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_isChildClassName = "java/lang/Boolean";
         std::string newElement_0_isChildCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_isChildClassName.c_str(), newElement_0_isChildCtorSignature.c_str(), entry_0.isChild, newElement_0_isChild);
-      
+
     jclass neighborTableStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable", neighborTableStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -13701,7 +13701,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -13747,7 +13747,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_linkEstablishedClassName = "java/lang/Boolean";
         std::string newElement_0_linkEstablishedCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_linkEstablishedClassName.c_str(), newElement_0_linkEstablishedCtorSignature.c_str(), entry_0.linkEstablished, newElement_0_linkEstablished);
-      
+
     jclass routeTableStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable", routeTableStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -14487,7 +14487,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14501,7 +14501,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_flagsClassName = "java/lang/Integer";
         std::string newElement_0_flagsCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags, newElement_0_flags);
-      
+
     jclass securityPolicyStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy", securityPolicyStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -14547,7 +14547,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14601,7 +14601,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
               std::string newElement_0_channelMaskPresentClassName = "java/lang/Boolean";
         std::string newElement_0_channelMaskPresentCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_channelMaskPresentClassName.c_str(), newElement_0_channelMaskPresentCtorSignature.c_str(), entry_0.channelMaskPresent, newElement_0_channelMaskPresent);
-      
+
     jclass operationalDatasetComponentsStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents", operationalDatasetComponentsStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -14643,7 +14643,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14666,7 +14666,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14689,7 +14689,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14712,7 +14712,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14801,7 +14801,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14824,7 +14824,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14847,7 +14847,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14908,7 +14908,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -14969,7 +14969,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15011,7 +15011,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15034,7 +15034,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15093,7 +15093,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15116,7 +15116,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15139,7 +15139,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15388,7 +15388,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15411,7 +15411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15434,7 +15434,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15779,7 +15779,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15802,7 +15802,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15825,7 +15825,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     jobject value;
                       chip::JniReferences::GetInstance().CreateArrayList(value);
-                    
+
                       auto iter_value_0 = cppValue.begin();
                       while (iter_value_0.Next())
                       {
@@ -15875,7 +15875,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
             break;
-    } 
+    }
     return nullptr;
 }
 

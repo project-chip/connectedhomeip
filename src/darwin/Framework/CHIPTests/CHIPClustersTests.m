@@ -293,7 +293,7 @@ CHIPDevice * GetConnectedDevice(void)
     ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -325,7 +325,7 @@ CHIPDevice * GetConnectedDevice(void)
     ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
@@ -357,7 +357,7 @@ CHIPDevice * GetConnectedDevice(void)
     ((CHIPAccessControlClusterAccessControlEntry *)temp_0[2]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -485,7 +485,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -498,7 +498,7 @@ CHIPDevice * GetConnectedDevice(void)
                 ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -569,14 +569,14 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:5];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:3];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -640,14 +640,14 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -711,7 +711,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -722,7 +722,7 @@ CHIPDevice * GetConnectedDevice(void)
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -786,7 +786,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -801,7 +801,7 @@ CHIPDevice * GetConnectedDevice(void)
     ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -865,7 +865,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -895,7 +895,7 @@ CHIPDevice * GetConnectedDevice(void)
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -959,7 +959,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
@@ -1069,7 +1069,7 @@ CHIPDevice * GetConnectedDevice(void)
     ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).targets = temp_3;
               }
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -1133,7 +1133,7 @@ CHIPDevice * GetConnectedDevice(void)
               ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).subjects = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).targets = nil;
             ((CHIPAccessControlClusterAccessControlEntry *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     aclArgument = temp_0;
       }
     [cluster writeAttributeAclWithValue:aclArgument completionHandler:^(NSError * _Nullable err) {
@@ -12755,7 +12755,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
               params.credential = [[CHIPDoorLockClusterDlCredential alloc] init];
             ((CHIPDoorLockClusterDlCredential *)params.credential).credentialType = [NSNumber numberWithUnsignedChar:1];
               ((CHIPDoorLockClusterDlCredential *)params.credential).credentialIndex = [NSNumber numberWithUnsignedShort:1U];
-  
+
             params.credentialData = [[NSData alloc] initWithBytes:"123456" length:6];
             params.userIndex = nil;
             params.userStatus = nil;
@@ -12932,7 +12932,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
                 params.credential = [[CHIPDoorLockClusterDlCredential alloc] init];
             ((CHIPDoorLockClusterDlCredential *)params.credential).credentialType = [NSNumber numberWithUnsignedChar:1];
               ((CHIPDoorLockClusterDlCredential *)params.credential).credentialIndex = [NSNumber numberWithUnsignedShort:1U];
-  
+
       [cluster clearCredentialWithParams:params completionHandler:
         ^(NSError * _Nullable err) {
         NSLog(@"Clean the created credential Error: %@", err);
@@ -37014,7 +37014,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)params.arg1).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).h = [NSNumber numberWithDouble:0];
-  
+
       [cluster testStructArgumentRequestWithParams:params completionHandler:
         ^(CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
         NSLog(@"Send Test Command With Struct Argument and arg1.b is true Error: %@", err);
@@ -37051,7 +37051,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)params.arg1).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).h = [NSNumber numberWithDouble:0];
-  
+
       [cluster testStructArgumentRequestWithParams:params completionHandler:
         ^(CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
         NSLog(@"Send Test Command With Struct Argument and arg1.b is false Error: %@", err);
@@ -37091,7 +37091,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).h = [NSNumber numberWithDouble:0];
-  
+
 
       [cluster testNestedStructArgumentRequestWithParams:params completionHandler:
         ^(CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -37132,7 +37132,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStruct *)params.arg1).c).h = [NSNumber numberWithDouble:0];
-  
+
 
       [cluster testNestedStructArgumentRequestWithParams:params completionHandler:
         ^(CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -37173,7 +37173,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).h = [NSNumber numberWithDouble:0];
-  
+
           {
             NSMutableArray * temp_1 = [[NSMutableArray alloc] init];
                   temp_1[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -37185,7 +37185,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_1[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).a = [NSNumber numberWithUnsignedChar:2];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).b = [NSNumber numberWithBool:true];
@@ -37195,7 +37195,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).h = [NSNumber numberWithDouble:0];
-  
+
     ((CHIPTestClusterClusterNestedStructList *)params.arg1).d = temp_1;
           }
           {
@@ -37258,7 +37258,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)params.arg1).c).h = [NSNumber numberWithDouble:0];
-  
+
           {
             NSMutableArray * temp_1 = [[NSMutableArray alloc] init];
                   temp_1[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -37270,7 +37270,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_1[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).a = [NSNumber numberWithUnsignedChar:2];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).b = [NSNumber numberWithBool:false];
@@ -37280,7 +37280,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_1[1]).h = [NSNumber numberWithDouble:0];
-  
+
     ((CHIPTestClusterClusterNestedStructList *)params.arg1).d = temp_1;
           }
           {
@@ -37340,7 +37340,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)params.arg1).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).g = [NSNumber numberWithFloat:0.1f];
               ((CHIPTestClusterClusterSimpleStruct *)params.arg1).h = [NSNumber numberWithDouble:0.1];
-  
+
       [cluster simpleStructEchoRequestWithParams:params completionHandler:
         ^(CHIPTestClusterClusterSimpleStructResponseParams * _Nullable values, NSError * _Nullable err) {
         NSLog(@"Send Test Command With Struct Argument and see what we get back Error: %@", err);
@@ -37547,7 +37547,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_0[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).a = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).b = [NSNumber numberWithBool:true];
@@ -37557,7 +37557,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).h = [NSNumber numberWithDouble:0];
-  
+
     params.arg1 = temp_0;
           }
       [cluster testListStructArgumentRequestWithParams:params completionHandler:
@@ -37598,7 +37598,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_0[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).a = [NSNumber numberWithUnsignedChar:0];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).b = [NSNumber numberWithBool:false];
@@ -37608,7 +37608,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_0[1]).h = [NSNumber numberWithDouble:0];
-  
+
     params.arg1 = temp_0;
           }
       [cluster testListStructArgumentRequestWithParams:params completionHandler:
@@ -37652,7 +37652,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).h = [NSNumber numberWithDouble:0];
-  
+
           {
             NSMutableArray * temp_2 = [[NSMutableArray alloc] init];
                   temp_2[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -37664,7 +37664,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_2[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).a = [NSNumber numberWithUnsignedChar:2];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).b = [NSNumber numberWithBool:true];
@@ -37674,7 +37674,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).h = [NSNumber numberWithDouble:0];
-  
+
     ((CHIPTestClusterClusterNestedStructList *)temp_0[0]).d = temp_2;
           }
           {
@@ -37741,7 +37741,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)((CHIPTestClusterClusterNestedStructList *)temp_0[0]).c).h = [NSNumber numberWithDouble:0];
-  
+
           {
             NSMutableArray * temp_2 = [[NSMutableArray alloc] init];
                   temp_2[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -37753,7 +37753,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[0]).h = [NSNumber numberWithDouble:0];
-  
+
           temp_2[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).a = [NSNumber numberWithUnsignedChar:2];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).b = [NSNumber numberWithBool:false];
@@ -37763,7 +37763,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
             ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).f = [NSNumber numberWithUnsignedChar:1];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).g = [NSNumber numberWithFloat:0.0f];
               ((CHIPTestClusterClusterSimpleStruct *)temp_2[1]).h = [NSNumber numberWithDouble:0];
-  
+
     ((CHIPTestClusterClusterNestedStructList *)temp_0[0]).d = temp_2;
           }
           {
@@ -45748,7 +45748,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported
             ((CHIPTestClusterClusterSimpleStruct *)structAttrArgument).f = [NSNumber numberWithUnsignedChar:17];
               ((CHIPTestClusterClusterSimpleStruct *)structAttrArgument).g = [NSNumber numberWithFloat:1.5f];
               ((CHIPTestClusterClusterSimpleStruct *)structAttrArgument).h = [NSNumber numberWithDouble:3.14159265358979];
-  
+
     [cluster writeAttributeStructAttrWithValue:structAttrArgument completionHandler:^(NSError * _Nullable err) {
             NSLog(@"Write struct-typed attribute Error: %@", err);
 
@@ -50123,7 +50123,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                 ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochStartTime1 = [NSNumber numberWithUnsignedLongLong:1110001ULL];
                   ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochKey2 = [[NSData alloc] initWithBytes:"\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317" length:16];
                 ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochStartTime2 = [NSNumber numberWithUnsignedLongLong:1110002ULL];
-  
+
       [cluster keySetWriteWithParams:params completionHandler:
         ^(NSError * _Nullable err) {
         NSLog(@"KeySet Write 1 Error: %@", err);
@@ -50156,7 +50156,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                 ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochStartTime1 = [NSNumber numberWithUnsignedLongLong:2110001ULL];
                   ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochKey2 = [[NSData alloc] initWithBytes:"\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377" length:16];
                 ((CHIPGroupKeyManagementClusterGroupKeySetStruct *)params.groupKeySet).epochStartTime2 = [NSNumber numberWithUnsignedLongLong:2110002ULL];
-  
+
       [cluster keySetWriteWithParams:params completionHandler:
         ^(NSError * _Nullable err) {
         NSLog(@"KeySet Write 2 Error: %@", err);
@@ -50224,7 +50224,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:258U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:0U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
-  
+
     groupKeyMapArgument = temp_0;
       }
     [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument completionHandler:^(NSError * _Nullable err) {
@@ -50253,12 +50253,12 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
-  
+
           temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
             ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
               ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
-  
+
     groupKeyMapArgument = temp_0;
       }
     [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument completionHandler:^(NSError * _Nullable err) {
@@ -50846,14 +50846,14 @@ NSNumber * _Nonnull ourFabricIndex;
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
               temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
             ((CHIPBindingClusterTargetStruct *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
               ((CHIPBindingClusterTargetStruct *)temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
                 ((CHIPBindingClusterTargetStruct *)temp_0[1]).group = [NSNumber numberWithUnsignedShort:1U];
                 ((CHIPBindingClusterTargetStruct *)temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
                 ((CHIPBindingClusterTargetStruct *)temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
               ((CHIPBindingClusterTargetStruct *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     bindingArgument = temp_0;
       }
     [cluster writeAttributeBindingWithValue:bindingArgument completionHandler:^(NSError * _Nullable err) {
@@ -50881,18 +50881,18 @@ NSNumber * _Nonnull ourFabricIndex;
               temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
               ((CHIPBindingClusterTargetStruct *)temp_0[0]).group = [NSNumber numberWithUnsignedShort:1U];
               ((CHIPBindingClusterTargetStruct *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
               ((CHIPBindingClusterTargetStruct *)temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
                 ((CHIPBindingClusterTargetStruct *)temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
                 ((CHIPBindingClusterTargetStruct *)temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
               ((CHIPBindingClusterTargetStruct *)temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
           temp_0[2] = [[CHIPBindingClusterTargetStruct alloc] init];
               ((CHIPBindingClusterTargetStruct *)temp_0[2]).node = [NSNumber numberWithUnsignedLongLong:2ULL];
                 ((CHIPBindingClusterTargetStruct *)temp_0[2]).endpoint = [NSNumber numberWithUnsignedShort:1U];
               ((CHIPBindingClusterTargetStruct *)temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     bindingArgument = temp_0;
       }
     [cluster writeAttributeBindingWithValue:bindingArgument completionHandler:^(NSError * _Nullable err) {
@@ -50960,7 +50960,7 @@ NSNumber * _Nonnull ourFabricIndex;
               ((CHIPBindingClusterTargetStruct *)temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
                 ((CHIPBindingClusterTargetStruct *)temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
               ((CHIPBindingClusterTargetStruct *)temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
-  
+
     bindingArgument = temp_0;
       }
     [cluster writeAttributeBindingWithValue:bindingArgument completionHandler:^(NSError * _Nullable err) {

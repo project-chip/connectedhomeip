@@ -8970,7 +8970,3 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
-
-
-

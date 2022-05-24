@@ -51,4 +51,3 @@ void MediaInputClusterInputListListAttributeFilter(chip::TLV::TLVReader * data, 
 typedef void (*MediaInputInputListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
 void TargetNavigatorClusterTargetListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
-
