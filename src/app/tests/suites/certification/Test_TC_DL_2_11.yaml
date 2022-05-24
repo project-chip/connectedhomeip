@@ -131,9 +131,11 @@ tests:
                 value: 0x0
               - name: "LocalStartTime"
                 constraints:
+                    hasValue: true
                     type: epoch-s
               - name: "LocalEndTime"
                 constraints:
+                    hasValue: true
                     type: epoch-s
 
     - label:
@@ -171,6 +173,12 @@ tests:
                 value: 21
               - name: "status"
                 value: 0x85
+              - name: "LocalStartTime"
+                constraints:
+                    hasValue: false
+              - name: "LocalEndTime"
+                constraints:
+                    hasValue: false
 
     - label:
           "send Get Year Day Schedule Command to DUT and verify NOT_FOUND
@@ -190,6 +198,12 @@ tests:
                 value: 5
               - name: "status"
                 value: 0x8B
+              - name: "LocalStartTime"
+                constraints:
+                    hasValue: false
+              - name: "LocalEndTime"
+                constraints:
+                    hasValue: false
 
     - label:
           "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND
@@ -209,6 +223,12 @@ tests:
                 value: 2
               - name: "status"
                 value: 0x8B
+              - name: "LocalStartTime"
+                constraints:
+                    hasValue: false
+              - name: "LocalEndTime"
+                constraints:
+                    hasValue: false
 
     - label: "Send Set Year Day Schedule Command to DUT"
       command: "SetYearDaySchedule"

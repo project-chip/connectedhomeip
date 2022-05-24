@@ -29050,9 +29050,11 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalIdle", value.mrpRetryIntervalIdle));
-                VerifyOrReturn(
-                    CheckConstraintMaxValue("value.mrpRetryIntervalIdle.Value()", value.mrpRetryIntervalIdle.Value(), 3600000UL));
+                if (value.mrpRetryIntervalIdle.HasValue())
+                {
+                    VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalIdle.Value()", value.mrpRetryIntervalIdle.Value(),
+                                                           3600000UL));
+                }
             }
             shouldContinue = true;
             break;
@@ -29062,9 +29064,11 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalActive", value.mrpRetryIntervalActive));
-                VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalActive.Value()", value.mrpRetryIntervalActive.Value(),
-                                                       3600000UL));
+                if (value.mrpRetryIntervalActive.HasValue())
+                {
+                    VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalActive.Value()",
+                                                           value.mrpRetryIntervalActive.Value(), 3600000UL));
+                }
             }
             shouldContinue = true;
             break;
@@ -49910,9 +49914,11 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalIdle", value.mrpRetryIntervalIdle));
-                VerifyOrReturn(
-                    CheckConstraintMaxValue("value.mrpRetryIntervalIdle.Value()", value.mrpRetryIntervalIdle.Value(), 3600000UL));
+                if (value.mrpRetryIntervalIdle.HasValue())
+                {
+                    VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalIdle.Value()", value.mrpRetryIntervalIdle.Value(),
+                                                           3600000UL));
+                }
             }
             shouldContinue = true;
             break;
@@ -49922,9 +49928,11 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalActive", value.mrpRetryIntervalActive));
-                VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalActive.Value()", value.mrpRetryIntervalActive.Value(),
-                                                       3600000UL));
+                if (value.mrpRetryIntervalActive.HasValue())
+                {
+                    VerifyOrReturn(CheckConstraintMaxValue("value.mrpRetryIntervalActive.Value()",
+                                                           value.mrpRetryIntervalActive.Value(), 3600000UL));
+                }
             }
             shouldContinue = true;
             break;
@@ -62120,19 +62128,19 @@ private:
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
                 VerifyOrReturn(CheckValue("status", value.status, 0));
 
-                VerifyOrReturn(CheckValuePresent("value.daysMask", value.daysMask));
+                VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.daysMask.Value()", value.daysMask.Value(), 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value.daysMask.Value()", value.daysMask.Value(), 6));
-                VerifyOrReturn(CheckValuePresent("value.startHour", value.startHour));
+                VerifyOrReturn(CheckConstraintHasValue("value.startHour", value.startHour, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.startHour.Value()", value.startHour.Value(), 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value.startHour.Value()", value.startHour.Value(), 23));
-                VerifyOrReturn(CheckValuePresent("value.startMinute", value.startMinute));
+                VerifyOrReturn(CheckConstraintHasValue("value.startMinute", value.startMinute, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.startMinute.Value()", value.startMinute.Value(), 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value.startMinute.Value()", value.startMinute.Value(), 59));
-                VerifyOrReturn(CheckValuePresent("value.endHour", value.endHour));
+                VerifyOrReturn(CheckConstraintHasValue("value.endHour", value.endHour, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.endHour.Value()", value.endHour.Value(), 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value.endHour.Value()", value.endHour.Value(), 23));
-                VerifyOrReturn(CheckValuePresent("value.endMinute", value.endMinute));
+                VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.endMinute.Value()", value.endMinute.Value(), 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value.endMinute.Value()", value.endMinute.Value(), 59));
             }
@@ -62150,6 +62158,16 @@ private:
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 133));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.startHour", value.startHour, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.startMinute", value.startMinute, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.endHour", value.endHour, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, false));
             }
             break;
         case 8:
@@ -62165,6 +62183,16 @@ private:
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 139));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.startHour", value.startHour, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.startMinute", value.startMinute, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.endHour", value.endHour, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, false));
             }
             break;
         default:
@@ -62401,9 +62429,9 @@ private:
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
                 VerifyOrReturn(CheckValue("status", value.status, 0));
 
-                VerifyOrReturn(CheckValuePresent("value.localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, true));
                 VerifyOrReturn(CheckConstraintType("value.localStartTime.Value()", "", "epoch-s"));
-                VerifyOrReturn(CheckValuePresent("value.localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckConstraintHasValue("value.localEndTime", value.localEndTime, true));
                 VerifyOrReturn(CheckConstraintType("value.localEndTime.Value()", "", "epoch-s"));
             }
             break;
@@ -62420,6 +62448,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 21U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 133));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localEndTime", value.localEndTime, false));
             }
             break;
         case 9:
@@ -62432,6 +62464,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 5U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 139));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localEndTime", value.localEndTime, false));
             }
             break;
         case 10:
@@ -62444,6 +62480,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 139));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
+
+                VerifyOrReturn(CheckConstraintHasValue("value.localEndTime", value.localEndTime, false));
             }
             break;
         case 11:
