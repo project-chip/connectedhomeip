@@ -6,4 +6,4 @@ updates:
       interval: "weekly"
     allow:
       - dependency-name: "third_party/pigweed/repo"
-    open-pull-requests-limit: 1
+      - dependency-name: "third_party/mbedtls/repo"
