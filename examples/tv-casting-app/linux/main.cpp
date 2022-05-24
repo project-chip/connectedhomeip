@@ -99,7 +99,7 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
     if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
     {
-        CastingServer::GetInstance()->SetDefaultFabricIndex(HandleCommissioningCompleteCallback);
+        CastingServer::GetInstance()->SetDefaultFabricIndex();
     }
     gCommands.Run(argc, argv);
     return CHIP_NO_ERROR;
@@ -137,7 +137,7 @@ int main(int argc, char * argv[])
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     // Send discover commissioners request
