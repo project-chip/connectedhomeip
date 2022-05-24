@@ -59,9 +59,9 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
 {
-    mRequestor          = requestor;
-    mImageProcessor     = processor;
-    mProviderRetryCount = 0;
+    mRequestor                = requestor;
+    mImageProcessor           = processor;
+    mProviderRetryCount       = 0;
     mInvalidSessionRetryCount = 0;
 
     if (mImageProcessor->IsFirstImageRun())
@@ -129,20 +129,23 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
 
 void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
+    if (reason != IdleStateReason::kInvalidSession)
+    {
+        mInvalidSessionRetryCount = 0;
+    }
+
     switch (reason)
     {
     case IdleStateReason::kUnknown:
-        mInvalidSessionRetryCount = 0;
         ChipLogProgress(SoftwareUpdate, "Unknown idle state reason so set the periodic timer for a next attempt");
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kIdle:
-        mInvalidSessionRetryCount = 0;
         // There is no current OTA update in progress so start the periodic query timer
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
-        if(mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
+        if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
         {
             // An invalid session is detected which may be temporary so try to query the same provider again
             SendQueryImage();

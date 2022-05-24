@@ -110,7 +110,7 @@ protected:
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
     // Track retry count for the current provider
-    uint8_t mProviderRetryCount; 
+    uint8_t mProviderRetryCount;
     // Track query image retry count on invalid session error
     uint8_t mInvalidSessionRetryCount;
 };
