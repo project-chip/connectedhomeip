@@ -21,14 +21,14 @@
 
 #import "CHIPStructsObjc.h"
 
-#include <app/data-model/Decode.h>
-#include <app/data-model/DecodableList.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Events.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Events.h>
 #include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
@@ -36,2283 +36,2135 @@ using namespace chip::app;
 
 id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    switch (aPath.mClusterId)
-    {
+    switch (aPath.mClusterId) {
     case Clusters::AccessControl::Id: {
         using namespace Clusters::AccessControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::AccessControlEntryChanged::Id: {
             Events::AccessControlEntryChanged::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPAccessControlClusterAccessControlEntryChangedEvent *value = [CHIPAccessControlClusterAccessControlEntryChangedEvent new];
+            CHIPAccessControlClusterAccessControlEntryChangedEvent * value =
+                [CHIPAccessControlClusterAccessControlEntryChangedEvent new];
 
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.adminNodeID.IsNull()) {
+                if (cppValue.adminNodeID.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
+                }
                 value.adminNodeID = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.adminPasscodeID.IsNull()) {
+                if (cppValue.adminPasscodeID.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.adminPasscodeID.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.adminPasscodeID.Value()];
+                }
                 value.adminPasscodeID = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.changeType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.changeType)];
                 value.changeType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 CHIPAccessControlClusterAccessControlEntry * _Nullable memberValue;
-                  if (cppValue.latestValue.IsNull()) {
+                if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
-                  } else {
-                        memberValue = [CHIPAccessControlClusterAccessControlEntry new];
-            memberValue.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
-            memberValue.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().authMode)];
-        if (cppValue.latestValue.Value().subjects.IsNull()) {
-          memberValue.subjects = nil;
-        } else {
-            { // Scope for our temporary variables
-              auto * array_3 = [NSMutableArray new];
-              auto iter_3 = cppValue.latestValue.Value().subjects.Value().begin();
-              while (iter_3.Next()) {
-                auto & entry_3 = iter_3.GetValue();
-                NSNumber * newElement_3;
-                        newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
-            [array_3 addObject:newElement_3];
-              }
-              CHIP_ERROR err = iter_3.GetStatus();
-              if (err != CHIP_NO_ERROR) {
-                *aError = err; return nil;
-              }
-              memberValue.subjects = array_3;
-            }
-        }
-        if (cppValue.latestValue.Value().targets.IsNull()) {
-          memberValue.targets = nil;
-        } else {
-            { // Scope for our temporary variables
-              auto * array_3 = [NSMutableArray new];
-              auto iter_3 = cppValue.latestValue.Value().targets.Value().begin();
-              while (iter_3.Next()) {
-                auto & entry_3 = iter_3.GetValue();
-                CHIPAccessControlClusterTarget * newElement_3;
-                    newElement_3 = [CHIPAccessControlClusterTarget new];
-        if (entry_3.cluster.IsNull()) {
-          newElement_3.cluster = nil;
-        } else {
-                  newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
-        }
-        if (entry_3.endpoint.IsNull()) {
-          newElement_3.endpoint = nil;
-        } else {
-                  newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
-        }
-        if (entry_3.deviceType.IsNull()) {
-          newElement_3.deviceType = nil;
-        } else {
-                  newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
-        }
-      [array_3 addObject:newElement_3];
-              }
-              CHIP_ERROR err = iter_3.GetStatus();
-              if (err != CHIP_NO_ERROR) {
-                *aError = err; return nil;
-              }
-              memberValue.targets = array_3;
-            }
-        }
-              memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
-        }
+                } else {
+                    memberValue = [CHIPAccessControlClusterAccessControlEntry new];
+                    memberValue.privilege =
+                        [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
+                    memberValue.authMode =
+                        [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().authMode)];
+                    if (cppValue.latestValue.Value().subjects.IsNull()) {
+                        memberValue.subjects = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = cppValue.latestValue.Value().subjects.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            memberValue.subjects = array_3;
+                        }
+                    }
+                    if (cppValue.latestValue.Value().targets.IsNull()) {
+                        memberValue.targets = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = cppValue.latestValue.Value().targets.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                CHIPAccessControlClusterTarget * newElement_3;
+                                newElement_3 = [CHIPAccessControlClusterTarget new];
+                                if (entry_3.cluster.IsNull()) {
+                                    newElement_3.cluster = nil;
+                                } else {
+                                    newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
+                                }
+                                if (entry_3.endpoint.IsNull()) {
+                                    newElement_3.endpoint = nil;
+                                } else {
+                                    newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
+                                }
+                                if (entry_3.deviceType.IsNull()) {
+                                    newElement_3.deviceType = nil;
+                                } else {
+                                    newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
+                                }
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            memberValue.targets = array_3;
+                        }
+                    }
+                    memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
+                }
                 value.latestValue = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
-                      value.adminFabricIndex = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
+                value.adminFabricIndex = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::AccessControlExtensionChanged::Id: {
             Events::AccessControlExtensionChanged::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPAccessControlClusterAccessControlExtensionChangedEvent *value = [CHIPAccessControlClusterAccessControlExtensionChangedEvent new];
+            CHIPAccessControlClusterAccessControlExtensionChangedEvent * value =
+                [CHIPAccessControlClusterAccessControlExtensionChangedEvent new];
 
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.adminNodeID.IsNull()) {
+                if (cppValue.adminNodeID.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
+                }
                 value.adminNodeID = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.adminPasscodeID.IsNull()) {
+                if (cppValue.adminPasscodeID.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.adminPasscodeID.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.adminPasscodeID.Value()];
+                }
                 value.adminPasscodeID = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.changeType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.changeType)];
                 value.changeType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 CHIPAccessControlClusterExtensionEntry * _Nullable memberValue;
-                  if (cppValue.latestValue.IsNull()) {
+                if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
-                  } else {
-                        memberValue = [CHIPAccessControlClusterExtensionEntry new];
-              memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data() length:cppValue.latestValue.Value().data.size()];
-              memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
-        }
+                } else {
+                    memberValue = [CHIPAccessControlClusterExtensionEntry new];
+                    memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
+                                                      length:cppValue.latestValue.Value().data.size()];
+                    memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
+                }
                 value.latestValue = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
-                      value.adminFabricIndex = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.adminFabricIndex];
+                value.adminFabricIndex = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::AccountLogin::Id: {
         using namespace Clusters::AccountLogin;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::AdministratorCommissioning::Id: {
         using namespace Clusters::AdministratorCommissioning;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ApplicationBasic::Id: {
         using namespace Clusters::ApplicationBasic;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ApplicationLauncher::Id: {
         using namespace Clusters::ApplicationLauncher;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::AudioOutput::Id: {
         using namespace Clusters::AudioOutput;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::BarrierControl::Id: {
         using namespace Clusters::BarrierControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Basic::Id: {
         using namespace Clusters::Basic;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::StartUp::Id: {
             Events::StartUp::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBasicClusterStartUpEvent *value = [CHIPBasicClusterStartUpEvent new];
+            CHIPBasicClusterStartUpEvent * value = [CHIPBasicClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
-                      value.softwareVersion = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
+                value.softwareVersion = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::ShutDown::Id: {
             Events::ShutDown::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBasicClusterShutDownEvent *value = [CHIPBasicClusterShutDownEvent new];
-
+            CHIPBasicClusterShutDownEvent * value = [CHIPBasicClusterShutDownEvent new];
 
             return value;
         }
-
 
         case Events::Leave::Id: {
             Events::Leave::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBasicClusterLeaveEvent *value = [CHIPBasicClusterLeaveEvent new];
-
+            CHIPBasicClusterLeaveEvent * value = [CHIPBasicClusterLeaveEvent new];
 
             return value;
         }
-
 
         case Events::ReachableChanged::Id: {
             Events::ReachableChanged::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBasicClusterReachableChangedEvent *value = [CHIPBasicClusterReachableChangedEvent new];
+            CHIPBasicClusterReachableChangedEvent * value = [CHIPBasicClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
-                      value.reachableNewValue = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
+                value.reachableNewValue = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::BinaryInputBasic::Id: {
         using namespace Clusters::BinaryInputBasic;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Binding::Id: {
         using namespace Clusters::Binding;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::BooleanState::Id: {
         using namespace Clusters::BooleanState;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::StateChange::Id: {
             Events::StateChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBooleanStateClusterStateChangeEvent *value = [CHIPBooleanStateClusterStateChangeEvent new];
+            CHIPBooleanStateClusterStateChangeEvent * value = [CHIPBooleanStateClusterStateChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithBool:cppValue.stateValue];
-                      value.stateValue = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithBool:cppValue.stateValue];
+                value.stateValue = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::BridgedActions::Id: {
         using namespace Clusters::BridgedActions;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::StateChanged::Id: {
             Events::StateChanged::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedActionsClusterStateChangedEvent *value = [CHIPBridgedActionsClusterStateChangedEvent new];
+            CHIPBridgedActionsClusterStateChangedEvent * value = [CHIPBridgedActionsClusterStateChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedShort:cppValue.actionID];
-                      value.actionID = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.actionID];
+                value.actionID = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.invokeID];
-                      value.invokeID = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.invokeID];
+                value.invokeID = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
                 value.newState = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::ActionFailed::Id: {
             Events::ActionFailed::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedActionsClusterActionFailedEvent *value = [CHIPBridgedActionsClusterActionFailedEvent new];
+            CHIPBridgedActionsClusterActionFailedEvent * value = [CHIPBridgedActionsClusterActionFailedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedShort:cppValue.actionID];
-                      value.actionID = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.actionID];
+                value.actionID = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.invokeID];
-                      value.invokeID = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.invokeID];
+                value.invokeID = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
                 value.newState = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.error)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.error)];
                 value.error = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::BridgedDeviceBasic::Id: {
         using namespace Clusters::BridgedDeviceBasic;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::StartUp::Id: {
             Events::StartUp::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedDeviceBasicClusterStartUpEvent *value = [CHIPBridgedDeviceBasicClusterStartUpEvent new];
+            CHIPBridgedDeviceBasicClusterStartUpEvent * value = [CHIPBridgedDeviceBasicClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
-                      value.softwareVersion = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
+                value.softwareVersion = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::ShutDown::Id: {
             Events::ShutDown::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedDeviceBasicClusterShutDownEvent *value = [CHIPBridgedDeviceBasicClusterShutDownEvent new];
-
+            CHIPBridgedDeviceBasicClusterShutDownEvent * value = [CHIPBridgedDeviceBasicClusterShutDownEvent new];
 
             return value;
         }
-
 
         case Events::Leave::Id: {
             Events::Leave::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedDeviceBasicClusterLeaveEvent *value = [CHIPBridgedDeviceBasicClusterLeaveEvent new];
-
+            CHIPBridgedDeviceBasicClusterLeaveEvent * value = [CHIPBridgedDeviceBasicClusterLeaveEvent new];
 
             return value;
         }
-
 
         case Events::ReachableChanged::Id: {
             Events::ReachableChanged::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPBridgedDeviceBasicClusterReachableChangedEvent *value = [CHIPBridgedDeviceBasicClusterReachableChangedEvent new];
+            CHIPBridgedDeviceBasicClusterReachableChangedEvent * value = [CHIPBridgedDeviceBasicClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
-                      value.reachableNewValue = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
+                value.reachableNewValue = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Channel::Id: {
         using namespace Clusters::Channel;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ColorControl::Id: {
         using namespace Clusters::ColorControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ContentLauncher::Id: {
         using namespace Clusters::ContentLauncher;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Descriptor::Id: {
         using namespace Clusters::Descriptor;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::DiagnosticLogs::Id: {
         using namespace Clusters::DiagnosticLogs;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::DoorLock::Id: {
         using namespace Clusters::DoorLock;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::DoorLockAlarm::Id: {
             Events::DoorLockAlarm::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPDoorLockClusterDoorLockAlarmEvent *value = [CHIPDoorLockClusterDoorLockAlarmEvent new];
+            CHIPDoorLockClusterDoorLockAlarmEvent * value = [CHIPDoorLockClusterDoorLockAlarmEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmCode)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.alarmCode)];
                 value.alarmCode = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::DoorStateChange::Id: {
             Events::DoorStateChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPDoorLockClusterDoorStateChangeEvent *value = [CHIPDoorLockClusterDoorStateChangeEvent new];
+            CHIPDoorLockClusterDoorStateChangeEvent * value = [CHIPDoorLockClusterDoorStateChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.doorState)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.doorState)];
                 value.doorState = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::LockOperation::Id: {
             Events::LockOperation::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPDoorLockClusterLockOperationEvent *value = [CHIPDoorLockClusterLockOperationEvent new];
+            CHIPDoorLockClusterLockOperationEvent * value = [CHIPDoorLockClusterLockOperationEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockOperationType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockOperationType)];
                 value.lockOperationType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
                 value.operationSource = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.userIndex.IsNull()) {
+                if (cppValue.userIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
+                }
                 value.userIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.fabricIndex.IsNull()) {
+                if (cppValue.fabricIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
+                }
                 value.fabricIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.sourceNode.IsNull()) {
+                if (cppValue.sourceNode.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
+                }
                 value.sourceNode = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nullable memberValue;
-                  if (cppValue.credentials.HasValue()) {
-                      if (cppValue.credentials.Value().IsNull()) {
+                if (cppValue.credentials.HasValue()) {
+                    if (cppValue.credentials.Value().IsNull()) {
                         memberValue = nil;
-                      } else {
-                          { // Scope for our temporary variables
+                    } else {
+                        { // Scope for our temporary variables
                             auto * array_2 = [NSMutableArray new];
                             auto iter_2 = cppValue.credentials.Value().Value().begin();
                             while (iter_2.Next()) {
-                              auto & entry_2 = iter_2.GetValue();
-                              CHIPDoorLockClusterDlCredential * newElement_2;
-                                  newElement_2 = [CHIPDoorLockClusterDlCredential new];
-            newElement_2.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
-              newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
-            [array_2 addObject:newElement_2];
+                                auto & entry_2 = iter_2.GetValue();
+                                CHIPDoorLockClusterDlCredential * newElement_2;
+                                newElement_2 = [CHIPDoorLockClusterDlCredential new];
+                                newElement_2.credentialType =
+                                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
+                                newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
+                                [array_2 addObject:newElement_2];
                             }
                             CHIP_ERROR err = iter_2.GetStatus();
                             if (err != CHIP_NO_ERROR) {
-                              *aError = err; return nil;
+                                *aError = err;
+                                return nil;
                             }
                             memberValue = array_2;
-                          }
-                      }
-                  } else {
+                        }
+                    }
+                } else {
                     memberValue = nil;
-                  }
+                }
                 value.credentials = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::LockOperationError::Id: {
             Events::LockOperationError::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPDoorLockClusterLockOperationErrorEvent *value = [CHIPDoorLockClusterLockOperationErrorEvent new];
+            CHIPDoorLockClusterLockOperationErrorEvent * value = [CHIPDoorLockClusterLockOperationErrorEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockOperationType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockOperationType)];
                 value.lockOperationType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
                 value.operationSource = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationError)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationError)];
                 value.operationError = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.userIndex.IsNull()) {
+                if (cppValue.userIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
+                }
                 value.userIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.fabricIndex.IsNull()) {
+                if (cppValue.fabricIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
+                }
                 value.fabricIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.sourceNode.IsNull()) {
+                if (cppValue.sourceNode.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
+                }
                 value.sourceNode = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nullable memberValue;
-                  if (cppValue.credentials.HasValue()) {
-                      if (cppValue.credentials.Value().IsNull()) {
+                if (cppValue.credentials.HasValue()) {
+                    if (cppValue.credentials.Value().IsNull()) {
                         memberValue = nil;
-                      } else {
-                          { // Scope for our temporary variables
+                    } else {
+                        { // Scope for our temporary variables
                             auto * array_2 = [NSMutableArray new];
                             auto iter_2 = cppValue.credentials.Value().Value().begin();
                             while (iter_2.Next()) {
-                              auto & entry_2 = iter_2.GetValue();
-                              CHIPDoorLockClusterDlCredential * newElement_2;
-                                  newElement_2 = [CHIPDoorLockClusterDlCredential new];
-            newElement_2.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
-              newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
-            [array_2 addObject:newElement_2];
+                                auto & entry_2 = iter_2.GetValue();
+                                CHIPDoorLockClusterDlCredential * newElement_2;
+                                newElement_2 = [CHIPDoorLockClusterDlCredential new];
+                                newElement_2.credentialType =
+                                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
+                                newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
+                                [array_2 addObject:newElement_2];
                             }
                             CHIP_ERROR err = iter_2.GetStatus();
                             if (err != CHIP_NO_ERROR) {
-                              *aError = err; return nil;
+                                *aError = err;
+                                return nil;
                             }
                             memberValue = array_2;
-                          }
-                      }
-                  } else {
+                        }
+                    }
+                } else {
                     memberValue = nil;
-                  }
+                }
                 value.credentials = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::LockUserChange::Id: {
             Events::LockUserChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPDoorLockClusterLockUserChangeEvent *value = [CHIPDoorLockClusterLockUserChangeEvent new];
+            CHIPDoorLockClusterLockUserChangeEvent * value = [CHIPDoorLockClusterLockUserChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockDataType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lockDataType)];
                 value.lockDataType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.dataOperationType)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.dataOperationType)];
                 value.dataOperationType = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationSource)];
                 value.operationSource = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.userIndex.IsNull()) {
+                if (cppValue.userIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.userIndex.Value()];
+                }
                 value.userIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.fabricIndex.IsNull()) {
+                if (cppValue.fabricIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex.Value()];
+                }
                 value.fabricIndex = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.sourceNode.IsNull()) {
+                if (cppValue.sourceNode.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNode.Value()];
+                }
                 value.sourceNode = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.dataIndex.IsNull()) {
+                if (cppValue.dataIndex.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedShort:cppValue.dataIndex.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedShort:cppValue.dataIndex.Value()];
+                }
                 value.dataIndex = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ElectricalMeasurement::Id: {
         using namespace Clusters::ElectricalMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::EthernetNetworkDiagnostics::Id: {
         using namespace Clusters::EthernetNetworkDiagnostics;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::FanControl::Id: {
         using namespace Clusters::FanControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::FixedLabel::Id: {
         using namespace Clusters::FixedLabel;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::FlowMeasurement::Id: {
         using namespace Clusters::FlowMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::GeneralCommissioning::Id: {
         using namespace Clusters::GeneralCommissioning;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::GeneralDiagnostics::Id: {
         using namespace Clusters::GeneralDiagnostics;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::HardwareFaultChange::Id: {
             Events::HardwareFaultChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent *value = [CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent new];
+            CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent * value =
+                [CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.current.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.current = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.previous.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.previous = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::RadioFaultChange::Id: {
             Events::RadioFaultChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent *value = [CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent new];
+            CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent * value = [CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.current.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.current = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.previous.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.previous = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::NetworkFaultChange::Id: {
             Events::NetworkFaultChange::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent *value = [CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
+            CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent * value =
+                [CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.current.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.current = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.previous.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.previous = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::BootReason::Id: {
             Events::BootReason::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPGeneralDiagnosticsClusterBootReasonEvent *value = [CHIPGeneralDiagnosticsClusterBootReasonEvent new];
+            CHIPGeneralDiagnosticsClusterBootReasonEvent * value = [CHIPGeneralDiagnosticsClusterBootReasonEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.bootReason)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.bootReason)];
                 value.bootReason = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::GroupKeyManagement::Id: {
         using namespace Clusters::GroupKeyManagement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Groups::Id: {
         using namespace Clusters::Groups;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Identify::Id: {
         using namespace Clusters::Identify;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::IlluminanceMeasurement::Id: {
         using namespace Clusters::IlluminanceMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::KeypadInput::Id: {
         using namespace Clusters::KeypadInput;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::LevelControl::Id: {
         using namespace Clusters::LevelControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::LocalizationConfiguration::Id: {
         using namespace Clusters::LocalizationConfiguration;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::LowPower::Id: {
         using namespace Clusters::LowPower;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::MediaInput::Id: {
         using namespace Clusters::MediaInput;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::MediaPlayback::Id: {
         using namespace Clusters::MediaPlayback;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ModeSelect::Id: {
         using namespace Clusters::ModeSelect;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::NetworkCommissioning::Id: {
         using namespace Clusters::NetworkCommissioning;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OtaSoftwareUpdateProvider::Id: {
         using namespace Clusters::OtaSoftwareUpdateProvider;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OtaSoftwareUpdateRequestor::Id: {
         using namespace Clusters::OtaSoftwareUpdateRequestor;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::StateTransition::Id: {
             Events::StateTransition::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent *value = [CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent new];
+            CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent * value =
+                [CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousState)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousState)];
                 value.previousState = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.newState)];
                 value.newState = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.reason)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.reason)];
                 value.reason = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.targetSoftwareVersion.IsNull()) {
+                if (cppValue.targetSoftwareVersion.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedInt:cppValue.targetSoftwareVersion.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.targetSoftwareVersion.Value()];
+                }
                 value.targetSoftwareVersion = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::VersionApplied::Id: {
             Events::VersionApplied::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent *value = [CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent new];
+            CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent * value =
+                [CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
-                      value.softwareVersion = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
+                value.softwareVersion = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedShort:cppValue.productID];
-                      value.productID = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.productID];
+                value.productID = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::DownloadError::Id: {
             Events::DownloadError::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent *value = [CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent new];
+            CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent * value =
+                [CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
-                      value.softwareVersion = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.softwareVersion];
+                value.softwareVersion = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.bytesDownloaded];
-                      value.bytesDownloaded = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.bytesDownloaded];
+                value.bytesDownloaded = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.progressPercent.IsNull()) {
+                if (cppValue.progressPercent.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithUnsignedChar:cppValue.progressPercent.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedChar:cppValue.progressPercent.Value()];
+                }
                 value.progressPercent = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nullable memberValue;
-                  if (cppValue.platformCode.IsNull()) {
+                if (cppValue.platformCode.IsNull()) {
                     memberValue = nil;
-                  } else {
-                            memberValue = [NSNumber numberWithLongLong:cppValue.platformCode.Value()];
-        }
+                } else {
+                    memberValue = [NSNumber numberWithLongLong:cppValue.platformCode.Value()];
+                }
                 value.platformCode = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OccupancySensing::Id: {
         using namespace Clusters::OccupancySensing;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OnOff::Id: {
         using namespace Clusters::OnOff;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OnOffSwitchConfiguration::Id: {
         using namespace Clusters::OnOffSwitchConfiguration;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::OperationalCredentials::Id: {
         using namespace Clusters::OperationalCredentials;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::PowerSource::Id: {
         using namespace Clusters::PowerSource;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::PowerSourceConfiguration::Id: {
         using namespace Clusters::PowerSourceConfiguration;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::PressureMeasurement::Id: {
         using namespace Clusters::PressureMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::PumpConfigurationAndControl::Id: {
         using namespace Clusters::PumpConfigurationAndControl;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::SupplyVoltageLow::Id: {
             Events::SupplyVoltageLow::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent *value = [CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent new];
-
+            CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent * value =
+                [CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent new];
 
             return value;
         }
-
 
         case Events::SupplyVoltageHigh::Id: {
             Events::SupplyVoltageHigh::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent *value = [CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent new];
-
+            CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent * value =
+                [CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent new];
 
             return value;
         }
-
 
         case Events::PowerMissingPhase::Id: {
             Events::PowerMissingPhase::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent *value = [CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent new];
-
+            CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent * value =
+                [CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent new];
 
             return value;
         }
-
 
         case Events::SystemPressureLow::Id: {
             Events::SystemPressureLow::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent *value = [CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent new];
-
+            CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent * value =
+                [CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent new];
 
             return value;
         }
-
 
         case Events::SystemPressureHigh::Id: {
             Events::SystemPressureHigh::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent *value = [CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent new];
-
+            CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent * value =
+                [CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent new];
 
             return value;
         }
-
 
         case Events::DryRunning::Id: {
             Events::DryRunning::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterDryRunningEvent *value = [CHIPPumpConfigurationAndControlClusterDryRunningEvent new];
-
+            CHIPPumpConfigurationAndControlClusterDryRunningEvent * value =
+                [CHIPPumpConfigurationAndControlClusterDryRunningEvent new];
 
             return value;
         }
-
 
         case Events::MotorTemperatureHigh::Id: {
             Events::MotorTemperatureHigh::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent *value = [CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent new];
-
+            CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent * value =
+                [CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent new];
 
             return value;
         }
-
 
         case Events::PumpMotorFatalFailure::Id: {
             Events::PumpMotorFatalFailure::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent *value = [CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent new];
-
+            CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent * value =
+                [CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent new];
 
             return value;
         }
-
 
         case Events::ElectronicTemperatureHigh::Id: {
             Events::ElectronicTemperatureHigh::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent *value = [CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent new];
-
+            CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent * value =
+                [CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent new];
 
             return value;
         }
-
 
         case Events::PumpBlocked::Id: {
             Events::PumpBlocked::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterPumpBlockedEvent *value = [CHIPPumpConfigurationAndControlClusterPumpBlockedEvent new];
-
+            CHIPPumpConfigurationAndControlClusterPumpBlockedEvent * value =
+                [CHIPPumpConfigurationAndControlClusterPumpBlockedEvent new];
 
             return value;
         }
-
 
         case Events::SensorFailure::Id: {
             Events::SensorFailure::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterSensorFailureEvent *value = [CHIPPumpConfigurationAndControlClusterSensorFailureEvent new];
-
+            CHIPPumpConfigurationAndControlClusterSensorFailureEvent * value =
+                [CHIPPumpConfigurationAndControlClusterSensorFailureEvent new];
 
             return value;
         }
-
 
         case Events::ElectronicNonFatalFailure::Id: {
             Events::ElectronicNonFatalFailure::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent *value = [CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent new];
-
+            CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent * value =
+                [CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent new];
 
             return value;
         }
-
 
         case Events::ElectronicFatalFailure::Id: {
             Events::ElectronicFatalFailure::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent *value = [CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent new];
-
+            CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent * value =
+                [CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent new];
 
             return value;
         }
-
 
         case Events::GeneralFault::Id: {
             Events::GeneralFault::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterGeneralFaultEvent *value = [CHIPPumpConfigurationAndControlClusterGeneralFaultEvent new];
-
+            CHIPPumpConfigurationAndControlClusterGeneralFaultEvent * value =
+                [CHIPPumpConfigurationAndControlClusterGeneralFaultEvent new];
 
             return value;
         }
-
 
         case Events::Leakage::Id: {
             Events::Leakage::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterLeakageEvent *value = [CHIPPumpConfigurationAndControlClusterLeakageEvent new];
-
+            CHIPPumpConfigurationAndControlClusterLeakageEvent * value = [CHIPPumpConfigurationAndControlClusterLeakageEvent new];
 
             return value;
         }
-
 
         case Events::AirDetection::Id: {
             Events::AirDetection::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterAirDetectionEvent *value = [CHIPPumpConfigurationAndControlClusterAirDetectionEvent new];
-
+            CHIPPumpConfigurationAndControlClusterAirDetectionEvent * value =
+                [CHIPPumpConfigurationAndControlClusterAirDetectionEvent new];
 
             return value;
         }
-
 
         case Events::TurbineOperation::Id: {
             Events::TurbineOperation::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPPumpConfigurationAndControlClusterTurbineOperationEvent *value = [CHIPPumpConfigurationAndControlClusterTurbineOperationEvent new];
-
+            CHIPPumpConfigurationAndControlClusterTurbineOperationEvent * value =
+                [CHIPPumpConfigurationAndControlClusterTurbineOperationEvent new];
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::RelativeHumidityMeasurement::Id: {
         using namespace Clusters::RelativeHumidityMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Scenes::Id: {
         using namespace Clusters::Scenes;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::SoftwareDiagnostics::Id: {
         using namespace Clusters::SoftwareDiagnostics;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::SoftwareFault::Id: {
             Events::SoftwareFault::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent *value = [CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent new];
+            CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent * value = [CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent new];
 
             do {
                 CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull memberValue;
-                    memberValue = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
-              memberValue.id = [NSNumber numberWithUnsignedLongLong:cppValue.softwareFault.id];
-                    memberValue.name = [[NSString alloc] initWithBytes:cppValue.softwareFault.name.data() length:cppValue.softwareFault.name.size() encoding:NSUTF8StringEncoding];
-              memberValue.faultRecording = [NSData dataWithBytes:cppValue.softwareFault.faultRecording.data() length:cppValue.softwareFault.faultRecording.size()];
+                memberValue = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
+                memberValue.id = [NSNumber numberWithUnsignedLongLong:cppValue.softwareFault.id];
+                memberValue.name = [[NSString alloc] initWithBytes:cppValue.softwareFault.name.data()
+                                                            length:cppValue.softwareFault.name.size()
+                                                          encoding:NSUTF8StringEncoding];
+                memberValue.faultRecording = [NSData dataWithBytes:cppValue.softwareFault.faultRecording.data()
+                                                            length:cppValue.softwareFault.faultRecording.size()];
                 value.softwareFault = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Switch::Id: {
         using namespace Clusters::Switch;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::SwitchLatched::Id: {
             Events::SwitchLatched::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterSwitchLatchedEvent *value = [CHIPSwitchClusterSwitchLatchedEvent new];
+            CHIPSwitchClusterSwitchLatchedEvent * value = [CHIPSwitchClusterSwitchLatchedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                      value.newPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
+                value.newPosition = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::InitialPress::Id: {
             Events::InitialPress::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterInitialPressEvent *value = [CHIPSwitchClusterInitialPressEvent new];
+            CHIPSwitchClusterInitialPressEvent * value = [CHIPSwitchClusterInitialPressEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                      value.newPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
+                value.newPosition = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::LongPress::Id: {
             Events::LongPress::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterLongPressEvent *value = [CHIPSwitchClusterLongPressEvent new];
+            CHIPSwitchClusterLongPressEvent * value = [CHIPSwitchClusterLongPressEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                      value.newPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
+                value.newPosition = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::ShortRelease::Id: {
             Events::ShortRelease::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterShortReleaseEvent *value = [CHIPSwitchClusterShortReleaseEvent new];
+            CHIPSwitchClusterShortReleaseEvent * value = [CHIPSwitchClusterShortReleaseEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousPosition];
-                      value.previousPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousPosition];
+                value.previousPosition = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::LongRelease::Id: {
             Events::LongRelease::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterLongReleaseEvent *value = [CHIPSwitchClusterLongReleaseEvent new];
+            CHIPSwitchClusterLongReleaseEvent * value = [CHIPSwitchClusterLongReleaseEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousPosition];
-                      value.previousPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousPosition];
+                value.previousPosition = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::MultiPressOngoing::Id: {
             Events::MultiPressOngoing::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterMultiPressOngoingEvent *value = [CHIPSwitchClusterMultiPressOngoingEvent new];
+            CHIPSwitchClusterMultiPressOngoingEvent * value = [CHIPSwitchClusterMultiPressOngoingEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                      value.newPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
+                value.newPosition = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentNumberOfPressesCounted];
-                      value.currentNumberOfPressesCounted = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentNumberOfPressesCounted];
+                value.currentNumberOfPressesCounted = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::MultiPressComplete::Id: {
             Events::MultiPressComplete::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPSwitchClusterMultiPressCompleteEvent *value = [CHIPSwitchClusterMultiPressCompleteEvent new];
+            CHIPSwitchClusterMultiPressCompleteEvent * value = [CHIPSwitchClusterMultiPressCompleteEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                      value.newPosition = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
+                value.newPosition = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.totalNumberOfPressesCounted];
-                      value.totalNumberOfPressesCounted = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.totalNumberOfPressesCounted];
+                value.totalNumberOfPressesCounted = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::TargetNavigator::Id: {
         using namespace Clusters::TargetNavigator;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::TemperatureMeasurement::Id: {
         using namespace Clusters::TemperatureMeasurement;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::TestCluster::Id: {
         using namespace Clusters::TestCluster;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::TestEvent::Id: {
             Events::TestEvent::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPTestClusterClusterTestEventEvent *value = [CHIPTestClusterClusterTestEventEvent new];
+            CHIPTestClusterClusterTestEventEvent * value = [CHIPTestClusterClusterTestEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
-                      value.arg1 = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
+                value.arg1 = memberValue;
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg2)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg2)];
                 value.arg2 = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithBool:cppValue.arg3];
-                      value.arg3 = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithBool:cppValue.arg3];
+                value.arg3 = memberValue;
+            } while (0);
             do {
                 CHIPTestClusterClusterSimpleStruct * _Nonnull memberValue;
-                    memberValue = [CHIPTestClusterClusterSimpleStruct new];
-              memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
-                    memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
-                  memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
-              memberValue.d = [NSData dataWithBytes:cppValue.arg4.d.data() length:cppValue.arg4.d.size()];
-              memberValue.e = [[NSString alloc] initWithBytes:cppValue.arg4.e.data() length:cppValue.arg4.e.size() encoding:NSUTF8StringEncoding];
-              memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
-              memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
-                    memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
-                      value.arg4 = memberValue;
-            } while(0);
+                memberValue = [CHIPTestClusterClusterSimpleStruct new];
+                memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
+                memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
+                memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
+                memberValue.d = [NSData dataWithBytes:cppValue.arg4.d.data() length:cppValue.arg4.d.size()];
+                memberValue.e = [[NSString alloc] initWithBytes:cppValue.arg4.e.data()
+                                                         length:cppValue.arg4.e.size()
+                                                       encoding:NSUTF8StringEncoding];
+                memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
+                memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
+                memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
+                value.arg4 = memberValue;
+            } while (0);
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.arg5.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      CHIPTestClusterClusterSimpleStruct * newElement_0;
-                          newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
-              newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-                    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-                  newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-              newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-              newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
-              newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-              newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-                    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-            [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        CHIPTestClusterClusterSimpleStruct * newElement_0;
+                        newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                        newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+                        newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
+                        newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
+                                                                  length:entry_0.e.size()
+                                                                encoding:NSUTF8StringEncoding];
+                        newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                        newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+                        newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.arg5 = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSArray * _Nonnull memberValue;
-                  { // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_0 = [NSMutableArray new];
                     auto iter_0 = cppValue.arg6.begin();
                     while (iter_0.Next()) {
-                      auto & entry_0 = iter_0.GetValue();
-                      NSNumber * newElement_0;
-                            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                        auto & entry_0 = iter_0.GetValue();
+                        NSNumber * newElement_0;
+                        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                        [array_0 addObject:newElement_0];
                     }
                     CHIP_ERROR err = iter_0.GetStatus();
                     if (err != CHIP_NO_ERROR) {
-                      *aError = err; return nil;
+                        *aError = err;
+                        return nil;
                     }
                     memberValue = array_0;
-                  }
+                }
                 value.arg6 = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
-
 
         case Events::TestFabricScopedEvent::Id: {
             Events::TestFabricScopedEvent::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPTestClusterClusterTestFabricScopedEventEvent *value = [CHIPTestClusterClusterTestFabricScopedEventEvent new];
+            CHIPTestClusterClusterTestFabricScopedEventEvent * value = [CHIPTestClusterClusterTestFabricScopedEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
-                      value.arg1 = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
+                value.arg1 = memberValue;
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::Thermostat::Id: {
         using namespace Clusters::Thermostat;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         using namespace Clusters::ThermostatUserInterfaceConfiguration;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::ThreadNetworkDiagnostics::Id: {
         using namespace Clusters::ThreadNetworkDiagnostics;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::ConnectionStatus::Id: {
             Events::ConnectionStatus::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent *value = [CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent new];
+            CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent * value =
+                [CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.connectionStatus)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.connectionStatus)];
                 value.connectionStatus = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::TimeFormatLocalization::Id: {
         using namespace Clusters::TimeFormatLocalization;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::UnitLocalization::Id: {
         using namespace Clusters::UnitLocalization;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::UserLabel::Id: {
         using namespace Clusters::UserLabel;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::WakeOnLan::Id: {
         using namespace Clusters::WakeOnLan;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::WiFiNetworkDiagnostics::Id: {
         using namespace Clusters::WiFiNetworkDiagnostics;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         case Events::Disconnection::Id: {
             Events::Disconnection::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent *value = [CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent new];
+            CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent * value = [CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedShort:cppValue.reasonCode];
-                      value.reasonCode = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.reasonCode];
+                value.reasonCode = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::AssociationFailure::Id: {
             Events::AssociationFailure::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent *value = [CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent new];
+            CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent * value =
+                [CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailure)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailure)];
                 value.associationFailure = memberValue;
-            } while(0);
+            } while (0);
             do {
                 NSNumber * _Nonnull memberValue;
-                        memberValue = [NSNumber numberWithUnsignedShort:cppValue.status];
-                      value.status = memberValue;
-            } while(0);
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.status];
+                value.status = memberValue;
+            } while (0);
 
             return value;
         }
-
 
         case Events::ConnectionStatus::Id: {
             Events::ConnectionStatus::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
+            if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
 
-            CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent *value = [CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent new];
+            CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent * value =
+                [CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
-                      memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.connectionStatus)];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.connectionStatus)];
                 value.connectionStatus = memberValue;
-            } while(0);
+            } while (0);
 
             return value;
         }
 
-
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     case Clusters::WindowCovering::Id: {
         using namespace Clusters::WindowCovering;
-        switch (aPath.mEventId)
-        {
+        switch (aPath.mEventId) {
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-          break;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            break;
         }
         break;
     }
     default: {
-      *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-      break;
+        *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+        break;
     }
     }
     return nil;

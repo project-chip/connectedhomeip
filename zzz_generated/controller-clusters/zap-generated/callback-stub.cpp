@@ -29,196 +29,196 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-     case ZCL_ACCESS_CONTROL_CLUSTER_ID :
+    case ZCL_ACCESS_CONTROL_CLUSTER_ID:
         emberAfAccessControlClusterInitCallback(endpoint);
         break;
-     case ZCL_ACCOUNT_LOGIN_CLUSTER_ID :
+    case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
         emberAfAccountLoginClusterInitCallback(endpoint);
         break;
-     case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID :
+    case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID:
         emberAfAdministratorCommissioningClusterInitCallback(endpoint);
         break;
-     case ZCL_APPLICATION_BASIC_CLUSTER_ID :
+    case ZCL_APPLICATION_BASIC_CLUSTER_ID:
         emberAfApplicationBasicClusterInitCallback(endpoint);
         break;
-     case ZCL_APPLICATION_LAUNCHER_CLUSTER_ID :
+    case ZCL_APPLICATION_LAUNCHER_CLUSTER_ID:
         emberAfApplicationLauncherClusterInitCallback(endpoint);
         break;
-     case ZCL_AUDIO_OUTPUT_CLUSTER_ID :
+    case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
         emberAfAudioOutputClusterInitCallback(endpoint);
         break;
-     case ZCL_BARRIER_CONTROL_CLUSTER_ID :
+    case ZCL_BARRIER_CONTROL_CLUSTER_ID:
         emberAfBarrierControlClusterInitCallback(endpoint);
         break;
-     case ZCL_BASIC_CLUSTER_ID :
+    case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
-     case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID :
+    case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
         emberAfBinaryInputBasicClusterInitCallback(endpoint);
         break;
-     case ZCL_BINDING_CLUSTER_ID :
+    case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
-     case ZCL_BOOLEAN_STATE_CLUSTER_ID :
+    case ZCL_BOOLEAN_STATE_CLUSTER_ID:
         emberAfBooleanStateClusterInitCallback(endpoint);
         break;
-     case ZCL_BRIDGED_ACTIONS_CLUSTER_ID :
+    case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
         emberAfBridgedActionsClusterInitCallback(endpoint);
         break;
-     case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID :
+    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
         emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
         break;
-     case ZCL_CHANNEL_CLUSTER_ID :
+    case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
         break;
-     case ZCL_COLOR_CONTROL_CLUSTER_ID :
+    case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-     case ZCL_CONTENT_LAUNCH_CLUSTER_ID :
+    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
         break;
-     case ZCL_DESCRIPTOR_CLUSTER_ID :
+    case ZCL_DESCRIPTOR_CLUSTER_ID:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
-     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID :
+    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
-     case ZCL_DOOR_LOCK_CLUSTER_ID :
+    case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
-     case ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID :
+    case ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID:
         emberAfElectricalMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID :
+    case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-     case ZCL_FAN_CONTROL_CLUSTER_ID :
+    case ZCL_FAN_CONTROL_CLUSTER_ID:
         emberAfFanControlClusterInitCallback(endpoint);
         break;
-     case ZCL_FIXED_LABEL_CLUSTER_ID :
+    case ZCL_FIXED_LABEL_CLUSTER_ID:
         emberAfFixedLabelClusterInitCallback(endpoint);
         break;
-     case ZCL_FLOW_MEASUREMENT_CLUSTER_ID :
+    case ZCL_FLOW_MEASUREMENT_CLUSTER_ID:
         emberAfFlowMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID :
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
-     case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID :
+    case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
         emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
-     case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID :
+    case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
-     case ZCL_GROUPS_CLUSTER_ID :
+    case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
         break;
-     case ZCL_IDENTIFY_CLUSTER_ID :
+    case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
-     case ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID :
+    case ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID:
         emberAfIlluminanceMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_KEYPAD_INPUT_CLUSTER_ID :
+    case ZCL_KEYPAD_INPUT_CLUSTER_ID:
         emberAfKeypadInputClusterInitCallback(endpoint);
         break;
-     case ZCL_LEVEL_CONTROL_CLUSTER_ID :
+    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-     case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID :
+    case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
         emberAfLocalizationConfigurationClusterInitCallback(endpoint);
         break;
-     case ZCL_LOW_POWER_CLUSTER_ID :
+    case ZCL_LOW_POWER_CLUSTER_ID:
         emberAfLowPowerClusterInitCallback(endpoint);
         break;
-     case ZCL_MEDIA_INPUT_CLUSTER_ID :
+    case ZCL_MEDIA_INPUT_CLUSTER_ID:
         emberAfMediaInputClusterInitCallback(endpoint);
         break;
-     case ZCL_MEDIA_PLAYBACK_CLUSTER_ID :
+    case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
         emberAfMediaPlaybackClusterInitCallback(endpoint);
         break;
-     case ZCL_MODE_SELECT_CLUSTER_ID :
+    case ZCL_MODE_SELECT_CLUSTER_ID:
         emberAfModeSelectClusterInitCallback(endpoint);
         break;
-     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID :
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-     case ZCL_OTA_PROVIDER_CLUSTER_ID :
+    case ZCL_OTA_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
-     case ZCL_OTA_REQUESTOR_CLUSTER_ID :
+    case ZCL_OTA_REQUESTOR_CLUSTER_ID:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
-     case ZCL_OCCUPANCY_SENSING_CLUSTER_ID :
+    case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:
         emberAfOccupancySensingClusterInitCallback(endpoint);
         break;
-     case ZCL_ON_OFF_CLUSTER_ID :
+    case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
-     case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID :
+    case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID:
         emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
         break;
-     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID :
+    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
-     case ZCL_POWER_SOURCE_CLUSTER_ID :
+    case ZCL_POWER_SOURCE_CLUSTER_ID:
         emberAfPowerSourceClusterInitCallback(endpoint);
         break;
-     case ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID :
+    case ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID:
         emberAfPowerSourceConfigurationClusterInitCallback(endpoint);
         break;
-     case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID :
+    case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
         emberAfPressureMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID :
+    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
-     case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID :
+    case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
         emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_SCENES_CLUSTER_ID :
+    case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
-     case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID :
+    case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
-     case ZCL_SWITCH_CLUSTER_ID :
+    case ZCL_SWITCH_CLUSTER_ID:
         emberAfSwitchClusterInitCallback(endpoint);
         break;
-     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID :
+    case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
         break;
-     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID :
+    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
-     case ZCL_TEST_CLUSTER_ID :
+    case ZCL_TEST_CLUSTER_ID:
         emberAfTestClusterClusterInitCallback(endpoint);
         break;
-     case ZCL_THERMOSTAT_CLUSTER_ID :
+    case ZCL_THERMOSTAT_CLUSTER_ID:
         emberAfThermostatClusterInitCallback(endpoint);
         break;
-     case ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID :
+    case ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID:
         emberAfThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
         break;
-     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID :
+    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-     case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID :
+    case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
         emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
-     case ZCL_UNIT_LOCALIZATION_CLUSTER_ID :
+    case ZCL_UNIT_LOCALIZATION_CLUSTER_ID:
         emberAfUnitLocalizationClusterInitCallback(endpoint);
         break;
-     case ZCL_USER_LABEL_CLUSTER_ID :
+    case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
         break;
-     case ZCL_WAKE_ON_LAN_CLUSTER_ID :
+    case ZCL_WAKE_ON_LAN_CLUSTER_ID:
         emberAfWakeOnLanClusterInitCallback(endpoint);
         break;
-     case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID :
+    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-     case ZCL_WINDOW_COVERING_CLUSTER_ID :
+    case ZCL_WINDOW_COVERING_CLUSTER_ID:
         emberAfWindowCoveringClusterInitCallback(endpoint);
         break;
     default:
@@ -556,58 +556,49 @@ void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicatio
 
 void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
-EmberAfAttributeWritePermission __attribute__((weak)) emberAfAllowNetworkWriteAttributeCallback(
-    EndpointId endpoint, ClusterId clusterId,
-                                                                          AttributeId attributeId, uint8_t mask,
-                                                                          uint8_t * value, uint8_t type)
+EmberAfAttributeWritePermission __attribute__((weak))
+emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                          uint8_t * value, uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
 
-bool __attribute__((weak)) emberAfAttributeReadAccessCallback(
-    EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return true;
 }
 
-bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(
-    EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return true;
 }
 
-bool __attribute__((weak)) emberAfDefaultResponseCallback(
-    ClusterId clusterId, CommandId commandId, EmberAfStatus status)
+bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     return false;
 }
 
-bool __attribute__((weak)) emberAfPreMessageSendCallback(
-    EmberAfMessageStruct * messageStruct, EmberStatus * status)
+bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
 {
     return false;
 }
 
-bool __attribute__((weak)) emberAfMessageSentCallback(
-    const MessageSendDestination & destination,
-    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-    EmberStatus status)
+bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
 
-EmberAfStatus __attribute__((weak)) emberAfExternalAttributeReadCallback(
-    EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata,
-                                                   uint8_t * buffer, uint16_t maxReadLength)
+EmberAfStatus __attribute__((weak))
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
+                                     uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-EmberAfStatus __attribute__((weak)) emberAfExternalAttributeWriteCallback(
-    EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata,
-                                                    uint8_t * buffer)
+EmberAfStatus __attribute__((weak))
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
+                                      uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
@@ -617,17 +608,16 @@ uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback()
     return 0;
 }
 
-bool __attribute__((weak)) emberAfGetEndpointInfoCallback(
-    EndpointId endpoint, uint8_t * returnNetworkIndex,
-    EmberAfEndpointInfoStruct * returnEndpointInfo)
+bool __attribute__((weak))
+emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
 }
 
 void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
 
-EmberStatus __attribute__((weak)) emberAfInterpanSendMessageCallback(
-    EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
+EmberStatus __attribute__((weak))
+emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
 {
     return EMBER_LIBRARY_NOT_PRESENT;
 }
@@ -637,15 +627,13 @@ bool __attribute__((weak)) emberAfStartMoveCallback()
     return false;
 }
 
-chip::Protocols::InteractionModel::Status __attribute__((weak)) MatterPreAttributeChangeCallback(
-    const chip::app::ConcreteAttributePath & attributePath,
-    uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+chip::Protocols::InteractionModel::Status __attribute__((weak))
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                 uint8_t * value)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-void __attribute__((weak)) MatterPostAttributeChangeCallback(
-    const chip::app::ConcreteAttributePath & attributePath,
-    uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
-{
-}
+void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask,
+                                                             uint8_t type, uint16_t size, uint8_t * value)
+{}
