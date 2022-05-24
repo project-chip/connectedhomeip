@@ -62117,8 +62117,6 @@ private:
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value.weekDayIndex", value.weekDayIndex, 1));
-                VerifyOrReturn(
-                    CheckConstraintMaxValue("value.weekDayIndex", value.weekDayIndex, NumberOfWeekDaySchedulesSupportedPerUser));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
                 VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
                 VerifyOrReturn(CheckValue("status", value.status, 0));
@@ -62401,8 +62399,6 @@ private:
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value.yearDayIndex", value.yearDayIndex, 1));
-                VerifyOrReturn(
-                    CheckConstraintMaxValue("value.yearDayIndex", value.yearDayIndex, NumberOfYearDaySchedulesSupportedPerUser));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
                 VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
                 VerifyOrReturn(CheckValue("status", value.status, 0));
