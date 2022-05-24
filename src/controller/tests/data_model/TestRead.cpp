@@ -2063,7 +2063,7 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, SessionHandle sessionHa
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
-    // Note: We cannot use ctx.DrainAndServiceIO() since the infinity read will make DrainAndServiceIO never return.
+    // Note: We cannot use ctx.DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
     using namespace SubscriptionPathQuotaHelpers;
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
@@ -2074,19 +2074,19 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
-    // Here, we set up two background infinity read requests to simulate parallel Read + Subscriptions.
+    // Here, we set up two background perpetual read requests to simulate parallel Read + Subscriptions.
     // We don't care about the data read, we only care about the existence of such read transactions.
     TestReadCallback readCallback;
     TestReadCallback readCallbackFabric2;
-    TestPerpetualListReadCallback infinityReadCallback;
+    TestPerpetualListReadCallback perpetualReadCallback;
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionAliceToBob(), 1, 1,
                                  app::AttributePathParams(kTestEndpointId, TestCluster::Id, kNeverEndAttributeid),
-                                 app::ReadClient::InteractionType::Read, &infinityReadCallback, readClients);
+                                 app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1, 1,
                                  app::AttributePathParams(kTestEndpointId, TestCluster::Id, kNeverEndAttributeid),
-                                 app::ReadClient::InteractionType::Read, &infinityReadCallback, readClients);
+                                 app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read) == 2;
     });
@@ -2097,10 +2097,12 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
 
     // Intentially establish subscriptions using exceeded resources.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    // We established kExpectedParallelSubs + 1 subsctions, with (kExpectedParallelSubs + 1) * kMinSupportedPathsPerSubscription + 1
-    // interested paths. This exceeds the limit we set below, and the subscription with kMinSupportedPathsPerSubscription + 1
-    // interested path will be evicted firstly.
-    // We intentially use exceeded resource here to make testing "used exactly all resources" easier.
+    //
+    // We establish 1 subscription that exceeds the minimum supported paths (but is still established since the
+    // target has sufficient resources), and kExpectedParallelSubs subscriptions that conform to the minimum
+    // supported paths. This sets the stage to make it possible to test eviction of subscriptions that are in violation
+    // of the minimum later below.
+    //
     // Subscription A
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
                                  app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
@@ -2193,6 +2195,9 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // Before the above subscription, we have one subscription with kMinSupportedPathsPerSubscription + 1 paths, we should evict
     // that subscription before evicting any other subscriptions, which will result we used exactly kExpectedParallelPaths and have
     // exactly kExpectedParallelSubs.
+    // We have exactly one subscription than uses more resources than others, so the interaction model must evict it first, and we
+    // will have exactly kExpectedParallelPaths only when that subscription have been evicted. We use this indirect method to verify
+    // the subscriptions since the read client won't shutdown until the timeout fired.
     NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == kExpectedParallelPaths);
     NL_TEST_ASSERT(apSuite,
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
