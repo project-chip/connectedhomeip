@@ -107,7 +107,6 @@ tests:
               - name: "userIndex"
                 constraints:
                     minValue: 1
-                    maxValue: NumberOfTotalUsersSupported
               - name: "status"
                 value: 0x0
               - name: "daysMask"
