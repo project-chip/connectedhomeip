@@ -1642,6 +1642,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
+    ReturnErrorOnFailure(mExchangeCtxt->SendStandaloneAckMessage());
+
     // By default, CHIP_ERROR_INVALID_MESSAGE_TYPE is returned if in the current state
     // a message handler is not defined for the received message type.
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
