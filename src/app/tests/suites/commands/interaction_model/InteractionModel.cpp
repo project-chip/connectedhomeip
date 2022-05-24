@@ -116,9 +116,7 @@ void InteractionModel::OnError(CHIP_ERROR error)
 
 void InteractionModel::OnDone(ReadClient * aReadClient)
 {
-    // TODO: Keep track of multiple read/subscribe interactions, clear out the
-    // right thing here.
-    mReadClient.reset();
+    InteractionModelReports::CleanupReadClient(aReadClient);
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
@@ -300,10 +298,11 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
         }
     }
 
-    auto & client = interactionType == ReadClient::InteractionType::Subscribe ? mSubscribeClient : mReadClient;
-    client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), mBufferedReadAdapter,
-                                          interactionType);
-    return client->SendRequest(params);
+    auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                               mBufferedReadAdapter, interactionType);
+    ReturnErrorOnFailure(client->SendRequest(params));
+    mReadClients.push_back(std::move(client));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vector<EndpointId> endpointIds,
@@ -405,8 +404,16 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
         }
     }
 
-    auto & client = interactionType == ReadClient::InteractionType::Subscribe ? mSubscribeClient : mReadClient;
-    client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), mBufferedReadAdapter,
-                                          interactionType);
-    return client->SendRequest(params);
+    auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                               mBufferedReadAdapter, interactionType);
+    ReturnErrorOnFailure(client->SendRequest(params));
+    mReadClients.push_back(std::move(client));
+    return CHIP_NO_ERROR;
+}
+
+void InteractionModelReports::CleanupReadClient(ReadClient * aReadClient)
+{
+    mReadClients.erase(
+        std::remove_if(mReadClients.begin(), mReadClients.end(), [aReadClient](auto & item) { return item.get() == aReadClient; }),
+        mReadClients.end());
 }

@@ -95,6 +95,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
+        ExecuteDeferredCleanups();
         return false;
     }
 
