@@ -1643,8 +1643,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_SLOW_CRYPTO
-    if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 ||
-        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
+    if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3)
     {

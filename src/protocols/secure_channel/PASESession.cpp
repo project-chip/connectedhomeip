@@ -800,16 +800,13 @@ CHIP_ERROR PASESession::OnUnsolicitedMessageReceived(const PayloadHeader & paylo
 CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, msg);
+    CHIP_ERROR err  = ValidateReceivedMessage(exchange, payloadHeader, msg);
     MsgType msgType = static_cast<MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_SLOW_CRYPTO
-    if (msgType == MsgType::PBKDFParamRequest ||
-        msgType == MsgType::PBKDFParamResponse ||
-        msgType == MsgType::PASE_Pake1 ||
-        msgType == MsgType::PASE_Pake2 ||
-        msgType == MsgType::PASE_Pake3)
+    if (msgType == MsgType::PBKDFParamRequest || msgType == MsgType::PBKDFParamResponse || msgType == MsgType::PASE_Pake1 ||
+        msgType == MsgType::PASE_Pake2 || msgType == MsgType::PASE_Pake3)
     {
         SuccessOrExit(mExchangeCtxt->SendStandaloneAckMessage());
     }

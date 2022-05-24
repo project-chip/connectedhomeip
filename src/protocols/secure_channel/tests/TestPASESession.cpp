@@ -49,9 +49,9 @@ using namespace chip::Protocols;
 namespace {
 
 #if CHIP_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestPaseMessageCount        = 8;
-#else // CHIP_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestPaseMessageCount        = 5;
+constexpr uint32_t sTestPaseMessageCount = 8;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestPaseMessageCount = 5;
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
 // Test Set #01 of Spake2p Parameters (PIN Code, Iteration Count, Salt, and matching Verifier):
