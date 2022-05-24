@@ -38,7 +38,6 @@ class HostApp(Enum):
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
     NL_TEST_RUNNER = auto()
-    LIGHTING = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
 
@@ -73,8 +72,6 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.NL_TEST_RUNNER:
             return '../src/test_driver/efr32'
-        elif self == HostApp.LIGHTING:
-            return 'lighting-app/linux'
         elif self == HostApp.TV_CASTING:
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
