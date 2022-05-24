@@ -19,237 +19,237 @@
 
 #pragma once
 
-void __attribute__((weak))  MatterPowerConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPowerConfigurationPluginClientInitCallback() {}
 void MatterPowerConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterDeviceTemperatureConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDeviceTemperatureConfigurationPluginClientInitCallback() {}
 void MatterDeviceTemperatureConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterIdentifyPluginClientInitCallback() {}
+void __attribute__((weak)) MatterIdentifyPluginClientInitCallback() {}
 void MatterIdentifyPluginServerInitCallback();
-void __attribute__((weak))  MatterGroupsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterGroupsPluginClientInitCallback() {}
 void MatterGroupsPluginServerInitCallback();
-void __attribute__((weak))  MatterScenesPluginClientInitCallback() {}
+void __attribute__((weak)) MatterScenesPluginClientInitCallback() {}
 void MatterScenesPluginServerInitCallback();
-void __attribute__((weak))  MatterOnOffPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOnOffPluginClientInitCallback() {}
 void MatterOnOffPluginServerInitCallback();
-void __attribute__((weak))  MatterOnOffSwitchConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOnOffSwitchConfigurationPluginClientInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterLevelControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterLevelControlPluginClientInitCallback() {}
 void MatterLevelControlPluginServerInitCallback();
-void __attribute__((weak))  MatterAlarmsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterAlarmsPluginClientInitCallback() {}
 void MatterAlarmsPluginServerInitCallback();
-void __attribute__((weak))  MatterTimePluginClientInitCallback() {}
+void __attribute__((weak)) MatterTimePluginClientInitCallback() {}
 void MatterTimePluginServerInitCallback();
-void __attribute__((weak))  MatterBinaryInputBasicPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBinaryInputBasicPluginClientInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback();
-void __attribute__((weak))  MatterPowerProfilePluginClientInitCallback() {}
+void __attribute__((weak)) MatterPowerProfilePluginClientInitCallback() {}
 void MatterPowerProfilePluginServerInitCallback();
-void __attribute__((weak))  MatterApplianceControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplianceControlPluginClientInitCallback() {}
 void MatterApplianceControlPluginServerInitCallback();
-void __attribute__((weak))  MatterPulseWidthModulationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPulseWidthModulationPluginClientInitCallback() {}
 void MatterPulseWidthModulationPluginServerInitCallback();
-void __attribute__((weak))  MatterDescriptorPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDescriptorPluginClientInitCallback() {}
 void MatterDescriptorPluginServerInitCallback();
-void __attribute__((weak))  MatterBindingPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
-void __attribute__((weak))  MatterAccessControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterAccessControlPluginClientInitCallback() {}
 void MatterAccessControlPluginServerInitCallback();
-void __attribute__((weak))  MatterPollControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPollControlPluginClientInitCallback() {}
 void MatterPollControlPluginServerInitCallback();
-void __attribute__((weak))  MatterBridgedActionsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback() {}
 void MatterBridgedActionsPluginServerInitCallback();
-void __attribute__((weak))  MatterBasicPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBasicPluginClientInitCallback() {}
 void MatterBasicPluginServerInitCallback();
-void __attribute__((weak))  MatterOtaSoftwareUpdateProviderPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOtaSoftwareUpdateProviderPluginClientInitCallback() {}
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback();
-void __attribute__((weak))  MatterOtaSoftwareUpdateRequestorPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOtaSoftwareUpdateRequestorPluginClientInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
-void __attribute__((weak))  MatterLocalizationConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterTimeFormatLocalizationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTimeFormatLocalizationPluginClientInitCallback() {}
 void MatterTimeFormatLocalizationPluginServerInitCallback();
-void __attribute__((weak))  MatterUnitLocalizationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterUnitLocalizationPluginClientInitCallback() {}
 void MatterUnitLocalizationPluginServerInitCallback();
-void __attribute__((weak))  MatterPowerSourceConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
 void MatterPowerSourceConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterPowerSourcePluginClientInitCallback() {}
+void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback();
-void __attribute__((weak))  MatterGeneralCommissioningPluginClientInitCallback() {}
+void __attribute__((weak)) MatterGeneralCommissioningPluginClientInitCallback() {}
 void MatterGeneralCommissioningPluginServerInitCallback();
-void __attribute__((weak))  MatterNetworkCommissioningPluginClientInitCallback() {}
+void __attribute__((weak)) MatterNetworkCommissioningPluginClientInitCallback() {}
 void MatterNetworkCommissioningPluginServerInitCallback();
-void __attribute__((weak))  MatterDiagnosticLogsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDiagnosticLogsPluginClientInitCallback() {}
 void MatterDiagnosticLogsPluginServerInitCallback();
-void __attribute__((weak))  MatterGeneralDiagnosticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterGeneralDiagnosticsPluginClientInitCallback() {}
 void MatterGeneralDiagnosticsPluginServerInitCallback();
-void __attribute__((weak))  MatterSoftwareDiagnosticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterSoftwareDiagnosticsPluginClientInitCallback() {}
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
-void __attribute__((weak))  MatterThreadNetworkDiagnosticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterThreadNetworkDiagnosticsPluginClientInitCallback() {}
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
-void __attribute__((weak))  MatterWiFiNetworkDiagnosticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterWiFiNetworkDiagnosticsPluginClientInitCallback() {}
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
-void __attribute__((weak))  MatterEthernetNetworkDiagnosticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterEthernetNetworkDiagnosticsPluginClientInitCallback() {}
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
-void __attribute__((weak))  MatterTimeSynchronizationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTimeSynchronizationPluginClientInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback();
-void __attribute__((weak))  MatterBridgedDeviceBasicPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBridgedDeviceBasicPluginClientInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback();
-void __attribute__((weak))  MatterSwitchPluginClientInitCallback() {}
+void __attribute__((weak)) MatterSwitchPluginClientInitCallback() {}
 void MatterSwitchPluginServerInitCallback();
-void __attribute__((weak))  MatterAdministratorCommissioningPluginClientInitCallback() {}
+void __attribute__((weak)) MatterAdministratorCommissioningPluginClientInitCallback() {}
 void MatterAdministratorCommissioningPluginServerInitCallback();
-void __attribute__((weak))  MatterOperationalCredentialsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOperationalCredentialsPluginClientInitCallback() {}
 void MatterOperationalCredentialsPluginServerInitCallback();
-void __attribute__((weak))  MatterGroupKeyManagementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback();
-void __attribute__((weak))  MatterFixedLabelPluginClientInitCallback() {}
+void __attribute__((weak)) MatterFixedLabelPluginClientInitCallback() {}
 void MatterFixedLabelPluginServerInitCallback();
-void __attribute__((weak))  MatterUserLabelPluginClientInitCallback() {}
+void __attribute__((weak)) MatterUserLabelPluginClientInitCallback() {}
 void MatterUserLabelPluginServerInitCallback();
-void __attribute__((weak))  MatterProxyConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterProxyConfigurationPluginClientInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterProxyDiscoveryPluginClientInitCallback() {}
+void __attribute__((weak)) MatterProxyDiscoveryPluginClientInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback();
-void __attribute__((weak))  MatterProxyValidPluginClientInitCallback() {}
+void __attribute__((weak)) MatterProxyValidPluginClientInitCallback() {}
 void MatterProxyValidPluginServerInitCallback();
-void __attribute__((weak))  MatterBooleanStatePluginClientInitCallback() {}
+void __attribute__((weak)) MatterBooleanStatePluginClientInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback();
-void __attribute__((weak))  MatterModeSelectPluginClientInitCallback() {}
+void __attribute__((weak)) MatterModeSelectPluginClientInitCallback() {}
 void MatterModeSelectPluginServerInitCallback();
-void __attribute__((weak))  MatterShadeConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterShadeConfigurationPluginClientInitCallback() {}
 void MatterShadeConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterDoorLockPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDoorLockPluginClientInitCallback() {}
 void MatterDoorLockPluginServerInitCallback();
-void __attribute__((weak))  MatterWindowCoveringPluginClientInitCallback() {}
+void __attribute__((weak)) MatterWindowCoveringPluginClientInitCallback() {}
 void MatterWindowCoveringPluginServerInitCallback();
-void __attribute__((weak))  MatterBarrierControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBarrierControlPluginClientInitCallback() {}
 void MatterBarrierControlPluginServerInitCallback();
-void __attribute__((weak))  MatterPumpConfigurationAndControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPumpConfigurationAndControlPluginClientInitCallback() {}
 void MatterPumpConfigurationAndControlPluginServerInitCallback();
-void __attribute__((weak))  MatterThermostatPluginClientInitCallback() {}
+void __attribute__((weak)) MatterThermostatPluginClientInitCallback() {}
 void MatterThermostatPluginServerInitCallback();
-void __attribute__((weak))  MatterFanControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterFanControlPluginClientInitCallback() {}
 void MatterFanControlPluginServerInitCallback();
-void __attribute__((weak))  MatterDehumidificationControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDehumidificationControlPluginClientInitCallback() {}
 void MatterDehumidificationControlPluginServerInitCallback();
-void __attribute__((weak))  MatterThermostatUserInterfaceConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterThermostatUserInterfaceConfigurationPluginClientInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterColorControlPluginClientInitCallback() {}
+void __attribute__((weak)) MatterColorControlPluginClientInitCallback() {}
 void MatterColorControlPluginServerInitCallback();
-void __attribute__((weak))  MatterBallastConfigurationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBallastConfigurationPluginClientInitCallback() {}
 void MatterBallastConfigurationPluginServerInitCallback();
-void __attribute__((weak))  MatterIlluminanceMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterIlluminanceMeasurementPluginClientInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterTemperatureMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTemperatureMeasurementPluginClientInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterPressureMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterPressureMeasurementPluginClientInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterFlowMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterFlowMeasurementPluginClientInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterRelativeHumidityMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterRelativeHumidityMeasurementPluginClientInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterOccupancySensingPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOccupancySensingPluginClientInitCallback() {}
 void MatterOccupancySensingPluginServerInitCallback();
-void __attribute__((weak))  MatterCarbonMonoxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterCarbonMonoxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterCarbonDioxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterCarbonDioxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterEthyleneConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterEthyleneConcentrationMeasurementPluginClientInitCallback() {}
 void MatterEthyleneConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterEthyleneOxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterEthyleneOxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterEthyleneOxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterHydrogenConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterHydrogenConcentrationMeasurementPluginClientInitCallback() {}
 void MatterHydrogenConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterHydrogenSulphideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterHydrogenSulphideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterHydrogenSulphideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterNitricOxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterNitricOxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterNitricOxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterNitrogenDioxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterNitrogenDioxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterOxygenConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOxygenConcentrationMeasurementPluginClientInitCallback() {}
 void MatterOxygenConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterOzoneConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterOzoneConcentrationMeasurementPluginClientInitCallback() {}
 void MatterOzoneConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterSulfurDioxideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterSulfurDioxideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterSulfurDioxideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterDissolvedOxygenConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterDissolvedOxygenConcentrationMeasurementPluginClientInitCallback() {}
 void MatterDissolvedOxygenConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterBromateConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBromateConcentrationMeasurementPluginClientInitCallback() {}
 void MatterBromateConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterChloraminesConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterChloraminesConcentrationMeasurementPluginClientInitCallback() {}
 void MatterChloraminesConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterChlorineConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterChlorineConcentrationMeasurementPluginClientInitCallback() {}
 void MatterChlorineConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterFecalColiformAndEColiConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterFecalColiformAndEColiConcentrationMeasurementPluginClientInitCallback() {}
 void MatterFecalColiformAndEColiConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterFluorideConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterFluorideConcentrationMeasurementPluginClientInitCallback() {}
 void MatterFluorideConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterHaloaceticAcidsConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterHaloaceticAcidsConcentrationMeasurementPluginClientInitCallback() {}
 void MatterHaloaceticAcidsConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterTotalTrihalomethanesConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTotalTrihalomethanesConcentrationMeasurementPluginClientInitCallback() {}
 void MatterTotalTrihalomethanesConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterTotalColiformBacteriaConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTotalColiformBacteriaConcentrationMeasurementPluginClientInitCallback() {}
 void MatterTotalColiformBacteriaConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterTurbidityConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTurbidityConcentrationMeasurementPluginClientInitCallback() {}
 void MatterTurbidityConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterCopperConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterCopperConcentrationMeasurementPluginClientInitCallback() {}
 void MatterCopperConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterLeadConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterLeadConcentrationMeasurementPluginClientInitCallback() {}
 void MatterLeadConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterManganeseConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterManganeseConcentrationMeasurementPluginClientInitCallback() {}
 void MatterManganeseConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterSulfateConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterSulfateConcentrationMeasurementPluginClientInitCallback() {}
 void MatterSulfateConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterBromodichloromethaneConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBromodichloromethaneConcentrationMeasurementPluginClientInitCallback() {}
 void MatterBromodichloromethaneConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterBromoformConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterBromoformConcentrationMeasurementPluginClientInitCallback() {}
 void MatterBromoformConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterChlorodibromomethaneConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterChlorodibromomethaneConcentrationMeasurementPluginClientInitCallback() {}
 void MatterChlorodibromomethaneConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterChloroformConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterChloroformConcentrationMeasurementPluginClientInitCallback() {}
 void MatterChloroformConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterSodiumConcentrationMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterSodiumConcentrationMeasurementPluginClientInitCallback() {}
 void MatterSodiumConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak))  MatterIasZonePluginClientInitCallback() {}
+void __attribute__((weak)) MatterIasZonePluginClientInitCallback() {}
 void MatterIasZonePluginServerInitCallback();
-void __attribute__((weak))  MatterIasAcePluginClientInitCallback() {}
+void __attribute__((weak)) MatterIasAcePluginClientInitCallback() {}
 void MatterIasAcePluginServerInitCallback();
-void __attribute__((weak))  MatterIasWdPluginClientInitCallback() {}
+void __attribute__((weak)) MatterIasWdPluginClientInitCallback() {}
 void MatterIasWdPluginServerInitCallback();
-void __attribute__((weak))  MatterWakeOnLanPluginClientInitCallback() {}
+void __attribute__((weak)) MatterWakeOnLanPluginClientInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback();
-void __attribute__((weak))  MatterChannelPluginClientInitCallback() {}
+void __attribute__((weak)) MatterChannelPluginClientInitCallback() {}
 void MatterChannelPluginServerInitCallback();
-void __attribute__((weak))  MatterTargetNavigatorPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTargetNavigatorPluginClientInitCallback() {}
 void MatterTargetNavigatorPluginServerInitCallback();
-void __attribute__((weak))  MatterMediaPlaybackPluginClientInitCallback() {}
+void __attribute__((weak)) MatterMediaPlaybackPluginClientInitCallback() {}
 void MatterMediaPlaybackPluginServerInitCallback();
-void __attribute__((weak))  MatterMediaInputPluginClientInitCallback() {}
+void __attribute__((weak)) MatterMediaInputPluginClientInitCallback() {}
 void MatterMediaInputPluginServerInitCallback();
-void __attribute__((weak))  MatterLowPowerPluginClientInitCallback() {}
+void __attribute__((weak)) MatterLowPowerPluginClientInitCallback() {}
 void MatterLowPowerPluginServerInitCallback();
-void __attribute__((weak))  MatterKeypadInputPluginClientInitCallback() {}
+void __attribute__((weak)) MatterKeypadInputPluginClientInitCallback() {}
 void MatterKeypadInputPluginServerInitCallback();
-void __attribute__((weak))  MatterContentLauncherPluginClientInitCallback() {}
+void __attribute__((weak)) MatterContentLauncherPluginClientInitCallback() {}
 void MatterContentLauncherPluginServerInitCallback();
-void __attribute__((weak))  MatterAudioOutputPluginClientInitCallback() {}
+void __attribute__((weak)) MatterAudioOutputPluginClientInitCallback() {}
 void MatterAudioOutputPluginServerInitCallback();
-void __attribute__((weak))  MatterApplicationLauncherPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplicationLauncherPluginClientInitCallback() {}
 void MatterApplicationLauncherPluginServerInitCallback();
-void __attribute__((weak))  MatterApplicationBasicPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplicationBasicPluginClientInitCallback() {}
 void MatterApplicationBasicPluginServerInitCallback();
-void __attribute__((weak))  MatterAccountLoginPluginClientInitCallback() {}
+void __attribute__((weak)) MatterAccountLoginPluginClientInitCallback() {}
 void MatterAccountLoginPluginServerInitCallback();
-void __attribute__((weak))  MatterTestClusterPluginClientInitCallback() {}
+void __attribute__((weak)) MatterTestClusterPluginClientInitCallback() {}
 void MatterTestClusterPluginServerInitCallback();
-void __attribute__((weak))  MatterMessagingPluginClientInitCallback() {}
+void __attribute__((weak)) MatterMessagingPluginClientInitCallback() {}
 void MatterMessagingPluginServerInitCallback();
-void __attribute__((weak))  MatterApplianceIdentificationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplianceIdentificationPluginClientInitCallback() {}
 void MatterApplianceIdentificationPluginServerInitCallback();
-void __attribute__((weak))  MatterMeterIdentificationPluginClientInitCallback() {}
+void __attribute__((weak)) MatterMeterIdentificationPluginClientInitCallback() {}
 void MatterMeterIdentificationPluginServerInitCallback();
-void __attribute__((weak))  MatterApplianceEventsAndAlertPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplianceEventsAndAlertPluginClientInitCallback() {}
 void MatterApplianceEventsAndAlertPluginServerInitCallback();
-void __attribute__((weak))  MatterApplianceStatisticsPluginClientInitCallback() {}
+void __attribute__((weak)) MatterApplianceStatisticsPluginClientInitCallback() {}
 void MatterApplianceStatisticsPluginServerInitCallback();
-void __attribute__((weak))  MatterElectricalMeasurementPluginClientInitCallback() {}
+void __attribute__((weak)) MatterElectricalMeasurementPluginClientInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback();

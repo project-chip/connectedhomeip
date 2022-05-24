@@ -24,157 +24,155 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation CHIPIdentifyClusterIdentifyParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _identifyTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIdentifyClusterIdentifyQueryResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _timeout = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIdentifyClusterTriggerEffectParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _effectIdentifier = @(0);
 
         _effectVariant = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterAddGroupParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
-      _groupName = @"";
-  }
-  return self;
+        _groupName = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterAddGroupResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterViewGroupParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterViewGroupResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
 
-      _groupName = @"";
-  }
-  return self;
+        _groupName = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterGetGroupMembershipParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _groupList = [NSArray array];
-  }
-  return self;
+        _groupList = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterGetGroupMembershipResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _capacity = nil;
+        _capacity = nil;
 
-      _groupList = [NSArray array];
-  }
-  return self;
+        _groupList = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterRemoveGroupParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupsClusterRemoveGroupResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPGroupsClusterAddGroupIfIdentifyingParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
-      _groupName = @"";
-  }
-  return self;
+        _groupName = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterAddSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
@@ -182,46 +180,46 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-      _sceneName = @"";
+        _sceneName = @"";
 
-      _extensionFieldSets = [NSArray array];
-  }
-  return self;
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterAddSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterViewSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterViewSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
@@ -231,124 +229,124 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-      _sceneName = @"";
+        _sceneName = @"";
 
-      _extensionFieldSets = [NSArray array];
-  }
-  return self;
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterRemoveSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterRemoveSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterRemoveAllScenesParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterStoreSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterStoreSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterRecallSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
         _sceneId = @(0);
 
         _transitionTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterGetSceneMembershipParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
@@ -358,16 +356,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneCount = @(0);
 
-      _sceneList = [NSArray array];
-  }
-  return self;
+        _sceneList = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterEnhancedAddSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
@@ -375,46 +373,46 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-      _sceneName = @"";
+        _sceneName = @"";
 
-      _extensionFieldSets = [NSArray array];
-  }
-  return self;
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterEnhancedViewSceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupId = @(0);
 
         _sceneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
@@ -424,18 +422,18 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-      _sceneName = @"";
+        _sceneName = @"";
 
-      _extensionFieldSets = [NSArray array];
-  }
-  return self;
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterCopySceneParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _mode = @(0);
 
@@ -446,62 +444,58 @@ NS_ASSUME_NONNULL_BEGIN
         _groupIdTo = @(0);
 
         _sceneIdTo = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPScenesClusterCopySceneResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
         _groupIdFrom = @(0);
 
         _sceneIdFrom = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
-
 
 @implementation CHIPOnOffClusterOffWithEffectParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _effectId = @(0);
 
         _effectVariant = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPOnOffClusterOnWithTimedOffParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _onOffControl = @(0);
 
         _onTime = @(0);
 
         _offWaitTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterMoveToLevelParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _level = @(0);
 
@@ -510,15 +504,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionMask = @(0);
 
         _optionOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterMoveParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
@@ -527,15 +521,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionMask = @(0);
 
         _optionOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterStepParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
@@ -546,97 +540,95 @@ NS_ASSUME_NONNULL_BEGIN
         _optionMask = @(0);
 
         _optionOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterStopParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _optionMask = @(0);
 
         _optionOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterMoveToLevelWithOnOffParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _level = @(0);
 
         _transitionTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterMoveWithOnOffParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
         _rate = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPLevelControlClusterStepWithOnOffParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
         _stepSize = @(0);
 
         _transitionTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPAlarmsClusterResetAlarmParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _alarmCode = @(0);
 
         _clusterId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAlarmsClusterAlarmParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _alarmCode = @(0);
 
         _clusterId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPAlarmsClusterGetAlarmResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
@@ -645,28 +637,26 @@ NS_ASSUME_NONNULL_BEGIN
         _clusterId = @(0);
 
         _timeStamp = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPPowerProfileClusterPowerProfileRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterPowerProfileNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _totalProfileNum = @(0);
 
@@ -674,17 +664,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _numOfTransferredPhases = @(0);
 
-      _transferredPhases = [NSArray array];
-  }
-  return self;
+        _transferredPhases = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPPowerProfileClusterPowerProfileResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _totalProfileNum = @(0);
 
@@ -692,16 +681,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _numOfTransferredPhases = @(0);
 
-      _transferredPhases = [NSArray array];
-  }
-  return self;
+        _transferredPhases = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
@@ -710,146 +699,145 @@ NS_ASSUME_NONNULL_BEGIN
         _price = @(0);
 
         _priceTrailingDigit = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterPowerProfileStateResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileCount = @(0);
 
-      _powerProfileRecords = [NSArray array];
-  }
-  return self;
+        _powerProfileRecords = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _currency = @(0);
 
         _price = @(0);
 
         _priceTrailingDigit = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _numOfScheduledPhases = @(0);
 
-      _scheduledPhases = [NSArray array];
-  }
-  return self;
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterPowerProfilesStateNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileCount = @(0);
 
-      _powerProfileRecords = [NSArray array];
-  }
-  return self;
+        _powerProfileRecords = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _numOfScheduledPhases = @(0);
 
-      _scheduledPhases = [NSArray array];
-  }
-  return self;
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _numOfScheduledPhases = @(0);
 
-      _scheduledPhases = [NSArray array];
-  }
-  return self;
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
@@ -858,349 +846,343 @@ NS_ASSUME_NONNULL_BEGIN
         _price = @(0);
 
         _priceTrailingDigit = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _numOfScheduledPhases = @(0);
 
-      _scheduledPhases = [NSArray array];
-  }
-  return self;
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _startAfter = @(0);
 
         _stopBefore = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _powerProfileId = @(0);
 
         _startAfter = @(0);
 
         _stopBefore = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _options = @(0);
 
         _powerProfileId = @(0);
 
         _powerProfileStartTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceControlClusterExecutionOfACommandParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _commandId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceControlClusterSignalStateResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _applianceStatus = @(0);
 
         _remoteEnableFlagsAndDeviceStatus2 = @(0);
 
         _applianceStatus2 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPApplianceControlClusterSignalStateNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _applianceStatus = @(0);
 
         _remoteEnableFlagsAndDeviceStatus2 = @(0);
 
         _applianceStatus2 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceControlClusterWriteFunctionsParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _functionId = @(0);
 
         _functionDataType = @(0);
 
-      _functionData = [NSArray array];
-  }
-  return self;
+        _functionData = [NSArray array];
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPApplianceControlClusterOverloadWarningParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _warningEvent = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _startFastPolling = @(0);
 
         _fastPollTimeout = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPPollControlClusterSetLongPollIntervalParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _newLongPollInterval = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPPollControlClusterSetShortPollIntervalParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _newShortPollInterval = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterInstantActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterInstantActionWithTransitionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
+        _invokeID = nil;
 
         _transitionTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterStartActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterStartActionWithDurationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
+        _invokeID = nil;
 
         _duration = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterStopActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterPauseActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterPauseActionWithDurationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
+        _invokeID = nil;
 
         _duration = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterResumeActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterEnableActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterEnableActionWithDurationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
+        _invokeID = nil;
 
         _duration = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterDisableActionParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
-  }
-  return self;
+        _invokeID = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterDisableActionWithDurationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _actionID = @(0);
 
-    _invokeID = nil;
+        _invokeID = nil;
 
         _duration = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _vendorId = @(0);
 
@@ -1208,88 +1190,88 @@ NS_ASSUME_NONNULL_BEGIN
 
         _softwareVersion = @(0);
 
-      _protocolsSupported = [NSArray array];
+        _protocolsSupported = [NSArray array];
 
-    _hardwareVersion = nil;
+        _hardwareVersion = nil;
 
-    _location = nil;
+        _location = nil;
 
-    _requestorCanConsent = nil;
+        _requestorCanConsent = nil;
 
-    _metadataForProvider = nil;
-  }
-  return self;
+        _metadataForProvider = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _delayedActionTime = nil;
+        _delayedActionTime = nil;
 
-    _imageURI = nil;
+        _imageURI = nil;
 
-    _softwareVersion = nil;
+        _softwareVersion = nil;
 
-    _softwareVersionString = nil;
+        _softwareVersionString = nil;
 
-    _updateToken = nil;
+        _updateToken = nil;
 
-    _userConsentNeeded = nil;
+        _userConsentNeeded = nil;
 
-    _metadataForRequestor = nil;
-  }
-  return self;
+        _metadataForRequestor = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _updateToken = [NSData data];
+        _updateToken = [NSData data];
 
         _newVersion = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _action = @(0);
 
         _delayedActionTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _updateToken = [NSData data];
+        _updateToken = [NSData data];
 
         _softwareVersion = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _providerNodeId = @(0);
 
@@ -1297,566 +1279,560 @@ NS_ASSUME_NONNULL_BEGIN
 
         _announcementReason = @(0);
 
-    _metadataForNode = nil;
+        _metadataForNode = nil;
 
         _endpoint = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _expiryLengthSeconds = @(0);
 
         _breadcrumb = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGeneralCommissioningClusterArmFailSafeResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _errorCode = @(0);
 
-      _debugText = @"";
-  }
-  return self;
+        _debugText = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _newRegulatoryConfig = @(0);
 
-      _countryCode = @"";
+        _countryCode = @"";
 
         _breadcrumb = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _errorCode = @(0);
 
-      _debugText = @"";
-  }
-  return self;
+        _debugText = @"";
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _errorCode = @(0);
 
-      _debugText = @"";
-  }
-  return self;
+        _debugText = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterScanNetworksParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _ssid = nil;
+        _ssid = nil;
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterScanNetworksResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _networkingStatus = @(0);
 
-    _debugText = nil;
+        _debugText = nil;
 
-    _wiFiScanResults = nil;
+        _wiFiScanResults = nil;
 
-    _threadScanResults = nil;
-  }
-  return self;
+        _threadScanResults = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _ssid = [NSData data];
+        _ssid = [NSData data];
 
-      _credentials = [NSData data];
+        _credentials = [NSData data];
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _operationalDataset = [NSData data];
+        _operationalDataset = [NSData data];
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterRemoveNetworkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _networkID = [NSData data];
+        _networkID = [NSData data];
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterNetworkConfigResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _networkingStatus = @(0);
 
-    _debugText = nil;
+        _debugText = nil;
 
-    _networkIndex = nil;
-  }
-  return self;
+        _networkIndex = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterConnectNetworkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _networkID = [NSData data];
+        _networkID = [NSData data];
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterConnectNetworkResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _networkingStatus = @(0);
 
-    _debugText = nil;
+        _debugText = nil;
 
-    _errorValue = nil;
-  }
-  return self;
+        _errorValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterReorderNetworkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _networkID = [NSData data];
+        _networkID = [NSData data];
 
         _networkIndex = @(0);
 
-    _breadcrumb = nil;
-  }
-  return self;
+        _breadcrumb = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _intent = @(0);
 
         _requestedProtocol = @(0);
 
-      _transferFileDesignator = [NSData data];
-  }
-  return self;
+        _transferFileDesignator = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDiagnosticLogsClusterRetrieveLogsResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-      _content = [NSData data];
+        _content = [NSData data];
 
         _timeStamp = @(0);
 
         _timeSinceBoot = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
-
-
 
 @implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _commissioningTimeout = @(0);
 
-      _pakeVerifier = [NSData data];
+        _pakeVerifier = [NSData data];
 
         _discriminator = @(0);
 
         _iterations = @(0);
 
-      _salt = [NSData data];
-  }
-  return self;
+        _salt = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _commissioningTimeout = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPOperationalCredentialsClusterAttestationRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _attestationNonce = [NSData data];
-  }
-  return self;
+        _attestationNonce = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterAttestationResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _attestationElements = [NSData data];
+        _attestationElements = [NSData data];
 
-      _signature = [NSData data];
-  }
-  return self;
+        _signature = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _certificateType = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterCertificateChainResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _certificate = [NSData data];
-  }
-  return self;
+        _certificate = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _csrNonce = [NSData data];
-  }
-  return self;
+        _csrNonce = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterCSRResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _nocsrElements = [NSData data];
+        _nocsrElements = [NSData data];
 
-      _attestationSignature = [NSData data];
-  }
-  return self;
+        _attestationSignature = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterAddNOCParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _nocValue = [NSData data];
+        _nocValue = [NSData data];
 
-    _icacValue = nil;
+        _icacValue = nil;
 
-      _ipkValue = [NSData data];
+        _ipkValue = [NSData data];
 
         _caseAdminNode = @(0);
 
         _adminVendorId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterUpdateNOCParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _nocValue = [NSData data];
+        _nocValue = [NSData data];
 
-    _icacValue = nil;
-  }
-  return self;
+        _icacValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterNOCResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _statusCode = @(0);
 
-    _fabricIndex = nil;
+        _fabricIndex = nil;
 
-    _debugText = nil;
-  }
-  return self;
+        _debugText = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterUpdateFabricLabelParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _label = @"";
-  }
-  return self;
+        _label = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterRemoveFabricParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _fabricIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _rootCertificate = [NSData data];
-  }
-  return self;
+        _rootCertificate = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _trustedRootIdentifier = [NSData data];
-  }
-  return self;
+        _trustedRootIdentifier = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetReadParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupKeySetID = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetReadResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetRemoveParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _groupKeySetID = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _groupKeySetIDs = [NSArray array];
-  }
-  return self;
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _groupKeySetIDs = [NSArray array];
-  }
-  return self;
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _newMode = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterLockDoorParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _pinCode = nil;
-  }
-  return self;
+        _pinCode = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterUnlockDoorParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _pinCode = nil;
-  }
-  return self;
+        _pinCode = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterUnlockWithTimeoutParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _timeout = @(0);
 
-    _pinCode = nil;
-  }
-  return self;
+        _pinCode = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetLogRecordParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _logIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetLogRecordResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _logEntryId = @(0);
 
@@ -1870,110 +1846,109 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-      _pin = [NSData data];
-  }
-  return self;
+        _pin = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetPINCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-      _pin = [NSData data];
-  }
-  return self;
+        _pin = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetPINCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetPINCodeResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-    _pin = nil;
-  }
-  return self;
+        _pin = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearPINCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _pinSlotIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPDoorLockClusterSetUserStatusParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
         _userStatus = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserStatusParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserStatusResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
         _userStatus = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetWeekDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _weekDayIndex = @(0);
 
@@ -1988,28 +1963,28 @@ NS_ASSUME_NONNULL_BEGIN
         _endHour = @(0);
 
         _endMinute = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetWeekDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _weekDayIndex = @(0);
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetWeekDayScheduleResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _weekDayIndex = @(0);
 
@@ -2017,37 +1992,37 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-    _daysMask = nil;
+        _daysMask = nil;
 
-    _startHour = nil;
+        _startHour = nil;
 
-    _startMinute = nil;
+        _startMinute = nil;
 
-    _endHour = nil;
+        _endHour = nil;
 
-    _endMinute = nil;
-  }
-  return self;
+        _endMinute = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearWeekDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _weekDayIndex = @(0);
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetYearDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _yearDayIndex = @(0);
 
@@ -2056,28 +2031,28 @@ NS_ASSUME_NONNULL_BEGIN
         _localStartTime = @(0);
 
         _localEndTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetYearDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _yearDayIndex = @(0);
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetYearDayScheduleResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _yearDayIndex = @(0);
 
@@ -2085,31 +2060,31 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-    _localStartTime = nil;
+        _localStartTime = nil;
 
-    _localEndTime = nil;
-  }
-  return self;
+        _localEndTime = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearYearDayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _yearDayIndex = @(0);
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetHolidayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _holidayIndex = @(0);
 
@@ -2118,224 +2093,223 @@ NS_ASSUME_NONNULL_BEGIN
         _localEndTime = @(0);
 
         _operatingMode = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetHolidayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _holidayIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetHolidayScheduleResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _holidayIndex = @(0);
 
         _status = @(0);
 
-    _localStartTime = nil;
+        _localStartTime = nil;
 
-    _localEndTime = nil;
+        _localEndTime = nil;
 
-    _operatingMode = nil;
-  }
-  return self;
+        _operatingMode = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearHolidayScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _holidayIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetUserTypeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
         _userType = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserTypeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserTypeResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
         _userType = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetRFIDCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-      _rfidCode = [NSData data];
-  }
-  return self;
+        _rfidCode = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetRFIDCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetRFIDCodeResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userId = @(0);
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-    _rfidCode = nil;
-  }
-  return self;
+        _rfidCode = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearRFIDCodeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _rfidSlotIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPDoorLockClusterSetUserParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _operationType = @(0);
 
         _userIndex = @(0);
 
-    _userName = nil;
+        _userName = nil;
 
-    _userUniqueId = nil;
+        _userUniqueId = nil;
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-    _credentialRule = nil;
-  }
-  return self;
+        _credentialRule = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetUserResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userIndex = @(0);
 
-    _userName = nil;
+        _userName = nil;
 
-    _userUniqueId = nil;
+        _userUniqueId = nil;
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
+        _userType = nil;
 
-    _credentialRule = nil;
+        _credentialRule = nil;
 
-    _credentials = nil;
+        _credentials = nil;
 
-    _creatorFabricIndex = nil;
+        _creatorFabricIndex = nil;
 
-    _lastModifiedFabricIndex = nil;
+        _lastModifiedFabricIndex = nil;
 
-    _nextUserIndex = nil;
-  }
-  return self;
+        _nextUserIndex = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearUserParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _userIndex = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterOperatingEventNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _operationEventSource = @(0);
 
@@ -2343,20 +2317,20 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-      _pin = [NSData data];
+        _pin = [NSData data];
 
         _localTime = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterProgrammingEventNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _programEventSource = @(0);
 
@@ -2364,7 +2338,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-      _pin = [NSData data];
+        _pin = [NSData data];
 
         _userType = @(0);
 
@@ -2372,165 +2346,161 @@ NS_ASSUME_NONNULL_BEGIN
 
         _localTime = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetCredentialParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _operationType = @(0);
 
         _credential = [CHIPDoorLockClusterDlCredential new];
 
-      _credentialData = [NSData data];
+        _credentialData = [NSData data];
 
-    _userIndex = nil;
+        _userIndex = nil;
 
-    _userStatus = nil;
+        _userStatus = nil;
 
-    _userType = nil;
-  }
-  return self;
+        _userType = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterSetCredentialResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _userIndex = nil;
+        _userIndex = nil;
 
-    _nextCredentialIndex = nil;
-  }
-  return self;
+        _nextCredentialIndex = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetCredentialStatusParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _credential = [CHIPDoorLockClusterDlCredential new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterGetCredentialStatusResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _credentialExists = @(0);
 
-    _userIndex = nil;
+        _userIndex = nil;
 
-    _nextCredentialIndex = nil;
-  }
-  return self;
+        _nextCredentialIndex = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterClearCredentialParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _credential = nil;
-  }
-  return self;
+        _credential = nil;
+    }
+    return self;
 }
 @end
-
-
-
 
 @implementation CHIPWindowCoveringClusterGoToLiftValueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _liftValue = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPWindowCoveringClusterGoToLiftPercentageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _liftPercentageValue = @(0);
 
-    _liftPercent100thsValue = nil;
-  }
-  return self;
+        _liftPercent100thsValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPWindowCoveringClusterGoToTiltValueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _tiltValue = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPWindowCoveringClusterGoToTiltPercentageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _tiltPercentageValue = @(0);
 
-    _tiltPercent100thsValue = nil;
-  }
-  return self;
+        _tiltPercent100thsValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPBarrierControlClusterBarrierControlGoToPercentParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _percentOpen = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPThermostatClusterSetpointRaiseLowerParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _mode = @(0);
 
         _amount = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _numberOfTransitionsForSequence = @(0);
 
@@ -2538,16 +2508,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-      _payload = [NSArray array];
-  }
-  return self;
+        _payload = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPThermostatClusterSetWeeklyScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _numberOfTransitionsForSequence = @(0);
 
@@ -2555,16 +2525,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-      _payload = [NSArray array];
-  }
-  return self;
+        _payload = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _timeOfDay = @(0);
 
@@ -2577,30 +2547,28 @@ NS_ASSUME_NONNULL_BEGIN
         _setpoint = @(0);
 
         _unreadEntries = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPThermostatClusterGetWeeklyScheduleParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _daysToReturn = @(0);
 
         _modeToReturn = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPColorControlClusterMoveToHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _hue = @(0);
 
@@ -2611,15 +2579,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
@@ -2628,15 +2596,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterStepHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
@@ -2647,15 +2615,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveToSaturationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _saturation = @(0);
 
@@ -2664,15 +2632,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveSaturationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
@@ -2681,15 +2649,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterStepSaturationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
@@ -2700,15 +2668,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveToHueAndSaturationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _hue = @(0);
 
@@ -2719,15 +2687,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveToColorParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _colorX = @(0);
 
@@ -2738,15 +2706,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveColorParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _rateX = @(0);
 
@@ -2755,15 +2723,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterStepColorParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepX = @(0);
 
@@ -2774,15 +2742,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveToColorTemperatureParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _colorTemperature = @(0);
 
@@ -2791,15 +2759,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterEnhancedMoveToHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _enhancedHue = @(0);
 
@@ -2810,15 +2778,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterEnhancedMoveHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
@@ -2827,15 +2795,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterEnhancedStepHueParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
@@ -2846,15 +2814,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _enhancedHue = @(0);
 
@@ -2865,15 +2833,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterColorLoopSetParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _updateFlags = @(0);
 
@@ -2888,28 +2856,28 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterStopMoveStepParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterMoveColorTemperatureParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _moveMode = @(0);
 
@@ -2922,15 +2890,15 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPColorControlClusterStepColorTemperatureParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _stepMode = @(0);
 
@@ -2945,28 +2913,28 @@ NS_ASSUME_NONNULL_BEGIN
         _optionsMask = @(0);
 
         _optionsOverride = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasZoneClusterZoneEnrollResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _enrollResponseCode = @(0);
 
         _zoneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasZoneClusterZoneStatusChangeNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneStatus = @(0);
 
@@ -2975,85 +2943,82 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneId = @(0);
 
         _delay = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasZoneClusterZoneEnrollRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneType = @(0);
 
         _manufacturerCode = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasZoneClusterInitiateTestModeParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _testModeDuration = @(0);
 
         _currentZoneSensitivityLevel = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPIasAceClusterArmParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _armMode = @(0);
 
-      _armDisarmCode = @"";
+        _armDisarmCode = @"";
 
         _zoneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterArmResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _armNotification = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterBypassParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _numberOfZones = @(0);
 
-      _zoneIds = [NSArray array];
+        _zoneIds = [NSArray array];
 
-      _armDisarmCode = @"";
-  }
-  return self;
+        _armDisarmCode = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterGetZoneIdMapResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _section0 = @(0);
 
@@ -3086,16 +3051,15 @@ NS_ASSUME_NONNULL_BEGIN
         _section14 = @(0);
 
         _section15 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterGetZoneInformationResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneId = @(0);
 
@@ -3103,17 +3067,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ieeeAddress = @(0);
 
-      _zoneLabel = @"";
-  }
-  return self;
+        _zoneLabel = @"";
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterZoneStatusChangedParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneId = @(0);
 
@@ -3121,17 +3084,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audibleNotification = @(0);
 
-      _zoneLabel = @"";
-  }
-  return self;
+        _zoneLabel = @"";
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterPanelStatusChangedParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _panelStatus = @(0);
 
@@ -3140,16 +3102,15 @@ NS_ASSUME_NONNULL_BEGIN
         _audibleNotification = @(0);
 
         _alarmStatus = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterGetPanelStatusResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _panelStatus = @(0);
 
@@ -3158,69 +3119,67 @@ NS_ASSUME_NONNULL_BEGIN
         _audibleNotification = @(0);
 
         _alarmStatus = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterGetZoneInformationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterSetBypassedZoneListParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _numberOfZones = @(0);
 
-      _zoneIds = [NSArray array];
-  }
-  return self;
+        _zoneIds = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterBypassResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _numberOfZones = @(0);
 
-      _bypassResult = [NSArray array];
-  }
-  return self;
+        _bypassResult = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPIasAceClusterGetZoneStatusResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _zoneStatusComplete = @(0);
 
         _numberOfZones = @(0);
 
-      _zoneStatusResult = [NSArray array];
-  }
-  return self;
+        _zoneStatusResult = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasAceClusterGetZoneStatusParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _startingZoneId = @(0);
 
@@ -3229,15 +3188,15 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneStatusMaskFlag = @(0);
 
         _zoneStatusMask = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasWdClusterStartWarningParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _warningInfo = @(0);
 
@@ -3246,790 +3205,773 @@ NS_ASSUME_NONNULL_BEGIN
         _strobeDutyCycle = @(0);
 
         _strobeLevel = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPIasWdClusterSquawkParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _squawkInfo = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _match = @"";
-  }
-  return self;
+        _match = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPChannelClusterChangeChannelByNumberParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _majorNumber = @(0);
 
         _minorNumber = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPChannelClusterSkipChannelParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _count = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTargetNavigatorClusterNavigateTargetParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _target = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTargetNavigatorClusterNavigateTargetResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
-
-
-
-
-
-
-
-
 
 @implementation CHIPMediaPlaybackClusterSkipForwardParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _deltaPositionMilliseconds = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMediaPlaybackClusterSkipBackwardParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _deltaPositionMilliseconds = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMediaPlaybackClusterPlaybackResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMediaPlaybackClusterSeekParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _position = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMediaInputClusterSelectInputParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _index = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPMediaInputClusterRenameInputParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _index = @(0);
 
-      _name = @"";
-  }
-  return self;
+        _name = @"";
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPKeypadInputClusterSendKeyParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _keyCode = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPKeypadInputClusterSendKeyResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterLaunchContentParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _search = [CHIPContentLauncherClusterContentSearch new];
 
         _autoPlay = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterLaunchURLParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _contentURL = @"";
+        _contentURL = @"";
 
-    _displayString = nil;
+        _displayString = nil;
 
-    _brandingInformation = nil;
-  }
-  return self;
+        _brandingInformation = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterLaunchResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAudioOutputClusterSelectOutputParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _index = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAudioOutputClusterRenameOutputParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _index = @(0);
 
-      _name = @"";
-  }
-  return self;
+        _name = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterLaunchAppParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _application = [CHIPApplicationLauncherClusterApplication new];
 
-    _data = nil;
-  }
-  return self;
+        _data = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterStopAppParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _application = [CHIPApplicationLauncherClusterApplication new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterHideAppParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _application = [CHIPApplicationLauncherClusterApplication new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterLauncherResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _status = @(0);
 
-      _data = [NSData data];
-  }
-  return self;
+        _data = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAccountLoginClusterGetSetupPINParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _tempAccountIdentifier = @"";
-  }
-  return self;
+        _tempAccountIdentifier = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAccountLoginClusterGetSetupPINResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _setupPIN = @"";
-  }
-  return self;
+        _setupPIN = @"";
+    }
+    return self;
 }
 @end
 
 @implementation CHIPAccountLoginClusterLoginParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _tempAccountIdentifier = @"";
+        _tempAccountIdentifier = @"";
 
-      _setupPIN = @"";
-  }
-  return self;
+        _setupPIN = @"";
+    }
+    return self;
 }
 @end
-
-
 
 @implementation CHIPTestClusterClusterTestSpecificResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _returnValue = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPTestClusterClusterTestAddArgumentsResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _returnValue = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPTestClusterClusterTestSimpleArgumentResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _returnValue = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPTestClusterClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
+        _arg1 = [NSArray array];
 
-      _arg2 = [NSArray array];
+        _arg2 = [NSArray array];
 
-      _arg3 = [NSArray array];
+        _arg3 = [NSArray array];
 
-      _arg4 = [NSArray array];
+        _arg4 = [NSArray array];
 
         _arg5 = @(0);
 
         _arg6 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestAddArgumentsParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
 
         _arg2 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListInt8UReverseResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
-  }
-  return self;
+        _arg1 = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestSimpleArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEnumsResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
 
         _arg2 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
+        _arg1 = [NSArray array];
 
-      _arg2 = [NSArray array];
+        _arg2 = [NSArray array];
 
-      _arg3 = [NSArray array];
+        _arg3 = [NSArray array];
 
-      _arg4 = [NSArray array];
+        _arg4 = [NSArray array];
 
         _arg5 = @(0);
 
         _arg6 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestNullableOptionalResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _wasPresent = @(0);
 
-    _wasNull = nil;
+        _wasNull = nil;
 
-    _value = nil;
+        _value = nil;
 
-    _originalValue = nil;
-  }
-  return self;
+        _originalValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestStructArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _nullableIntWasNull = @(0);
 
-    _nullableIntValue = nil;
+        _nullableIntValue = nil;
 
         _optionalIntWasPresent = @(0);
 
-    _optionalIntValue = nil;
+        _optionalIntValue = nil;
 
         _nullableOptionalIntWasPresent = @(0);
 
-    _nullableOptionalIntWasNull = nil;
+        _nullableOptionalIntWasNull = nil;
 
-    _nullableOptionalIntValue = nil;
+        _nullableOptionalIntValue = nil;
 
         _nullableStringWasNull = @(0);
 
-    _nullableStringValue = nil;
+        _nullableStringValue = nil;
 
         _optionalStringWasPresent = @(0);
 
-    _optionalStringValue = nil;
+        _optionalStringValue = nil;
 
         _nullableOptionalStringWasPresent = @(0);
 
-    _nullableOptionalStringWasNull = nil;
+        _nullableOptionalStringWasNull = nil;
 
-    _nullableOptionalStringValue = nil;
+        _nullableOptionalStringValue = nil;
 
         _nullableStructWasNull = @(0);
 
-    _nullableStructValue = nil;
+        _nullableStructValue = nil;
 
         _optionalStructWasPresent = @(0);
 
-    _optionalStructValue = nil;
+        _optionalStructValue = nil;
 
         _nullableOptionalStructWasPresent = @(0);
 
-    _nullableOptionalStructWasNull = nil;
+        _nullableOptionalStructWasNull = nil;
 
-    _nullableOptionalStructValue = nil;
+        _nullableOptionalStructValue = nil;
 
         _nullableListWasNull = @(0);
 
-    _nullableListValue = nil;
+        _nullableListValue = nil;
 
         _optionalListWasPresent = @(0);
 
-    _optionalListValue = nil;
+        _optionalListValue = nil;
 
         _nullableOptionalListWasPresent = @(0);
 
-    _nullableOptionalListWasNull = nil;
+        _nullableOptionalListWasNull = nil;
 
-    _nullableOptionalListValue = nil;
-  }
-  return self;
+        _nullableOptionalListValue = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterNestedStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterBooleanResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _value = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListStructArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
-  }
-  return self;
+        _arg1 = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterSimpleStructResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
-  }
-  return self;
+        _arg1 = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEmitTestEventResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _value = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterNestedStructList new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _value = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
-  }
-  return self;
+        _arg1 = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-      _arg1 = [NSArray array];
-  }
-  return self;
+        _arg1 = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEnumsRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
 
         _arg2 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestNullableOptionalRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _arg1 = nil;
-  }
-  return self;
+        _arg1 = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _nullableInt = nil;
+        _nullableInt = nil;
 
-    _optionalInt = nil;
+        _optionalInt = nil;
 
-    _nullableOptionalInt = nil;
+        _nullableOptionalInt = nil;
 
-    _nullableString = nil;
+        _nullableString = nil;
 
-    _optionalString = nil;
+        _optionalString = nil;
 
-    _nullableOptionalString = nil;
+        _nullableOptionalString = nil;
 
-    _nullableStruct = nil;
+        _nullableStruct = nil;
 
-    _optionalStruct = nil;
+        _optionalStruct = nil;
 
-    _nullableOptionalStruct = nil;
+        _nullableOptionalStruct = nil;
 
-    _nullableList = nil;
+        _nullableList = nil;
 
-    _optionalList = nil;
+        _optionalList = nil;
 
-    _nullableOptionalList = nil;
-  }
-  return self;
+        _nullableOptionalList = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterSimpleStructEchoRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
-    _arg1 = nil;
-  }
-  return self;
+        _arg1 = nil;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEmitTestEventRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
 
         _arg2 = @(0);
 
         _arg3 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _arg1 = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMessagingClusterDisplayMessageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _messageId = @(0);
 
@@ -4039,32 +3981,31 @@ NS_ASSUME_NONNULL_BEGIN
 
         _durationInMinutes = @(0);
 
-      _message = @"";
+        _message = @"";
 
         _optionalExtendedMessageControl = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPMessagingClusterCancelMessageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _messageId = @(0);
 
         _messageControl = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMessagingClusterMessageConfirmationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _messageId = @(0);
 
@@ -4072,16 +4013,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _messageConfirmationControl = @(0);
 
-      _messageResponse = [NSData data];
-  }
-  return self;
+        _messageResponse = [NSData data];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMessagingClusterDisplayProtectedMessageParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _messageId = @(0);
 
@@ -4091,80 +4032,79 @@ NS_ASSUME_NONNULL_BEGIN
 
         _durationInMinutes = @(0);
 
-      _message = @"";
+        _message = @"";
 
         _optionalExtendedMessageControl = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMessagingClusterGetMessageCancellationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _earliestImplementationTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPMessagingClusterCancelAllMessagesParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _implementationDateTime = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _alertsCount = @(0);
 
-      _alertStructures = [NSArray array];
-  }
-  return self;
+        _alertStructures = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _alertsCount = @(0);
 
-      _alertStructures = [NSArray array];
-  }
-  return self;
+        _alertStructures = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _eventHeader = @(0);
 
         _eventId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceStatisticsClusterLogNotificationParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _timeStamp = @(0);
 
@@ -4172,27 +4112,27 @@ NS_ASSUME_NONNULL_BEGIN
 
         _logLength = @(0);
 
-      _logPayload = [NSArray array];
-  }
-  return self;
+        _logPayload = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceStatisticsClusterLogRequestParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _logId = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceStatisticsClusterLogResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _timeStamp = @(0);
 
@@ -4200,43 +4140,42 @@ NS_ASSUME_NONNULL_BEGIN
 
         _logLength = @(0);
 
-      _logPayload = [NSArray array];
-  }
-  return self;
+        _logPayload = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _logQueueSize = @(0);
 
-      _logIds = [NSArray array];
-  }
-  return self;
+        _logIds = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _logQueueSize = @(0);
 
-      _logIds = [NSArray array];
-  }
-  return self;
+        _logIds = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _profileCount = @(0);
 
@@ -4244,17 +4183,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxNumberOfIntervals = @(0);
 
-      _listOfAttributes = [NSArray array];
-  }
-  return self;
+        _listOfAttributes = [NSArray array];
+    }
+    return self;
 }
 @end
-
 
 @implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _startTime = @(0);
 
@@ -4266,26 +4204,25 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attributeId = @(0);
 
-      _intervals = [NSArray array];
-  }
-  return self;
+        _intervals = [NSArray array];
+    }
+    return self;
 }
 @end
 
 @implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
 - (instancetype)init
 {
-  if (self = [super init]) {
+    if (self = [super init]) {
 
         _attributeId = @(0);
 
         _startTime = @(0);
 
         _numberOfIntervals = @(0);
-  }
-  return self;
+    }
+    return self;
 }
 @end
-
 
 NS_ASSUME_NONNULL_END
