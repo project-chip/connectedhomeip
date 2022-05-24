@@ -27,6 +27,8 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
+#include <jni.h>
+#include <lib/support/JniReferences.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -37,6 +39,7 @@
 #include "../include/target-navigator/TargetNavigatorManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
+#include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
@@ -50,6 +53,9 @@
 
 CHIP_ERROR InitVideoPlayerPlatform();
 CHIP_ERROR PreServerInit();
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager);
+void SendTestMessage(EndpointId epID, const char * message);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -65,6 +71,7 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
+using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -75,10 +82,10 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN) :
+                   const char * szApplicationVersion, const char * setupPIN, jobject manager) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate({ "image/*", "video/*" },
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(ContentAppCommandDelegate(manager), { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
@@ -88,7 +95,11 @@ public:
     ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
-    ContentLauncherDelegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    ContentLauncherDelegate * GetContentLauncherDelegate() override
+    {
+        mContentLauncherDelegate.SetEndpointId(GetEndpointId());
+        return &mContentLauncherDelegate;
+    };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
@@ -119,6 +130,10 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
+    EndpointId AddContentApp(ContentAppImpl & app);
+
+    void SendTestMessage(EndpointId epID, const char * message);
+
     // Gets the catalog vendor ID used by this platform
     uint16_t GetPlatformCatalogVendorId() override;
 
@@ -127,11 +142,11 @@ public:
     CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
-        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
-        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
-        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
-        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
+    std::vector<ContentAppImpl> mContentApps{
+        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890", nullptr),
+        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr),
+        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
+        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
     };
 };
 

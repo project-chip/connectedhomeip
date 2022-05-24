@@ -51,10 +51,10 @@ public class ContentAppAgentService extends Service {
     return null;
   }
 
-  public static void sendCommand(Context context, String packageName) {
+  public static void sendCommand(Context context, String packageName, String payload) {
     Intent in = new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND);
     Bundle extras = new Bundle();
-    extras.putByteArray(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, "test payload".getBytes());
+    extras.putByteArray(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, payload.getBytes());
     in.putExtras(extras);
     in.setPackage(packageName);
     int flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES;
@@ -84,7 +84,7 @@ public class ContentAppAgentService extends Service {
       Log.d(
           TAG,
           "Command response "
-              + intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD));
+              + new String(intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD)));
       // Send the response back to the client.
     }
 
