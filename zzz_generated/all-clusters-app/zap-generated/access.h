@@ -37,18 +37,18 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -100,18 +100,18 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -163,18 +163,18 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: white point y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point r intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point g intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b x, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b y, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: color point b intensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -225,18 +225,18 @@
     40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: white point x, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: white point y, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point r x, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point r y, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point r intensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point g x, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point g y, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point g intensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point b x, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point b y, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: color point b intensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -279,18 +279,18 @@
     5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    48, /* Cluster: Color Control, Attribute: white point x, Privilege: manage */ \
-    49, /* Cluster: Color Control, Attribute: white point y, Privilege: manage */ \
-    50, /* Cluster: Color Control, Attribute: color point r x, Privilege: manage */ \
-    51, /* Cluster: Color Control, Attribute: color point r y, Privilege: manage */ \
-    52, /* Cluster: Color Control, Attribute: color point r intensity, Privilege: manage */ \
-    54, /* Cluster: Color Control, Attribute: color point g x, Privilege: manage */ \
-    55, /* Cluster: Color Control, Attribute: color point g y, Privilege: manage */ \
-    56, /* Cluster: Color Control, Attribute: color point g intensity, Privilege: manage */ \
-    58, /* Cluster: Color Control, Attribute: color point b x, Privilege: manage */ \
-    59, /* Cluster: Color Control, Attribute: color point b y, Privilege: manage */ \
-    60, /* Cluster: Color Control, Attribute: color point b intensity, Privilege: manage */ \
-    16400, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    48, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
+    49, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
+    50, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
+    51, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
+    52, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
+    54, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
+    55, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
+    56, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
+    58, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
+    59, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
+    60, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
+    16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     4, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     5, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     6, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -333,18 +333,18 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: white point x, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: white point y, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point r x, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point r y, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point r intensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point g x, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point g y, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point g intensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point b x, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point b y, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: color point b intensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \

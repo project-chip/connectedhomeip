@@ -42,7 +42,7 @@ tests:
 
     - label: "Check current hue attribute value matched before any change"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -51,7 +51,7 @@ tests:
 
     - label: "Check Saturation attribute value matched before any change"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -64,13 +64,13 @@ tests:
           values:
               - name: "hue"
                 value: 40
-              - name: "saturation"
+              - name: "Saturation"
                 value: 160
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 10ms"
@@ -85,7 +85,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -96,7 +96,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8

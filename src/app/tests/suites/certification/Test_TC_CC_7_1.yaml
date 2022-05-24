@@ -43,22 +43,22 @@ tests:
       command: "EnhancedMoveToHue"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1025
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 1
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -69,15 +69,15 @@ tests:
       command: "EnhancedMoveToHue"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1100
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -92,7 +92,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -111,7 +111,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -130,7 +130,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -141,15 +141,15 @@ tests:
       command: "EnhancedMoveToHue"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1150
-              - name: "direction"
+              - name: "Direction"
                 value: 1
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -164,7 +164,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -183,7 +183,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -202,7 +202,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -213,15 +213,15 @@ tests:
       command: "EnhancedMoveToHue"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1200
-              - name: "direction"
+              - name: "Direction"
                 value: 2
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -236,7 +236,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -255,7 +255,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -274,7 +274,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -285,15 +285,15 @@ tests:
       command: "EnhancedMoveToHue"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1300
-              - name: "direction"
+              - name: "Direction"
                 value: 3
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -308,7 +308,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -327,7 +327,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -346,7 +346,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16

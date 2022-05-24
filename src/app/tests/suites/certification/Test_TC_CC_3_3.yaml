@@ -41,7 +41,7 @@ tests:
 
     - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -52,15 +52,15 @@ tests:
       command: "StepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 25
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     #delay step is necessary to let the attribute value change over time
@@ -74,7 +74,7 @@ tests:
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -85,15 +85,15 @@ tests:
       command: "StepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 3
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 25
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 25ms"
@@ -106,7 +106,7 @@ tests:
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8

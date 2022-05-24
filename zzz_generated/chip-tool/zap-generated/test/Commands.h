@@ -3079,7 +3079,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorControlOptions", value, 0));
+                VerifyOrReturn(CheckValue("options", value, 0));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
             break;
@@ -3169,7 +3169,7 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorTempPhysicalMin", value, 0U));
+                VerifyOrReturn(CheckValue("colorTempPhysicalMinMireds", value, 0U));
             }
             break;
         case 22:
@@ -3187,7 +3187,7 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorTempPhysicalMax", value, 65279U));
+                VerifyOrReturn(CheckValue("colorTempPhysicalMaxMireds", value, 65279U));
             }
             break;
         case 24:
@@ -3271,7 +3271,7 @@ private:
         case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
@@ -3301,7 +3301,7 @@ private:
         case 33:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3329,7 +3329,7 @@ private:
         case 36:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3357,7 +3357,7 @@ private:
         case 39:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3385,7 +3385,7 @@ private:
         case 42:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3413,7 +3413,7 @@ private:
         case 45:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3441,7 +3441,7 @@ private:
         case 48:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3509,7 +3509,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3549,7 +3549,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3589,7 +3589,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -3670,8 +3670,8 @@ private:
         }
         case 11: {
             LogStep(11, "Validate constraints of attribute: Options");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorControlOptions::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Options::Id, true,
+                                 chip::NullOptional);
         }
         case 12: {
             LogStep(12, "Validate constraints of attribute: EnhancedCurrentHue");
@@ -3722,22 +3722,22 @@ private:
         case 21: {
             LogStep(21, "Reads ColorTempPhysicalMinMireds attribute from DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMin::Id, true, chip::NullOptional);
+                                 ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 22: {
             LogStep(22, "Validate constraints of attribute: ColorTempPhysicalMinMireds");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMin::Id, true, chip::NullOptional);
+                                 ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Read ColorTempPhysicalMaxMireds attribute from DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMax::Id, true, chip::NullOptional);
+                                 ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Validate constraints of attribute: ColorTempPhysicalMaxMireds");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMax::Id, true, chip::NullOptional);
+                                 ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Read the optional attribute: CoupleColorTempToLevelMinMireds");
@@ -7591,12 +7591,12 @@ private:
             LogStep(4, "Move up color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
-            value.rate                    = 10U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
+            value.rate                          = 10U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7642,12 +7642,12 @@ private:
             LogStep(11, "Move down color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
-            value.rate                    = 20U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
+            value.rate                          = 20U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7693,12 +7693,12 @@ private:
             LogStep(18, "Move up color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
-            value.rate                    = 10U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
+            value.rate                          = 10U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7708,12 +7708,12 @@ private:
             LogStep(19, "Stop Color Temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
-            value.rate                    = 10U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
+            value.rate                          = 10U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7759,12 +7759,12 @@ private:
             LogStep(26, "Move down color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
-            value.rate                    = 20U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
+            value.rate                          = 20U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7774,12 +7774,12 @@ private:
             LogStep(27, "Stop Color Temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
-            value.rate                    = 10U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
+            value.rate                          = 10U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -8043,13 +8043,13 @@ private:
             LogStep(4, "Step up color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
-            value.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
-            value.stepSize                = 5U;
-            value.transitionTime          = 50U;
-            value.colorTemperatureMinimum = 5U;
-            value.colorTemperatureMaximum = 100U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.stepMode                      = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
+            value.stepSize                      = 5U;
+            value.transitionTime                = 50U;
+            value.colorTemperatureMinimumMireds = 5U;
+            value.colorTemperatureMaximumMireds = 100U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -8095,13 +8095,13 @@ private:
             LogStep(11, "Step down color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
-            value.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
-            value.stepSize                = 5U;
-            value.transitionTime          = 50U;
-            value.colorTemperatureMinimum = 5U;
-            value.colorTemperatureMaximum = 100U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.stepMode                      = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
+            value.stepSize                      = 5U;
+            value.transitionTime                = 50U;
+            value.colorTemperatureMinimumMireds = 5U;
+            value.colorTemperatureMaximumMireds = 100U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -9931,12 +9931,12 @@ private:
             LogStep(24, "Move up color temperature command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
-            value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
-            value.rate                    = 10U;
-            value.colorTemperatureMinimum = 1U;
-            value.colorTemperatureMaximum = 255U;
-            value.optionsMask             = 0;
-            value.optionsOverride         = 0;
+            value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
+            value.rate                          = 10U;
+            value.colorTemperatureMinimumMireds = 1U;
+            value.colorTemperatureMaximumMireds = 255U;
+            value.optionsMask                   = 0;
+            value.optionsOverride               = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 

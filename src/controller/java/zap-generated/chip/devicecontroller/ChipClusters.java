@@ -3857,8 +3857,8 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer moveMode,
         Integer rate,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride) {
       moveColorTemperature(
@@ -3866,8 +3866,8 @@ public class ChipClusters {
           callback,
           moveMode,
           rate,
-          colorTemperatureMinimum,
-          colorTemperatureMaximum,
+          colorTemperatureMinimumMireds,
+          colorTemperatureMaximumMireds,
           optionsMask,
           optionsOverride,
           null);
@@ -3877,8 +3877,8 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer moveMode,
         Integer rate,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -3887,8 +3887,8 @@ public class ChipClusters {
           callback,
           moveMode,
           rate,
-          colorTemperatureMinimum,
-          colorTemperatureMaximum,
+          colorTemperatureMinimumMireds,
+          colorTemperatureMaximumMireds,
           optionsMask,
           optionsOverride,
           timedInvokeTimeoutMs);
@@ -4159,8 +4159,8 @@ public class ChipClusters {
         Integer stepMode,
         Integer stepSize,
         Integer transitionTime,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride) {
       stepColorTemperature(
@@ -4169,8 +4169,8 @@ public class ChipClusters {
           stepMode,
           stepSize,
           transitionTime,
-          colorTemperatureMinimum,
-          colorTemperatureMaximum,
+          colorTemperatureMinimumMireds,
+          colorTemperatureMaximumMireds,
           optionsMask,
           optionsOverride,
           null);
@@ -4181,8 +4181,8 @@ public class ChipClusters {
         Integer stepMode,
         Integer stepSize,
         Integer transitionTime,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride,
         int timedInvokeTimeoutMs) {
@@ -4192,8 +4192,8 @@ public class ChipClusters {
           stepMode,
           stepSize,
           transitionTime,
-          colorTemperatureMinimum,
-          colorTemperatureMaximum,
+          colorTemperatureMinimumMireds,
+          colorTemperatureMaximumMireds,
           optionsMask,
           optionsOverride,
           timedInvokeTimeoutMs);
@@ -4351,8 +4351,8 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer moveMode,
         Integer rate,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -4439,8 +4439,8 @@ public class ChipClusters {
         Integer stepMode,
         Integer stepSize,
         Integer transitionTime,
-        Integer colorTemperatureMinimum,
-        Integer colorTemperatureMaximum,
+        Integer colorTemperatureMinimumMireds,
+        Integer colorTemperatureMaximumMireds,
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -4471,6 +4471,86 @@ public class ChipClusters {
         Integer optionsMask,
         Integer optionsOverride,
         @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface NumberOfPrimariesAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary1IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary2IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary3IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary4IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary5IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface Primary6IntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface ColorPointRIntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface ColorPointGIntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface ColorPointBIntensityAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
 
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
@@ -4577,30 +4657,30 @@ public class ChipClusters {
       subscribeColorModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorControlOptionsAttribute(IntegerAttributeCallback callback) {
-      readColorControlOptionsAttribute(chipClusterPtr, callback);
+    public void readOptionsAttribute(IntegerAttributeCallback callback) {
+      readOptionsAttribute(chipClusterPtr, callback);
     }
 
-    public void writeColorControlOptionsAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorControlOptionsAttribute(chipClusterPtr, callback, value, null);
+    public void writeOptionsAttribute(DefaultClusterCallback callback, Integer value) {
+      writeOptionsAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeColorControlOptionsAttribute(
+    public void writeOptionsAttribute(
         DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      writeColorControlOptionsAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      writeOptionsAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
-    public void subscribeColorControlOptionsAttribute(
+    public void subscribeOptionsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeColorControlOptionsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeOptionsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readNumberOfPrimariesAttribute(IntegerAttributeCallback callback) {
+    public void readNumberOfPrimariesAttribute(NumberOfPrimariesAttributeCallback callback) {
       readNumberOfPrimariesAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeNumberOfPrimariesAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        NumberOfPrimariesAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeNumberOfPrimariesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4622,12 +4702,12 @@ public class ChipClusters {
       subscribePrimary1YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary1IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary1IntensityAttribute(Primary1IntensityAttributeCallback callback) {
       readPrimary1IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary1IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary1IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary1IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4649,12 +4729,12 @@ public class ChipClusters {
       subscribePrimary2YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary2IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary2IntensityAttribute(Primary2IntensityAttributeCallback callback) {
       readPrimary2IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary2IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary2IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary2IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4676,12 +4756,12 @@ public class ChipClusters {
       subscribePrimary3YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary3IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary3IntensityAttribute(Primary3IntensityAttributeCallback callback) {
       readPrimary3IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary3IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary3IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary3IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4703,12 +4783,12 @@ public class ChipClusters {
       subscribePrimary4YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary4IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary4IntensityAttribute(Primary4IntensityAttributeCallback callback) {
       readPrimary4IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary4IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary4IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary4IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4730,12 +4810,12 @@ public class ChipClusters {
       subscribePrimary5YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary5IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary5IntensityAttribute(Primary5IntensityAttributeCallback callback) {
       readPrimary5IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary5IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary5IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary5IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4757,12 +4837,12 @@ public class ChipClusters {
       subscribePrimary6YAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPrimary6IntensityAttribute(IntegerAttributeCallback callback) {
+    public void readPrimary6IntensityAttribute(Primary6IntensityAttributeCallback callback) {
       readPrimary6IntensityAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePrimary6IntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        Primary6IntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePrimary6IntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4838,7 +4918,7 @@ public class ChipClusters {
       subscribeColorPointRYAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorPointRIntensityAttribute(IntegerAttributeCallback callback) {
+    public void readColorPointRIntensityAttribute(ColorPointRIntensityAttributeCallback callback) {
       readColorPointRIntensityAttribute(chipClusterPtr, callback);
     }
 
@@ -4852,7 +4932,7 @@ public class ChipClusters {
     }
 
     public void subscribeColorPointRIntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        ColorPointRIntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeColorPointRIntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4892,7 +4972,7 @@ public class ChipClusters {
       subscribeColorPointGYAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorPointGIntensityAttribute(IntegerAttributeCallback callback) {
+    public void readColorPointGIntensityAttribute(ColorPointGIntensityAttributeCallback callback) {
       readColorPointGIntensityAttribute(chipClusterPtr, callback);
     }
 
@@ -4906,7 +4986,7 @@ public class ChipClusters {
     }
 
     public void subscribeColorPointGIntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        ColorPointGIntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeColorPointGIntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4946,7 +5026,7 @@ public class ChipClusters {
       subscribeColorPointBYAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorPointBIntensityAttribute(IntegerAttributeCallback callback) {
+    public void readColorPointBIntensityAttribute(ColorPointBIntensityAttributeCallback callback) {
       readColorPointBIntensityAttribute(chipClusterPtr, callback);
     }
 
@@ -4960,7 +5040,7 @@ public class ChipClusters {
     }
 
     public void subscribeColorPointBIntensityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        ColorPointBIntensityAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeColorPointBIntensityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -5038,22 +5118,24 @@ public class ChipClusters {
       subscribeColorCapabilitiesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorTempPhysicalMinAttribute(IntegerAttributeCallback callback) {
-      readColorTempPhysicalMinAttribute(chipClusterPtr, callback);
+    public void readColorTempPhysicalMinMiredsAttribute(IntegerAttributeCallback callback) {
+      readColorTempPhysicalMinMiredsAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeColorTempPhysicalMinAttribute(
+    public void subscribeColorTempPhysicalMinMiredsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeColorTempPhysicalMinAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeColorTempPhysicalMinMiredsAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readColorTempPhysicalMaxAttribute(IntegerAttributeCallback callback) {
-      readColorTempPhysicalMaxAttribute(chipClusterPtr, callback);
+    public void readColorTempPhysicalMaxMiredsAttribute(IntegerAttributeCallback callback) {
+      readColorTempPhysicalMaxMiredsAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeColorTempPhysicalMaxAttribute(
+    public void subscribeColorTempPhysicalMaxMiredsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeColorTempPhysicalMaxAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeColorTempPhysicalMaxMiredsAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readCoupleColorTempToLevelMinMiredsAttribute(IntegerAttributeCallback callback) {
@@ -5189,23 +5271,26 @@ public class ChipClusters {
     private native void subscribeColorModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readColorControlOptionsAttribute(
+    private native void readOptionsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void writeColorControlOptionsAttribute(
+    private native void writeOptionsAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
         Integer value,
         @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeColorControlOptionsAttribute(
+    private native void subscribeOptionsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readNumberOfPrimariesAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, NumberOfPrimariesAttributeCallback callback);
 
     private native void subscribeNumberOfPrimariesAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        NumberOfPrimariesAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary1XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5220,10 +5305,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary1IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary1IntensityAttributeCallback callback);
 
     private native void subscribePrimary1IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary1IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary2XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5238,10 +5326,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary2IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary2IntensityAttributeCallback callback);
 
     private native void subscribePrimary2IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary2IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary3XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5256,10 +5347,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary3IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary3IntensityAttributeCallback callback);
 
     private native void subscribePrimary3IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary3IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary4XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5274,10 +5368,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary4IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary4IntensityAttributeCallback callback);
 
     private native void subscribePrimary4IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary4IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary5XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5292,10 +5389,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary5IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary5IntensityAttributeCallback callback);
 
     private native void subscribePrimary5IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary5IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPrimary6XAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5310,10 +5410,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPrimary6IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, Primary6IntensityAttributeCallback callback);
 
     private native void subscribePrimary6IntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        Primary6IntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readWhitePointXAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5364,7 +5467,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readColorPointRIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, ColorPointRIntensityAttributeCallback callback);
 
     private native void writeColorPointRIntensityAttribute(
         long chipClusterPtr,
@@ -5373,7 +5476,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeColorPointRIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        ColorPointRIntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readColorPointGXAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5400,7 +5506,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readColorPointGIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, ColorPointGIntensityAttributeCallback callback);
 
     private native void writeColorPointGIntensityAttribute(
         long chipClusterPtr,
@@ -5409,7 +5515,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeColorPointGIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        ColorPointGIntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readColorPointBXAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5436,7 +5545,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readColorPointBIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, ColorPointBIntensityAttributeCallback callback);
 
     private native void writeColorPointBIntensityAttribute(
         long chipClusterPtr,
@@ -5445,7 +5554,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeColorPointBIntensityAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        ColorPointBIntensityAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readEnhancedCurrentHueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -5495,16 +5607,16 @@ public class ChipClusters {
     private native void subscribeColorCapabilitiesAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readColorTempPhysicalMinAttribute(
+    private native void readColorTempPhysicalMinMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void subscribeColorTempPhysicalMinAttribute(
+    private native void subscribeColorTempPhysicalMinMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readColorTempPhysicalMaxAttribute(
+    private native void readColorTempPhysicalMaxMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void subscribeColorTempPhysicalMaxAttribute(
+    private native void subscribeColorTempPhysicalMaxMiredsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readCoupleColorTempToLevelMinMiredsAttribute(

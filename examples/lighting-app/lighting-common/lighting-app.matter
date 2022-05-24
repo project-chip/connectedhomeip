@@ -229,8 +229,8 @@ server cluster ColorControl = 768 {
   readonly attribute int16u currentY = 4;
   readonly attribute int16u colorTemperature = 7;
   readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 colorControlOptions = 15;
-  readonly attribute int8u numberOfPrimaries = 16;
+  attribute bitmap8 options = 15;
+  readonly attribute nullable int8u numberOfPrimaries = 16;
   readonly attribute int16u enhancedCurrentHue = 16384;
   readonly attribute enum8 enhancedColorMode = 16385;
   readonly attribute int8u colorLoopActive = 16386;
@@ -239,8 +239,8 @@ server cluster ColorControl = 768 {
   readonly attribute int16u colorLoopStartEnhancedHue = 16389;
   readonly attribute int16u colorLoopStoredEnhancedHue = 16390;
   readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMin = 16395;
-  readonly attribute int16u colorTempPhysicalMax = 16396;
+  readonly attribute int16u colorTempPhysicalMinMireds = 16395;
+  readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
   attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
   readonly attribute bitmap32 featureMap = 65532;
@@ -378,8 +378,8 @@ server cluster ColorControl = 768 {
   request struct MoveColorTemperatureRequest {
     HueMoveMode moveMode = 0;
     INT16U rate = 1;
-    INT16U colorTemperatureMinimum = 2;
-    INT16U colorTemperatureMaximum = 3;
+    INT16U colorTemperatureMinimumMireds = 2;
+    INT16U colorTemperatureMaximumMireds = 3;
     BITMAP8 optionsMask = 4;
     BITMAP8 optionsOverride = 5;
   }
@@ -388,8 +388,8 @@ server cluster ColorControl = 768 {
     HueStepMode stepMode = 0;
     INT16U stepSize = 1;
     INT16U transitionTime = 2;
-    INT16U colorTemperatureMinimum = 3;
-    INT16U colorTemperatureMaximum = 4;
+    INT16U colorTemperatureMinimumMireds = 3;
+    INT16U colorTemperatureMaximumMireds = 4;
     BITMAP8 optionsMask = 5;
     BITMAP8 optionsOverride = 6;
   }
@@ -2001,7 +2001,7 @@ endpoint 1 {
     ram      attribute currentY default = 0x607D;
     ram      attribute colorTemperature default = 0x00FA;
     ram      attribute colorMode default = 0x01;
-    ram      attribute colorControlOptions;
+    ram      attribute options;
     ram      attribute numberOfPrimaries;
     ram      attribute enhancedCurrentHue;
     ram      attribute enhancedColorMode default = 0x01;
@@ -2011,8 +2011,8 @@ endpoint 1 {
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue;
     ram      attribute colorCapabilities;
-    ram      attribute colorTempPhysicalMin;
-    ram      attribute colorTempPhysicalMax default = 0xFEFF;
+    ram      attribute colorTempPhysicalMinMireds;
+    ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;

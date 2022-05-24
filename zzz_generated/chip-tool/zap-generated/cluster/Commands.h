@@ -11303,7 +11303,7 @@ private:
 | * CompensationText                                                  | 0x0006 |
 | * ColorTemperature                                                  | 0x0007 |
 | * ColorMode                                                         | 0x0008 |
-| * ColorControlOptions                                               | 0x000F |
+| * Options                                                           | 0x000F |
 | * NumberOfPrimaries                                                 | 0x0010 |
 | * Primary1X                                                         | 0x0011 |
 | * Primary1Y                                                         | 0x0012 |
@@ -11342,8 +11342,8 @@ private:
 | * ColorLoopStartEnhancedHue                                         | 0x4005 |
 | * ColorLoopStoredEnhancedHue                                        | 0x4006 |
 | * ColorCapabilities                                                 | 0x400A |
-| * ColorTempPhysicalMin                                              | 0x400B |
-| * ColorTempPhysicalMax                                              | 0x400C |
+| * ColorTempPhysicalMinMireds                                        | 0x400B |
+| * ColorTempPhysicalMaxMireds                                        | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -11944,8 +11944,8 @@ public:
     {
         AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
+        AddArgument("ColorTemperatureMinimumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMinimumMireds);
+        AddArgument("ColorTemperatureMaximumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMaximumMireds);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
@@ -11981,8 +11981,8 @@ public:
         AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
+        AddArgument("ColorTemperatureMinimumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMinimumMireds);
+        AddArgument("ColorTemperatureMaximumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMaximumMireds);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
@@ -12006,18 +12006,17 @@ private:
     chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type mRequest;
 };
 
-class WriteColorControlColorControlOptions : public WriteAttribute
+class WriteColorControlOptions : public WriteAttribute
 {
 public:
-    WriteColorControlColorControlOptions(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ColorControlOptions", credsIssuerConfig)
+    WriteColorControlOptions(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Options", credsIssuerConfig)
     {
-        AddArgument("attr-name", "color-control-options");
+        AddArgument("attr-name", "options");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteColorControlColorControlOptions() {}
+    ~WriteColorControlOptions() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -12161,7 +12160,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlColorPointGX : public WriteAttribute
@@ -12240,7 +12239,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlColorPointBX : public WriteAttribute
@@ -12319,7 +12318,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlStartUpColorTemperatureMireds : public WriteAttribute
@@ -23080,7 +23079,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "color-control-options", Attributes::ColorControlOptions::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                         //
@@ -23119,10 +23118,12 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "color-loop-start-enhanced-hue", Attributes::ColorLoopStartEnhancedHue::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "color-loop-stored-enhanced-hue", Attributes::ColorLoopStoredEnhancedHue::Id,
-                                   credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "color-temp-physical-min", Attributes::ColorTempPhysicalMin::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "color-temp-physical-max", Attributes::ColorTempPhysicalMax::Id, credsIssuerConfig), //
+                                   credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "color-temp-physical-min-mireds", Attributes::ColorTempPhysicalMinMireds::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "color-temp-physical-max-mireds", Attributes::ColorTempPhysicalMaxMireds::Id,
+                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "couple-color-temp-to-level-min-mireds", Attributes::CoupleColorTempToLevelMinMireds::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,
@@ -23133,7 +23134,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<WriteColorControlColorControlOptions>(credsIssuerConfig),                                                   //
+        make_unique<WriteColorControlOptions>(credsIssuerConfig),                                                               //
         make_unique<WriteColorControlWhitePointX>(credsIssuerConfig),                                                           //
         make_unique<WriteColorControlWhitePointY>(credsIssuerConfig),                                                           //
         make_unique<WriteColorControlColorPointRX>(credsIssuerConfig),                                                          //
@@ -23156,7 +23157,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "color-control-options", Attributes::ColorControlOptions::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                         //
@@ -23195,10 +23196,12 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "color-loop-start-enhanced-hue", Attributes::ColorLoopStartEnhancedHue::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "color-loop-stored-enhanced-hue", Attributes::ColorLoopStoredEnhancedHue::Id,
-                                        credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "color-temp-physical-min", Attributes::ColorTempPhysicalMin::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "color-temp-physical-max", Attributes::ColorTempPhysicalMax::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                              //
+        make_unique<SubscribeAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "color-temp-physical-min-mireds", Attributes::ColorTempPhysicalMinMireds::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "color-temp-physical-max-mireds", Attributes::ColorTempPhysicalMaxMireds::Id,
+                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "couple-color-temp-to-level-min-mireds",
                                         Attributes::CoupleColorTempToLevelMinMireds::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,

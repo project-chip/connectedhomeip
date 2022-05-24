@@ -3203,28 +3203,25 @@ NS_ASSUME_NONNULL_BEGIN
                                            queue:(dispatch_queue_t)queue
                                completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeColorControlOptionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
-- (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value
-                                            params:(CHIPWriteParams * _Nullable)params
-                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)readAttributeOptionsWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value
+                                params:(CHIPWriteParams * _Nullable)params
+                     completionHandler:(StatusCompletion)completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeColorControlOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                      params:(CHIPSubscribeParams * _Nullable)params
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeColorControlOptionsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                  endpoint:(NSNumber *)endpoint
-                                                     queue:(dispatch_queue_t)queue
-                                         completionHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeOptionsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                      endpoint:(NSNumber *)endpoint
+                                         queue:(dispatch_queue_t)queue
+                             completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeNumberOfPrimariesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
@@ -3632,9 +3629,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorPointRIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(CHIPWriteParams * _Nullable)params
                                   completionHandler:(StatusCompletion)completionHandler;
 /**
@@ -3700,9 +3697,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorPointGIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(CHIPWriteParams * _Nullable)params
                                   completionHandler:(StatusCompletion)completionHandler;
 /**
@@ -3768,9 +3765,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorPointBIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(CHIPWriteParams * _Nullable)params
                                   completionHandler:(StatusCompletion)completionHandler;
 /**
@@ -3936,43 +3933,43 @@ NS_ASSUME_NONNULL_BEGIN
                                        completionHandler:
                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeColorTempPhysicalMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                   NSError * _Nullable error))completionHandler;
+- (void)readAttributeColorTempPhysicalMinMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                       params:(CHIPSubscribeParams * _Nullable)params
-                                      subscriptionEstablished:
-                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                reportHandler:
-                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeColorTempPhysicalMinWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                          completionHandler:
-                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeColorTempPhysicalMinMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
++ (void)readAttributeColorTempPhysicalMinMiredsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                         endpoint:(NSNumber *)endpoint
+                                                            queue:(dispatch_queue_t)queue
+                                                completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeColorTempPhysicalMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                   NSError * _Nullable error))completionHandler;
+- (void)readAttributeColorTempPhysicalMaxMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                       params:(CHIPSubscribeParams * _Nullable)params
-                                      subscriptionEstablished:
-                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                reportHandler:
-                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeColorTempPhysicalMaxWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                          completionHandler:
-                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeColorTempPhysicalMaxMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
++ (void)readAttributeColorTempPhysicalMaxMiredsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                         endpoint:(NSNumber *)endpoint
+                                                            queue:(dispatch_queue_t)queue
+                                                completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;

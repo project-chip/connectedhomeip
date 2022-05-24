@@ -160,24 +160,22 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("channel", writeChannelInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
+    Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorControlOptionsCommandParameterInfo =
+    CommandParameterInfo colorControloptionsCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class);
-    writeColorControlColorControlOptionsCommandParams.put(
-        "value", colorControlcolorControlOptionsCommandParameterInfo);
-    InteractionInfo writeColorControlColorControlOptionsAttributeInteractionInfo =
+    writeColorControlOptionsCommandParams.put("value", colorControloptionsCommandParameterInfo);
+    InteractionInfo writeColorControlOptionsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .writeColorControlOptionsAttribute(
+                  .writeOptionsAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeColorControlColorControlOptionsCommandParams);
+            writeColorControlOptionsCommandParams);
     writeColorControlInteractionInfo.put(
-        "writeColorControlOptionsAttribute",
-        writeColorControlColorControlOptionsAttributeInteractionInfo);
+        "writeOptionsAttribute", writeColorControlOptionsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeColorControlWhitePointXCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlwhitePointXCommandParameterInfo =

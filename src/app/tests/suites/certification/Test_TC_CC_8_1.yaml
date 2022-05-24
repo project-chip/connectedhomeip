@@ -43,18 +43,18 @@ tests:
       command: "MoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -65,14 +65,14 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -91,7 +91,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           attribute"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -102,20 +102,20 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -126,14 +126,14 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads CurrentSaturation attribute from DUT."
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -152,7 +152,7 @@ tests:
           "Check Saturation attribute value matched the value sent by the last
           attribute"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -167,14 +167,14 @@ tests:
                 value: 15
               - name: "rateY"
                 value: 20
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads CurrentX attribute from DUT"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -183,7 +183,7 @@ tests:
 
     - label: "Reads CurrentY attribute from DUT"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16
@@ -194,14 +194,14 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads CurrentX attribute from DUT"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -210,7 +210,7 @@ tests:
 
     - label: "Reads CurrentY attribute from DUT"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16
@@ -229,7 +229,7 @@ tests:
           "Check current x attribute value matched the value sent by the last
           attribute"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -240,7 +240,7 @@ tests:
           "Check current y attribute value matched the value sent by the last
           attribute"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16
@@ -251,22 +251,22 @@ tests:
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads current color temprature from DUT"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -277,14 +277,14 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads current color temprature from DUT"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -303,7 +303,7 @@ tests:
           "Reads current color attribute value matched the value sent by the
           last attribute"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -314,18 +314,18 @@ tests:
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads EnhancedCurrentHue attribute value from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -336,14 +336,14 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Reads EnhancedCurrentHue attribute value from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -362,7 +362,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last attribute"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16

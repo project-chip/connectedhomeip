@@ -2027,27 +2027,27 @@ public class ClusterReadMapping {
             readColorControlColorModeCommandParams);
     readColorControlInteractionInfo.put(
         "readColorModeAttribute", readColorControlColorModeAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readColorControlColorControlOptionsCommandParams =
+    Map<String, CommandParameterInfo> readColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readColorControlColorControlOptionsAttributeInteractionInfo =
+    InteractionInfo readColorControlOptionsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorControlOptionsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                  .readOptionsAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readColorControlColorControlOptionsCommandParams);
+            readColorControlOptionsCommandParams);
     readColorControlInteractionInfo.put(
-        "readColorControlOptionsAttribute",
-        readColorControlColorControlOptionsAttributeInteractionInfo);
+        "readOptionsAttribute", readColorControlOptionsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readColorControlNumberOfPrimariesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readColorControlNumberOfPrimariesAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readNumberOfPrimariesAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNumberOfPrimariesAttribute(
+                      (ChipClusters.ColorControlCluster.NumberOfPrimariesAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlNumberOfPrimariesCommandParams);
@@ -2084,7 +2084,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary1IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary1IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary1IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary1IntensityCommandParams);
@@ -2121,7 +2123,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary2IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary2IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary2IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary2IntensityCommandParams);
@@ -2158,7 +2162,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary3IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary3IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary3IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary3IntensityCommandParams);
@@ -2195,7 +2201,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary4IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary4IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary4IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary4IntensityCommandParams);
@@ -2232,7 +2240,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary5IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary5IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary5IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary5IntensityCommandParams);
@@ -2269,7 +2279,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary6IntensityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPrimary6IntensityAttribute(
+                      (ChipClusters.ColorControlCluster.Primary6IntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary6IntensityCommandParams);
@@ -2331,7 +2343,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorPointRIntensityAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.ColorControlCluster.ColorPointRIntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointRIntensityCommandParams);
@@ -2369,7 +2382,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorPointGIntensityAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.ColorControlCluster.ColorPointGIntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointGIntensityCommandParams);
@@ -2407,7 +2421,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorPointBIntensityAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.ColorControlCluster.ColorPointBIntensityAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointBIntensityCommandParams);
@@ -2520,34 +2535,34 @@ public class ClusterReadMapping {
     readColorControlInteractionInfo.put(
         "readColorCapabilitiesAttribute",
         readColorControlColorCapabilitiesAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readColorControlColorTempPhysicalMinCommandParams =
+    Map<String, CommandParameterInfo> readColorControlColorTempPhysicalMinMiredsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readColorControlColorTempPhysicalMinAttributeInteractionInfo =
+    InteractionInfo readColorControlColorTempPhysicalMinMiredsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorTempPhysicalMinAttribute(
+                  .readColorTempPhysicalMinMiredsAttribute(
                       (ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readColorControlColorTempPhysicalMinCommandParams);
+            readColorControlColorTempPhysicalMinMiredsCommandParams);
     readColorControlInteractionInfo.put(
-        "readColorTempPhysicalMinAttribute",
-        readColorControlColorTempPhysicalMinAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readColorControlColorTempPhysicalMaxCommandParams =
+        "readColorTempPhysicalMinMiredsAttribute",
+        readColorControlColorTempPhysicalMinMiredsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readColorControlColorTempPhysicalMaxMiredsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readColorControlColorTempPhysicalMaxAttributeInteractionInfo =
+    InteractionInfo readColorControlColorTempPhysicalMaxMiredsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorTempPhysicalMaxAttribute(
+                  .readColorTempPhysicalMaxMiredsAttribute(
                       (ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readColorControlColorTempPhysicalMaxCommandParams);
+            readColorControlColorTempPhysicalMaxMiredsCommandParams);
     readColorControlInteractionInfo.put(
-        "readColorTempPhysicalMaxAttribute",
-        readColorControlColorTempPhysicalMaxAttributeInteractionInfo);
+        "readColorTempPhysicalMaxMiredsAttribute",
+        readColorControlColorTempPhysicalMaxMiredsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readColorControlCoupleColorTempToLevelMinMiredsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readColorControlCoupleColorTempToLevelMinMiredsAttributeInteractionInfo =

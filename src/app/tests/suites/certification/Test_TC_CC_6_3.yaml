@@ -42,7 +42,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -53,19 +53,19 @@ tests:
       command: "StepColorTemperature"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 50
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 5
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 100
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -78,7 +78,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -95,7 +95,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -112,7 +112,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -123,19 +123,19 @@ tests:
       command: "StepColorTemperature"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 3
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 50
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 5
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 100
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -148,7 +148,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -165,7 +165,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -182,7 +182,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16

@@ -299,7 +299,7 @@ server cluster ColorControl = 768 {
 
   readonly attribute int16u currentX = 3;
   readonly attribute int16u currentY = 4;
-  attribute bitmap8 colorControlOptions = 15;
+  attribute bitmap8 options = 15;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
   attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
   readonly attribute bitmap32 featureMap = 65532;
@@ -3061,7 +3061,7 @@ endpoint 1 {
   server cluster ColorControl {
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    ram      attribute colorControlOptions;
+    ram      attribute options;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap;
