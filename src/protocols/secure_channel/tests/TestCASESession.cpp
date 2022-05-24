@@ -53,6 +53,12 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount        = 8;
+#else // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount        = 5;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
 GroupDataProviderImpl gCommissionerGroupDataProvider;
@@ -283,7 +289,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                                                         MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 8);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
@@ -335,7 +341,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                                                          nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 8);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     // Validate that secure session is created
@@ -721,21 +727,21 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         {
             .initiatorStorage         = SessionResumptionTestStorage(CHIP_NO_ERROR, responder, &resumptionIdA, &sharedSecretA),
             .responderStorage         = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
-            .expectedSentMessageCount = 8, // we expect this number of sent message when we fall back to CASE
+            .expectedSentMessageCount = sTestCaseMessageCount, // we expect this number of sent message when we fall back to CASE
         },
         // Peers both have record of the same resumption ID, but a different shared secret.
         // This should succeed with fall back to CASE.
         {
             .initiatorStorage         = SessionResumptionTestStorage(CHIP_NO_ERROR, responder, &resumptionIdA, &sharedSecretA),
             .responderStorage         = SessionResumptionTestStorage(CHIP_NO_ERROR, initiator, &resumptionIdA, &sharedSecretB),
-            .expectedSentMessageCount = 8, // we expect this number of sent message when we fall back to CASE
+            .expectedSentMessageCount = sTestCaseMessageCount, // we expect this number of sent message when we fall back to CASE
         },
         // Neither peer has a session resumption record.
         // This should succeed - no attempt at session resumption will be made.
         {
             .initiatorStorage         = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
             .responderStorage         = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
-            .expectedSentMessageCount = 8, // we expect this number of sent messages if we do not attempt session resumption
+            .expectedSentMessageCount = sTestCaseMessageCount, // we expect this number of sent messages if we do not attempt session resumption
         },
     };
 
