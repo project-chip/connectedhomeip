@@ -32,10 +32,10 @@ development kit.
 Building the example application is quite straightforward. It can be done via
 following commands:
 ```
-git submodule update --init
-source third_party/connectedhomeip/scripts/activate.sh
-gn gen out/debug
-ninja -v -C out/debug
+$ git submodule update --init
+$ source third_party/connectedhomeip/scripts/activate.sh
+$ gn gen out/debug
+$ ninja -v -C out/debug
 ```
 Example application binary file "all-cluster-mw320.bin" will be generated under
 directory "out/debug".
@@ -43,7 +43,7 @@ directory "out/debug".
 Note:
 1. "git submodule update --init" only needs to be issued for the first time in order
    to download MW320 SDK for Matter.
-3. "source third_party/connectedhomeip/scripts/activate.sh" can be omitted if your
+2. "source third_party/connectedhomeip/scripts/activate.sh" can be omitted if your
    environment is already setup without issues.
 
 <a name="flashdebug"></a>
@@ -53,14 +53,14 @@ Note:
 Connect MW320 to Ubuntu USB port and open Linux text-based serial port communications
 program at second USB interface (/dev/ttyUSB1):
 ```
-TERM=linux minicom -D /dev/ttyUSB1 -b 115200
+$ TERM=linux minicom -D /dev/ttyUSB1 -b 115200
 ```
 
 Prepare MW320 download firmware image:
 ```
-ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
-mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F000100
-cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
+$ ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
+$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F000100
+$ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 ```
 
 Install OpenOCD (Open On-Chip Debugger):
@@ -70,8 +70,8 @@ sudo apt-get install openocd
 
 Flashing firmware image to MW320:
 ```
-cd mw320_sdk/mw320_matter_flash
-sudo python2 flashprog.py -l Matter/layout-4m.txt --boot2 Matter/boot2.bin --wififw Matter/mw32x_uapsta_W14.88.36.p172.bin --mcufw Matter/all-cluster-mw320.mcufw.bin -r
+$ cd mw320_sdk/mw320_matter_flash
+$ sudo python2 flashprog.py -l Matter/layout-4m.txt --boot2 Matter/boot2.bin --wififw Matter/mw32x_uapsta_W14.88.36.p172.bin --mcufw Matter/all-cluster-mw320.mcufw.bin -r
 ```
 
 After MW320 is reset, console will allow you to enter commands:
