@@ -459,8 +459,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 
     if (validIP)
     {
-        mdnsService.mAddress.SetValue(ipStr);
-        rCtx->callback(rCtx->cbContext, &mdnsService, chip::Span<chip::Inet::IPAddress>(), CHIP_NO_ERROR);
+        rCtx->callback(rCtx->cbContext, &mdnsService, chip::Span<chip::Inet::IPAddress>(&ipStr, 1), CHIP_NO_ERROR);
         StopResolve(rCtx);
     }
     else
