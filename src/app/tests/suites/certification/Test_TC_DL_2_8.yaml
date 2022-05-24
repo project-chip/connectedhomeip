@@ -104,7 +104,6 @@ tests:
               - name: "weekDayIndex"
                 constraints:
                     minValue: 1
-                    maxValue: NumberOfWeekDaySchedulesSupportedPerUser
               - name: "userIndex"
                 constraints:
                     minValue: 1

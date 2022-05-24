@@ -124,7 +124,6 @@ tests:
               - name: "YearDayIndex"
                 constraints:
                     minValue: 1
-                    maxValue: NumberOfYearDaySchedulesSupportedPerUser
               - name: "userIndex"
                 constraints:
                     minValue: 1
