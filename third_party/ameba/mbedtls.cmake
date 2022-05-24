@@ -27,6 +27,7 @@ list(
     ${dir_mbedtlschip}/cipher.c
     ${dir_mbedtlschip}/cipher_wrap.c
     ${dir_mbedtlschip}/cmac.c
+    ${dir_mbedtlschip}/constant_time.c
     ${dir_mbedtlschip}/ctr_drbg.c
     ${dir_mbedtlschip}/debug.c
     ${dir_mbedtlschip}/des.c
