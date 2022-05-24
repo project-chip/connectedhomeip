@@ -53,7 +53,7 @@ DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointI
 
 size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
-    // In Zephyr Simulation, return the size of the hardcoded labelList on all endpoints.
+    // A hardcoded labelList on all endpoints.
     return 4;
 }
 
@@ -61,7 +61,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 {
     bool retval = true;
 
-    // In Zephyr Simulation, use the following hardcoded labelList on all endpoints.
+    // A hardcoded list for testing only
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * labelPtr = nullptr;
@@ -215,7 +215,7 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-    // In Zephyr Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
+    // Hardcoded list of locales
     // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
 
     return 8;
@@ -225,7 +225,7 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 {
     bool retval = true;
 
-    // In Zephyr simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    // Hardcoded list of locales
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * activeLocalePtr = nullptr;
@@ -290,7 +290,7 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-    // In Zephyr Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // Hardcoded list of strings
     // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
     //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
 
@@ -301,7 +301,7 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
 {
     bool retval = true;
 
-    // In Zephyr Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    // Hardcoded list of Strings that are valid values for the Calendar Types.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mIndex < 12, false);
