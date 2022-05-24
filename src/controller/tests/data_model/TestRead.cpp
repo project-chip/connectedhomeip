@@ -263,7 +263,7 @@ public:
         mReadError = true;
     }
 
-    void OnDone() override {}
+    void OnDone(app::ReadClient *) override {}
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
@@ -2052,7 +2052,7 @@ public:
         }
     }
 
-    void OnDone() override { mOnDone++; }
+    void OnDone(app::ReadClient *) override { mOnDone++; }
 
     void OnReportEnd() override { mOnReportEnd++; }
 

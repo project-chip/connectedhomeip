@@ -2082,6 +2082,38 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::
     ComplexArgumentParser::Finalize(request.fabricIndex);
     ComplexArgumentParser::Finalize(request.operationalCert);
 }
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransition.transitionTime", "transitionTime",
+                                                                  value.isMember("transitionTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransition.heatSetpoint", "heatSetpoint",
+                                                                  value.isMember("heatSetpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransition.coolSetpoint", "coolSetpoint",
+                                                                  value.isMember("coolSetpoint")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatSetpoint, value["heatSetpoint"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolSetpoint, value["coolSetpoint"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.transitionTime);
+    ComplexArgumentParser::Finalize(request.heatSetpoint);
+    ComplexArgumentParser::Finalize(request.coolSetpoint);
+}
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request,

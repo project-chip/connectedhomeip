@@ -156,7 +156,7 @@ void ReadClient::Close(CHIP_ERROR aError)
         StopResubscription();
     }
 
-    mpCallback.OnDone();
+    mpCallback.OnDone(this);
 }
 
 const char * ReadClient::GetStateStr() const

@@ -80,6 +80,7 @@ tests:
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
+                  0xFFFC, # FeatureMap
                   0xFFFD, # ClusterRevision
               ]
 

@@ -2776,7 +2776,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2793,7 +2793,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3169,9 +3169,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _rate = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 
@@ -3192,9 +3192,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 

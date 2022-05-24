@@ -22016,6 +22016,33 @@ public:
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+namespace Structs {
+namespace ThermostatScheduleTransition {
+enum class Fields
+{
+    kTransitionTime = 0,
+    kHeatSetpoint   = 1,
+    kCoolSetpoint   = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t transitionTime = static_cast<uint16_t>(0);
+    DataModel::Nullable<int16_t> heatSetpoint;
+    DataModel::Nullable<int16_t> coolSetpoint;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ThermostatScheduleTransition
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -22099,7 +22126,7 @@ enum class Fields
     kNumberOfTransitionsForSequence = 0,
     kDayOfWeekForSequence           = 1,
     kModeForSequence                = 2,
-    kPayload                        = 3,
+    kTransitions                    = 3,
 };
 
 struct Type
@@ -22112,7 +22139,7 @@ public:
     uint8_t numberOfTransitionsForSequence          = static_cast<uint8_t>(0);
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence  = static_cast<chip::BitFlags<DayOfWeek>>(0);
     chip::BitFlags<ModeForSequence> modeForSequence = static_cast<chip::BitFlags<ModeForSequence>>(0);
-    DataModel::List<const uint8_t> payload;
+    DataModel::List<const Structs::ThermostatScheduleTransition::Type> transitions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22130,7 +22157,7 @@ public:
     uint8_t numberOfTransitionsForSequence          = static_cast<uint8_t>(0);
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence  = static_cast<chip::BitFlags<DayOfWeek>>(0);
     chip::BitFlags<ModeForSequence> modeForSequence = static_cast<chip::BitFlags<ModeForSequence>>(0);
-    DataModel::DecodableList<uint8_t> payload;
+    DataModel::DecodableList<Structs::ThermostatScheduleTransition::DecodableType> transitions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklyScheduleResponse
@@ -22140,7 +22167,7 @@ enum class Fields
     kNumberOfTransitionsForSequence = 0,
     kDayOfWeekForSequence           = 1,
     kModeForSequence                = 2,
-    kPayload                        = 3,
+    kTransitions                    = 3,
 };
 
 struct Type
@@ -22153,7 +22180,7 @@ public:
     uint8_t numberOfTransitionsForSequence          = static_cast<uint8_t>(0);
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence  = static_cast<chip::BitFlags<DayOfWeek>>(0);
     chip::BitFlags<ModeForSequence> modeForSequence = static_cast<chip::BitFlags<ModeForSequence>>(0);
-    DataModel::List<const uint8_t> payload;
+    DataModel::List<const Structs::ThermostatScheduleTransition::Type> transitions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -22171,7 +22198,7 @@ public:
     uint8_t numberOfTransitionsForSequence          = static_cast<uint8_t>(0);
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence  = static_cast<chip::BitFlags<DayOfWeek>>(0);
     chip::BitFlags<ModeForSequence> modeForSequence = static_cast<chip::BitFlags<ModeForSequence>>(0);
-    DataModel::DecodableList<uint8_t> payload;
+    DataModel::DecodableList<Structs::ThermostatScheduleTransition::DecodableType> transitions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
@@ -22194,7 +22221,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay           = static_cast<uint16_t>(0);
-    uint16_t relayStatus         = static_cast<uint16_t>(0);
+    uint8_t relayStatus          = static_cast<uint8_t>(0);
     int16_t localTemperature     = static_cast<int16_t>(0);
     uint8_t humidityInPercentage = static_cast<uint8_t>(0);
     int16_t setpoint             = static_cast<int16_t>(0);
@@ -22214,7 +22241,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay           = static_cast<uint16_t>(0);
-    uint16_t relayStatus         = static_cast<uint16_t>(0);
+    uint8_t relayStatus          = static_cast<uint8_t>(0);
     int16_t localTemperature     = static_cast<int16_t>(0);
     uint8_t humidityInPercentage = static_cast<uint8_t>(0);
     int16_t setpoint             = static_cast<int16_t>(0);
@@ -22320,9 +22347,9 @@ namespace Attributes {
 namespace LocalTemperature {
 struct TypeInfo
 {
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperature::Id; }
@@ -22332,9 +22359,9 @@ struct TypeInfo
 namespace OutdoorTemperature {
 struct TypeInfo
 {
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutdoorTemperature::Id; }
@@ -22401,7 +22428,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AbsMaxCoolSetpointLimit
-namespace PiCoolingDemand {
+namespace PICoolingDemand {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22409,11 +22436,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PiCoolingDemand::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PICoolingDemand::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PiCoolingDemand
-namespace PiHeatingDemand {
+} // namespace PICoolingDemand
+namespace PIHeatingDemand {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22421,11 +22448,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PiHeatingDemand::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PIHeatingDemand::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PiHeatingDemand
-namespace HvacSystemTypeConfiguration {
+} // namespace PIHeatingDemand
+namespace HVACSystemTypeConfiguration {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22433,10 +22460,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HVACSystemTypeConfiguration::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace HvacSystemTypeConfiguration
+} // namespace HVACSystemTypeConfiguration
 namespace LocalTemperatureCalibration {
 struct TypeInfo
 {
@@ -22668,9 +22695,9 @@ struct TypeInfo
 namespace TemperatureSetpointHoldDuration {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldDuration::Id; }
@@ -22716,9 +22743,9 @@ struct TypeInfo
 namespace SetpointChangeAmount {
 struct TypeInfo
 {
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeAmount::Id; }
@@ -22737,7 +22764,79 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointChangeSourceTimestamp
-namespace AcType {
+namespace OccupiedSetback {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetback::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OccupiedSetback
+namespace OccupiedSetbackMin {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetbackMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OccupiedSetbackMin
+namespace OccupiedSetbackMax {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetbackMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OccupiedSetbackMax
+namespace UnoccupiedSetback {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetback::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UnoccupiedSetback
+namespace UnoccupiedSetbackMin {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetbackMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UnoccupiedSetbackMin
+namespace UnoccupiedSetbackMax {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetbackMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UnoccupiedSetbackMax
+namespace EmergencyHeatDelta {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22745,11 +22844,23 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EmergencyHeatDelta::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcType
-namespace AcCapacity {
+} // namespace EmergencyHeatDelta
+namespace ACType {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ACType
+namespace ACCapacity {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -22757,11 +22868,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacity::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACCapacity::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCapacity
-namespace AcRefrigerantType {
+} // namespace ACCapacity
+namespace ACRefrigerantType {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22769,11 +22880,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACRefrigerantType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcRefrigerantType
-namespace AcCompressorType {
+} // namespace ACRefrigerantType
+namespace ACCompressorType {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22781,11 +22892,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressorType::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACCompressorType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCompressorType
-namespace AcErrorCode {
+} // namespace ACCompressorType
+namespace ACErrorCode {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -22793,11 +22904,11 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACErrorCode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcErrorCode
-namespace AcLouverPosition {
+} // namespace ACErrorCode
+namespace ACLouverPosition {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22805,23 +22916,23 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACLouverPosition::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcLouverPosition
-namespace AcCoilTemperature {
+} // namespace ACLouverPosition
+namespace ACCoilTemperature {
 struct TypeInfo
 {
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCoilTemperature::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACCoilTemperature::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCoilTemperature
-namespace AcCapacityFormat {
+} // namespace ACCoilTemperature
+namespace ACCapacityformat {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22829,10 +22940,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACCapacityformat::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcCapacityFormat
+} // namespace ACCapacityformat
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -22902,16 +23013,16 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::LocalTemperature::TypeInfo::DecodableType localTemperature                       = static_cast<int16_t>(0);
-        Attributes::OutdoorTemperature::TypeInfo::DecodableType outdoorTemperature                   = static_cast<int16_t>(0);
+        Attributes::LocalTemperature::TypeInfo::DecodableType localTemperature;
+        Attributes::OutdoorTemperature::TypeInfo::DecodableType outdoorTemperature;
         Attributes::Occupancy::TypeInfo::DecodableType occupancy                                     = static_cast<uint8_t>(0);
         Attributes::AbsMinHeatSetpointLimit::TypeInfo::DecodableType absMinHeatSetpointLimit         = static_cast<int16_t>(0);
         Attributes::AbsMaxHeatSetpointLimit::TypeInfo::DecodableType absMaxHeatSetpointLimit         = static_cast<int16_t>(0);
         Attributes::AbsMinCoolSetpointLimit::TypeInfo::DecodableType absMinCoolSetpointLimit         = static_cast<int16_t>(0);
         Attributes::AbsMaxCoolSetpointLimit::TypeInfo::DecodableType absMaxCoolSetpointLimit         = static_cast<int16_t>(0);
-        Attributes::PiCoolingDemand::TypeInfo::DecodableType piCoolingDemand                         = static_cast<uint8_t>(0);
-        Attributes::PiHeatingDemand::TypeInfo::DecodableType piHeatingDemand                         = static_cast<uint8_t>(0);
-        Attributes::HvacSystemTypeConfiguration::TypeInfo::DecodableType hvacSystemTypeConfiguration = static_cast<uint8_t>(0);
+        Attributes::PICoolingDemand::TypeInfo::DecodableType PICoolingDemand                         = static_cast<uint8_t>(0);
+        Attributes::PIHeatingDemand::TypeInfo::DecodableType PIHeatingDemand                         = static_cast<uint8_t>(0);
+        Attributes::HVACSystemTypeConfiguration::TypeInfo::DecodableType HVACSystemTypeConfiguration = static_cast<uint8_t>(0);
         Attributes::LocalTemperatureCalibration::TypeInfo::DecodableType localTemperatureCalibration = static_cast<int8_t>(0);
         Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableType occupiedCoolingSetpoint         = static_cast<int16_t>(0);
         Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableType occupiedHeatingSetpoint         = static_cast<int16_t>(0);
@@ -22932,22 +23043,28 @@ struct TypeInfo
         Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);
         Attributes::NumberOfDailyTransitions::TypeInfo::DecodableType numberOfDailyTransitions   = static_cast<uint8_t>(0);
         Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold     = static_cast<uint8_t>(0);
-        Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType temperatureSetpointHoldDuration =
-            static_cast<uint16_t>(0);
+        Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType temperatureSetpointHoldDuration;
         Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableType thermostatProgrammingOperationMode =
             static_cast<uint8_t>(0);
-        Attributes::ThermostatRunningState::TypeInfo::DecodableType thermostatRunningState               = static_cast<uint16_t>(0);
-        Attributes::SetpointChangeSource::TypeInfo::DecodableType setpointChangeSource                   = static_cast<uint8_t>(0);
-        Attributes::SetpointChangeAmount::TypeInfo::DecodableType setpointChangeAmount                   = static_cast<int16_t>(0);
+        Attributes::ThermostatRunningState::TypeInfo::DecodableType thermostatRunningState = static_cast<uint16_t>(0);
+        Attributes::SetpointChangeSource::TypeInfo::DecodableType setpointChangeSource     = static_cast<uint8_t>(0);
+        Attributes::SetpointChangeAmount::TypeInfo::DecodableType setpointChangeAmount;
         Attributes::SetpointChangeSourceTimestamp::TypeInfo::DecodableType setpointChangeSourceTimestamp = static_cast<uint32_t>(0);
-        Attributes::AcType::TypeInfo::DecodableType acType                                               = static_cast<uint8_t>(0);
-        Attributes::AcCapacity::TypeInfo::DecodableType acCapacity                                       = static_cast<uint16_t>(0);
-        Attributes::AcRefrigerantType::TypeInfo::DecodableType acRefrigerantType                         = static_cast<uint8_t>(0);
-        Attributes::AcCompressorType::TypeInfo::DecodableType acCompressorType                           = static_cast<uint8_t>(0);
-        Attributes::AcErrorCode::TypeInfo::DecodableType acErrorCode                                     = static_cast<uint32_t>(0);
-        Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
-        Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);
-        Attributes::AcCapacityFormat::TypeInfo::DecodableType acCapacityFormat                           = static_cast<uint8_t>(0);
+        Attributes::OccupiedSetback::TypeInfo::DecodableType occupiedSetback;
+        Attributes::OccupiedSetbackMin::TypeInfo::DecodableType occupiedSetbackMin;
+        Attributes::OccupiedSetbackMax::TypeInfo::DecodableType occupiedSetbackMax;
+        Attributes::UnoccupiedSetback::TypeInfo::DecodableType unoccupiedSetback;
+        Attributes::UnoccupiedSetbackMin::TypeInfo::DecodableType unoccupiedSetbackMin;
+        Attributes::UnoccupiedSetbackMax::TypeInfo::DecodableType unoccupiedSetbackMax;
+        Attributes::EmergencyHeatDelta::TypeInfo::DecodableType emergencyHeatDelta = static_cast<uint8_t>(0);
+        Attributes::ACType::TypeInfo::DecodableType ACType                         = static_cast<uint8_t>(0);
+        Attributes::ACCapacity::TypeInfo::DecodableType ACCapacity                 = static_cast<uint16_t>(0);
+        Attributes::ACRefrigerantType::TypeInfo::DecodableType ACRefrigerantType   = static_cast<uint8_t>(0);
+        Attributes::ACCompressorType::TypeInfo::DecodableType ACCompressorType     = static_cast<uint8_t>(0);
+        Attributes::ACErrorCode::TypeInfo::DecodableType ACErrorCode               = static_cast<uint32_t>(0);
+        Attributes::ACLouverPosition::TypeInfo::DecodableType ACLouverPosition     = static_cast<uint8_t>(0);
+        Attributes::ACCoilTemperature::TypeInfo::DecodableType ACCoilTemperature;
+        Attributes::ACCapacityformat::TypeInfo::DecodableType ACCapacityformat = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -24323,12 +24440,12 @@ public:
 namespace MoveColorTemperature {
 enum class Fields
 {
-    kMoveMode                = 0,
-    kRate                    = 1,
-    kColorTemperatureMinimum = 2,
-    kColorTemperatureMaximum = 3,
-    kOptionsMask             = 4,
-    kOptionsOverride         = 5,
+    kMoveMode                      = 0,
+    kRate                          = 1,
+    kColorTemperatureMinimumMireds = 2,
+    kColorTemperatureMaximumMireds = 3,
+    kOptionsMask                   = 4,
+    kOptionsOverride               = 5,
 };
 
 struct Type
@@ -24338,12 +24455,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode             = static_cast<HueMoveMode>(0);
-    uint16_t rate                    = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimum = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximum = static_cast<uint16_t>(0);
-    uint8_t optionsMask              = static_cast<uint8_t>(0);
-    uint8_t optionsOverride          = static_cast<uint8_t>(0);
+    HueMoveMode moveMode                   = static_cast<HueMoveMode>(0);
+    uint16_t rate                          = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
+    uint8_t optionsMask                    = static_cast<uint8_t>(0);
+    uint8_t optionsOverride                = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -24358,25 +24475,25 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode             = static_cast<HueMoveMode>(0);
-    uint16_t rate                    = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimum = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximum = static_cast<uint16_t>(0);
-    uint8_t optionsMask              = static_cast<uint8_t>(0);
-    uint8_t optionsOverride          = static_cast<uint8_t>(0);
+    HueMoveMode moveMode                   = static_cast<HueMoveMode>(0);
+    uint16_t rate                          = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
+    uint8_t optionsMask                    = static_cast<uint8_t>(0);
+    uint8_t optionsOverride                = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveColorTemperature
 namespace StepColorTemperature {
 enum class Fields
 {
-    kStepMode                = 0,
-    kStepSize                = 1,
-    kTransitionTime          = 2,
-    kColorTemperatureMinimum = 3,
-    kColorTemperatureMaximum = 4,
-    kOptionsMask             = 5,
-    kOptionsOverride         = 6,
+    kStepMode                      = 0,
+    kStepSize                      = 1,
+    kTransitionTime                = 2,
+    kColorTemperatureMinimumMireds = 3,
+    kColorTemperatureMaximumMireds = 4,
+    kOptionsMask                   = 5,
+    kOptionsOverride               = 6,
 };
 
 struct Type
@@ -24386,13 +24503,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode             = static_cast<HueStepMode>(0);
-    uint16_t stepSize                = static_cast<uint16_t>(0);
-    uint16_t transitionTime          = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimum = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximum = static_cast<uint16_t>(0);
-    uint8_t optionsMask              = static_cast<uint8_t>(0);
-    uint8_t optionsOverride          = static_cast<uint8_t>(0);
+    HueStepMode stepMode                   = static_cast<HueStepMode>(0);
+    uint16_t stepSize                      = static_cast<uint16_t>(0);
+    uint16_t transitionTime                = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
+    uint8_t optionsMask                    = static_cast<uint8_t>(0);
+    uint8_t optionsOverride                = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -24407,13 +24524,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode             = static_cast<HueStepMode>(0);
-    uint16_t stepSize                = static_cast<uint16_t>(0);
-    uint16_t transitionTime          = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimum = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximum = static_cast<uint16_t>(0);
-    uint8_t optionsMask              = static_cast<uint8_t>(0);
-    uint8_t optionsOverride          = static_cast<uint8_t>(0);
+    HueStepMode stepMode                   = static_cast<HueStepMode>(0);
+    uint16_t stepSize                      = static_cast<uint16_t>(0);
+    uint16_t transitionTime                = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
+    uint8_t optionsMask                    = static_cast<uint8_t>(0);
+    uint8_t optionsOverride                = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepColorTemperature
@@ -24530,7 +24647,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorMode
-namespace ColorControlOptions {
+namespace Options {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -24538,16 +24655,16 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ColorControlOptions
+} // namespace Options
 namespace NumberOfPrimaries {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPrimaries::Id; }
@@ -24581,9 +24698,9 @@ struct TypeInfo
 namespace Primary1Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Intensity::Id; }
@@ -24617,9 +24734,9 @@ struct TypeInfo
 namespace Primary2Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Intensity::Id; }
@@ -24653,9 +24770,9 @@ struct TypeInfo
 namespace Primary3Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Intensity::Id; }
@@ -24689,9 +24806,9 @@ struct TypeInfo
 namespace Primary4Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Intensity::Id; }
@@ -24725,9 +24842,9 @@ struct TypeInfo
 namespace Primary5Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Intensity::Id; }
@@ -24761,9 +24878,9 @@ struct TypeInfo
 namespace Primary6Intensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Intensity::Id; }
@@ -24821,9 +24938,9 @@ struct TypeInfo
 namespace ColorPointRIntensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRIntensity::Id; }
@@ -24857,9 +24974,9 @@ struct TypeInfo
 namespace ColorPointGIntensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGIntensity::Id; }
@@ -24893,9 +25010,9 @@ struct TypeInfo
 namespace ColorPointBIntensity {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBIntensity::Id; }
@@ -24998,7 +25115,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorCapabilities
-namespace ColorTempPhysicalMin {
+namespace ColorTempPhysicalMinMireds {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -25006,11 +25123,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMinMireds::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ColorTempPhysicalMin
-namespace ColorTempPhysicalMax {
+} // namespace ColorTempPhysicalMinMireds
+namespace ColorTempPhysicalMaxMireds {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -25018,10 +25135,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMax::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMaxMireds::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ColorTempPhysicalMax
+} // namespace ColorTempPhysicalMaxMireds
 namespace CoupleColorTempToLevelMinMireds {
 struct TypeInfo
 {
@@ -25122,39 +25239,39 @@ struct TypeInfo
         Attributes::CurrentY::TypeInfo::DecodableType currentY                   = static_cast<uint16_t>(0);
         Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation = static_cast<uint8_t>(0);
         Attributes::CompensationText::TypeInfo::DecodableType compensationText;
-        Attributes::ColorTemperature::TypeInfo::DecodableType colorTemperature                     = static_cast<uint16_t>(0);
-        Attributes::ColorMode::TypeInfo::DecodableType colorMode                                   = static_cast<uint8_t>(0);
-        Attributes::ColorControlOptions::TypeInfo::DecodableType colorControlOptions               = static_cast<uint8_t>(0);
-        Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries                   = static_cast<uint8_t>(0);
-        Attributes::Primary1X::TypeInfo::DecodableType primary1X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary1Y::TypeInfo::DecodableType primary1Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary1Intensity::TypeInfo::DecodableType primary1Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary2X::TypeInfo::DecodableType primary2X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary2Y::TypeInfo::DecodableType primary2Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary2Intensity::TypeInfo::DecodableType primary2Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary3X::TypeInfo::DecodableType primary3X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary3Y::TypeInfo::DecodableType primary3Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary3Intensity::TypeInfo::DecodableType primary3Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary4X::TypeInfo::DecodableType primary4X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary4Y::TypeInfo::DecodableType primary4Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary4Intensity::TypeInfo::DecodableType primary4Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary5X::TypeInfo::DecodableType primary5X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary5Y::TypeInfo::DecodableType primary5Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary5Intensity::TypeInfo::DecodableType primary5Intensity                   = static_cast<uint8_t>(0);
-        Attributes::Primary6X::TypeInfo::DecodableType primary6X                                   = static_cast<uint16_t>(0);
-        Attributes::Primary6Y::TypeInfo::DecodableType primary6Y                                   = static_cast<uint16_t>(0);
-        Attributes::Primary6Intensity::TypeInfo::DecodableType primary6Intensity                   = static_cast<uint8_t>(0);
-        Attributes::WhitePointX::TypeInfo::DecodableType whitePointX                               = static_cast<uint16_t>(0);
-        Attributes::WhitePointY::TypeInfo::DecodableType whitePointY                               = static_cast<uint16_t>(0);
-        Attributes::ColorPointRX::TypeInfo::DecodableType colorPointRX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointRY::TypeInfo::DecodableType colorPointRY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointRIntensity::TypeInfo::DecodableType colorPointRIntensity             = static_cast<uint8_t>(0);
-        Attributes::ColorPointGX::TypeInfo::DecodableType colorPointGX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointGY::TypeInfo::DecodableType colorPointGY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointGIntensity::TypeInfo::DecodableType colorPointGIntensity             = static_cast<uint8_t>(0);
-        Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY                             = static_cast<uint16_t>(0);
-        Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity             = static_cast<uint8_t>(0);
+        Attributes::ColorTemperature::TypeInfo::DecodableType colorTemperature = static_cast<uint16_t>(0);
+        Attributes::ColorMode::TypeInfo::DecodableType colorMode               = static_cast<uint8_t>(0);
+        Attributes::Options::TypeInfo::DecodableType options                   = static_cast<uint8_t>(0);
+        Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries;
+        Attributes::Primary1X::TypeInfo::DecodableType primary1X = static_cast<uint16_t>(0);
+        Attributes::Primary1Y::TypeInfo::DecodableType primary1Y = static_cast<uint16_t>(0);
+        Attributes::Primary1Intensity::TypeInfo::DecodableType primary1Intensity;
+        Attributes::Primary2X::TypeInfo::DecodableType primary2X = static_cast<uint16_t>(0);
+        Attributes::Primary2Y::TypeInfo::DecodableType primary2Y = static_cast<uint16_t>(0);
+        Attributes::Primary2Intensity::TypeInfo::DecodableType primary2Intensity;
+        Attributes::Primary3X::TypeInfo::DecodableType primary3X = static_cast<uint16_t>(0);
+        Attributes::Primary3Y::TypeInfo::DecodableType primary3Y = static_cast<uint16_t>(0);
+        Attributes::Primary3Intensity::TypeInfo::DecodableType primary3Intensity;
+        Attributes::Primary4X::TypeInfo::DecodableType primary4X = static_cast<uint16_t>(0);
+        Attributes::Primary4Y::TypeInfo::DecodableType primary4Y = static_cast<uint16_t>(0);
+        Attributes::Primary4Intensity::TypeInfo::DecodableType primary4Intensity;
+        Attributes::Primary5X::TypeInfo::DecodableType primary5X = static_cast<uint16_t>(0);
+        Attributes::Primary5Y::TypeInfo::DecodableType primary5Y = static_cast<uint16_t>(0);
+        Attributes::Primary5Intensity::TypeInfo::DecodableType primary5Intensity;
+        Attributes::Primary6X::TypeInfo::DecodableType primary6X = static_cast<uint16_t>(0);
+        Attributes::Primary6Y::TypeInfo::DecodableType primary6Y = static_cast<uint16_t>(0);
+        Attributes::Primary6Intensity::TypeInfo::DecodableType primary6Intensity;
+        Attributes::WhitePointX::TypeInfo::DecodableType whitePointX   = static_cast<uint16_t>(0);
+        Attributes::WhitePointY::TypeInfo::DecodableType whitePointY   = static_cast<uint16_t>(0);
+        Attributes::ColorPointRX::TypeInfo::DecodableType colorPointRX = static_cast<uint16_t>(0);
+        Attributes::ColorPointRY::TypeInfo::DecodableType colorPointRY = static_cast<uint16_t>(0);
+        Attributes::ColorPointRIntensity::TypeInfo::DecodableType colorPointRIntensity;
+        Attributes::ColorPointGX::TypeInfo::DecodableType colorPointGX = static_cast<uint16_t>(0);
+        Attributes::ColorPointGY::TypeInfo::DecodableType colorPointGY = static_cast<uint16_t>(0);
+        Attributes::ColorPointGIntensity::TypeInfo::DecodableType colorPointGIntensity;
+        Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX = static_cast<uint16_t>(0);
+        Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY = static_cast<uint16_t>(0);
+        Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity;
         Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue                 = static_cast<uint16_t>(0);
         Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode                   = static_cast<uint8_t>(0);
         Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive                       = static_cast<uint8_t>(0);
@@ -25163,8 +25280,8 @@ struct TypeInfo
         Attributes::ColorLoopStartEnhancedHue::TypeInfo::DecodableType colorLoopStartEnhancedHue   = static_cast<uint16_t>(0);
         Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableType colorLoopStoredEnhancedHue = static_cast<uint16_t>(0);
         Attributes::ColorCapabilities::TypeInfo::DecodableType colorCapabilities                   = static_cast<uint16_t>(0);
-        Attributes::ColorTempPhysicalMin::TypeInfo::DecodableType colorTempPhysicalMin             = static_cast<uint16_t>(0);
-        Attributes::ColorTempPhysicalMax::TypeInfo::DecodableType colorTempPhysicalMax             = static_cast<uint16_t>(0);
+        Attributes::ColorTempPhysicalMinMireds::TypeInfo::DecodableType colorTempPhysicalMinMireds = static_cast<uint16_t>(0);
+        Attributes::ColorTempPhysicalMaxMireds::TypeInfo::DecodableType colorTempPhysicalMaxMireds = static_cast<uint16_t>(0);
         Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableType coupleColorTempToLevelMinMireds =
             static_cast<uint16_t>(0);
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds = static_cast<uint16_t>(0);

@@ -333,7 +333,6 @@ function getManualTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_1',
     'Test_TC_LC_2_3',
     'Test_TC_LC_2_4',
     'Test_TC_LC_2_5',
@@ -551,7 +550,8 @@ function getTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_2',
+    'Test_TC_ULABEL_1_1',
+    'Test_TC_ULABEL_2_2',
   ];
 
   const MediaControl = [

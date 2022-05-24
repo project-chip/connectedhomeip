@@ -574,6 +574,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject
 @end
 
+@interface CHIPThermostatClusterThermostatScheduleTransition : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (strong, nonatomic) NSNumber * _Nullable heatSetpoint;
+@property (strong, nonatomic) NSNumber * _Nullable coolSetpoint;
+- (instancetype)init;
+@end
+
 @interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 @property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;

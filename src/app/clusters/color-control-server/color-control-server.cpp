@@ -107,7 +107,7 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
     }
 
     uint8_t options = 0x00;
-    Attributes::ColorControlOptions::Get(endpoint, &options);
+    Attributes::Options::Get(endpoint, &options);
 
     bool on = true;
     OnOff::Attributes::OnOff::Get(endpoint, &on);
@@ -1981,10 +1981,10 @@ EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t
     VerifyOrReturnError(colorTempTransitionState != nullptr, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
 
     uint16_t temperatureMin = MIN_TEMPERATURE_VALUE;
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &temperatureMin);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &temperatureMin);
 
     uint16_t temperatureMax = MAX_TEMPERATURE_VALUE;
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &temperatureMax);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &temperatureMax);
 
     if (transitionTime == 0)
     {
@@ -2039,7 +2039,7 @@ uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         // Not less than the physical min.
-        Attributes::ColorTempPhysicalMin::Get(endpoint, &colorTemperatureCoupleToLevelMin);
+        Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
     }
 
     return colorTemperatureCoupleToLevelMin;
@@ -2085,10 +2085,10 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
+            Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
 
             uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+            Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
             if (tempPhysicalMin <= startUpColorTemp && startUpColorTemp <= tempPhysicalMax)
             {
@@ -2158,8 +2158,8 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 {
     uint8_t moveMode                 = commandData.moveMode;
     uint16_t rate                    = commandData.rate;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimum;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximum;
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
@@ -2177,8 +2177,8 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
         return true;
     }
 
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -2278,8 +2278,8 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
     uint8_t stepMode                 = commandData.stepMode;
     uint16_t stepSize                = commandData.stepSize;
     uint16_t transitionTime          = commandData.transitionTime;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimum;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximum;
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
@@ -2296,9 +2296,8 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
         return true;
     }
 
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
-
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
     if (transitionTime == 0)
     {
@@ -2420,7 +2419,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         LevelControl::Attributes::CurrentLevel::Get(endpoint, &currentLevel);
 
         uint16_t tempPhysMax = MAX_TEMPERATURE_VALUE;
-        Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysMax);
+        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysMax);
 
         // Scale color temp setting between the coupling min and the physical max.
         // Note that mireds varies inversely with level: low level -> high mireds.

@@ -154,7 +154,8 @@
         "Group Key Management": [
             "ClusterRevision",
             "MaxGroupsPerFabric",
-            "MaxGroupKeysPerFabric"
+            "MaxGroupKeysPerFabric",
+            "FeatureMap"
         ],
         "Operational Credentials": [
             "SupportedFabrics",

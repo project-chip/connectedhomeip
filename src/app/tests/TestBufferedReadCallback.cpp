@@ -81,7 +81,7 @@ public:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnDone() override {}
+    void OnDone(ReadClient *) override {}
 
     std::vector<ValidationInstruction> mInstructionList;
     uint32_t mCurrentInstruction = 0;

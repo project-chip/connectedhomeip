@@ -6419,29 +6419,29 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        Integer timeOfDay,
-        Integer relayStatus,
-        Integer localTemperature,
-        Integer humidityInPercentage,
-        Integer setpoint,
-        Integer unreadEntries) {
+        Integer TimeOfDay,
+        Integer RelayStatus,
+        Integer LocalTemperature,
+        Integer HumidityInPercentage,
+        Integer Setpoint,
+        Integer UnreadEntries) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo timeOfDayResponseValue = new CommandResponseInfo("timeOfDay", "Integer");
-      responseValues.put(timeOfDayResponseValue, timeOfDay);
-      CommandResponseInfo relayStatusResponseValue =
-          new CommandResponseInfo("relayStatus", "Integer");
-      responseValues.put(relayStatusResponseValue, relayStatus);
-      CommandResponseInfo localTemperatureResponseValue =
-          new CommandResponseInfo("localTemperature", "Integer");
-      responseValues.put(localTemperatureResponseValue, localTemperature);
-      CommandResponseInfo humidityInPercentageResponseValue =
-          new CommandResponseInfo("humidityInPercentage", "Integer");
-      responseValues.put(humidityInPercentageResponseValue, humidityInPercentage);
-      CommandResponseInfo setpointResponseValue = new CommandResponseInfo("setpoint", "Integer");
-      responseValues.put(setpointResponseValue, setpoint);
-      CommandResponseInfo unreadEntriesResponseValue =
-          new CommandResponseInfo("unreadEntries", "Integer");
-      responseValues.put(unreadEntriesResponseValue, unreadEntries);
+      CommandResponseInfo TimeOfDayResponseValue = new CommandResponseInfo("TimeOfDay", "Integer");
+      responseValues.put(TimeOfDayResponseValue, TimeOfDay);
+      CommandResponseInfo RelayStatusResponseValue =
+          new CommandResponseInfo("RelayStatus", "Integer");
+      responseValues.put(RelayStatusResponseValue, RelayStatus);
+      CommandResponseInfo LocalTemperatureResponseValue =
+          new CommandResponseInfo("LocalTemperature", "Integer");
+      responseValues.put(LocalTemperatureResponseValue, LocalTemperature);
+      CommandResponseInfo HumidityInPercentageResponseValue =
+          new CommandResponseInfo("HumidityInPercentage", "Integer");
+      responseValues.put(HumidityInPercentageResponseValue, HumidityInPercentage);
+      CommandResponseInfo SetpointResponseValue = new CommandResponseInfo("Setpoint", "Integer");
+      responseValues.put(SetpointResponseValue, Setpoint);
+      CommandResponseInfo UnreadEntriesResponseValue =
+          new CommandResponseInfo("UnreadEntries", "Integer");
+      responseValues.put(UnreadEntriesResponseValue, UnreadEntries);
       callback.onSuccess(responseValues);
     }
 
@@ -6463,22 +6463,22 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        Integer numberOfTransitionsForSequence,
-        Integer dayOfWeekForSequence,
-        Integer modeForSequence,
-        ArrayList<Integer> payload) {
+        Integer NumberOfTransitionsForSequence,
+        Integer DayOfWeekForSequence,
+        Integer ModeForSequence,
+        ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> Transitions) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo numberOfTransitionsForSequenceResponseValue =
-          new CommandResponseInfo("numberOfTransitionsForSequence", "Integer");
+      CommandResponseInfo NumberOfTransitionsForSequenceResponseValue =
+          new CommandResponseInfo("NumberOfTransitionsForSequence", "Integer");
       responseValues.put(
-          numberOfTransitionsForSequenceResponseValue, numberOfTransitionsForSequence);
-      CommandResponseInfo dayOfWeekForSequenceResponseValue =
-          new CommandResponseInfo("dayOfWeekForSequence", "Integer");
-      responseValues.put(dayOfWeekForSequenceResponseValue, dayOfWeekForSequence);
-      CommandResponseInfo modeForSequenceResponseValue =
-          new CommandResponseInfo("modeForSequence", "Integer");
-      responseValues.put(modeForSequenceResponseValue, modeForSequence);
-      // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
+          NumberOfTransitionsForSequenceResponseValue, NumberOfTransitionsForSequence);
+      CommandResponseInfo DayOfWeekForSequenceResponseValue =
+          new CommandResponseInfo("DayOfWeekForSequence", "Integer");
+      responseValues.put(DayOfWeekForSequenceResponseValue, DayOfWeekForSequence);
+      CommandResponseInfo ModeForSequenceResponseValue =
+          new CommandResponseInfo("ModeForSequence", "Integer");
+      responseValues.put(ModeForSequenceResponseValue, ModeForSequence);
+      // Transitions: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -8583,18 +8583,18 @@ public class ClusterInfoMapping {
         "rate", colorControlmoveColorTemperaturerateCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMinimum", Integer.class);
+        colorControlmoveColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMinimumMireds", Integer.class);
     colorControlmoveColorTemperatureCommandParams.put(
-        "colorTemperatureMinimum",
-        colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
+        "colorTemperatureMinimumMireds",
+        colorControlmoveColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMaximum", Integer.class);
+        colorControlmoveColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMaximumMireds", Integer.class);
     colorControlmoveColorTemperatureCommandParams.put(
-        "colorTemperatureMaximum",
-        colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
+        "colorTemperatureMaximumMireds",
+        colorControlmoveColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo);
 
     CommandParameterInfo colorControlmoveColorTemperatureoptionsMaskCommandParameterInfo =
         new CommandParameterInfo("optionsMask", Integer.class);
@@ -8614,8 +8614,8 @@ public class ClusterInfoMapping {
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("moveMode"),
                       (Integer) commandArguments.get("rate"),
-                      (Integer) commandArguments.get("colorTemperatureMinimum"),
-                      (Integer) commandArguments.get("colorTemperatureMaximum"),
+                      (Integer) commandArguments.get("colorTemperatureMinimumMireds"),
+                      (Integer) commandArguments.get("colorTemperatureMaximumMireds"),
                       (Integer) commandArguments.get("optionsMask"),
                       (Integer) commandArguments.get("optionsOverride"));
             },
@@ -8954,18 +8954,18 @@ public class ClusterInfoMapping {
         "transitionTime", colorControlstepColorTemperaturetransitionTimeCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMinimum", Integer.class);
+        colorControlstepColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMinimumMireds", Integer.class);
     colorControlstepColorTemperatureCommandParams.put(
-        "colorTemperatureMinimum",
-        colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
+        "colorTemperatureMinimumMireds",
+        colorControlstepColorTemperaturecolorTemperatureMinimumMiredsCommandParameterInfo);
 
     CommandParameterInfo
-        colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo =
-            new CommandParameterInfo("colorTemperatureMaximum", Integer.class);
+        colorControlstepColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMaximumMireds", Integer.class);
     colorControlstepColorTemperatureCommandParams.put(
-        "colorTemperatureMaximum",
-        colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
+        "colorTemperatureMaximumMireds",
+        colorControlstepColorTemperaturecolorTemperatureMaximumMiredsCommandParameterInfo);
 
     CommandParameterInfo colorControlstepColorTemperatureoptionsMaskCommandParameterInfo =
         new CommandParameterInfo("optionsMask", Integer.class);
@@ -8986,8 +8986,8 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("stepMode"),
                       (Integer) commandArguments.get("stepSize"),
                       (Integer) commandArguments.get("transitionTime"),
-                      (Integer) commandArguments.get("colorTemperatureMinimum"),
-                      (Integer) commandArguments.get("colorTemperatureMaximum"),
+                      (Integer) commandArguments.get("colorTemperatureMinimumMireds"),
+                      (Integer) commandArguments.get("colorTemperatureMaximumMireds"),
                       (Integer) commandArguments.get("optionsMask"),
                       (Integer) commandArguments.get("optionsOverride"));
             },
@@ -11824,11 +11824,6 @@ public class ClusterInfoMapping {
     thermostatsetWeeklyScheduleCommandParams.put(
         "modeForSequence", thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo);
 
-    CommandParameterInfo thermostatsetWeeklySchedulepayloadCommandParameterInfo =
-        new CommandParameterInfo("payload", ArrayList.class);
-    thermostatsetWeeklyScheduleCommandParams.put(
-        "payload", thermostatsetWeeklySchedulepayloadCommandParameterInfo);
-
     InteractionInfo thermostatsetWeeklyScheduleInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -11838,7 +11833,8 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("numberOfTransitionsForSequence"),
                       (Integer) commandArguments.get("dayOfWeekForSequence"),
                       (Integer) commandArguments.get("modeForSequence"),
-                      (ArrayList<Integer>) commandArguments.get("payload"));
+                      (ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>)
+                          commandArguments.get("transitions"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             thermostatsetWeeklyScheduleCommandParams);

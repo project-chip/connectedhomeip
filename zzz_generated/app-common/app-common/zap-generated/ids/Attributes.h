@@ -3308,17 +3308,17 @@ namespace AbsMaxCoolSetpointLimit {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace AbsMaxCoolSetpointLimit
 
-namespace PiCoolingDemand {
+namespace PICoolingDemand {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace PiCoolingDemand
+} // namespace PICoolingDemand
 
-namespace PiHeatingDemand {
+namespace PIHeatingDemand {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace PiHeatingDemand
+} // namespace PIHeatingDemand
 
-namespace HvacSystemTypeConfiguration {
+namespace HVACSystemTypeConfiguration {
 static constexpr AttributeId Id = 0x00000009;
-} // namespace HvacSystemTypeConfiguration
+} // namespace HVACSystemTypeConfiguration
 
 namespace LocalTemperatureCalibration {
 static constexpr AttributeId Id = 0x00000010;
@@ -3420,37 +3420,65 @@ namespace SetpointChangeSourceTimestamp {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace SetpointChangeSourceTimestamp
 
-namespace AcType {
+namespace OccupiedSetback {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace OccupiedSetback
+
+namespace OccupiedSetbackMin {
+static constexpr AttributeId Id = 0x00000035;
+} // namespace OccupiedSetbackMin
+
+namespace OccupiedSetbackMax {
+static constexpr AttributeId Id = 0x00000036;
+} // namespace OccupiedSetbackMax
+
+namespace UnoccupiedSetback {
+static constexpr AttributeId Id = 0x00000037;
+} // namespace UnoccupiedSetback
+
+namespace UnoccupiedSetbackMin {
+static constexpr AttributeId Id = 0x00000038;
+} // namespace UnoccupiedSetbackMin
+
+namespace UnoccupiedSetbackMax {
+static constexpr AttributeId Id = 0x00000039;
+} // namespace UnoccupiedSetbackMax
+
+namespace EmergencyHeatDelta {
+static constexpr AttributeId Id = 0x0000003A;
+} // namespace EmergencyHeatDelta
+
+namespace ACType {
 static constexpr AttributeId Id = 0x00000040;
-} // namespace AcType
+} // namespace ACType
 
-namespace AcCapacity {
+namespace ACCapacity {
 static constexpr AttributeId Id = 0x00000041;
-} // namespace AcCapacity
+} // namespace ACCapacity
 
-namespace AcRefrigerantType {
+namespace ACRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
-} // namespace AcRefrigerantType
+} // namespace ACRefrigerantType
 
-namespace AcCompressorType {
+namespace ACCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressorType
+} // namespace ACCompressorType
 
-namespace AcErrorCode {
+namespace ACErrorCode {
 static constexpr AttributeId Id = 0x00000044;
-} // namespace AcErrorCode
+} // namespace ACErrorCode
 
-namespace AcLouverPosition {
+namespace ACLouverPosition {
 static constexpr AttributeId Id = 0x00000045;
-} // namespace AcLouverPosition
+} // namespace ACLouverPosition
 
-namespace AcCoilTemperature {
+namespace ACCoilTemperature {
 static constexpr AttributeId Id = 0x00000046;
-} // namespace AcCoilTemperature
+} // namespace ACCoilTemperature
 
-namespace AcCapacityFormat {
+namespace ACCapacityformat {
 static constexpr AttributeId Id = 0x00000047;
-} // namespace AcCapacityFormat
+} // namespace ACCapacityformat
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3680,9 +3708,9 @@ namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace ColorMode
 
-namespace ColorControlOptions {
+namespace Options {
 static constexpr AttributeId Id = 0x0000000F;
-} // namespace ColorControlOptions
+} // namespace Options
 
 namespace NumberOfPrimaries {
 static constexpr AttributeId Id = 0x00000010;
@@ -3836,13 +3864,13 @@ namespace ColorCapabilities {
 static constexpr AttributeId Id = 0x0000400A;
 } // namespace ColorCapabilities
 
-namespace ColorTempPhysicalMin {
+namespace ColorTempPhysicalMinMireds {
 static constexpr AttributeId Id = 0x0000400B;
-} // namespace ColorTempPhysicalMin
+} // namespace ColorTempPhysicalMinMireds
 
-namespace ColorTempPhysicalMax {
+namespace ColorTempPhysicalMaxMireds {
 static constexpr AttributeId Id = 0x0000400C;
-} // namespace ColorTempPhysicalMax
+} // namespace ColorTempPhysicalMaxMireds
 
 namespace CoupleColorTempToLevelMinMireds {
 static constexpr AttributeId Id = 0x0000400D;

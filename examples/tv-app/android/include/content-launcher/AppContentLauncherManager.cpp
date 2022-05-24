@@ -37,6 +37,22 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
+    ChipLogProgress(Zcl, " AutoPlay=%s", (autoplay ? "true" : "false"));
+
+    bool foundMatch = false;
+    auto iter       = parameterList.begin();
+    while (iter.Next())
+    {
+        auto & parameterType = iter.GetValue();
+        ChipLogProgress(Zcl, " TEST CASE found match=Example TV Show type=%d", static_cast<uint16_t>(parameterType.type));
+        foundMatch = true;
+    }
+
+    if (!foundMatch)
+    {
+        ChipLogProgress(Zcl, " TEST CASE did not find a match");
+    }
+
     LaunchResponseType response;
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));

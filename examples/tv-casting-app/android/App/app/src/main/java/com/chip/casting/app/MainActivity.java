@@ -2,6 +2,7 @@ package com.chip.casting.app;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,6 +21,8 @@ import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity
     implements CommissionerDiscoveryFragment.Callback, CommissioningFragment.Callback {
+
+  private static final String TAG = MainActivity.class.getSimpleName();
 
   private ChipAppServer chipAppServer;
   private TvCastingApp tvCastingApp;
@@ -48,9 +51,13 @@ public class MainActivity extends AppCompatActivity
     showFragment(ContentLauncherFragment.newInstance(tvCastingApp));
   }
 
+  /**
+   * The order is important, must first new TvCastingApp to load dynamic library, then
+   * AndroidChipPlatform to prepare platform, then start ChipAppServer, then call init on
+   * TvCastingApp
+   */
   private void initJni() {
-    tvCastingApp =
-        new TvCastingApp((app, clusterId, duration) -> app.openBasicCommissioningWindow(duration));
+    tvCastingApp = new TvCastingApp();
 
     tvCastingApp.setDACProvider(new DACProviderStub());
     Context applicationContext = this.getApplicationContext();
@@ -68,10 +75,13 @@ public class MainActivity extends AppCompatActivity
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
+
+    tvCastingApp.init();
   }
 
   private void showFragment(Fragment fragment, boolean showOnBack) {
-    System.out.println(
+    Log.d(
+        TAG,
         "showFragment called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
     FragmentTransaction fragmentTransaction =
         getSupportFragmentManager()
