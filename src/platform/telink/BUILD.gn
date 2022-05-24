@@ -23,8 +23,6 @@ static_library("telink") {
   sources = [
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
-    "../Zephyr/DeviceInfoProviderImpl.cpp",
-    "../Zephyr/DeviceInfoProviderImpl.h",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
