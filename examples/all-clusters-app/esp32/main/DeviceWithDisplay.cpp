@@ -17,6 +17,7 @@
  */
 
 #include "DeviceWithDisplay.h"
+#include <app-common/zap-generated/cluster-enums.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #if CONFIG_HAVE_DISPLAY
@@ -24,6 +25,7 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::Thermostat;
 
 static const char * TAG = "DeviceWithDisplay";
 
@@ -134,6 +136,32 @@ public:
         return i == 0 ? "+" : "-";
     }
 
+    bool isValidThermostatSystemMode(uint8_t systemMode) {
+        switch(systemMode) {
+            case ThermostatSystemMode::kOff:
+            case ThermostatSystemMode::kAuto:
+            case ThermostatSystemMode::kCool:
+            case ThermostatSystemMode::kHeat:
+            case ThermostatSystemMode::kEmergencyHeating:
+            case ThermostatSystemMode::kPrecooling:
+            case ThermostatSystemMode::kFanOnly:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool isValidThermostatRunningMode(uint8_t runningMode) {
+        switch(runningMode) {
+            case ThermostatRunningMode::kOff:
+            case ThermostatRunningMode::kCool:
+            case ThermostatRunningMode::kHeat:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     void DoAction(int i) override
     {
         auto & attribute = this->attribute();
@@ -182,20 +210,70 @@ public:
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
                 app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
-            else if (name == "OccupiedCoolingSetpoint")
+            else if (name == "CoolSetpoint")
             {
-                ESP_LOGI(TAG, "OccupiedCoolingSetpoint changed to : %d", n);
+                // update the occupied cooling setpoint for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupied Cooling Setpoint changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(n * 100));
             }
-            else if (name == "OccupiedHeatingSetpoint")
+            else if (name == "HeatSetpoint")
             {
-                ESP_LOGI(TAG, "OccupiedHeatingSetpoint changed to : %d", n);
+                // update the occupied heating setpoint for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupied Heating Setpoint changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(n * 100));
             }
             else if (name == "SystemMode")
             {
-                ESP_LOGI(TAG, "SystemMode changed to : %d", n);
-                app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, n);
+                // System modes - Off, Auto, Cool and Heat are currently supported.
+                uint8_t mode = n % 5;
+                // Update the system mode here for hardcoded endpoint 1
+               if (isValidThermostatSystemMode(mode))
+               {
+                    ESP_LOGI(TAG, "System Mode changed to : %d", mode);
+                    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<uint8_t>(mode));
+                    // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
+                    if (mode == ThermostatSystemMode::kAuto)
+                    {
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(ThermostatRunningMode::kOff));
+                    }
+                    else
+                    {
+                        if (isValidThermostatRunningMode(mode)) {
+                            ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
+                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
+                        } else {
+                            ESP_LOGI(TAG, "Running Mode %d is not valid", mode);
+                        }
+                    }
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "System Mode %d is not valid", mode);
+                }
+            }
+            else if (name == "RunningMode")
+            {
+                // Get the system mode
+                uint8_t systemMode = ThermostatRunningMode::kOff;
+                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, static_cast<uint8_t *>(&systemMode));
+                if (systemMode != ThermostatSystemMode::kAuto)
+                {
+                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", systemMode);
+                }
+                else
+                {
+                    uint8_t mode = n % 5;
+                    // update the running mode here for hardcoded endpoint 1
+                    if (isValidThermostatRunningMode(mode))
+                    {
+                        ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
+                    }
+                    else
+                    {
+                        ESP_LOGI(TAG, "Running Mode %d is not valid", mode);
+                    }
+                }
             }
             else if (name == "Current Lift")
             {
@@ -543,11 +621,13 @@ void SetupPretendDevices()
     app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
-    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
-    AddAttribute("OccupiedCoolingSetpoint", "19");
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<uint8_t>(ThermostatSystemMode::kHeat));
+    AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
-    AddAttribute("OccupiedHeatingSetpoint", "25");
+    AddAttribute("HeatSetpoint", "25");
     app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
+    AddAttribute("RunningMode", "4");
+    app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(ThermostatRunningMode::kHeat));
 
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
