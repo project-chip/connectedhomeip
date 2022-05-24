@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  webos_sysroot = ""
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
+
+gdbus_library("openthread") {
+  sources = [ "introspect.xml" ]
+
+  c_namespace = "Openthread"
+  c_generate_object_manager = false
+  dbus_out_dir = "platform/webos/dbus/openthread"
 }
