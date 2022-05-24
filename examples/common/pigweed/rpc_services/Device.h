@@ -83,7 +83,7 @@ public:
         size_t count                    = 0;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
         {
-            if (count < ArraySize(response.fabric_info) && fabricInfo.IsInitialized())
+            if (count < ArraySize(response.fabric_info))
             {
                 response.fabric_info[count].fabric_id = fabricInfo.GetFabricId();
                 response.fabric_info[count].node_id   = fabricInfo.GetPeerId().GetNodeId();
