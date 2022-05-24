@@ -59,7 +59,7 @@ public:
      */
     void Release() { mSession.ClearValue(); }
 
-    //Transport::Session * operator->() const { return Get(); }
+    // Transport::Session * operator->() const { return Get(); }
 
 private:
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
