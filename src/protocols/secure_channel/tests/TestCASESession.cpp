@@ -53,11 +53,11 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
-#if CHIP_CONFIG_SLOW_CRYPTO
+#if CHIP_DEVICE_CONFIG_SLOW_CRYPTO
 constexpr uint32_t sTestCaseMessageCount        = 8;
-#else // CHIP_CONFIG_SLOW_CRYPTO
+#else // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
 constexpr uint32_t sTestCaseMessageCount        = 5;
-#endif // CHIP_CONFIG_SLOW_CRYPTO
+#endif // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
 
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;

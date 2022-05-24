@@ -803,9 +803,9 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, msg);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_SLOW_CRYPTO
+#if CHIP_DEVICE_CONFIG_SLOW_CRYPTO
     ReturnErrorOnFailure(mExchangeCtxt->SendStandaloneAckMessage());
-#endif // CHIP_CONFIG_SLOW_CRYPTO
+#endif // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
 
     switch (static_cast<MsgType>(payloadHeader.GetMessageType()))
     {

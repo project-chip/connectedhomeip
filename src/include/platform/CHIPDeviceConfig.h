@@ -272,6 +272,17 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ *  @def CHIP_DEVICE_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SLOW_CRYPTO
+#define CHIP_DEVICE_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
