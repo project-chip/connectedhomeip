@@ -679,7 +679,7 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(void * context, const chi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -698,7 +698,7 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(void * context, const chi
         newElement_0_subjects = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_subjects);
-        
+
           auto iter_newElement_0_subjects_NaN = entry_0.subjects.Value().begin();
           while (iter_newElement_0_subjects_NaN.Next())
           {
@@ -715,7 +715,7 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(void * context, const chi
         newElement_0_targets = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_targets);
-        
+
           auto iter_newElement_0_targets_NaN = entry_0.targets.Value().begin();
           while (iter_newElement_0_targets_NaN.Next())
           {
@@ -771,7 +771,7 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(void * context, const chi
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass accessControlEntryStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntry", accessControlEntryStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -845,7 +845,7 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(void * context, con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -859,7 +859,7 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(void * context, con
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass extensionEntryStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$AccessControlClusterExtensionEntry", extensionEntryStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -936,7 +936,7 @@ void CHIPAccessControlGeneratedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -998,7 +998,7 @@ void CHIPAccessControlAcceptedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1060,7 +1060,7 @@ void CHIPAccessControlAttributeListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1124,7 +1124,7 @@ void CHIPAccountLoginGeneratedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1186,7 +1186,7 @@ void CHIPAccountLoginAcceptedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1248,7 +1248,7 @@ void CHIPAccountLoginAttributeListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1315,7 +1315,7 @@ CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback::~CHIPAdministra
                 std::string javaValueClassName = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value, javaValue);
-      
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
 
@@ -1367,7 +1367,7 @@ void CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback::Callba
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1429,7 +1429,7 @@ void CHIPAdministratorCommissioningAcceptedCommandListAttributeCallback::Callbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1491,7 +1491,7 @@ void CHIPAdministratorCommissioningAttributeListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1567,7 +1567,7 @@ void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1629,7 +1629,7 @@ void CHIPApplicationBasicGeneratedCommandListAttributeCallback::CallbackFn(void 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1691,7 +1691,7 @@ void CHIPApplicationBasicAcceptedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1753,7 +1753,7 @@ void CHIPApplicationBasicAttributeListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1817,7 +1817,7 @@ void CHIPApplicationLauncherCatalogListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1879,7 +1879,7 @@ void CHIPApplicationLauncherGeneratedCommandListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -1941,7 +1941,7 @@ void CHIPApplicationLauncherAcceptedCommandListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2003,7 +2003,7 @@ void CHIPApplicationLauncherAttributeListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2067,7 +2067,7 @@ void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(void * context, cons
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2157,7 +2157,7 @@ void CHIPAudioOutputGeneratedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2219,7 +2219,7 @@ void CHIPAudioOutputAcceptedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2281,7 +2281,7 @@ void CHIPAudioOutputAttributeListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2353,7 +2353,7 @@ void CHIPBarrierControlGeneratedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2415,7 +2415,7 @@ void CHIPBarrierControlAcceptedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2477,7 +2477,7 @@ void CHIPBarrierControlAttributeListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2628,7 +2628,7 @@ void CHIPBasicGeneratedCommandListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2690,7 +2690,7 @@ void CHIPBasicAcceptedCommandListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2752,7 +2752,7 @@ void CHIPBasicAttributeListAttributeCallback::CallbackFn(void * context, const c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2822,7 +2822,7 @@ void CHIPBinaryInputBasicGeneratedCommandListAttributeCallback::CallbackFn(void 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2884,7 +2884,7 @@ void CHIPBinaryInputBasicAcceptedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -2946,7 +2946,7 @@ void CHIPBinaryInputBasicAttributeListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3010,7 +3010,7 @@ void CHIPBindingBindingAttributeCallback::CallbackFn(void * context, const chip:
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3060,7 +3060,7 @@ void CHIPBindingBindingAttributeCallback::CallbackFn(void * context, const chip:
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass targetStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$BindingClusterTargetStruct", targetStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -3134,7 +3134,7 @@ void CHIPBindingGeneratedCommandListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3196,7 +3196,7 @@ void CHIPBindingAcceptedCommandListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3258,7 +3258,7 @@ void CHIPBindingAttributeListAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3324,7 +3324,7 @@ void CHIPBooleanStateGeneratedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3386,7 +3386,7 @@ void CHIPBooleanStateAcceptedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3448,7 +3448,7 @@ void CHIPBooleanStateAttributeListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3512,7 +3512,7 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3615,7 +3615,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3633,7 +3633,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(void * context,
       chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), static_cast<uint8_t>(entry_0.type), newElement_0_type);
       jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
-      
+
         auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
         while (iter_newElement_0_endpoints_NaN.Next())
         {
@@ -3719,7 +3719,7 @@ void CHIPBridgedActionsGeneratedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3781,7 +3781,7 @@ void CHIPBridgedActionsAcceptedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3843,7 +3843,7 @@ void CHIPBridgedActionsAttributeListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -3986,7 +3986,7 @@ void CHIPBridgedDeviceBasicGeneratedCommandListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4048,7 +4048,7 @@ void CHIPBridgedDeviceBasicAcceptedCommandListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4110,7 +4110,7 @@ void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4174,7 +4174,7 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(void * context, const c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4286,7 +4286,7 @@ void CHIPChannelGeneratedCommandListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4348,7 +4348,7 @@ void CHIPChannelAcceptedCommandListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4410,7 +4410,7 @@ void CHIPChannelAttributeListAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4578,7 +4578,7 @@ void CHIPColorControlGeneratedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4640,7 +4640,7 @@ void CHIPColorControlAcceptedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4702,7 +4702,7 @@ void CHIPColorControlAttributeListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4766,7 +4766,7 @@ void CHIPContentLauncherAcceptHeaderAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4828,7 +4828,7 @@ void CHIPContentLauncherGeneratedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4890,7 +4890,7 @@ void CHIPContentLauncherAcceptedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -4952,7 +4952,7 @@ void CHIPContentLauncherAttributeListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5016,7 +5016,7 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5030,7 +5030,7 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(void * context, const
               std::string newElement_0_revisionClassName = "java/lang/Integer";
         std::string newElement_0_revisionCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_revisionClassName.c_str(), newElement_0_revisionCtorSignature.c_str(), entry_0.revision, newElement_0_revision);
-      
+
     jclass deviceTypeStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceType", deviceTypeStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -5101,7 +5101,7 @@ void CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5163,7 +5163,7 @@ void CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5225,7 +5225,7 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5287,7 +5287,7 @@ void CHIPDescriptorGeneratedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5349,7 +5349,7 @@ void CHIPDescriptorAcceptedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5411,7 +5411,7 @@ void CHIPDescriptorAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5475,7 +5475,7 @@ void CHIPDiagnosticLogsGeneratedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5537,7 +5537,7 @@ void CHIPDiagnosticLogsAcceptedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5599,7 +5599,7 @@ void CHIPDiagnosticLogsAttributeListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5815,7 +5815,7 @@ void CHIPDoorLockGeneratedCommandListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5877,7 +5877,7 @@ void CHIPDoorLockAcceptedCommandListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -5939,7 +5939,7 @@ void CHIPDoorLockAttributeListAttributeCallback::CallbackFn(void * context, cons
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6025,7 +6025,7 @@ void CHIPElectricalMeasurementGeneratedCommandListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6087,7 +6087,7 @@ void CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::CallbackFn(v
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6149,7 +6149,7 @@ void CHIPElectricalMeasurementAttributeListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6390,7 +6390,7 @@ void CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback::Callba
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6452,7 +6452,7 @@ void CHIPEthernetNetworkDiagnosticsAcceptedCommandListAttributeCallback::Callbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6514,7 +6514,7 @@ void CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6602,7 +6602,7 @@ void CHIPFanControlGeneratedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6664,7 +6664,7 @@ void CHIPFanControlAcceptedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6726,7 +6726,7 @@ void CHIPFanControlAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6792,7 +6792,7 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6873,7 +6873,7 @@ void CHIPFixedLabelGeneratedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6935,7 +6935,7 @@ void CHIPFixedLabelAcceptedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -6997,7 +6997,7 @@ void CHIPFixedLabelAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7228,7 +7228,7 @@ void CHIPFlowMeasurementGeneratedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7290,7 +7290,7 @@ void CHIPFlowMeasurementAcceptedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7352,7 +7352,7 @@ void CHIPFlowMeasurementAttributeListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7424,7 +7424,7 @@ void CHIPGeneralCommissioningGeneratedCommandListAttributeCallback::CallbackFn(v
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7486,7 +7486,7 @@ void CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7548,7 +7548,7 @@ void CHIPGeneralCommissioningAttributeListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7612,7 +7612,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7646,7 +7646,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(void *
         newElement_0_hardwareAddress = newElement_0_hardwareAddressByteArray;
       jobject newElement_0_IPv4Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv4Addresses);
-      
+
         auto iter_newElement_0_IPv4Addresses_NaN = entry_0.IPv4Addresses.begin();
         while (iter_newElement_0_IPv4Addresses_NaN.Next())
         {
@@ -7659,7 +7659,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(void *
         }
       jobject newElement_0_IPv6Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
-      
+
         auto iter_newElement_0_IPv6Addresses_NaN = entry_0.IPv6Addresses.begin();
         while (iter_newElement_0_IPv6Addresses_NaN.Next())
         {
@@ -7759,7 +7759,7 @@ void CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7821,7 +7821,7 @@ void CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7883,7 +7883,7 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -7945,7 +7945,7 @@ void CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8007,7 +8007,7 @@ void CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8069,7 +8069,7 @@ void CHIPGeneralDiagnosticsAttributeListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8133,7 +8133,7 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8151,7 +8151,7 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(void * conte
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass groupKeyMapStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct", groupKeyMapStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -8223,7 +8223,7 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8235,7 +8235,7 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(void * contex
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupIdClassName.c_str(), newElement_0_groupIdCtorSignature.c_str(), entry_0.groupId, newElement_0_groupId);
             jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
-      
+
         auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
         while (iter_newElement_0_endpoints_NaN.Next())
         {
@@ -8258,7 +8258,7 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(void * contex
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass groupInfoMapStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct", groupInfoMapStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -8335,7 +8335,7 @@ void CHIPGroupKeyManagementGeneratedCommandListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8397,7 +8397,7 @@ void CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8459,7 +8459,7 @@ void CHIPGroupKeyManagementAttributeListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8525,7 +8525,7 @@ void CHIPGroupsGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8587,7 +8587,7 @@ void CHIPGroupsAcceptedCommandListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8649,7 +8649,7 @@ void CHIPGroupsAttributeListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8717,7 +8717,7 @@ void CHIPIdentifyGeneratedCommandListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8779,7 +8779,7 @@ void CHIPIdentifyAcceptedCommandListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -8841,7 +8841,7 @@ void CHIPIdentifyAttributeListAttributeCallback::CallbackFn(void * context, cons
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9127,7 +9127,7 @@ void CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback::CallbackFn
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9189,7 +9189,7 @@ void CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9251,7 +9251,7 @@ void CHIPIlluminanceMeasurementAttributeListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9315,7 +9315,7 @@ void CHIPKeypadInputGeneratedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9377,7 +9377,7 @@ void CHIPKeypadInputAcceptedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9439,7 +9439,7 @@ void CHIPKeypadInputAttributeListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9796,7 +9796,7 @@ void CHIPLevelControlGeneratedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9858,7 +9858,7 @@ void CHIPLevelControlAcceptedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9920,7 +9920,7 @@ void CHIPLevelControlAttributeListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -9988,7 +9988,7 @@ void CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10048,7 +10048,7 @@ void CHIPLocalizationConfigurationGeneratedCommandListAttributeCallback::Callbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10110,7 +10110,7 @@ void CHIPLocalizationConfigurationAcceptedCommandListAttributeCallback::Callback
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10174,7 +10174,7 @@ void CHIPLowPowerGeneratedCommandListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10236,7 +10236,7 @@ void CHIPLowPowerAcceptedCommandListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10298,7 +10298,7 @@ void CHIPLowPowerAttributeListAttributeCallback::CallbackFn(void * context, cons
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10362,7 +10362,7 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10455,7 +10455,7 @@ void CHIPMediaInputGeneratedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10517,7 +10517,7 @@ void CHIPMediaInputAcceptedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10579,7 +10579,7 @@ void CHIPMediaInputAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10867,7 +10867,7 @@ void CHIPMediaPlaybackGeneratedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10929,7 +10929,7 @@ void CHIPMediaPlaybackAcceptedCommandListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -10991,7 +10991,7 @@ void CHIPMediaPlaybackAttributeListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11112,7 +11112,7 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11128,7 +11128,7 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(void * context, c
               std::string newElement_0_semanticTagClassName = "java/lang/Long";
         std::string newElement_0_semanticTagCtorSignature = "(J)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_semanticTagClassName.c_str(), newElement_0_semanticTagCtorSignature.c_str(), entry_0.semanticTag, newElement_0_semanticTag);
-      
+
     jclass modeOptionStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ModeSelectClusterModeOptionStruct", modeOptionStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -11312,7 +11312,7 @@ void CHIPModeSelectGeneratedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11374,7 +11374,7 @@ void CHIPModeSelectAcceptedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11436,7 +11436,7 @@ void CHIPModeSelectAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11504,7 +11504,7 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11518,7 +11518,7 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(void * contex
               std::string newElement_0_connectedClassName = "java/lang/Boolean";
         std::string newElement_0_connectedCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_connectedClassName.c_str(), newElement_0_connectedCtorSignature.c_str(), entry_0.connected, newElement_0_connected);
-      
+
     jclass networkInfoStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -11760,7 +11760,7 @@ void CHIPNetworkCommissioningGeneratedCommandListAttributeCallback::CallbackFn(v
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11822,7 +11822,7 @@ void CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11888,7 +11888,7 @@ void CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11952,7 +11952,7 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::Callbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -11970,7 +11970,7 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::Callbac
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass providerLocationStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation", providerLocationStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12101,7 +12101,7 @@ void CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12171,7 +12171,7 @@ void CHIPOccupancySensingGeneratedCommandListAttributeCallback::CallbackFn(void 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12233,7 +12233,7 @@ void CHIPOccupancySensingAcceptedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12295,7 +12295,7 @@ void CHIPOccupancySensingAttributeListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12422,7 +12422,7 @@ void CHIPOnOffGeneratedCommandListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12484,7 +12484,7 @@ void CHIPOnOffAcceptedCommandListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12546,7 +12546,7 @@ void CHIPOnOffAttributeListAttributeCallback::CallbackFn(void * context, const c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12616,7 +12616,7 @@ void CHIPOnOffSwitchConfigurationGeneratedCommandListAttributeCallback::Callback
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12678,7 +12678,7 @@ void CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback::CallbackF
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12740,7 +12740,7 @@ void CHIPOnOffSwitchConfigurationAttributeListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12804,7 +12804,7 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12826,7 +12826,7 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(void * context,
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass NOCStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterNOCStruct", NOCStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -12898,7 +12898,7 @@ void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -12926,7 +12926,7 @@ void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(void * conte
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass fabricDescriptorStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptor", fabricDescriptorStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -13005,7 +13005,7 @@ void CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::Callbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13068,7 +13068,7 @@ CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback::~CHIPOperationalC
                 std::string javaValueClassName = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(), value, javaValue);
-      
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
 
@@ -13118,7 +13118,7 @@ void CHIPOperationalCredentialsGeneratedCommandListAttributeCallback::CallbackFn
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13180,7 +13180,7 @@ void CHIPOperationalCredentialsAcceptedCommandListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13242,7 +13242,7 @@ void CHIPOperationalCredentialsAttributeListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13320,7 +13320,7 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13384,7 +13384,7 @@ void CHIPPowerSourceGeneratedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13446,7 +13446,7 @@ void CHIPPowerSourceAcceptedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13508,7 +13508,7 @@ void CHIPPowerSourceAttributeListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13574,7 +13574,7 @@ void CHIPPowerSourceConfigurationSourcesAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13636,7 +13636,7 @@ void CHIPPowerSourceConfigurationGeneratedCommandListAttributeCallback::Callback
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13698,7 +13698,7 @@ void CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback::CallbackF
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13760,7 +13760,7 @@ void CHIPPowerSourceConfigurationAttributeListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -13989,7 +13989,7 @@ void CHIPPressureMeasurementAttributeListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15055,7 +15055,7 @@ void CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback::Callb
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15117,7 +15117,7 @@ void CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback::Callba
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15179,7 +15179,7 @@ void CHIPPumpConfigurationAndControlAttributeListAttributeCallback::CallbackFn(v
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15412,7 +15412,7 @@ void CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback::Callb
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15474,7 +15474,7 @@ void CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback::Callba
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15536,7 +15536,7 @@ void CHIPRelativeHumidityMeasurementAttributeListAttributeCallback::CallbackFn(v
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15610,7 +15610,7 @@ void CHIPScenesGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15672,7 +15672,7 @@ void CHIPScenesAcceptedCommandListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15734,7 +15734,7 @@ void CHIPScenesAttributeListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15798,7 +15798,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15822,7 +15822,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(void * co
               std::string newElement_0_stackSizeClassName = "java/lang/Long";
         std::string newElement_0_stackSizeCtorSignature = "(J)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackSizeClassName.c_str(), newElement_0_stackSizeCtorSignature.c_str(), entry_0.stackSize, newElement_0_stackSize);
-      
+
     jclass threadMetricsStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetrics", threadMetricsStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -15902,7 +15902,7 @@ void CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn(vo
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -15964,7 +15964,7 @@ void CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16026,7 +16026,7 @@ void CHIPSoftwareDiagnosticsAttributeListAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16098,7 +16098,7 @@ void CHIPSwitchGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16160,7 +16160,7 @@ void CHIPSwitchAcceptedCommandListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16222,7 +16222,7 @@ void CHIPSwitchAttributeListAttributeCallback::CallbackFn(void * context, const 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16288,7 +16288,7 @@ void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(void * context, 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16373,7 +16373,7 @@ void CHIPTargetNavigatorGeneratedCommandListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16435,7 +16435,7 @@ void CHIPTargetNavigatorAcceptedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16497,7 +16497,7 @@ void CHIPTargetNavigatorAttributeListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16728,7 +16728,7 @@ void CHIPTemperatureMeasurementAttributeListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16844,7 +16844,7 @@ void CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context, const
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16906,7 +16906,7 @@ void CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(void * context,
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -16968,7 +16968,7 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(void * co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -17114,7 +17114,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -17212,7 +17212,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
               std::string newElement_0_nullableStruct_hClassName = "java/lang/Double";
         std::string newElement_0_nullableStruct_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_nullableStruct_hClassName.c_str(), newElement_0_nullableStruct_hCtorSignature.c_str(), entry_0.nullableStruct.Value().h, newElement_0_nullableStruct_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -17272,7 +17272,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
               std::string newElement_0_optionalStructInsideOptional_hClassName = "java/lang/Double";
         std::string newElement_0_optionalStructInsideOptional_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_optionalStructInsideOptional_hClassName.c_str(), newElement_0_optionalStructInsideOptional_hCtorSignature.c_str(), entry_0.optionalStruct.Value().h, newElement_0_optionalStructInsideOptional_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -17336,7 +17336,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
               std::string newElement_0_nullableOptionalStructInsideOptional_hClassName = "java/lang/Double";
         std::string newElement_0_nullableOptionalStructInsideOptional_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_nullableOptionalStructInsideOptional_hClassName.c_str(), newElement_0_nullableOptionalStructInsideOptional_hCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().h, newElement_0_nullableOptionalStructInsideOptional_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -17368,7 +17368,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         newElement_0_nullableList = nullptr;
       } else {
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableList);
-        
+
           auto iter_newElement_0_nullableList_NaN = entry_0.nullableList.Value().begin();
           while (iter_newElement_0_nullableList_NaN.Next())
           {
@@ -17386,7 +17386,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
       } else {
         jobject newElement_0_optionalListInsideOptional;
           chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalListInsideOptional);
-        
+
           auto iter_newElement_0_optionalListInsideOptional_NaN = entry_0.optionalList.Value().begin();
           while (iter_newElement_0_optionalListInsideOptional_NaN.Next())
           {
@@ -17408,7 +17408,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
           newElement_0_nullableOptionalListInsideOptional = nullptr;
         } else {
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalListInsideOptional);
-          
+
             auto iter_newElement_0_nullableOptionalListInsideOptional_NaN = entry_0.nullableOptionalList.Value().Value().begin();
             while (iter_newElement_0_nullableOptionalListInsideOptional_NaN.Next())
             {
@@ -17513,7 +17513,7 @@ void CHIPTestClusterListLongOctetStringAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -17575,7 +17575,7 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -17650,7 +17650,7 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(void * context
               std::string newElement_0_fabricSensitiveStruct_hClassName = "java/lang/Double";
         std::string newElement_0_fabricSensitiveStruct_hCtorSignature = "(D)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<double>(newElement_0_fabricSensitiveStruct_hClassName.c_str(), newElement_0_fabricSensitiveStruct_hCtorSignature.c_str(), entry_0.fabricSensitiveStruct.h, newElement_0_fabricSensitiveStruct_h);
-      
+
     jclass simpleStructStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -17676,7 +17676,7 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(void * context
     );
       jobject newElement_0_fabricSensitiveInt8uList;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_fabricSensitiveInt8uList);
-      
+
         auto iter_newElement_0_fabricSensitiveInt8uList_NaN = entry_0.fabricSensitiveInt8uList.begin();
         while (iter_newElement_0_fabricSensitiveInt8uList_NaN.Next())
         {
@@ -17691,7 +17691,7 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(void * context
               std::string newElement_0_fabricIndexClassName = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(), entry_0.fabricIndex, newElement_0_fabricIndex);
-      
+
     jclass testFabricScopedStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestFabricScoped", testFabricScopedStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -19534,7 +19534,7 @@ void CHIPTestClusterGeneratedCommandListAttributeCallback::CallbackFn(void * con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19596,7 +19596,7 @@ void CHIPTestClusterAcceptedCommandListAttributeCallback::CallbackFn(void * cont
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19658,7 +19658,7 @@ void CHIPTestClusterAttributeListAttributeCallback::CallbackFn(void * context, c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19756,7 +19756,7 @@ void CHIPThermostatAttributeListAttributeCallback::CallbackFn(void * context, co
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19828,7 +19828,7 @@ void CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallba
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19890,7 +19890,7 @@ void CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallbac
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -19952,7 +19952,7 @@ void CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback::Cal
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20030,7 +20030,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20092,7 +20092,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
               std::string newElement_0_isChildClassName = "java/lang/Boolean";
         std::string newElement_0_isChildCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_isChildClassName.c_str(), newElement_0_isChildCtorSignature.c_str(), entry_0.isChild, newElement_0_isChild);
-      
+
     jclass neighborTableStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable", neighborTableStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -20175,7 +20175,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20221,7 +20221,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(voi
               std::string newElement_0_linkEstablishedClassName = "java/lang/Boolean";
         std::string newElement_0_linkEstablishedCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_linkEstablishedClassName.c_str(), newElement_0_linkEstablishedCtorSignature.c_str(), entry_0.linkEstablished, newElement_0_linkEstablished);
-      
+
     jclass routeTableStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable", routeTableStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -20400,7 +20400,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(voi
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20414,7 +20414,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(voi
               std::string newElement_0_flagsClassName = "java/lang/Integer";
         std::string newElement_0_flagsCtorSignature = "(I)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags, newElement_0_flags);
-      
+
     jclass securityPolicyStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy", securityPolicyStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -20487,7 +20487,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20541,7 +20541,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
               std::string newElement_0_channelMaskPresentClassName = "java/lang/Boolean";
         std::string newElement_0_channelMaskPresentCtorSignature = "(Z)V";
           chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_channelMaskPresentClassName.c_str(), newElement_0_channelMaskPresentCtorSignature.c_str(), entry_0.channelMaskPresent, newElement_0_channelMaskPresent);
-      
+
     jclass operationalDatasetComponentsStructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents", operationalDatasetComponentsStructClass);
     if (err != CHIP_NO_ERROR) {
@@ -20622,7 +20622,7 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::Callb
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20684,7 +20684,7 @@ void CHIPThreadNetworkDiagnosticsGeneratedCommandListAttributeCallback::Callback
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20746,7 +20746,7 @@ void CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback::CallbackF
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20808,7 +20808,7 @@ void CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(void
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20878,7 +20878,7 @@ void CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::Callback
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -20940,7 +20940,7 @@ void CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback::CallbackFn
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21002,7 +21002,7 @@ void CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21068,7 +21068,7 @@ void CHIPUnitLocalizationAttributeListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21134,7 +21134,7 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(void * context, const c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21215,7 +21215,7 @@ void CHIPUserLabelGeneratedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21277,7 +21277,7 @@ void CHIPUserLabelAcceptedCommandListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21343,7 +21343,7 @@ void CHIPWakeOnLanGeneratedCommandListAttributeCallback::CallbackFn(void * conte
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21405,7 +21405,7 @@ void CHIPWakeOnLanAcceptedCommandListAttributeCallback::CallbackFn(void * contex
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21467,7 +21467,7 @@ void CHIPWakeOnLanAttributeListAttributeCallback::CallbackFn(void * context, con
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21822,7 +21822,7 @@ void CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback::CallbackFn
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21884,7 +21884,7 @@ void CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback::CallbackFn(
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -21946,7 +21946,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(void *
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -22472,7 +22472,7 @@ void CHIPWindowCoveringGeneratedCommandListAttributeCallback::CallbackFn(void * 
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -22534,7 +22534,7 @@ void CHIPWindowCoveringAcceptedCommandListAttributeCallback::CallbackFn(void * c
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -22596,7 +22596,7 @@ void CHIPWindowCoveringAttributeListAttributeCallback::CallbackFn(void * context
 
     jobject arrayListObj;
       chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-    
+
       auto iter_arrayListObj_0 = list.begin();
       while (iter_arrayListObj_0.Next())
       {
@@ -22611,8 +22611,3 @@ void CHIPWindowCoveringAttributeListAttributeCallback::CallbackFn(void * context
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
-
-
-
-
-

@@ -340,4 +340,3 @@
 @interface CHIPWindowCovering ()
 @property (readonly) chip::Controller::WindowCoveringCluster cppCluster;
 @end
-

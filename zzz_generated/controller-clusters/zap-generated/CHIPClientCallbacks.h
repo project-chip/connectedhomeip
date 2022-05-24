@@ -475,4 +475,3 @@ void WindowCoveringClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVR
 typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 void WindowCoveringClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
 typedef void (*WindowCoveringAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

@@ -46,7 +46,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -520,7 +520,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -560,7 +560,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -598,7 +598,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -628,7 +628,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -848,7 +848,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -1377,7 +1377,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -1738,7 +1738,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -1793,7 +1793,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -2025,4 +2025,3 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::
     ComplexArgumentParser::Finalize(request.current);
     ComplexArgumentParser::Finalize(request.previous);
 }
-

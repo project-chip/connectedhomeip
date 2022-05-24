@@ -489,4 +489,3 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
-
