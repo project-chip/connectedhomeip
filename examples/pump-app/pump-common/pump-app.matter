@@ -936,6 +936,10 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
   readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
@@ -1202,7 +1206,7 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16u maxConstFlow = 10;
   readonly attribute nullable int16s minConstTemp = 11;
   readonly attribute nullable int16s maxConstTemp = 12;
-  readonly attribute bitmap16 pumpStatus = 16;
+  readonly attribute PumpStatus pumpStatus = 16;
   readonly attribute PumpOperationMode effectiveOperationMode = 17;
   readonly attribute PumpControlMode effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
@@ -1212,7 +1216,6 @@ server cluster PumpConfigurationAndControl = 512 {
   attribute access(write: manage) nullable int32u lifetimeEnergyConsumed = 23;
   attribute access(write: manage) PumpOperationMode operationMode = 32;
   attribute access(write: manage) PumpControlMode controlMode = 33;
-  readonly attribute bitmap16 alarmMask = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1222,95 +1225,98 @@ server cluster Scenes = 5 {
     kCopyAllScenes = 0x1;
   }
 
-  struct SceneExtensionFieldSet {
+  struct ExtensionFieldSet {
     cluster_id clusterId = 0;
-    int8u length = 1;
-    int8u value = 2;
+    AttributeValuePair attributeValueList[] = 1;
+  }
+
+  struct AttributeValuePair {
+    optional attrib_id attributeId = 0;
+    int8u attributeValue[] = 1;
   }
 
   readonly attribute int8u sceneCount = 0;
   readonly attribute int8u currentScene = 1;
-  readonly attribute int16u currentGroup = 2;
+  readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
-    SceneExtensionFieldSet extensionFieldSets[] = 4;
+    ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct StoreSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RecallSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
-    INT16U transitionTime = 2;
+    optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
-    INT16U transitionTime = 3;
-    CHAR_STRING sceneName = 4;
-    SceneExtensionFieldSet extensionFieldSets[] = 5;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
-    INT8U capacity = 1;
-    INT16U groupId = 2;
-    INT8U sceneCount = 3;
-    INT8U sceneList[] = 4;
+    nullable INT8U capacity = 1;
+    group_id groupId = 2;
+    optional INT8U sceneList[] = 3;
   }
 
   command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
@@ -1894,7 +1900,6 @@ endpoint 1 {
     ram      attribute lifetimeEnergyConsumed;
     ram      attribute operationMode;
     ram      attribute controlMode;
-    ram      attribute alarmMask;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }

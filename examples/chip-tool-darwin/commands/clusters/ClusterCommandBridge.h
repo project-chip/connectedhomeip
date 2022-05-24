@@ -32,10 +32,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
+        AddArguments();
     }
 
     ClusterCommand(chip::ClusterId clusterId)
@@ -44,18 +41,7 @@ public:
     {
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
-    }
-
-    ClusterCommand(const char * _Nonnull commandName)
-        : ModelCommand(commandName)
-    {
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        AddArguments();
     }
 
     ~ClusterCommand() {}
@@ -117,6 +103,21 @@ public:
     }
 
 protected:
+    ClusterCommand(const char * _Nonnull commandName)
+        : ModelCommand(commandName)
+    {
+        // Subclasses are responsible for calling AddArguments.
+    }
+
+    void AddArguments()
+    {
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
+            "If provided, do a timed invoke with the given timed interaction timeout.");
+        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
+        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        ModelCommand::AddArguments();
+    }
+
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;

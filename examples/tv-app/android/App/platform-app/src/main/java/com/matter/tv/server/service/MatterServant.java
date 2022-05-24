@@ -18,6 +18,7 @@
 package com.matter.tv.server.service;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
@@ -134,6 +135,11 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
+  }
+
+  public void sendCustomCommand(String customCommand) {
+    Log.i(MatterServant.class.getName(), customCommand);
+    // TODO: insert logic ot send custom command here
   }
 
   public void updateLevel(int value) {

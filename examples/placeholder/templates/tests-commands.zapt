@@ -4,6 +4,8 @@
 
 #include "TestCommand.h"
 
+#include <lib/support/CHIPListUtils.h>
+
 {{#if (getTests)}}
 {{>test_cluster tests=(getTests) credsIssuerConfigArg=false needsWaitDuration=false}}
 {{/if}}

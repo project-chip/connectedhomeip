@@ -175,8 +175,6 @@ public:
     CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
-    bool IsOverlappedAttributePath(AttributePathParams & aAttributePath);
-
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
     CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);

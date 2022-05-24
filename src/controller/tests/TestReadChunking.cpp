@@ -128,7 +128,7 @@ public:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
-    void OnDone() override;
+    void OnDone(app::ReadClient * apReadClient) override;
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
@@ -198,7 +198,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     mAttributeCount++;
 }
 
-void TestReadCallback::OnDone() {}
+void TestReadCallback::OnDone(app::ReadClient *) {}
 
 class TestMutableAttrAccess
 {
@@ -295,7 +295,7 @@ public:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
-    void OnDone() override {}
+    void OnDone(app::ReadClient *) override {}
 
     void OnReportBegin() override { mAttributeCount = 0; }
 

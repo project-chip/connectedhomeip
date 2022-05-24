@@ -75,6 +75,8 @@ ti_simplelink_executable("pump_app") {
 
   sources = [
     "${project_dir}/main/AppTask.cpp",
+    "${project_dir}/main/CHIPDeviceManager.cpp",
+    "${project_dir}/main/DeviceCallbacks.cpp",
     "${project_dir}/main/PumpManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",

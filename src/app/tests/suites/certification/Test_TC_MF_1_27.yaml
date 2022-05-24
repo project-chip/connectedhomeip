@@ -11,56 +11,69 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    22.1.27. [TC-MF-1.27] Open commissioning window - durations max and max+1
-    [BCM] [DUT - Commissioner]
+    22.1.27. [TC-MF-1.27] Open commissioning window - durations min and min-1
+    [BCM] [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    timeout: 330
     endpoint: 0
 
 tests:
-    - label: "Reset DUT_CR to factory defaults"
-      verification: |
+    - label: "Factory Reset the DUT_CE"
+      cluster: "SystemCommands"
+      command: "FactoryReset"
 
-      disabled: true
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "DUT_CR starts a commissioning process with TH_CE using BCM"
-      verification: |
-          1. Provision the device using your DUT controller(use above instructions) ,
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Wait for commissioning Window to 301 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 181000
 
     - label:
-          "DUT_CR opens a commissioning window on TH_CE with a value of 15
-          minutes"
-      verification: |
-          On your DUT controller, open commissioning window using BCM,
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
 
-          Below is an example when using chip tool as controller
-
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 900 1 0
-      disabled: true
-
-    - label: "Wait for commissioning Window to Timeout"
-      verification: |
-          Wait for commissioning Window to Timeout
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 179
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "DUT_CR opens a commissioning window on TH_CE with a value of 901
-          seconds"
-      verification: |
-          On your DUT controller, open commissioning window using BCM,
-
-          Below is an example when using chip tool as controller
-
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 901 1 0
-      disabled: true
-
-    - label: "Wait for commissioning Window to Timeout"
-      verification: |
-          Wait for commissioning Window to Timeout
-      disabled: true
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0

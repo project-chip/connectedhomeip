@@ -114,8 +114,10 @@ void InteractionModel::OnError(CHIP_ERROR error)
     OnResponse(status, nullptr);
 }
 
-void InteractionModel::OnDone()
+void InteractionModel::OnDone(ReadClient * aReadClient)
 {
+    // TODO: Keep track of multiple read/subscribe interactions, clear out the
+    // right thing here.
     mReadClient.reset();
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

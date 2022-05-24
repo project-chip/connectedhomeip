@@ -767,12 +767,12 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, writeNodeLabelAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
+JNI_METHOD(void, ColorControlCluster, writeOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::Options::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -1038,8 +1038,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1194,8 +1202,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1350,8 +1366,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

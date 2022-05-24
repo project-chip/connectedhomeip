@@ -20,6 +20,8 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -64,6 +66,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceManager;
 using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
@@ -75,6 +78,8 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static DeviceCallbacks sDeviceCallbacks;
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 static DefaultOTARequestor sRequestorCore;
@@ -151,18 +156,16 @@ int AppTask::Init()
             ;
     }
 
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#endif
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
         while (1)
             ;
     }
@@ -174,19 +177,6 @@ int AppTask::Init()
         while (1)
             ;
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
-#endif
-
-    // Init ZCL Data Model and start server
-    PLAT_LOG("Initialize Server");
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -222,6 +212,18 @@ int AppTask::Init()
 
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+#endif
+
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     ConfigurationMgr().LogDeviceConfig();
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -230,6 +232,15 @@ int AppTask::Init()
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&sDeviceCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }
@@ -327,6 +338,8 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+        // Signal to the PCC cluster, that the pump is running
+        sAppTask.UpdateClusterState();
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
@@ -335,6 +348,8 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+        // Signal to the PCC cluster, that the pump is NOT running
+        sAppTask.UpdateClusterState();
     }
     if (aActor == AppEvent::kEventType_ButtonLeft)
     {
@@ -442,11 +457,56 @@ void AppTask::InitOnOffClusterState()
 
 void AppTask::InitPCCClusterState() {}
 
-void AppTask::UpdateClusterState()
+void AppTask::UpdateClusterState(void)
+{
+    // We must ensure that the Cluster accessors gets called in the right context
+    // which is the Matter mainloop thru ScheduleWork()
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+}
+
+void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
+    BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
+    ChipLogProgress(NotSpecified, "Update Cluster State");
+
+    // Update the PumpStatus
+    PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
+    if (PumpMgr().IsStopped())
+    {
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    else
+    {
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
+
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT,
+                                                                       PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);
+    }
 
     // Write the new values
     bool onOffState = !PumpMgr().IsStopped();

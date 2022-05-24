@@ -41,7 +41,7 @@ tests:
 
     - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -52,13 +52,13 @@ tests:
       command: "MoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 140ms"
@@ -73,7 +73,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -92,7 +92,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -111,7 +111,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -122,13 +122,13 @@ tests:
       command: "MoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 140ms"
@@ -143,7 +143,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -162,7 +162,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -181,7 +181,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -192,13 +192,13 @@ tests:
       command: "MoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 140ms"
@@ -213,7 +213,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -232,7 +232,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -251,7 +251,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -262,13 +262,13 @@ tests:
       command: "MoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 140ms"
@@ -283,7 +283,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -302,7 +302,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -321,7 +321,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8

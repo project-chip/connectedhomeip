@@ -645,7 +645,10 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
 
     VerifyOrExit(sig != nullptr, error = CHIP_ERROR_INTERNAL);
     ECDSA_SIG_get0(sig, &r, &s);
-    VerifyOrExit((r != nullptr) || (s != nullptr) || (BN_num_bytes(r) == kP256_FE_Length) || (BN_num_bytes(s) == kP256_FE_Length),
+    VerifyOrExit((r != nullptr) && (s != nullptr), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<size_t>(BN_num_bytes(r)) && CanCastTo<size_t>(BN_num_bytes(s)), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit((static_cast<size_t>(BN_num_bytes(r)) <= kP256_FE_Length) &&
+                     (static_cast<size_t>(BN_num_bytes(s)) <= kP256_FE_Length),
                  error = CHIP_ERROR_INTERNAL);
 
     // Concatenate r and s to output. Sizes were checked above.

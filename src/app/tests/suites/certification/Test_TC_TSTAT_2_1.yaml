@@ -33,7 +33,7 @@ tests:
     - label:
           "Reads constraints of mandatory attributes from DUT: LocalTemperature"
       command: "readAttribute"
-      attribute: "local temperature"
+      attribute: "LocalTemperature"
       response:
           constraints:
               type: int16
@@ -42,7 +42,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           AbsMinHeatSetpointLimit"
       command: "readAttribute"
-      attribute: "abs min heat setpoint limit"
+      attribute: "AbsMinHeatSetpointLimit"
       response:
           constraints:
               type: int16
@@ -53,7 +53,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           AbsMaxHeatSetpointLimit"
       command: "readAttribute"
-      attribute: "abs max heat setpoint limit"
+      attribute: "AbsMaxHeatSetpointLimit"
       response:
           constraints:
               type: int16
@@ -65,7 +65,7 @@ tests:
           AbsMinCoolSetpointLimit"
       optional: true
       command: "readAttribute"
-      attribute: "abs min cool setpoint limit"
+      attribute: "AbsMinCoolSetpointLimit"
       response:
           constraints:
               type: int16
@@ -77,7 +77,7 @@ tests:
           AbsMaxCoolSetpointLimit"
       optional: true
       command: "readAttribute"
-      attribute: "abs max cool setpoint limit"
+      attribute: "AbsMaxCoolSetpointLimit"
       response:
           constraints:
               type: int16
@@ -111,7 +111,7 @@ tests:
           OccupiedCoolingSetpoint"
       optional: true
       command: "readAttribute"
-      attribute: "occupied cooling setpoint"
+      attribute: "OccupiedCoolingSetpoint"
       response:
           constraints:
               type: int16
@@ -122,7 +122,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           OccupiedHeatingSetpoint"
       command: "readAttribute"
-      attribute: "occupied heating setpoint"
+      attribute: "OccupiedHeatingSetpoint"
       response:
           constraints:
               type: int16
@@ -157,7 +157,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           MinHeatSetpointLimit"
       command: "readAttribute"
-      attribute: "min heat setpoint limit"
+      attribute: "MinHeatSetpointLimit"
       response:
           constraints:
               type: int16
@@ -168,7 +168,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           MaxHeatSetpointLimit"
       command: "readAttribute"
-      attribute: "max heat setpoint limit"
+      attribute: "MaxHeatSetpointLimit"
       response:
           constraints:
               type: int16
@@ -180,7 +180,7 @@ tests:
           MinCoolSetpointLimit"
       optional: true
       command: "readAttribute"
-      attribute: "min cool setpoint limit"
+      attribute: "MinCoolSetpointLimit"
       response:
           constraints:
               type: int16
@@ -192,7 +192,7 @@ tests:
           MaxCoolSetpointLimit"
       optional: true
       command: "readAttribute"
-      attribute: "max cool setpoint limit"
+      attribute: "MaxCoolSetpointLimit"
       response:
           constraints:
               type: int16
@@ -203,7 +203,7 @@ tests:
           "Reads constraints of mandatory attributes from DUT:
           ControlSequenceOfOperation"
       command: "readAttribute"
-      attribute: "control sequence of operation"
+      attribute: "ControlSequenceOfOperation"
       response:
           constraints:
               type: enum8
@@ -212,7 +212,7 @@ tests:
 
     - label: "Reads constraints of mandatory attributes from DUT: SystemMode"
       command: "readAttribute"
-      attribute: "system mode"
+      attribute: "SystemMode"
       response:
           constraints:
               type: enum8
@@ -267,7 +267,7 @@ tests:
           MinSetpointDeadBand"
       optional: true
       command: "readAttribute"
-      attribute: "min setpoint dead band"
+      attribute: "MinSetpointDeadBand"
       response:
           constraints:
               type: int8
@@ -309,7 +309,7 @@ tests:
     - label: "Reads constraints of optional attributes from DUT: StartOfWeek"
       optional: true
       command: "readAttribute"
-      attribute: "start of week"
+      attribute: "StartOfWeek"
       response:
           constraints:
               type: enum8
@@ -321,7 +321,7 @@ tests:
           NumberOfWeeklyTransitions"
       optional: true
       command: "readAttribute"
-      attribute: "number of weekly transitions"
+      attribute: "NumberOfWeeklyTransitions"
       response:
           constraints:
               type: uint8
@@ -331,7 +331,7 @@ tests:
           NumberOfDailyTransitions"
       optional: true
       command: "readAttribute"
-      attribute: "number of daily transitions"
+      attribute: "NumberOfDailyTransitions"
       response:
           constraints:
               type: uint8

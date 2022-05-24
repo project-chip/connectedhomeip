@@ -154,6 +154,12 @@ enum class OnOffFeature : uint32_t
 {
     kLighting = 0x1,
 };
+
+// Bitmap for SceneFeatures
+enum class SceneFeatures : uint32_t
+{
+    kSceneNames = 0x1,
+};
 } // namespace OnOff
 
 namespace OnOffSwitchConfiguration {
