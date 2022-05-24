@@ -18,11 +18,23 @@
 #pragma once
 
 #include <system/SystemClock.h>
+#include <transport/Session.h>
+#include <transport/SessionHandle.h>
 
 namespace chip {
 namespace app {
 
-static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
+static constexpr System::Clock::Timeout kExpectedIMProcessingTime = System::Clock::Seconds16(5);
+
+// Returns the suggested timeout for interaction model
+inline System::Clock::Timeout InteractionModelTimeoutForSession(const SessionHandle & aSession)
+{
+    if (aSession->IsGroupSession())
+    {
+        return System::Clock::kZero;
+    }
+    return aSession->GetAckTimeout() + kExpectedIMProcessingTime;
+}
 
 } // namespace app
 } // namespace chip

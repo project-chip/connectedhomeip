@@ -214,11 +214,11 @@ public:
      *  handle calling Shutdown on itself once it decides it's done with waiting
      *  for a response (i.e. times out or gets a response). Client can specify
      *  the maximum time to wait for response (in milliseconds) via timeout parameter.
-     *  Default timeout value will be used otherwise.
+     *  If the timeout is missing or is set to System::Clock::kZero, a value based on the CRMP timeouts of the session will be used.
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
     /**
      *  Shutdown the WriteClient. This terminates this instance

@@ -372,7 +372,15 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(!(mpExchangeCtx->IsGroupExchangeContext() && mHasDataVersion), CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    mpExchangeCtx->SetResponseTimeout(timeout);
+
+    if (timeout == System::Clock::kZero)
+    {
+        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(session));
+    }
+    else
+    {
+        mpExchangeCtx->SetResponseTimeout(timeout);
+    }
 
     if (mTimedWriteTimeoutMs.HasValue())
     {

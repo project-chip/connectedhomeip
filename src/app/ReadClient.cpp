@@ -274,7 +274,14 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
+    if (aReadPrepareParams.mTimeout == System::Clock::kZero)
+    {
+        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(aReadPrepareParams.mSessionHolder.Get().Value()));
+    }
+    else
+    {
+        mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
+    }
 
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
@@ -919,7 +926,15 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+
+    if (aReadPrepareParams.mTimeout == System::Clock::kZero)
+    {
+        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(aReadPrepareParams.mSessionHolder.Get().Value()));
+    }
+    else
+    {
+        mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
+    }
 
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));

@@ -71,7 +71,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(!mpExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(kImMessageTimeout));
+    mpExchangeCtx->SetResponseTimeout(timeout.ValueOr(InteractionModelTimeoutForSession(session)));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
