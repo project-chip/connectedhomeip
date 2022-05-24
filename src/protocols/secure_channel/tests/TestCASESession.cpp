@@ -53,11 +53,13 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
-#if CHIP_DEVICE_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestCaseMessageCount        = 8;
-#else // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestCaseMessageCount        = 5;
-#endif // CHIP_DEVICE_CONFIG_SLOW_CRYPTO
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 8;
+constexpr uint32_t sTestCaseResumptionMessageCount = 6;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 5;
+constexpr uint32_t sTestCaseResumptionMessageCount = 4;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
@@ -718,9 +720,10 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         // Both peers have a matching session resumption record.
         // This should succeed.
         {
-            .initiatorStorage         = SessionResumptionTestStorage(CHIP_NO_ERROR, responder, &resumptionIdA, &sharedSecretA),
-            .responderStorage         = SessionResumptionTestStorage(CHIP_NO_ERROR, initiator, &resumptionIdA, &sharedSecretA),
-            .expectedSentMessageCount = 6, // we expect this number of sent messages with successful session resumption
+            .initiatorStorage = SessionResumptionTestStorage(CHIP_NO_ERROR, responder, &resumptionIdA, &sharedSecretA),
+            .responderStorage = SessionResumptionTestStorage(CHIP_NO_ERROR, initiator, &resumptionIdA, &sharedSecretA),
+            .expectedSentMessageCount =
+                sTestCaseResumptionMessageCount, // we expect this number of sent messages with successful session resumption
         },
         // Peers have mismatched session resumption records.
         // This should succeed with fall back to CASE.
@@ -739,9 +742,10 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         // Neither peer has a session resumption record.
         // This should succeed - no attempt at session resumption will be made.
         {
-            .initiatorStorage         = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
-            .responderStorage         = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
-            .expectedSentMessageCount = sTestCaseMessageCount, // we expect this number of sent messages if we do not attempt session resumption
+            .initiatorStorage = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
+            .responderStorage = SessionResumptionTestStorage(CHIP_ERROR_KEY_NOT_FOUND),
+            .expectedSentMessageCount =
+                sTestCaseMessageCount, // we expect this number of sent messages if we do not attempt session resumption
         },
     };
 
