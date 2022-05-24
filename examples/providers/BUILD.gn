@@ -15,8 +15,13 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+config("include_providers_dir") {
+  include_dirs = [ "." ]
+}
+
 static_library("device_info_provider") {
   output_name = "libMatterDeviceInfoProviderExample"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
     "DeviceInfoProviderImpl.cpp",
@@ -27,4 +32,6 @@ static_library("device_info_provider") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
   ]
+
+  public_configs = [ ":include_providers_dir" ]
 }
