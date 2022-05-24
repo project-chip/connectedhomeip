@@ -75,4 +75,5 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
             break;
         };
     }
+    PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }

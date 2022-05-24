@@ -139,6 +139,14 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
 
+/**
+ * @brief PostAttributeChange is called when an Attribute is modified
+ *
+ * @param[in] endpoint
+ * @param[in] attributeId
+ */
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
