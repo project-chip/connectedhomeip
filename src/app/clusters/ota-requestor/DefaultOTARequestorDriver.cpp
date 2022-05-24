@@ -45,6 +45,7 @@ namespace {
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
+constexpr uint8_t kMaxInvalidSessionRetries        = 3;  // Max # of query image retries to perform on invalid session error
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
@@ -61,6 +62,7 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     mRequestor          = requestor;
     mImageProcessor     = processor;
     mProviderRetryCount = 0;
+    mInvalidSessionRetryCount = 0;
 
     if (mImageProcessor->IsFirstImageRun())
     {
@@ -127,21 +129,30 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
 
 void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
-    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::HandleIdleStateEnter IdleStateReason %d", reason);
-
     switch (reason)
     {
     case IdleStateReason::kUnknown:
+        mInvalidSessionRetryCount = 0;
         ChipLogProgress(SoftwareUpdate, "Unknown idle state reason so set the periodic timer for a next attempt");
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kIdle:
+        mInvalidSessionRetryCount = 0;
         // There is no current OTA update in progress so start the periodic query timer
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
-        // An invalid session is detected which may be temporary so try to query the same provider again
-        SendQueryImage();
+        if(mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
+        {
+            // An invalid session is detected which may be temporary so try to query the same provider again
+            SendQueryImage();
+            mInvalidSessionRetryCount++;
+        }
+        else
+        {
+            mInvalidSessionRetryCount = 0;
+            StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+        }
         break;
     }
 }
@@ -308,8 +319,6 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
 
 void DefaultOTARequestorDriver::SendQueryImage()
 {
-    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::SendQueryImage");
-
     OTAUpdateStateEnum currentUpdateState;
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);

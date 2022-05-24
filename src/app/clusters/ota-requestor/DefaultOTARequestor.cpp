@@ -648,9 +648,6 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
 
 void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
-    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::HandleIdleStateEnter newState %hhu, reason %hhu", newState, reason);
-    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::HandleIdleStateEnter error %" CHIP_ERROR_FORMAT, error.Format());
-
     bool handleIdleStateEnter = true;
     IdleStateReason idleStateReason = IdleStateReason::kUnknown;
 
