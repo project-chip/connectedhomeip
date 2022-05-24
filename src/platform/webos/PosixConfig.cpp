@@ -287,7 +287,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu16 " (0x%" PRIX16 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %u (0x%X)", key.Namespace, key.Name, val, val);
 
 exit:
     return err;
@@ -407,7 +407,8 @@ CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
         err = storage->Commit();
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %zu)", key.Namespace, key.Name, dataLen);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", key.Namespace, key.Name,
+                        static_cast<unsigned int>(dataLen));
     }
     else
     {
