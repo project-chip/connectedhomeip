@@ -59,10 +59,10 @@
             /* 48 - ChannelMask, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Media Playback (server), big-endian */                                                        \
+            /* Endpoint: 1, Cluster: Media Playback (server), big-endian */                                                        \
                                                                                                                                    \
             /* 55 - StartTime, */                                                                                                  \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* 63 - Duration, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
@@ -71,6 +71,20 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* 79 - SeekRangeStart, */                                                                                             \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* Endpoint: 3, Cluster: Media Playback (server), big-endian */                                                        \
+                                                                                                                                   \
+            /* 87 - StartTime, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
+                                                                                                                                   \
+            /* 95 - Duration, */                                                                                                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 103 - SeekRangeEnd, */                                                                                              \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 111 - SeekRangeStart, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
     }
 
@@ -108,10 +122,10 @@
             /* 48 - ChannelMask, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Media Playback (server), little-endian */                                                     \
+            /* Endpoint: 1, Cluster: Media Playback (server), little-endian */                                                     \
                                                                                                                                    \
             /* 55 - StartTime, */                                                                                                  \
-            0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* 63 - Duration, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
@@ -121,11 +135,25 @@
                                                                                                                                    \
             /* 79 - SeekRangeStart, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* Endpoint: 3, Cluster: Media Playback (server), little-endian */                                                     \
+                                                                                                                                   \
+            /* 87 - StartTime, */                                                                                                  \
+            0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 95 - Duration, */                                                                                                   \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 103 - SeekRangeEnd, */                                                                                              \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 111 - SeekRangeStart, */                                                                                            \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (12)
+#define GENERATED_DEFAULTS_COUNT (16)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -158,7 +186,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 338
+#define GENERATED_ATTRIBUTE_COUNT 347
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -506,6 +534,18 @@
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                          /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Media Playback (server) */                                                                    \
+            { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                                  /* CurrentState */   \
+            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(55) }, /* StartTime */      \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(63) },   /* Duration */       \
+            { 0x00000003, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
+              ZAP_EMPTY_DEFAULT() },                                                                        /* SampledPosition */  \
+            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                                  /* PlaybackSpeed */    \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(71) }, /* SeekRangeEnd */     \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(79) }, /* SeekRangeStart */   \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x003) },                            /* FeatureMap */       \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                  /* ClusterRevision */  \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Media Input (server) */                                                                       \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* InputList */         \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                               /* CurrentInput */      \
@@ -590,15 +630,15 @@
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Media Playback (server) */                                                                    \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                                  /* CurrentState */   \
-            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(55) }, /* StartTime */      \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(63) },   /* Duration */       \
+            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(87) }, /* StartTime */      \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(95) },   /* Duration */       \
             { 0x00000003, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
-              ZAP_EMPTY_DEFAULT() },                                                                        /* SampledPosition */  \
-            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_EMPTY_DEFAULT() },                                    /* PlaybackSpeed */    \
-            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(71) }, /* SeekRangeEnd */     \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(79) }, /* SeekRangeStart */   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0003) },                           /* FeatureMap */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                  /* ClusterRevision */  \
+              ZAP_EMPTY_DEFAULT() },                                                                         /* SampledPosition */ \
+            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_EMPTY_DEFAULT() },                                     /* PlaybackSpeed */   \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(103) }, /* SeekRangeEnd */    \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(111) }, /* SeekRangeStart */  \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0003) },                            /* FeatureMap */      \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                   /* ClusterRevision */ \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Content Launcher (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AcceptHeader */      \
@@ -793,65 +833,8 @@
   /*   GeneratedCommandList (index=65)*/ \
   0x00000001 /* NavigateTargetResponse */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Media Input (server) */\
+  /* Endpoint: 1, Cluster: Media Playback (server) */\
   /*   AcceptedCommandList (index=67) */ \
-  0x00000000 /* SelectInput */, \
-  0x00000001 /* ShowInputStatus */, \
-  0x00000002 /* HideInputStatus */, \
-  0x00000003 /* RenameInput */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Low Power (server) */\
-  /*   AcceptedCommandList (index=72) */ \
-  0x00000000 /* Sleep */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Keypad Input (server) */\
-  /*   AcceptedCommandList (index=74) */ \
-  0x00000000 /* SendKey */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=76)*/ \
-  0x00000001 /* SendKeyResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Content Launcher (server) */\
-  /*   AcceptedCommandList (index=78) */ \
-  0x00000000 /* LaunchContent */, \
-  0x00000001 /* LaunchURL */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=81)*/ \
-  0x00000002 /* LaunchResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Audio Output (server) */\
-  /*   AcceptedCommandList (index=83) */ \
-  0x00000000 /* SelectOutput */, \
-  0x00000001 /* RenameOutput */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Application Launcher (server) */\
-  /*   AcceptedCommandList (index=86) */ \
-  0x00000000 /* LaunchApp */, \
-  0x00000001 /* StopApp */, \
-  0x00000002 /* HideApp */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=90)*/ \
-  0x00000003 /* LauncherResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 2, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=92) */ \
-  0x00000000 /* Off */, \
-  0x00000001 /* On */, \
-  0x00000002 /* Toggle */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 2, Cluster: Level Control (server) */\
-  /*   AcceptedCommandList (index=96) */ \
-  0x00000000 /* MoveToLevel */, \
-  0x00000001 /* Move */, \
-  0x00000002 /* Step */, \
-  0x00000003 /* Stop */, \
-  0x00000004 /* MoveToLevelWithOnOff */, \
-  0x00000005 /* MoveWithOnOff */, \
-  0x00000006 /* StepWithOnOff */, \
-  0x00000007 /* StopWithOnOff */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 3, Cluster: Media Playback (server) */\
-  /*   AcceptedCommandList (index=105) */ \
   0x00000000 /* Play */, \
   0x00000001 /* Pause */, \
   0x00000002 /* StopPlayback */, \
@@ -864,32 +847,106 @@
   0x00000009 /* SkipBackward */, \
   0x0000000B /* Seek */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=117)*/ \
+  /*   GeneratedCommandList (index=79)*/ \
   0x0000000A /* PlaybackResponse */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 3, Cluster: Content Launcher (server) */\
-  /*   AcceptedCommandList (index=119) */ \
+  /* Endpoint: 1, Cluster: Media Input (server) */\
+  /*   AcceptedCommandList (index=81) */ \
+  0x00000000 /* SelectInput */, \
+  0x00000001 /* ShowInputStatus */, \
+  0x00000002 /* HideInputStatus */, \
+  0x00000003 /* RenameInput */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Low Power (server) */\
+  /*   AcceptedCommandList (index=86) */ \
+  0x00000000 /* Sleep */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Keypad Input (server) */\
+  /*   AcceptedCommandList (index=88) */ \
+  0x00000000 /* SendKey */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=90)*/ \
+  0x00000001 /* SendKeyResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Content Launcher (server) */\
+  /*   AcceptedCommandList (index=92) */ \
   0x00000000 /* LaunchContent */, \
   0x00000001 /* LaunchURL */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=122)*/ \
+  /*   GeneratedCommandList (index=95)*/ \
+  0x00000002 /* LaunchResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Audio Output (server) */\
+  /*   AcceptedCommandList (index=97) */ \
+  0x00000000 /* SelectOutput */, \
+  0x00000001 /* RenameOutput */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Application Launcher (server) */\
+  /*   AcceptedCommandList (index=100) */ \
+  0x00000000 /* LaunchApp */, \
+  0x00000001 /* StopApp */, \
+  0x00000002 /* HideApp */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=104)*/ \
+  0x00000003 /* LauncherResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 2, Cluster: On/Off (server) */\
+  /*   AcceptedCommandList (index=106) */ \
+  0x00000000 /* Off */, \
+  0x00000001 /* On */, \
+  0x00000002 /* Toggle */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 2, Cluster: Level Control (server) */\
+  /*   AcceptedCommandList (index=110) */ \
+  0x00000000 /* MoveToLevel */, \
+  0x00000001 /* Move */, \
+  0x00000002 /* Step */, \
+  0x00000003 /* Stop */, \
+  0x00000004 /* MoveToLevelWithOnOff */, \
+  0x00000005 /* MoveWithOnOff */, \
+  0x00000006 /* StepWithOnOff */, \
+  0x00000007 /* StopWithOnOff */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 3, Cluster: Media Playback (server) */\
+  /*   AcceptedCommandList (index=119) */ \
+  0x00000000 /* Play */, \
+  0x00000001 /* Pause */, \
+  0x00000002 /* StopPlayback */, \
+  0x00000003 /* StartOver */, \
+  0x00000004 /* Previous */, \
+  0x00000005 /* Next */, \
+  0x00000006 /* Rewind */, \
+  0x00000007 /* FastForward */, \
+  0x00000008 /* SkipForward */, \
+  0x00000009 /* SkipBackward */, \
+  0x0000000B /* Seek */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=131)*/ \
+  0x0000000A /* PlaybackResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 3, Cluster: Content Launcher (server) */\
+  /*   AcceptedCommandList (index=133) */ \
+  0x00000000 /* LaunchContent */, \
+  0x00000001 /* LaunchURL */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=136)*/ \
   0x00000002 /* LaunchResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 3, Cluster: Account Login (server) */\
-  /*   AcceptedCommandList (index=124) */ \
+  /*   AcceptedCommandList (index=138) */ \
   0x00000000 /* GetSetupPIN */, \
   0x00000002 /* Login */, \
   0x00000003 /* Logout */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=128)*/ \
+  /*   GeneratedCommandList (index=142)*/ \
   0x00000001 /* GetSetupPINResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 4, Cluster: Content Launcher (server) */\
-  /*   AcceptedCommandList (index=130) */ \
+  /*   AcceptedCommandList (index=144) */ \
   0x00000000 /* LaunchContent */, \
   0x00000001 /* LaunchURL */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=133)*/ \
+  /*   GeneratedCommandList (index=147)*/ \
   0x00000002 /* LaunchResponse */, \
   chip::kInvalidCommandId /* end of list */, \
 }
@@ -1246,105 +1303,105 @@
       /* Endpoint: 1, Cluster: Media Playback (server) */ \
       .clusterId = 0x00000506,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(227), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
+      .attributeCount = 9, \
+      .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 67 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 79 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Input (server) */ \
       .clusterId = 0x00000507,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(227), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(236), \
       .attributeCount = 4, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 67 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 81 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Low Power (server) */ \
       .clusterId = 0x00000508,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(231), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(240), \
       .attributeCount = 2, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 72 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 86 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Keypad Input (server) */ \
       .clusterId = 0x00000509,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(233), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(242), \
       .attributeCount = 2, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 74 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 76 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 90 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(235), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(244), \
       .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 78 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 81 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 95 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Audio Output (server) */ \
       .clusterId = 0x0000050B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(239), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(248), \
       .attributeCount = 4, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 97 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Application Launcher (server) */ \
       .clusterId = 0x0000050C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(243), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(252), \
       .attributeCount = 4, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 86 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 90 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 100 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 104 ) ,\
     },\
   { \
       /* Endpoint: 2, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(247), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(256), \
       .attributeCount = 3, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 106 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Level Control (server) */ \
       .clusterId = 0x00000008,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(250), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(259), \
       .attributeCount = 16, \
       .clusterSize = 27, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 96 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 110 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(266), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(275), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1355,7 +1412,7 @@
   { \
       /* Endpoint: 3, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(272), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(281), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1366,29 +1423,29 @@
   { \
       /* Endpoint: 3, Cluster: Media Playback (server) */ \
       .clusterId = 0x00000506,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(278), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(287), \
       .attributeCount = 9, \
       .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 105 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 117 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 119 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 131 ) ,\
     },\
   { \
       /* Endpoint: 3, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(287), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(296), \
       .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 119 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 122 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 133 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 136 ) ,\
     },\
   { \
       /* Endpoint: 3, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(291), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(300), \
       .attributeCount = 10, \
       .clusterSize = 110, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1399,18 +1456,18 @@
   { \
       /* Endpoint: 3, Cluster: Account Login (server) */ \
       .clusterId = 0x0000050E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(301), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(310), \
       .attributeCount = 2, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 124 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 128 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 138 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
     },\
   { \
       /* Endpoint: 4, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(303), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(312), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1421,18 +1478,18 @@
   { \
       /* Endpoint: 4, Cluster: Content Launcher (server) */ \
       .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(309), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(318), \
       .attributeCount = 4, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 130 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 133 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 144 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 147 ) ,\
     },\
   { \
       /* Endpoint: 4, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(313), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(322), \
       .attributeCount = 10, \
       .clusterSize = 110, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1443,7 +1500,7 @@
   { \
       /* Endpoint: 5, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(323), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(332), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1454,7 +1511,7 @@
   { \
       /* Endpoint: 5, Cluster: Application Basic (server) */ \
       .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(329), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(338), \
       .attributeCount = 9, \
       .clusterSize = 110, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1473,7 +1530,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 26, 501 }, { ZAP_CLUSTER_INDEX(26), 12, 105 }, { ZAP_CLUSTER_INDEX(38), 3, 38 },                   \
+        { ZAP_CLUSTER_INDEX(0), 26, 501 }, { ZAP_CLUSTER_INDEX(26), 12, 148 }, { ZAP_CLUSTER_INDEX(38), 3, 38 },                   \
             { ZAP_CLUSTER_INDEX(41), 5, 173 }, { ZAP_CLUSTER_INDEX(46), 3, 124 }, { ZAP_CLUSTER_INDEX(49), 2, 114 },               \
     }
 
@@ -1486,7 +1543,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1055)
+#define ATTRIBUTE_MAX_SIZE (1098)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (6)
