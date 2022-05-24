@@ -2065,7 +2065,7 @@ public:
         }
     }
 
-    void OnDone() override {}
+    void OnDone(chip::app::ReadClient *) override {}
 
     int32_t reportsReceived = 0;
 };
