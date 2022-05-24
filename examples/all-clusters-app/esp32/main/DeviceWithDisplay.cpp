@@ -199,14 +199,20 @@ public:
                 uint8_t mode = n % 5;
                 // Update the system mode here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "System Mode changed to : %d", mode);
-                if (mode == 2) {
+                if (mode == 2)
+                {
                     ESP_LOGI(TAG, "System Mode 2 is not valid");
-                } else {
+                }
+                else
+                {
                     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<uint8_t>(mode));
                     // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
-                    if (mode == 1) {
+                    if (mode == 1)
+                    {
                         app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(0));
-                    } else {
+                    }
+                    else
+                    {
                         app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
                     }
                 }
@@ -215,16 +221,22 @@ public:
             {
                 // Get the system mode
                 uint8_t systemMode = 2;
-                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, static_cast<uint8_t*>(&systemMode));
-                if (systemMode != 1) {
-                     ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", systemMode);
-                } else {
+                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, static_cast<uint8_t *>(&systemMode));
+                if (systemMode != 1)
+                {
+                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", systemMode);
+                }
+                else
+                {
                     uint8_t mode = n % 5;
                     // update the running mode here for hardcoded endpoint 1
                     ESP_LOGI(TAG, "ThermostatRunningMode  Mode changed to : %d", mode);
-                    if (mode == 1 || mode == 2) {
+                    if (mode == 1 || mode == 2)
+                    {
                         ESP_LOGI(TAG, "System Mode %d is not valid", mode);
-                    } else {
+                    }
+                    else
+                    {
                         ESP_LOGI(TAG, "Thermostat Running Mode changed to : %d", mode);
                         app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
                     }
