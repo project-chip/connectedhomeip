@@ -65,7 +65,7 @@ $ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 
 Install OpenOCD (Open On-Chip Debugger):
 ```
-sudo apt-get install openocd
+$ sudo apt-get install openocd
 ```
 
 Flashing firmware image to MW320:
