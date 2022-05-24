@@ -27,7 +27,7 @@ class ReportCommand : public InteractionModelReports, public ModelCommand, publi
 {
 public:
     ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig)
+        InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig, /* supportsMultipleEndpoints = */ true)
     {}
 
     virtual void OnSubscription(){};
@@ -96,7 +96,7 @@ public:
         mError = error;
     }
 
-    void OnDone() override
+    void OnDone(chip::app::ReadClient *) override
     {
         InteractionModelReports::Shutdown();
         SetCommandExitStatus(mError);
@@ -120,19 +120,19 @@ class ReadAttribute : public ReportCommand
 public:
     ReadAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("read-by-id", credsIssuerConfig)
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to read from (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF to "
+                    "indicate a wildcard cluster.");
+        AddAttributeIdArgument();
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
     ReadAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
         ReportCommand("read-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddAttributeIdArgument();
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
@@ -142,8 +142,7 @@ public:
         mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {
         AddArgument("attr-name", attributeName);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
@@ -155,6 +154,21 @@ public:
     }
 
 private:
+    void AddAttributeIdArgument()
+    {
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to read (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+    }
+
+    void AddCommonArguments()
+    {
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+                    "Comma-separated list of data versions for the clusters being read.");
+    }
+
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
     chip::Optional<bool> mFabricFiltered;
@@ -166,25 +180,19 @@ class SubscribeAttribute : public ReportCommand
 public:
     SubscribeAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("subscribe-by-id", credsIssuerConfig)
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to subscribe to (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF "
+                    "to indicate a wildcard cluster.");
+        AddAttributeIdArgument();
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
     SubscribeAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
         ReportCommand("subscribe-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddAttributeIdArgument();
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
@@ -194,11 +202,7 @@ public:
         mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {
         AddArgument("attr-name", attributeName);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddCommonArguments();
         ReportCommand::AddArguments();
     }
 
@@ -228,6 +232,27 @@ public:
     }
 
 private:
+    void AddAttributeIdArgument()
+    {
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to subscribe to (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+    }
+
+    void AddCommonArguments()
+    {
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
+                    "Server should not send a new report if less than this number of seconds has elapsed since the last report.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
+                    "Server must send a report if this number of seconds has elapsed since the last report.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered subscription. Defaults to true.");
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+                    "Comma-separated list of data versions for the clusters being subscribed to.");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "Boolean indicating whether to keep existing subscriptions when creating the new one. Defaults to false.");
+    }
+
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
 

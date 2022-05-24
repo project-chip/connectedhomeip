@@ -126,7 +126,7 @@ class TestReadCallback : public app::ClusterStateCache::Callback
 {
 public:
     TestReadCallback() : mClusterCacheAdapter(*this) {}
-    void OnDone() {}
+    void OnDone(app::ReadClient *) {}
 
     app::ClusterStateCache mClusterCacheAdapter;
 };

@@ -20,11 +20,8 @@
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
-#include <lib/support/ReferenceCountedHandle.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/TimeSource.h>
-#include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 #include <transport/Session.h>
 #include <transport/raw/PeerAddress.h>
@@ -32,18 +29,12 @@
 namespace chip {
 namespace Transport {
 
-class UnauthenticatedSessionDeleter
-{
-public:
-    // This is a no-op because life-cycle of UnauthenticatedSessionTable is rotated by LRU
-    static void Release(UnauthenticatedSession * entry) {}
-};
-
 /**
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  */
-class UnauthenticatedSession : public Session, public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
+class UnauthenticatedSession : public Session,
+                               public ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>
 {
 public:
     enum class SessionRole
@@ -58,7 +49,7 @@ public:
         mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
         mMRPConfig(config)
     {}
-    ~UnauthenticatedSession() override { NotifySessionReleased(); }
+    ~UnauthenticatedSession() override { VerifyOrDie(GetReferenceCount() == 0); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -79,8 +70,10 @@ public:
     const char * GetSessionTypeString() const override { return "unauthenticated"; };
 #endif
 
-    void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
-    void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
+    void Retain() override { ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     ScopedNodeId GetPeer() const override { return ScopedNodeId(GetPeerNodeId(), kUndefinedFabricIndex); }
     ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(kUndefinedNodeId, kUndefinedFabricIndex); }

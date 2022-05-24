@@ -792,14 +792,14 @@ void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
 
     while (pCurListItem != apReadClient)
     {
+        //
+        // Item must exist in this tracker list. If not, there's a bug somewhere.
+        //
+        VerifyOrDie(pCurListItem != nullptr);
+
         pPrevListItem = pCurListItem;
         pCurListItem  = pCurListItem->GetNextClient();
     }
-
-    //
-    // Item must exist in this tracker list. If not, there's a bug somewhere.
-    //
-    VerifyOrDie(pCurListItem != nullptr);
 
     if (pPrevListItem)
     {
@@ -992,26 +992,6 @@ CHIP_ERROR InteractionModelEngine::PushFront(ObjectList<T> *& aObjectList, T & a
     object->mpNext = aObjectList;
     aObjectList    = object;
     return CHIP_NO_ERROR;
-}
-
-bool InteractionModelEngine::IsOverlappedAttributePath(AttributePathParams & aAttributePath)
-{
-    return (mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
-        if (handler->IsType(ReadHandler::InteractionType::Subscribe) &&
-            (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
-        {
-            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
-            {
-                if (object->mValue.IsAttributePathSupersetOf(aAttributePath) ||
-                    aAttributePath.IsAttributePathSupersetOf(object->mValue))
-                {
-                    return Loop::Break;
-                }
-            }
-        }
-
-        return Loop::Continue;
-    }) == Loop::Break);
 }
 
 void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,

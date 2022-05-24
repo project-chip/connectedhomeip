@@ -1,1 +1,1 @@
-0.5.75 Version bump reason: Update curl version from 7.68.0-1ubuntu2.10 to 7.68.0-1ubuntu2.11
+0.5.76 Version bump reason: [Ameba] Save wifi information in persistent storage for autoconnect

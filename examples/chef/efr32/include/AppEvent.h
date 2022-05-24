@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +19,37 @@
 
 #pragma once
 
-#include <jni.h>
-#include <lib/core/CHIPError.h>
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
 
-struct MatterCallbackHandler
+struct AppEvent
 {
-    jobject object   = nullptr;
-    jclass clazz     = nullptr;
-    jmethodID method = nullptr;
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Light,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LightEvent;
+    };
+
+    EventHandler Handler;
 };
-
-extern struct MatterCallbackHandler gCommissioningCompleteHandler;
-
-CHIP_ERROR SetUpMatterCallbackHandler(JNIEnv * env, jobject inHandler, MatterCallbackHandler & callback);
-
-CHIP_ERROR CommissioningCompleteHandler();

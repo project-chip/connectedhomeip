@@ -263,7 +263,7 @@ public:
         mReadError = true;
     }
 
-    void OnDone() override {}
+    void OnDone(app::ReadClient *) override {}
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
@@ -401,6 +401,42 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
     int testId = 0;
+
+    // Read of E2C3A1(dedup), E*C3A1(E1C3A1 not exit, E2C3A1 exist), E2C3A* (5 supported attributes)
+    // Expect no versions would be cached.
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = kInvalidEndpointId;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[2].mAttributeId = kInvalidAttributeId;
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
     // Read of E2C3A1, E2C3A2 and E3C2A2.
     // Expect no versions would be cached.
     {
@@ -2016,7 +2052,7 @@ public:
         }
     }
 
-    void OnDone() override { mOnDone++; }
+    void OnDone(app::ReadClient *) override { mOnDone++; }
 
     void OnReportEnd() override { mOnReportEnd++; }
 

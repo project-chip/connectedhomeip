@@ -327,7 +327,7 @@ public:
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
-    void OnDone() override;
+    void OnDone(chip::app::ReadClient * aReadClient) override;
     void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
 
     /////////// WriteClient Callback Interface /////////

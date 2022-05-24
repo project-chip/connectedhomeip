@@ -18,20 +18,30 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/GroupId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
 
 namespace chip {
 namespace Transport {
 
-class IncomingGroupSession : public Session
+class IncomingGroupSession : public Session, public ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>
 {
 public:
     IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId peerNodeId) : mGroupId(group), mPeerNodeId(peerNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession() override { NotifySessionReleased(); }
+    ~IncomingGroupSession() override
+    {
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
+    }
+
+    void Retain() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
@@ -74,11 +84,20 @@ private:
     const NodeId mPeerNodeId;
 };
 
-class OutgoingGroupSession : public Session
+class OutgoingGroupSession : public Session, public ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>
 {
 public:
     OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
-    ~OutgoingGroupSession() override { NotifySessionReleased(); }
+    ~OutgoingGroupSession() override
+    {
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
+    }
+
+    void Retain() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
 #if CHIP_PROGRESS_LOGGING

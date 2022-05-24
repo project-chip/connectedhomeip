@@ -416,11 +416,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
 
-@property (strong, nonatomic) NSString * _Nonnull sceneName;
+@property (strong, nonatomic) NSString * _Nullable sceneName;
 
-@property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
+@property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -585,7 +585,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -629,13 +629,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 
-@property (strong, nonatomic) NSNumber * _Nonnull capacity;
+@property (strong, nonatomic) NSNumber * _Nullable capacity;
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneCount;
-
-@property (strong, nonatomic) NSArray * _Nonnull sceneList;
+@property (strong, nonatomic) NSArray * _Nullable sceneList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -739,11 +737,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+@property (strong, nonatomic) NSNumber * _Nullable transitionTime;
 
-@property (strong, nonatomic) NSString * _Nonnull sceneName;
+@property (strong, nonatomic) NSString * _Nullable sceneName;
 
-@property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
+@property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4819,7 +4817,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull payload;
+@property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4846,7 +4844,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull modeForSequence;
 
-@property (strong, nonatomic) NSArray * _Nonnull payload;
+@property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5442,9 +5440,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
@@ -5475,9 +5473,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMinimumMireds;
 
-@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximum;
+@property (strong, nonatomic) NSNumber * _Nonnull colorTemperatureMaximumMireds;
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 

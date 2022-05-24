@@ -26,24 +26,25 @@ using namespace ::chip;
 CHIP_ERROR ModelCommand::RunCommand()
 {
 
-    if (IsGroupId(mNodeId))
+    if (IsGroupId(mDestinationId))
     {
         FabricIndex fabricIndex;
         ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
-        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mNodeId));
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
-        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
 
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mNodeId, &commissioneeDeviceProxy))
+    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
     {
         return SendCommand(commissioneeDeviceProxy, mEndPointId);
     }
 
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
+                                                    &mOnDeviceConnectionFailureCallback);
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
