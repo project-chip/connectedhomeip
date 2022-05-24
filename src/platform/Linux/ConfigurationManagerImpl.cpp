@@ -133,6 +133,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     // TODO: ideally the buffer size should have been passed as a span, however
     //       for now use the size that is validated in GenericConfigurationManagerImpl.ipp
     constexpr size_t kExpectedBufMinSize = ConfigurationManager::kPrimaryMACAddressLength;
+    memset(buf, 0, kExpectedBufMinSize);
 
     VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
     for (auto addr = addresses; addr != nullptr; addr = addr->ifa_next)
