@@ -111,6 +111,8 @@ protected:
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
     // Track retry count for the current provider
     uint8_t mProviderRetryCount = 0;
+    // Track query image retry count on invalid session error
+    uint8_t mInvalidSessionRetryCount = 0;
 };
 
 } // namespace DeviceLayer
