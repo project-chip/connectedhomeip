@@ -34,7 +34,6 @@ public:
      *
      * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided MutableByteSpan is not big enough.
      */
-    // TODO should I just use MutableByteSpan instead?
     virtual CHIP_ERROR GetEnableKey(MutableByteSpan enableKey) = 0;
 
     /**
