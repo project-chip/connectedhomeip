@@ -96,7 +96,9 @@ def main():
         print("Error: Insufficient space for the upgrade XS.")
         return -1
 
-    return gen_image(option, ds_header, ds_data, xs_header, cx_data)
+    gen_image(option, ds_header, ds_data, xs_header, cx_data)
+
+    return 0
 
 
 def compress_data(option, data, file_suffix):
@@ -141,15 +143,13 @@ def gen_image(option, ds_header, ds_data, xs_header, cx_data):
             break
 
     if header_size % 4 == 0:
-        return 0
+        return
 
     # Insert zeroes to align sections to word
     inserted_zero_count = 4 - header_size % 4
     write_binary(option, ds_header, ds_data, xs_header,
                  cx_data, inserted_zero_count)
     run_ota_image_tool(option, configs)
-
-    return 0
 
 
 def parse_config(option):
