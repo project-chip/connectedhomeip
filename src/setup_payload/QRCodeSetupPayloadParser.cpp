@@ -365,7 +365,8 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     outPayload.setUpPINCode = static_cast<uint32_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kPaddingFieldLengthInBits));
-    if (dest != 0) {
+    if (dest != 0)
+    {
         ChipLogError(SetupPayload, "Payload padding bits are not all 0: 0x%x", static_cast<unsigned>(dest));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
