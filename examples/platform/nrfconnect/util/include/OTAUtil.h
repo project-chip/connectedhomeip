@@ -24,6 +24,14 @@ class OTAImageProcessorImpl;
 } // namespace chip
 
 /**
+ * Get FlashHandler static instance.
+ *
+ * Returned object can be used to control the QSPI external flash,
+ * which can be introduced into sleep mode and woken up on demand.
+ */
+chip::DeviceLayer::FlashHandler & GetFlashHandler();
+
+/**
  * Select recommended OTA image processor implementation.
  *
  * If the application uses QSPI external flash and enables API for controlling
