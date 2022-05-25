@@ -399,9 +399,9 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
             emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
         }
 
-        // appclusters, 5.2.4.36.1: We need to add next available user after userIndex if any.
+        // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
         uint16_t nextAvailableUserIndex = 0;
-        if (findUnoccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+        if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
         {
             SuccessOrExit(err =
                               writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), nextAvailableUserIndex));
@@ -702,7 +702,7 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
         }
     }
 
-    Commands::GetCredentialStatusResponse::Type response { .credentialExists = credentialExists };
+    Commands::GetCredentialStatusResponse::Type response{ .credentialExists = credentialExists };
     if (credentialExists)
     {
         if (0 != userIndexWithCredential)
@@ -719,8 +719,8 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
         }
     }
     uint16_t nextCredentialIndex = 0;
-    if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
-                                     nextCredentialIndex))
+    if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
+                                   nextCredentialIndex))
     {
         response.nextCredentialIndex = Nullable<uint16_t>(nextCredentialIndex);
     }
@@ -1404,6 +1404,32 @@ bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCr
     return status;
 }
 
+bool DoorLockServer::findOccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex)
+{
+    uint16_t maxNumberOfUsers;
+    VerifyOrReturnError(GetAttribute(endpointId, Attributes::NumberOfTotalUsersSupported::Id,
+                                     Attributes::NumberOfTotalUsersSupported::Get, maxNumberOfUsers),
+                        false);
+
+    userIndex = 0;
+    for (uint16_t i = startIndex; i <= maxNumberOfUsers; ++i)
+    {
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
+        {
+            ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [userIndex=%d]", i);
+            return false;
+        }
+
+        if (DlUserStatus::kAvailable != user.userStatus)
+        {
+            userIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex)
 {
     return findUnoccupiedUserSlot(endpointId, 1, userIndex);
@@ -1432,6 +1458,42 @@ bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_
             return true;
         }
     }
+    return false;
+}
+
+bool DoorLockServer::findOccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
+                                                uint16_t & credentialIndex)
+{
+    uint16_t maxNumberOfCredentials = 0;
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxNumberOfCredentials))
+    {
+        return false;
+    }
+
+    // Programming PIN index starts with 0, and it is assumed that it is unique. Therefor different bounds checking for that
+    // credential type
+    if (DlCredentialType::kProgrammingPIN == credentialType)
+    {
+        maxNumberOfCredentials--;
+    }
+
+    for (uint16_t i = startIndex; i <= maxNumberOfCredentials; ++i)
+    {
+        EmberAfPluginDoorLockCredentialInfo info;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, i, credentialType, info))
+        {
+            ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
+                         endpointId, to_underlying(credentialType), i);
+            return false;
+        }
+
+        if (DlCredentialStatus::kAvailable != info.status)
+        {
+            credentialIndex = i;
+            return true;
+        }
+    }
+
     return false;
 }
 

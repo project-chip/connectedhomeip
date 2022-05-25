@@ -191,9 +191,13 @@ private:
     bool getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize);
     bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t & maxNumberOfCredentials);
 
+    bool findOccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
+
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
 
+    bool findOccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
+                                    uint16_t & credentialIndex);
     bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
                                       uint16_t & credentialIndex);
 
@@ -438,12 +442,12 @@ enum class DlAssetSource : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;        /**< Indicates if credential slot is occupied or not. */
-    DlCredentialType credentialType;  /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;    /**< Credential data bytes. */
+    DlCredentialStatus status;       /**< Indicates if credential slot is occupied or not. */
+    DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;   /**< Credential data bytes. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;      /**< ID of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
 
     DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
@@ -462,10 +466,10 @@ struct EmberAfPluginDoorLockUserInfo
     DlCredentialRule credentialRule;            /**< Number of supported credentials. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
 
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
 /**
