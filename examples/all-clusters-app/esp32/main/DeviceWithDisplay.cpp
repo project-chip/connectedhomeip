@@ -136,29 +136,33 @@ public:
         return i == 0 ? "+" : "-";
     }
 
-    bool isValidThermostatSystemMode(uint8_t systemMode) {
-        switch(systemMode) {
-            case ThermostatSystemMode::kOff:
-            case ThermostatSystemMode::kAuto:
-            case ThermostatSystemMode::kCool:
-            case ThermostatSystemMode::kHeat:
-            case ThermostatSystemMode::kEmergencyHeating:
-            case ThermostatSystemMode::kPrecooling:
-            case ThermostatSystemMode::kFanOnly:
-                return true;
-            default:
-                return false;
+    bool isValidThermostatSystemMode(uint8_t systemMode)
+    {
+        switch (systemMode)
+        {
+        case ThermostatSystemMode::kOff:
+        case ThermostatSystemMode::kAuto:
+        case ThermostatSystemMode::kCool:
+        case ThermostatSystemMode::kHeat:
+        case ThermostatSystemMode::kEmergencyHeating:
+        case ThermostatSystemMode::kPrecooling:
+        case ThermostatSystemMode::kFanOnly:
+            return true;
+        default:
+            return false;
         }
     }
 
-    bool isValidThermostatRunningMode(uint8_t runningMode) {
-        switch(runningMode) {
-            case ThermostatRunningMode::kOff:
-            case ThermostatRunningMode::kCool:
-            case ThermostatRunningMode::kHeat:
-                return true;
-            default:
-                return false;
+    bool isValidThermostatRunningMode(uint8_t runningMode)
+    {
+        switch (runningMode)
+        {
+        case ThermostatRunningMode::kOff:
+        case ThermostatRunningMode::kCool:
+        case ThermostatRunningMode::kHeat:
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -227,21 +231,25 @@ public:
                 // System modes - Off, Auto, Cool and Heat are currently supported.
                 uint8_t mode = n % 5;
                 // Update the system mode here for hardcoded endpoint 1
-               if (isValidThermostatSystemMode(mode))
-               {
+                if (isValidThermostatSystemMode(mode))
+                {
                     ESP_LOGI(TAG, "System Mode changed to : %d", mode);
                     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<uint8_t>(mode));
                     // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
                     if (mode == ThermostatSystemMode::kAuto)
                     {
-                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(ThermostatRunningMode::kOff));
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
+                            1, static_cast<uint8_t>(ThermostatRunningMode::kOff));
                     }
                     else
                     {
-                        if (isValidThermostatRunningMode(mode)) {
+                        if (isValidThermostatRunningMode(mode))
+                        {
                             ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
                             app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
-                        } else {
+                        }
+                        else
+                        {
                             ESP_LOGI(TAG, "Running Mode %d is not valid", mode);
                         }
                     }
