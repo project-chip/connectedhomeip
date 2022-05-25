@@ -145,11 +145,11 @@ CHIP_ERROR TraceDecoder::Log(Json::Value & json)
         return CHIP_NO_ERROR;
     }
 
+    bool isResponse = json.isMember(kSourceKey) ? true : false;
     ReturnErrorOnFailure(LogAndConsumeProtocol(json));
-
     ReturnErrorOnFailure(MaybeLogAndConsumeHeaderFlags(json));
     ReturnErrorOnFailure(MaybeLogAndConsumeEncryptedPayload(json));
-    ReturnErrorOnFailure(MaybeLogAndConsumePayload(json));
+    ReturnErrorOnFailure(MaybeLogAndConsumePayload(json, isResponse));
     ReturnErrorOnFailure(MaybeLogAndConsumeOthers(json));
 
     return CHIP_NO_ERROR;
@@ -273,15 +273,16 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TraceDecoder::MaybeLogAndConsumePayload(Json::Value & json)
+CHIP_ERROR TraceDecoder::MaybeLogAndConsumePayload(Json::Value & json, bool isResponse)
 {
     auto size = static_cast<uint16_t>(json[kPayloadSizeKey].asLargestUInt());
     if (size)
     {
+        bool shouldDecode = !isResponse || mOptions.mEnableProtocolInteractionModelResponse;
         auto payload      = json[kPayloadDataKey].asString();
         auto protocolId   = json[kProtocolIdKey].asLargestUInt();
         auto protocolCode = json[kProtocolCodeKey].asLargestUInt();
-        ReturnErrorOnFailure(LogAsProtocolMessage(protocolId, protocolCode, payload.c_str(), payload.size()));
+        ReturnErrorOnFailure(LogAsProtocolMessage(protocolId, protocolCode, payload.c_str(), payload.size(), shouldDecode));
         ChipLogDetail(DataManagement, "");
     }
 

@@ -68,7 +68,7 @@ public:
                     "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
-        AddArgument("trace_log", 0, 1, &mTraceLog);
+        AddArgument("trace_log", 0, 2, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
     }
@@ -161,6 +161,6 @@ private:
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::Optional<char *> mTraceFile;
-    chip::Optional<bool> mTraceLog;
+    chip::Optional<uint8_t> mTraceLog;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 };
