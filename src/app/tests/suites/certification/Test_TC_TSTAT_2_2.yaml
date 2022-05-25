@@ -62,35 +62,37 @@ tests:
       response:
           value: 2000
 
-    #issue 18544
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 30
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 4000
       response:
           error: CONSTRAINT_ERROR
 
+    # Disabled: This test makes no sense: It's setting OccupiedCoolingSetpoint
+    # to below OccupiedHeatingSetpoint.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
           attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -142,27 +144,25 @@ tests:
       response:
           value: 2100
 
-    #issue 18544
     - label:
           "Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
-          value: 1002
+          value: 600
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 4010
       response:
@@ -178,9 +178,13 @@ tests:
       arguments:
           value: 700
 
+    # Disabled: This test makes no sense: It's setting OccupiedHeatingSetpoint
+    # to above OccupiedCoolingSetpoint.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
           attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -222,27 +226,25 @@ tests:
       response:
           value: 2500
 
-    #issue 18544
     - label:
           "Writes UnoccupiedCoolingSetpoint to value below the
           MinHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 1002
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes UnoccupiedCoolingSetpoint to value above the
           MaxHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 4010
       response:
@@ -302,27 +304,25 @@ tests:
       response:
           value: 2500
 
-    #issue 18544
     - label:
           "Writes UnoccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
       arguments:
           value: 500
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes UnoccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
       arguments:
           value: 4010
       response:
@@ -362,9 +362,14 @@ tests:
               minValue: 700
               maxValue: 3000
 
+    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
+    # to above MinCoolSetpointLimit when AUTO is supported, which is not
+    # allowed.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes a value back that is different but valid for
           MinHeatSetpointLimit attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -372,9 +377,12 @@ tests:
       arguments:
           value: 2000
 
+    # Disabled: Because the previous set is disabled.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Reads it back again to confirm the successful write of
           MinHeatSetpointLimit attribute"
+      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -382,27 +390,25 @@ tests:
       response:
           value: 2000
 
-    #issue 18544
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINHEATSETPOINTLIMIT
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 650
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINHEATSETPOINTLIMIT
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 4050
       response:
@@ -418,9 +424,13 @@ tests:
       arguments:
           value: 700
 
+    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
+    # to higher than what we have various cooling limits set to.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
           attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
@@ -428,9 +438,11 @@ tests:
       arguments:
           value: 3000
 
+    # Disabled: Because the preceding write is disabled.
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
+      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -462,27 +474,25 @@ tests:
       response:
           value: 2000
 
-    #issue 18544
     - label:
           "Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MAXHEATSETPOINTLIMIT
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 500
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MAXHEATSETPOINTLIMIT
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 4000
       response:
@@ -542,26 +552,24 @@ tests:
       response:
           value: 2000
 
-    #issue 18544
     - label:
           "Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINCOOLSETPOINTLIMIT
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1000
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINCOOLSETPOINTLIMIT
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 4000
       response:
@@ -601,9 +609,13 @@ tests:
               minValue: 1600
               maxValue: 3200
 
+    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit to
+    # below what we just set MinCoolSetpointLimit to.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes a value back that is different but valid for
           MaxCoolSetpointLimit attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -611,9 +623,12 @@ tests:
       arguments:
           value: 2000
 
+    # Disabled: Because the previous set is disabled.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Reads it back again to confirm the successful write of
           MaxCoolSetpointLimit attribute"
+      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -621,34 +636,36 @@ tests:
       response:
           value: 2000
 
-    #issue 18544
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MAXCOOLSETPOINTLIMIT
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1000
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MAXCOOLSETPOINTLIMIT
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 4000
       response:
           error: CONSTRAINT_ERROR
 
+    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit
+    # to below various heating setpoints.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -732,23 +749,21 @@ tests:
       response:
           value: 5
 
-    #issue 18544
     - label: "Writes the value below MinSetpointDeadBand"
       optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINSETPOINTDEADBAND
+      PICS: A_MINSETPOINTDEADBAND
       arguments:
           value: -1
       response:
           error: CONSTRAINT_ERROR
 
-    #issue 18544
     - label: "Writes the value above MinSetpointDeadBand "
       optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: PICS_SKIP_SAMPLE_APP && A_MINSETPOINTDEADBAND
+      PICS: A_MINSETPOINTDEADBAND
       arguments:
           value: 30
       response:
