@@ -1,5 +1,5 @@
 {
-  "featureLevel": 70,
+  "featureLevel": 67,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -902,7 +902,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "10",
