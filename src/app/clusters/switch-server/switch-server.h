@@ -63,7 +63,7 @@ public:
     /**
      * @brief
      *   Called when the momentary switch has been released (after debouncing)
-     *   and after having been pressed for a long time.
+     *   after having been pressed for a long time.
      */
     void OnLongReleased(EndpointId endpoint, uint8_t previousPosition);
 
