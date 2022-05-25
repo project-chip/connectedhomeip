@@ -83,7 +83,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = new NetworkInterface();
+    NetworkInterface * ifp = Platform::New<NetworkInterface>();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
@@ -109,7 +109,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     {
         NetworkInterface * del = netifp;
         netifp                 = netifp->Next;
-        delete del;
+        Platform::Delete(del);
     }
 }
 
