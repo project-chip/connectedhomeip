@@ -34,11 +34,6 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
@@ -48,7 +43,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
+          value: [0, 1, 65528, 65529, 65531, 65533]
           constraints:
               type: list
 

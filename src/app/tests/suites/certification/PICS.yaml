@@ -180,6 +180,17 @@ PICS:
           "Does the device implement receiving the SetpointRaiseLower command?"
       id: CR_SetpointRaiseLower
 
+    - label:
+          "Does the device implement the UnoccupiedCoolingSetpoint attribute?"
+      id: A_UNOCCUPIEDCOOLINGSETPOINT
+
+    - label:
+          "Does the device implement the UnoccupiedHeatingSetpoint attribute?"
+      id: A_UNOCCUPIEDHEATINGSETPOINT
+
+    - label: "Does the device implement the MinSetpointDeadBand attribute?"
+      id: A_MINSETPOINTDEADBAND
+
       # Occupency sensing cluster
     - label: "Does the device implement the Occupancy attribute?"
       id: A_OCCUPANCY
