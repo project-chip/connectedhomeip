@@ -232,6 +232,11 @@ public:
     size_t GetNumActiveReadClients();
 
     /**
+     * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
+     */
+    size_t GetNumDirtySubscriptions() const;
+
+    /**
      * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
      * transaction is in the middle of processing the chunked value of the given path.)
      */

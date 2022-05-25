@@ -372,25 +372,13 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         }
     }
 
-    size_t handlerPoolCapacity = mReadHandlers.Capacity();
-
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    size_t handlerPoolCapacity = mReadHandlers.Capacity();
     if (mReadHandlerCapacityOverride != -1)
     {
         handlerPoolCapacity = (size_t) mReadHandlerCapacityOverride;
     }
-#endif
 
-    // Reserve the last ReadHandler for ReadInteraction
-    if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
-        !HasActiveRead())
-    {
-        ChipLogDetail(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
-        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
-        return CHIP_NO_ERROR;
-    }
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
     if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
     {
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
@@ -668,9 +656,27 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     const size_t readHandlerCap =
         allowUnlimited ? SIZE_MAX : static_cast<size_t>(readHandlerPoolCapacity - kReservedHandlersForReads);
 
-    size_t usedAttributePaths = mAttributePathPool.Allocated();
-    size_t usedEventPaths     = mEventPathPool.Allocated();
-    size_t usedReadHandlers   = mReadHandlers.Allocated();
+    size_t usedAttributePaths = 0;
+    size_t usedEventPaths     = 0;
+    size_t usedReadHandlers   = 0;
+
+    auto countResourceUsage = [&]() {
+        usedAttributePaths = 0;
+        usedEventPaths     = 0;
+        usedReadHandlers   = 0;
+        mReadHandlers.ForEachActiveObject([&](auto * handler) {
+            if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+            {
+                return Loop::Continue;
+            }
+            usedAttributePaths += handler->GetAttributePathCount();
+            usedEventPaths += handler->GetEventPathCount();
+            usedReadHandlers++;
+            return Loop::Continue;
+        });
+    };
+
+    countResourceUsage();
 
     if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
         usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
@@ -688,10 +694,8 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     }
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret           = TrimFabric(fabricIndex, forceEvict);
-        usedAttributePaths = mAttributePathPool.Allocated();
-        usedEventPaths     = mEventPathPool.Allocated();
-        usedReadHandlers   = mReadHandlers.Allocated();
+        bool ret = TrimFabric(fabricIndex, forceEvict);
+        countResourceUsage();
         return ret;
     };
 
@@ -1179,6 +1183,19 @@ uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
     size_t perFabricSubscriptionCapacity = static_cast<size_t>(readHandlerPoolCapacity - kReservedPathsForReads) / fabricCount;
 
     return static_cast<uint16_t>(perFabricSubscriptionCapacity);
+}
+
+size_t InteractionModelEngine::GetNumDirtySubscriptions() const
+{
+    size_t numDirtySubscriptions = 0;
+    mReadHandlers.ForEachActiveObject([&](const auto readHandler) {
+        if (readHandler->IsType(ReadHandler::InteractionType::Subscribe) && readHandler->IsDirty())
+        {
+            numDirtySubscriptions++;
+        }
+        return Loop::Continue;
+    });
+    return numDirtySubscriptions;
 }
 
 } // namespace app
