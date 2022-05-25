@@ -662,7 +662,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
-    VerifyOrExit(err == CHIP_NO_ERROR && NOCValue && NOCValue.sizse() <= 400,
+    VerifyOrExit(err == CHIP_NO_ERROR && NOCValue && NOCValue.size() <= 400,
                  nonDefaultStatus = InteractionModel::Status::InvalidCommand);
 
     err = gFabricBeingCommissioned.SetICACert(ICACValue);
@@ -788,7 +788,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     err = fabric->SetNOCCert(NOCValue);
-    VerifyOrExit(err == CHIP_NO_ERROR && NOCValue && NOCValue.sizse() <= 400,
+    VerifyOrExit(err == CHIP_NO_ERROR && NOCValue && NOCValue.size() <= 400,
                  nonDefaultStatus = InteractionModel::Status::InvalidCommand);
 
     err = fabric->SetICACert(ICACValue);
