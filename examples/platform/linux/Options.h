@@ -53,7 +53,7 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
-    bool traceStreamToLogEnabled        = false;
+    uint8_t traceStreamToLog            = 0;
     chip::Optional<std::string> traceStreamFilename;
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
 
