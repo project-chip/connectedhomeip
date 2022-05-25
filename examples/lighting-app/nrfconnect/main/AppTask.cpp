@@ -176,6 +176,7 @@ CHIP_ERROR AppTask::Init()
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
