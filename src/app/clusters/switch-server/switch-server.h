@@ -58,7 +58,7 @@ public:
      * @brief
      *   Called when the momentary switch has been released.
      */
-    void OnShortReleased(EndpointId endpoint, uint8_t previousPosition);
+    void OnShortRelease(EndpointId endpoint, uint8_t previousPosition);
 
     /**
      * @brief
