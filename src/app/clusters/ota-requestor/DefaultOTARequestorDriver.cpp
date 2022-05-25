@@ -148,7 +148,9 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
         {
             // An invalid session is detected which may be temporary (such as provider being restarted)
-            // so try to query the same provider again.
+            // so try to query the same provider again. Since the session has already been disconnected prior to
+            // getting here, this new query should trigger an attempt to re-establish CASE. If that subsequently fails,
+            // we conclusively know the provider is not available, and will fall into the else clause below on that attempt.
             SendQueryImage();
             mInvalidSessionRetryCount++;
         }
