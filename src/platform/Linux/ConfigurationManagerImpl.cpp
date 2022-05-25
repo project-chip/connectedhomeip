@@ -141,14 +141,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
         if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)
         {
             struct sockaddr_ll * mac = (struct sockaddr_ll *) addr->ifa_addr;
-
-            size_t mac_len = mac->sll_halen;
-            if (mac_len > kExpectedBufMinSize)
-            {
-                mac_len = kExpectedBufMinSize;
-            }
-
-            memcpy(buf, mac->sll_addr, mac_len);
+            memcpy(buf, mac->sll_addr, std::min(mac->sll_halen, kExpectedBufMinSize));
             found = true;
             break;
         }
