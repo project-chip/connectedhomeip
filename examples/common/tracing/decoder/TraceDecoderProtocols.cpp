@@ -102,7 +102,8 @@ const char * ToProtocolMessageTypeName(uint16_t protocolId, uint8_t protocolCode
     }
 }
 
-CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const char * payload, size_t len)
+CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const char * payload, size_t len,
+                                bool interactionModelResponse)
 {
     constexpr uint16_t kMaxPayloadLen = 2048;
     uint8_t data[kMaxPayloadLen]      = {};
@@ -118,7 +119,7 @@ CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const
     }
     else if (protocol == Protocols::InteractionModel::Id)
     {
-        err = im::LogAsProtocolMessage(protocolCode, data, dataLen);
+        err = im::LogAsProtocolMessage(protocolCode, data, dataLen, interactionModelResponse);
     }
     else if (protocol == Protocols::BDX::Id)
     {

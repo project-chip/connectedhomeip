@@ -32,6 +32,9 @@ struct TraceDecoderOptions
     bool mEnableProtocolUserDirectedCommissioning = true;
     bool mEnableProtocolEcho                      = true;
 
+    // Disable the decoding of interaction model responses
+    bool mEnableProtocolInteractionModelResponse = true;
+
     // Message
     bool mEnableMessageInitiator = true;
     bool mEnableMessageResponder = true;

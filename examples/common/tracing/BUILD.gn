@@ -28,6 +28,28 @@ source_set("trace_handlers") {
   public_configs = [ ":default_config" ]
 }
 
+source_set("trace_handlers_decoder") {
+  sources = [
+    "TraceDecoder.cpp",
+    "TraceDecoderLog.cpp",
+    "TraceHandlers.cpp",
+    "decoder/TraceDecoderProtocolBDX.cpp",
+    "decoder/TraceDecoderProtocolEcho.cpp",
+    "decoder/TraceDecoderProtocolInteractionModel.cpp",
+    "decoder/TraceDecoderProtocolInteractionModelCustomLog.cpp",
+    "decoder/TraceDecoderProtocolSecureChannel.cpp",
+    "decoder/TraceDecoderProtocolUserDirectedCommissioning.cpp",
+    "decoder/TraceDecoderProtocols.cpp",
+    "decoder/TraceDecoderToCertificateString.cpp",
+    "decoder/TraceDecoderToHexString.cpp",
+  ]
+
+  public_configs = [ ":default_config" ]
+
+  deps = [ "${chip_root}/src/lib" ]
+  public_deps = [ "${chip_root}/third_party/jsoncpp" ]
+}
+
 executable("chip-trace-decoder") {
   sources = [
     "TraceDecoder.cpp",
