@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -162,6 +163,11 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case BootReasons::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
+    case TestEventTriggersEnabled::Id: {
+        // TODO actually implement this part
+        ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! Nice we are in here");
+        return aEncoder.Encode(false);
+    }
     default: {
         break;
     }
@@ -289,6 +295,16 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
+
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEventTrigger::DecodableType & commandData) {
+
+    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger command");
+    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger commandData.enableKey.size()=%d", (int)(commandData.enableKey.size()));
+    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! commandData.eventTrigger=0x" ChipLogFormatX64, ChipLogValueX64(commandData.eventTrigger));
+    return false;
+}
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {

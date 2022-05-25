@@ -594,6 +594,7 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID = 0x00000005,
     kMatterClusterGeneralDiagnosticsAttributeActiveRadioFaultsID = 0x00000006,
     kMatterClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID = 0x00000007,
+    kMatterClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID = 0x00000008,
     kMatterClusterGeneralDiagnosticsAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
     kMatterClusterGeneralDiagnosticsAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
     kMatterClusterGeneralDiagnosticsAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
@@ -2236,6 +2237,9 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     // Cluster DiagnosticLogs commands
     kMatterClusterDiagnosticLogsCommandRetrieveLogsRequestID = 0x00000000,
     kMatterClusterDiagnosticLogsCommandRetrieveLogsResponseID = 0x00000001,
+
+    // Cluster GeneralDiagnostics commands
+    kMatterClusterGeneralDiagnosticsCommandTestEventTriggerID = 0x00000000,
 
     // Cluster SoftwareDiagnostics commands
     kMatterClusterSoftwareDiagnosticsCommandResetWatermarksID = 0x00000000,

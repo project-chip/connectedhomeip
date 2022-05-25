@@ -9181,6 +9181,16 @@ public class ChipClusters {
       subscribeActiveNetworkFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readTestEventTriggersEnabledAttribute(BooleanAttributeCallback callback) {
+      readTestEventTriggersEnabledAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTestEventTriggersEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTestEventTriggersEnabledAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -9284,6 +9294,12 @@ public class ChipClusters {
         ActiveNetworkFaultsAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readTestEventTriggersEnabledAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeTestEventTriggersEnabledAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

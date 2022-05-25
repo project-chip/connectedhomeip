@@ -29,6 +29,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -105,6 +106,8 @@ struct ServerInitParams
     // Network native params can be injected depending on the
     // selected Endpoint implementation
     void * endpointNativeParams = nullptr;
+    // TODO(thampson): comment here about what this does
+    TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
 };
 
 /**
@@ -241,6 +244,8 @@ public:
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
+
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     /**
      * This function send the ShutDown event before stopping
@@ -380,6 +385,8 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+    TestEventTriggerDelegate * mTestEventTriggerDelegate;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

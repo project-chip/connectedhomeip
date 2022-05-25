@@ -615,6 +615,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+namespace GeneralDiagnostics {
+namespace Commands {
+
+namespace TestEventTrigger {
+static constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+} // namespace GeneralDiagnostics
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 

@@ -30,6 +30,13 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
+{
+public:
+    GeneralDiagnosticsCluster() : ClusterBase(app::Clusters::GeneralDiagnostics::Id) {}
+    ~GeneralDiagnosticsCluster() {}
+};
+
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:

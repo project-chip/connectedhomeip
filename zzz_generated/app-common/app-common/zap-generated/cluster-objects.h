@@ -11683,6 +11683,54 @@ public:
 } // namespace NetworkInterfaceType
 } // namespace Structs
 
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace TestEventTrigger {
+struct Type;
+struct DecodableType;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+
+namespace Commands {
+namespace TestEventTrigger {
+enum class Fields
+{
+    kEnableKey    = 0,
+    kEventTrigger = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestEventTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    chip::ByteSpan enableKey;
+    uint64_t eventTrigger = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestEventTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    chip::ByteSpan enableKey;
+    uint64_t eventTrigger = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEventTrigger
+} // namespace Commands
+
 namespace Attributes {
 
 namespace NetworkInterfaces {
@@ -11783,6 +11831,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaults
+namespace TestEventTriggersEnabled {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TestEventTriggersEnabled::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TestEventTriggersEnabled
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -11860,6 +11920,7 @@ struct TypeInfo
         Attributes::ActiveHardwareFaults::TypeInfo::DecodableType activeHardwareFaults;
         Attributes::ActiveRadioFaults::TypeInfo::DecodableType activeRadioFaults;
         Attributes::ActiveNetworkFaults::TypeInfo::DecodableType activeNetworkFaults;
+        Attributes::TestEventTriggersEnabled::TypeInfo::DecodableType testEventTriggersEnabled = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
