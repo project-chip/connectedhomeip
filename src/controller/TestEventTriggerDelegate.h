@@ -27,42 +27,26 @@ class TestEventTriggerDelegate
 {
 public:
     /**
-     * This API can be used to retrieve the test enable key. The enable key is copied into `buffer`
-     * if the size is large enough.
+     * Checks to see if `enableKey` provided matches value choosen by by the manufacturer.
      *
-     * @param[out] enableKey Buffer to put the test enable key into
-     *
-     * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided MutableByteSpan is not big enough.
+     * @param[in] enableKey Buffer of the key to verify.
      */
-    virtual CHIP_ERROR GetEnableKey(MutableByteSpan enableKey) = 0;
+    virtual bool DoesEnableKeyMatch(const ByteSpan & enableKey) const = 0;
 
     /**
-     * Expectation is that the caller has already validated the test enable key before calling this.
-     * Configures the test event trigger based on `eventTrigger` provided.
+     * Expectation is that the caller has already validated the enable key before calling this.
+     * Handles the test event trigger based on `eventTrigger` provided.
      *
-     * @param[in] eventTrigger Event trigger to configure
+     * @param[in] eventTrigger Event trigger to handle.
      *
      * @return CHIP_ERROR_INVALID_ARGUMENT when eventTrigger is not a valid test event trigger.
      */
-    virtual CHIP_ERROR ConfigureTestEventTrigger(uint64_t eventTrigger) = 0;
+    virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 
     /**
      * Get the count of all configured test event triggers.
-     *
-     * @return count of configured event triggers.
      */
-    virtual size_t ConfiguredEventTriggerCount() = 0;
+    virtual size_t ConfiguredEventTriggerCount() const = 0;
 };
-
-#if 0
-// This is a lighter weight interface from General Diagnostics Cluster perspective placing all the burden on each
-// implementation to perform required validation.
-class TestEventTriggerDelegate
-{
-public:
-    virtual CHIP_ERROR ConfigureTestEventTrigger(const ByteSpan testEventKey, uint64_t eventTrigger) = 0;
-    virtual size_t ConfiguredEventTriggerCount() = 0;
-};
-#endif 
 
 } // namespace chip
