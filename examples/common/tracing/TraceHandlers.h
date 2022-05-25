@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
