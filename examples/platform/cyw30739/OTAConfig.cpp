@@ -25,6 +25,8 @@
 #include <app/server/Server.h>
 #include <platform/CYW30739/OTAImageProcessorImpl.h>
 
+namespace OTAConfig {
+
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
@@ -32,7 +34,7 @@ chip::DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
 chip::OTAImageProcessorImpl gImageProcessor;
 
-void OTAConfig::Init()
+void Init()
 {
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
@@ -48,3 +50,5 @@ void OTAConfig::Init()
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
+
+} // namespace OTAConfig

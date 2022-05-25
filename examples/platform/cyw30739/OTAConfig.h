@@ -18,10 +18,8 @@
 
 #pragma once
 
-class OTAConfig
-{
-public:
-    OTAConfig(){};
+namespace OTAConfig {
 
-    static void Init();
-};
+void Init();
+
+} // namespace OTAConfig
