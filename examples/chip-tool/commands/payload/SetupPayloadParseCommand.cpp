@@ -26,6 +26,8 @@ using namespace ::chip;
 
 namespace {
 
+#if CHIP_PROGRESS_LOGGING
+
 const char * CustomFlowString(CommissioningFlow flow)
 {
     switch (flow)
@@ -40,6 +42,8 @@ const char * CustomFlowString(CommissioningFlow flow)
 
     return "???";
 }
+
+#endif // CHIP_PROGRESS_LOGGING
 
 } // namespace
 
