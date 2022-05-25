@@ -31,22 +31,22 @@ connected door lock device. This uses the open-source CHIP implementation and
 the Texas Instruments SimpleLink™ Wi-Fi® CC32xx software development kit.
 
 By default this example targets the [CC3235SF_LAUNCHXL][cc3235sf_launchxl]
-LaunchPad, but the example application is enabled to build on the whole
-`CC32XX` family of MCUs.
+LaunchPad, but the example application is enabled to build on the whole `CC32XX`
+family of MCUs.
 
-The lock example is intended to serve both as a means to explore the workings
-of CHIP, as well as a template for creating real products based on the Texas
+The lock example is intended to serve both as a means to explore the workings of
+CHIP, as well as a template for creating real products based on the Texas
 Instruments devices.
 
 ## Device UI
 
 This example application has a simple User Interface to depict the state of the
 door lock and to control the state. The user LEDs on the LaunchPad are set on
-when the lock is locked, and are set off when unlocked. The LEDs will flash
-when in the transition state between locked and unlocked. The user buttons are
-used for requesting lock and unlock of the door lock. The left button (`BTN-1`)
-is used to enable provsioning (provisioning is enabled as "oneshot" by default. 
-The right button (`BTN-2`) us used to toggle the "Lock" state.
+when the lock is locked, and are set off when unlocked. The LEDs will flash when
+in the transition state between locked and unlocked. The user buttons are used
+for requesting lock and unlock of the door lock. The left button (`BTN-1`) is
+used to enable provsioning (provisioning is enabled as "oneshot" by default. The
+right button (`BTN-2`) us used to toggle the "Lock" state.
 
 ## Building
 
@@ -56,7 +56,9 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   Download and install [SysConfig][sysconfig] ([recommended version][sysconfig_recommended]). This can be done simply with the following commands. 
+-   Download and install [SysConfig][sysconfig] ([recommended
+    version][sysconfig_recommended]). This can be done simply with the following
+    commands.
 
     ```
     $ cd ~
@@ -85,9 +87,9 @@ Ninja to build the executable.
     ```
 
 -   Run the build to produce a default executable. By default on Linux the
-    Sysconfig is located in a `ti` folder in the user's
-    home directory, and you must provide the absolute path for it. For example
-    `/home/username/ti/sysconfig_1.12.1`. On Windows the default directory is 
+    Sysconfig is located in a `ti` folder in the user's home directory, and you
+    must provide the absolute path for it. For example
+    `/home/username/ti/sysconfig_1.12.1`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
@@ -98,12 +100,11 @@ Ninja to build the executable.
     $ ninja -C out/debug
     ```
 
-
 ## Programming
 
-Loading the built image onto a LaunchPad is supported through  Code Composer Studio (CCS). 
-Code Composer Studio can be used to load the image and debug the source code.
-UniFlash programming (bin) image is not generated currently.
+Loading the built image onto a LaunchPad is supported through Code Composer
+Studio (CCS). Code Composer Studio can be used to load the image and debug the
+source code. UniFlash programming (bin) image is not generated currently.
 
 ### Code Composer Studio
 
@@ -136,7 +137,6 @@ Note that the default configuration of the CCXML uses 2-wire cJTAG instead of
 the full 4-wire JTAG connection to match the default jumper configuration of the
 LaunchPad.
 
-
 ## Viewing Logging Output
 
 By default the log output will be sent to the Application/User UART. Open a
@@ -155,14 +155,20 @@ terminal emulator to that port to see the output with the following options:
 ### Provisioning
 
 The first step to bring the Matter device onto the network is to provision it.
-The example accomplishes this through the proprietary SimpleLink provisioning method (AP or Smart Config) using the SimpleLink Starter Pro mobile app.
-Once the device is connected to the local AP, commissioning can be triggered using "OnNetwork" configuration.
+The example accomplishes this through the proprietary SimpleLink provisioning
+method (AP or Smart Config) using the SimpleLink Starter Pro mobile app. Once
+the device is connected to the local AP, commissioning can be triggered using
+"OnNetwork" configuration.
 
 #### Bluetooth LE Provisioning
+
 BLE provisioning is not supported currently.
 
 ### CHIP tool changes needed for Wi-Fi example
-The timeout for the CHIP tool needs to be increased from 10 to 15 seconds. This can be done in chip::System::Clock::Timeout GetWaitDuration in connectedhomeip/examples/chip-tool/commands/clusters/ModelCommand.h 
+
+The timeout for the CHIP tool needs to be increased from 10 to 15 seconds. This
+can be done in chip::System::Clock::Timeout GetWaitDuration in
+connectedhomeip/examples/chip-tool/commands/clusters/ModelCommand.h
 
 ## TI Support
 
@@ -180,9 +186,11 @@ Additionally, we welcome any feedback.
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
 [cc3235sf_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC3235SF
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/wi-fi-group/wifi/f/wi-fi-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/wi-fi-group/wifi/f/wi-fi-forum
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
     https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.12.1_2446-setup.run
-[ti_cc32xx_matter_request]: https://www.ti.com/tool/download/SIMPLELINK-CC32XX-SDK/5.30.00.08 
+[ti_cc32xx_matter_request]:
+    https://www.ti.com/tool/download/SIMPLELINK-CC32XX-SDK/5.30.00.08
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
