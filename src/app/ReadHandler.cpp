@@ -41,10 +41,10 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeCtx                = apExchangeContext;
-    mInteractionType             = aInteractionType;
-    mLastWrittenEventsBytes      = 0;
-    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mpExchangeCtx               = apExchangeContext;
+    mInteractionType            = aInteractionType;
+    mLastWrittenEventsBytes     = 0;
+    mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
     mFlags.Set(ReadHandlerFlags::PrimingReports, true);
     if (apExchangeContext != nullptr)
