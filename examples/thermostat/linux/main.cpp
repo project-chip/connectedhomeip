@@ -42,20 +42,6 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
     return true;
 }
 
-// MatterPreAttributeChangeCallback() is called for every cluster.
-// As of 8/17/21 cluster specific PreAttributeChangeCalbacks are not yet implemented.
-
-Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t mask,
-                                                                     uint8_t type, uint16_t size, uint8_t * value)
-{
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
-    if (attributePath.mClusterId == chip::app::Clusters::Thermostat::Id)
-    {
-        status = MatterThermostatClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
-    }
-    return status;
-}
-
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
