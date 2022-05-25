@@ -63,6 +63,7 @@
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -279,9 +280,19 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
         const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
         gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
     }
-    else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
+    else if (LinuxDeviceOptions::GetInstance().traceStreamToLog == 1)
     {
         gTraceStream = new chip::trace::TraceStreamLog();
+    }
+    else if (LinuxDeviceOptions::GetInstance().traceStreamToLog == 2)
+    {
+        chip::trace::TraceDecoderOptions options;
+        options.mEnableProtocolInteractionModelResponse = false;
+
+        chip::trace::TraceDecoder * decoder = new chip::trace::TraceDecoder();
+        decoder->SetOptions(options);
+
+        gTraceStream = decoder;
     }
     chip::trace::InitTrace();
     if (gTraceStream != nullptr)
