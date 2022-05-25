@@ -12644,7 +12644,7 @@ private:
         }
         case 4: {
             LogStep(4, "Read PacketRxCount value from DUT and verify the number of packets received on ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12659,7 +12659,7 @@ private:
         }
         case 6: {
             LogStep(6, "Read PacketTxCount value from DUT and verify the number of packets received on ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12676,7 +12676,7 @@ private:
             LogStep(8,
                     "Read TxErrCount value from DUT and verify value indicates the number of failed packet transmission on "
                     "ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12693,7 +12693,7 @@ private:
             LogStep(10,
                     "Read CollisionCount value from DUT and verify value indicates the number of collision occurred while "
                     "transmitting packets on ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12710,7 +12710,7 @@ private:
             LogStep(12,
                     "Read OverrunCount value from DUT and verify value indicates the number of packets dropped due to lack of "
                     "buffer memory on ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12727,7 +12727,7 @@ private:
             LogStep(14,
                     "Read CarrierDetect value from DUT and verify value indicates the presence of carrier detect control signal on "
                     "ethernet network interface");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -12742,7 +12742,7 @@ private:
         }
         case 16: {
             LogStep(16, "Read TimeSinceReset value from DUT and verify the value indicates the duration of time, in minutes");
-            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -21468,7 +21468,7 @@ private:
         }
         case 3: {
             LogStep(3, "Sends a NavigateTarget command");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
             value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1;
@@ -21479,7 +21479,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the CurrentTarget attribute");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
@@ -21490,7 +21490,7 @@ private:
         }
         case 6: {
             LogStep(6, "Sends a NavigateTarget command");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
             value.target = mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2;
@@ -21501,7 +21501,7 @@ private:
         }
         case 7: {
             LogStep(7, "Reads the CurrentTarget attribute");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
@@ -35267,7 +35267,7 @@ private:
         }
         case 6: {
             LogStep(6, "Reads BeaconLostCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id, true, chip::NullOptional);
         }
@@ -35278,37 +35278,37 @@ private:
         }
         case 8: {
             LogStep(8, "Reads PacketMulticastRxCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Reads PacketMulticastTxCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, true, chip::NullOptional);
         }
         case 10: {
             LogStep(10, "Reads PacketUnicastRxCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id, true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Reads PacketUnicastTxCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id, true, chip::NullOptional);
         }
         case 12: {
             LogStep(12, "Reads CurrentMaxRate attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, true, chip::NullOptional);
         }
         case 13: {
             LogStep(13, "Reads OverrunCount attribute constraints");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, true, chip::NullOptional);
         }
