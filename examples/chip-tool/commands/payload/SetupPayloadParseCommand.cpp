@@ -82,10 +82,18 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
             }
             if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kBLE))
             {
+                if (!humanFlags.Empty())
+                {
+                    humanFlags.Add(", ");
+                }
                 humanFlags.Add("BLE");
             }
             if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kOnNetwork))
             {
+                if (!humanFlags.Empty())
+                {
+                    humanFlags.Add(", ");
+                }
                 humanFlags.Add("On IP network");
             }
         }
