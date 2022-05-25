@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-struct AppEvent;
-
 struct AppEvent
 {
     enum AppEventTypes
