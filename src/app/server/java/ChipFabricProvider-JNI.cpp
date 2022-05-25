@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/appserver/ChipFabricProvider");
     sJVM = jvm;
 
-    // Get a JNI environment object.
+    // check if the JNI environment is correct
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -84,9 +84,6 @@ CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self)
     VerifyOrExit(jFabricCls != nullptr, ChipLogError(NotSpecified, "could not find Class Fabric"));
     for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
     {
-        // see src/app/clusters/operational-credentials-server/operational-credentials-server.cpp#ReadFabricsList
-        if (!fabricInfo.IsInitialized())
-            continue;
 
         jmethodID constructor = env->GetMethodID(jFabricCls, "<init>", "()V");
         VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
