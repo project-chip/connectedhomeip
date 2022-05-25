@@ -1325,9 +1325,7 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
         onFailureCbInvoked = true;
     };
 
-    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) {
-        onDoneCbInvoked = true;
-    };
+    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
     Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
                                                                          onSuccessCb, onFailureCb, onDoneCb);

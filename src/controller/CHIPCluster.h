@@ -48,7 +48,7 @@ using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
-using ReadDoneCallback       = void (*)(void * context);
+using ReadDoneCallback                = void (*)(void * context);
 using SubscriptionEstablishedCallback = void (*)(void * context);
 
 class DLL_EXPORT ClusterBase
@@ -260,11 +260,11 @@ public:
      * value when it changes.
      */
     template <typename AttributeInfo>
-    CHIP_ERROR
-    SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
-                       ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                       SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr, bool aIsFabricFiltered = true,
-                       bool aKeepPreviousSubscriptions = false)
+    CHIP_ERROR SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
+                                  ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                                  uint16_t maxIntervalCeilingSeconds,
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                                  bool aIsFabricFiltered = true, bool aKeepPreviousSubscriptions = false)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
@@ -342,8 +342,7 @@ public:
 
     template <typename DecodableType>
     CHIP_ERROR SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb,
-                              ReadResponseFailureCallback failureCb,
-                              ReadDoneCallback doneCb, uint16_t minIntervalFloorSeconds,
+                              ReadResponseFailureCallback failureCb, ReadDoneCallback doneCb, uint16_t minIntervalFloorSeconds,
                               uint16_t maxIntervalCeilingSeconds,
                               SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
                               bool aKeepPreviousSubscriptions = false, bool aIsUrgentEvent = false)

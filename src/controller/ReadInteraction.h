@@ -130,14 +130,14 @@ ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & se
 
 // Helper for SubscribeAttribute to reduce the amount of code generated.
 template <typename DecodableAttributeType>
-CHIP_ERROR SubscribeAttribute(
-    Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId, ClusterId clusterId,
-    AttributeId attributeId, typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
-    typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb, uint16_t minIntervalFloorSeconds,
-    uint16_t maxIntervalCeilingSeconds,
-    typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType onSubscriptionEstablishedCb =
-        nullptr,
-    bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
+CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
+                              ClusterId clusterId, AttributeId attributeId,
+                              typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
+                              typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
+                              uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
+                              typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
+                                  onSubscriptionEstablishedCb = nullptr,
+                              bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -258,7 +258,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb = onSuccessCb;
     params.mOnErrorCb  = onErrorCb;
-    params.mOnDoneCb  = onDoneCb;
+    params.mOnDoneCb   = onDoneCb;
     return detail::ReportEvent(exchangeMgr, endpointId, std::move(params), false /*aIsUrgentEvent*/);
 }
 
@@ -279,7 +279,7 @@ CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const Sessio
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
     params.mOnErrorCb                   = onErrorCb;
-    params.mOnDoneCb  = onDoneCb;
+    params.mOnDoneCb                    = onDoneCb;
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
