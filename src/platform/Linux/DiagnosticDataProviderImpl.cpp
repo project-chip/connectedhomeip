@@ -24,6 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <app-common/zap-generated/enums.h>
+#include <app/data-model/List.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -47,6 +48,7 @@
 #include <unistd.h>
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -450,6 +452,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
             {
+                uint8_t size           = 0;
                 NetworkInterface * ifp = new NetworkInterface();
 
                 strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
@@ -460,6 +463,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->type          = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
                 ifp->offPremiseServicesReachableIPv4.SetNull();
                 ifp->offPremiseServicesReachableIPv6.SetNull();
+
+                if (ConnectivityUtils::GetInterfaceIPv4Addrs(ifa->ifa_name, size, ifp) == CHIP_NO_ERROR)
+                {
+                    if (size > 0)
+                    {
+                        ifp->IPv4Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv4AddressSpans, size);
+                    }
+                }
+
+                if (ConnectivityUtils::GetInterfaceIPv6Addrs(ifa->ifa_name, size, ifp) == CHIP_NO_ERROR)
+                {
+                    if (size > 0)
+                    {
+                        ifp->IPv6Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv6AddressSpans, size);
+                    }
+                }
 
                 if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
                     CHIP_NO_ERROR)
