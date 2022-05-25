@@ -141,7 +141,8 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
     case IdleStateReason::kInvalidSession:
         if (mProviderRetryCount < kMaxInvalidSessionRetries)
         {
-            // An invalid session is detected which may be temporary so try to query the same provider again
+            // An invalid session is detected which may be temporary (such as provider being restarted)
+            // so try to query the same provider again.
             SendQueryImage();
         }
         else
