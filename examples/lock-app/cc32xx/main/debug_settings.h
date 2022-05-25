@@ -36,7 +36,7 @@
 
 #if (D_DEBUG_METHOD == D_USER_DEFINED)
 extern void cc32xxLog(const char * msg, ...);
-#define PRINTF(...) cc32xxLog(__VA_ARGS__); 
+#define PRINTF(...) cc32xxLog(__VA_ARGS__);
 #endif
 
 #endif // DEBUG_SETTINGS_H

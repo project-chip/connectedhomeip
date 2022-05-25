@@ -43,7 +43,7 @@
 /* syscfg */
 #include <ti_drivers_config.h>
 
-extern "C" 
+extern "C"
 {
 extern int   WiFi_init();
 extern void  DisplayBanner();
@@ -108,7 +108,7 @@ int AppTask::Init()
 
     /* Initial Terminal, and print Application name */
     DisplayBanner();
-    
+
     // Init Chip memory management before the stack
     PLAT_LOG("Initialize Memory");
     chip::Platform::MemoryInit();
@@ -134,7 +134,7 @@ int AppTask::Init()
     buttonParams.longPressDuration = 1000U; // ms
     gButtonRightHandle             = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(gButtonRightHandle, ButtonRightEventHandler);
-    
+
     PLAT_LOG("Initialize Wi-Fi");
     WiFi_init();
 

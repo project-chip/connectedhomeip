@@ -58,7 +58,7 @@ int main(void)
 {
     Board_init();
     GPIO_init();
-    
+
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     int ret = GetAppTask().StartAppTask();

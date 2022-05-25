@@ -38,7 +38,7 @@
 
 #include <type_traits>
 
-extern "C" 
+extern "C"
 {
 #include <ti/net/slnetconn.h>
 
