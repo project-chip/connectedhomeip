@@ -135,7 +135,6 @@ tests:
       response:
           value: 2100
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
@@ -145,17 +144,19 @@ tests:
       PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 1002
+      response:
+          error: CONSTRAINT_ERROR
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
-      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 4010
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
@@ -206,27 +207,27 @@ tests:
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 650
+      response:
+          error: CONSTRAINT_ERROR
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 4050
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
@@ -245,6 +246,14 @@ tests:
       PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 3000
+
+    - label:
+          "Writes the limist of AbsMinHeatSetpointLimit to MinHeatSetpointLimit o we can manipulate MaxHeatSetpointLimit reasonable."
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 700
 
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
@@ -266,7 +275,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
-          value: 2000
+          value: 2500
 
     - label:
           "Reads it back again to confirm the successful write of
@@ -275,29 +284,29 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: A_MAXHEATSETPOINTLIMIT
       response:
-          value: 2000
+          value: 2500
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 500
+      response:
+          error: CONSTRAINT_ERROR
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 4000
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit
@@ -351,26 +360,26 @@ tests:
       response:
           value: 2000
 
-    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1000
+      response:
+          error: CONSTRAINT_ERROR
 
-    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
       PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 4000
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
@@ -391,6 +400,16 @@ tests:
       PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 3200
+
+    - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
+          attribute so we can manipulate MaxCoolSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 1600
 
     - label:
           "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
@@ -426,26 +445,26 @@ tests:
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1000
+      response:
+          error: CONSTRAINT_ERROR
 
-    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
-      disabled: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
       PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 4000
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
@@ -485,9 +504,12 @@ tests:
       arguments:
           value: 3000
 
+    # Disabled: This test makes no sense: It's setting MaxHeatSetpointLimit to
+    # below what we just set MinHeatSetpointLimit to.
     - label:
           "Writes (sets back) the limit of MinHeatSetpointLimit to
           MaxHeatSetpointLimit attribute"
+      disabled: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: A_MINHEATSETPOINTLIMIT
@@ -523,9 +545,12 @@ tests:
       arguments:
           value: 3200
 
+    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit to
+    # below what we just set MinCoolSetpointLimit to.
     - label:
           "Writes (sets back) the limit of MinCoolSetpointLimit to
           MaxCoolSetpointLimit attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
@@ -572,7 +597,9 @@ tests:
       response:
           value: 2
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedHeatingSetpoint to default value"
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
@@ -601,7 +628,9 @@ tests:
       response:
           value: -30
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedHeatingSetpoint to default value"
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
@@ -630,7 +659,9 @@ tests:
       response:
           value: 30
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -660,7 +691,9 @@ tests:
       response:
           value: -30
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -690,7 +723,9 @@ tests:
       response:
           value: 30
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -698,7 +733,9 @@ tests:
       arguments:
           value: 2600
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedHeatingSetpoint to default value"
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
@@ -737,7 +774,9 @@ tests:
       response:
           value: -30
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedCoolingSetpoint to default value"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
@@ -745,7 +784,9 @@ tests:
       arguments:
           value: 2600
 
+    # Disabled: The earlier messing with limits makes the default value invalid.
     - label: "Sets OccupiedHeatingSetpoint to default value"
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
