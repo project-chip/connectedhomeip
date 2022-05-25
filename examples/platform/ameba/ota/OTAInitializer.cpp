@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "OTAHelper.h"
+#include "OTAInitializer.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
@@ -49,7 +49,7 @@ extern "C" void amebaApplyUpdateCmdHandler()
     PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
-void OTAHelper::InitOTARequestor(void)
+void OTAInitializer::InitOTARequestor(void)
 {
     SetRequestorInstance(&gRequestorCore);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());

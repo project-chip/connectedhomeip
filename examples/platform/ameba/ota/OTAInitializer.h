@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-class OTAHelper
+class OTAInitializer
 {
 public:
-    static OTAHelper & Instance(void)
+    static OTAInitializer & Instance(void)
     {
-        static OTAHelper sInitOTA;
+        static OTAInitializer sInitOTA;
         return sInitOTA;
     }
     void InitOTARequestor(void);

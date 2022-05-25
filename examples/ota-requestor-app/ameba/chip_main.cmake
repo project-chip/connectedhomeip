@@ -27,7 +27,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/examples/platform/ameba/ota/OTAHelper.cpp
+    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 )
 
 add_library(

@@ -37,7 +37,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <ota/OTAHelper.h>
+#include <ota/OTAInitializer.h>
 #endif
 
 #include "Globals.h"
@@ -59,7 +59,7 @@ constexpr uint32_t kInitOTARequestorDelaySec = 3;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
-    OTAHelper::Instance().InitOTARequestor();
+    OTAInitializer::Instance().InitOTARequestor();
 }
 #endif
 
