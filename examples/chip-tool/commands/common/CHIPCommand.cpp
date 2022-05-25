@@ -27,6 +27,7 @@
 #include <lib/support/TestGroupData.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -211,6 +212,16 @@ void CHIPCommand::StartTracing()
     else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
         chip::trace::AddTraceStream(new chip::trace::TraceStreamLog());
+    }
+
+    if (mTraceDecode.HasValue() && mTraceDecode.Value())
+    {
+        chip::trace::TraceDecoderOptions options;
+        // The interaction model protocol is already logged, so just disable logging those.
+        options.mEnableProtocolInteractionModelResponse = false;
+        chip::trace::TraceDecoder * decoder             = new chip::trace::TraceDecoder();
+        decoder->SetOptions(options);
+        chip::trace::AddTraceStream(decoder);
     }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }

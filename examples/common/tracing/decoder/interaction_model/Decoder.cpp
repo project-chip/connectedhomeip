@@ -53,16 +53,16 @@ namespace chip {
 namespace trace {
 namespace interaction_model {
 
-CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader);
-CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader);
-CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader);
-CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader);
-CHIP_ERROR DecodeReportData(TLV::TLVReader & reader);
-CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader);
-CHIP_ERROR DecodeWriteResponse(TLV::TLVReader & reader);
-CHIP_ERROR DecodeInvokeCommandRequest(TLV::TLVReader & reader);
-CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader);
-CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader);
+CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeReportData(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeWriteResponse(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeInvokeCommandRequest(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader, bool decode);
+CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader, bool decode);
 
 const char * ToProtocolName()
 {
@@ -98,7 +98,7 @@ const char * ToProtocolMessageTypeName(uint8_t protocolCode)
     }
 }
 
-CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len)
+CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len, bool decodeResponse)
 {
     TLV::TLVReader reader;
     reader.Init(data, len);
@@ -106,144 +106,174 @@ CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size
     switch (protocolCode)
     {
     case to_underlying(MessageType::StatusResponse):
-        return DecodeStatusResponse(reader);
+        return DecodeStatusResponse(reader, decodeResponse);
     case to_underlying(MessageType::ReadRequest):
-        return DecodeReadRequest(reader);
+        return DecodeReadRequest(reader, decodeResponse);
     case to_underlying(MessageType::SubscribeRequest):
-        return DecodeSubscribeRequest(reader);
+        return DecodeSubscribeRequest(reader, decodeResponse);
     case to_underlying(MessageType::SubscribeResponse):
-        return DecodeSubscribeResponse(reader);
+        return DecodeSubscribeResponse(reader, decodeResponse);
     case to_underlying(MessageType::ReportData):
-        return DecodeReportData(reader);
+        return DecodeReportData(reader, decodeResponse);
     case to_underlying(MessageType::WriteRequest):
-        return DecodeWriteRequest(reader);
+        return DecodeWriteRequest(reader, decodeResponse);
     case to_underlying(MessageType::WriteResponse):
-        return DecodeWriteResponse(reader);
+        return DecodeWriteResponse(reader, decodeResponse);
     case to_underlying(MessageType::InvokeCommandRequest):
-        return DecodeInvokeCommandRequest(reader);
+        return DecodeInvokeCommandRequest(reader, decodeResponse);
     case to_underlying(MessageType::InvokeCommandResponse):
-        return DecodeInvokeCommandResponse(reader);
+        return DecodeInvokeCommandResponse(reader, decodeResponse);
     case to_underlying(MessageType::TimedRequest):
-        return DecodeTimedRequest(reader);
+        return DecodeTimedRequest(reader, decodeResponse);
     default:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 }
 
-CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader)
+CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::InvokeRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::InvokeRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader)
+CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::ReadRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::ReadRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader)
+CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::SubscribeRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::SubscribeRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader)
+CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::SubscribeResponseMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::SubscribeResponseMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeReportData(TLV::TLVReader & reader)
+CHIP_ERROR DecodeReportData(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedReadResponse(reader.GetReadPoint(), reader.GetTotalLength()));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::ReportDataMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::ReportDataMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader)
+CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::WriteRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::WriteRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeWriteResponse(TLV::TLVReader & reader)
+CHIP_ERROR DecodeWriteResponse(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::WriteResponseMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::WriteResponseMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeInvokeCommandRequest(TLV::TLVReader & reader)
+CHIP_ERROR DecodeInvokeCommandRequest(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedCommandRequest(reader.GetReadPoint(), reader.GetTotalLength()));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::InvokeRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::InvokeRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader)
+CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedCommandResponse(reader.GetReadPoint(), reader.GetTotalLength()));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::InvokeResponseMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::InvokeResponseMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader)
+CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader, bool decode)
 {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    app::TimedRequestMessage::Parser parser;
-    ReturnErrorOnFailure(parser.Init(reader));
-    return parser.CheckSchemaValidity();
-#else
-    return CHIP_NO_ERROR;
+    if (decode)
+    {
+        app::TimedRequestMessage::Parser parser;
+        ReturnErrorOnFailure(parser.Init(reader));
+        return parser.CheckSchemaValidity();
+    }
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace interaction_model
