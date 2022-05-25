@@ -1,4 +1,44 @@
 #!/usr/bin/env python
+#
+# Copyright 2016-2022, Cypress Semiconductor Corporation (an Infineon company) or
+# an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
+#
+# This software, including source code, documentation and related
+# materials ("Software") is owned by Cypress Semiconductor Corporation
+# or one of its affiliates ("Cypress") and is protected by and subject to
+# worldwide patent protection (United States and foreign),
+# United States copyright laws and international treaty provisions.
+# Therefore, you may use this Software only as provided in the license
+# agreement accompanying the software package from which you
+# obtained this Software ("EULA").
+# If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
+# non-transferable license to copy, modify, and compile the Software
+# source code solely for use in connection with Cypress's
+# integrated circuit products.  Any reproduction, modification, translation,
+# compilation, or representation of this Software except as specified
+# above is prohibited without the express written permission of Cypress.
+#
+# Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress
+# reserves the right to make changes to the Software without notice. Cypress
+# does not assume any liability arising out of the application or use of the
+# Software or any product or circuit described in the Software. Cypress does
+# not authorize its products for use in any products where a malfunction or
+# failure of the Cypress product may reasonably be expected to result in
+# significant property damage, injury or death ("High Risk Product"). By
+# including Cypress's product in a High Risk Product, the manufacturer
+# of such system or application assumes all risk of such use and in doing
+# so agrees to indemnify Cypress against all liability.
+#
+"""CGS data entry compressor
+
+This script compresses "Data" entries into "Compressed data" entries
+from the input CGS file to the output CGS file with the given LZSS tool.
+
+"Data" entries that are smaller than 512 bytes would be skipped.
+
+"""
 
 import argparse
 import io
@@ -32,8 +72,7 @@ def parse_cgs(file_name):
     cgs = []
 
     with open(file_name, mode="r") as file:
-        while True:
-            line = file.readline()
+        for line in file:
             if len(line) == 0:
                 break
 
@@ -56,7 +95,16 @@ def parse_cgs(file_name):
 
 def parse_entry(file: io.TextIOBase, line):
 
-    data_re = re.compile(r'^\s*ENTRY\s+"([^"]+)"(?:\s*=\s*"([^"]+)")?$')
+    # compile the regex for extracting name and remark of the entry.
+    data_re = re.compile(r"""
+      ^\s*               # Allow leading spaces
+      ENTRY\s+"([^"]+)"  # Parse the entry name
+      (?:                # Optional non-capturing part begin
+        \s*=\s*          # Allow leading and trailing spaces
+        "([^"]+)"        # Parse the entry remark
+      )?                 # Optional non-capturing part end
+      \s*$               # Allow trailing spaces
+    """, re.VERBOSE)
 
     items = []
     name = None
