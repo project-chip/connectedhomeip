@@ -248,7 +248,8 @@ tests:
           value: 3000
 
     - label:
-          "Writes the limist of AbsMinHeatSetpointLimit to MinHeatSetpointLimit o we can manipulate MaxHeatSetpointLimit reasonable."
+          "Writes the limist of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
+          o we can manipulate MaxHeatSetpointLimit reasonable."
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
       PICS: A_MINHEATSETPOINTLIMIT
