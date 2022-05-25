@@ -206,7 +206,6 @@ public:
     TestReadInteraction() {}
 
     static void TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestReadDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
@@ -348,49 +347,6 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
-    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
-void TestReadInteraction::TestReadDataVersionFilter(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
-    auto sessionHandle      = ctx.GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
-                                                      const auto & dataResponse) {
-        uint8_t i = 0;
-        auto iter = dataResponse.begin();
-        while (iter.Next())
-        {
-            auto & item = iter.GetValue();
-            NL_TEST_ASSERT(apSuite, item.fabricIndex == i);
-            i++;
-        }
-        NL_TEST_ASSERT(apSuite, i == 4);
-        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
-
-    Optional<DataVersion> dataVersion(kDataVersion);
-    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true, dataVersion);
-
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1354,7 +1310,7 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false, onDoneCbInvoked = false;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1370,12 +1326,16 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
         onFailureCbInvoked = true;
     };
 
+    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
+
     Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                         onSuccessCb, onFailureCb);
+                                                                         onSuccessCb, onFailureCb, onDoneCb);
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, onDoneCbInvoked);
+
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -2583,7 +2543,6 @@ void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlT
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadAttributeResponse", TestReadInteraction::TestReadAttributeResponse),
-    NL_TEST_DEF("TestReadDataVersionFilter", TestReadInteraction::TestReadDataVersionFilter),
     NL_TEST_DEF("TestReadEventResponse", TestReadInteraction::TestReadEventResponse),
     NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
     NL_TEST_DEF("TestReadFabricScopedWithoutFabricFilter", TestReadInteraction::TestReadFabricScopedWithoutFabricFilter),
