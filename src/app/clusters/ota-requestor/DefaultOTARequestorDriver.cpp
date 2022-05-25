@@ -145,10 +145,6 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
-        ChipLogProgress(SoftwareUpdate,
-                        "//is: IdleStateReason::kInvalidSession mProviderRetryCount %d, mInvalidSessionRetryCount %d, "
-                        "kMaxInvalidSessionRetries %d",
-                        mProviderRetryCount, mInvalidSessionRetryCount, kMaxInvalidSessionRetries);
         if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
         {
             // An invalid session is detected which may be temporary (such as provider being restarted)
