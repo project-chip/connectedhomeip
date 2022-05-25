@@ -17,11 +17,35 @@
  */
 
 #include "SetupPayloadParseCommand.h"
+#include <lib/support/StringBuilder.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
+
+namespace {
+
+#if CHIP_PROGRESS_LOGGING
+
+const char * CustomFlowString(CommissioningFlow flow)
+{
+    switch (flow)
+    {
+    case CommissioningFlow::kStandard:
+        return "STANDARD";
+    case CommissioningFlow::kUserActionRequired:
+        return "USER ACTION REQUIRED";
+    case CommissioningFlow::kCustom:
+        return "CUSTOM";
+    }
+
+    return "???";
+}
+
+#endif // CHIP_PROGRESS_LOGGING
+
+} // namespace
 
 CHIP_ERROR SetupPayloadParseCommand::Run()
 {
@@ -46,13 +70,46 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
 
 CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
 {
-    ChipLogProgress(SetupPayload, "CommissioningFlow: %u", to_underlying(payload.commissioningFlow));
-    ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
-    ChipLogProgress(SetupPayload, "Version: %u", payload.version);
-    ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
+    ChipLogProgress(SetupPayload, "Version:       %u", payload.version);
+    ChipLogProgress(SetupPayload, "VendorID:      %u", payload.vendorID);
+    ChipLogProgress(SetupPayload, "ProductID:     %u", payload.productID);
+    ChipLogProgress(SetupPayload, "Custom flow:   %u    (%s)", to_underlying(payload.commissioningFlow),
+                    CustomFlowString(payload.commissioningFlow));
+    {
+        StringBuilder<128> humanFlags;
+
+        if (payload.rendezvousInformation.HasAny())
+        {
+            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kSoftAP))
+            {
+                humanFlags.Add("Soft-AP");
+            }
+            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kBLE))
+            {
+                if (!humanFlags.Empty())
+                {
+                    humanFlags.Add(", ");
+                }
+                humanFlags.Add("BLE");
+            }
+            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kOnNetwork))
+            {
+                if (!humanFlags.Empty())
+                {
+                    humanFlags.Add(", ");
+                }
+                humanFlags.Add("On IP network");
+            }
+        }
+        else
+        {
+            humanFlags.Add("NONE");
+        }
+
+        ChipLogProgress(SetupPayload, "Capabilities:  0x%02X (%s)", payload.rendezvousInformation.Raw(), humanFlags.c_str());
+    }
     ChipLogProgress(SetupPayload, "Discriminator: %u", payload.discriminator);
-    ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.setUpPINCode);
-    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation.Raw());
+    ChipLogProgress(SetupPayload, "Passcode:      %u", payload.setUpPINCode);
 
     std::string serialNumber;
     if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
