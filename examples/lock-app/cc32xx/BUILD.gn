@@ -53,11 +53,11 @@ source_set("lock_app_sdk") {
 
   sources = [
     "${chip_root}/src/platform/cc32xx/Logging.cpp",
+    "${project_dir}/main/cc32xxWifiInit.c",
+    "${project_dir}/main/main.cpp",
     "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/lwip_if.c",
     "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/utils_if.c",
     "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/wifi_if.c",
-    "${project_dir}/main/main.cpp",
-    "${project_dir}/main/cc32xxWifiInit.c",
   ]
 
   include_dirs = [

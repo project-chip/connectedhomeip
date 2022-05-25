@@ -26,11 +26,11 @@ freertos_target = "${chip_root}/third_party/ti_simplelink_sdk:freertos"
 mbedtls_target = "${chip_root}/third_party/ti_simplelink_sdk:mbedtls"
 
 lwip_platform = "cc32xx"
-lwip_ipv6 = true 
-lwip_ipv4 = true 
-lwip_api = true 
+lwip_ipv6 = true
+lwip_ipv4 = true
+lwip_api = true
 
-chip_inet_config_enable_ipv4 = true 
+chip_inet_config_enable_ipv4 = true
 chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
