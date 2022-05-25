@@ -24,6 +24,25 @@
 
 using namespace ::chip;
 
+namespace {
+
+const char * CustomFlowString(CommissioningFlow flow)
+{
+    switch (flow)
+    {
+    case CommissioningFlow::kStandard:
+        return "STANDARD";
+    case CommissioningFlow::kUserActionRequired:
+        return "USER ACTION REQUIRED";
+    case CommissioningFlow::kCustom:
+        return "CUSTOM";
+    }
+
+    return "???";
+}
+
+} // namespace
+
 CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     std::string codeString(mCode);
@@ -50,7 +69,8 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     ChipLogProgress(SetupPayload, "Version:       %u", payload.version);
     ChipLogProgress(SetupPayload, "VendorID:      %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "ProductID:     %u", payload.productID);
-    ChipLogProgress(SetupPayload, "Custom flow:   %u", to_underlying(payload.commissioningFlow));
+    ChipLogProgress(SetupPayload, "Custom flow:   %u    (%s)", to_underlying(payload.commissioningFlow),
+                    CustomFlowString(payload.commissioningFlow));
     {
         StringBuilder<128> humanFlags;
 
