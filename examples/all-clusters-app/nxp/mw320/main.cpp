@@ -1407,3 +1407,22 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 	return;
 }
+
+EmberAfStatus
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
+                                      uint8_t * buffer)
+{
+    PRINTF("====> %s() \r\n", __FUNCTION__);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
+                                     uint8_t * buffer, uint16_t maxReadLength)
+{
+    // Added for the pairing of TE9 to report the commission_info
+    // default function (in zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp)
+    //
+    PRINTF("-> %s()\n\r", __FUNCTION__);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
