@@ -138,20 +138,23 @@ void AppTask::AppTaskMain(void * pvParameter)
     log_info("App Task entered\r\n");
 
     err = sWiFiNetworkCommissioningInstance.Init();
-    if (CHIP_NO_ERROR != err) {
+    if (CHIP_NO_ERROR != err)
+    {
         log_error("Network commissioning failed, err:%d \r\n", err);
         return;
     }
 
     chip::CommonCaseDeviceServerInitParams initParams;
     err = initParams.InitializeStaticResourcesBeforeServerInit();
-    if (CHIP_NO_ERROR != err) {
+    if (CHIP_NO_ERROR != err)
+    {
         log_error("Resources Init failed, err:%d \r\n", err);
         return;
     }
 
     err = chip::Server::GetInstance().Init(initParams);
-    if (CHIP_NO_ERROR != err) {
+    if (CHIP_NO_ERROR != err)
+    {
         log_error("Server Init failed, err:%d \r\n", err);
         return;
     }
