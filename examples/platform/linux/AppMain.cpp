@@ -240,6 +240,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
