@@ -878,6 +878,7 @@ nongnu
 nordicsemi
 NotAvailable
 notValue
+npm
 nRF
 nrfconnect
 nrfdks
