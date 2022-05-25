@@ -46,7 +46,7 @@ public:
      * @brief
      *   Called when the momentary switch starts to be pressed.
      */
-    void OnInitialPressed(EndpointId endpoint, uint8_t newPosition);
+    void OnInitialPress(EndpointId endpoint, uint8_t newPosition);
 
     /**
      * @brief
