@@ -26,7 +26,7 @@ tests:
 
     - label: "Set up subscription to SwitchLatched event"
       verification: |
-          ./chip-tool switch subscribe-event switch-latched 1 100 1 1 
+          ./chip-tool switch subscribe-event switch-latched 1 100 1 1
 
           [1646209067.917157][2496:2501] CHIP:DMG: SubscribeResponseMessage =
           [1646209067.917184][2496:2501] CHIP:DMG: {
@@ -100,7 +100,7 @@ tests:
 
     - label: "Set up subscription to InitialPress event"
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
           [1646209546.313236][2641:2646] CHIP:DMG: SubscribeResponseMessage =
           [1646209546.313263][2641:2646] CHIP:DMG: {
           [1646209546.313285][2641:2646] CHIP:DMG:        SubscriptionId = 0x463c015025bd6b74,
