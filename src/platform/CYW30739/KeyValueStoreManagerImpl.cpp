@@ -136,10 +136,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
     {
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
+
+    ChipLogError(DeviceLayer, "%s wiced_hal_delete_nvram %u", __func__, result);
+    return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
 bool KeyValueStoreManagerImpl::KeyEntry::IsMatchKey(const char * key)
