@@ -52,7 +52,7 @@ public:
      * @brief
      *   Called when the momentary switch has been pressed for a "long" time.
      */
-    void OnLongPressed(EndpointId endpoint, uint8_t newPosition);
+    void OnLongPress(EndpointId endpoint, uint8_t newPosition);
 
     /**
      * @brief
