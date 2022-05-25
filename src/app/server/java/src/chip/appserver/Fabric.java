@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,24 +17,23 @@
  */
 package chip.appserver;
 
-/** Controller to interact with the CHIP device. */
-public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+public class Fabric {
 
-  private volatile ChipFabricProvider mChipFabricProvider;
+  public int vendorId;
+  public long nodeId;
+  public short fabricIndex;
+  public String label;
 
-  public ChipFabricProvider getFabricProvider() {
-
-    if (mChipFabricProvider == null) {
-      synchronized (this) {
-        if (mChipFabricProvider == null) mChipFabricProvider = new ChipFabricProvider();
-      }
-    }
-
-    return mChipFabricProvider;
+  @Override
+  public String toString() {
+    return "Fabric [fabricIndex="
+        + fabricIndex
+        + ", label="
+        + label
+        + ", nodeId="
+        + nodeId
+        + ", vendorId="
+        + vendorId
+        + "]";
   }
-
-  public native boolean startApp();
-
-  public native boolean stopApp();
 }
