@@ -45,7 +45,7 @@ namespace {
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
-constexpr uint8_t kMaxInvalidSessionRetries        = 3;  // Max # of query image retries to perform on invalid session error
+constexpr uint8_t kMaxInvalidSessionRetries        = 1;  // Max # of query image retries to perform on invalid session error
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
@@ -59,10 +59,9 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
 {
-    mRequestor                = requestor;
-    mImageProcessor           = processor;
-    mProviderRetryCount       = 0;
-    mInvalidSessionRetryCount = 0;
+    mRequestor          = requestor;
+    mImageProcessor     = processor;
+    mProviderRetryCount = 0;
 
     if (mImageProcessor->IsFirstImageRun())
     {
@@ -129,11 +128,6 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
 
 void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
-    if (reason != IdleStateReason::kInvalidSession)
-    {
-        mInvalidSessionRetryCount = 0;
-    }
-
     switch (reason)
     {
     case IdleStateReason::kUnknown:
@@ -145,15 +139,13 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
-        if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
+        if (mProviderRetryCount < kMaxInvalidSessionRetries)
         {
             // An invalid session is detected which may be temporary so try to query the same provider again
             SendQueryImage();
-            mInvalidSessionRetryCount++;
         }
         else
         {
-            mInvalidSessionRetryCount = 0;
             StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         }
         break;
