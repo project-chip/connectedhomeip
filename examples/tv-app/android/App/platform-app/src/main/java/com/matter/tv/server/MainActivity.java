@@ -7,20 +7,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.matter.tv.server.fragments.ContentAppFragment;
 import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.TerminalFragment;
-import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
 
   private LinkedHashMap<String, String> packages = new LinkedHashMap<>();
-
-  @Override
-  protected void onRestart() {
-    super.onRestart();
-    packages.clear();
-    ContentAppDiscoveryService.getReceiverInstance()
-        .initializeMatterApps(this.getApplicationContext());
-  }
 
   private BottomNavigationView.OnNavigationItemSelectedListener navListener =
       item -> {

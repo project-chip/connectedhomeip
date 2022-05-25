@@ -17,14 +17,18 @@
  */
 
 #include "AppContentLauncherManager.h"
+#include "../../java/ContentAppCommandDelegate.h"
 
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
 
-AppContentLauncherManager::AppContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+AppContentLauncherManager::AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, list<std::string> acceptHeaderList,
+                                                     uint32_t supportedStreamingProtocols) :
+    mCommandDelegate(commandDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
     mSupportedStreamingProtocols = supportedStreamingProtocols;
@@ -69,8 +73,11 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
     string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
+
+    const char * resStr = mCommandDelegate.sendCommand(mEndpointId, contentUrlString);
+
     LaunchResponseType response;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional(CharSpan::fromCharString(resStr));
     response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
     helper.Success(response);
 }
