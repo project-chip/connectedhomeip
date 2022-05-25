@@ -280,6 +280,7 @@ function getManualTests() {
   ];
 
   const FlowMeasurement = [
+    'Test_TC_FLW_2_2',
     'Test_TC_FLW_3_1',
   ];
 
@@ -371,15 +372,18 @@ function getManualTests() {
   ];
 
   const RelativeHumidityMeasurement = [
+    'Test_TC_RH_2_2',
     'Test_TC_RH_3_1',
   ];
 
   const Switch = [
     'Test_TC_SWTCH_1_1',
+    'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
   ];
 
   const TemperatureMeasurement = [
+    'Test_TC_TM_2_2',
     'Test_TC_TM_3_1',
   ];
 
@@ -513,7 +517,6 @@ function getTests() {
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
-    'Test_TC_FLW_2_2',
   ];
 
   const GeneralCommissioning = [
@@ -638,7 +641,6 @@ function getTests() {
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
-    'Test_TC_RH_2_2',
   ];
 
   const SecureChannel = [
@@ -647,13 +649,11 @@ function getTests() {
 
   const Switch = [
     'Test_TC_SWTCH_2_1',
-    'Test_TC_SWTCH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
-    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [

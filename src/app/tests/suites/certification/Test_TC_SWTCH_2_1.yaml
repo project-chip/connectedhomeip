@@ -33,11 +33,6 @@ tests:
       attribute: "number of positions"
       response:
           value: 2
-
-    - label: "Read NumberOfPositions attribute"
-      command: "readAttribute"
-      attribute: "number of positions"
-      response:
           constraints:
               type: uint8
               minValue: 2
@@ -47,11 +42,6 @@ tests:
       attribute: "current position"
       response:
           value: 0
-
-    - label: "Read CurrentPosition attribute"
-      command: "readAttribute"
-      attribute: "current position"
-      response:
           constraints:
               type: uint8
               minValue: 0
@@ -61,11 +51,6 @@ tests:
       attribute: "multi press max"
       response:
           value: 2
-
-    - label: "Read MultiPressMax attribute"
-      command: "readAttribute"
-      attribute: "multi press max"
-      response:
           constraints:
               type: uint8
               minValue: 2
