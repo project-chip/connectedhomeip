@@ -1015,6 +1015,8 @@ typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(
+    void *, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>);
 typedef void (*PumpConfigurationAndControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallback)(
@@ -7391,6 +7393,35 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>
+{
+public:
+    CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
+};
+
+class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
+    : public CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
+{
+public:
+    CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

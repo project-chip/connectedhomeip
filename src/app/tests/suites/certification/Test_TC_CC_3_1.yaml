@@ -41,7 +41,7 @@ tests:
 
     - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -54,13 +54,13 @@ tests:
           values:
               - name: "hue"
                 value: 150
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -75,7 +75,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -94,7 +94,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -113,7 +113,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -126,13 +126,13 @@ tests:
           values:
               - name: "hue"
                 value: 200
-              - name: "direction"
+              - name: "Direction"
                 value: 1
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -147,7 +147,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -166,7 +166,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -185,7 +185,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -198,13 +198,13 @@ tests:
           values:
               - name: "hue"
                 value: 250
-              - name: "direction"
+              - name: "Direction"
                 value: 2
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -219,7 +219,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -238,7 +238,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -257,7 +257,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -270,13 +270,13 @@ tests:
           values:
               - name: "hue"
                 value: 225
-              - name: "direction"
+              - name: "Direction"
                 value: 3
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 300
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -291,7 +291,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -310,7 +310,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8
@@ -329,7 +329,7 @@ tests:
           "Check current hue attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
               type: uint8

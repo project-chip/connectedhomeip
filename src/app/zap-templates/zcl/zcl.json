@@ -50,6 +50,7 @@
         "pump-configuration-and-control-cluster.xml",
         "pwm-cluster.xml",
         "relative-humidity-measurement-cluster.xml",
+        "scene.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
@@ -153,7 +154,8 @@
         "Group Key Management": [
             "ClusterRevision",
             "MaxGroupsPerFabric",
-            "MaxGroupKeysPerFabric"
+            "MaxGroupKeysPerFabric",
+            "FeatureMap"
         ],
         "Operational Credentials": [
             "SupportedFabrics",

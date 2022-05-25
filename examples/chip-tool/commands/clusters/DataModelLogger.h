@@ -49,17 +49,35 @@ private:
 
     static CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
     {
-        char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        if (CHIP_NO_ERROR ==
-            chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
+        // CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE includes various prefixes we don't
+        // control (timestamps, process ids, etc).  Let's assume (hope?) that
+        // those prefixes use up no more than half the total available space.
+        // Right now it looks like the prefixes are 45 chars out of a 255 char
+        // buffer.
+        char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2];
+        size_t prefixSize = ComputePrefixSize(label, indent);
+        if (prefixSize > ArraySize(buffer))
         {
-            DataModelLogger::LogString(label, indent, buffer);
+            DataModelLogger::LogString("", 0, "Prefix is too long to fit in buffer");
+            return CHIP_ERROR_INTERNAL;
         }
-        else
+
+        const size_t availableSize = ArraySize(buffer) - prefixSize;
+        // Each byte ends up as two hex characters.
+        const size_t bytesPerLogCall = availableSize / 2;
+        std::string labelStr(label);
+        while (value.size() > bytesPerLogCall)
         {
-            DataModelLogger::LogString(label, indent,
-                                       std::string("Elided value too large of size ") + std::to_string(value.size()));
+            ReturnErrorOnFailure(
+                chip::Encoding::BytesToUppercaseHexString(value.data(), bytesPerLogCall, &buffer[0], ArraySize(buffer)));
+            LogString(labelStr, indent, buffer);
+            value = value.SubSpan(bytesPerLogCall);
+            // For the second and following lines, make it clear that they are
+            // continuation lines by replacing the label with "....".
+            labelStr.replace(labelStr.begin(), labelStr.end(), labelStr.size(), '.');
         }
+        ReturnErrorOnFailure(chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], ArraySize(buffer)));
+        LogString(labelStr, indent, buffer);
 
         return CHIP_NO_ERROR;
     }
@@ -152,12 +170,28 @@ private:
 
     static void LogString(const std::string label, size_t indent, const std::string string)
     {
-        std::string indentation;
+        std::string prefix = ComputePrefix(label, indent);
+
+        ChipLogProgress(chipTool, "%s%s", prefix.c_str(), string.c_str());
+    }
+
+private:
+    static std::string ComputePrefix(const std::string label, size_t indent)
+    {
+        std::string prefix;
         for (size_t i = 0; i < indent; ++i)
         {
-            indentation.append("  ");
+            prefix.append("  ");
         }
+        if (label.size() > 0)
+        {
+            prefix.append(label);
+            prefix.append(":");
+        }
+        prefix.append(" ");
 
-        ChipLogProgress(chipTool, "%s%s%s %s", indentation.c_str(), label.c_str(), label.size() ? ":" : "", string.c_str());
+        return prefix;
     }
+
+    static size_t ComputePrefixSize(const std::string label, size_t indent) { return ComputePrefix(label, indent).size(); }
 };

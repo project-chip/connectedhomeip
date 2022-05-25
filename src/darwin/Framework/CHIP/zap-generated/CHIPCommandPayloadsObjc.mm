@@ -245,11 +245,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
-        _sceneName = @"";
+        _sceneName = nil;
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSets = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -344,7 +344,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -368,13 +368,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _capacity = @(0);
+        _capacity = nil;
 
         _groupId = @(0);
 
-        _sceneCount = @(0);
-
-        _sceneList = [NSArray array];
+        _sceneList = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -438,11 +436,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
-        _sceneName = @"";
+        _sceneName = nil;
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSets = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2778,7 +2776,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2795,7 +2793,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3171,9 +3169,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _rate = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 
@@ -3194,9 +3192,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 

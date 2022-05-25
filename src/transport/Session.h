@@ -65,9 +65,10 @@ public:
         mHolders.Remove(&holder);
     }
 
-    // For types of sessions using reference counter, override these functions, otherwise leave it empty.
-    virtual void Retain() {}
-    virtual void Release() {}
+    virtual void Retain()  = 0;
+    virtual void Release() = 0;
+
+    virtual bool IsActiveSession() const = 0;
 
     virtual ScopedNodeId GetPeer() const                               = 0;
     virtual ScopedNodeId GetLocalScopedNodeId() const                  = 0;

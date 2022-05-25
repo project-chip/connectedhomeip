@@ -79,7 +79,7 @@
 
             <TextView
                 android:id="@+id/launchUrlStatus"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         </LinearLayout>

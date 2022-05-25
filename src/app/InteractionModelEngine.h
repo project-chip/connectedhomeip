@@ -175,8 +175,6 @@ public:
     CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
-    bool IsOverlappedAttributePath(AttributePathParams & aAttributePath);
-
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
     CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
@@ -232,6 +230,11 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
+
+    /**
+     * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
+     */
+    size_t GetNumDirtySubscriptions() const;
 
     /**
      * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write

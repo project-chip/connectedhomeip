@@ -116,7 +116,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
-        chip_device_platform == "k32w0") {
+        chip_device_platform == "k32w0" || chip_device_platform == "webos") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -249,7 +249,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "webos") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_WEBOS=1",
-        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_LAYER_TARGET=webos",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
       defines -=
@@ -351,7 +351,7 @@ if (chip_device_platform != "none") {
 
     # Linux has its own NetworkCommissioningThreadDriver
     if (chip_enable_openthread && chip_device_platform != "linux" &&
-        chip_device_platform != "tizen") {
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",

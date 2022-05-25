@@ -2,7 +2,7 @@
 
 {{~#*inline "maybePICS"}}
 {{#if PICS}}
-    VerifyOrdo(!ShouldSkip("{{PICS}}"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+    VerifyOrDo(!ShouldSkip("{{PICS}}"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
 {{/if}}
 {{/inline~}}
 

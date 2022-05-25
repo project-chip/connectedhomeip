@@ -21,16 +21,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation CHIPScenesClusterSceneExtensionFieldSet
+@implementation CHIPScenesClusterAttributeValuePair
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeId = nil;
+
+        _attributeValue = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterExtensionFieldSet
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _clusterId = @(0);
 
-        _length = @(0);
-
-        _value = @(0);
+        _attributeValueList = [NSArray array];
     }
     return self;
 }
@@ -1305,6 +1316,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPThermostatClusterThermostatScheduleTransition
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _transitionTime = @(0);
+
+        _heatSetpoint = nil;
+
+        _coolSetpoint = nil;
     }
     return self;
 }

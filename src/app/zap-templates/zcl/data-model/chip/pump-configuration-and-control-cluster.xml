@@ -38,7 +38,7 @@ limitations under the License.
     <attribute side="server" code="0x000A" define="MAX_CONST_FLOW" type="INT16U" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MaxConstFlow</attribute>
     <attribute side="server" code="0x000B" define="MIN_CONST_TEMP" type="INT16S" isNullable="true" min="0x954D" max="32767" writable="false" optional="true">MinConstTemp</attribute>
     <attribute side="server" code="0x000C" define="MAX_CONST_TEMP" type="INT16S" isNullable="true" min="0x954D" max="0x7FFF" writable="false" optional="true">MaxConstTemp</attribute>
-    <attribute side="server" code="0x0010" define="PUMP_STATUS" type="BITMAP16" writable="false" default="0x0000" reportable="true" optional="true">PumpStatus</attribute>
+    <attribute side="server" code="0x0010" define="PUMP_STATUS" type="PumpStatus" writable="false" default="0x0000" reportable="true" optional="true">PumpStatus</attribute>
     <attribute side="server" code="0x0011" define="EFFECTIVE_OPERATION_MODE" type="PumpOperationMode" min="0x00" max="0x03" writable="false" optional="false">EffectiveOperationMode</attribute>
     <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="PumpControlMode" min="0x00" max="0x07" writable="false" optional="false">EffectiveControlMode</attribute>
     <attribute side="server" code="0x0013" define="CAPACITY" type="INT16S" isNullable="true" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
@@ -64,7 +64,6 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" default="0x0000" optional="true">AlarmMask</attribute>
 
     <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
       <description>SupplyVoltageLow</description>

@@ -322,9 +322,7 @@ function getManualTests() {
     'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_7',
-    'Test_TC_DL_2_8',
     'Test_TC_DL_2_10',
-    'Test_TC_DL_2_11',
     'Test_TC_DL_2_13',
     'Test_TC_DL_2_14',
     'Test_TC_DL_2_15',
@@ -333,7 +331,6 @@ function getManualTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_1',
     'Test_TC_LC_2_3',
     'Test_TC_LC_2_4',
     'Test_TC_LC_2_5',
@@ -551,7 +548,8 @@ function getTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_2',
+    'Test_TC_ULABEL_1_1',
+    'Test_TC_ULABEL_2_2',
   ];
 
   const MediaControl = [
@@ -761,6 +759,8 @@ function getTests() {
     'Test_TC_DL_2_2',
     'Test_TC_DL_2_3',
     'Test_TC_DL_2_4',
+    'Test_TC_DL_2_8',
+    'Test_TC_DL_2_11',
   ];
 
   const Groups = [

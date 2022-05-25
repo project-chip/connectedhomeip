@@ -37,7 +37,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
@@ -62,7 +62,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
@@ -87,7 +87,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
@@ -111,7 +111,7 @@
     40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     8, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
@@ -127,7 +127,7 @@
     5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    16400, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     16384, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
@@ -143,7 +143,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \

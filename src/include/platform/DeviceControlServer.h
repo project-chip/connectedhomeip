@@ -29,60 +29,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-/**
- * Defines the Swtich Device Control Delegate class to notify platform events.
- */
-class SwitchDeviceControlDelegate
-{
-public:
-    virtual ~SwitchDeviceControlDelegate() {}
-
-    /**
-     * @brief
-     *   Called when the latching switch is moved to a new position.
-     */
-    virtual void OnSwitchLatched(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch starts to be pressed.
-     */
-    virtual void OnInitialPressed(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been pressed for a "long" time.
-     */
-    virtual void OnLongPressed(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been released.
-     */
-    virtual void OnShortReleased(uint8_t previousPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been released (after debouncing)
-     *   and after having been pressed for a long time.
-     */
-    virtual void OnLongReleased(uint8_t previousPosition) {}
-
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, during that sequence.
-     */
-    virtual void OnMultiPressOngoing(uint8_t newPosition, uint8_t count) {}
-
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, after it has been detected that the sequence has ended.
-     */
-    virtual void OnMultiPressComplete(uint8_t newPosition, uint8_t count) {}
-};
-
 class DeviceControlServer final
 {
 public:
@@ -92,8 +38,6 @@ public:
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
-    void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
-    SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
     FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
 
     static DeviceControlServer & DeviceControlSvr();
@@ -102,7 +46,6 @@ private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
     FailSafeContext mFailSafeContext;
-    SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
 
     // ===== Private members reserved for use by this class only.
 

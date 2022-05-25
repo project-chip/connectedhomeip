@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    94.4. [TC-LC-1.4]User Label cluster constraint_error verification [DUT -
-    Commissionee]
+name: 92.3. [TC-ULABEL-2.2] User Label cluster write verification [DUT-server]
 
 config:
     nodeId: 0x12344321
@@ -30,10 +28,29 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH1 reads LabelList attribute from the DUT"
+    - label: "TH writes LabelList attribute from the DUT"
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value:
+              [
+                  { label: "roomName", value: "master bedroom 1" },
+                  { label: "Orientation", value: "east" },
+                  { label: "floor", value: "2" },
+                  { label: "roomType", value: "bedroom" },
+              ]
+
+    - label: "TH reads LabelList attribute from the DUT"
       command: "readAttribute"
       attribute: "label list"
       response:
+          value:
+              [
+                  { label: "roomName", value: "master bedroom 1" },
+                  { label: "Orientation", value: "east" },
+                  { label: "floor", value: "2" },
+                  { label: "roomType", value: "bedroom" },
+              ]
           constraints:
               - type: list
-              - minLength: 3
+              - minLength: 4

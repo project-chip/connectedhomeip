@@ -587,12 +587,6 @@ EmberEventControl * ConfigureFakeMotionEventControl(EndpointId endpoint)
     return controller;
 }
 
-/**
- * @brief PostAttributeChange is called when an Attribute is modified
- *
- * @param[in] endpoint
- * @param[in] attributeId
- */
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
 {
     // all-cluster-app: simulation for the CI testing

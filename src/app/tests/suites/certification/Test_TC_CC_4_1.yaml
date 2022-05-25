@@ -41,7 +41,7 @@ tests:
 
     - label: "Check Saturation attribute value matched before any change"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -52,13 +52,13 @@ tests:
       command: "MoveToSaturation"
       arguments:
           values:
-              - name: "saturation"
+              - name: "Saturation"
                 value: 90
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 6ms"
@@ -73,7 +73,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -92,7 +92,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -111,7 +111,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8

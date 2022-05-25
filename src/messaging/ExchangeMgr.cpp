@@ -111,6 +111,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
+    // Disallow creating exchange on an inactive session
+    VerifyOrReturnError(session->IsActiveSession(), nullptr);
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
@@ -230,10 +232,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                         packetHeader.GetDestinationGroupId().Value());
     }
 
+    // Do not handle unsolicited messages on a inactive session.
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
     // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
+    if (session->IsActiveSession() && !msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.

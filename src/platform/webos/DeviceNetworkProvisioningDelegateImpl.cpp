@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,22 @@ namespace DeviceLayer {
 
 CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(NetworkProvisioning, "LinuxNetworkProvisioningDelegate: SSID: %s", ssid);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    err = ConnectivityMgrImpl().ProvisionWiFiNetwork(ssid, key);
+#else
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+    }
+
+    return err;
 }
 
 } // namespace DeviceLayer

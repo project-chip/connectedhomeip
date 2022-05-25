@@ -86,7 +86,7 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 bool emberAfPluginScenesServerParseAddScene(
     chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
     uint16_t transitionTime, const chip::CharSpan & sceneName,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType> &
         extensionFieldSets);
 bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                              chip::GroupId groupId, uint8_t sceneId);

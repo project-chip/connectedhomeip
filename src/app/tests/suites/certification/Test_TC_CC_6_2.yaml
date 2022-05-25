@@ -42,7 +42,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -53,17 +53,17 @@ tests:
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 90ms"
@@ -76,7 +76,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -93,7 +93,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -110,7 +110,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -121,17 +121,17 @@ tests:
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 20
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 190ms"
@@ -144,7 +144,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -161,7 +161,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -178,7 +178,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -189,34 +189,34 @@ tests:
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Stop Color Temperature command"
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 90ms"
@@ -229,7 +229,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -246,7 +246,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -263,7 +263,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -274,34 +274,34 @@ tests:
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 20
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Stop Color Temperature command"
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 140ms"
@@ -314,7 +314,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -331,7 +331,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -348,7 +348,7 @@ tests:
 
     - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16

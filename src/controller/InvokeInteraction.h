@@ -105,7 +105,6 @@ template <typename RequestObjectT>
 CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, chip::FabricIndex fabric, chip::GroupId groupId,
                                      const RequestObjectT & requestCommandData)
 {
-    CHIP_ERROR error                   = CHIP_NO_ERROR;
     app::CommandPathParams commandPath = { groupId, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            app::CommandPathFlags::kGroupIdValid };
     Transport::OutgoingGroupSession session(groupId, fabric);
@@ -113,15 +112,8 @@ CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, c
     auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    error = commandSender->AddRequestData(commandPath, requestCommandData);
-    SuccessOrExit(error);
-
-    error = commandSender->SendGroupCommandRequest(SessionHandle(session));
-    SuccessOrExit(error);
-
-exit:
-    chip::Platform::Delete(commandSender.release());
-    return error;
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    return commandSender->SendGroupCommandRequest(SessionHandle(session));
 }
 
 template <typename RequestObjectT>
