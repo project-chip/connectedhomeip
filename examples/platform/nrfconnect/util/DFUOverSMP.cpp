@@ -30,6 +30,8 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "OTAUtil.h"
+
 using namespace ::chip::DeviceLayer;
 
 constexpr uint16_t kAdvertisingIntervalMinMs = 400;

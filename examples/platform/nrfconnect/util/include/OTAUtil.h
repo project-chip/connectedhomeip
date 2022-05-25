@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+
 namespace chip {
 namespace DeviceLayer {
 class OTAImageProcessorImpl;
