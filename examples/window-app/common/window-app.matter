@@ -1900,7 +1900,7 @@ endpoint 1 {
     persist  attribute installedClosedLimitLift default = 0xFFFF;
     persist  attribute installedOpenLimitTilt;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x14;
+    persist  attribute mode;
     ram      attribute safetyStatus;
     ram      attribute featureMap default = 0x0017;
     ram      attribute clusterRevision default = 5;

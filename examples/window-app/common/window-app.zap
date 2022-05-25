@@ -1,5 +1,5 @@
 {
-  "featureLevel": 70,
+  "featureLevel": 71,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -8844,7 +8844,7 @@
               "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x14",
+              "defaultValue": "0x0",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10518,5 +10518,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 514
     }
-  ]
+  ],
+  "log": []
 }

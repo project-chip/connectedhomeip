@@ -126,7 +126,7 @@
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* HourFormat */                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
-            { (uint16_t) 0x14, (uint16_t) 0x0, (uint16_t) 0xF }, /* Mode */                                                        \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF }, /* Mode */                                                         \
                                                                                                                                    \
         /* Endpoint: 2, Cluster: Window Covering (server) */ { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF } /* Mode */         \
     }
