@@ -214,7 +214,7 @@ public:
      *  handle calling Shutdown on itself once it decides it's done with waiting
      *  for a response (i.e. times out or gets a response). Client can specify
      *  the maximum time to wait for response (in milliseconds) via timeout parameter.
-     *  If the timeout is missing or is set to System::Clock::kZero, a value based on the CRMP timeouts of the session will be used.
+     *  If the timeout is missing or is set to System::Clock::kZero, a value based on the MRP timeouts of the session will be used.
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */

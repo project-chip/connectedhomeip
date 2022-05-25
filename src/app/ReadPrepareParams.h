@@ -49,8 +49,8 @@ struct ReadPrepareParams
     DataVersionFilter * mpDataVersionFilterList     = nullptr;
     size_t mDataVersionFilterListSize               = 0;
     Optional<EventNumber> mEventNumber;
-    // The timeout for waiting the response or System::Clock::kZero to let the interaction model decide the timeout based on the
-    // CRMP timeouts of the session.
+    // The timeout for waiting for the response or System::Clock::kZero to let the interaction model decide the timeout based on the
+    // MRP timeouts of the session.
     System::Clock::Timeout mTimeout          = System::Clock::kZero;
     uint16_t mMinIntervalFloorSeconds        = 0;
     uint16_t mMaxIntervalCeilingSeconds      = 0;
