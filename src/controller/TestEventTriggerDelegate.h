@@ -63,6 +63,6 @@ public:
     virtual CHIP_ERROR ConfigureTestEventTrigger(const ByteSpan testEventKey, uint64_t eventTrigger) = 0;
     virtual size_t ConfiguredEventTriggerCount() = 0;
 };
-#endif 
+#endif
 
 } // namespace chip
