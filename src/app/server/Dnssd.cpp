@@ -70,15 +70,7 @@ bool DnssdServer::HaveOperationalCredentials()
     VerifyOrDie(mFabricTable != nullptr);
 
     // Look for any fabric info that has a useful operational identity.
-    for (const FabricInfo & fabricInfo : *mFabricTable)
-    {
-        if (fabricInfo.IsInitialized())
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return mFabricTable->FabricCount() != 0;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -252,34 +244,31 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
-        if (fabricInfo.IsInitialized())
+        uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
+        MutableByteSpan mac(macBuffer);
+        if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
         {
-            uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
-            MutableByteSpan mac(macBuffer);
-            if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-                Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
-            }
-
-            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                                 .SetPeerId(fabricInfo.GetPeerId())
-                                                 .SetMac(mac)
-                                                 .SetPort(GetSecuredPort())
-                                                 .SetInterfaceId(GetInterfaceId())
-                                                 .SetMRPConfig(GetLocalMRPConfig())
-                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                                 .EnableIpV4(true);
-
-            auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
-
-            ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
-                            ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
-                            ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
-            // Should we keep trying to advertise the other operational
-            // identities on failure?
-            ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+            ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+            Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
         }
+
+        const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                             .SetPeerId(fabricInfo.GetPeerId())
+                                             .SetMac(mac)
+                                             .SetPort(GetSecuredPort())
+                                             .SetInterfaceId(GetInterfaceId())
+                                             .SetMRPConfig(GetLocalMRPConfig())
+                                             .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                             .EnableIpV4(true);
+
+        auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+
+        ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
+                        ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
+                        ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
+        // Should we keep trying to advertise the other operational
+        // identities on failure?
+        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
     }
     return CHIP_NO_ERROR;
 }

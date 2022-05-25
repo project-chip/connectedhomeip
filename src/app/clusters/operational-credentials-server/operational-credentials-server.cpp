@@ -122,9 +122,6 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
         {
             Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
 
-            if (!fabricInfo.IsInitialized())
-                continue;
-
             noc.fabricIndex = fabricInfo.GetFabricIndex();
 
             if (accessingFabricIndex == fabricInfo.GetFabricIndex())
@@ -164,9 +161,6 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
-            if (!fabricInfo.IsInitialized())
-                continue;
-
             Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
 
             fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
@@ -193,10 +187,6 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             ByteSpan cert;
-
-            if (!fabricInfo.IsInitialized())
-                continue;
-
             ReturnErrorOnFailure(fabricInfo.GetRootCert(cert));
             ReturnErrorOnFailure(encoder.Encode(cert));
         }
