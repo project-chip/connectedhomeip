@@ -25,7 +25,7 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-//using namespace ::chip::app::Clusters::Thermostat;
+// using namespace ::chip::app::Clusters::Thermostat;
 
 static const char * TAG = "DeviceWithDisplay";
 
@@ -633,13 +633,15 @@ void SetupPretendDevices()
     app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
-    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatSystemMode::kHeat));
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(
+        1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatSystemMode::kHeat));
     AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("HeatSetpoint", "25");
     app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
     AddAttribute("RunningMode", "4");
-    app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatRunningMode::kHeat));
+    app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
+        1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatRunningMode::kHeat));
 
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
