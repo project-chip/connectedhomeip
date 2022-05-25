@@ -39,7 +39,7 @@ using namespace ::chip::DeviceLayer::Internal;
 #define DEVICE_LAYER_LOG_BUFFER_SIZE (256)
 static UART2_Handle sDebugUartHandle;
 static char sDebugUartBuffer[DEVICE_LAYER_LOG_BUFFER_SIZE];
-//static pthread_mutex_t mutex;
+// static pthread_mutex_t mutex;
 
 extern "C" int cc32xxLogInit(void)
 {
@@ -54,7 +54,7 @@ extern "C" int cc32xxLogInit(void)
     UART2_rxDisable(sDebugUartHandle);
 
     /* Enable debug mutex */
-    //pthread_mutex_init(&mutex, NULL);
+    // pthread_mutex_init(&mutex, NULL);
     return 0;
 }
 
@@ -62,7 +62,7 @@ extern "C" void cc32xxVLog(const char * msg, va_list v)
 {
     int ret;
 
-    //pthread_mutex_lock(&mutex);
+    // pthread_mutex_lock(&mutex);
     ret = vsnprintf(sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
     if (0 < ret)
     {
@@ -74,7 +74,7 @@ extern "C" void cc32xxVLog(const char * msg, va_list v)
 
         UART2_write(sDebugUartHandle, sDebugUartBuffer, len, &len);
     }
-    //pthread_mutex_unlock(&mutex);
+    // pthread_mutex_unlock(&mutex);
 }
 
 namespace chip {

@@ -82,8 +82,8 @@
  * Define AP_SSID and optionally AP_PASSWORD - to connect to local network
  * Hard-Coded Definition: update AP_SSID and AP_PASSWORD (NULL means OPEN, else is WPA2)
  */
-#define AP_SSID     NULL     // "network-name"
-#define AP_PASSWORD NULL     // "network-password"
+#define AP_SSID NULL     // "network-name"
+#define AP_PASSWORD NULL // "network-password"
 
 /* Static Profile setting  - Method 2: Configuration file
  * File format should be:

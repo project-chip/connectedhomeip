@@ -38,14 +38,13 @@
 
 #include <type_traits>
 
-extern "C"
-{
+extern "C" {
 #include <ti/net/slnetconn.h>
 
 #define SLNETCONN_TIMEOUT 0xffff // "infinite" Timeout
 
-extern int   LWIP_IF_start();
-extern void  SlNetConnEventHandler(uint32_t ifID, SlNetConnStatus_e netStatus, void * data);
+extern int LWIP_IF_start();
+extern void SlNetConnEventHandler(uint32_t ifID, SlNetConnStatus_e netStatus, void * data);
 }
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -163,8 +162,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
         // if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
         // {
-            ChipLogProgress(AppServer, "Commissioning completed successfully");
-            DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
+        ChipLogProgress(AppServer, "Commissioning completed successfully");
+        DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
         // }
         // else
         // {

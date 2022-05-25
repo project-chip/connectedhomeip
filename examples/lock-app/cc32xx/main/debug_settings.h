@@ -27,12 +27,12 @@
 #define D_DEBUG_METHOD D_USER_DEFINED
 
 // Select Sevrity Color
-#define _FATAL_CLR_ 	_CLR_B_RED_
-#define _ERROR_CLR_ 	_CLR_RED_
-#define _WARNING_CLR_ 	_CLR_MAGENTA_
-#define _INFO_CLR_ 	_CLR_GREEN_
-#define _DEBUG_CLR_ 	_CLR_YELLOW_
-#define _TRACE_CLR_ 	_CLR_RESET_
+#define _FATAL_CLR_ _CLR_B_RED_
+#define _ERROR_CLR_ _CLR_RED_
+#define _WARNING_CLR_ _CLR_MAGENTA_
+#define _INFO_CLR_ _CLR_GREEN_
+#define _DEBUG_CLR_ _CLR_YELLOW_
+#define _TRACE_CLR_ _CLR_RESET_
 
 #if (D_DEBUG_METHOD == D_USER_DEFINED)
 extern void cc32xxLog(const char * msg, ...);

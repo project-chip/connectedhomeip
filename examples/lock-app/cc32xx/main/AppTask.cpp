@@ -43,14 +43,12 @@
 /* syscfg */
 #include <ti_drivers_config.h>
 
-extern "C"
-{
-extern int   WiFi_init();
-extern void  DisplayBanner();
+extern "C" {
+extern int WiFi_init();
+extern void DisplayBanner();
 }
 
 /* Application Version and Naming*/
-
 
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 4
@@ -69,7 +67,6 @@ static QueueHandle_t sAppEventQueue;
 
 extern LED_Handle gLedGreenHandle, gLedRedHandle;
 static Button_Handle gButtonRightHandle;
-
 
 AppTask AppTask::sAppTask;
 
@@ -95,8 +92,6 @@ int AppTask::StartAppTask()
     }
     return ret;
 }
-
-
 
 int AppTask::Init()
 {
@@ -273,8 +268,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         LED_setOff(gLedRedHandle);
         state = 0;
     }
-    emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &state,
-                          ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
