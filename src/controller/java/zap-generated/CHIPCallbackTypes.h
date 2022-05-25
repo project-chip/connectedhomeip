@@ -730,6 +730,8 @@ typedef void (*CHIPGeneralDiagnosticsClusterActiveRadioFaultsAttributeCallbackTy
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterActiveNetworkFaultsAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralDiagnosticsClusterTestEventTriggersEnabledAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterAcceptedCommandListAttributeCallbackType)(

@@ -1742,6 +1742,10 @@ namespace ActiveNetworkFaults {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace ActiveNetworkFaults
 
+namespace TestEventTriggersEnabled {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TestEventTriggersEnabled
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

@@ -2880,6 +2880,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000008: {
+                    "attributeName": "TestEventTriggersEnabled",
+                    "attributeId": 0x00000008,
+                    "type": "bool",
+                    "reportable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,

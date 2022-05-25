@@ -1664,6 +1664,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
+@implementation CHIPGeneralDiagnosticsClusterTestEventTriggerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _enableKey = [NSData data];
+
+        _eventTrigger = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+@end
 @implementation CHIPSoftwareDiagnosticsClusterResetWatermarksParams
 - (instancetype)init
 {

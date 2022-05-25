@@ -30,3 +30,19 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & data);
+typedef void (*GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(void * context,
+                                                                         const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*GeneralDiagnosticsGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*GeneralDiagnosticsAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
