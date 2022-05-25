@@ -55,8 +55,12 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
-    user.createdBy      = userInDb.createdBy;
-    user.lastModifiedBy = userInDb.lastModifiedBy;
+    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // source to Matter
+    user.creationSource     = DlAssetSource::kMatterIM;
+    user.createdBy          = userInDb.createdBy;
+    user.modificationSource = DlAssetSource::kMatterIM;
+    user.lastModifiedBy     = userInDb.lastModifiedBy;
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
@@ -151,8 +155,12 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
-    credential.createdBy      = credentialInStorage.createdBy;
-    credential.lastModifiedBy = credentialInStorage.modifiedBy;
+    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // source to Matter
+    credential.creationSource     = DlAssetSource::kMatterIM;
+    credential.createdBy          = credentialInStorage.createdBy;
+    credential.modificationSource = DlAssetSource::kMatterIM;
+    credential.lastModifiedBy     = credentialInStorage.modifiedBy;
 
     ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]",
                   mEndpointId, credentialIndex, to_underlying(credential.credentialType),

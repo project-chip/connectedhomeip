@@ -382,9 +382,17 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
                 }
                 SuccessOrExit(err = writer->EndContainer(credentialsContainer));
             }
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
-            SuccessOrExit(
-                err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)), user.lastModifiedBy));
+            // Append fabric IDs only if the user was created/modified by matter
+            if (user.creationSource == DlAssetSource::kMatterIM)
+            {
+                SuccessOrExit(err =
+                                  writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
+            }
+            if (user.modificationSource == DlAssetSource::kMatterIM)
+            {
+                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)),
+                                                user.lastModifiedBy));
+            }
         }
         else
         {
@@ -694,54 +702,34 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
         }
     }
 
-    uint16_t nextCredentialIndex = 0;
-
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    using ResponseFields          = Commands::GetCredentialStatusResponse::Fields;
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetCredentialStatusResponse::Id };
-    TLV::TLVWriter * writer       = nullptr;
-    SuccessOrExit(err = commandObj->PrepareCommand(path));
-    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialExists)), credentialExists));
+    Commands::GetCredentialStatusResponse::Type response { .credentialExists = credentialExists };
     if (credentialExists)
     {
         if (0 != userIndexWithCredential)
         {
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
+            response.userIndex = Nullable<uint16_t>(userIndexWithCredential);
         }
-        if (kUndefinedFabricIndex != credentialInfo.createdBy)
+        if (credentialInfo.creationSource == DlAssetSource::kMatterIM)
         {
-            SuccessOrExit(
-                err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), credentialInfo.createdBy));
+            response.creatorFabricIndex = Nullable<chip::FabricIndex>(credentialInfo.createdBy);
         }
-        if (kUndefinedFabricIndex != credentialInfo.lastModifiedBy)
+        if (credentialInfo.modificationSource == DlAssetSource::kMatterIM)
         {
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)),
-                                            credentialInfo.lastModifiedBy));
+            response.lastModifiedFabricIndex = Nullable<chip::FabricIndex>(credentialInfo.lastModifiedBy);
         }
     }
+    uint16_t nextCredentialIndex = 0;
     if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
                                      nextCredentialIndex))
     {
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextCredentialIndex)), nextCredentialIndex));
+        response.nextCredentialIndex = Nullable<uint16_t>(nextCredentialIndex);
     }
-    SuccessOrExit(err = commandObj->FinishCommand());
+    commandObj->AddResponse(commandPath, response);
 
     emberAfDoorLockClusterPrintln("[GetCredentialStatus] Prepared credential status "
                                   "[endpointId=%d,credentialType=%u,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
                                   commandPath.mEndpointId, to_underlying(credentialType), credentialIndex, userIndexWithCredential,
                                   nextCredentialIndex);
-
-exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl,
-                     "[GetCredentialStatus] Error occurred when preparing response: %s "
-                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
-                     err.AsString(), commandPath.mEndpointId, to_underlying(credentialType), credentialIndex,
-                     userIndexWithCredential, nextCredentialIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
 }
 
 void DoorLockServer::ClearCredentialCommandHandler(

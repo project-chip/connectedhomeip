@@ -427,6 +427,12 @@ enum class DlCredentialStatus : uint8_t
     kOccupied  = 0x01, /**< Indicates if credential slot is already occupied. */
 };
 
+enum class DlAssetSource : uint8_t
+{
+    kUnspecified = 0x00,
+    kMatterIM    = 0x01,
+};
+
 /**
  * @brief Structure that holds the credential information.
  */
@@ -435,7 +441,11 @@ struct EmberAfPluginDoorLockCredentialInfo
     DlCredentialStatus status;        /**< Indicates if credential slot is occupied or not. */
     DlCredentialType credentialType;  /**< Specifies the type of the credential (PIN, RFID, etc.). */
     chip::ByteSpan credentialData;    /**< Credential data bytes. */
+
+    DlAssetSource creationSource;
     chip::FabricIndex createdBy;      /**< ID of the fabric that created the user. */
+
+    DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
@@ -450,7 +460,11 @@ struct EmberAfPluginDoorLockUserInfo
     DlUserStatus userStatus;                    /**< Status of the user slot (available/occupied). */
     DlUserType userType;                        /**< Type of the user. */
     DlCredentialRule credentialRule;            /**< Number of supported credentials. */
+
+    DlAssetSource creationSource;
     chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
+
+    DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
 
