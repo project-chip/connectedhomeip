@@ -206,7 +206,6 @@ public:
     TestReadInteraction() {}
 
     static void TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestReadDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
@@ -217,7 +216,6 @@ public:
     static void TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
-    static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
@@ -348,49 +346,6 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
-    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
-void TestReadInteraction::TestReadDataVersionFilter(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
-    auto sessionHandle      = ctx.GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
-                                                      const auto & dataResponse) {
-        uint8_t i = 0;
-        auto iter = dataResponse.begin();
-        while (iter.Next())
-        {
-            auto & item = iter.GetValue();
-            NL_TEST_ASSERT(apSuite, item.fabricIndex == i);
-            i++;
-        }
-        NL_TEST_ASSERT(apSuite, i == 4);
-        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
-
-    Optional<DataVersion> dataVersion(kDataVersion);
-    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true, dataVersion);
-
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1354,7 +1309,7 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false, onDoneCbInvoked = false;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1370,12 +1325,18 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
         onFailureCbInvoked = true;
     };
 
+    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) {
+        onDoneCbInvoked = true;
+    };
+
     Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                         onSuccessCb, onFailureCb);
+                                                                         onSuccessCb, onFailureCb, onDoneCb);
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, onDoneCbInvoked);
+
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1794,69 +1755,6 @@ void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext 
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == aReadCount);
     NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
-}
-
-void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
-    auto sessionHandle                       = ctx.GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [apSuite, &numSuccessCalls](const app::ConcreteDataAttributePath & attributePath,
-                                                   const auto & dataResponse) {
-        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&apSuite](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        //
-        // We shouldn't be encountering any failures in this test.
-        //
-        NL_TEST_ASSERT(apSuite, false);
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
-    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
-    // present in that define.
-    //
-    chip::Optional<chip::DataVersion> dataVersion(1);
-    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
-    {
-        NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
-    }
-
-    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
-    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
-        return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
-            numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
-    });
-
-    ChipLogError(Zcl, "Success call cnt: %u (expect %u) subscription cnt: %u (expect %u)", numSuccessCalls,
-                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1), numSubscriptionEstablishedCalls,
-                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
-
-    NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
-    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext)
@@ -2583,14 +2481,12 @@ void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlT
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadAttributeResponse", TestReadInteraction::TestReadAttributeResponse),
-    NL_TEST_DEF("TestReadDataVersionFilter", TestReadInteraction::TestReadDataVersionFilter),
     NL_TEST_DEF("TestReadEventResponse", TestReadInteraction::TestReadEventResponse),
     NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
     NL_TEST_DEF("TestReadFabricScopedWithoutFabricFilter", TestReadInteraction::TestReadFabricScopedWithoutFabricFilter),
     NL_TEST_DEF("TestReadFabricScopedWithFabricFilter", TestReadInteraction::TestReadFabricScopedWithFabricFilter),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptions", TestReadInteraction::TestReadHandler_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandler_SubscriptionAppRejection", TestReadInteraction::TestReadHandler_SubscriptionAppRejection),
-    NL_TEST_DEF("TestReadHandler_MultipleSubscriptionsWithDataVersionFilter", TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter),
     NL_TEST_DEF("TestReadHandler_MultipleReads", TestReadInteraction::TestReadHandler_MultipleReads),
     NL_TEST_DEF("TestReadHandler_OneSubscribeMultipleReads", TestReadInteraction::TestReadHandler_OneSubscribeMultipleReads),
     NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
