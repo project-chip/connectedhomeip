@@ -64113,7 +64113,7 @@ private:
 class TestGroupsClusterSuite : public TestCommand
 {
 public:
-    TestGroupsClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestGroupsCluster", 19, credsIssuerConfig)
+    TestGroupsClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestGroupsCluster", 20, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -64175,12 +64175,22 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 135));
+
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 0));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
             break;
-        case 4:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64192,7 +64202,7 @@ private:
                 VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
             }
             break;
-        case 5:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64202,7 +64212,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
             break;
-        case 6:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -64217,7 +64227,7 @@ private:
                 }
             }
             break;
-        case 7:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64227,7 +64237,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
             break;
-        case 8:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64239,7 +64249,7 @@ private:
                 VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
             }
             break;
-        case 9:
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
@@ -64249,7 +64259,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
             }
             break;
-        case 10:
+        case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
@@ -64259,7 +64269,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4U));
             }
             break;
-        case 11:
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64271,7 +64281,7 @@ private:
                 VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
             }
             break;
-        case 12:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64281,7 +64291,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
             break;
-        case 13:
+        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -64296,10 +64306,10 @@ private:
                 }
             }
             break;
-        case 14:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 15:
+        case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64309,7 +64319,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
             break;
-        case 16:
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64319,7 +64329,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
             break;
-        case 17:
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -64329,7 +64339,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
             break;
-        case 18:
+        case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -64385,7 +64395,17 @@ private:
             );
         }
         case 3: {
-            LogStep(3, "Add Group 1 (new)");
+            LogStep(3, "Add Group 1 (invalid)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 0U;
+            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 4: {
+            LogStep(4, "Add Group 1 (new)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 1U;
@@ -64394,8 +64414,8 @@ private:
 
             );
         }
-        case 4: {
-            LogStep(4, "View Group 1 (new)");
+        case 5: {
+            LogStep(5, "View Group 1 (new)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -64404,8 +64424,8 @@ private:
 
             );
         }
-        case 5: {
-            LogStep(5, "View Group 2 (not found)");
+        case 6: {
+            LogStep(6, "View Group 2 (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
@@ -64414,8 +64434,8 @@ private:
 
             );
         }
-        case 6: {
-            LogStep(6, "Get Group Membership 1 (all)");
+        case 7: {
+            LogStep(7, "Get Group Membership 1 (all)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 
@@ -64425,8 +64445,8 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "View Group 3 (not found)");
+        case 8: {
+            LogStep(8, "View Group 3 (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
@@ -64435,8 +64455,8 @@ private:
 
             );
         }
-        case 8: {
-            LogStep(8, "View Group 1 (existing)");
+        case 9: {
+            LogStep(9, "View Group 1 (existing)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -64445,8 +64465,8 @@ private:
 
             );
         }
-        case 9: {
-            LogStep(9, "Remove Group 0 (invalid)");
+        case 10: {
+            LogStep(10, "Remove Group 0 (invalid)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
             value.groupId = 0U;
@@ -64455,8 +64475,8 @@ private:
 
             );
         }
-        case 10: {
-            LogStep(10, "Remove Group 4 (not found)");
+        case 11: {
+            LogStep(11, "Remove Group 4 (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
             value.groupId = 4U;
@@ -64465,8 +64485,8 @@ private:
 
             );
         }
-        case 11: {
-            LogStep(11, "View Group 1 (not removed)");
+        case 12: {
+            LogStep(12, "View Group 1 (not removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -64475,8 +64495,8 @@ private:
 
             );
         }
-        case 12: {
-            LogStep(12, "View Group 2 (removed)");
+        case 13: {
+            LogStep(13, "View Group 2 (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
@@ -64485,8 +64505,8 @@ private:
 
             );
         }
-        case 13: {
-            LogStep(13, "Get Group Membership 3");
+        case 14: {
+            LogStep(14, "Get Group Membership 3");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 
@@ -64504,8 +64524,8 @@ private:
 
             );
         }
-        case 14: {
-            LogStep(14, "Remove All");
+        case 15: {
+            LogStep(15, "Remove All");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
@@ -64513,8 +64533,8 @@ private:
 
             );
         }
-        case 15: {
-            LogStep(15, "View Group 1 (removed)");
+        case 16: {
+            LogStep(16, "View Group 1 (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -64523,8 +64543,8 @@ private:
 
             );
         }
-        case 16: {
-            LogStep(16, "View Group 2 (still removed)");
+        case 17: {
+            LogStep(17, "View Group 2 (still removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
@@ -64533,8 +64553,8 @@ private:
 
             );
         }
-        case 17: {
-            LogStep(17, "View Group 3 (removed)");
+        case 18: {
+            LogStep(18, "View Group 3 (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
@@ -64543,8 +64563,8 @@ private:
 
             );
         }
-        case 18: {
-            LogStep(18, "Get Group Membership 4");
+        case 19: {
+            LogStep(19, "Get Group Membership 4");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 

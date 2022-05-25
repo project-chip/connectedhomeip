@@ -54,6 +54,21 @@ tests:
               - name: "groupId"
                 value: 0x0001
 
+    - label: "Add Group 1 (invalid)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0000
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 135
+              - name: "groupId"
+                value: 0x0000
+
     - label: "Add Group 1 (new)"
       command: "AddGroup"
       arguments:
