@@ -31,16 +31,16 @@ namespace Switch {
 /**
  * @brief switch-server class
  */
-class SwitchServer
+class Server
 {
 public:
-    static SwitchServer & Instance();
+    static Server & Instance();
 
     /**
      * @brief
      *   Called when the latching switch is moved to a new position.
      */
-    void OnSwitchLatched(EndpointId endpoint, uint8_t newPosition);
+    void OnSwitchLatch(EndpointId endpoint, uint8_t newPosition);
 
     /**
      * @brief
@@ -82,7 +82,7 @@ public:
     void OnMultiPressComplete(EndpointId endpoint, uint8_t newPosition, uint8_t count);
 
 private:
-    static SwitchServer instance;
+    static Server instance;
 };
 
 } // namespace Switch

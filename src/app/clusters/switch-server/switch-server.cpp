@@ -41,20 +41,20 @@ namespace app {
 namespace Clusters {
 namespace Switch {
 
-SwitchServer SwitchServer::instance;
+Server Server::instance;
 
 /**********************************************************
- * SwitchServer Implementation
+ * Server Implementation
  *********************************************************/
 
-SwitchServer & SwitchServer::Instance()
+Server & Server::Instance()
 {
     return instance;
 }
 
-void SwitchServer::OnSwitchLatched(EndpointId endpoint, uint8_t newPosition)
+void Server::OnSwitchLatch(EndpointId endpoint, uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnSwitchLatched");
+    ChipLogProgress(Zcl, "Server: OnSwitchLatch");
 
     // Record SwitchLatched event
     EventNumber eventNumber;
@@ -62,13 +62,13 @@ void SwitchServer::OnSwitchLatched(EndpointId endpoint, uint8_t newPosition)
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record SwitchLatched event");
+        ChipLogError(Zcl, "Server: Failed to record SwitchLatched event");
     }
 }
 
-void SwitchServer::OnInitialPressed(EndpointId endpoint, uint8_t newPosition)
+void Server::OnInitialPress(EndpointId endpoint, uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnInitialPressed");
+    ChipLogProgress(Zcl, "Server: OnInitialPress");
 
     // Record InitialPress event
     EventNumber eventNumber;
@@ -76,13 +76,13 @@ void SwitchServer::OnInitialPressed(EndpointId endpoint, uint8_t newPosition)
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record InitialPress event");
+        ChipLogError(Zcl, "Server: Failed to record InitialPress event");
     }
 }
 
-void SwitchServer::OnLongPressed(EndpointId endpoint, uint8_t newPosition)
+void Server::OnLongPress(EndpointId endpoint, uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnLongPressed");
+    ChipLogProgress(Zcl, "Server: OnLongPress");
 
     // Record LongPress event
     EventNumber eventNumber;
@@ -90,13 +90,13 @@ void SwitchServer::OnLongPressed(EndpointId endpoint, uint8_t newPosition)
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record LongPress event");
+        ChipLogError(Zcl, "Server: Failed to record LongPress event");
     }
 }
 
-void SwitchServer::OnShortReleased(EndpointId endpoint, uint8_t previousPosition)
+void Server::OnShortRelease(EndpointId endpoint, uint8_t previousPosition)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnShortReleased");
+    ChipLogProgress(Zcl, "Server: OnShortRelease");
 
     // Record ShortRelease event
     EventNumber eventNumber;
@@ -104,13 +104,13 @@ void SwitchServer::OnShortReleased(EndpointId endpoint, uint8_t previousPosition
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record ShortRelease event");
+        ChipLogError(Zcl, "Server: Failed to record ShortRelease event");
     }
 }
 
-void SwitchServer::OnLongReleased(EndpointId endpoint, uint8_t previousPosition)
+void Server::OnLongRelease(EndpointId endpoint, uint8_t previousPosition)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnLongReleased");
+    ChipLogProgress(Zcl, "Server: OnLongRelease");
 
     // Record LongRelease event
     EventNumber eventNumber;
@@ -118,13 +118,13 @@ void SwitchServer::OnLongReleased(EndpointId endpoint, uint8_t previousPosition)
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record LongRelease event");
+        ChipLogError(Zcl, "Server: Failed to record LongRelease event");
     }
 }
 
-void SwitchServer::OnMultiPressOngoing(EndpointId endpoint, uint8_t newPosition, uint8_t count)
+void Server::OnMultiPressOngoing(EndpointId endpoint, uint8_t newPosition, uint8_t count)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnMultiPressOngoing");
+    ChipLogProgress(Zcl, "Server: OnMultiPressOngoing");
 
     // Record MultiPressOngoing event
     EventNumber eventNumber;
@@ -132,13 +132,13 @@ void SwitchServer::OnMultiPressOngoing(EndpointId endpoint, uint8_t newPosition,
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record MultiPressOngoing event");
+        ChipLogError(Zcl, "Server: Failed to record MultiPressOngoing event");
     }
 }
 
-void SwitchServer::OnMultiPressComplete(EndpointId endpoint, uint8_t newPosition, uint8_t count)
+void Server::OnMultiPressComplete(EndpointId endpoint, uint8_t newPosition, uint8_t count)
 {
-    ChipLogProgress(Zcl, "SwitchServer: OnMultiPressComplete");
+    ChipLogProgress(Zcl, "Server: OnMultiPressComplete");
 
     // Record MultiPressComplete event
     EventNumber eventNumber;
@@ -146,7 +146,7 @@ void SwitchServer::OnMultiPressComplete(EndpointId endpoint, uint8_t newPosition
 
     if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
     {
-        ChipLogError(Zcl, "SwitchServer: Failed to record MultiPressComplete event");
+        ChipLogError(Zcl, "Server: Failed to record MultiPressComplete event");
     }
 }
 
