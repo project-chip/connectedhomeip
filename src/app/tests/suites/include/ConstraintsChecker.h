@@ -400,4 +400,23 @@ protected:
         }
         return CheckConstraintNotValue(itemName, current, expected.Value());
     }
+
+    template <typename T>
+    bool CheckConstraintHasValue(const char * itemName, const chip::Optional<T> & current, bool expected)
+    {
+        if (current.HasValue() == expected)
+        {
+            return true;
+        }
+
+        if (current.HasValue())
+        {
+            Exit(std::string(itemName) + " not expected to have a value but does");
+        }
+        else
+        {
+            Exit(std::string(itemName) + " expected to have a value but doesn't");
+        }
+        return false;
+    }
 };

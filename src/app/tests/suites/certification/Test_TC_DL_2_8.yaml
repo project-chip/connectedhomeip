@@ -111,22 +111,27 @@ tests:
                 value: 0x0
               - name: "daysMask"
                 constraints:
+                    hasValue: true
                     minValue: 0
                     maxValue: 6
               - name: "startHour"
                 constraints:
+                    hasValue: true
                     minValue: 0
                     maxValue: 23
               - name: "startMinute"
                 constraints:
+                    hasValue: true
                     minValue: 0
                     maxValue: 59
               - name: "endHour"
                 constraints:
+                    hasValue: true
                     minValue: 0
                     maxValue: 23
               - name: "endMinute"
                 constraints:
+                    hasValue: true
                     minValue: 0
                     maxValue: 59
 
@@ -171,6 +176,21 @@ tests:
                 value: 1
               - name: "status"
                 value: 0x85
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false
 
     - label: "Clear all week day schedules for the first user"
       command: "ClearWeekDaySchedule"
@@ -197,3 +217,18 @@ tests:
                 value: 1
               - name: "status"
                 value: 0x8B
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false

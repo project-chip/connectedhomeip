@@ -586,6 +586,7 @@ hardknott
 hardwarever
 HardwareVersion
 HardwareVersionString
+hasValue
 hci
 hciattach
 hciconfig
