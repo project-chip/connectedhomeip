@@ -14,16 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <DeviceInfoProviderImpl.h>
 
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <cstring>
 
 namespace chip {
 namespace DeviceLayer {
@@ -41,7 +43,7 @@ DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
-    return new FixedLabelIteratorImpl(endpoint);
+    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
 }
 
 DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
@@ -51,7 +53,7 @@ DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointI
 
 size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
-    // In Ameba Simulation, return the size of the hardcoded labelList on all endpoints.
+    // A hardcoded labelList on all endpoints.
     return 4;
 }
 
@@ -59,7 +61,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 {
     bool retval = true;
 
-    // In Ameba Simulation, use the following hardcoded labelList on all endpoints.
+    // A hardcoded list for testing only
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * labelPtr = nullptr;
@@ -67,7 +69,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
     VerifyOrReturnError(mIndex < 4, false);
 
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%ld at endpoint:%d", mIndex, mEndpoint);
+    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
 
     switch (mIndex)
     {
@@ -149,7 +151,7 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
-    return new UserLabelIteratorImpl(*this, endpoint);
+    return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
 }
 
 DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint) :
@@ -170,7 +172,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
     DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
-    uint16_t len = static_cast<uint16_t>(UserLabelTLVMaxSize());
+    uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
     err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
@@ -208,12 +210,12 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
 DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
 {
-    return new SupportedLocalesIteratorImpl();
+    return chip::Platform::New<SupportedLocalesIteratorImpl>();
 }
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-    // In Ameba Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
+    // Hardcoded list of locales
     // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
 
     return 8;
@@ -223,7 +225,7 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 {
     bool retval = true;
 
-    // In Ameba simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    // Hardcoded list of locales
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * activeLocalePtr = nullptr;
@@ -283,12 +285,12 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
 {
-    return new SupportedCalendarTypesIteratorImpl();
+    return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
 }
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-    // In Ameba Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // Hardcoded list of strings
     // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
     //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
 
@@ -299,7 +301,7 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
 {
     bool retval = true;
 
-    // In Ameba Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    // Hardcoded list of Strings that are valid values for the Calendar Types.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mIndex < 12, false);

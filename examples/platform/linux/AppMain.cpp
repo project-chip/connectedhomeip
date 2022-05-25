@@ -41,6 +41,8 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <DeviceInfoProviderImpl.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include "CommissionerMain.h"
 #include <ControllerShellCommands.h>
@@ -95,6 +97,8 @@ static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 namespace {
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 chip::trace::TraceStream * gTraceStream = nullptr;
@@ -236,6 +240,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
                                                    LinuxDeviceOptions::GetInstance());
