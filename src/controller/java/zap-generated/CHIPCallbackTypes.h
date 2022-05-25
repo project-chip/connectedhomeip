@@ -784,8 +784,6 @@ typedef void (*CHIPGroupsClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::Groups::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Groups::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPIdentifyClusterIdentifyQueryResponseCallbackType)(
-    void *, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &);
 
 typedef void (*CHIPIdentifyClusterIdentifyTimeAttributeCallbackType)(
     void *, chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo::DecodableArgType);

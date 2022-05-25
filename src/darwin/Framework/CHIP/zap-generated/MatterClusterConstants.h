@@ -2084,8 +2084,6 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
 typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     // Cluster Identify commands
     kMatterClusterIdentifyCommandIdentifyID = 0x00000000,
-    kMatterClusterIdentifyCommandIdentifyQueryResponseID = 0x00000000,
-    kMatterClusterIdentifyCommandIdentifyQueryID = 0x00000001,
     kMatterClusterIdentifyCommandTriggerEffectID = 0x00000040,
 
     // Cluster Groups commands

@@ -12266,16 +12266,6 @@ void CHIPGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data)
-{
-    auto * response = [CHIPIdentifyClusterIdentifyQueryResponseParams new];
-    {
-        response.timeout = [NSNumber numberWithUnsignedShort:data.timeout];
-    }
-    DispatchSuccess(context, response);
-};
-
 void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
 {
