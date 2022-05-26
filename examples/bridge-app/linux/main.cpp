@@ -88,10 +88,6 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH 0x0103
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_ROOT_NODE 0x0016
-// (taken from chip-devices.xml)
-#define DEVICE_TYPE_AGGREGATOR 0x000e
-// (taken from chip-devices.xml)
 #define DEVICE_TYPE_POWER_SOURCE 0x0011
 
 // Device Version for dynamic endpoints:
@@ -152,8 +148,6 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-
-ComposedDevice AggregatorDevice("Aggregator device", "Bedroom");
 
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
@@ -244,7 +238,6 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
-DataVersion gAggregatorDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];    // Todo: What is the correct cluster to use here?
 DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
 DataVersion gComposedSwitch1DataVersions[ArraySize(bridgedSwitchClusters)];
 DataVersion gComposedSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
@@ -659,11 +652,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
 void ApplicationInit() {}
 
-// const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-//                                                       { DEVICE_TYPE_AGGREGATOR, DEVICE_VERSION_DEFAULT } };
-
-const EmberAfDeviceType gAggregatorDeviceTypes[] = { { DEVICE_TYPE_AGGREGATOR, DEVICE_VERSION_DEFAULT } };
-
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
@@ -698,22 +686,19 @@ void * bridge_polling_thread(void * context)
             int ch = getchar();
             if (ch == '2' && light2_added == false)
             {
-                std::cout << "Adding light2." << std::endl;    
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), AggregatorDevice.GetEndpointId());
+                                  Span<DataVersion>(gLight2DataVersions), 1);
                 light2_added = true;
             }
             else if (ch == '4' && light1_added == true)
             {
-                std::cout << "Removing light1." << std::endl;
                 RemoveDeviceEndpoint(&Light1);
                 light1_added = false;
             }
             if (ch == '5' && light1_added == false)
             {
-                std::cout << "Adding light1." << std::endl;    
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), AggregatorDevice.GetEndpointId());
+                                  Span<DataVersion>(gLight1DataVersions), 1);
                 light1_added = true;
             }
             if (ch == 'b')
@@ -781,7 +766,6 @@ int main(int argc, char * argv[])
     ComposedSwitch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
     ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
 
-    AggregatorDevice.SetReachable(true);
     ComposedDevice.SetReachable(true);
     ComposedSwitch1.SetReachable(true);
     ComposedSwitch2.SetReachable(true);
@@ -817,43 +801,20 @@ int main(int argc, char * argv[])
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
-
-
-    // Todo: I think I can just remove this since we are using a non-zero endpointID for the aggregator/bridge
-
-    //
-    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
-    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
-    //
-    // emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
-
-
-
-    // Add an aggregator as device that uses a non-zero endpointID.
-    AddDeviceEndpoint(&AggregatorDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gAggregatorDeviceTypes),
-                      Span<DataVersion>(gAggregatorDeviceDataVersions));
-    // Todo: I'm not sure that bridgedComposedDeviceEndpoint is the correct thing to use here.
-
     
-
-
-
-
-
-
     // Add light 1 -> will be mapped to ZCL endpoints 3
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), AggregatorDevice.GetEndpointId());
+                      Span<DataVersion>(gLight1DataVersions), 1);
     
     // Add switch 1..2 --> will be mapped to ZCL endpoints 4,5
     AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch1DataVersions), AggregatorDevice.GetEndpointId());
+                      Span<DataVersion>(gSwitch1DataVersions), 1);
     AddDeviceEndpoint(&Switch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch2DataVersions), AggregatorDevice.GetEndpointId());
+                      Span<DataVersion>(gSwitch2DataVersions), 1);
 
     // Add composed Device with two buttons and a power source
     AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
-                      Span<DataVersion>(gComposedDeviceDataVersions));
+                      Span<DataVersion>(gComposedDeviceDataVersions), 1);
     AddDeviceEndpoint(&ComposedSwitch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),
                       Span<DataVersion>(gComposedSwitch1DataVersions), ComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedSwitch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),

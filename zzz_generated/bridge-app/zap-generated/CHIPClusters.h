@@ -37,5 +37,12 @@ public:
     ~AccessControlCluster() {}
 };
 
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    ~BindingCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip
