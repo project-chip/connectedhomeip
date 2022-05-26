@@ -27,6 +27,7 @@
 
 #include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/ESP32/DeviceInfoProviderImpl.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/SystemTimeSupport.h>
@@ -61,6 +62,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
