@@ -106,8 +106,7 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -115,16 +114,14 @@ CHIP_ERROR InvokeResponseIB::Parser::GetCommand(CommandDataIB::Parser * const ap
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kCommand)), reader));
-    ReturnErrorOnFailure(apCommand->Init(reader));
-    return CHIP_NO_ERROR;
+    return apCommand->Init(reader);
 }
 
 CHIP_ERROR InvokeResponseIB::Parser::GetStatus(CommandStatusIB::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kStatus)), reader));
-    ReturnErrorOnFailure(apStatus->Init(reader));
-    return CHIP_NO_ERROR;
+    return apStatus->Init(reader);
 }
 
 CommandDataIB::Builder & InvokeResponseIB::Builder::CreateCommand()

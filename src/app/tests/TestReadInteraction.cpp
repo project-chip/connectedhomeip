@@ -1458,9 +1458,6 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
         err = attributePathListBuilder.GetError();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsProxy(true);
-        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
         subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 

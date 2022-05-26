@@ -582,13 +582,13 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "mDNS collision";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
-        desc = "Malformed Interacton Model Attribute Path";
+        desc = "Malformed Interacton Model Attribute Path IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_EVENT_PATH.AsInteger():
-        desc = "Malformed Interacton Model Event Path";
+        desc = "Malformed Interacton Model Event Path IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH.AsInteger():
-        desc = "Malformed Interacton Model Command Path";
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB.AsInteger():
+        desc = "Malformed Interacton Model Command Path IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT.AsInteger():
         desc = "Malformed Interacton Model Attribute DataElement";
@@ -596,7 +596,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT.AsInteger():
         desc = "Malformed Interacton Model Attribute DataElement";
         break;
-    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT.AsInteger():
+    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB.AsInteger():
         desc = "Malformed Interacton Model Event DataElement";
         break;
     case CHIP_ERROR_IM_MALFORMED_STATUS_CODE.AsInteger():
@@ -665,8 +665,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Write Request Message";
         break;
-    case CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Write Response Message";
+    case CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Filter IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Read Request Message";
@@ -715,6 +715,18 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB.AsInteger():
+        desc = "Malformed Interaction Model Attribute Report IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_IB.AsInteger():
+        desc = "Malformed Interaction Model Attribute Status IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB.AsInteger():
+        desc = "Malformed Interaction Model Command Data IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Status IB";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
