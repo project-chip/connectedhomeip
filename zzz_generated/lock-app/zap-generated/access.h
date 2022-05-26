@@ -201,6 +201,9 @@
     257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetHolidaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetHolidaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearHolidaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
@@ -243,6 +246,9 @@
     14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     16, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    17, /* Cluster: Door Lock, Command: SetHolidaySchedule, Privilege: administer */ \
+    18, /* Cluster: Door Lock, Command: GetHolidaySchedule, Privilege: administer */ \
+    19, /* Cluster: Door Lock, Command: ClearHolidaySchedule, Privilege: administer */ \
     26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
@@ -285,6 +291,9 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetHolidaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetHolidaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearHolidaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \

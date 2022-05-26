@@ -587,6 +587,7 @@ server cluster DoorLock = 257 {
   readonly attribute int16u numberOfRFIDUsersSupported = 19;
   readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
   readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
+  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
@@ -656,6 +657,21 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 1;
   }
 
+  request struct SetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+    epoch_s localStartTime = 1;
+    epoch_s localEndTime = 2;
+    DlOperatingMode operatingMode = 3;
+  }
+
+  request struct GetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
+  request struct ClearHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
   request struct SetUserRequest {
     DlDataOperationType operationType = 0;
     INT16U userIndex = 1;
@@ -710,6 +726,14 @@ server cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
+  response struct GetHolidayScheduleResponse = 18 {
+    INT8U holidayIndex = 0;
+    DlStatus status = 1;
+    optional epoch_s localStartTime = 2;
+    optional epoch_s localEndTime = 3;
+    optional DlOperatingMode operatingMode = 4;
+  }
+
   response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
@@ -746,6 +770,9 @@ server cluster DoorLock = 257 {
   command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
   command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
   command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
+  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
   command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
   timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
@@ -2144,6 +2171,7 @@ endpoint 1 {
     ram      attribute numberOfRFIDUsersSupported default = 10;
     ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
     ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfHolidaySchedulesSupported default = 10;
     ram      attribute maxPINCodeLength default = 8;
     ram      attribute minPINCodeLength default = 6;
     ram      attribute maxRFIDCodeLength default = 20;

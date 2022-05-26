@@ -55954,7 +55954,7 @@ class DL_UsersAndCredentialsSuite : public TestCommand
 {
 public:
     DL_UsersAndCredentialsSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("DL_UsersAndCredentials", 113, credsIssuerConfig)
+        TestCommand("DL_UsersAndCredentials", 114, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -57739,6 +57739,9 @@ private:
                 VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 7U));
             }
             break;
+        case 113:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -59340,6 +59343,16 @@ private:
 
             );
         }
+        case 113: {
+            LogStep(113, "Final clean-up");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -59576,7 +59589,7 @@ private:
 class DL_SchedulesSuite : public TestCommand
 {
 public:
-    DL_SchedulesSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_Schedules", 84, credsIssuerConfig)
+    DL_SchedulesSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_Schedules", 127, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -59600,6 +59613,7 @@ private:
     uint16_t NumberOfTotalUsersSupported;
     uint8_t NumberOfWeekDaySchedulesSupportedPerUser;
     uint8_t NumberOfYearDaySchedulesSupportedPerUser;
+    uint8_t NumberOfHolidaySchedulesSupported;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
@@ -59662,7 +59676,14 @@ private:
             }
             break;
         case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("numberOfHolidaySchedulesSupported", value, 10));
+
+                NumberOfHolidaySchedulesSupported = value;
+            }
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
@@ -59674,10 +59695,10 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
             break;
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
@@ -59704,6 +59725,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59715,7 +59739,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 20:
+        case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59727,7 +59751,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 21:
+        case 22:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59740,7 +59764,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 22:
+        case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59752,7 +59776,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 23:
+        case 24:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59764,7 +59788,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 24:
+        case 25:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59776,9 +59800,6 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 25:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
-            break;
         case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
@@ -59789,12 +59810,15 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 29:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
-            break;
-        case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            break;
         case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 32:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59806,7 +59830,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 32:
+        case 33:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59818,7 +59842,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 33:
+        case 34:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59831,7 +59855,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 34:
+        case 35:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59843,7 +59867,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 35:
+        case 36:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59855,7 +59879,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
             break;
-        case 36:
+        case 37:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59867,88 +59891,75 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 37:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 38:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
-
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
-
-                VerifyOrReturn(CheckValue("status", value.status, 0));
-
-                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
-
-                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
-
-                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
-
-                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
-
-                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
-            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 39:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 40:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
-
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
-
-                VerifyOrReturn(CheckValue("status", value.status, 0));
-
-                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
-                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
-
-                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
-                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
-            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 41:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 42:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
             break;
         case 43:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 0));
+
+                VerifyOrReturn(CheckValue("status", value.status, 133));
+            }
             break;
         case 44:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(
+                    CheckValue("holidayIndex", value.holidayIndex, static_cast<uint8_t>(NumberOfHolidaySchedulesSupported + 1)));
+
+                VerifyOrReturn(CheckValue("status", value.status, 133));
+            }
             break;
         case 45:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 46:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
             break;
         case 47:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 48:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
-            break;
-        case 49:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
-            break;
-        case 50:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
-            break;
-        case 51:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -59975,7 +59986,10 @@ private:
                 VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
             }
             break;
-        case 52:
+        case 49:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 50:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -59993,61 +60007,22 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
             }
             break;
+        case 51:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 52:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
         case 53:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 54:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
-
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
-
-                VerifyOrReturn(CheckValue("status", value.status, 0));
-
-                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2));
-
-                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
-
-                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
-
-                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
-
-                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
-            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 55:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
             break;
         case 56:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
-
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
-
-                VerifyOrReturn(CheckValue("status", value.status, 0));
-
-                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
-                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
-
-                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
-                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
-            }
-            break;
-        case 57:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 58:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60056,25 +60031,25 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
             }
             break;
-        case 59:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 60:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
-
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
-
-                VerifyOrReturn(CheckValue("status", value.status, 139));
-            }
-            break;
-        case 61:
+        case 57:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60092,29 +60067,66 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
             }
             break;
-        case 62:
+        case 58:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
+            break;
+        case 59:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 60:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 61:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 62:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 63:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            break;
+        case 64:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
                 VerifyOrReturn(CheckValue("status", value.status, 0));
 
-                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
-                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
 
-                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
-                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
             }
-            break;
-        case 63:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 64:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 65:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -60125,13 +60137,303 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
             }
             break;
         case 66:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
             break;
         case 67:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 68:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            break;
+        case 69:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
+            }
+            break;
+        case 70:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+            }
+            break;
+        case 71:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
+            break;
+        case 72:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 73:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2));
+
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+            }
+            break;
+        case 74:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 75:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
+            }
+            break;
+        case 76:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 77:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+            }
+            break;
+        case 78:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 79:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 80:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 81:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 82:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+            }
+            break;
+        case 83:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
+            }
+            break;
+        case 84:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
+            break;
+        case 85:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+            }
+            break;
+        case 86:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 87:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 88:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 89:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 90:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60143,7 +60445,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 68:
+        case 91:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60170,16 +60472,16 @@ private:
                 VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
             }
             break;
-        case 69:
+        case 92:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 70:
+        case 93:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 71:
+        case 94:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 72:
+        case 95:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60206,10 +60508,10 @@ private:
                 VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
             }
             break;
-        case 73:
+        case 96:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 74:
+        case 97:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60227,10 +60529,10 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
             }
             break;
-        case 75:
+        case 98:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 76:
+        case 99:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60257,10 +60559,10 @@ private:
                 VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
             }
             break;
-        case 77:
+        case 100:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 78:
+        case 101:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60278,10 +60580,10 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 7777777UL));
             }
             break;
-        case 79:
+        case 102:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 80:
+        case 103:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60293,7 +60595,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 81:
+        case 104:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60305,7 +60607,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 82:
+        case 105:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60317,7 +60619,7 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
             break;
-        case 83:
+        case 106:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
@@ -60328,6 +60630,263 @@ private:
 
                 VerifyOrReturn(CheckValue("status", value.status, 139));
             }
+            break;
+        case 107:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
+            break;
+        case 108:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+            }
+            break;
+        case 109:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 110:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 1UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 100UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4));
+            }
+            break;
+        case 111:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
+
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+            }
+            break;
+        case 112:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 113:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 114:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 115:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+            }
+            break;
+        case 116:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 117:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 1UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 100UL));
+
+                VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4));
+            }
+            break;
+        case 118:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+            }
+            break;
+        case 119:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
+            }
+            break;
+        case 120:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 121:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 122:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 123:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
+
+                VerifyOrReturn(CheckValue("status", value.status, 139));
+            }
+            break;
+        case 124:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+
+                VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+
+                VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+
+                VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+            }
+            break;
+        case 125:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+
+                VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
+
+                VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 888888888UL));
+            }
+            break;
+        case 126:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -60385,7 +60944,12 @@ private:
                                  DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, true, chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "Create Week Day schedule with 0 index");
+            LogStep(5, "Get Max number of Holiday schedules and verify default value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
+                                 DoorLock::Attributes::NumberOfHolidaySchedulesSupported::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Create Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
@@ -60400,8 +60964,8 @@ private:
 
             );
         }
-        case 6: {
-            LogStep(6, "Create Week Day schedule with out-of-bounds index");
+        case 7: {
+            LogStep(7, "Create Week Day schedule with out-of-bounds index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
@@ -60416,8 +60980,8 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "Create Week Day schedule with 0 user index");
+        case 8: {
+            LogStep(8, "Create Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60432,8 +60996,8 @@ private:
 
             );
         }
-        case 8: {
-            LogStep(8, "Create Week Day schedule with out-of-bounds user index");
+        case 9: {
+            LogStep(9, "Create Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60448,8 +61012,8 @@ private:
 
             );
         }
-        case 9: {
-            LogStep(9, "Create Week Day schedule for non-existing user");
+        case 10: {
+            LogStep(10, "Create Week Day schedule for non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60464,8 +61028,8 @@ private:
 
             );
         }
-        case 10: {
-            LogStep(10, "Create Week Day schedule with 0 days mask");
+        case 11: {
+            LogStep(11, "Create Week Day schedule with 0 days mask");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60480,8 +61044,8 @@ private:
 
             );
         }
-        case 11: {
-            LogStep(11, "Create Week Day schedule for Sunday and Monday");
+        case 12: {
+            LogStep(12, "Create Week Day schedule for Sunday and Monday");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60496,8 +61060,8 @@ private:
 
             );
         }
-        case 12: {
-            LogStep(12, "Create Week Day schedule for Sunday Wednesday and Saturday");
+        case 13: {
+            LogStep(13, "Create Week Day schedule for Sunday Wednesday and Saturday");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60512,8 +61076,8 @@ private:
 
             );
         }
-        case 13: {
-            LogStep(13, "Create Week Day schedule with invalid start hour");
+        case 14: {
+            LogStep(14, "Create Week Day schedule with invalid start hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60528,8 +61092,8 @@ private:
 
             );
         }
-        case 14: {
-            LogStep(14, "Create Week Day schedule with invalid start minute");
+        case 15: {
+            LogStep(15, "Create Week Day schedule with invalid start minute");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60544,8 +61108,8 @@ private:
 
             );
         }
-        case 15: {
-            LogStep(15, "Create Week Day schedule with invalid end hour");
+        case 16: {
+            LogStep(16, "Create Week Day schedule with invalid end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60560,8 +61124,8 @@ private:
 
             );
         }
-        case 16: {
-            LogStep(16, "Create Week Day schedule with invalid end minute");
+        case 17: {
+            LogStep(17, "Create Week Day schedule with invalid end minute");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60576,8 +61140,8 @@ private:
 
             );
         }
-        case 17: {
-            LogStep(17, "Create Week Day schedule with start hour later that end hour");
+        case 18: {
+            LogStep(18, "Create Week Day schedule with start hour later that end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60592,8 +61156,8 @@ private:
 
             );
         }
-        case 18: {
-            LogStep(18, "Create Week Day schedule with start minute later that end minute when hours are equal");
+        case 19: {
+            LogStep(19, "Create Week Day schedule with start minute later that end minute when hours are equal");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60608,8 +61172,8 @@ private:
 
             );
         }
-        case 19: {
-            LogStep(19, "Make sure that previous operations did not create a schedule");
+        case 20: {
+            LogStep(20, "Make sure that previous operations did not create a schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60619,8 +61183,8 @@ private:
 
             );
         }
-        case 20: {
-            LogStep(20, "Get Week Day schedule with 0 index");
+        case 21: {
+            LogStep(21, "Get Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
@@ -60630,8 +61194,8 @@ private:
 
             );
         }
-        case 21: {
-            LogStep(21, "Get Week Day schedule with out-of-bounds index");
+        case 22: {
+            LogStep(22, "Get Week Day schedule with out-of-bounds index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
@@ -60641,8 +61205,8 @@ private:
 
             );
         }
-        case 22: {
-            LogStep(22, "Get Week Day schedule with 0 user index");
+        case 23: {
+            LogStep(23, "Get Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60652,8 +61216,8 @@ private:
 
             );
         }
-        case 23: {
-            LogStep(23, "Get Week Day schedule with out-of-bounds user index");
+        case 24: {
+            LogStep(24, "Get Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60663,8 +61227,8 @@ private:
 
             );
         }
-        case 24: {
-            LogStep(24, "Get Week Day schedule with non-existing user index");
+        case 25: {
+            LogStep(25, "Get Week Day schedule with non-existing user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60674,8 +61238,8 @@ private:
 
             );
         }
-        case 25: {
-            LogStep(25, "Create Year Day schedule with 0 index");
+        case 26: {
+            LogStep(26, "Create Year Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 0;
@@ -60687,8 +61251,8 @@ private:
 
             );
         }
-        case 26: {
-            LogStep(26, "Create Year Day schedule with out-of-bounds index");
+        case 27: {
+            LogStep(27, "Create Year Day schedule with out-of-bounds index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
@@ -60700,8 +61264,8 @@ private:
 
             );
         }
-        case 27: {
-            LogStep(27, "Create Year Day schedule with 0 user index");
+        case 28: {
+            LogStep(28, "Create Year Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -60713,8 +61277,8 @@ private:
 
             );
         }
-        case 28: {
-            LogStep(28, "Create Year Day schedule with out-of-bounds user index");
+        case 29: {
+            LogStep(29, "Create Year Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -60726,8 +61290,8 @@ private:
 
             );
         }
-        case 29: {
-            LogStep(29, "Create Year Day schedule for non-existing user");
+        case 30: {
+            LogStep(30, "Create Year Day schedule for non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -60739,8 +61303,8 @@ private:
 
             );
         }
-        case 30: {
-            LogStep(30, "Create Year Day schedule with start hour later that end hour");
+        case 31: {
+            LogStep(31, "Create Year Day schedule with start hour later that end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -60752,8 +61316,8 @@ private:
 
             );
         }
-        case 31: {
-            LogStep(31, "Make sure that previous operations did not create a schedule");
+        case 32: {
+            LogStep(32, "Make sure that previous operations did not create a schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -60763,8 +61327,8 @@ private:
 
             );
         }
-        case 32: {
-            LogStep(32, "Get Year Day schedule with 0 index");
+        case 33: {
+            LogStep(33, "Get Year Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 0;
@@ -60774,8 +61338,8 @@ private:
 
             );
         }
-        case 33: {
-            LogStep(33, "Get Year Day schedule with out-of-bounds index");
+        case 34: {
+            LogStep(34, "Get Year Day schedule with out-of-bounds index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
@@ -60785,8 +61349,8 @@ private:
 
             );
         }
-        case 34: {
-            LogStep(34, "Get Year Day schedule with 0 user index");
+        case 35: {
+            LogStep(35, "Get Year Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -60796,8 +61360,8 @@ private:
 
             );
         }
-        case 35: {
-            LogStep(35, "Get Year Day schedule with out-of-bounds user index");
+        case 36: {
+            LogStep(36, "Get Year Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -60807,8 +61371,8 @@ private:
 
             );
         }
-        case 36: {
-            LogStep(36, "Get Year Day schedule with non-existing user index");
+        case 37: {
+            LogStep(37, "Get Year Day schedule with non-existing user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -60818,8 +61382,113 @@ private:
 
             );
         }
-        case 37: {
-            LogStep(37, "Create Week Day schedule with valid parameters");
+        case 38: {
+            LogStep(38, "Create Holiday schedule with 0 index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = 0;
+            value.localStartTime = 12345UL;
+            value.localEndTime   = 12345689UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 39: {
+            LogStep(39, "Create Holiday schedule with out-of-bounds index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = static_cast<uint8_t>(NumberOfHolidaySchedulesSupported + 1);
+            value.localStartTime = 12345UL;
+            value.localEndTime   = 12345689UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 40: {
+            LogStep(40, "Create Holiday schedule with start hour later that end hour");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = 1;
+            value.localStartTime = 12345689UL;
+            value.localEndTime   = 12345688UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 41: {
+            LogStep(41, "Create Holiday schedule with invalid operating mode");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = 1;
+            value.localStartTime = 12345UL;
+            value.localEndTime   = 12345689UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(5);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 42: {
+            LogStep(42, "Make sure that previous operations did not create a schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 43: {
+            LogStep(43, "Get Holiday schedule with 0 index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 0;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 44: {
+            LogStep(44, "Get Holiday schedule with out-of-bounds index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = static_cast<uint8_t>(NumberOfHolidaySchedulesSupported + 1);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 45: {
+            LogStep(45, "Create Holiday schedule with valid parameters");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = 1;
+            value.localStartTime = 12345UL;
+            value.localEndTime   = 12345689UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 46: {
+            LogStep(46, "Verify created schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 47: {
+            LogStep(47, "Create Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60834,8 +61503,8 @@ private:
 
             );
         }
-        case 38: {
-            LogStep(38, "Verify created schedule");
+        case 48: {
+            LogStep(48, "Verify created schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60845,8 +61514,8 @@ private:
 
             );
         }
-        case 39: {
-            LogStep(39, "Create Year Day schedule with valid parameters");
+        case 49: {
+            LogStep(49, "Create Year Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -60858,8 +61527,8 @@ private:
 
             );
         }
-        case 40: {
-            LogStep(40, "Verify created schedule");
+        case 50: {
+            LogStep(50, "Verify created schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -60869,8 +61538,8 @@ private:
 
             );
         }
-        case 41: {
-            LogStep(41, "Clear Week Day schedule with 0 index");
+        case 51: {
+            LogStep(51, "Clear Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
@@ -60880,8 +61549,8 @@ private:
 
             );
         }
-        case 42: {
-            LogStep(42, "Clear Week Day schedule with out-of-bounds index");
+        case 52: {
+            LogStep(52, "Clear Week Day schedule with out-of-bounds index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
@@ -60891,8 +61560,8 @@ private:
 
             );
         }
-        case 43: {
-            LogStep(43, "Clear Week Day schedule with 0 user index");
+        case 53: {
+            LogStep(53, "Clear Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60902,8 +61571,8 @@ private:
 
             );
         }
-        case 44: {
-            LogStep(44, "Clear Week Day schedule with out-of-bounds user index");
+        case 54: {
+            LogStep(54, "Clear Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60913,8 +61582,8 @@ private:
 
             );
         }
-        case 45: {
-            LogStep(45, "Clear Week Day schedule with non-existing user");
+        case 55: {
+            LogStep(55, "Clear Week Day schedule with non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60924,63 +61593,8 @@ private:
 
             );
         }
-        case 46: {
-            LogStep(46, "Clear Year Day schedule with 0 index");
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 0;
-            value.userIndex    = 1U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 47: {
-            LogStep(47, "Clear Year Day schedule with out-of-bounds index");
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
-            value.userIndex    = 1U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 48: {
-            LogStep(48, "Clear Year Day schedule with 0 user index");
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
-            value.userIndex    = 0U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 49: {
-            LogStep(49, "Clear Year Day schedule with out-of-bounds user index");
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
-            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 50: {
-            LogStep(50, "Clear Year Day schedule with non-existing user");
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
-            value.userIndex    = 2U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 51: {
-            LogStep(51, "Make sure that week day schedule was not deleted");
+        case 56: {
+            LogStep(56, "Make sure that week day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -60990,8 +61604,8 @@ private:
 
             );
         }
-        case 52: {
-            LogStep(52, "Make sure that year day schedule was not deleted");
+        case 57: {
+            LogStep(57, "Make sure that year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -61001,8 +61615,157 @@ private:
 
             );
         }
-        case 53: {
-            LogStep(53, "Create another Week Day schedule with valid parameters");
+        case 58: {
+            LogStep(58, "Make sure that holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 59: {
+            LogStep(59, "Clear Year Day schedule with 0 index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 0;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 60: {
+            LogStep(60, "Clear Year Day schedule with out-of-bounds index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 61: {
+            LogStep(61, "Clear Year Day schedule with 0 user index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 0U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 62: {
+            LogStep(62, "Clear Year Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 63: {
+            LogStep(63, "Clear Year Day schedule with non-existing user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 2U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 64: {
+            LogStep(64, "Make sure that week day schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
+            value.weekDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 65: {
+            LogStep(65, "Make sure that year day schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 66: {
+            LogStep(66, "Make sure that holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 67: {
+            LogStep(67, "Clear Holiday schedule with 0 index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
+            value.holidayIndex = 0;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 68: {
+            LogStep(68, "Clear Holiday schedule with out-of-bounds index");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
+            value.holidayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 69: {
+            LogStep(69, "Make sure that week day schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
+            value.weekDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 70: {
+            LogStep(70, "Make sure that year day schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 71: {
+            LogStep(71, "Make sure that holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 72: {
+            LogStep(72, "Create another Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
@@ -61017,8 +61780,8 @@ private:
 
             );
         }
-        case 54: {
-            LogStep(54, "Verify created week day schedule");
+        case 73: {
+            LogStep(73, "Verify created week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
@@ -61028,8 +61791,8 @@ private:
 
             );
         }
-        case 55: {
-            LogStep(55, "Create another Year Day schedule with valid parameters");
+        case 74: {
+            LogStep(74, "Create another Year Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 2;
@@ -61041,8 +61804,8 @@ private:
 
             );
         }
-        case 56: {
-            LogStep(56, "Verify created year day schedule");
+        case 75: {
+            LogStep(75, "Verify created year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
@@ -61052,8 +61815,31 @@ private:
 
             );
         }
-        case 57: {
-            LogStep(57, "Clear a single week day schedule for the first user");
+        case 76: {
+            LogStep(76, "Create another Holiday schedule with valid parameters");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = 2;
+            value.localStartTime = 123456UL;
+            value.localEndTime   = 1234567UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(1);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 77: {
+            LogStep(77, "Verify created holiday schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 78: {
+            LogStep(78, "Clear a single week day schedule for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61063,8 +61849,8 @@ private:
 
             );
         }
-        case 58: {
-            LogStep(58, "Verify cleared week day schedule");
+        case 79: {
+            LogStep(79, "Verify cleared week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61074,8 +61860,8 @@ private:
 
             );
         }
-        case 59: {
-            LogStep(59, "Clear all remaining week day schedules for the first user");
+        case 80: {
+            LogStep(80, "Clear all remaining week day schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 254;
@@ -61085,8 +61871,8 @@ private:
 
             );
         }
-        case 60: {
-            LogStep(60, "Verify cleared week schedule");
+        case 81: {
+            LogStep(81, "Verify cleared week schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
@@ -61096,8 +61882,8 @@ private:
 
             );
         }
-        case 61: {
-            LogStep(61, "Make sure that first year day schedule was not deleted");
+        case 82: {
+            LogStep(82, "Make sure that first year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -61107,8 +61893,8 @@ private:
 
             );
         }
-        case 62: {
-            LogStep(62, "Make sure that second year day schedule was not deleted");
+        case 83: {
+            LogStep(83, "Make sure that second year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
@@ -61118,8 +61904,28 @@ private:
 
             );
         }
-        case 63: {
-            LogStep(63, "Create another Week Day schedule with valid parameters");
+        case 84: {
+            LogStep(84, "Make sure that first holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 85: {
+            LogStep(85, "Make sure that second holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 86: {
+            LogStep(86, "Create another Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61134,8 +61940,8 @@ private:
 
             );
         }
-        case 64: {
-            LogStep(64, "Clear a single year day schedule for the first user");
+        case 87: {
+            LogStep(87, "Clear a single year day schedule for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -61145,8 +61951,8 @@ private:
 
             );
         }
-        case 65: {
-            LogStep(65, "Verify cleared year day schedule");
+        case 88: {
+            LogStep(88, "Verify cleared year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -61156,8 +61962,8 @@ private:
 
             );
         }
-        case 66: {
-            LogStep(66, "Clear all remaining year schedules for the first user");
+        case 89: {
+            LogStep(89, "Clear all remaining year schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 254;
@@ -61167,8 +61973,8 @@ private:
 
             );
         }
-        case 67: {
-            LogStep(67, "Verify that second year day schedule was cleared");
+        case 90: {
+            LogStep(90, "Verify that second year day schedule was cleared");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
@@ -61178,8 +61984,8 @@ private:
 
             );
         }
-        case 68: {
-            LogStep(68, "Verify created week day schedule");
+        case 91: {
+            LogStep(91, "Verify created week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61189,8 +61995,8 @@ private:
 
             );
         }
-        case 69: {
-            LogStep(69, "Clear all remaining week day schedules for the first user");
+        case 92: {
+            LogStep(92, "Clear all remaining week day schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 254;
@@ -61200,8 +62006,8 @@ private:
 
             );
         }
-        case 70: {
-            LogStep(70, "Create new user without credential so we can add more schedules to it");
+        case 93: {
+            LogStep(93, "Create new user without credential so we can add more schedules to it");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
@@ -61216,8 +62022,8 @@ private:
 
             );
         }
-        case 71: {
-            LogStep(71, "Create Week Day schedule with valid parameters for first user");
+        case 94: {
+            LogStep(94, "Create Week Day schedule with valid parameters for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61232,8 +62038,8 @@ private:
 
             );
         }
-        case 72: {
-            LogStep(72, "Verify created week day schedule for first user");
+        case 95: {
+            LogStep(95, "Verify created week day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61243,8 +62049,8 @@ private:
 
             );
         }
-        case 73: {
-            LogStep(73, "Create Year Day schedule for first user");
+        case 96: {
+            LogStep(96, "Create Year Day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 4;
@@ -61256,8 +62062,8 @@ private:
 
             );
         }
-        case 74: {
-            LogStep(74, "Verify created year day schedule for first");
+        case 97: {
+            LogStep(97, "Verify created year day schedule for first");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 4;
@@ -61267,8 +62073,8 @@ private:
 
             );
         }
-        case 75: {
-            LogStep(75, "Create Week Day schedule with valid parameters for second user");
+        case 98: {
+            LogStep(98, "Create Week Day schedule with valid parameters for second user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
@@ -61283,8 +62089,8 @@ private:
 
             );
         }
-        case 76: {
-            LogStep(76, "Verify created week day schedule for first user");
+        case 99: {
+            LogStep(99, "Verify created week day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
@@ -61294,8 +62100,8 @@ private:
 
             );
         }
-        case 77: {
-            LogStep(77, "Create Year Day schedule for second user");
+        case 100: {
+            LogStep(100, "Create Year Day schedule for second user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
@@ -61307,8 +62113,8 @@ private:
 
             );
         }
-        case 78: {
-            LogStep(78, "Verify created year day schedule for first");
+        case 101: {
+            LogStep(101, "Verify created year day schedule for first");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
@@ -61318,8 +62124,8 @@ private:
 
             );
         }
-        case 79: {
-            LogStep(79, "Cleanup");
+        case 102: {
+            LogStep(102, "Cleanup the user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 65534U;
@@ -61328,8 +62134,8 @@ private:
 
             );
         }
-        case 80: {
-            LogStep(80, "Make sure clearing first user also cleared week day schedules");
+        case 103: {
+            LogStep(103, "Make sure clearing first user also cleared week day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
@@ -61339,8 +62145,8 @@ private:
 
             );
         }
-        case 81: {
-            LogStep(81, "Make sure clearing first user also cleared year day schedules");
+        case 104: {
+            LogStep(104, "Make sure clearing first user also cleared year day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 4;
@@ -61350,8 +62156,8 @@ private:
 
             );
         }
-        case 82: {
-            LogStep(82, "Make sure clearing second user also cleared week day schedules");
+        case 105: {
+            LogStep(105, "Make sure clearing second user also cleared week day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
@@ -61361,14 +62167,238 @@ private:
 
             );
         }
-        case 83: {
-            LogStep(83, "Make sure clearing second user also cleared year day schedules");
+        case 106: {
+            LogStep(106, "Make sure clearing second user also cleared year day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
+
+            );
+        }
+        case 107: {
+            LogStep(107, "Make sure that first holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 108: {
+            LogStep(108, "Make sure that second holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 109: {
+            LogStep(109, "Create another Holiday schedule at the last slot");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
+            value.holidayIndex   = NumberOfHolidaySchedulesSupported;
+            value.localStartTime = 1UL;
+            value.localEndTime   = 100UL;
+            value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(4);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 110: {
+            LogStep(110, "Verify Created Holiday Schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = NumberOfHolidaySchedulesSupported;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 111: {
+            LogStep(111, "Create new PIN credential and schedule user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 1U;
+
+            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+            value.userIndex.SetNull();
+            value.userStatus.SetNull();
+            value.userType.SetNull();
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 112: {
+            LogStep(112, "Create Week Day schedule for first user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
+            value.weekDayIndex = 1;
+            value.userIndex    = 1U;
+            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.startHour    = 0;
+            value.startMinute  = 0;
+            value.endHour      = 23;
+            value.endMinute    = 59;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 113: {
+            LogStep(113, "Create Year Day schedule for first user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
+            value.yearDayIndex   = 1;
+            value.userIndex      = 1U;
+            value.localStartTime = 9000UL;
+            value.localEndTime   = 888888888UL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 114: {
+            LogStep(114, "Clear a single holiday schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 115: {
+            LogStep(115, "Make sure that first holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 116: {
+            LogStep(116, "Make sure that second holiday schedule was deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 117: {
+            LogStep(117, "Make sure that third holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = NumberOfHolidaySchedulesSupported;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 118: {
+            LogStep(118, "Make sure clearing holiday schedule did not clear week day schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
+            value.weekDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 119: {
+            LogStep(119, "Make sure clearing holiday schedule did not clear year day schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 120: {
+            LogStep(120, "Clear all remaining holiday schedules");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
+            value.holidayIndex = 254;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 121: {
+            LogStep(121, "Make sure that first holiday is still deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 122: {
+            LogStep(122, "Make sure that second holiday schedule was deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 123: {
+            LogStep(123, "Make sure that third holiday schedule was not deleted");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
+            value.holidayIndex = NumberOfHolidaySchedulesSupported;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 124: {
+            LogStep(124, "Make sure clearing holiday schedule did not clear week day schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
+            value.weekDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 125: {
+            LogStep(125, "Make sure clearing holiday schedule did not clear year day schedule");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
+            value.yearDayIndex = 1;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 126: {
+            LogStep(126, "Final Cleanup");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 65534U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
