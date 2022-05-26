@@ -193,6 +193,55 @@ exit:
     return result;
 }
 
+JNI_METHOD(void, setOperationalKeyConfig)
+(JNIEnv * env, jobject self, jlong handle, jobject keypairBridge, jbyteArray rcac, jbyteArray icac, jbyteArray noc, jbyteArray ipk)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper     = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    FabricInfo * fabricInfo                      = nullptr;
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    CommissionerInitParams params;
+
+    JniByteArray jniRcac(env, rcac);
+    JniByteArray jniIcac(env, icac);
+    JniByteArray jniNoc(env, noc);
+    JniByteArray jniIpk(env, ipk);
+
+    params.controllerRCAC = jniRcac.byteSpan();
+    params.controllerICAC = jniIcac.byteSpan();
+    params.controllerNOC  = jniNoc.byteSpan();
+
+    CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
+    nativeKeypairBridge->SetDelegate(keypairBridge);
+    err = nativeKeypairBridge->Initialize();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to initialize KeypairBridge."));
+
+    params.operationalKeypair                   = nativeKeypairBridge;
+    params.hasExternallyOwnedOperationalKeypair = true;
+    params.systemState = const_cast<DeviceControllerSystemState *>(DeviceControllerFactory::GetInstance().GetSystemState());
+
+    err = wrapper->Controller()->InitControllerNOCChain(params);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to process NOC chain."));
+
+    // Compressed fabric ID can be generated only after the NOC chain is initialized
+    fabricInfo = wrapper->Controller()->GetFabricInfo();
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to get compressed fabric ID."));
+
+    err = chip::Credentials::SetSingleIpkEpochKey(wrapper->GroupDataProvider(), fabricInfo->GetFabricIndex(), jniIpk.byteSpan(),
+                                                  compressedFabricIdSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to set IPK epoch key."));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
