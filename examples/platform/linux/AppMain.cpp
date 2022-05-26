@@ -240,7 +240,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
                                                    LinuxDeviceOptions::GetInstance());
@@ -352,6 +351,9 @@ void ChipLinuxAppMainLoop()
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the

@@ -184,6 +184,7 @@ efr32_executable("lighting_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
