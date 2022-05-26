@@ -40,6 +40,33 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
+bool isTestEventTriggerEnabled()
+{
+    auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
+    if (testEventTrigger == nullptr)
+    {
+        return false;
+    }
+    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = { 0 };
+    if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
+{
+    for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
+    {
+        if (*it != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -165,17 +192,8 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
     case TestEventTriggersEnabled::Id: {
-        auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
-        if (testEventTrigger == nullptr)
-        {
-            return aEncoder.Encode(false);
-        }
-        uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = { 0 };
-        if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
-        {
-            return aEncoder.Encode(false);
-        }
-        return aEncoder.Encode(true);
+        bool isTestEventTriggersEnabled = isTestEventTriggerEnabled();
+        return aEncoder.Encode(isTestEventTriggersEnabled);
     }
     default: {
         break;
@@ -302,18 +320,6 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 };
 
 GeneralDiagnosticsDelegate gDiagnosticDelegate;
-
-bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
-{
-    for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
-    {
-        if (*it != 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 } // anonymous namespace
 

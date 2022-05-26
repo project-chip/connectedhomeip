@@ -9053,6 +9053,26 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void testEventTrigger(
+        DefaultClusterCallback callback, byte[] enableKey, Long eventTrigger) {
+      testEventTrigger(chipClusterPtr, callback, enableKey, eventTrigger, null);
+    }
+
+    public void testEventTrigger(
+        DefaultClusterCallback callback,
+        byte[] enableKey,
+        Long eventTrigger,
+        int timedInvokeTimeoutMs) {
+      testEventTrigger(chipClusterPtr, callback, enableKey, eventTrigger, timedInvokeTimeoutMs);
+    }
+
+    private native void testEventTrigger(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        byte[] enableKey,
+        Long eventTrigger,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     public interface NetworkInterfacesAttributeCallback {
       void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterfaceType> valueList);
 

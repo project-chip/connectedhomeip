@@ -9772,6 +9772,31 @@ public class ClusterInfoMapping {
     commandMap.put("generalCommissioning", generalCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> generalDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> generalDiagnosticstestEventTriggerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo =
+        new CommandParameterInfo("enableKey", byte[].class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "enableKey", generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo);
+
+    CommandParameterInfo generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo =
+        new CommandParameterInfo("eventTrigger", Long.class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "eventTrigger", generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo);
+
+    InteractionInfo generalDiagnosticstestEventTriggerInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .testEventTrigger(
+                      (DefaultClusterCallback) callback,
+                      (byte[]) commandArguments.get("enableKey"),
+                      (Long) commandArguments.get("eventTrigger"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalDiagnosticstestEventTriggerCommandParams);
+    generalDiagnosticsClusterInteractionInfoMap.put(
+        "testEventTrigger", generalDiagnosticstestEventTriggerInteractionInfo);
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();

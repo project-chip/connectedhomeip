@@ -3338,7 +3338,7 @@
           "mfgCode": null,
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "client",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "TestEventTrigger",
@@ -3346,7 +3346,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [

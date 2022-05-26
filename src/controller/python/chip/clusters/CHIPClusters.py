@@ -2830,6 +2830,14 @@ class ChipClusters:
             "clusterName": "GeneralDiagnostics",
             "clusterId": 0x00000033,
             "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "TestEventTrigger",
+                    "args": {
+                        "enableKey": "bytes",
+                        "eventTrigger": "int",
+                    },
+                },
             },
             "attributes": {
                 0x00000000: {

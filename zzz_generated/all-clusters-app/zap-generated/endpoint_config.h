@@ -1957,7 +1957,7 @@
 // clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 79
+#define GENERATED_CLUSTER_COUNT 78
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -2136,17 +2136,6 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 36 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 38 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: General Diagnostics (client) */ \
-      .clusterId = 0x00000033,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(93), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
@@ -2841,8 +2830,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 596 }, { ZAP_CLUSTER_INDEX(28), 45, 3473 }, { ZAP_CLUSTER_INDEX(73), 5, 105 },                 \
-            { ZAP_CLUSTER_INDEX(78), 1, 0 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(0), 27, 596 }, { ZAP_CLUSTER_INDEX(27), 45, 3473 }, { ZAP_CLUSTER_INDEX(72), 5, 105 },                 \
+            { ZAP_CLUSTER_INDEX(77), 1, 0 },                                                                                       \
     }
 
 // Largest attribute size is needed for various buffers
