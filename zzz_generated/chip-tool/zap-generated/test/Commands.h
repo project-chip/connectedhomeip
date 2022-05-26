@@ -77665,7 +77665,7 @@ private:
         }
         case 2: {
             LogStep(2, "operate on DUT to change the flow significantly");
-            VerifyOrDo(!ShouldSkip("MANUAL_TEMPERATURE_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MANUAL_FLOW_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
@@ -79812,7 +79812,7 @@ private:
 class Test_TC_RH_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_RH_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", 5, credsIssuerConfig)
+    Test_TC_RH_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", 6, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -79867,16 +79867,26 @@ private:
                 chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "int16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "int16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
                 ValueBeforeChange = value;
             }
             break;
-        case 3:
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
-        case 4:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -79913,22 +79923,28 @@ private:
                                  RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Reads MeasuredValue attribute from DUT");
+            LogStep(2, "Reads constraints of attribute: MaxMeasuredValue");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Reads MeasuredValue attribute from DUT");
             VerifyOrDo(!ShouldSkip("A_RELATIVEHUMIDITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
-        case 3: {
-            LogStep(3, "Operate on device to change the relative humidity significantly");
-            VerifyOrDo(!ShouldSkip("MANUAL_TEMPERATURE_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 4: {
+            LogStep(4, "Operate on device to change the relative humidity significantly");
+            VerifyOrDo(!ShouldSkip("MANUAL_RELATIVEHUMIDITY_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>(
                 "Operate on device to change the relative humidity significantlygarbage: not in length on purpose", 63);
             return Log(kIdentityAlpha, value);
         }
-        case 4: {
-            LogStep(4, "Read the mandatory attribute: MeasuredValue");
+        case 5: {
+            LogStep(5, "Read the mandatory attribute: MeasuredValue");
             VerifyOrDo(!ShouldSkip("A_RELATIVEHUMIDITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
