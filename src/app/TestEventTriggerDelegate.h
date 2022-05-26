@@ -27,7 +27,6 @@ namespace chip {
 class TestEventTriggerDelegate
 {
 public:
-
     /* Expected byte size of the EnableKey */
     static constexpr size_t kExpectedEnableKeyLength = 16;
 

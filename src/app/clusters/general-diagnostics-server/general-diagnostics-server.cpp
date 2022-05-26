@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -23,7 +24,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
-#include "app/server/Server.h"
 #include <app/util/attribute-storage.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -166,11 +166,13 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     }
     case TestEventTriggersEnabled::Id: {
         auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
-        if (testEventTrigger == nullptr) {
+        if (testEventTrigger == nullptr)
+        {
           return aEncoder.Encode(false);
         }
-        uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = {0};
-        if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData))) {
+        uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = { 0 };
+        if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
+        {
           return aEncoder.Encode(false);
         }
         return aEncoder.Encode(true);
@@ -301,10 +303,12 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 
 GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
-bool IsByteSpanAllZeros(const ByteSpan & byteSpan) {
+bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
+{
     for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
     {
-        if (*it != 0) {
+        if (*it != 0)
+        {
             return false;
         }
     }
@@ -313,38 +317,36 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan) {
 
 } // anonymous namespace
 
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
 
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::TestEventTrigger::DecodableType & commandData) {
-
-    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger command");
-    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger commandData.enableKey.size()=%d", (int)(commandData.enableKey.size()));
-    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! commandData.eventTrigger=0x" ChipLogFormatX64, ChipLogValueX64(commandData.eventTrigger));
-
-    if (commandData.enableKey.empty() || commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength) {
+    if (commandData.enableKey.empty() || commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
         return true;
     }
 
-    if (IsByteSpanAllZeros(commandData.enableKey)){
+    if (IsByteSpanAllZeros(commandData.enableKey))
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
         return true;
     }
 
     auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
-    if (testEventTrigger == nullptr) {
-        // TODO Is this the right error?
+    if (testEventTrigger == nullptr)
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return true;
     }
 
-    if (!testEventTrigger->DoesEnableKeyMatch(commandData.enableKey)) {
+    if (!testEventTrigger->DoesEnableKeyMatch(commandData.enableKey))
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         return true;
     }
 
-    if (CHIP_NO_ERROR != testEventTrigger->HandleEventTrigger(commandData.eventTrigger)) {
+    if (CHIP_NO_ERROR != testEventTrigger->HandleEventTrigger(commandData.eventTrigger))
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return true;
     }
