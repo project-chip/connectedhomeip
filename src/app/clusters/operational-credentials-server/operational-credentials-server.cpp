@@ -664,16 +664,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
-    // Index just allocated.
-    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
-        nocResponse = ConvertToNOCResponseStatus(err);
-        SuccessOrExit(err);
-    }
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
     // The IPK SHALL be the operational group key under GroupKeySetID of 0
@@ -713,6 +703,16 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
                                                             commandData.caseAdminSubject);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index just allocated.
+    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
+    if (err != CHIP_NO_ERROR)
+    {
+        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        nocResponse = ConvertToNOCResponseStatus(err);
+        SuccessOrExit(err);
+    }
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
