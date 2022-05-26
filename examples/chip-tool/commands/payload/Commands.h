@@ -19,6 +19,7 @@
 #pragma once
 
 #include "AdditionalDataParseCommand.h"
+#include "CredentialResponseParser.h"
 #include "SetupPayloadGenerateCommand.h"
 #include "SetupPayloadParseCommand.h"
 #include "SetupPayloadVerhoeff.h"
@@ -33,6 +34,8 @@ void registerCommandsPayload(Commands & commands)
         make_unique<AdditionalDataParseCommand>(),            //
         make_unique<SetupPayloadVerhoeffVerify>(),            //
         make_unique<SetupPayloadVerhoeffGenerate>(),          //
+        make_unique<AttestationElementsParser>(),             //
+        make_unique<NOCCSRElementsParser>(),                  //
     };
 
     commands.Register(clusterName, clusterCommands);
