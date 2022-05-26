@@ -21,6 +21,8 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
+#include <DeviceInfoProviderImpl.h>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -53,9 +55,15 @@ using namespace ::chip::DeviceLayer;
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
-static LEDWidget sStatusLED;
-static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
-static k_timer sFunctionTimer;
+namespace {
+
+LEDWidget sStatusLED;
+UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
+k_timer sFunctionTimer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+} // namespace
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -141,7 +149,11 @@ CHIP_ERROR AppTask::Init()
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
