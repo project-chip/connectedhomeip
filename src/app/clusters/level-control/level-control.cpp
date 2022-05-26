@@ -1120,22 +1120,20 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 
 static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)
 {
-    /* emberAfPushEndpointNetworkIndex(endpoint); */
     emberEventControlSetInactive(control);
     (*callback)(endpoint);
-    /* emberAfPopNetworkIndex(); */
 }
 
-EmberEventControl ctrl;
+EmberEventControl eventControl;
 
 void MatterLevelControlClusterServerTickCallbackWrapperFunction(uint8_t endpoint)
 {
-    clusterTickWrapper(&ctrl, emberAfLevelControlClusterServerTickCallback, endpoint);
+    clusterTickWrapper(&eventControl, emberAfLevelControlClusterServerTickCallback, endpoint);
 }
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {
-    EmberEventData data = { &ctrl, MatterLevelControlClusterServerTickCallbackWrapperFunction };
-    EmberAfEventContext context = { .endpoint = endpoint, .clusterId = LevelControl::Id, .isClient = false, .pollControl = EMBER_AF_LONG_POLL, .sleepControl = EMBER_AF_OK_TO_SLEEP, .eventControl = &ctrl };
+    EmberEventData data = { &eventControl, MatterLevelControlClusterServerTickCallbackWrapperFunction };
+    EmberAfEventContext context = { .endpoint = endpoint, .clusterId = LevelControl::Id, .isClient = false, .pollControl = EMBER_AF_LONG_POLL, .sleepControl = EMBER_AF_OK_TO_SLEEP, .eventControl = &eventControl };
     MatterRegisterAfEvent(data, "Level Control", context);
 }
 
