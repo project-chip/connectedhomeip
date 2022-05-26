@@ -72,9 +72,9 @@ source_set("efr-matter-shell") {
   }
 }
 
-  config("config_includes") {
-    include_dirs = [ "." ]
-  }
+config("config_includes") {
+  include_dirs = [ "." ]
+}
 pw_source_set("freertos_config") {
   public_configs = [ ":config_includes" ]
 }
