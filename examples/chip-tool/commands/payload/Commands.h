@@ -22,6 +22,7 @@
 #include "SetupPayloadGenerateCommand.h"
 #include "SetupPayloadParseCommand.h"
 #include "SetupPayloadVerhoeff.h"
+#include "AttestationResponseParser.h"
 
 void registerCommandsPayload(Commands & commands)
 {
@@ -33,6 +34,7 @@ void registerCommandsPayload(Commands & commands)
         make_unique<AdditionalDataParseCommand>(),            //
         make_unique<SetupPayloadVerhoeffVerify>(),            //
         make_unique<SetupPayloadVerhoeffGenerate>(),          //
+        make_unique<AttestationResponseParser>(),             //
     };
 
     commands.Register(clusterName, clusterCommands);

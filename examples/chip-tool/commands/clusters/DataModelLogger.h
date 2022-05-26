@@ -34,7 +34,7 @@ public:
     static CHIP_ERROR LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data);
     static CHIP_ERROR LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
 
-private:
+protected:
     static CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
     {
         DataModelLogger::LogString(label, indent, value ? "TRUE" : "FALSE");
