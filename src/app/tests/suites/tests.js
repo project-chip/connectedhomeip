@@ -225,6 +225,8 @@ function getManualTests() {
     'Test_TC_MF_1_24',
     'Test_TC_MF_1_25',
     'Test_TC_MF_1_26',
+    'Test_TC_MF_1_27',
+    'Test_TC_MF_1_28',
   ];
 
   const ModeSelect = [
