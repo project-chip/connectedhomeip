@@ -1186,7 +1186,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.IPKValue      = ipk;
     request.caseAdminSubject = adminSubject;
     request.adminVendorId = mVendorId;
-    
+
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
