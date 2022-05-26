@@ -22,7 +22,6 @@
 #include "../common/Command.h"
 #include <setup_payload/SetupPayload.h>
 
-
 class AttestationElementsParser : public Command, public DataModelLogger
 {
 public:
