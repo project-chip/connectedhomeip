@@ -217,24 +217,26 @@ async function asJavaType(type, zclType, cluster, options)
     classType += asJavaBoxedType(type, zclType);
   }
 
-  if (!options.hash.forceNotList && (this.isArray || this.entryType)) {
-    if (!options.hash.removeGenericType) {
-      classType = 'ArrayList<' + classType + '>';
-    } else {
-      classType = 'ArrayList';
+  if (!options.hash.underlyingType) {
+    if (!options.hash.forceNotList && (this.isArray || this.entryType)) {
+      if (!options.hash.removeGenericType) {
+        classType = 'ArrayList<' + classType + '>';
+      } else {
+        classType = 'ArrayList';
+      }
     }
-  }
 
-  if (this.isOptional) {
-    if (!options.hash.removeGenericType) {
-      classType = 'Optional<' + classType + '>';
-    } else {
-      classType = 'Optional';
+    if (this.isOptional) {
+      if (!options.hash.removeGenericType) {
+        classType = 'Optional<' + classType + '>';
+      } else {
+        classType = 'Optional';
+      }
     }
-  }
 
-  if (this.isNullable && options.hash.includeAnnotations) {
-    classType = '@Nullable ' + classType;
+    if (this.isNullable && options.hash.includeAnnotations) {
+      classType = '@Nullable ' + classType;
+    }
   }
 
   return classType;
