@@ -168,12 +168,12 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
         if (testEventTrigger == nullptr)
         {
-          return aEncoder.Encode(false);
+            return aEncoder.Encode(false);
         }
         uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = { 0 };
         if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
         {
-          return aEncoder.Encode(false);
+            return aEncoder.Encode(false);
         }
         return aEncoder.Encode(true);
     }
@@ -319,6 +319,7 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 
 bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                               const Commands::TestEventTrigger::DecodableType & commandData)
+{
 
     if (commandData.enableKey.empty() || commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
     {

@@ -5220,7 +5220,7 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
-            },
+            }
           ],
           "attributes": [
             {

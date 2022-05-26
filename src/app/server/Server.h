@@ -106,7 +106,8 @@ struct ServerInitParams
     // Network native params can be injected depending on the
     // selected Endpoint implementation
     void * endpointNativeParams = nullptr;
-    // TODO(thampson): comment here about what this does
+    // Optional. Support test event triggers when provided. Must be initialized before being
+    // provided.
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
 };
 

@@ -118,6 +118,5 @@ limitations under the License.
       <description>Indicate the reason that caused the device to start-up.</description>
       <field id="0" name="BootReason" type="BootReasonType"/>
     </event>               
-
   </cluster>
 </configurator>
