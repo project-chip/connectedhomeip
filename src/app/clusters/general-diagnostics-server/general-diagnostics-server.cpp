@@ -319,7 +319,7 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 
 bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                               const Commands::TestEventTrigger::DecodableType & commandData)
-{                                                              
+{
 
     if (commandData.enableKey.empty() || commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
     {
