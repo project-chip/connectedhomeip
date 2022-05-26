@@ -53,6 +53,4 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip:
 // Bridge Stubs
 // ************************************
 
-void MatterBridgedActionsPluginServerInitCallback(void)
-{
-}
+void MatterBridgedActionsPluginServerInitCallback(void) {}
