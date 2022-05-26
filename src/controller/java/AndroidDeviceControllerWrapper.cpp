@@ -47,6 +47,12 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)

@@ -27,6 +27,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/android/CHIPP256KeypairBridge.h>
 
 #include "AndroidOperationalCredentialsIssuer.h"
 
@@ -45,6 +46,15 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
     jobject JavaObjectRef() { return mJavaObjectRef; }
     jlong ToJNIHandle();
+
+    chip::Crypto::CHIPP256KeypairBridge * GetP256KeypairBridge()
+    {
+        if (mKeypairBridge == nullptr)
+        {
+            mKeypairBridge = chip::Platform::New<chip::Crypto::CHIPP256KeypairBridge>();
+        }
+        return mKeypairBridge;
+    }
 
     void CallJavaMethod(const char * methodName, jint argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
@@ -79,6 +89,8 @@ public:
                                                         AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
                                                         CHIP_ERROR * errInfoOnFailure);
 
+    chip::Credentials::GroupDataProvider * GroupDataProvider() { return &mGroupDataProvider; }
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
@@ -87,8 +99,9 @@ private:
     // TODO: This may need to be injected as a GroupDataProvider*
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
 
-    JavaVM * mJavaVM       = nullptr;
-    jobject mJavaObjectRef = nullptr;
+    JavaVM * mJavaVM                                     = nullptr;
+    jobject mJavaObjectRef                               = nullptr;
+    chip::Crypto::CHIPP256KeypairBridge * mKeypairBridge = nullptr;
 
     // These fields allow us to release the string/byte array memory later.
     jstring ssidStr                    = nullptr;
