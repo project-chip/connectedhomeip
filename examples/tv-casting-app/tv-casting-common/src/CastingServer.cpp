@@ -69,7 +69,7 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+        { &server.GetFabricTable(), server.GetCASEDeviceManager(), &server.GetPersistentStorage() });
     return CHIP_NO_ERROR;
 }
 

@@ -85,7 +85,7 @@ CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
 
 CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
 {
-    VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.mCASEDeviceManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
@@ -114,16 +114,16 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
 
 CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
 {
-    VerifyOrReturnError(mInitParams.mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitParams.mCASEDeviceManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     PeerId peer = PeerIdForNode(mInitParams.mFabricTable, fabric, node);
     VerifyOrReturnError(peer.GetNodeId() != kUndefinedNodeId, CHIP_ERROR_NOT_FOUND);
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
-    mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    mInitParams.mCASEDeviceManager->FindOrInitializeDevice(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
-        // TODO: Some reference counting mechanism shall be added the CASESessionManager
+        // TODO: Some reference counting mechanism shall be added the CASEDeviceManager
         // so that other session clients don't get accidentally closed.
         FabricIndex fabricToRemove;
         NodeId nodeToRemove;
@@ -131,10 +131,10 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
         {
             mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
             PeerId lruPeer = PeerIdForNode(mInitParams.mFabricTable, fabricToRemove, nodeToRemove);
-            mInitParams.mCASESessionManager->ReleaseSession(lruPeer);
+            mInitParams.mCASEDeviceManager->ReleaseDevice(lruPeer);
             // Now retry
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
-            mInitParams.mCASESessionManager->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+            mInitParams.mCASEDeviceManager->FindOrInitializeDevice(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
         }
     }
     return mLastSessionEstablishmentError;
@@ -178,7 +178,7 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 {
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    mInitParams.mCASESessionManager->ReleaseSession(peerId);
+    mInitParams.mCASEDeviceManager->ReleaseDevice(peerId);
     mLastSessionEstablishmentError = error;
 }
 
@@ -188,7 +188,7 @@ void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 
     // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
     //               to execute such a release. Currently not done because paths were not tested.
-    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(fabricIndex);
+    mInitParams.mCASEDeviceManager->ReleaseDevicesForFabric(fabricIndex);
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
@@ -211,7 +211,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 FabricInfo * fabricInfo = mInitParams.mFabricTable->FindFabricWithIndex(iter->fabricIndex);
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(iter->nodeId);
-                OperationalDeviceProxy * peerDevice = mInitParams.mCASESessionManager->FindExistingSession(peer);
+                OperationalDeviceProxy * peerDevice = mInitParams.mCASEDeviceManager->FindExistingDevice(peer);
                 if (peerDevice != nullptr && peerDevice->IsConnected())
                 {
                     // We already have an active connection

@@ -30,7 +30,7 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
@@ -88,7 +88,7 @@ struct DeviceControllerSystemStateParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
     CASEServer * caseServer                                       = nullptr;
-    CASESessionManager * caseSessionManager                       = nullptr;
+    CASEDeviceManager * caseDeviceManager                         = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                   = nullptr;
@@ -108,7 +108,7 @@ public:
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
-        mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
+        mCASEServer(params.caseServer), mCASEDeviceManager(params.caseDeviceManager),
         mOperationalDevicePool(params.operationalDevicePool), mCASEClientPool(params.caseClientPool),
         mGroupDataProvider(params.groupDataProvider), mFabricTableDelegate(params.fabricTableDelegate)
     {
@@ -142,7 +142,7 @@ public:
     bool IsInitialized()
     {
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
-            mExchangeMgr != nullptr && mMessageCounterManager != nullptr && mFabrics != nullptr && mCASESessionManager != nullptr &&
+            mExchangeMgr != nullptr && mMessageCounterManager != nullptr && mFabrics != nullptr && mCASEDeviceManager != nullptr &&
             mOperationalDevicePool != nullptr && mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
     };
 
@@ -157,7 +157,7 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() const { return mBleLayer; };
 #endif
-    CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
+    CASEDeviceManager * GetCASEDeviceManager() const { return mCASEDeviceManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     void SetTempFabricTable(FabricTable * tempFabricTable) { mTempFabricTable = tempFabricTable; }
 
@@ -176,7 +176,7 @@ private:
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     FabricTable * mFabrics                                         = nullptr;
     CASEServer * mCASEServer                                       = nullptr;
-    CASESessionManager * mCASESessionManager                       = nullptr;
+    CASEDeviceManager * mCASEDeviceManager                         = nullptr;
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;

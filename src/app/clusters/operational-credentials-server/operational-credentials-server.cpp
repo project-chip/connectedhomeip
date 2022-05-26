@@ -290,13 +290,13 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // Session Context at the Server.
     if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked || event->FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked)
     {
-        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-        if (caseSessionManager)
+        CASEDeviceManager * caseDeviceManager = Server::GetInstance().GetCASEDeviceManager();
+        if (caseDeviceManager)
         {
             FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
             VerifyOrReturn(fabricInfo != nullptr);
 
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
+            caseDeviceManager->ReleaseDevicesForFabric(fabricInfo->GetFabricIndex());
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();

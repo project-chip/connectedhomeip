@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/server/Server.h>
 #include <app/util/binding-table.h>
@@ -48,9 +48,9 @@ using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandle
 
 struct BindingManagerInitParams
 {
-    FabricTable * mFabricTable               = nullptr;
-    CASESessionManager * mCASESessionManager = nullptr;
-    PersistentStorageDelegate * mStorage     = nullptr;
+    FabricTable * mFabricTable             = nullptr;
+    CASEDeviceManager * mCASEDeviceManager = nullptr;
+    PersistentStorageDelegate * mStorage   = nullptr;
 };
 
 /**

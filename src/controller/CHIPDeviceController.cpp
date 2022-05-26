@@ -225,7 +225,7 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
-        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricInfo->GetFabricIndex());
+        mSystemState->GetCASEDeviceManager()->ReleaseDevicesForFabric(mFabricInfo->GetFabricIndex());
 
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
@@ -251,14 +251,15 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
 {
     VerifyOrReturn(mState == State::Initialized && mFabricInfo != nullptr,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
+    mSystemState->GetCASEDeviceManager()->ReleaseDevice(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
 
 CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(mFabricInfo->GetPeerIdForNode(nodeId));
+    OperationalDeviceProxy * proxy =
+        mSystemState->GetCASEDeviceManager()->FindExistingDevice(mFabricInfo->GetPeerIdForNode(nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
@@ -324,7 +325,7 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(peerId, peerAddr));
+    ReturnErrorOnFailure(mSystemState->GetCASEDeviceManager()->GetPeerAddress(peerId, peerAddr));
     addr = peerAddr.GetIPAddress();
     port = peerAddr.GetPort();
     return CHIP_NO_ERROR;
@@ -1571,7 +1572,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     {
         commissioner->CommissioningStageComplete(error);
     }
-    commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
+    commissioner->mSystemState->GetCASEDeviceManager()->ReleaseDevice(peerId);
 }
 
 // ClusterStateCache::Callback impl
@@ -2166,25 +2167,25 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
     VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(deviceId));
+    OperationalDeviceProxy * proxy = GetDevice(mFabricInfo->GetPeerIdForNode(deviceId));
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
 
     return proxy->LookupPeerAddress();
 }
 
-OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceController::GetDevice(const PeerId & peerId)
 {
-    return mSystemState->CASESessionMgr()->FindExistingSession(peerId);
+    return mSystemState->GetCASEDeviceManager()->FindExistingDevice(peerId);
 }
 
-OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceCommissioner::GetDevice(const PeerId & peerId)
 {
-    mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
-                                                           &mOnDeviceConnectionFailureCallback);
+    mSystemState->GetCASEDeviceManager()->FindOrInitializeDevice(peerId, &mOnDeviceConnectedCallback,
+                                                                 &mOnDeviceConnectionFailureCallback);
 
     // If there is an OperationalDeviceProxy for this peerId now the call to the
     // superclass will return it.
-    return DeviceController::GetDeviceSession(peerId);
+    return DeviceController::GetDevice(peerId);
 }
 
 } // namespace Controller

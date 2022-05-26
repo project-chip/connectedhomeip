@@ -58,7 +58,7 @@ enum LogModule
     kLogModule_Test,
     kLogModule_OperationalDeviceProxy,
     kLogModule_Automation,
-    kLogModule_CASESessionManager,
+    kLogModule_CASEDeviceManager,
 
     kLogModule_Max
 };

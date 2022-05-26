@@ -22,7 +22,7 @@
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AclStorage.h>
@@ -222,7 +222,7 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
-    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+    CASEDeviceManager * GetCASEDeviceManager() { return &mCASEDeviceManager; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -359,7 +359,7 @@ private:
     SessionManager mSessions;
     CASEServer mCASEServer;
 
-    CASESessionManager mCASESessionManager;
+    CASEDeviceManager mCASEDeviceManager;
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
 

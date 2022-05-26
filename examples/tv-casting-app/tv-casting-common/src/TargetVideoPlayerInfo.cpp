@@ -42,7 +42,7 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
 
     PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    server->GetCASEDeviceManager()->FindOrInitializeDevice(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 
     if (mOperationalDeviceProxy == nullptr)
     {

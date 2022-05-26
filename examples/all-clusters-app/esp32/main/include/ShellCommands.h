@@ -19,7 +19,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
@@ -148,16 +148,16 @@ private:
 
     static void ConnectToNode(intptr_t arg)
     {
-        CASECommands * caseCommand              = reinterpret_cast<CASECommands *>(arg);
-        Server * server                         = &(chip::Server::GetInstance());
-        CASESessionManager * caseSessionManager = server->GetCASESessionManager();
-        if (caseSessionManager == nullptr)
+        CASECommands * caseCommand            = reinterpret_cast<CASECommands *>(arg);
+        Server * server                       = &(chip::Server::GetInstance());
+        CASEDeviceManager * caseDeviceManager = server->GetCASEDeviceManager();
+        if (caseDeviceManager == nullptr)
         {
-            ChipLogError(SecureChannel, "Can't get the CASESessionManager");
+            ChipLogError(SecureChannel, "Can't get the CASEDeviceManager");
             return;
         }
-        caseSessionManager->FindOrEstablishSession(caseCommand->GetFabricInfo()->GetPeerIdForNode(caseCommand->GetNodeId()),
-                                                   &sOnConnectedCallback, &sOnConnectionFailureCallback);
+        caseDeviceManager->FindOrInitializeDevice(caseCommand->GetFabricInfo()->GetPeerIdForNode(caseCommand->GetNodeId()),
+                                                  &sOnConnectedCallback, &sOnConnectionFailureCallback);
     }
 
     static CHIP_ERROR ConnectToNodeHandler(int argc, char ** argv)

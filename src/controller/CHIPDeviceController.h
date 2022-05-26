@@ -29,7 +29,7 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <app/ClusterStateCache.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
@@ -185,7 +185,8 @@ public:
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        mSystemState->GetCASEDeviceManager()->FindOrInitializeDevice(mFabricInfo->GetPeerIdForNode(deviceId), onConnection,
+                                                                     onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -299,7 +300,7 @@ protected:
 
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
-    virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
+    virtual OperationalDeviceProxy * GetDevice(const PeerId & peerId);
 
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
@@ -603,7 +604,7 @@ public:
     void OnDone(app::ReadClient *) override;
 
     // Commissioner will establish new device connections after PASE.
-    OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
+    OperationalDeviceProxy * GetDevice(const PeerId & peerId) override;
 
 private:
     DevicePairingDelegate * mPairingDelegate;

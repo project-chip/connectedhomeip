@@ -123,7 +123,7 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
                                      BDXDownloader & downloader)
 {
     mServer             = &server;
-    mCASESessionManager = server.GetCASESessionManager();
+    mCASEDeviceManager  = server.GetCASEDeviceManager();
     mStorage            = &storage;
     mOtaRequestorDriver = &driver;
     mBdxDownloader      = &downloader;
@@ -377,8 +377,8 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
-                                                &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    mCASEDeviceManager->FindOrInitializeDevice(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
+                                               &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -401,8 +401,8 @@ void DefaultOTARequestor::DisconnectFromProvider()
     }
 
     PeerId peerID = fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID);
-    mCASESessionManager->FindExistingSession(peerID)->Disconnect();
-    mCASESessionManager->ReleaseSession(peerID);
+    mCASEDeviceManager->FindExistingDevice(peerID)->Disconnect();
+    mCASEDeviceManager->ReleaseDevice(peerID);
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
@@ -429,7 +429,7 @@ CHIP_ERROR DefaultOTARequestor::GetUpdateStateAttribute(EndpointId endpointId, O
     return CHIP_NO_ERROR;
 }
 
-// Called whenever FindOrEstablishSession is successful
+// Called whenever FindOrInitializeDevice is successful
 void DefaultOTARequestor::OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
@@ -487,7 +487,7 @@ void DefaultOTARequestor::OnConnected(void * context, OperationalDeviceProxy * d
     }
 }
 
-// Called whenever FindOrEstablishSession fails
+// Called whenever FindOrInitializeDevice fails
 void DefaultOTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);

@@ -231,14 +231,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
     };
 
-    CASESessionManagerConfig sessionManagerConfig = {
-        .sessionInitParams = deviceInitParams,
-        .devicePool        = stateParams.operationalDevicePool,
+    CASEDeviceManagerConfig sessionManagerConfig = {
+        .deviceInitParams = deviceInitParams,
+        .devicePool       = stateParams.operationalDevicePool,
     };
 
-    // TODO: Need to be able to create a CASESessionManagerConfig here!
-    stateParams.caseSessionManager = Platform::New<CASESessionManager>();
-    ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
+    // TODO: Need to be able to create a CASEDeviceManagerConfig here!
+    stateParams.caseDeviceManager = Platform::New<CASEDeviceManager>();
+    ReturnErrorOnFailure(stateParams.caseDeviceManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -342,15 +342,15 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASEServer = nullptr;
     }
 
-    if (mCASESessionManager != nullptr)
+    if (mCASEDeviceManager != nullptr)
     {
-        mCASESessionManager->Shutdown();
-        Platform::Delete(mCASESessionManager);
-        mCASESessionManager = nullptr;
+        mCASEDeviceManager->Shutdown();
+        Platform::Delete(mCASEDeviceManager);
+        mCASEDeviceManager = nullptr;
     }
 
     // mCASEClientPool and mDevicePool must be deallocated
-    // after mCASESessionManager, which uses them.
+    // after mCASEDeviceManager, which uses them.
 
     if (mOperationalDevicePool != nullptr)
     {

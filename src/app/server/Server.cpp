@@ -101,7 +101,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     ChipLogProgress(AppServer, "Server initializing...");
 
-    CASESessionManagerConfig caseSessionManagerConfig;
+    CASEDeviceManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
@@ -250,7 +250,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 
     caseSessionManagerConfig = {
-        .sessionInitParams =  {
+        .deviceInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
             .exchangeMgr       = &mExchangeMgr,
@@ -261,7 +261,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .devicePool        = &mDevicePool,
     };
 
-    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
+    err = mCASEDeviceManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
     err =
@@ -356,7 +356,7 @@ void Server::Shutdown()
 
     mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
-    mCASESessionManager.Shutdown();
+    mCASEDeviceManager.Shutdown();
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();

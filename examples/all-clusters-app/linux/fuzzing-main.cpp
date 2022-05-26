@@ -25,7 +25,7 @@ void CleanShutdown()
 {
     Server::GetInstance().Shutdown();
     PlatformMgr().Shutdown();
-    // TODO: We don't Platform::MemoryShutdown because ~CASESessionManager calls
+    // TODO: We don't Platform::MemoryShutdown because ~CASEDeviceManager calls
     // Dnssd::ResolverProxy::Shutdown, which starts doing Platform::Delete.
     // Platform::MemoryShutdown();
 }

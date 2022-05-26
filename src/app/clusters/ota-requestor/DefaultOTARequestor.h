@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <app/CASESessionManager.h>
+#include <app/CASEDeviceManager.h>
 #include <app/server/Server.h>
 #include <protocols/bdx/BdxMessages.h>
 
@@ -294,7 +294,7 @@ private:
 
     OTARequestorStorage * mStorage            = nullptr;
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    CASESessionManager * mCASESessionManager  = nullptr;
+    CASEDeviceManager * mCASEDeviceManager    = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader

@@ -31,9 +31,9 @@
 
 namespace chip {
 
-struct CASESessionManagerConfig
+struct CASEDeviceManagerConfig
 {
-    DeviceProxyInitParams sessionInitParams;
+    DeviceProxyInitParams deviceInitParams;
     OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
 };
 
@@ -45,13 +45,13 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager
+class CASEDeviceManager
 {
 public:
-    CASESessionManager() = default;
-    virtual ~CASESessionManager() {}
+    CASEDeviceManager() = default;
+    virtual ~CASEDeviceManager() {}
 
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASEDeviceManagerConfig & params);
     void Shutdown() {}
 
     /**
@@ -68,31 +68,31 @@ public:
      * The `onFailure` callback may be called before the FindOrEstablishSession
      * call returns, for error cases that are detected synchronously.
      */
-    void FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+    void FindOrInitializeDevice(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
+    OperationalDeviceProxy * FindExistingDevice(PeerId peerId) const;
 
-    void ReleaseSession(PeerId peerId);
+    void ReleaseDevice(PeerId peerId);
 
-    void ReleaseSessionsForFabric(FabricIndex fabricIndex);
+    void ReleaseDevicesForFabric(FabricIndex fabricIndex);
 
-    void ReleaseAllSessions();
+    void ReleaseAllDevices();
 
     /**
      * This API returns the address for the given node ID.
-     * If the CASESessionManager is configured with a DNS-SD cache, the cache is looked up
+     * If the CASEDeviceManager is configured with a DNS-SD cache, the cache is looked up
      * for the node ID.
-     * If the DNS-SD cache is not available, the CASESessionManager looks up the list for
+     * If the DNS-SD cache is not available, the CASEDeviceManager looks up the list for
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
 private:
-    void ReleaseSession(OperationalDeviceProxy * device) const;
+    void ReleaseDevice(OperationalDeviceProxy * device) const;
 
-    CASESessionManagerConfig mConfig;
+    CASEDeviceManagerConfig mConfig;
 };
 
 } // namespace chip
