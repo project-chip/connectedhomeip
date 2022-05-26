@@ -27,6 +27,7 @@ config("config") {
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
+    "${chip_root}/src/credentials",
   ]
 
   defines = [
@@ -65,6 +66,7 @@ static_library("chip-tool-utils") {
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
+    "commands/payload/CredentialResponseParser.cpp",
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
@@ -90,6 +92,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
