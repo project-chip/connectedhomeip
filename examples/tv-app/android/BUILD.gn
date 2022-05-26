@@ -48,6 +48,8 @@ shared_library("jni") {
     "java/ContentAppCommandDelegate.h",
     "java/ContentLauncherManager.cpp",
     "java/ContentLauncherManager.h",
+    "java/DeviceCallbacks.cpp",
+    "java/DeviceCallbacks.h",
     "java/JNIDACProvider.cpp",
     "java/JNIDACProvider.h",
     "java/KeypadInputManager.cpp",
@@ -65,8 +67,6 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
-    "java/DeviceCallbacks.cpp",
-    "java/DeviceCallbacks.h",
   ]
 
   deps = [
@@ -112,6 +112,7 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/ContentLaunchSearchParameter.java",
     "java/src/com/tcl/chip/tvapp/DACProvider.java",
     "java/src/com/tcl/chip/tvapp/DACProviderStub.java",
+    "java/src/com/tcl/chip/tvapp/DeviceEventProvider.java",
     "java/src/com/tcl/chip/tvapp/KeypadInputManager.java",
     "java/src/com/tcl/chip/tvapp/KeypadInputManagerStub.java",
     "java/src/com/tcl/chip/tvapp/LevelManager.java",
@@ -130,7 +131,6 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
-    "java/src/com/tcl/chip/tvapp/DeviceEventProvider.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

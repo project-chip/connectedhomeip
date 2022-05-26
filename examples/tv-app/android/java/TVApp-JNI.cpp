@@ -20,6 +20,7 @@
 #include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
+#include "DeviceCallbacks.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
@@ -38,7 +39,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include "DeviceCallbacks.h"
 
 using namespace chip;
 using namespace chip::app;
