@@ -131,18 +131,6 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
-        case to_underlying(Tag::kIsProxy):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsProxy))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kIsProxy));
-            VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                bool isProxy;
-                ReturnErrorOnFailure(reader.Get(isProxy));
-                PRETTY_PRINT("\tIsProxy = %s, ", isProxy ? "true" : "false");
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
         case to_underlying(Tag::kIsFabricFiltered):
             // check if this tag has appeared before
             VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
@@ -230,11 +218,6 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilterIBs::Pars
     return apEventFilters->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) const
-{
-    return GetSimpleValue(to_underlying(Tag::kIsProxy), TLV::kTLVType_Boolean, apIsProxy);
-}
-
 CHIP_ERROR SubscribeRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
 {
     return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
@@ -304,15 +287,6 @@ EventFilterIBs::Builder & SubscribeRequestMessage::Builder::CreateEventFilters()
         mError = mEventFilters.Init(mpWriter, to_underlying(Tag::kEventFilters));
     }
     return mEventFilters;
-}
-
-SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsProxy(const bool aIsProxy)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsProxy)), aIsProxy);
-    }
-    return *this;
 }
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)

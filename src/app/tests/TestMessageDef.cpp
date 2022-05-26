@@ -1262,9 +1262,6 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventFilters(apSuite, eventFilters);
 
-    subscribeRequestBuilder.IsProxy(true);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
     subscribeRequestBuilder.IsFabricFiltered(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -1288,7 +1285,6 @@ void ParseSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & 
     uint16_t MinIntervalFloorSeconds   = 0;
     uint16_t MaxIntervalCeilingSeconds = 0;
     bool keepExistingSubscription      = false;
-    bool isProxy                       = false;
     bool isFabricFiltered              = false;
 
     err = subscribeRequestParser.Init(aReader);
@@ -1317,9 +1313,6 @@ void ParseSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & 
 
     err = subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscription);
     NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);
-
-    err = subscribeRequestParser.GetIsProxy(&isProxy);
-    NL_TEST_ASSERT(apSuite, isProxy && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetIsFabricFiltered(&isFabricFiltered);
     NL_TEST_ASSERT(apSuite, isFabricFiltered && err == CHIP_NO_ERROR);
