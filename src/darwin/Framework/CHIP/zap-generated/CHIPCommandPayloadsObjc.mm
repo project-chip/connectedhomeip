@@ -32,26 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
-@implementation CHIPIdentifyClusterIdentifyQueryResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeout = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPIdentifyClusterIdentifyQueryParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
 @implementation CHIPIdentifyClusterTriggerEffectParams
 - (instancetype)init
 {

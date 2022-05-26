@@ -319,21 +319,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPIdentifyClusterIdentifyQueryResponseCallback
-    : public Callback::Callback<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>
-{
-public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallback(jobject javaCallback);
-
-    ~CHIPIdentifyClusterIdentifyQueryResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPKeypadInputClusterSendKeyResponseCallback : public Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>
 {
 public:

@@ -34,8 +34,6 @@
 
 // Commands for cluster: Identify
 #define ZCL_IDENTIFY_COMMAND_ID (0x00)
-#define ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID (0x00)
-#define ZCL_IDENTIFY_QUERY_COMMAND_ID (0x01)
 #define ZCL_TRIGGER_EFFECT_COMMAND_ID (0x40)
 
 // Commands for cluster: Groups

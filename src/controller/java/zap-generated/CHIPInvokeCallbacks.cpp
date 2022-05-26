@@ -1868,65 +1868,6 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, groupName);
 }
-CHIPIdentifyClusterIdentifyQueryResponseCallback::CHIPIdentifyClusterIdentifyQueryResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPIdentifyClusterIdentifyQueryResponseCallback::~CHIPIdentifyClusterIdentifyQueryResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPIdentifyClusterIdentifyQueryResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPIdentifyClusterIdentifyQueryResponseCallback, void (*)(CHIPIdentifyClusterIdentifyQueryResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPIdentifyClusterIdentifyQueryResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject timeout;
-    std::string timeoutClassName     = "java/lang/Integer";
-    std::string timeoutCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeoutClassName.c_str(), timeoutCtorSignature.c_str(),
-                                                                   dataResponse.timeout, timeout);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, timeout);
-}
 CHIPKeypadInputClusterSendKeyResponseCallback::CHIPKeypadInputClusterSendKeyResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>(CallbackFn, this)
 {

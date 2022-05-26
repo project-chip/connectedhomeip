@@ -230,61 +230,6 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
                Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 const Commands::IdentifyQuery::DecodableType & commandData)
-{
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    // cmd IdentifyQuery
-    uint16_t identifyTime  = 0;
-    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-
-    status = Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS || 0 == identifyTime)
-    {
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            emberAfIdentifyClusterPrintln("Error reading identify time");
-        }
-        else
-        {
-            emberAfIdentifyClusterPrintln("identifyTime is at 0");
-        }
-        emberAfIdentifyClusterPrintln("Sending back default response");
-        sendStatus = emberAfSendImmediateDefaultResponse(status);
-        if (EMBER_SUCCESS != sendStatus)
-        {
-            emberAfIdentifyClusterPrintln("Identify: failed to send %s response: "
-                                          "0x%x",
-                                          "default", sendStatus);
-        }
-        return true;
-    }
-
-    emberAfIdentifyClusterPrintln("Identifying for %u more seconds", identifyTime);
-    {
-        app::ConcreteCommandPath path = { endpoint, Clusters::Identify::Id, ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID };
-        TLV::TLVWriter * writer       = nullptr;
-
-        VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-        SuccessOrExit(err = commandObj->PrepareCommand(path));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), identifyTime));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        emberAfIdentifyClusterPrintln("Failed to encode response command.");
-    }
-    return true;
-}
-
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::TriggerEffect::DecodableType & commandData)
 {
