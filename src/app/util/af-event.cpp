@@ -65,32 +65,37 @@ void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 EMBER_AF_GENERATED_EVENT_CODE
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
-struct MatterEventMetaContext {
+struct MatterEventMetaContext
+{
     EmberAfEventContext context;
-    const char* eventString;
+    const char * eventString;
     EmberEventData event;
-    MatterEventMetaContext* nextContext;
+    MatterEventMetaContext * nextContext;
 };
 
-MatterEventMetaContext* metaContextListHead = nullptr;
+MatterEventMetaContext * metaContextListHead = nullptr;
 
-void MatterEventMetaContextAppend(MatterEventMetaContext& newContext)
+void MatterEventMetaContextAppend(MatterEventMetaContext & newContext)
 {
     auto newContextHeap = new MatterEventMetaContext(newContext);
-    if (metaContextListHead == nullptr) {
+    if (metaContextListHead == nullptr)
+    {
         metaContextListHead = newContextHeap;
-    } else {
+    }
+    else
+    {
         auto metaContextPointer = metaContextListHead;
-        while (metaContextPointer->nextContext != nullptr) {
+        while (metaContextPointer->nextContext != nullptr)
+        {
             metaContextPointer = metaContextPointer->nextContext;
         }
         metaContextPointer->nextContext = newContextHeap;
     }
 }
 
-void MatterRegisterAfEvent(EmberEventData data, const char* eventString, EmberAfEventContext eventContext)
+void MatterRegisterAfEvent(EmberEventData data, const char * eventString, EmberAfEventContext eventContext)
 {
-    MatterEventMetaContext ctx = {eventContext, eventString, data, nullptr};
+    MatterEventMetaContext ctx = { eventContext, eventString, data, nullptr };
     MatterEventMetaContextAppend(ctx);
 }
 
@@ -107,14 +112,13 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
             return;
         }
 
-        for (auto metaContext = metaContextListHead;
-              metaContext != nullptr;
-              metaContext = metaContext->nextContext) {
+        for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
+        {
             const EmberEventData & event = metaContext->event;
             if (event.control != control)
                 continue;
             control->status = EMBER_EVENT_INACTIVE;
-            event.handler((uint8_t)metaContext->context.endpoint);
+            event.handler((uint8_t) metaContext->context.endpoint);
             break;
         }
     }
@@ -130,15 +134,16 @@ void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {
-    if (index == 0xFF) {
+    if (index == 0xFF)
+    {
         return emAfStackEventString;
     }
 
     uint8_t iteratorCounter = 0;
-    for (auto metaContext = metaContextListHead;
-              metaContext != nullptr;
-              metaContext = metaContext->nextContext) {
-        if (iteratorCounter == index) {
+    for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
+    {
+        if (iteratorCounter == index)
+        {
             return metaContext->eventString;
         }
         iteratorCounter++;
@@ -149,10 +154,9 @@ const char * emberAfGetEventString(uint8_t index)
 
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
-    for (auto metaContext = metaContextListHead;
-              metaContext != nullptr;
-              metaContext = metaContext->nextContext) {
-        auto& context = metaContext->context;
+    for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
+    {
+        auto & context = metaContext->context;
         if (context.endpoint == endpoint && context.clusterId == clusterId && context.isClient == isClient)
         {
             return &context;

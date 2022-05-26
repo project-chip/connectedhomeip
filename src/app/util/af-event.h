@@ -57,9 +57,8 @@ typedef struct
     EmberEventControl * control;
     /** The procedure to call when the event fires. */
     void (*handler)(uint8_t endpoint);
-    //void (*handler)(EmberEventControl* ctrl);
+    // void (*handler)(EmberEventControl* ctrl);
 } EmberEventData;
-
 
 // A function used to retrieve the proper NCP timer duration and unit based on a given
 // passed number of milliseconds.
@@ -85,4 +84,4 @@ bool emberEventControlGetActive(EmberEventControl * control);
  */
 void emberEventControlSetActive(EmberEventControl * control);
 
-void MatterRegisterAfEvent(EmberEventData data, const char* eventString, EmberAfEventContext eventContext);
+void MatterRegisterAfEvent(EmberEventData data, const char * eventString, EmberAfEventContext eventContext);
