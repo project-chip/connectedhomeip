@@ -56,16 +56,16 @@ CHIP_ERROR AttestationResponseParser::ParseAttestationResponse(chip::ByteSpan & 
 
     ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTag_Signature)));
     ReturnErrorOnFailure(reader.Get(signature));
-    
+
     ReturnErrorOnFailure(chip::Credentials::CMS_ExtractCDContent(certDecleration, certDeclerationElements));
-    
+
     DataModelLogger::LogString("AttestationResponse", indent, "{");
     DataModelLogger::LogString("certDeclerationElements", indent + 1, "{");
-    
+
     ReturnErrorOnFailure(DecodeCertificationElements(certDeclerationElements, certElements));
     ReturnErrorOnFailure(DataModelLogger::LogValue("FormatVersion", indent + 2, certElements.FormatVersion));
     ReturnErrorOnFailure(DataModelLogger::LogValue("VendorId", indent + 2, certElements.VendorId));
-    
+
     std::string arrayString = "";
     DataModelLogger::LogString(indent + 2, "ProductIds = [");
     for (int i = 1; i < certElements.ProductIdsCount + 1; i++) {
