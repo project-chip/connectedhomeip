@@ -225,6 +225,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
         break;
     }
     case OTAQueryStatus::kBusy: {
+        ChipLogDetail(SoftwareUpdate, "//is: OTAQueryStatus::kBusy delayedActionTime %d", response.delayedActionTime.ValueOr(0));
         CHIP_ERROR status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
             UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         if ((status == CHIP_ERROR_MAX_RETRY_EXCEEDED) || (status == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED))
