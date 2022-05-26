@@ -84,4 +84,11 @@ bool emberEventControlGetActive(EmberEventControl * control);
  */
 void emberEventControlSetActive(EmberEventControl * control);
 
-void MatterRegisterAfEvent(EmberEventData data, const char * eventString, EmberAfEventContext eventContext);
+struct MatterEventMetaContext {
+    EmberAfEventContext context;
+    const char* eventString;
+    EmberEventData event;
+    MatterEventMetaContext* nextContext;
+};
+
+void MatterRegisterAfEvent(MatterEventMetaContext* newContext);

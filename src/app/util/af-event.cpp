@@ -53,6 +53,7 @@
 #include <zap-generated/af-gen-event.h>
 
 using namespace chip;
+using namespace chip::Platform;
 
 // *****************************************************************************
 // Globals
@@ -65,38 +66,19 @@ void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 EMBER_AF_GENERATED_EVENT_CODE
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
-struct MatterEventMetaContext
-{
-    EmberAfEventContext context;
-    const char * eventString;
-    EmberEventData event;
-    MatterEventMetaContext * nextContext;
-};
 
-MatterEventMetaContext * metaContextListHead = nullptr;
-
-void MatterEventMetaContextAppend(MatterEventMetaContext & newContext)
+void MatterRegisterAfEvent(MatterEventMetaContext* newContext)
 {
-    auto newContextHeap = new MatterEventMetaContext(newContext);
-    if (metaContextListHead == nullptr)
-    {
-        metaContextListHead = newContextHeap;
-    }
-    else
-    {
+    if (metaContextListHead == nullptr) {
+        metaContextListHead = newContext;
+    } else {
         auto metaContextPointer = metaContextListHead;
         while (metaContextPointer->nextContext != nullptr)
         {
             metaContextPointer = metaContextPointer->nextContext;
         }
-        metaContextPointer->nextContext = newContextHeap;
+        metaContextPointer->nextContext = newContext;
     }
-}
-
-void MatterRegisterAfEvent(EmberEventData data, const char * eventString, EmberAfEventContext eventContext)
-{
-    MatterEventMetaContext ctx = { eventContext, eventString, data, nullptr };
-    MatterEventMetaContextAppend(ctx);
 }
 
 void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
