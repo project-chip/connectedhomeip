@@ -26,6 +26,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <transport/raw/PeerAddress.h>
 
 #include <cstddef>
 #include <jni.h>
@@ -236,12 +237,15 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(CanCastTo<uint16_t>(port), dispatch(CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturn(Inet::IPAddress::FromString(jniAddress.c_str(), ipAddress), dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
+    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(const_cast<char *>(jniAddress.c_str()), port);
 
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
-    service.mPort = static_cast<uint16_t>(port);
+    service.mAddress.SetValue(peerAddress.GetIPAddress());
+    service.mInterface = peerAddress.GetInterface();
+    service.mPort      = static_cast<uint16_t>(port);
 
     dispatch(CHIP_NO_ERROR, &service, &ipAddress);
 }
