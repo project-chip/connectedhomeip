@@ -70,7 +70,7 @@ using namespace chip::Credentials;
 
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
-static CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobject & outLocation);
+static CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jint interfaceIndex, jobject & outLocation);
 static CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue);
 static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
                                          std::vector<app::AttributePathParams> & outAttributePathParamsList);
@@ -267,16 +267,13 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
     ChipLogProgress(Controller, "pairDeviceWithAddress() called");
 
-    Inet::IPAddress addr;
     JniUtfString addrJniString(env, address);
-    VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
-                   ChipLogError(Controller, "Failed to parse IP address."),
-                   JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters rendezvousParams = RendezvousParameters()
-                                                .SetDiscriminator(discriminator)
-                                                .SetSetupPINCode(pinCode)
-                                                .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters()
+            .SetDiscriminator(discriminator)
+            .SetSetupPINCode(pinCode)
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
     CommissioningParameters commissioningParams = CommissioningParameters();
     if (csrNonce != nullptr)
     {
@@ -523,15 +520,16 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Inet::IPAddress addr;
+    chip::Inet::InterfaceId iface;
     uint16_t port;
     jobject networkLocation;
     char addrStr[50];
 
-    CHIP_ERROR err =
-        wrapper->Controller()->GetPeerAddressAndPort(PeerId()
-                                                         .SetCompressedFabricId(wrapper->Controller()->GetCompressedFabricId())
-                                                         .SetNodeId(static_cast<chip::NodeId>(deviceId)),
-                                                     addr, port);
+    CHIP_ERROR err = wrapper->Controller()->GetPeerAddressInterfaceAndPort(
+        PeerId()
+            .SetCompressedFabricId(wrapper->Controller()->GetCompressedFabricId())
+            .SetNodeId(static_cast<chip::NodeId>(deviceId)),
+        addr, iface, port);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -541,7 +539,8 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
 
     addr.ToString(addrStr);
 
-    err = N2J_NetworkLocation(env, env->NewStringUTF(addrStr), static_cast<jint>(port), networkLocation);
+    err = N2J_NetworkLocation(env, env->NewStringUTF(addrStr), static_cast<jint>(port),
+                              static_cast<jint>(iface.GetPlatformInterface()), networkLocation);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to create NetworkLocation");
@@ -952,7 +951,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobject & outLocation)
+CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jint interfaceIndex, jobject & outLocation)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID constructor;
@@ -963,10 +962,10 @@ CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobje
     SuccessOrExit(err);
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(locationClass, "<init>", "(Ljava/lang/String;I)V");
+    constructor = env->GetMethodID(locationClass, "<init>", "(Ljava/lang/String;II)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outLocation = (jobject) env->NewObject(locationClass, constructor, ipAddress, port);
+    outLocation = (jobject) env->NewObject(locationClass, constructor, ipAddress, port, interfaceIndex);
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:

@@ -186,12 +186,14 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
+    static PeerAddress UDP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return UDP(addr).SetPort(port).SetInterface(interface);
     }
     static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
+    static PeerAddress TCP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return TCP(addr).SetPort(port).SetInterface(interface);
@@ -214,6 +216,29 @@ public:
     }
 
 private:
+    static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
+    {
+        char * addrPart  = nullptr;
+        char * scopePart = nullptr;
+        Inet::IPAddress addr;
+
+        addrPart = strtok(addrStr, "%");
+        if (addrPart != nullptr)
+        {
+            scopePart = strtok(nullptr, "%");
+        }
+
+        if (addrPart == nullptr || scopePart == nullptr)
+        {
+            Inet::IPAddress::FromString(addrStr, addr);
+            return PeerAddress(addr, type).SetPort(port);
+        }
+
+        Inet::InterfaceId interfaceId;
+        Inet::InterfaceId::InterfaceNameToId(scopePart, interfaceId);
+        Inet::IPAddress::FromString(addrPart, addr);
+        return PeerAddress(addr, type).SetPort(port).SetInterface(interfaceId);
+    }
     Inet::IPAddress mIPAddress   = {};
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.

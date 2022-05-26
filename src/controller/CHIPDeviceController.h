@@ -45,6 +45,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -62,8 +63,6 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
-
-#include <controller/CHIPDeviceControllerSystemState.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -166,6 +165,8 @@ public:
     }
 
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+
+    CHIP_ERROR GetPeerAddressInterfaceAndPort(PeerId peerId, Inet::IPAddress & addr, Inet::InterfaceId & iface, uint16_t & port);
 
     /**
      * This function finds the device corresponding to deviceId, and establishes
