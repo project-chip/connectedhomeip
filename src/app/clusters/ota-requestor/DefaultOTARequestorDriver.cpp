@@ -186,17 +186,17 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
     case UpdateNotFoundReason::kUpToDate:
         break;
     case UpdateNotFoundReason::kBusy: {
-        status = ScheduleQueryRetry(true);
+        status = ScheduleQueryRetry(true, chip::max(kDefaultDelayedActionTime, delay));
         if (status == CHIP_ERROR_MAX_RETRY_EXCEEDED)
         {
             // If max retry exceeded with current provider, try a different provider
-            status = ScheduleQueryRetry(false);
+            status = ScheduleQueryRetry(false, chip::max(kDefaultDelayedActionTime, delay));
         }
         break;
     }
     case UpdateNotFoundReason::kNotAvailable: {
         // Schedule a query only if a different provider is available
-        status = ScheduleQueryRetry(false);
+        status = ScheduleQueryRetry(false, chip::max(kDefaultDelayedActionTime, delay));
         break;
     }
     }
@@ -449,7 +449,7 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
     return false;
 }
 
-CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
+CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider, System::Clock::Seconds32 delay)
 {
     CHIP_ERROR status = CHIP_NO_ERROR;
 
@@ -483,7 +483,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider)
     if (status == CHIP_NO_ERROR)
     {
         ChipLogProgress(SoftwareUpdate, "Scheduling a retry");
-        ScheduleDelayedAction(kDefaultDelayedActionTime, StartDelayTimerHandler, this);
+        ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
     }
 
     return status;
