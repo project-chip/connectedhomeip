@@ -9800,11 +9800,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIdentify : CHIPCluster
 
 - (void)identifyWithParams:(CHIPIdentifyClusterIdentifyParams *)params completionHandler:(StatusCompletion)completionHandler;
-- (void)identifyQueryWithParams:(CHIPIdentifyClusterIdentifyQueryParams * _Nullable)params
-              completionHandler:(void (^)(CHIPIdentifyClusterIdentifyQueryResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
-- (void)identifyQueryWithCompletionHandler:(void (^)(CHIPIdentifyClusterIdentifyQueryResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
 - (void)triggerEffectWithParams:(CHIPIdentifyClusterTriggerEffectParams *)params
               completionHandler:(StatusCompletion)completionHandler;
 

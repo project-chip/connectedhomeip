@@ -1498,34 +1498,6 @@ class Identify(Cluster):
             identifyTime: 'uint' = 0
 
         @dataclass
-        class IdentifyQueryResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0003
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="timeout", Tag=0, Type=uint),
-                    ])
-
-            timeout: 'uint' = 0
-
-        @dataclass
-        class IdentifyQuery(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0003
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
-
-        @dataclass
         class TriggerEffect(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0003
             command_id: typing.ClassVar[int] = 0x0040

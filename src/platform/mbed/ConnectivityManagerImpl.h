@@ -79,6 +79,8 @@ private:
     CHIP_ERROR InitWiFi(void);
     void OnWiFiPlatformEvent(const ChipDeviceEvent * event);
 
+    void ChangeWiFiStationState(WiFiStationState newState);
+
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
     bool _IsWiFiStationEnabled();

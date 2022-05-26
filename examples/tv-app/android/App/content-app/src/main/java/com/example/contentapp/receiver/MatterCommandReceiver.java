@@ -28,6 +28,8 @@ public class MatterCommandReceiver extends BroadcastReceiver {
             new StringBuilder()
                 .append("Received matter command: ")
                 .append(intent.getAction())
+                .append(". Payload : ")
+                .append(new String(commandPayload))
                 .toString());
 
         PendingIntent pendingIntent =

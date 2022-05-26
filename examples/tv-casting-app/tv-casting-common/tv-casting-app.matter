@@ -868,12 +868,7 @@ server cluster Identify = 3 {
     INT16U identifyTime = 0;
   }
 
-  response struct IdentifyQueryResponse = 0 {
-    INT16U timeout = 0;
-  }
-
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) IdentifyQuery(): IdentifyQueryResponse = 1;
 }
 
 client cluster KeypadInput = 1289 {

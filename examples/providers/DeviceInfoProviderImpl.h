@@ -43,7 +43,7 @@ protected:
         FixedLabelIteratorImpl(EndpointId endpoint);
         size_t Count() override;
         bool Next(FixedLabelType & output) override;
-        void Release() override { delete this; }
+        void Release() override { chip::Platform::Delete(this); }
 
     private:
         EndpointId mEndpoint = 0;
@@ -58,7 +58,7 @@ protected:
         UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint);
         size_t Count() override { return mTotal; }
         bool Next(UserLabelType & output) override;
-        void Release() override { delete this; }
+        void Release() override { chip::Platform::Delete(this); }
 
     private:
         DeviceInfoProviderImpl & mProvider;
@@ -75,7 +75,7 @@ protected:
         SupportedLocalesIteratorImpl() = default;
         size_t Count() override;
         bool Next(CharSpan & output) override;
-        void Release() override { delete this; }
+        void Release() override { chip::Platform::Delete(this); }
 
     private:
         size_t mIndex = 0;
@@ -88,7 +88,7 @@ protected:
         SupportedCalendarTypesIteratorImpl() = default;
         size_t Count() override;
         bool Next(CalendarType & output) override;
-        void Release() override { delete this; }
+        void Release() override { chip::Platform::Delete(this); }
 
     private:
         size_t mIndex = 0;

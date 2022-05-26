@@ -18,7 +18,7 @@
 
 #include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
-#include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/ESP32/ESP32Config.h>
 
 namespace chip {
 namespace DeviceLayer {

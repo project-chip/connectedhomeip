@@ -280,11 +280,10 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                        const PayloadHeader & aPayloadHeader,
-                                                        System::PacketBufferHandle && aPayload,
-                                                        ReadHandler::InteractionType aInteractionType,
-                                                        Protocols::InteractionModel::Status & aStatus)
+Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                                                 const PayloadHeader & aPayloadHeader,
+                                                                                 System::PacketBufferHandle && aPayload,
+                                                                                 ReadHandler::InteractionType aInteractionType)
 {
     ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
@@ -301,55 +300,68 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         if (apExchangeContext->GetSessionHandle()->GetFabricIndex() == kUndefinedFabricIndex)
         {
             // Subscriptions must be associated to a fabric.
-            aStatus = Protocols::InteractionModel::Status::UnsupportedAccess;
-            return CHIP_NO_ERROR;
+            return Status::UnsupportedAccess;
         }
 
         reader.Init(aPayload.Retain());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
-        ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
+        CHIP_ERROR err = subscribeRequestParser.Init(reader);
+        if (err != CHIP_NO_ERROR)
+        {
+            return Status::InvalidAction;
+        }
 
         {
             size_t requestedAttributePathCount = 0;
             size_t requestedEventPathCount     = 0;
             AttributePathIBs::Parser attributePathListParser;
-            CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
+            err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
             if (err == CHIP_NO_ERROR)
             {
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
-                TLV::Utilities::Count(pathReader, requestedAttributePathCount, false);
+                err = TLV::Utilities::Count(pathReader, requestedAttributePathCount, false);
             }
-            else if (err != CHIP_ERROR_END_OF_TLV)
+            else if (err == CHIP_ERROR_END_OF_TLV)
             {
-                aStatus = Protocols::InteractionModel::Status::InvalidAction;
-                return CHIP_NO_ERROR;
+                err = CHIP_NO_ERROR;
             }
+            if (err != CHIP_NO_ERROR)
+            {
+                return Status::InvalidAction;
+            }
+
             EventPathIBs::Parser eventpathListParser;
             err = subscribeRequestParser.GetEventRequests(&eventpathListParser);
             if (err == CHIP_NO_ERROR)
             {
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
-                TLV::Utilities::Count(pathReader, requestedEventPathCount, false);
+                err = TLV::Utilities::Count(pathReader, requestedEventPathCount, false);
             }
-            else if (err != CHIP_ERROR_END_OF_TLV)
+            else if (err == CHIP_ERROR_END_OF_TLV)
             {
-                aStatus = Protocols::InteractionModel::Status::InvalidAction;
-                return CHIP_NO_ERROR;
+                err = CHIP_NO_ERROR;
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                return Status::InvalidAction;
             }
 
             // The following cast is safe, since we can only hold a few tens of paths in one request.
             if (!EnsureResourceForSubscription(apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount,
                                                requestedEventPathCount))
             {
-                aStatus = Protocols::InteractionModel::Status::PathsExhausted;
-                return CHIP_NO_ERROR;
+                return Status::PathsExhausted;
             }
         }
 
-        ReturnErrorOnFailure(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions));
+        err = subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions);
+        if (err != CHIP_NO_ERROR)
+        {
+            return Status::InvalidAction;
+        }
 
         if (!keepExistingSubscriptions)
         {
@@ -381,33 +393,29 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 
     if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
     {
-        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
-        return CHIP_NO_ERROR;
+        return Status::ResourceExhausted;
     }
 #endif
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
     ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
-    if (handler)
+    if (handler == nullptr)
     {
-        CHIP_ERROR err = handler->OnInitialRequest(std::move(aPayload));
-        if (err == CHIP_ERROR_NO_MEMORY)
-        {
-            aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
-        }
-        else
-        {
-            aStatus = StatusIB(err).mStatus;
-        }
-        return err;
+        ChipLogProgress(InteractionModel, "no resource for %s interaction",
+                        aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
+        return Status::ResourceExhausted;
     }
 
-    ChipLogProgress(InteractionModel, "no resource for %s interaction",
-                    aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
-    aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+    CHIP_ERROR err = handler->OnInitialRequest(std::move(aPayload));
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return Status::ResourceExhausted;
+    }
 
-    return CHIP_NO_ERROR;
+    // TODO: Should probably map various TLV errors into InvalidAction, here
+    // or inside the read handler.
+    return StatusIB(err).mStatus;
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -494,7 +502,6 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 {
     using namespace Protocols::InteractionModel;
 
-    CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
@@ -503,18 +510,16 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-        SuccessOrExit(
-            OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false, status));
+        OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false, status);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                           ReadHandler::InteractionType::Read, status));
+        status = OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Read);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
@@ -522,8 +527,8 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
-        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                           ReadHandler::InteractionType::Subscribe, status));
+        status =
+            OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Subscribe);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
@@ -532,19 +537,19 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
-        SuccessOrExit(OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status));
+        OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
     }
     else
     {
         ChipLogProgress(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     }
 
-exit:
     if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
-    return err;
+
+    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)

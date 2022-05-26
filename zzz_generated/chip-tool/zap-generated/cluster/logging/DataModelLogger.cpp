@@ -3931,14 +3931,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Identify::Commands::IdentifyQueryResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("timeout", indent + 1, value.timeout));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const KeypadInput::Commands::SendKeyResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -10330,17 +10322,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Groups::Commands::RemoveGroupResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveGroupResponse", 1, value);
-        }
-        }
-        break;
-    }
-    case Identify::Id: {
-        switch (path.mCommandId)
-        {
-        case Identify::Commands::IdentifyQueryResponse::Id: {
-            Identify::Commands::IdentifyQueryResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IdentifyQueryResponse", 1, value);
         }
         }
         break;

@@ -19,7 +19,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/Linux/DeviceInfoProviderImpl.h>
+#include <platform/ESP32/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
@@ -51,7 +51,9 @@ DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointI
 
 size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded labelList on all endpoints.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded labellist.
     return 4;
 }
 
@@ -59,7 +61,9 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 {
     bool retval = true;
 
-    // In Linux Simulation, use the following hardcoded labelList on all endpoints.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded labellist.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * labelPtr = nullptr;
@@ -67,7 +71,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
     VerifyOrReturnError(mIndex < 4, false);
 
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%ld at endpoint:%d", mIndex, mEndpoint);
+    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%d at endpoint:%d", mIndex, mEndpoint);
 
     switch (mIndex)
     {
@@ -94,8 +98,8 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
     if (err == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+        VerifyOrReturnError(strlen(labelPtr) <= kMaxLabelNameLength, false);
+        VerifyOrReturnError(strlen(valuePtr) <= kMaxLabelValueLength, false);
 
         Platform::CopyString(mFixedLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
         Platform::CopyString(mFixedLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
@@ -213,7 +217,9 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the ActiveLocale.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded SupportedLocales.
     // {("en-US"), ("de-DE"), ("fr-FR"), ("en-GB"), ("es-ES"), ("zh-CN"), ("it-IT"), ("ja-JP")}
 
     return 8;
@@ -223,7 +229,9 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 {
     bool retval = true;
 
-    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded SupportedLocales.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     const char * activeLocalePtr = nullptr;
@@ -263,7 +271,7 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
     if (err == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
+        VerifyOrReturnError(strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
 
         Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
 
@@ -288,7 +296,9 @@ DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::Ite
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
-    // In Linux Simulation, return the size of the hardcoded list of Strings that are valid values for the Calendar Types.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded SupportedCalendarTypes.
     // {("kBuddhist"), ("kChinese"), ("kCoptic"), ("kEthiopian"), ("kGregorian"), ("kHebrew"), ("kIndian"), ("kJapanese"),
     //  ("kKorean"), ("kPersian"), ("kTaiwanese"), ("kIslamic")}
 
@@ -299,7 +309,9 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
 {
     bool retval = true;
 
-    // In Linux Simulation, return following hardcoded list of Strings that are valid values for the Calendar Types.
+    // TODO: Need to provide a script which can generate a binary file which contains device information and
+    // update the DeviceInfoProvider which can read the information from it.
+    // Now we use the hardcoded SupportedCalendarTypes.
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mIndex < 12, false);

@@ -665,14 +665,10 @@
   /* Endpoint: 1, Cluster: Identify (server) */\
   /*   AcceptedCommandList (index=54) */ \
   0x00000000 /* Identify */, \
-  0x00000001 /* IdentifyQuery */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=58)*/ \
-  0x00000000 /* IdentifyQueryResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=60) */ \
+  /*   AcceptedCommandList (index=57) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -680,14 +676,14 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=67)*/ \
+  /*   GeneratedCommandList (index=64)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Window Covering (server) */\
-  /*   AcceptedCommandList (index=72) */ \
+  /*   AcceptedCommandList (index=69) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -697,7 +693,7 @@
   0x00000008 /* GoToTiltPercentage */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=80) */ \
+  /*   AcceptedCommandList (index=77) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -705,14 +701,14 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=87)*/ \
+  /*   GeneratedCommandList (index=84)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Window Covering (server) */\
-  /*   AcceptedCommandList (index=92) */ \
+  /*   AcceptedCommandList (index=89) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -970,7 +966,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 58 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
@@ -980,8 +976,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 67 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 57 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 64 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Scenes (client) */ \
@@ -1013,7 +1009,7 @@
       .clusterSize = 35, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 72 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 69 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1024,8 +1020,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 80 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 87 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 77 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 84 ) ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Scenes (client) */ \
@@ -1057,7 +1053,7 @@
       .clusterSize = 35, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 89 ) ,\
       .generatedCommandList = nullptr ,\
     },\
 }
@@ -1104,7 +1100,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-        { 0x0016, 1 }, { 0x0202, 1 }, { 0x0202, 1 }                                                                                \
+        { 0x0016, 1 }, { 0x0202, 2 }, { 0x0202, 2 }                                                                                \
     }
 
 // Array of device type offsets

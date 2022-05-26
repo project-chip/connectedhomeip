@@ -1630,7 +1630,6 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Identify                                                          |   0x00 |
-| * IdentifyQuery                                                     |   0x01 |
 | * TriggerEffect                                                     |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -1673,35 +1672,6 @@ public:
 
 private:
     chip::app::Clusters::Identify::Commands::Identify::Type mRequest;
-};
-
-/*
- * Command IdentifyQuery
- */
-class IdentifyIdentifyQuery : public ClusterCommand
-{
-public:
-    IdentifyIdentifyQuery(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("identify-query", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Identify::Commands::IdentifyQuery::Type mRequest;
 };
 
 /*
@@ -19570,7 +19540,6 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),    //
         make_unique<IdentifyIdentify>(credsIssuerConfig),      //
-        make_unique<IdentifyIdentifyQuery>(credsIssuerConfig), //
         make_unique<IdentifyTriggerEffect>(credsIssuerConfig), //
         //
         // Attributes

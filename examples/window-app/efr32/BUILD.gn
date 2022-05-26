@@ -172,6 +172,7 @@ efr32_executable("window_app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/examples/window-app/common:window-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",

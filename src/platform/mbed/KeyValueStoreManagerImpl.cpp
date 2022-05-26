@@ -43,6 +43,13 @@ public:
     {
         auto ret = snprintf(buffer, sizeof(buffer), "%s%s", prefix, key);
         valid    = (ret > 0) && ((size_t) ret <= (sizeof(buffer) - 1));
+        // Key must not include '*' '/' '?' ':' ';' '\' '"' '|' ' ' '<' '>' '\'.
+        // It's replaced by '-'
+        char * ptr = buffer + strlen(prefix);
+        while ((ptr = strpbrk(ptr, " */?:;\"|<>\\")) != NULL)
+        {
+            *ptr = '-';
+        }
     }
 
     const char * str() const { return valid ? buffer : nullptr; }

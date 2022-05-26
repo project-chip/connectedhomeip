@@ -81,8 +81,6 @@ typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterRemoveGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
-typedef void (*CHIPIdentifyClusterIdentifyQueryResponseCallbackType)(
-    void *, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &);
 typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
 typedef void (*CHIPMediaPlaybackClusterPlaybackResponseCallbackType)(
@@ -9983,18 +9981,6 @@ public:
         CHIPCallbackBridge<CHIPGroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
-};
-
-class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>
-{
-public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data);
 };
 
 class CHIPKeypadInputClusterSendKeyResponseCallbackBridge

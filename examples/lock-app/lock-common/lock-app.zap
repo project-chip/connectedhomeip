@@ -1,5 +1,5 @@
 {
-  "featureLevel": 70,
+  "featureLevel": 71,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -207,14 +207,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
-            },
-            {
-              "name": "IdentifyQuery",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
             }
           ],
           "attributes": [
@@ -243,16 +235,7 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "identify time",
@@ -583,7 +566,7 @@
           ],
           "attributes": [
             {
-              "name": "scene count",
+              "name": "SceneCount",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -599,7 +582,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current scene",
+              "name": "CurrentScene",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -615,11 +598,11 @@
               "reportableChange": 0
             },
             {
-              "name": "current group",
+              "name": "CurrentGroup",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "group_id",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -631,7 +614,7 @@
               "reportableChange": 0
             },
             {
-              "name": "scene valid",
+              "name": "SceneValid",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -647,7 +630,7 @@
               "reportableChange": 0
             },
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -5552,14 +5535,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            },
-            {
-              "name": "IdentifyQuery",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
             }
           ],
           "attributes": [
@@ -5588,16 +5563,7 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "identify time",
@@ -5960,7 +5926,7 @@
           ],
           "attributes": [
             {
-              "name": "scene count",
+              "name": "SceneCount",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5976,7 +5942,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current scene",
+              "name": "CurrentScene",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5992,11 +5958,11 @@
               "reportableChange": 0
             },
             {
-              "name": "current group",
+              "name": "CurrentGroup",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "group_id",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6008,7 +5974,7 @@
               "reportableChange": 0
             },
             {
-              "name": "scene valid",
+              "name": "SceneValid",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6024,7 +5990,7 @@
               "reportableChange": 0
             },
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -7168,6 +7134,30 @@
               "outgoing": 0
             },
             {
+              "name": "SetHolidaySchedule",
+              "code": 17,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetHolidaySchedule",
+              "code": 18,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ClearHolidaySchedule",
+              "code": 19,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "SetUser",
               "code": 26,
               "mfgCode": null,
@@ -7254,6 +7244,14 @@
             {
               "name": "GetYearDayScheduleResponse",
               "code": 15,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetHolidayScheduleResponse",
+              "code": 18,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
@@ -7499,11 +7497,11 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "10",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8227,5 +8225,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ]
+  ],
+  "log": []
 }

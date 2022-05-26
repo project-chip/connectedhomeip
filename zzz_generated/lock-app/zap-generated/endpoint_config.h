@@ -169,7 +169,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 259
+#define GENERATED_ATTRIBUTE_COUNT 260
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -527,6 +527,7 @@
             { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfRFIDUsersSupported */                       \
             { 0x00000014, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* NumberOfWeekDaySchedulesSupportedPerUser */         \
             { 0x00000015, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* NumberOfYearDaySchedulesSupportedPerUser */         \
+            { 0x00000016, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* NumberOfHolidaySchedulesSupported */                \
             { 0x00000017, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(8) },   /* MaxPINCodeLength */                                 \
             { 0x00000018, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MinPINCodeLength */                                 \
             { 0x00000019, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(20) },  /* MaxRFIDCodeLength */                                \
@@ -668,13 +669,9 @@
   /* Endpoint: 1, Cluster: Identify (server) */\
   /*   AcceptedCommandList (index=52) */ \
   0x00000000 /* Identify */, \
-  0x00000001 /* IdentifyQuery */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=55)*/ \
-  0x00000000 /* IdentifyQueryResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=57) */ \
+  /*   AcceptedCommandList (index=54) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -682,20 +679,20 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=64)*/ \
+  /*   GeneratedCommandList (index=61)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=69) */ \
+  /*   AcceptedCommandList (index=66) */ \
   0x00000000 /* Off */, \
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Door Lock (server) */\
-  /*   AcceptedCommandList (index=73) */ \
+  /*   AcceptedCommandList (index=70) */ \
   0x00000000 /* LockDoor */, \
   0x00000001 /* UnlockDoor */, \
   0x00000003 /* UnlockWithTimeout */, \
@@ -705,6 +702,9 @@
   0x0000000E /* SetYearDaySchedule */, \
   0x0000000F /* GetYearDaySchedule */, \
   0x00000010 /* ClearYearDaySchedule */, \
+  0x00000011 /* SetHolidaySchedule */, \
+  0x00000012 /* GetHolidaySchedule */, \
+  0x00000013 /* ClearHolidaySchedule */, \
   0x0000001A /* SetUser */, \
   0x0000001B /* GetUser */, \
   0x0000001D /* ClearUser */, \
@@ -715,6 +715,7 @@
   /*   GeneratedCommandList (index=89)*/ \
   0x0000000C /* GetWeekDayScheduleResponse */, \
   0x0000000F /* GetYearDayScheduleResponse */, \
+  0x00000012 /* GetHolidayScheduleResponse */, \
   0x0000001C /* GetUserResponse */, \
   0x00000023 /* SetCredentialResponse */, \
   0x00000025 /* GetCredentialStatusResponse */, \
@@ -968,7 +969,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 55 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
@@ -978,8 +979,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 57 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 64 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 61 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
@@ -989,7 +990,7 @@
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 69 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 66 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1018,11 +1019,11 @@
       /* Endpoint: 1, Cluster: Door Lock (server) */ \
       .clusterId = 0x00000101,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(232), \
-      .attributeCount = 27, \
-      .clusterSize = 41, \
+      .attributeCount = 28, \
+      .clusterSize = 42, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayDoorLockServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 73 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 89 ) ,\
     },\
 }
@@ -1036,7 +1037,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 552 }, { ZAP_CLUSTER_INDEX(21), 6, 206 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 21, 552 }, { ZAP_CLUSTER_INDEX(21), 6, 207 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1048,7 +1049,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (758)
+#define ATTRIBUTE_MAX_SIZE (759)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

@@ -19,11 +19,19 @@ import("${chip_root}/build/chip/tests.gni")
 
 assert(current_os == "zephyr")
 
+declare_args() {
+  chip_build_example_providers = false
+}
+
 group("nrfconnect") {
   deps = [ "${chip_root}/src/lib" ]
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
+  }
+
+  if (chip_build_example_providers) {
+    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
   }
 }
 
