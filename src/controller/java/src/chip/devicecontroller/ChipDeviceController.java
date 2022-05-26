@@ -372,6 +372,39 @@ public class ChipDeviceController {
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
+  /**
+   * Sets the key configuration used for operational control of devices. This includes all necessary
+   * credential elements for a Java controller to be used for operational control of devices.
+   *
+   * @param keypairDelegate a delegate for signing operations
+   * @param rootCertificate the trusted root X.509 certificate in DER-encoded form
+   * @param intermediateCertificate the intermediate X.509 certificate in DER-encoded form
+   * @param operationalCertificate the node operational X.509 certificate in DER-encoded form
+   * @param ipk the IPK epoch key to use (assuming a single one)
+   */
+  public void setOperationalKeyConfig(
+      KeypairDelegate keypairDelegate,
+      byte[] rootCertificate,
+      byte[] intermediateCertificate,
+      byte[] operationalCertificate,
+      byte[] ipk) {
+    setOperationalKeyConfig(
+        deviceControllerPtr,
+        keypairDelegate,
+        rootCertificate,
+        intermediateCertificate,
+        operationalCertificate,
+        ipk);
+  }
+
+  private native void setOperationalKeyConfig(
+      long deviceControllerPtr,
+      KeypairDelegate keypairDelegate,
+      byte[] rootCertificate,
+      byte[] intermediateCertificate,
+      byte[] operationalCertificate,
+      byte[] ipk);
+
   private native void subscribeToPath(
       long deviceControllerPtr,
       long callbackHandle,

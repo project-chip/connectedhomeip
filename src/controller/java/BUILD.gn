@@ -86,6 +86,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
+    "src/chip/devicecontroller/KeypairDelegate.java",
     "src/chip/devicecontroller/NetworkCredentials.java",
     "src/chip/devicecontroller/NetworkLocation.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
