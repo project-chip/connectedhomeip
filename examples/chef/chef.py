@@ -273,7 +273,7 @@ def main(argv: Sequence[str]) -> None:
  {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}")
                 shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
         chef_util.generate_device_manifest(_CHEF_DEVICES_DIR, include_zap_submod=True, write_manifest_file=True,
-                                           _CI_MANIFEST_FILE_NAME=_CI_MANIFEST_FILE_NAME, repo_base_path=_REPO_BASE_PATH, _CHEF_ZZZ_ROOT=_CHEF_ZZZ_ROOT)
+                                           ci_manifest_file_name=_CI_MANIFEST_FILE_NAME, repo_base_path=_REPO_BASE_PATH, chef_zzz_root=_CHEF_ZZZ_ROOT)
         exit(0)
 
     #
