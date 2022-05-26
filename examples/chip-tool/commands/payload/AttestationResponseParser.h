@@ -18,17 +18,14 @@
 
 #pragma once
 
-#include "../common/Command.h"
 #include "../clusters/DataModelLogger.h"
+#include "../common/Command.h"
 #include <setup_payload/SetupPayload.h>
 
 class AttestationResponseParser : public Command, public DataModelLogger
 {
 public:
-    AttestationResponseParser() : Command("attestation-response-parse")
-    {
-        AddArgument("payload", &mAttResponse);
-    }
+    AttestationResponseParser() : Command("attestation-response-parse") { AddArgument("payload", &mAttResponse); }
     CHIP_ERROR Run() override;
 
 private:

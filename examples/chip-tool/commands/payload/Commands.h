@@ -19,10 +19,10 @@
 #pragma once
 
 #include "AdditionalDataParseCommand.h"
+#include "AttestationResponseParser.h"
 #include "SetupPayloadGenerateCommand.h"
 #include "SetupPayloadParseCommand.h"
 #include "SetupPayloadVerhoeff.h"
-#include "AttestationResponseParser.h"
 
 void registerCommandsPayload(Commands & commands)
 {

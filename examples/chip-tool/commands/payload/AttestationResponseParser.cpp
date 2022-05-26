@@ -20,13 +20,12 @@
 #include <credentials/CertificationDeclaration.h>
 #include <string>
 
-
 using namespace ::chip;
 
 enum
 {
-    kTag_CertDecleration       = 1,
-    kTag_Signature             = 2,
+    kTag_CertDecleration = 1,
+    kTag_Signature       = 2,
 };
 
 CHIP_ERROR AttestationResponseParser::Run()
@@ -68,9 +67,11 @@ CHIP_ERROR AttestationResponseParser::ParseAttestationResponse(chip::ByteSpan & 
 
     std::string arrayString = "";
     DataModelLogger::LogString(indent + 2, "ProductIds = [");
-    for (int i = 1; i < certElements.ProductIdsCount + 1; i++) {
+    for (int i = 1; i < certElements.ProductIdsCount + 1; i++)
+    {
         arrayString += std::to_string(certElements.ProductIds[i - 1]) + ", ";
-        if (i % 10 == 0) {
+        if (i % 10 == 0)
+        {
             DataModelLogger::LogString(indent + 5, arrayString);
             arrayString = "";
         }
@@ -85,7 +86,8 @@ CHIP_ERROR AttestationResponseParser::ParseAttestationResponse(chip::ByteSpan & 
     ReturnErrorOnFailure(DataModelLogger::LogValue("CertificationType", indent + 2, certElements.CertificationType));
     ReturnErrorOnFailure(DataModelLogger::LogValue("DACOriginVendorId (Optional)", indent + 2, certElements.DACOriginVendorId));
     ReturnErrorOnFailure(DataModelLogger::LogValue("DACOriginProductId (Optional)", indent + 2, certElements.DACOriginProductId));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("DACOriginVIDandPIDPresent (Optional)", indent + 2, certElements.DACOriginVIDandPIDPresent));
+    ReturnErrorOnFailure(
+        DataModelLogger::LogValue("DACOriginVIDandPIDPresent (Optional)", indent + 2, certElements.DACOriginVIDandPIDPresent));
     // TODO: Figure out how to log.
     // ReturnErrorOnFailure(DataModelLogger::LogValue("AuthorizedPAAList", indent + 2, certElements.AuthorizedPAAList));
     ReturnErrorOnFailure(DataModelLogger::LogValue("AuthorizedPAAListCount", indent + 2, certElements.AuthorizedPAAListCount));
