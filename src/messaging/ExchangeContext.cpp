@@ -79,6 +79,11 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
 }
 
+void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+{
+    SetResponseTimeout(mSession->SuggestEndToEndTimeout(applicationProcessingTimeout));
+}
+
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
 {
     mResponseTimeout = timeout;

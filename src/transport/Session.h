@@ -78,6 +78,10 @@ public:
     virtual System::Clock::Timestamp GetMRPBaseTimeout()               = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
 
+    // Returns a suggested timeout value based on the session type and the given upper layer processing timeout.
+    // For group sessions, this function will always return 0.
+    System::Clock::Timeout SuggestEndToEndTimeout(System::Clock::Timeout upperlayerProcessingTimeout);
+
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     SecureSession * AsSecureSession();

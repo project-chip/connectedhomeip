@@ -276,7 +276,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(aReadPrepareParams.mSessionHolder.Get().Value()));
+        mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {
@@ -929,7 +929,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(aReadPrepareParams.mSessionHolder.Get().Value()));
+        mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {

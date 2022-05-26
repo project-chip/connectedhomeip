@@ -175,6 +175,15 @@ public:
     void Close();
     void Abort();
 
+    // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
+    // the next message to the exchange. The exchange context must have a valid session when calling this function.
+    //
+    // This function is an equivalent of SetResponseTimeout(mSession->SuggestEndToEndTimeout(applicationProcessingTimeout))
+    void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
+
+    // Set the response timeout for the exchange context, regardless of the underlying session type. Using
+    // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
+    // using this function is recommended.
     void SetResponseTimeout(Timeout timeout);
 
 private:

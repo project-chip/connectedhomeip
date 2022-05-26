@@ -24,17 +24,9 @@
 namespace chip {
 namespace app {
 
+// This is an expected upper bound of time-to-first-byte for IM transactions, the actual processing time should never exceed this
+// value unless specified elsewhere (e.g. async command handling for some clusters).
 static constexpr System::Clock::Timeout kExpectedIMProcessingTime = System::Clock::Seconds16(5);
-
-// Returns the suggested timeout for interaction model
-inline System::Clock::Timeout InteractionModelTimeoutForSession(const SessionHandle & aSession)
-{
-    if (aSession->IsGroupSession())
-    {
-        return System::Clock::kZero;
-    }
-    return aSession->GetAckTimeout() + kExpectedIMProcessingTime;
-}
 
 } // namespace app
 } // namespace chip

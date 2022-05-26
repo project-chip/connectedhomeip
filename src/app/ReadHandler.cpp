@@ -255,7 +255,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         MoveToState(HandlerState::AwaitingReportResponse);
     }
 
-    mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(mSessionHandle.Get().Value()));
+    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err =
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                    Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone

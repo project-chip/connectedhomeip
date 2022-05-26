@@ -375,7 +375,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     if (timeout == System::Clock::kZero)
     {
-        mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(session));
+        mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {

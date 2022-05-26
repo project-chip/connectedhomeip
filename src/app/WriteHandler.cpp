@@ -192,7 +192,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx->SetResponseTimeout(InteractionModelTimeoutForSession(mpExchangeCtx->GetSessionHandle()));
+    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                      mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
                                                     : Messaging::SendMessageFlags::kNone);
