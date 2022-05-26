@@ -38,7 +38,7 @@ tests:
               maxValue: 9999
 
     - label: "Reads constraints of attribute: MaxMeasuredValue"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "max measured value"
       response:
@@ -59,7 +59,7 @@ tests:
               maxValue: 10000
 
     - label: "Operate on device to change the relative humidity significantly"
-      PICS: MANUAL_TEMPERATURE_CHANGE
+      PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
       cluster: "LogCommands"
       command: "Log"
       arguments:

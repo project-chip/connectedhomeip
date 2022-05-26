@@ -84,7 +84,6 @@ tests:
     #validate the service type and the service domain not implemented in CI
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
       PICS: "(WIFI || ETH) && !THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -98,7 +97,6 @@ tests:
                     isHexString: true
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
       PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -257,7 +255,6 @@ tests:
                 constraints:
                     minValue: 1
 
-    # The testplan needs TH needs to be Rebooted so below steps disabled for now
     - label: "Stop target device"
       cluster: "SystemCommands"
       command: "Stop"
@@ -305,7 +302,6 @@ tests:
     #validate the service type and the service domain not implemented in CI
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
       PICS: "(WIFI || ETH) && !THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -319,7 +315,6 @@ tests:
                     isHexString: true
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
       PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -358,7 +353,6 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      # The device type is not broadcasted by the accessory under CI.
       PICS: PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"

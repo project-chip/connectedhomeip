@@ -37,7 +37,7 @@ tests:
               type: uint16
 
     - label: "operate on DUT to change the flow significantly"
-      PICS: MANUAL_TEMPERATURE_CHANGE
+      PICS: MANUAL_FLOW_CHANGE
       cluster: "LogCommands"
       command: "Log"
       arguments:
