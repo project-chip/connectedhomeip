@@ -67,6 +67,8 @@ public class TvApp {
 
   public native void setDACProvider(DACProvider provider);
 
+  public native void setChipDeviceEventProvider(DeviceEventProvider provider);
+
   public native int addContentApp(
       String vendorName,
       int vendorId,

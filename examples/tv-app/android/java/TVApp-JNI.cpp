@@ -38,6 +38,7 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include "DeviceCallbacks.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -175,6 +176,11 @@ JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject mana
 JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return LevelManager::SetLevel(endpoint, value);
+}
+
+JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider)
+{
+    DeviceCallbacks::NewManager(provider);
 }
 
 JNI_METHOD(jint, addContentApp)

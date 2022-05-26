@@ -34,6 +34,7 @@ import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.DACProviderStub;
+import com.tcl.chip.tvapp.DeviceEventProvider;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LevelManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
@@ -113,6 +114,12 @@ public class MatterServant {
             });
     mTvApp.setDACProvider(new DACProviderStub());
 
+    mTvApp.setChipDeviceEventProvider(new DeviceEventProvider() {
+      @Override
+      public void onCommissioningComplete() {
+        Log.d("lz", "onCommissioningComplete: ");
+      }
+    });
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
