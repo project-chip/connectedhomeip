@@ -707,22 +707,22 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
     {
         if (0 != userIndexWithCredential)
         {
-            response.userIndex = Nullable<uint16_t>(userIndexWithCredential);
+            response.userIndex.SetNonNull(userIndexWithCredential);
         }
         if (credentialInfo.creationSource == DlAssetSource::kMatterIM)
         {
-            response.creatorFabricIndex = Nullable<chip::FabricIndex>(credentialInfo.createdBy);
+            response.creatorFabricIndex.SetNonNull(credentialInfo.createdBy);
         }
         if (credentialInfo.modificationSource == DlAssetSource::kMatterIM)
         {
-            response.lastModifiedFabricIndex = Nullable<chip::FabricIndex>(credentialInfo.lastModifiedBy);
+            response.lastModifiedFabricIndex.SetNonNull(credentialInfo.lastModifiedBy);
         }
     }
     uint16_t nextCredentialIndex = 0;
     if (findOccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
                                    nextCredentialIndex))
     {
-        response.nextCredentialIndex = Nullable<uint16_t>(nextCredentialIndex);
+        response.nextCredentialIndex.SetNonNull(nextCredentialIndex);
     }
     commandObj->AddResponse(commandPath, response);
 
@@ -1238,7 +1238,7 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
         fabricIndex);
 
     // Iterate over all the users and clean up the deleted fabric
-    if (!cleanFabricFromUsers(endpointId, fabricIndex))
+    if (!clearFabricFromUsers(endpointId, fabricIndex))
     {
         ChipLogError(Zcl, "[OnFabricRemoved] Unable to cleanup fabric from users - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
@@ -1827,7 +1827,7 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool DoorLockServer::cleanFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
+bool DoorLockServer::clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
 {
     uint16_t maxNumberOfUsers;
     VerifyOrReturnError(GetAttribute(endpointId, Attributes::NumberOfTotalUsersSupported::Id,
@@ -1851,7 +1851,17 @@ bool DoorLockServer::cleanFabricFromUsers(chip::EndpointId endpointId, chip::Fab
             continue;
         }
 
-        if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, user.userName,
+        if (user.createdBy == fabricIndex)
+        {
+            user.createdBy = kUndefinedFabricIndex;
+        }
+
+        if (user.lastModifiedBy == fabricIndex)
+        {
+            user.lastModifiedBy = kUndefinedFabricIndex;
+        }
+
+        if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, user.lastModifiedBy, user.userName,
                                           user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
                                           user.credentials.data(), user.credentials.size()))
         {
@@ -2287,7 +2297,7 @@ bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DlCred
     case DlCredentialType::kPin:
         return SupportsPIN(endpointId);
     case DlCredentialType::kRfid:
-        return SupportsPFID(endpointId);
+        return SupportsRFID(endpointId);
     default:
         return false;
     }
@@ -2714,7 +2724,7 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         emberAfDoorLockClusterPrintln("[clearCredentials] All PIN credentials were cleared [endpointId=%d]", endpointId);
     }
 
-    if (SupportsPFID(endpointId))
+    if (SupportsRFID(endpointId))
     {
         auto status = clearCredentials(endpointId, modifier, sourceNodeId, DlCredentialType::kRfid);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
@@ -2829,7 +2839,17 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, DlC
             continue;
         }
 
-        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
+        if (credential.createdBy == fabricToRemove)
+        {
+            credential.createdBy = kUndefinedFabricIndex;
+        }
+
+        if (credential.lastModifiedBy == fabricToRemove)
+        {
+            credential.lastModifiedBy = kUndefinedFabricIndex;
+        }
+
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, credential.createdBy, credential.lastModifiedBy,
                                                 credential.status, credential.credentialType, credential.credentialData))
         {
             ChipLogError(Zcl,
@@ -2845,7 +2865,7 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, DlC
 
 bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, chip::FabricIndex fabricToRemove)
 {
-    if (SupportsPFID(endpointId))
+    if (SupportsRFID(endpointId))
     {
         clearFabricFromCredentials(endpointId, DlCredentialType::kRfid, fabricToRemove);
     }
@@ -2881,13 +2901,13 @@ bool DoorLockServer::sendRemoteLockUserChange(chip::EndpointId endpointId, DlLoc
     event.operationSource   = DlOperationSource::kRemote;
     if (0 != userIndex)
     {
-        event.userIndex = Nullable<uint16_t>(userIndex);
+        event.userIndex.SetNonNull(userIndex);
     }
-    event.fabricIndex = Nullable<chip::FabricIndex>(fabricIndex);
-    event.sourceNode  = Nullable<chip::NodeId>(nodeId);
+    event.fabricIndex.SetNonNull(fabricIndex);
+    event.sourceNode.SetNonNull(nodeId);
     if (0 != dataIndex)
     {
-        event.dataIndex = Nullable<uint16_t>(dataIndex);
+        event.dataIndex.SetNonNull(dataIndex);
     }
 
     EventNumber eventNumber;
