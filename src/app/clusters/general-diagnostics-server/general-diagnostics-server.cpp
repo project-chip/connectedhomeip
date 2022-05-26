@@ -296,12 +296,13 @@ GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
 
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::TestEventTrigger::DecodableType & commandData) {
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+{
 
     ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger command");
-    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger commandData.enableKey.size()=%d", (int)(commandData.enableKey.size()));
+    ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! We got the TestEventTrigger commandData.enableKey.size()=%d",
+                  (int) (commandData.enableKey.size()));
     ChipLogDetail(Zcl, "TMsg!!!!!!!!!!!! commandData.eventTrigger=0x" ChipLogFormatX64, ChipLogValueX64(commandData.eventTrigger));
     return false;
 }

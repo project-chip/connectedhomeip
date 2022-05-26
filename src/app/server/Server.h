@@ -25,11 +25,11 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
-#include <app/TestEventTriggerDelegate.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
