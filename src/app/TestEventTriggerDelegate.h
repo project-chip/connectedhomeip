@@ -1,5 +1,6 @@
 /*
  *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,7 +28,7 @@ class TestEventTriggerDelegate
 {
 public:
     /**
-     * Checks to see if `enableKey` provided matches value choosen by by the manufacturer.
+     * Checks to see if `enableKey` provided matches value chosen by the manufacturer.
      *
      * @param[in] enableKey Buffer of the key to verify.
      */
@@ -42,11 +43,6 @@ public:
      * @return CHIP_ERROR_INVALID_ARGUMENT when eventTrigger is not a valid test event trigger.
      */
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
-
-    /**
-     * Get the count of all configured test event triggers.
-     */
-    virtual size_t ConfiguredEventTriggerCount() const = 0;
 };
 
 } // namespace chip
