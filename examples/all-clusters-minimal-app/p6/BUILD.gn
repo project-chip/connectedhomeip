@@ -22,7 +22,7 @@ import("${p6_sdk_build_root}/p6_sdk.gni")
 
 assert(current_os == "freertos")
 
-p6_project_dir = "${chip_root}/examples/all-clusters-app/p6"
+p6_project_dir = "${chip_root}/examples/all-clusters-minimal-app/p6"
 examples_plat_dir = "${chip_root}/examples/platform/p6"
 
 declare_args() {
@@ -54,10 +54,10 @@ p6_sdk_sources("all_clusters_app_sdk_sources") {
   public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
 }
 
-p6_executable("clusters_app") {
+p6_executable("clusters_minimal_app") {
   include_dirs = []
   defines = []
-  output_name = "chip-p6-clusters-example.out"
+  output_name = "chip-p6-clusters-minimal-example.out"
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
@@ -73,7 +73,7 @@ p6_executable("clusters_app") {
 
   deps = [
     ":all_clusters_app_sdk_sources",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -104,7 +104,7 @@ p6_executable("clusters_app") {
 }
 
 group("p6") {
-  deps = [ ":clusters_app" ]
+  deps = [ ":clusters_minimal_app" ]
 }
 
 group("default") {

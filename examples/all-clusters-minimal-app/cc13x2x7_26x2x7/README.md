@@ -104,7 +104,7 @@ Ninja to build the executable.
     step.
 
     ```
-    $ cd ~/connectedhomeip/examples/all-clusters-app/cc13x2x7_26x2x7
+    $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x2x7_26x2x7
     $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
     $ ninja -C out/debug
 

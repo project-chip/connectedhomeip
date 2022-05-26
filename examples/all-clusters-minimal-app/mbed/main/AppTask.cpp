@@ -97,7 +97,7 @@ int AppTask::StartApp()
         return ret;
     }
 
-    ChipLogProgress(NotSpecified, "Mbed all-clusters-app example application run");
+    ChipLogProgress(NotSpecified, "Mbed all-clusters-minimal-app example application run");
 
     while (true)
     {

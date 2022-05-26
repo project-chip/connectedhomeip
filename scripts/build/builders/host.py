@@ -21,6 +21,7 @@ from .gn import GnBuilder
 
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     CHIP_TOOL = auto()
     CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
@@ -42,6 +43,8 @@ class HostApp(Enum):
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
+        elif self == HostApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         elif self == HostApp.CHIP_TOOL_DARWIN:
@@ -77,6 +80,9 @@ class HostApp(Enum):
         if self == HostApp.ALL_CLUSTERS:
             yield 'chip-all-clusters-app'
             yield 'chip-all-clusters-app.map'
+        elif self == HostApp.ALL_CLUSTERS_MINIMAL:
+            yield 'chip-all-clusters-minimal-app'
+            yield 'chip-all-clusters-minimal-app.map'
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'

@@ -26,11 +26,11 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/all-clusters-app/cc13x2x7_26x2x7"
+project_dir = "${chip_root}/examples/all-clusters-minimal-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
-  public_configs = [ ":all-clusters-app_config" ]
+  public_configs = [ ":all-clusters-minimal-app_config" ]
 }
 
 ti_sysconfig("sysconfig") {
@@ -70,8 +70,8 @@ ti_sysconfig("sysconfig") {
   ]
 }
 
-ti_simplelink_executable("all-clusters-app") {
-  output_name = "chip-${ti_simplelink_board}-all-clusters-example.out"
+ti_simplelink_executable("all-clusters-minimal-app") {
+  output_name = "chip-${ti_simplelink_board}-all-clusters-minimal-example.out"
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
@@ -87,7 +87,7 @@ ti_simplelink_executable("all-clusters-app") {
   deps = [
     ":sdk",
     ":sysconfig",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
     "${chip_root}/src/lib",
   ]
 
@@ -113,7 +113,7 @@ ti_simplelink_executable("all-clusters-app") {
 }
 
 group("cc13x2x7_26x2x7") {
-  deps = [ ":all-clusters-app" ]
+  deps = [ ":all-clusters-minimal-app" ]
 }
 
 group("default") {

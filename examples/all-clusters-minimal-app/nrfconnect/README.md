@@ -263,7 +263,7 @@ environment:
 
 1.  Navigate to the example's directory:
 
-        $ cd examples/all-clusters-app/nrfconnect
+        $ cd examples/all-clusters-minimal-app/nrfconnect
 
 2.  Run the following command to build the example, with _build-target_ replaced
     with the build target name of the Nordic Semiconductor's kit you own, for

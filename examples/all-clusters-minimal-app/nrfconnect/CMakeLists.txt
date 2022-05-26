@@ -39,7 +39,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
-project(chip-nrfconnect-all-clusters-app-example)
+project(chip-nrfconnect-all-clusters-minimal-app-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
@@ -49,7 +49,7 @@ target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/all-clusters-app
+                           ${GEN_DIR}/all-clusters-minimal-app
                            ${NRFCONNECT_COMMON}/util/include)
 
 target_sources(app PRIVATE
@@ -58,13 +58,13 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-minimal-app.zap
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)

@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
 
     mbed_logging_init();
 
-    ChipLogProgress(NotSpecified, "Mbed all-clusters-app example application start");
+    ChipLogProgress(NotSpecified, "Mbed all-clusters-minimal-app example application start");
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)

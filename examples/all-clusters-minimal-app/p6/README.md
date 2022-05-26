@@ -53,7 +53,7 @@ will then join the network.
 *   Build the example application:
 
           ```
-          $ ./scripts/examples/gn_p6_example.sh ./examples/all-clusters-app/p6 out/clusters_app_p6
+          $ ./scripts/examples/gn_p6_example.sh ./examples/all-clusters-minimal-app/p6 out/minimal_clusters_app_p6
           ```
 
 -   To delete generated executable, libraries and object files use:
@@ -75,7 +75,7 @@ will then join the network.
 
           ```
           $ cd ~/connectedhomeip
-          $ python3 out/clusters_app_p6/chip-p6-clusters-example.flash.py
+          $ python3 out/clusters_app_p6/chip-p6-clusters-minimal-example.flash.py
           ```
 
 <a name="Commissioning and cluster control"></a>

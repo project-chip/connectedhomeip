@@ -21,7 +21,7 @@ set(MCUBOOT_PATH ${MBED_MCU_BOOT_PATH} CACHE INTERNAL "")
 set(APP_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
 set(APP_TYPE ${MBED_APP_TYPE} CACHE INTERNAL "")
 set(BOOT_ENABLED FALSE)
-set(APP_TARGET chip-mbed-all-clusters-app-example)
+set(APP_TARGET chip-mbed-all-clusters-minimal-app-example)
 
 if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
     set(BOOT_ENABLED TRUE)
@@ -50,15 +50,15 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${MBED_COMMON}/util/include
                            ${ALL_CLUSTERS_COMMON}/include
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/all-clusters-app
+                           ${GEN_DIR}/all-clusters-minimal-app
                            ${NLIO_ROOT}
 )
 
 target_sources(${APP_TARGET} PRIVATE
                main/main.cpp
                main/AppTask.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
@@ -67,7 +67,7 @@ target_sources(${APP_TARGET} PRIVATE
 
 chip_configure_data_model(${APP_TARGET}
     INCLUDE_SERVER
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-app.zap
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-minimal-app.zap
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

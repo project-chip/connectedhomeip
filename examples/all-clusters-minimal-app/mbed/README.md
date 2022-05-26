@@ -121,13 +121,13 @@ example ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => all-clusters-app => (board name) => (build profile) => (build type)
+Command Palette (F1) => Run Task... => Run Mbed Application => build => all-clusters-minimal-app => (board name) => (build profile) => (build type)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=all-clusters-app -b=<board name> -p=<build profile> -T=<build type>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=all-clusters-minimal-app -b=<board name> -p=<build profile> -T=<build type>
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
@@ -161,19 +161,19 @@ image and reset the device.
 -   **by using VSCode task**:
 
 ```
-Command Palette (F1) => Run Task... -> Run Mbed Application => flash => all-clusters-app => (board name) => (build profile)
+Command Palette (F1) => Run Task... -> Run Mbed Application => flash => all-clusters-minimal-app => (board name) => (build profile)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=all-clusters-app -b=<board name> -p=<build profile>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=all-clusters-minimal-app -b=<board name> -p=<build profile>
 ```
 
 -   **by using VSCode launch task**:
 
 ```
-Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5)  => (board name) => all-clusters-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5)  => (board name) => all-clusters-minimal-app => (build profile)
 ```
 
 The last option uses the Open On-Chip Debugger to open and manage the gdb-server
@@ -193,7 +193,7 @@ the gdb-server session. Then gdb-client (arm-none-eabi-gdb) connect the server
 to upload binary image and control debugging.
 
 ```
-Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => all-clusters-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => all-clusters-minimal-app => (build profile)
 ```
 
 It is possible to connect to an external gdb-server session by using specific
@@ -215,13 +215,13 @@ use **mbed-tools** for this purpose
 After device reset these lines should be visible:
 
     ```
-    [INFO][CHIP]: [-]Mbed all-clusters-app example application start
+    [INFO][CHIP]: [-]Mbed all-clusters-minimal-app example application start
     ...
-    [INFO][CHIP]: [-]Mbed all-clusters-app example application run
+    [INFO][CHIP]: [-]Mbed all-clusters-minimal-app example application run
     ```
 
-The all-clusters-app application launched correctly and you can follow traces in
-the terminal.
+The all-clusters-minimal-app application launched correctly and you can follow
+traces in the terminal.
 
 ### CHIP Tools
 
@@ -241,7 +241,7 @@ within a WiFi network.
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `all-clusters-app/mbed/mbed_app.json`.  
+    `all-clusters-minimal-app/mbed/mbed_app.json`.  
     Information about this file syntax and its meaning in mbed-os project can be
     found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))

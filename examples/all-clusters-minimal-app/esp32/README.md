@@ -118,7 +118,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 To set IDF target, first:
 
         ```
-        $ cd {path-to-connectedhomeip}/examples/all-clusters-app/esp32/
+        $ cd {path-to-connectedhomeip}/examples/all-clusters-minimal-app/esp32/
         ```
 
 Then run set-target with one of the commands.
@@ -270,7 +270,7 @@ Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
 The command below uses the default values hard-coded into the debug versions of
-the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
+the ESP32 all-clusters-minimal-app to commission it onto a Wi-Fi network:
 
     ```
     $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
@@ -340,7 +340,7 @@ actual effect of the commands.
 You can use the rpc default config to setup everything correctly for RPCs:
 
     ```
-    $ export SDKCONFIG_DEFAULTS=$PROJECT_ROOT/examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults
+    $ export SDKCONFIG_DEFAULTS=$PROJECT_ROOT/examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack_rpc.defaults
     $ rm sdkconfig
     $ idf.py fullclean
     ```
