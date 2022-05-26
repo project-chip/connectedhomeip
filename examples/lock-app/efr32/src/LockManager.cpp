@@ -230,7 +230,7 @@ bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & us
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
-    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     user.creationSource     = DlAssetSource::kMatterIM;
     user.createdBy          = userInDb.createdBy;
@@ -322,7 +322,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = credentialInStorage.credentialData;
-    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     credential.creationSource     = DlAssetSource::kMatterIM;
     credential.modificationSource = DlAssetSource::kMatterIM;

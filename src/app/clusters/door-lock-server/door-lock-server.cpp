@@ -1470,7 +1470,7 @@ bool DoorLockServer::findOccupiedCredentialSlot(chip::EndpointId endpointId, DlC
         return false;
     }
 
-    // Programming PIN index starts with 0, and it is assumed that it is unique. Therefor different bounds checking for that
+    // Programming PIN index starts with 0, and it is assumed that it is unique. Therefore different bounds checking for that
     // credential type
     if (DlCredentialType::kProgrammingPIN == credentialType)
     {
