@@ -61,7 +61,7 @@ CHIP_ERROR CHIPP256KeypairBridge::SetDelegate(jobject delegate)
     err = JniReferences::GetInstance().FindMethod(env, delegate, "getPublicKey", "()[B", &mGetPublicKeyMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find KeypairDelegate.getPublicKey() method."));
 
-    err = JniReferences::GetInstance().FindMethod( env, delegate, "ecdsaSignMessage", "([B)[B", &mEcdsaSignMessageMethod);
+    err = JniReferences::GetInstance().FindMethod(env, delegate, "ecdsaSignMessage", "([B)[B", &mEcdsaSignMessageMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find KeypairDelegate.ecdsaSignMessage() method."));
 
 exit:
@@ -77,17 +77,7 @@ CHIP_ERROR CHIPP256KeypairBridge::Initialize()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::Serialize(P256SerializedKeypair& output) const
-{
-    if (!HasKeypair())
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-   return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR CHIPP256KeypairBridge::Deserialize(P256SerializedKeypair& input)
+CHIP_ERROR CHIPP256KeypairBridge::Serialize(P256SerializedKeypair & output) const
 {
     if (!HasKeypair())
     {
@@ -97,7 +87,17 @@ CHIP_ERROR CHIPP256KeypairBridge::Deserialize(P256SerializedKeypair& input)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t* csr, size_t& csr_length)
+CHIP_ERROR CHIPP256KeypairBridge::Deserialize(P256SerializedKeypair & input)
+{
+    if (!HasKeypair())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length)
 {
     if (!HasKeypair())
     {
@@ -109,7 +109,7 @@ CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t* csr, siz
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t* msg, size_t msg_length, P256ECDSASignature& out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
 {
     if (!HasKeypair())
     {
@@ -137,13 +137,13 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t* msg, size_t msg_
 
     JniByteArray jniSignature(env, static_cast<jbyteArray>(signedResult));
     MutableByteSpan signatureSpan(out_signature, out_signature.Capacity());
-    ReturnErrorOnFailure( EcdsaAsn1SignatureToRaw(CHIP_CRYPTO_GROUP_SIZE_BYTES, jniSignature.byteSpan(), signatureSpan));
+    ReturnErrorOnFailure(EcdsaAsn1SignatureToRaw(CHIP_CRYPTO_GROUP_SIZE_BYTES, jniSignature.byteSpan(), signatureSpan));
     ReturnErrorOnFailure(out_signature.SetLength(signatureSpan.size()));
 
     return err;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t* hash, size_t hash_length, P256ECDSASignature& out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
 {
     if (!HasKeypair())
     {
@@ -154,8 +154,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t* hash, size_t ha
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(const P256PublicKey& remote_public_key,
-                                                     P256ECDHDerivedSecret& out_secret) const
+CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(const P256PublicKey & remote_public_key,
+                                                     P256ECDHDerivedSecret & out_secret) const
 {
     if (!HasKeypair())
     {

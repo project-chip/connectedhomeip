@@ -59,7 +59,7 @@ public:
     CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
                                   chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 
-    const chip::Crypto::P256PublicKey& Pubkey() const override { return mPublicKey; };
+    const chip::Crypto::P256PublicKey & Pubkey() const override { return mPublicKey; };
 
 private:
     jobject mDelegate;
