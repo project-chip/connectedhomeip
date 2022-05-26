@@ -387,6 +387,8 @@ public:
         printf("Test_TC_MF_1_24\n");
         printf("Test_TC_MF_1_25\n");
         printf("Test_TC_MF_1_26\n");
+        printf("Test_TC_MF_1_27\n");
+        printf("Test_TC_MF_1_28\n");
         printf("Test_TC_MOD_1_2\n");
         printf("Test_TC_MOD_1_3\n");
         printf("Test_TC_MOD_2_1\n");
@@ -74674,6 +74676,298 @@ private:
     }
 };
 
+class Test_TC_MF_1_27Suite : public TestCommand
+{
+public:
+    Test_TC_MF_1_27Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_27", 7, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_27Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Factory Reset the DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            return FactoryReset(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 2: {
+            LogStep(2, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
+            value.commissioningTimeout = 180U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 3: {
+            LogStep(3, "Wait for commissioning Window to 301 seconds");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 181000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 4: {
+            LogStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                                 AdministratorCommissioning::Attributes::WindowStatus::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
+            value.commissioningTimeout = 179U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 6: {
+            LogStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                                 AdministratorCommissioning::Attributes::WindowStatus::Id, true, chip::NullOptional);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MF_1_28Suite : public TestCommand
+{
+public:
+    Test_TC_MF_1_28Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_28", 7, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_28Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Factory Reset the DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            return FactoryReset(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 2: {
+            LogStep(2, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
+            value.commissioningTimeout = 180U;
+            value.PAKEVerifier         = chip::ByteSpan(
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
+            value.discriminator = 3840U;
+            value.iterations    = 1000UL;
+            value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 3: {
+            LogStep(3, "Wait for commissioning Window to 301 seconds");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 181000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 4: {
+            LogStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                                 AdministratorCommissioning::Attributes::WindowStatus::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
+            value.commissioningTimeout = 179U;
+            value.PAKEVerifier         = chip::ByteSpan(
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
+            value.discriminator = 3840U;
+            value.iterations    = 1000UL;
+            value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 6: {
+            LogStep(6, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                                 AdministratorCommissioning::Attributes::WindowStatus::Id, true, chip::NullOptional);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_MOD_1_2Suite : public TestCommand
 {
 public:
@@ -81040,6 +81334,8 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_MF_1_24Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_25Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_26Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_27Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_28Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_2_1Suite>(credsIssuerConfig),
