@@ -114,12 +114,13 @@ public class MatterServant {
             });
     mTvApp.setDACProvider(new DACProviderStub());
 
-    mTvApp.setChipDeviceEventProvider(new DeviceEventProvider() {
-      @Override
-      public void onCommissioningComplete() {
-        Log.d("lz", "onCommissioningComplete: ");
-      }
-    });
+    mTvApp.setChipDeviceEventProvider(
+        new DeviceEventProvider() {
+          @Override
+          public void onCommissioningComplete() {
+            Log.d("lz", "onCommissioningComplete: ");
+          }
+        });
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
