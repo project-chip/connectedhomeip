@@ -447,7 +447,7 @@ struct EmberAfPluginDoorLockCredentialInfo
     chip::ByteSpan credentialData;   /**< Credential data bytes. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
     DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
