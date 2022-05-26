@@ -259,7 +259,8 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
  *
  * @param[in] onSuccessCb Used to deliver event data received through the Read interactions
  * @param[in] onErrorCb failureCb will be called when an error occurs *after* a successful call to ReadEvent.
- * @param[in] onDoneCb    OnDone will be called when ReadClient has finished all work for event retrieval, it is possible that there is no event.
+ * @param[in] onDoneCb    OnDone will be called when ReadClient has finished all work for event retrieval, it is possible that there
+ * is no event.
  */
 template <typename DecodableEventType>
 CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,

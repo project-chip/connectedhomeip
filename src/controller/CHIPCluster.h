@@ -313,7 +313,8 @@ public:
      *
      * @param[in] successCb Used to deliver event data received through the Read interactions
      * @param[in] failureCb failureCb will be called when an error occurs *after* a successful call to ReadEvent.
-     * @param[in] doneCb    OnDone will be called when ReadClient has finished all work for event retrieval, it is possible that there is no event.
+     * @param[in] doneCb    OnDone will be called when ReadClient has finished all work for event retrieval, it is possible that
+     * there is no event.
      */
     template <typename DecodableType>
     CHIP_ERROR ReadEvent(void * context, ReadResponseSuccessCallback<DecodableType> successCb,
