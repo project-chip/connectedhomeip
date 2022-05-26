@@ -114,6 +114,11 @@ public:
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
+    CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+    int32_t GetLastDisconnectReason();
+
+    void OnNetworkStatusChange();
+
     static WiFiDriverImpl & GetInstance()
     {
         static WiFiDriverImpl instance;
@@ -150,6 +155,9 @@ private:
     nsapi_security_t mSecurityType = NSAPI_SECURITY_NONE;
     Inet::IPAddress mIp4Address    = Inet::IPAddress::Any;
     Inet::IPAddress mIp6Address    = Inet::IPAddress::Any;
+
+    NetworkStatusChangeCallback * mStatusChangeCallback = nullptr;
+    int32_t mLastDisconnectedReason;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace NetworkCommissioning
