@@ -1181,12 +1181,11 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::AddNOC::Type request;
-    request.NOCValue      = nocCertBuf;
-    request.ICACValue     = icaCertBuf;
-    request.IPKValue      = ipk;
+    request.NOCValue         = nocCertBuf;
+    request.ICACValue        = icaCertBuf;
+    request.IPKValue         = ipk;
     request.caseAdminSubject = adminSubject;
-    request.adminVendorId = mVendorId;
-
+    request.adminVendorId    = mVendorId;
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
