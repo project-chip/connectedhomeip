@@ -5,12 +5,16 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
+using namespace ::chip;
+using namespace chip::app::Clusters::DoorLock;
+
+bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const chip::Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
     return true;
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const chip::Optional<ByteSpan> & pinCode,
+                                              DlOperationError & err)
 {
     return true;
 }
