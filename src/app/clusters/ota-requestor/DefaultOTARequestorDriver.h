@@ -109,7 +109,10 @@ protected:
     uint16_t maxDownloadBlockSize  = 1024;
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
-    uint8_t mProviderRetryCount; // Track retry count for the current provider
+    // Track retry count for the current provider
+    uint8_t mProviderRetryCount = 0;
+    // Track query image retry count on invalid session error
+    uint8_t mInvalidSessionRetryCount = 0;
 };
 
 } // namespace DeviceLayer

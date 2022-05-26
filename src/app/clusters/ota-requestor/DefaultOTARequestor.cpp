@@ -668,19 +668,19 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
+    OTAUpdateStateEnum prevState = mCurrentUpdateState;
+    // Update the new state before handling the state transition
+    mCurrentUpdateState = newState;
+
+    if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
-
-        // Inform the driver that the core logic has entered the Idle state
         mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
     }
-    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
+    else if ((prevState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {
         mOtaRequestorDriver->HandleIdleStateExit();
     }
-
-    mCurrentUpdateState = newState;
 }
 
 void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReasonEnum reason)
