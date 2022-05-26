@@ -1647,7 +1647,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3)
     {
-        ReturnErrorOnFailure(mExchangeCtxt->SendStandaloneAckMessage());
+        SuccessOrExit(mExchangeCtxt->FlushAcks());
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
