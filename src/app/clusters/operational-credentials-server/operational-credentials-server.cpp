@@ -652,10 +652,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
+
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
     err = gFabricBeingCommissioned.SetICACert(ICACValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -665,7 +667,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // Set the Identity Protection Key (IPK)
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
     // The IPK SHALL be the operational group key under GroupKeySetID of 0
     keyset.keyset_id     = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
     keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
@@ -725,21 +726,20 @@ exit:
         SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
         if (nocResponse != OperationalCertStatus::kSuccess)
         {
-            ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(),
-                         to_underlying(nocResponse));
+            ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
+                         err.Format(), to_underlying(nocResponse));
         }
         // We have an NOC response but had IM failures before on field validations
         else
         {
-            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(fabricIndex));
+            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", fabricIndex);
         }
     }
     else
     {
         // No NOC response - Failed constraints
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(),
-                     to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
     }
 
     return true;
@@ -773,16 +773,17 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
-    // Flag on the fail-safe context that the UpdateNOC command was invoked.
-    err = failSafeContext.SetUpdateNocCommandInvoked();
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
     err = fabric->SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
     err = fabric->SetICACert(ICACValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    // Flag on the fail-safe context that the UpdateNOC command was invoked.
+    err = failSafeContext.SetUpdateNocCommandInvoked();
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising
@@ -797,10 +798,10 @@ exit:
         SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
         if (nocResponse != OperationalCertStatus::kSuccess)
         {
-            ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT "). Sending Status %d", err.Format(),
-                         to_underlying(nocResponse));
+            ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
+                         err.Format(), to_underlying(nocResponse));
         }
-        // We have an NOC response but had IM failures before on field validations
+        // Success
         else
         {
             ChipLogProgress(Zcl, "OpCreds: UpdateNOC successful.");
@@ -810,8 +811,7 @@ exit:
     {
         // No NOC response - Failed constraints
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(),
-                     to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
     }
 
     return true;
