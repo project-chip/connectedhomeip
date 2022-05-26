@@ -60,9 +60,6 @@ namespace {
 const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
-const int kFixedLabelAttributeArraySize = 254;
-// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-const int kFixedLabelElementsOctetStringSize = 16;
 
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
@@ -99,7 +96,6 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 //   - On/Off
 //   - Descriptor
 //   - Bridged Device Basic
-//   - Fixed Label
 
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
@@ -120,11 +116,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSi
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Fixed Label cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(fixedLabelAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0), /* label list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
 // Declare Cluster List for Bridged Light endpoint
 // TODO: It's not clear whether it would be better to get the command lists from
 // the ZAP config on our last fixed endpoint instead.
@@ -141,8 +132,8 @@ constexpr CommandId onOffIncomingCommands[] = {
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
 DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, fixedLabelAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr)
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -164,7 +155,6 @@ DeviceSwitch Switch2("Switch 2", "Office",
 //   - Switch
 //   - Descriptor
 //   - Bridged Device Basic
-//   - Fixed Label
 
 // Declare Switch cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchAttrs)
@@ -188,17 +178,12 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSi
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Fixed Label cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchFixedLabelAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0), /* label list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
 // Declare Cluster List for Bridged Switch endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedSwitchClusters)
 DECLARE_DYNAMIC_CLUSTER(ZCL_SWITCH_CLUSTER_ID, switchAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, switchDescriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, switchBridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, switchFixedLabelAttrs, nullptr, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, switchBridgedDeviceBasicAttrs, nullptr, nullptr)
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Switch endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
@@ -315,24 +300,6 @@ int RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length,
-                      const EmberAfAttributeMetadata * am)
-{
-    char zclOctetStrBuf[kFixedLabelElementsOctetStringSize];
-    _LabelStruct labelStruct;
-
-    // TODO: This size is obviously wrong.  See
-    // https://github.com/project-chip/connectedhomeip/issues/10743
-    labelStruct.label = CharSpan(label, kFixedLabelElementsOctetStringSize);
-
-    strncpy(zclOctetStrBuf, value, sizeof(zclOctetStrBuf));
-    // TODO: This size is obviously wrong.  See
-    // https://github.com/project-chip/connectedhomeip/issues/10743
-    labelStruct.value = CharSpan(&zclOctetStrBuf[0], sizeof(zclOctetStrBuf));
-
-    // TODO: Need to set up an AttributeAccessInterface to handle the lists here.
-}
-
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
@@ -349,19 +316,6 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         MakeZclCharString(zclNameSpan, dev->GetName());
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
-    }
-
-    if (itemChangedMask & Device::kChanged_Location)
-    {
-        uint8_t buffer[kFixedLabelAttributeArraySize];
-        EmberAfAttributeMetadata am = { .attributeId  = ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                        .size         = kFixedLabelAttributeArraySize,
-                                        .defaultValue = static_cast<uint32_t>(0) };
-
-        EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
-
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                               ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 
@@ -501,25 +455,6 @@ EmberAfStatus HandleWriteOnOffAttribute(DeviceOnOff * dev, chip::AttributeId att
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, const EmberAfAttributeMetadata * am, uint8_t * buffer,
-                                            uint16_t maxReadLength)
-{
-    if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
-    {
-        EncodeFixedLabel("room", dev->GetLocation(), buffer, maxReadLength, am);
-    }
-    else if ((am->attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_FIXED_LABEL_CLUSTER_REVISION;
-    }
-    else
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     if ((attributeId == ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID) && (maxReadLength == 1))
@@ -604,10 +539,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
         {
             ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-        else if (clusterId == ZCL_FIXED_LABEL_CLUSTER_ID)
-        {
-            ret = HandleReadFixedLabelAttribute(dev, attributeMetadata, buffer, maxReadLength);
         }
         else if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
         {
