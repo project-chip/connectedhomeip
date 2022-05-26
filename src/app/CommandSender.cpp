@@ -274,7 +274,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
-            commandData.GetData(&commandDataReader);
+            commandData.GetFields(&commandDataReader);
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -336,7 +336,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
 

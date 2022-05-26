@@ -196,7 +196,7 @@ private:
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), aData));
         return FinishCommand(aTimedInvokeTimeoutMs);
     }
 

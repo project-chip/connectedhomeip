@@ -92,11 +92,14 @@ CHIP_ERROR EventStatusIB::Parser::CheckSchemaValidity() const
         {
             err = CHIP_NO_ERROR;
         }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB;
+        }
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -104,16 +107,14 @@ CHIP_ERROR EventStatusIB::Parser::GetPath(EventPathIB::Parser * const apPath) co
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
-    ReturnErrorOnFailure(apPath->Init(reader));
-    return CHIP_NO_ERROR;
+    return apPath->Init(reader);
 }
 
 CHIP_ERROR EventStatusIB::Parser::GetErrorStatus(StatusIB::Parser * const apErrorStatus) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kErrorStatus)), reader));
-    ReturnErrorOnFailure(apErrorStatus->Init(reader));
-    return CHIP_NO_ERROR;
+    return apErrorStatus->Init(reader);
 }
 
 EventPathIB::Builder & EventStatusIB::Builder::CreatePath()

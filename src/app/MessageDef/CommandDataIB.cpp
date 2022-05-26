@@ -29,13 +29,13 @@
 namespace chip {
 namespace app {
 CHIP_ERROR
-CommandDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
+CommandDataIB::Parser::ParseFields(TLV::TLVReader & aReader, int aDepth) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aDepth == 0)
     {
-        PRETTY_PRINT("\tCommandData = ");
+        PRETTY_PRINT("\tCommandFields = ");
     }
     else
     {
@@ -183,7 +183,7 @@ CommandDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
         {
             PRETTY_PRINT_INCDEPTH();
 
-            err = ParseData(aReader, aDepth + 1);
+            err = ParseFields(aReader, aDepth + 1);
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -235,11 +235,11 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
             }
 
             break;
-        case to_underlying(Tag::kData):
+        case to_underlying(Tag::kFields):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kData));
-            ReturnErrorOnFailure(ParseData(reader, 0));
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kFields))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kFields));
+            ReturnErrorOnFailure(ParseFields(reader, 0));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -260,13 +260,12 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
         }
         else
         {
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE;
+            err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -274,13 +273,12 @@ CHIP_ERROR CommandDataIB::Parser::GetPath(CommandPathIB::Parser * const apPath) 
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
-    ReturnErrorOnFailure(apPath->Init(reader));
-    return CHIP_NO_ERROR;
+    return apPath->Init(reader);
 }
 
-CHIP_ERROR CommandDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
+CHIP_ERROR CommandDataIB::Parser::GetFields(TLV::TLVReader * const apReader) const
 {
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kFields)), *apReader));
     return CHIP_NO_ERROR;
 }
 
