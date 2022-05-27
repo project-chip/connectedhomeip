@@ -145,6 +145,8 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
+        ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::HandleIdleStateEnter mInvalidSessionRetryCount=%u, mProviderRetryCount=%u", 
+                    mInvalidSessionRetryCount, mProviderRetryCount);
         if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
         {
             // An invalid session is detected which may be temporary (such as provider being restarted)
@@ -224,12 +226,19 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
 
 void DefaultOTARequestorDriver::UpdateDownloaded()
 {
+    ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestorDriver::UpdateDownloaded");
+
+    // Download complete so reset provider retry counter
+    mProviderRetryCount = 0;
+
     VerifyOrDie(mRequestor != nullptr);
     mRequestor->ApplyUpdate();
 }
 
 void DefaultOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
+    ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestorDriver::UpdateConfirmed");
+
     VerifyOrDie(mImageProcessor != nullptr);
     ScheduleDelayedAction(delay, ApplyTimerHandler, this);
 }
@@ -471,6 +480,8 @@ bool DefaultOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & p
 CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider, System::Clock::Seconds32 delay)
 {
     CHIP_ERROR status = CHIP_NO_ERROR;
+
+    ChipLogProgress(SoftwareUpdate, "//is: DefaultOTARequestorDriver::ScheduleQueryRetry mProviderRetryCount=%u", mProviderRetryCount);
 
     if (trySameProvider == false)
     {

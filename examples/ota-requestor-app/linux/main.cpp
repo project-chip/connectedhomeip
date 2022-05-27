@@ -124,6 +124,11 @@ bool CustomOTARequestorDriver::CanConsent()
 
 void CustomOTARequestorDriver::UpdateDownloaded()
 {
+    ChipLogError(SoftwareUpdate, "//is: CustomOTARequestorDriver::UpdateDownloaded");
+
+    // Download complete so reset provider retry counter
+    mProviderRetryCount = 0;
+    
     if (gAutoApplyImage)
     {
         // Let the default driver take further action to apply the image
