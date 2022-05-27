@@ -705,11 +705,9 @@
   0x00000001 /* SetWeeklySchedule */, \
   0x00000002 /* GetWeeklySchedule */, \
   0x00000003 /* ClearWeeklySchedule */, \
-  0x00000004 /* GetRelayStatusLog */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=90)*/ \
+  /*   GeneratedCommandList (index=89)*/ \
   0x00000000 /* GetWeeklyScheduleResponse */, \
-  0x00000001 /* GetRelayStatusLogResponse */, \
   chip::kInvalidCommandId /* end of list */, \
 }
 
@@ -1026,7 +1024,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayThermostatServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 84 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 90 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 89 ) ,\
     },\
 }
 

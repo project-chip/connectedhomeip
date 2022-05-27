@@ -3372,10 +3372,6 @@ namespace SystemMode {
 static constexpr AttributeId Id = 0x0000001C;
 } // namespace SystemMode
 
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x0000001D;
-} // namespace AlarmMask
-
 namespace ThermostatRunningMode {
 static constexpr AttributeId Id = 0x0000001E;
 } // namespace ThermostatRunningMode

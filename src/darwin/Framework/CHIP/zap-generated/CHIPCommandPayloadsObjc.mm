@@ -2779,27 +2779,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
-@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeOfDay = @(0);
-
-        _relayStatus = @(0);
-
-        _localTemperature = @(0);
-
-        _humidityInPercentage = @(0);
-
-        _setpoint = @(0);
-
-        _unreadEntries = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
 @implementation CHIPThermostatClusterGetWeeklyScheduleParams
 - (instancetype)init
 {
@@ -2814,15 +2793,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 @implementation CHIPThermostatClusterClearWeeklyScheduleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPThermostatClusterGetRelayStatusLogParams
 - (instancetype)init
 {
     if (self = [super init]) {

@@ -4293,19 +4293,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("timeOfDay", indent + 1, value.timeOfDay));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("relayStatus", indent + 1, value.relayStatus));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("localTemperature", indent + 1, value.localTemperature));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("humidityInPercentage", indent + 1, value.humidityInPercentage));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("setpoint", indent + 1, value.setpoint));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("unreadEntries", indent + 1, value.unreadEntries));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
@@ -9154,11 +9141,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SystemMode", 1, value);
         }
-        case Thermostat::Attributes::AlarmMask::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AlarmMask", 1, value);
-        }
         case Thermostat::Attributes::ThermostatRunningMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -10546,11 +10528,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
-        }
-        case Thermostat::Commands::GetRelayStatusLogResponse::Id: {
-            Thermostat::Commands::GetRelayStatusLogResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetRelayStatusLogResponse", 1, value);
         }
         }
         break;
