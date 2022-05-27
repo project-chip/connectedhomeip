@@ -1318,7 +1318,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ScanFilterData data = {
-        0x0,
+        { 0x0 },
     };
 
     ChipLogProgress(DeviceLayer, "Initiate Scan");
