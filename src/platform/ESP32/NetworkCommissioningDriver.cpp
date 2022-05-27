@@ -177,7 +177,7 @@ void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
-        DeviceLayer::SystemLayer().CancelTimer(ConnectWifiNetworkTimeout, NULL);
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -192,14 +192,9 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
     }
 }
 
-void ESPWiFiDriver::ConnectWifiNetworkTimeout(chip::System::Layer * aLayer, void * aAppState)
+void ESPWiFiDriver::OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, void * aAppState)
 {
-    CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
-    }
-    NetworkCommissioning::ESPWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed();
+    ESPWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed();
 }
 
 void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
@@ -217,8 +212,7 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
                              reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
 
     err = DeviceLayer::SystemLayer().StartTimer(
-        static_cast<System::Clock::Timeout>((kWiFiConnectNetworkTimeoutSeconds - 1) * secToMiliSec), ConnectWifiNetworkTimeout,
-        NULL);
+        static_cast<System::Clock::Timeout>((kWiFiConnectNetworkTimeoutSeconds) *secToMiliSec), OnConnectWiFiNetworkFailed, NULL);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)
