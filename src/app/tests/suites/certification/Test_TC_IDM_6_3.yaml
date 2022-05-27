@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.8.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
+    19.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
     Controller]
 
 config:
@@ -26,6 +26,42 @@ tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
           In case of chip tool, here is an example command to use
-
+           
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+
+          [1648725985.943503][2528:2528] CHIP:DMG: ReadRequestMessage =
+          [1648725985.943534][2528:2528] CHIP:DMG: {
+          [1648725985.943557][2528:2528] CHIP:DMG:         EventPathIBs =
+          [1648725985.943585][2528:2528] CHIP:DMG:         [
+          [1648725985.943610][2528:2528] CHIP:DMG:                 EventPath =
+          [1648725985.943638][2528:2528] CHIP:DMG:                 {
+          [1648725985.943673][2528:2528] CHIP:DMG:                 },
+          [1648725985.943706][2528:2528] CHIP:DMG:                 
+          [1648725985.943731][2528:2528] CHIP:DMG:         ],
+          [1648725985.943761][2528:2528] CHIP:DMG:         
+          [1648725985.943788][2528:2528] CHIP:DMG:         isFabricFiltered = true, 
+          [1648725985.943815][2528:2528] CHIP:DMG:         InteractionModelRevision = 1
+          [1648725985.943839][2528:2528] CHIP:DMG: },
+          [1648725985.943900][2528:2528] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1648725985.944083][2528:2528] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1648725985.944134][2528:2528] CHIP:DMG: AccessControl: allowed
+          [1648725985.944211][2528:2528] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1648725985.944242][2528:2528] CHIP:DMG: AccessControl: allowed
+          [1648725985.944297][2528:2528] CHIP:DMG: Fetched 2 events
+
+
+          [1648725985.909446][5234:5239] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1648725985.909480][5234:5239] CHIP:TOO:          Event number: 0
+          [1648725985.909510][5234:5239] CHIP:TOO:          Priority: Critical
+          [1648725985.909540][5234:5239] CHIP:TOO:          Timestamp: 684942
+          [1648725985.909636][5234:5239] CHIP:TOO:   StartUp: {
+          [1648725985.909668][5234:5239] CHIP:TOO:     SoftwareVersion: 1
+          [1648725985.909701][5234:5239] CHIP:TOO:    }
+          [1648725985.909821][5234:5239] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1648725985.909853][5234:5239] CHIP:TOO:          Event number: 1
+          [1648725985.909883][5234:5239] CHIP:TOO:          Priority: Critical
+          [1648725985.909912][5234:5239] CHIP:TOO:          Timestamp: 684942
+          [1648725985.909966][5234:5239] CHIP:TOO:   BootReason: {
+          [1648725985.909999][5234:5239] CHIP:TOO:     BootReason: 0
+          [1648725985.910029][5234:5239] CHIP:TOO:    }
       disabled: true

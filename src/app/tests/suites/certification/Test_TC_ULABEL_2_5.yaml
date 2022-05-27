@@ -1,0 +1,67 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 92.6. [TC-ULABEL-2.5] User label cluster [DUT-client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT reads LabelList from the TH"
+      verification: |
+          ./chip-tool userlabel read label-list 1 0
+
+          [1651124790.936078][2829:2834] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 953549512
+          [1651124790.936142][2829:2834] CHIP:TOO:   label list: 0 entries
+          [1651124790.936236][2829:2834] CHIP:EM: Sending Standalone Ack for MessageCounter:5651248 on exchange 8394i
+
+
+          If stored:
+          ubuntu@ubuntu:~/apps$ ./chip-tool userlabel read label-list 1 0
+
+          [1651125873.803465][2901:2906] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 953549528
+          [1651125873.803567][2901:2906] CHIP:TOO:   label list: 7 entries
+          [1651125873.803606][2901:2906] CHIP:TOO:     [1]: {
+          [1651125873.803630][2901:2906] CHIP:TOO:       Label: bedroom
+          [1651125873.803652][2901:2906] CHIP:TOO:       Value: bedroom1
+          [1651125873.803675][2901:2906] CHIP:TOO:      }
+          [1651125873.803702][2901:2906] CHIP:TOO:     [2]: {
+          [1651125873.803725][2901:2906] CHIP:TOO:       Label: orientation
+          [1651125873.803746][2901:2906] CHIP:TOO:       Value: east
+          [1651125873.803767][2901:2906] CHIP:TOO:      }
+          [1651125873.803793][2901:2906] CHIP:TOO:     [3]: {
+          [1651125873.803816][2901:2906] CHIP:TOO:       Label: floor
+          [1651125873.803836][2901:2906] CHIP:TOO:       Value: 3
+          [1651125873.803857][2901:2906] CHIP:TOO:      }
+          [1651125873.803883][2901:2906] CHIP:TOO:     [4]: {
+          [1651125873.803905][2901:2906] CHIP:TOO:       Label:
+          [1651125873.803926][2901:2906] CHIP:TOO:       Value:
+          [1651125873.803947][2901:2906] CHIP:TOO:      }
+          [1651125873.803973][2901:2906] CHIP:TOO:     [5]: {
+          [1651125873.803995][2901:2906] CHIP:TOO:       Label:
+          [1651125873.804016][2901:2906] CHIP:TOO:       Value:
+          [1651125873.804036][2901:2906] CHIP:TOO:      }
+          [1651125873.804063][2901:2906] CHIP:TOO:     [6]: {
+          [1651125873.804085][2901:2906] CHIP:TOO:       Label:
+          [1651125873.804105][2901:2906] CHIP:TOO:       Value:
+          [1651125873.804126][2901:2906] CHIP:TOO:      }
+          [1651125873.804152][2901:2906] CHIP:TOO:     [7]: {
+          [1651125873.804174][2901:2906] CHIP:TOO:       Label: direction
+          [1651125873.804195][2901:2906] CHIP:TOO:       Value: down
+          [1651125873.804216][2901:2906] CHIP:TOO:      }
+          [1651125873.804337][2901:2906] CHIP:EM: Sending Standalone Ack for MessageCounter:6017277 on exchange 38328i"
+      disabled: true
