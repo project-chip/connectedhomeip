@@ -41,11 +41,6 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  struct ExtensionEntry {
-    octet_string<128> data = 1;
-    fabric_idx fabricIndex = 254;
-  }
-
   info event access(read: administer) AccessControlEntryChanged = 0 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
@@ -63,7 +58,6 @@ server cluster AccessControl = 31 {
   }
 
   attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
-  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
@@ -74,6 +68,23 @@ server cluster AccessControl = 31 {
 server cluster AccountLogin = 1294 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct GetSetupPINRequest {
+    CHAR_STRING tempAccountIdentifier = 0;
+  }
+
+  request struct LoginRequest {
+    CHAR_STRING tempAccountIdentifier = 0;
+    CHAR_STRING setupPIN = 1;
+  }
+
+  response struct GetSetupPINResponse = 1 {
+    CHAR_STRING setupPIN = 0;
+  }
+
+  timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  timed command Login(LoginRequest): DefaultSuccess = 2;
+  timed command Logout(): DefaultSuccess = 3;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -103,12 +114,7 @@ server cluster AdministratorCommissioning = 60 {
     OCTET_STRING salt = 4;
   }
 
-  request struct OpenBasicCommissioningWindowRequest {
-    INT16U commissioningTimeout = 0;
-  }
-
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -120,10 +126,13 @@ server cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorID = 1;
+  struct ApplicationBasicApplication {
+    int16u catalogVendorId = 0;
+    char_string applicationId = 1;
+  }
+
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -147,9 +156,30 @@ server cluster ApplicationLauncher = 1292 {
     char_string applicationId = 1;
   }
 
-  readonly attribute INT16U catalogList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct LaunchAppRequest {
+    Application application = 0;
+    optional OCTET_STRING data = 1;
+  }
+
+  request struct StopAppRequest {
+    Application application = 0;
+  }
+
+  request struct HideAppRequest {
+    Application application = 0;
+  }
+
+  response struct LauncherResponse = 3 {
+    ApplicationLauncherStatusEnum status = 0;
+    OCTET_STRING data = 1;
+  }
+
+  command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
+  command StopApp(StopAppRequest): LauncherResponse = 1;
+  command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 server cluster AudioOutput = 1291 {
@@ -176,22 +206,12 @@ server cluster AudioOutput = 1291 {
   readonly attribute int8u currentOutput = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-}
 
-server cluster BarrierControl = 259 {
-  readonly attribute enum8 barrierMovingState = 1;
-  readonly attribute bitmap16 barrierSafetyStatus = 2;
-  readonly attribute bitmap8 barrierCapabilities = 3;
-  readonly attribute int8u barrierPosition = 10;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct BarrierControlGoToPercentRequest {
-    INT8U percentOpen = 0;
+  request struct SelectOutputRequest {
+    INT8U index = 0;
   }
 
-  command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
-  command BarrierControlStop(): DefaultSuccess = 1;
+  command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
 }
 
 server cluster Basic = 40 {
@@ -225,23 +245,7 @@ server cluster Basic = 40 {
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute char_string<16> manufacturingDate = 11;
-  readonly attribute char_string<32> partNumber = 12;
-  readonly attribute long_char_string<256> productURL = 13;
-  readonly attribute char_string<64> productLabel = 14;
-  readonly attribute char_string<32> serialNumber = 15;
-  attribute access(write: manage) boolean localConfigDisabled = 16;
-  readonly attribute boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-server cluster BinaryInputBasic = 15 {
-  attribute boolean outOfService = 81;
-  attribute boolean presentValue = 85;
-  readonly attribute bitmap8 statusFlags = 111;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -345,7 +349,6 @@ server cluster BridgedActions = 37 {
 
   readonly attribute ActionStruct actionList[] = 0;
   readonly attribute EndpointListStruct endpointList[] = 1;
-  readonly attribute long_char_string<512> setupUrl = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -366,17 +369,20 @@ server cluster Channel = 1284 {
     kLineupInfo = 0x2;
   }
 
-  struct ChannelInfo {
-    int16u majorNumber = 0;
-    int16u minorNumber = 1;
-    optional char_string<32> name = 2;
-    optional char_string<32> callSign = 3;
-    optional char_string<32> affiliateCallSign = 4;
-  }
-
-  readonly attribute ChannelInfo channelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeChannelByNumberRequest {
+    INT16U majorNumber = 0;
+    INT16U minorNumber = 1;
+  }
+
+  request struct SkipChannelRequest {
+    INT16U count = 0;
+  }
+
+  command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
+  command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
 }
 
 server cluster ColorControl = 768 {
@@ -449,228 +455,13 @@ server cluster ColorControl = 768 {
     kUpdateStartHue = 0x8;
   }
 
-  readonly attribute int8u currentHue = 0;
-  readonly attribute int8u currentSaturation = 1;
-  readonly attribute int16u remainingTime = 2;
-  readonly attribute int16u currentX = 3;
-  readonly attribute int16u currentY = 4;
-  readonly attribute enum8 driftCompensation = 5;
-  readonly attribute char_string<254> compensationText = 6;
-  readonly attribute int16u colorTemperature = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
-  readonly attribute int16u primary1X = 17;
-  readonly attribute int16u primary1Y = 18;
-  readonly attribute nullable int8u primary1Intensity = 19;
-  readonly attribute int16u primary2X = 21;
-  readonly attribute int16u primary2Y = 22;
-  readonly attribute nullable int8u primary2Intensity = 23;
-  readonly attribute int16u primary3X = 25;
-  readonly attribute int16u primary3Y = 26;
-  readonly attribute nullable int8u primary3Intensity = 27;
-  readonly attribute int16u primary4X = 32;
-  readonly attribute int16u primary4Y = 33;
-  readonly attribute nullable int8u primary4Intensity = 34;
-  readonly attribute int16u primary5X = 36;
-  readonly attribute int16u primary5Y = 37;
-  readonly attribute nullable int8u primary5Intensity = 38;
-  readonly attribute int16u primary6X = 40;
-  readonly attribute int16u primary6Y = 41;
-  readonly attribute nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) int16u whitePointX = 48;
-  attribute access(write: manage) int16u whitePointY = 49;
-  attribute access(write: manage) int16u colorPointRX = 50;
-  attribute access(write: manage) int16u colorPointRY = 51;
-  attribute access(write: manage) nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) int16u colorPointGX = 54;
-  attribute access(write: manage) int16u colorPointGY = 55;
-  attribute access(write: manage) nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) int16u colorPointBX = 58;
-  attribute access(write: manage) int16u colorPointBY = 59;
-  attribute access(write: manage) nullable int8u colorPointBIntensity = 60;
-  readonly attribute int16u enhancedCurrentHue = 16384;
   readonly attribute enum8 enhancedColorMode = 16385;
-  readonly attribute int8u colorLoopActive = 16386;
-  readonly attribute int8u colorLoopDirection = 16387;
-  readonly attribute int16u colorLoopTime = 16388;
-  readonly attribute int16u colorLoopStartEnhancedHue = 16389;
-  readonly attribute int16u colorLoopStoredEnhancedHue = 16390;
   readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMinMireds = 16395;
-  readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
-  readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct MoveToHueRequest {
-    INT8U hue = 0;
-    HueDirection direction = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveHueRequest {
-    HueMoveMode moveMode = 0;
-    INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepHueRequest {
-    HueStepMode stepMode = 0;
-    INT8U stepSize = 1;
-    INT8U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToSaturationRequest {
-    INT8U saturation = 0;
-    INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode = 0;
-    INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepSaturationRequest {
-    SaturationStepMode stepMode = 0;
-    INT8U stepSize = 1;
-    INT8U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToHueAndSaturationRequest {
-    INT8U hue = 0;
-    INT8U saturation = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToColorRequest {
-    INT16U colorX = 0;
-    INT16U colorY = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveColorRequest {
-    INT16S rateX = 0;
-    INT16S rateY = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepColorRequest {
-    INT16S stepX = 0;
-    INT16S stepY = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct MoveToColorTemperatureRequest {
-    INT16U colorTemperature = 0;
-    INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct EnhancedMoveToHueRequest {
-    INT16U enhancedHue = 0;
-    HueDirection direction = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode = 0;
-    INT16U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct EnhancedStepHueRequest {
-    HueStepMode stepMode = 0;
-    INT16U stepSize = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveToHueAndSaturationRequest {
-    INT16U enhancedHue = 0;
-    INT8U saturation = 1;
-    INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags = 0;
-    ColorLoopAction action = 1;
-    ColorLoopDirection direction = 2;
-    INT16U time = 3;
-    INT16U startHue = 4;
-    BITMAP8 optionsMask = 5;
-    BITMAP8 optionsOverride = 6;
-  }
-
-  request struct StopMoveStepRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
-  }
-
-  request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode = 0;
-    INT16U rate = 1;
-    INT16U colorTemperatureMinimumMireds = 2;
-    INT16U colorTemperatureMaximumMireds = 3;
-    BITMAP8 optionsMask = 4;
-    BITMAP8 optionsOverride = 5;
-  }
-
-  request struct StepColorTemperatureRequest {
-    HueStepMode stepMode = 0;
-    INT16U stepSize = 1;
-    INT16U transitionTime = 2;
-    INT16U colorTemperatureMinimumMireds = 3;
-    INT16U colorTemperatureMaximumMireds = 4;
-    BITMAP8 optionsMask = 5;
-    BITMAP8 optionsOverride = 6;
-  }
-
-  command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  command StepHue(StepHueRequest): DefaultSuccess = 2;
-  command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  command StepColor(StepColorRequest): DefaultSuccess = 9;
-  command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
-  command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
-  command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
-  command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
-  command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
-  command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
-  command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
 server cluster ContentLauncher = 1290 {
@@ -747,8 +538,6 @@ server cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1182,34 +971,9 @@ server cluster DoorLock = 257 {
   readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute nullable DlDoorState doorState = 3;
-  attribute access(write: manage) int32u doorOpenEvents = 4;
-  attribute access(write: manage) int32u doorClosedEvents = 5;
-  attribute access(write: manage) int16u openPeriod = 6;
-  readonly attribute int16u numberOfTotalUsersSupported = 17;
-  readonly attribute int16u numberOfPINUsersSupported = 18;
-  readonly attribute int16u numberOfRFIDUsersSupported = 19;
-  readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
-  readonly attribute int8u maxPINCodeLength = 23;
-  readonly attribute int8u minPINCodeLength = 24;
-  readonly attribute int8u maxRFIDCodeLength = 25;
-  readonly attribute int8u minRFIDCodeLength = 26;
-  readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
-  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
-  attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
-  attribute access(write: manage) int8u soundVolume = 36;
   attribute access(write: manage) DlOperatingMode operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
-  readonly attribute DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
-  attribute access(write: manage) boolean enableOneTouchLocking = 41;
-  attribute access(write: manage) boolean enableInsideStatusLED = 42;
-  attribute access(write: manage) boolean enablePrivacyModeButton = 43;
-  attribute access(write: administer) int8u wrongCodeEntryLimit = 48;
-  attribute access(write: administer) int8u userCodeTemporaryDisableTime = 49;
-  attribute access(write: administer) boolean requirePINforRemoteOperation = 51;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1221,135 +985,8 @@ server cluster DoorLock = 257 {
     optional OCTET_STRING pinCode = 0;
   }
 
-  request struct UnlockWithTimeoutRequest {
-    INT16U timeout = 0;
-    optional OCTET_STRING pinCode = 1;
-  }
-
-  request struct SetWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-    DlDaysMaskMap daysMask = 2;
-    INT8U startHour = 3;
-    INT8U startMinute = 4;
-    INT8U endHour = 5;
-    INT8U endMinute = 6;
-  }
-
-  request struct GetWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct ClearWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct SetYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-    epoch_s localStartTime = 2;
-    epoch_s localEndTime = 3;
-  }
-
-  request struct GetYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct SetUserRequest {
-    DlDataOperationType operationType = 0;
-    INT16U userIndex = 1;
-    nullable CHAR_STRING userName = 2;
-    nullable INT32U userUniqueId = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-    nullable DlCredentialRule credentialRule = 6;
-  }
-
-  request struct GetUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct ClearUserRequest {
-    INT16U userIndex = 0;
-  }
-
-  request struct SetCredentialRequest {
-    DlDataOperationType operationType = 0;
-    DlCredential credential = 1;
-    LONG_OCTET_STRING credentialData = 2;
-    nullable INT16U userIndex = 3;
-    nullable DlUserStatus userStatus = 4;
-    nullable DlUserType userType = 5;
-  }
-
-  request struct GetCredentialStatusRequest {
-    DlCredential credential = 0;
-  }
-
-  request struct ClearCredentialRequest {
-    nullable DlCredential credential = 0;
-  }
-
-  response struct GetUserResponse = 28 {
-    INT16U userIndex = 0;
-    nullable CHAR_STRING userName = 1;
-    nullable INT32U userUniqueId = 2;
-    nullable DlUserStatus userStatus = 3;
-    nullable DlUserType userType = 4;
-    nullable DlCredentialRule credentialRule = 5;
-    nullable DlCredential credentials[] = 6;
-    nullable fabric_idx creatorFabricIndex = 7;
-    nullable fabric_idx lastModifiedFabricIndex = 8;
-    nullable INT16U nextUserIndex = 9;
-  }
-
-  response struct SetCredentialResponse = 35 {
-    DlStatus status = 0;
-    nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
-  }
-
-  response struct GetCredentialStatusResponse = 37 {
-    boolean credentialExists = 0;
-    nullable INT16U userIndex = 1;
-    nullable fabric_idx creatorFabricIndex = 2;
-    nullable fabric_idx lastModifiedFabricIndex = 3;
-    nullable INT16U nextCredentialIndex = 4;
-  }
-
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
-  timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
-  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
-  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
-  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
-  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
-  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
-  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
-  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
-  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
-  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-}
-
-server cluster ElectricalMeasurement = 2820 {
-  readonly attribute bitmap32 measurementType = 0;
-  readonly attribute int32s totalActivePower = 772;
-  readonly attribute int16u rmsVoltage = 1285;
-  readonly attribute int16u rmsVoltageMin = 1286;
-  readonly attribute int16u rmsVoltageMax = 1287;
-  readonly attribute int16u rmsCurrent = 1288;
-  readonly attribute int16u rmsCurrentMin = 1289;
-  readonly attribute int16u rmsCurrentMax = 1290;
-  readonly attribute int16s activePower = 1291;
-  readonly attribute int16s activePowerMin = 1292;
-  readonly attribute int16s activePowerMax = 1293;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -1428,13 +1065,6 @@ server cluster FanControl = 514 {
   attribute FanModeSequenceType fanModeSequence = 1;
   attribute nullable int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
-  readonly attribute int8u speedMax = 4;
-  attribute nullable int8u speedSetting = 5;
-  readonly attribute int8u speedCurrent = 6;
-  readonly attribute bitmap8 rockSupport = 7;
-  attribute bitmap8 rockSetting = 8;
-  readonly attribute bitmap8 windSupport = 9;
-  attribute bitmap8 windSetting = 10;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1449,7 +1079,6 @@ server cluster FlowMeasurement = 1028 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1594,12 +1223,6 @@ server cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-  readonly attribute int64u upTime = 2;
-  readonly attribute int32u totalOperationalHours = 3;
-  readonly attribute enum8 bootReasons = 4;
-  readonly attribute ENUM8 activeHardwareFaults[] = 5;
-  readonly attribute ENUM8 activeRadioFaults[] = 6;
-  readonly attribute ENUM8 activeNetworkFaults[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1730,74 +1353,6 @@ server cluster Groups = 4 {
   command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster IasZone = 1280 {
-  enum IasEnrollResponseCode : ENUM8 {
-    kSuccess = 0;
-    kNotSupported = 1;
-    kNoEnrollPermit = 2;
-    kTooManyZones = 3;
-  }
-
-  enum IasZoneType : ENUM16 {
-    kStandardCie = 0;
-    kMotionSensor = 13;
-    kContactSwitch = 21;
-    kFireSensor = 40;
-    kWaterSensor = 42;
-    kGasSensor = 43;
-    kPersonalEmergencyDevice = 44;
-    kVibrationMovementSensor = 45;
-    kRemoteControl = 271;
-    kKeyFob = 277;
-    kKeypad = 541;
-    kStandardWarningDevice = 549;
-    kGlassBreakSensor = 550;
-    kCarbonMonoxideSensor = 551;
-    kSecurityRepeater = 553;
-    kInvalidZoneType = 65535;
-  }
-
-  bitmap IasZoneStatus : BITMAP16 {
-    kAlarm1 = 0x1;
-    kAlarm2 = 0x2;
-    kTamper = 0x4;
-    kBattery = 0x8;
-    kSupervisionReports = 0x10;
-    kRestoreReports = 0x20;
-    kTrouble = 0x40;
-    kAc = 0x80;
-    kTest = 0x100;
-    kBatteryDefect = 0x200;
-  }
-
-  readonly attribute enum8 zoneState = 0;
-  readonly attribute enum16 zoneType = 1;
-  readonly attribute bitmap16 zoneStatus = 2;
-  attribute node_id iasCieAddress = 16;
-  readonly attribute int8u zoneId = 17;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ZoneEnrollResponseRequest {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
-  }
-
-  response struct ZoneStatusChangeNotification = 0 {
-    IasZoneStatus zoneStatus = 0;
-    BITMAP8 extendedStatus = 1;
-    INT8U zoneId = 2;
-    INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollRequest = 1 {
-    IasZoneType zoneType = 0;
-    INT16U manufacturerCode = 1;
-  }
-
-  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -1830,13 +1385,7 @@ server cluster Identify = 3 {
     INT16U identifyTime = 0;
   }
 
-  request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier = 0;
-    IdentifyEffectVariant effectVariant = 1;
-  }
-
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 server cluster IlluminanceMeasurement = 1024 {
@@ -1848,8 +1397,6 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
-  readonly attribute nullable enum8 lightSensorType = 4;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1958,6 +1505,16 @@ server cluster KeypadInput = 1289 {
 
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SendKeyRequest {
+    CecKeyCode keyCode = 0;
+  }
+
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
+  }
+
+  command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 server cluster LevelControl = 8 {
@@ -1978,19 +1535,8 @@ server cluster LevelControl = 8 {
   }
 
   readonly attribute int8u currentLevel = 0;
-  readonly attribute int16u remainingTime = 1;
-  readonly attribute int8u minLevel = 2;
-  readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
   attribute bitmap8 options = 15;
-  attribute int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
-  attribute nullable int16u onTransitionTime = 18;
-  attribute nullable int16u offTransitionTime = 19;
-  attribute nullable int8u defaultMoveRate = 20;
-  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -2092,6 +1638,14 @@ server cluster MediaInput = 1287 {
   readonly attribute int8u currentInput = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SelectInputRequest {
+    INT8U index = 0;
+  }
+
+  command SelectInput(SelectInputRequest): DefaultSuccess = 0;
+  command ShowInputStatus(): DefaultSuccess = 1;
+  command HideInputStatus(): DefaultSuccess = 2;
 }
 
 server cluster MediaPlayback = 1286 {
@@ -2112,13 +1666,17 @@ server cluster MediaPlayback = 1286 {
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
-  readonly attribute nullable epoch_us startTime = 1;
-  readonly attribute nullable int64u duration = 2;
-  readonly attribute single playbackSpeed = 4;
-  readonly attribute nullable int64u seekRangeEnd = 5;
-  readonly attribute nullable int64u seekRangeStart = 6;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  response struct PlaybackResponse = 10 {
+    MediaPlaybackStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  command Play(): PlaybackResponse = 0;
+  command Pause(): PlaybackResponse = 1;
+  command StopPlayback(): PlaybackResponse = 2;
 }
 
 server cluster ModeSelect = 80 {
@@ -2141,8 +1699,6 @@ server cluster ModeSelect = 80 {
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
-  attribute nullable int8u startUpMode = 4;
-  attribute nullable int8u onMode = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2457,37 +2013,12 @@ server cluster OnOff = 6 {
   }
 
   readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
-  }
-
-  request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
-    int16u onTime = 1;
-    int16u offWaitTime = 2;
-  }
 
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
   command Toggle(): DefaultSuccess = 2;
-  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-}
-
-server cluster OnOffSwitchConfiguration = 7 {
-  readonly attribute enum8 switchType = 0;
-  attribute enum8 switchActions = 16;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -2669,9 +2200,6 @@ server cluster PowerSource = 47 {
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute boolean batteryReplacementNeeded = 15;
-  readonly attribute enum8 batteryReplaceability = 16;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2777,26 +2305,10 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16s maxPressure = 0;
   readonly attribute nullable int16u maxSpeed = 1;
   readonly attribute nullable int16u maxFlow = 2;
-  readonly attribute nullable int16s minConstPressure = 3;
-  readonly attribute nullable int16s maxConstPressure = 4;
-  readonly attribute nullable int16s minCompPressure = 5;
-  readonly attribute nullable int16s maxCompPressure = 6;
-  readonly attribute nullable int16u minConstSpeed = 7;
-  readonly attribute nullable int16u maxConstSpeed = 8;
-  readonly attribute nullable int16u minConstFlow = 9;
-  readonly attribute nullable int16u maxConstFlow = 10;
-  readonly attribute nullable int16s minConstTemp = 11;
-  readonly attribute nullable int16s maxConstTemp = 12;
-  readonly attribute PumpStatus pumpStatus = 16;
   readonly attribute PumpOperationMode effectiveOperationMode = 17;
   readonly attribute PumpControlMode effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
-  readonly attribute nullable int16u speed = 20;
-  attribute access(write: manage) nullable int24u lifetimeRunningHours = 21;
-  readonly attribute nullable int24u power = 22;
-  attribute access(write: manage) nullable int32u lifetimeEnergyConsumed = 23;
   attribute access(write: manage) PumpOperationMode operationMode = 32;
-  attribute access(write: manage) PumpControlMode controlMode = 33;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2805,7 +2317,6 @@ server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2919,26 +2430,12 @@ server cluster Scenes = 5 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
-  struct ThreadMetrics {
-    int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
-  }
-
   info event SoftwareFault = 0 {
     SoftwareFaultStruct softwareFault = 0;
   }
 
-  readonly attribute ThreadMetrics threadMetrics[] = 0;
-  readonly attribute int64u currentHeapFree = 1;
-  readonly attribute int64u currentHeapUsed = 2;
-  readonly attribute int64u currentHeapHighWatermark = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command ResetWatermarks(): DefaultSuccess = 0;
 }
 
 server cluster Switch = 59 {
@@ -2974,7 +2471,6 @@ server cluster Switch = 59 {
 
   readonly attribute int8u numberOfPositions = 0;
   readonly attribute int8u currentPosition = 1;
-  readonly attribute int8u multiPressMax = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2992,16 +2488,26 @@ server cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfo targetList[] = 0;
-  readonly attribute int8u currentTarget = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct NavigateTargetRequest {
+    INT8U target = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
 server cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3382,30 +2888,23 @@ server cluster Thermostat = 513 {
   }
 
   readonly attribute nullable int16s localTemperature = 0;
-  readonly attribute int16s absMinHeatSetpointLimit = 3;
-  readonly attribute int16s absMaxHeatSetpointLimit = 4;
-  readonly attribute int16s absMinCoolSetpointLimit = 5;
-  readonly attribute int16s absMaxCoolSetpointLimit = 6;
-  attribute int16s occupiedCoolingSetpoint = 17;
   attribute int16s occupiedHeatingSetpoint = 18;
-  attribute access(write: manage) int16s minHeatSetpointLimit = 21;
-  attribute access(write: manage) int16s maxHeatSetpointLimit = 22;
-  attribute access(write: manage) int16s minCoolSetpointLimit = 23;
-  attribute access(write: manage) int16s maxCoolSetpointLimit = 24;
-  attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetpointRaiseLowerRequest {
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
+  }
+
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
 server cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
   attribute access(write: manage) enum8 keypadLockout = 1;
-  attribute access(write: manage) enum8 scheduleProgrammingVisibility = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3500,7 +2999,6 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
-  readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
   readonly attribute int32u partitionId = 9;
@@ -3508,59 +3006,12 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int8u dataVersion = 11;
   readonly attribute int8u stableDataVersion = 12;
   readonly attribute int8u leaderRouterId = 13;
-  readonly attribute int16u detachedRoleCount = 14;
-  readonly attribute int16u childRoleCount = 15;
-  readonly attribute int16u routerRoleCount = 16;
-  readonly attribute int16u leaderRoleCount = 17;
-  readonly attribute int16u attachAttemptCount = 18;
-  readonly attribute int16u partitionIdChangeCount = 19;
-  readonly attribute int16u betterPartitionAttachAttemptCount = 20;
-  readonly attribute int16u parentChangeCount = 21;
-  readonly attribute int32u txTotalCount = 22;
-  readonly attribute int32u txUnicastCount = 23;
-  readonly attribute int32u txBroadcastCount = 24;
-  readonly attribute int32u txAckRequestedCount = 25;
-  readonly attribute int32u txAckedCount = 26;
-  readonly attribute int32u txNoAckRequestedCount = 27;
-  readonly attribute int32u txDataCount = 28;
-  readonly attribute int32u txDataPollCount = 29;
-  readonly attribute int32u txBeaconCount = 30;
-  readonly attribute int32u txBeaconRequestCount = 31;
-  readonly attribute int32u txOtherCount = 32;
-  readonly attribute int32u txRetryCount = 33;
-  readonly attribute int32u txDirectMaxRetryExpiryCount = 34;
-  readonly attribute int32u txIndirectMaxRetryExpiryCount = 35;
-  readonly attribute int32u txErrCcaCount = 36;
-  readonly attribute int32u txErrAbortCount = 37;
-  readonly attribute int32u txErrBusyChannelCount = 38;
-  readonly attribute int32u rxTotalCount = 39;
-  readonly attribute int32u rxUnicastCount = 40;
-  readonly attribute int32u rxBroadcastCount = 41;
-  readonly attribute int32u rxDataCount = 42;
-  readonly attribute int32u rxDataPollCount = 43;
-  readonly attribute int32u rxBeaconCount = 44;
-  readonly attribute int32u rxBeaconRequestCount = 45;
-  readonly attribute int32u rxOtherCount = 46;
-  readonly attribute int32u rxAddressFilteredCount = 47;
-  readonly attribute int32u rxDestAddrFilteredCount = 48;
-  readonly attribute int32u rxDuplicatedCount = 49;
-  readonly attribute int32u rxErrNoFrameCount = 50;
-  readonly attribute int32u rxErrUnknownNeighborCount = 51;
-  readonly attribute int32u rxErrInvalidSrcAddrCount = 52;
-  readonly attribute int32u rxErrSecCount = 53;
-  readonly attribute int32u rxErrFcsCount = 54;
-  readonly attribute int32u rxErrOtherCount = 55;
-  readonly attribute int64u activeTimestamp = 56;
-  readonly attribute int64u pendingTimestamp = 57;
-  readonly attribute int32u delay = 58;
   readonly attribute SecurityPolicy securityPolicy[] = 59;
   readonly attribute octet_string<4> channelMask = 60;
   readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster TimeFormatLocalization = 44 {
@@ -3585,8 +3036,6 @@ server cluster TimeFormatLocalization = 44 {
   }
 
   attribute HourFormat hourFormat = 0;
-  attribute CalendarType activeCalendarType = 1;
-  readonly attribute CalendarType supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3605,7 +3054,6 @@ server cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute TempUnit temperatureUnit = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3617,7 +3065,6 @@ server cluster UserLabel = 65 {
 }
 
 server cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> MACAddress = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3671,18 +3118,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute nullable WiFiVersionType wiFiVersion = 2;
   readonly attribute nullable int16u channelNumber = 3;
   readonly attribute nullable int8s rssi = 4;
-  readonly attribute int32u beaconLostCount = 5;
-  readonly attribute int32u beaconRxCount = 6;
-  readonly attribute int32u packetMulticastRxCount = 7;
-  readonly attribute int32u packetMulticastTxCount = 8;
-  readonly attribute int32u packetUnicastRxCount = 9;
-  readonly attribute int32u packetUnicastTxCount = 10;
-  readonly attribute int64u currentMaxRate = 11;
-  readonly attribute int64u overrunCount = 12;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster WindowCovering = 258 {
@@ -3775,49 +3212,16 @@ server cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
-  readonly attribute nullable int16u currentPositionLift = 3;
-  readonly attribute nullable int16u currentPositionTilt = 4;
   readonly attribute ConfigStatus configStatus = 7;
-  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
-  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
-  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute EndProductType endProductType = 13;
-  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
-  readonly attribute int16u installedOpenLimitLift = 16;
-  readonly attribute int16u installedClosedLimitLift = 17;
-  readonly attribute int16u installedOpenLimitTilt = 18;
-  readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
-  readonly attribute bitmap16 safetyStatus = 26;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct GoToLiftValueRequest {
-    INT16U liftValue = 0;
-  }
-
-  request struct GoToLiftPercentageRequest {
-    Percent100ths liftPercent100thsValue = 0;
-  }
-
-  request struct GoToTiltValueRequest {
-    INT16U tiltValue = 0;
-  }
-
-  request struct GoToTiltPercentageRequest {
-    Percent100ths tiltPercent100thsValue = 0;
-  }
 
   command UpOrOpen(): DefaultSuccess = 0;
   command DownOrClose(): DefaultSuccess = 1;
   command StopMotion(): DefaultSuccess = 2;
-  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
-  command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
-  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
-  command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
 
@@ -3854,7 +3258,6 @@ endpoint 0 {
 
   server cluster AccessControl {
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 3;
@@ -3874,14 +3277,6 @@ endpoint 0 {
     callback attribute hardwareVersionString;
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
-    ram      attribute reachable default = 1;
-    callback attribute uniqueID;
     callback attribute capabilityMinima;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
@@ -3905,8 +3300,6 @@ endpoint 0 {
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
-    callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3915,8 +3308,7 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit;
-    ram      attribute featureMap default = 0x1;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -3930,10 +3322,7 @@ endpoint 0 {
     ram      attribute status;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
-    ram      attribute batteryChargeLevel;
-    ram      attribute batteryReplacementNeeded;
-    ram      attribute batteryReplaceability;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -3968,12 +3357,6 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
-    callback attribute bootReasons;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3982,11 +3365,7 @@ endpoint 0 {
   }
 
   server cluster SoftwareDiagnostics {
-    callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -3997,7 +3376,6 @@ endpoint 0 {
     ram      attribute panId;
     ram      attribute extendedPanId;
     ram      attribute meshLocalPrefix;
-    ram      attribute overrunCount;
     callback attribute neighborTableList;
     callback attribute routeTableList;
     ram      attribute partitionId;
@@ -4005,56 +3383,11 @@ endpoint 0 {
     ram      attribute dataVersion;
     ram      attribute stableDataVersion;
     ram      attribute leaderRouterId;
-    ram      attribute detachedRoleCount;
-    ram      attribute childRoleCount;
-    ram      attribute routerRoleCount;
-    ram      attribute leaderRoleCount;
-    ram      attribute attachAttemptCount;
-    ram      attribute partitionIdChangeCount;
-    ram      attribute betterPartitionAttachAttemptCount;
-    ram      attribute parentChangeCount;
-    ram      attribute txTotalCount;
-    ram      attribute txUnicastCount;
-    ram      attribute txBroadcastCount;
-    ram      attribute txAckRequestedCount;
-    ram      attribute txAckedCount;
-    ram      attribute txNoAckRequestedCount;
-    ram      attribute txDataCount;
-    ram      attribute txDataPollCount;
-    ram      attribute txBeaconCount;
-    ram      attribute txBeaconRequestCount;
-    ram      attribute txOtherCount;
-    ram      attribute txRetryCount;
-    ram      attribute txDirectMaxRetryExpiryCount;
-    ram      attribute txIndirectMaxRetryExpiryCount;
-    ram      attribute txErrCcaCount;
-    ram      attribute txErrAbortCount;
-    ram      attribute txErrBusyChannelCount;
-    ram      attribute rxTotalCount;
-    ram      attribute rxUnicastCount;
-    ram      attribute rxBroadcastCount;
-    ram      attribute rxDataCount;
-    ram      attribute rxDataPollCount;
-    ram      attribute rxBeaconCount;
-    ram      attribute rxBeaconRequestCount;
-    ram      attribute rxOtherCount;
-    ram      attribute rxAddressFilteredCount;
-    ram      attribute rxDestAddrFilteredCount;
-    ram      attribute rxDuplicatedCount;
-    ram      attribute rxErrNoFrameCount;
-    ram      attribute rxErrUnknownNeighborCount;
-    ram      attribute rxErrInvalidSrcAddrCount;
-    ram      attribute rxErrSecCount;
-    ram      attribute rxErrFcsCount;
-    ram      attribute rxErrOtherCount;
-    ram      attribute activeTimestamp;
-    ram      attribute pendingTimestamp;
-    ram      attribute delay;
     callback attribute securityPolicy;
     ram      attribute channelMask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4064,15 +3397,7 @@ endpoint 0 {
     callback attribute wiFiVersion;
     callback attribute channelNumber;
     callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4166,46 +3491,16 @@ endpoint 1 {
 
   server cluster OnOff {
     persist  attribute onOff;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
-    persist  attribute startUpOnOff default = 0xFF;
-    ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster OnOffSwitchConfiguration {
-    ram      attribute switchType;
-    ram      attribute switchActions;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster LevelControl {
     persist  attribute currentLevel default = 0xFE;
-    ram      attribute remainingTime;
-    ram      attribute minLevel;
-    ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency;
-    ram      attribute minFrequency;
-    ram      attribute maxFrequency;
     ram      attribute options;
-    ram      attribute onOffTransitionTime;
     ram      attribute onLevel default = 0xFF;
-    ram      attribute onTransitionTime;
-    ram      attribute offTransitionTime;
-    ram      attribute defaultMoveRate default = 50;
-    persist  attribute startUpCurrentLevel default = 255;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 5;
-  }
-
-  server cluster BinaryInputBasic {
-    ram      attribute outOfService;
-    ram      attribute presentValue;
-    ram      attribute statusFlags;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
@@ -4226,7 +3521,6 @@ endpoint 1 {
   server cluster BridgedActions {
     callback attribute actionList;
     callback attribute endpointList;
-    callback attribute setupUrl;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
@@ -4235,18 +3529,14 @@ endpoint 1 {
     ram      attribute status;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
-    ram      attribute batteryChargeLevel;
-    ram      attribute batteryReplacementNeeded;
-    ram      attribute batteryReplaceability;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster Switch {
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
-    ram      attribute multiPressMax default = 2;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4273,12 +3563,10 @@ endpoint 1 {
     ram      attribute standardNamespace;
     callback attribute supportedModes;
     persist  attribute currentMode;
-    persist  attribute startUpMode;
-    persist  attribute onMode default = 255;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4286,117 +3574,41 @@ endpoint 1 {
     ram      attribute lockState default = 2;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
-    ram      attribute doorState;
-    ram      attribute doorOpenEvents;
-    ram      attribute doorClosedEvents;
-    ram      attribute openPeriod;
-    ram      attribute numberOfTotalUsersSupported default = 10;
-    ram      attribute numberOfPINUsersSupported default = 10;
-    ram      attribute numberOfRFIDUsersSupported default = 10;
-    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfHolidaySchedulesSupported;
-    ram      attribute maxPINCodeLength default = 6;
-    ram      attribute minPINCodeLength default = 6;
-    ram      attribute maxRFIDCodeLength default = 20;
-    ram      attribute minRFIDCodeLength default = 10;
-    ram      attribute credentialRulesSupport default = 1;
-    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
-    ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
-    ram      attribute soundVolume;
     ram      attribute operatingMode;
     ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute defaultConfigurationRegister;
-    ram      attribute enableOneTouchLocking;
-    ram      attribute enableInsideStatusLED;
-    ram      attribute enablePrivacyModeButton;
-    ram      attribute wrongCodeEntryLimit default = 3;
-    ram      attribute userCodeTemporaryDisableTime default = 10;
-    ram      attribute requirePINforRemoteOperation;
-    ram      attribute featureMap default = 0x113;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 6;
   }
 
   server cluster WindowCovering {
     ram      attribute type;
-    persist  attribute currentPositionLift default = 0x7FFF;
-    persist  attribute currentPositionTilt default = 0x7FFF;
     persist  attribute configStatus default = 0x03;
-    persist  attribute currentPositionLiftPercentage default = 50;
-    persist  attribute currentPositionTiltPercentage default = 50;
     ram      attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths default = 500;
-    ram      attribute targetPositionTiltPercent100ths default = 500;
     ram      attribute endProductType;
-    persist  attribute currentPositionLiftPercent100ths default = 500;
-    persist  attribute currentPositionTiltPercent100ths default = 500;
-    persist  attribute installedOpenLimitLift;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode;
-    ram      attribute safetyStatus;
-    ram      attribute featureMap default = 0x17;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
-  }
-
-  server cluster BarrierControl {
-    ram      attribute barrierMovingState;
-    ram      attribute barrierSafetyStatus;
-    ram      attribute barrierCapabilities;
-    ram      attribute barrierPosition;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster PumpConfigurationAndControl {
     ram      attribute maxPressure;
     ram      attribute maxSpeed;
     ram      attribute maxFlow;
-    ram      attribute minConstPressure;
-    ram      attribute maxConstPressure;
-    ram      attribute minCompPressure;
-    ram      attribute maxCompPressure;
-    ram      attribute minConstSpeed;
-    ram      attribute maxConstSpeed;
-    ram      attribute minConstFlow;
-    ram      attribute maxConstFlow;
-    ram      attribute minConstTemp;
-    ram      attribute maxConstTemp;
-    ram      attribute pumpStatus;
     ram      attribute effectiveOperationMode;
     ram      attribute effectiveControlMode;
     ram      attribute capacity;
-    ram      attribute speed;
-    ram      attribute lifetimeRunningHours;
-    ram      attribute power;
-    ram      attribute lifetimeEnergyConsumed;
     ram      attribute operationMode;
-    ram      attribute controlMode;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Thermostat {
     ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
-    ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
     ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
-    ram      attribute startOfWeek;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x000b;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -4405,79 +3617,24 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 0x02;
     ram      attribute percentSetting;
     ram      attribute percentCurrent;
-    ram      attribute speedMax default = 100;
-    ram      attribute speedSetting;
-    ram      attribute speedCurrent;
-    ram      attribute rockSupport;
-    ram      attribute rockSetting;
-    ram      attribute windSupport;
-    ram      attribute windSetting;
-    ram      attribute featureMap default = 0x0F;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
     ram      attribute temperatureDisplayMode;
     ram      attribute keypadLockout;
-    ram      attribute scheduleProgrammingVisibility;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue;
-    ram      attribute currentSaturation;
-    ram      attribute remainingTime;
-    ram      attribute currentX default = 0x616B;
-    ram      attribute currentY default = 0x607D;
-    ram      attribute driftCompensation;
-    ram      attribute compensationText;
-    ram      attribute colorTemperature default = 0x00FA;
     ram      attribute colorMode default = 0x01;
     ram      attribute options;
     ram      attribute numberOfPrimaries;
-    ram      attribute primary1X;
-    ram      attribute primary1Y;
-    ram      attribute primary1Intensity;
-    ram      attribute primary2X;
-    ram      attribute primary2Y;
-    ram      attribute primary2Intensity;
-    ram      attribute primary3X;
-    ram      attribute primary3Y;
-    ram      attribute primary3Intensity;
-    ram      attribute primary4X;
-    ram      attribute primary4Y;
-    ram      attribute primary4Intensity;
-    ram      attribute primary5X;
-    ram      attribute primary5Y;
-    ram      attribute primary5Intensity;
-    ram      attribute primary6X;
-    ram      attribute primary6Y;
-    ram      attribute primary6Intensity;
-    ram      attribute whitePointX;
-    ram      attribute whitePointY;
-    ram      attribute colorPointRX;
-    ram      attribute colorPointRY;
-    ram      attribute colorPointRIntensity;
-    ram      attribute colorPointGX;
-    ram      attribute colorPointGY;
-    ram      attribute colorPointGIntensity;
-    ram      attribute colorPointBX;
-    ram      attribute colorPointBY;
-    ram      attribute colorPointBIntensity;
-    ram      attribute enhancedCurrentHue;
     ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorLoopActive;
-    ram      attribute colorLoopDirection;
-    ram      attribute colorLoopTime default = 0x0019;
-    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue;
     ram      attribute colorCapabilities;
-    ram      attribute colorTempPhysicalMinMireds;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
-    ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
-    ram      attribute featureMap default = 0x1F;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -4485,8 +3642,6 @@ endpoint 1 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x01;
     ram      attribute maxMeasuredValue default = 0xFFFE;
-    ram      attribute tolerance;
-    ram      attribute lightSensorType default = 0xFF;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
@@ -4495,7 +3650,6 @@ endpoint 1 {
     ram      attribute measuredValue default = 0x8000;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
-    ram      attribute tolerance;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
@@ -4512,7 +3666,6 @@ endpoint 1 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute tolerance;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
@@ -4521,7 +3674,6 @@ endpoint 1 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute tolerance;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
@@ -4534,42 +3686,24 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 
-  server cluster IasZone {
-    ram      attribute zoneState;
-    ram      attribute zoneType;
-    ram      attribute zoneStatus;
-    ram      attribute iasCieAddress;
-    ram      attribute zoneId default = 0xff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 2;
-  }
-
   server cluster WakeOnLan {
-    ram      attribute MACAddress;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster Channel {
-    callback attribute channelList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TargetNavigator {
     callback attribute targetList;
-    ram      attribute currentTarget;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster MediaPlayback {
     ram      attribute currentState;
-    ram      attribute startTime default = 0xFF;
-    ram      attribute duration;
-    ram      attribute playbackSpeed;
-    ram      attribute seekRangeEnd;
-    ram      attribute seekRangeStart;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -4592,8 +3726,6 @@ endpoint 1 {
   }
 
   server cluster ContentLauncher {
-    callback attribute acceptHeader;
-    ram      attribute supportedStreamingProtocols;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -4606,16 +3738,13 @@ endpoint 1 {
   }
 
   server cluster ApplicationLauncher {
-    callback attribute catalogList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ApplicationBasic {
-    ram      attribute vendorName;
-    ram      attribute vendorID;
     ram      attribute applicationName;
-    ram      attribute productID;
+    callback attribute application;
     ram      attribute status;
     ram      attribute applicationVersion;
     callback attribute allowedVendorList;
@@ -4712,22 +3841,6 @@ endpoint 1 {
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
-
-  server cluster ElectricalMeasurement {
-    ram      attribute measurementType;
-    ram      attribute totalActivePower;
-    ram      attribute rmsVoltage default = 0xffff;
-    ram      attribute rmsVoltageMin default = 0x8000;
-    ram      attribute rmsVoltageMax default = 0x8000;
-    ram      attribute rmsCurrent default = 0xffff;
-    ram      attribute rmsCurrentMin default = 0xffff;
-    ram      attribute rmsCurrentMax default = 0xffff;
-    ram      attribute activePower default = 0xffff;
-    ram      attribute activePowerMin default = 0xffff;
-    ram      attribute activePowerMax default = 0xffff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
-  }
 }
 
 endpoint 2 {
@@ -4740,10 +3853,6 @@ endpoint 2 {
 
   server cluster OnOff {
     ram      attribute onOff;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
-    ram      attribute startUpOnOff;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
@@ -4761,10 +3870,7 @@ endpoint 2 {
     ram      attribute status;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
-    ram      attribute batteryChargeLevel;
-    ram      attribute batteryReplacementNeeded;
-    ram      attribute batteryReplaceability;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 

@@ -47,14 +47,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
         emberAfAudioOutputClusterInitCallback(endpoint);
         break;
-    case ZCL_BARRIER_CONTROL_CLUSTER_ID:
-        emberAfBarrierControlClusterInitCallback(endpoint);
-        break;
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
-        break;
-    case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
-        emberAfBinaryInputBasicClusterInitCallback(endpoint);
         break;
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
@@ -83,9 +77,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
-    case ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID:
-        emberAfElectricalMeasurementClusterInitCallback(endpoint);
-        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -109,9 +100,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
-        break;
-    case ZCL_IAS_ZONE_CLUSTER_ID:
-        emberAfIasZoneClusterInitCallback(endpoint);
         break;
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
@@ -154,9 +142,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
-        break;
-    case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID:
-        emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
@@ -257,17 +242,7 @@ void __attribute__((weak)) emberAfAudioOutputClusterInitCallback(EndpointId endp
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBinaryInputBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -317,11 +292,6 @@ void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfElectricalMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -358,11 +328,6 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfIasZoneClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -433,11 +398,6 @@ void __attribute__((weak)) emberAfOccupancySensingClusterInitCallback(EndpointId
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfOnOffSwitchConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -30,62 +30,26 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: Language, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
@@ -93,62 +57,26 @@
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: Language, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     5, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
@@ -156,62 +84,26 @@
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: Language, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: start up current level, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
@@ -221,53 +113,17 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: Language, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
-    257, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    8, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
-    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
-    512, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    516, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
@@ -275,53 +131,17 @@
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    48, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    49, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    50, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    51, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    52, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    54, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    55, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    56, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    58, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    59, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    60, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
-    16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
-    4, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
-    5, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
-    6, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
-    33, /* Cluster: Door Lock, Attribute: Language, Privilege: manage */ \
     35, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
-    36, /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: manage */ \
     37, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    41, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
-    42, /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: manage */ \
-    43, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
-    48, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
-    49, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
-    51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    16384, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    21, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
-    23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     32, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
-    33, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    21, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    22, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    23, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    24, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    2, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
@@ -329,53 +149,17 @@
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: Language, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: SoundVolume, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnableInsideStatusLED, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
@@ -385,19 +169,7 @@
 // Parallel array data (*cluster*, command, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
     60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -410,7 +182,6 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    3, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -435,19 +206,7 @@
 // Parallel array data (cluster, *command*, privilege) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
     0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
-    11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
-    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -460,7 +219,6 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    64, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
     0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -485,19 +243,7 @@
 // Parallel array data (cluster, command, *privilege*) for invoke command
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -510,7 +256,6 @@
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \

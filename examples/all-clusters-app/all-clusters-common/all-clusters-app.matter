@@ -2092,6 +2092,20 @@ server cluster MediaInput = 1287 {
   readonly attribute int8u currentInput = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SelectInputRequest {
+    INT8U index = 0;
+  }
+
+  request struct RenameInputRequest {
+    INT8U index = 0;
+    CHAR_STRING name = 1;
+  }
+
+  command SelectInput(SelectInputRequest): DefaultSuccess = 0;
+  command ShowInputStatus(): DefaultSuccess = 1;
+  command HideInputStatus(): DefaultSuccess = 2;
+  command RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
 server cluster MediaPlayback = 1286 {

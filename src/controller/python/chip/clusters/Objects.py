@@ -5675,7 +5675,7 @@ class AccessControl(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="acl", Tag=0x00000000, Type=typing.List[AccessControl.Structs.AccessControlEntry]),
-                ClusterObjectFieldDescriptor(Label="extension", Tag=0x00000001, Type=typing.List[AccessControl.Structs.ExtensionEntry]),
+                ClusterObjectFieldDescriptor(Label="extension", Tag=0x00000001, Type=typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]),
                 ClusterObjectFieldDescriptor(Label="subjectsPerAccessControlEntry", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="targetsPerAccessControlEntry", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="accessControlEntriesPerFabric", Tag=0x00000004, Type=uint),
@@ -5687,7 +5687,7 @@ class AccessControl(Cluster):
             ])
 
     acl: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
-    extension: 'typing.List[AccessControl.Structs.ExtensionEntry]' = None
+    extension: 'typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]' = None
     subjectsPerAccessControlEntry: 'uint' = None
     targetsPerAccessControlEntry: 'uint' = None
     accessControlEntriesPerFabric: 'uint' = None
@@ -5796,9 +5796,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.ExtensionEntry])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]])
 
-            value: 'typing.List[AccessControl.Structs.ExtensionEntry]' = field(default_factory=lambda: [])
+            value: 'typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]' = None
 
         @dataclass
         class SubjectsPerAccessControlEntry(ClusterAttributeDescriptor):
@@ -13597,7 +13597,7 @@ class Switch(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="numberOfPositions", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="currentPosition", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="multiPressMax", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="multiPressMax", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -13607,7 +13607,7 @@ class Switch(Cluster):
 
     numberOfPositions: 'uint' = None
     currentPosition: 'uint' = None
-    multiPressMax: 'uint' = None
+    multiPressMax: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -13662,9 +13662,9 @@ class Switch(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21986,8 +21986,8 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="colorCapabilities", Tag=0x0000400A, Type=uint),
                 ClusterObjectFieldDescriptor(Label="colorTempPhysicalMinMireds", Tag=0x0000400B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorTempPhysicalMaxMireds", Tag=0x0000400C, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="coupleColorTempToLevelMinMireds", Tag=0x0000400D, Type=uint),
-                ClusterObjectFieldDescriptor(Label="startUpColorTemperatureMireds", Tag=0x00004010, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coupleColorTempToLevelMinMireds", Tag=0x0000400D, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="startUpColorTemperatureMireds", Tag=0x00004010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -22045,8 +22045,8 @@ class ColorControl(Cluster):
     colorCapabilities: 'uint' = None
     colorTempPhysicalMinMireds: 'typing.Optional[uint]' = None
     colorTempPhysicalMaxMireds: 'typing.Optional[uint]' = None
-    coupleColorTempToLevelMinMireds: 'uint' = None
-    startUpColorTemperatureMireds: 'uint' = None
+    coupleColorTempToLevelMinMireds: 'typing.Optional[uint]' = None
+    startUpColorTemperatureMireds: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -23338,9 +23338,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class StartUpColorTemperatureMireds(ClusterAttributeDescriptor):
@@ -23354,9 +23354,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -33750,7 +33750,7 @@ class ApplicationLauncher(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="catalogList", Tag=0x00000000, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="catalogList", Tag=0x00000000, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="currentApp", Tag=0x00000001, Type=typing.Union[None, Nullable, ApplicationLauncher.Structs.ApplicationEP]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -33759,7 +33759,7 @@ class ApplicationLauncher(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    catalogList: 'typing.List[uint]' = None
+    catalogList: 'typing.Optional[typing.List[uint]]' = None
     currentApp: 'typing.Union[None, Nullable, ApplicationLauncher.Structs.ApplicationEP]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -33882,9 +33882,9 @@ class ApplicationLauncher(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
 
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+            value: 'typing.Optional[typing.List[uint]]' = None
 
         @dataclass
         class CurrentApp(ClusterAttributeDescriptor):

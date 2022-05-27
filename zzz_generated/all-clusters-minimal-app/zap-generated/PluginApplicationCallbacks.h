@@ -28,9 +28,7 @@
     MatterApplicationBasicPluginServerInitCallback();                                                                              \
     MatterApplicationLauncherPluginServerInitCallback();                                                                           \
     MatterAudioOutputPluginServerInitCallback();                                                                                   \
-    MatterBarrierControlPluginServerInitCallback();                                                                                \
     MatterBasicPluginServerInitCallback();                                                                                         \
-    MatterBinaryInputBasicPluginServerInitCallback();                                                                              \
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterBooleanStatePluginServerInitCallback();                                                                                  \
     MatterBridgedActionsPluginServerInitCallback();                                                                                \
@@ -40,7 +38,6 @@
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterDoorLockPluginServerInitCallback();                                                                                      \
-    MatterElectricalMeasurementPluginServerInitCallback();                                                                         \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterFanControlPluginServerInitCallback();                                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
@@ -49,7 +46,6 @@
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterGroupsPluginServerInitCallback();                                                                                        \
-    MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterIlluminanceMeasurementPluginServerInitCallback();                                                                        \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
@@ -64,7 +60,6 @@
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
     MatterOnOffPluginServerInitCallback();                                                                                         \
-    MatterOnOffSwitchConfigurationPluginServerInitCallback();                                                                      \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPowerSourcePluginServerInitCallback();                                                                                   \
     MatterPowerSourceConfigurationPluginServerInitCallback();                                                                      \
