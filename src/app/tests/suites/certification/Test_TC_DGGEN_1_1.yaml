@@ -67,7 +67,7 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
-          ./chip-tool generaldiagnostics read accepted-command-list 1 0 
+          ./chip-tool generaldiagnostics read accepted-command-list 1 0
 
 
           [1651787557.955586][241046:241051] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFF9 DataVersion: 617063494
