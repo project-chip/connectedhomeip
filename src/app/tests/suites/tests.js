@@ -89,9 +89,9 @@ function getManualTests() {
   ];
 
   const BridgedActions = [
-    'Test_TC_BRAC_2_1',
-    'Test_TC_BRAC_2_2',
-    'Test_TC_BRAC_3_1',
+    'Test_TC_ACT_2_1',
+    'Test_TC_ACT_2_2',
+    'Test_TC_ACT_3_1',
   ];
 
   const DeviceAttestation = [
@@ -157,9 +157,12 @@ function getManualTests() {
   ];
 
   const GeneralDiagnostics = [
-    'Test_TC_GENDIAG_1_1',
-    'Test_TC_GENDIAG_1_2',
-    'Test_TC_GENDIAG_2_1',
+    'Test_TC_DGGEN_1_1',
+    'Test_TC_DGGEN_2_1',
+    'Test_TC_DGGEN_2_2',
+    'Test_TC_DGGEN_2_3',
+    'Test_TC_DGGEN_3_1',
+    'Test_TC_DGGEN_3_2',
   ];
 
   const Identify = [
@@ -182,6 +185,7 @@ function getManualTests() {
     'Test_TC_IDM_3_2',
     'Test_TC_IDM_4_1',
     'Test_TC_IDM_4_2',
+    'Test_TC_IDM_4_3',
     'Test_TC_IDM_5_1',
     'Test_TC_IDM_5_2',
     'Test_TC_IDM_6_1',
@@ -253,6 +257,7 @@ function getManualTests() {
     'Test_TC_MOD_3_1',
     'Test_TC_MOD_3_2',
     'Test_TC_MOD_3_3',
+    'Test_TC_MOD_3_4',
   ];
 
   const OTASoftwareUpdate = [
@@ -264,6 +269,7 @@ function getManualTests() {
     'Test_TC_SU_2_5',
     'Test_TC_SU_2_6',
     'Test_TC_SU_2_7',
+    'Test_TC_SU_2_8',
     'Test_TC_SU_3_1',
     'Test_TC_SU_3_2',
     'Test_TC_SU_3_3',
@@ -291,7 +297,9 @@ function getManualTests() {
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_SWDIAG_1_2',
+    'Test_TC_DGSW_1_1',
+    'Test_TC_DGSW_3_1',
+    'Test_TC_DGSW_3_2',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -330,6 +338,10 @@ function getManualTests() {
     'Test_TC_PS_3_1',
   ];
 
+  const PumpConfigurationControl = [
+    'Test_TC_PCC_3_1',
+  ];
+
   const BooleanState = [
     'Test_TC_BOOL_2_2',
     'Test_TC_BOOL_3_1',
@@ -356,12 +368,16 @@ function getManualTests() {
     'Test_TC_DL_2_15',
     'Test_TC_DL_2_16',
     'Test_TC_DL_2_17',
+    'Test_TC_DL_3_1',
+    'Test_TC_DL_3_2',
+    'Test_TC_DL_3_3',
   ];
 
   const UserLabel = [
-    'Test_TC_LC_2_3',
-    'Test_TC_LC_2_4',
-    'Test_TC_LC_2_5',
+    'Test_TC_ULABEL_2_1',
+    'Test_TC_ULABEL_2_3',
+    'Test_TC_ULABEL_2_4',
+    'Test_TC_ULABEL_2_5',
   ];
 
   const LocalizationConfiguration = [
@@ -388,6 +404,7 @@ function getManualTests() {
     'Test_TC_SWTCH_1_1',
     'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
+    'Test_TC_SWTCH_3_2',
   ];
 
   const TemperatureMeasurement = [
@@ -405,17 +422,13 @@ function getManualTests() {
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_2_6',
-    'Test_TC_DIAG_TH_NW_2_7',
-    'Test_TC_DIAG_TH_NW_2_8',
-    'Test_TC_DIAG_TH_NW_2_9',
-  ];
-
-  const Actions = [
-    'Test_TC_ACT_1_1',
-    'Test_TC_ACT_2_1',
-    'Test_TC_ACT_2_2',
-    'Test_TC_ACT_3_1',
+    'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_2_5',
+    'Test_TC_DIAG_TH_NW_3_1',
+    'Test_TC_DIAG_TH_NW_3_2',
+    'Test_TC_DIAG_TH_NW_3_3',
+    'Test_TC_DIAG_TH_NW_3_4',
+    'Test_TC_DIAG_TH_NW_3_5',
   ];
 
   const TimeFormatLocalization = [
@@ -437,7 +450,7 @@ function getManualTests() {
     Groups,
     BulkDataExchangeProtocol,
     bridge,
-    BridgedActions,
+    BridgedActions,,
     DeviceAttestation,
     DeviceManagement,
     DiagnosticsLogs,
@@ -461,6 +474,7 @@ function getManualTests() {
     OccupancySensing,
     PressureMeasurement,
     PowerSource,
+    PumpConfigurationControl,
     BooleanState,
     ColorControl,
     DoorLock,
@@ -474,7 +488,6 @@ function getManualTests() {
     Thermostat,
     ThermostatUserConfiguration,
     ThreadNetworkDiagnostics,
-    Actions,
     TimeFormatLocalization,
     UnitLocalization,
   ].flat(1);
@@ -488,19 +501,13 @@ function getTests() {
     'TestAccessControlCluster',
   ];
 
-  const BinaryInput = [
-    'Test_TC_BI_1_1',
-    'Test_TC_BI_2_1',
-    'Test_TC_BI_2_2',
-  ];
-
   const BooleanState = [
     'Test_TC_BOOL_1_1',
     'Test_TC_BOOL_2_1',
   ];
 
   const BridgedActions = [
-    'Test_TC_BRAC_1_1',
+    'Test_TC_ACT_1_1',
   ];
 
   const ColorControl = [
@@ -531,10 +538,6 @@ function getTests() {
 
   const DeviceManagement = [
     'Test_TC_DM_2_1',
-  ];
-
-  const ElectricalMeasurement = [
-    'Test_TC_EMR_1_1',
   ];
 
   const EthernetNetworkDiagnostics = [
@@ -696,10 +699,10 @@ function getTests() {
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_1_1',
-    'Test_TC_DIAG_TH_NW_1_2',
+    'Test_TC_DIAG_TH_NW_2_1',
     'Test_TC_DIAG_TH_NW_2_2',
     'Test_TC_DIAG_TH_NW_2_3',
+    'Test_TC_DIAG_TH_NW_2_4',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -770,9 +773,9 @@ function getTests() {
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_SWDIAG_1_1',
-    'Test_TC_SWDIAG_2_1',
-    'Test_TC_SWDIAG_3_1',
+    'Test_TC_DGSW_2_1',
+    'Test_TC_DGSW_2_2',
+    'Test_TC_DGSW_2_3',
   ];
 
   const Subscriptions = [
@@ -798,12 +801,10 @@ function getTests() {
 
   const tests = [
     AccessControl,
-    BinaryInput,
     BooleanState,
-    BridgedActions,
+    BridgedActions,,
     ColorControl,
     DeviceManagement,
-    ElectricalMeasurement,
     EthernetNetworkDiagnostics,
     FlowMeasurement,
     GeneralCommissioning,

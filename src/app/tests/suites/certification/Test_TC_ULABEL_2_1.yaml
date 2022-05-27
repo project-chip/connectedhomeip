@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.3. [TC-GENDIAG-2.1] Event functionality test with server as DUT
+name: 92.2. [TC-ULABEL-2.1] User label cluster read verification [DUT-server]
 
 config:
     nodeId: 0x12344321
@@ -21,22 +21,11 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH use chip-tool event read to get server event report"
+    - label: "TH reads LabelList from the DUT"
       verification: |
-          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
-      disabled: true
+          ./chip-tool userlabel read label-list 1 0
 
-    - label: "TH use chip-tool event read to get server event report"
-      verification: |
-          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
-      disabled: true
-
-    - label: "TH use chip-tool event read to get server event report"
-      verification: |
-          ./chip-tool generaldiagnostics read-event network-fault-change 1 0
-      disabled: true
-
-    - label: "TH use chip-tool event read to get server event report"
-      verification: |
-          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+          [1652851996.990032][2436:2441] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3783457095
+          [1652851996.990102][2436:2441] CHIP:TOO:   label list: 0 entries
+          [1652851996.990196][2436:2441] CHIP:EM: Sending Standalone Ack for MessageCounter:776821 on exchange 57429i
       disabled: true
