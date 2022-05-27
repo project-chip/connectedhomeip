@@ -57,8 +57,8 @@ def codesign(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Codesign the chip-tool-darwin binary')
-    parser.add_argument('--entitlements_path', default='entitlements/chip-tool-darwin.entitlements',
+        description='Codesign the darwin-framework-tool binary')
+    parser.add_argument('--entitlements_path', default='entitlements/darwin-framework-tool.entitlements',
                         help='Set the entitlements for codesign', required=True)
     parser.add_argument(
         '--log_path', help='Output log file destination', required=True)
