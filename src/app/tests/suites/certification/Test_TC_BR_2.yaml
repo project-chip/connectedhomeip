@@ -174,7 +174,6 @@ tests:
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
       verification: |
-
           ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
