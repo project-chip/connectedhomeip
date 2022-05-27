@@ -6588,7 +6588,7 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
+        @Nullable List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
@@ -6617,7 +6617,9 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents> valueList) {
+        @Nullable
+            List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>
+                valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(

@@ -33559,7 +33559,7 @@ class Test_TC_DIAG_TH_NW_1_2Suite : public TestCommand
 {
 public:
     Test_TC_DIAG_TH_NW_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_1_2", 66, credsIssuerConfig)
+        TestCommand("Test_TC_DIAG_TH_NW_1_2", 68, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -33601,10 +33601,26 @@ private:
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckValueNull("channel", value));
             }
             break;
         case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNull("routingRole", value));
+            }
+            break;
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -33614,25 +33630,12 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 6));
             }
             break;
-        case 3:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("networkName", value));
-                VerifyOrReturn(CheckValueAsString("networkName.Value()", value.Value(), chip::CharSpan("", 0)));
-            }
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckValueNull("networkName", value));
             }
             break;
         case 6:
@@ -33642,9 +33645,9 @@ private:
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint64_t> value;
+                chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
         case 8:
@@ -33653,15 +33656,15 @@ private:
             break;
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint64_t value;
+                chip::app::DataModel::Nullable<uint64_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -33669,7 +33672,11 @@ private:
             break;
         case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
             break;
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -33677,32 +33684,24 @@ private:
             break;
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
-            }
+            shouldContinue = true;
             break;
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint8_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
+            shouldContinue = true;
             break;
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
             break;
         case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -33710,7 +33709,7 @@ private:
         case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -33718,17 +33717,17 @@ private:
         case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 21:
@@ -33782,17 +33781,17 @@ private:
         case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
         case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
         case 29:
@@ -34038,20 +34037,12 @@ private:
         case 59:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint64_t value;
+                uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
             break;
         case 60:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint64_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
-            }
-            break;
-        case 61:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint32_t value;
@@ -34059,16 +34050,28 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
             break;
+        case 61:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint64_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
+            break;
         case 62:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
+            {
+                chip::app::DataModel::Nullable<uint64_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
             break;
         case 63:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::ByteSpan value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "octstr"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
             break;
         case 64:
@@ -34076,6 +34079,18 @@ private:
             shouldContinue = true;
             break;
         case 65:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::ByteSpan> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "octstr"));
+            }
+            break;
+        case 66:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 67:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> value;
@@ -34106,22 +34121,32 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Validate constraints of attribute: Channel");
+            LogStep(1, "read configured Channel attribute value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::Channel::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "read RoutingRole atribute from DUT");
+            LogStep(2, "Validate constraints of attribute: Channel");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::Channel::Id, true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "read RoutingRole atribute from DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RoutingRole::Id, true, chip::NullOptional);
         }
-        case 3: {
-            LogStep(3, "read NetworkName attribute from DUT");
+        case 4: {
+            LogStep(4, "Validate constraints of attribute: RoutingRole");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::RoutingRole::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "read NetworkName attribute from DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::NetworkName::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4,
+        case 6: {
+            LogStep(6,
                     "read NetworkName attribute from DUT and verify response value, If value is NULL then verify that RoutingRole "
                     "is set to 1");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34132,13 +34157,13 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 5: {
-            LogStep(5, "read PanId attribute from DUT");
+        case 7: {
+            LogStep(7, "read PanId attribute from DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::PanId::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 8: {
+            LogStep(8,
                     "read PanId attribute from DUT and verify response value, If value is NULL then verify that RoutingRole is set "
                     "to 1");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34149,13 +34174,13 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 7: {
-            LogStep(7, "Validate constraints of attribute: ExtendedPanId");
+        case 9: {
+            LogStep(9, "Validate constraints of attribute: ExtendedPanId");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id, true, chip::NullOptional);
         }
-        case 8: {
-            LogStep(8,
+        case 10: {
+            LogStep(10,
                     "read ExtendedPanId attribute from DUT and verify response value, If value is NULL then verify that "
                     "RoutingRole is set to 1");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34166,8 +34191,8 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 9: {
-            LogStep(9,
+        case 11: {
+            LogStep(11,
                     "read MeshLocalPrefix attribute from DUT and verify response value, If value is NULL then verify that "
                     "RoutingRole is set to 1");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34178,14 +34203,14 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 10: {
-            LogStep(10, "Validate constraints of attribute: OverrunCount");
+        case 12: {
+            LogStep(12, "Validate constraints of attribute: OverrunCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::OverrunCount::Id, true, chip::NullOptional);
         }
-        case 11: {
+        case 13: {
             LogStep(
-                11,
+                13,
                 "read OverrunCount attribute from DUT and verify response value, If the Overruncount is greater than zero or not");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -34195,8 +34220,8 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 12: {
-            LogStep(12,
+        case 14: {
+            LogStep(14,
                     "read NeighborTableList attribute from DUT and Verify that the NeighborTable List size is Zero or greater and "
                     "verify each node types");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34207,8 +34232,8 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 13: {
-            LogStep(13,
+        case 15: {
+            LogStep(15,
                     "read RouteTableList attribute from DUT and Verify that the RouteTableList List size is Zero or greater and "
                     "verify each node types");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
@@ -34219,264 +34244,249 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 14: {
-            LogStep(14, "Validate constraints of attribute: PartitionId");
+        case 16: {
+            LogStep(16, "Validate constraints of attribute: PartitionId");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::PartitionId::Id, true, chip::NullOptional);
         }
-        case 15: {
-            LogStep(15, "Validate constraints of attribute: weighting");
+        case 17: {
+            LogStep(17, "Validate constraints of attribute: weighting");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::Weighting::Id, true, chip::NullOptional);
         }
-        case 16: {
-            LogStep(16, "Validate constraints of attribute: DataVersion");
+        case 18: {
+            LogStep(18, "Validate constraints of attribute: DataVersion");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::DataVersion::Id, true, chip::NullOptional);
         }
-        case 17: {
-            LogStep(17, "Validate constraints of attribute: StableDataVersion");
+        case 19: {
+            LogStep(19, "Validate constraints of attribute: StableDataVersion");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id, true, chip::NullOptional);
         }
-        case 18: {
-            LogStep(18, "Validate constraints of attribute: LeaderRouterId");
+        case 20: {
+            LogStep(20, "Validate constraints of attribute: LeaderRouterId");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id, true, chip::NullOptional);
         }
-        case 19: {
-            LogStep(19, "Validate constraints of attribute: DetachedRoleCount");
+        case 21: {
+            LogStep(21, "Validate constraints of attribute: DetachedRoleCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id, true, chip::NullOptional);
         }
-        case 20: {
-            LogStep(20, "Validate constraints of attribute: ChildRoleCount");
+        case 22: {
+            LogStep(22, "Validate constraints of attribute: ChildRoleCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id, true, chip::NullOptional);
         }
-        case 21: {
-            LogStep(21, "Validate constraints of attribute: RouterRoleCount");
+        case 23: {
+            LogStep(23, "Validate constraints of attribute: RouterRoleCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id, true, chip::NullOptional);
         }
-        case 22: {
-            LogStep(22, "Validate constraints of attribute: LeaderRoleCount");
+        case 24: {
+            LogStep(24, "Validate constraints of attribute: LeaderRoleCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id, true, chip::NullOptional);
         }
-        case 23: {
-            LogStep(23, "Validate constraints of attribute: AttachAttemptCount");
+        case 25: {
+            LogStep(25, "Validate constraints of attribute: AttachAttemptCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id, true, chip::NullOptional);
         }
-        case 24: {
-            LogStep(24, "Validate constraints of attribute: PartitionIdChangeCount");
+        case 26: {
+            LogStep(26, "Validate constraints of attribute: PartitionIdChangeCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id, true, chip::NullOptional);
         }
-        case 25: {
-            LogStep(25, "Validate constraints of attribute: BetterPartitionAttachAttemptCount");
+        case 27: {
+            LogStep(27, "Validate constraints of attribute: BetterPartitionAttachAttemptCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id, true,
                                  chip::NullOptional);
         }
-        case 26: {
-            LogStep(26, "Validate constraints of attribute: ParentChangeCount");
+        case 28: {
+            LogStep(28, "Validate constraints of attribute: ParentChangeCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id, true, chip::NullOptional);
         }
-        case 27: {
-            LogStep(27, "Validate constraints of attribute: TxTotalCount");
+        case 29: {
+            LogStep(29, "Validate constraints of attribute: TxTotalCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id, true, chip::NullOptional);
         }
-        case 28: {
-            LogStep(28, "Validate constraints of attribute: TxUnicastCount");
+        case 30: {
+            LogStep(30, "Validate constraints of attribute: TxUnicastCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id, true, chip::NullOptional);
         }
-        case 29: {
-            LogStep(29, "Validate constraints of attribute: TxBroadcastCount");
+        case 31: {
+            LogStep(31, "Validate constraints of attribute: TxBroadcastCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id, true, chip::NullOptional);
         }
-        case 30: {
-            LogStep(30, "Validate constraints of attribute: TxNoAckRequestedCount");
+        case 32: {
+            LogStep(32, "Validate constraints of attribute: TxNoAckRequestedCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id, true, chip::NullOptional);
         }
-        case 31: {
-            LogStep(31, "Validate constraints of attribute: TxDataCount");
+        case 33: {
+            LogStep(33, "Validate constraints of attribute: TxDataCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxDataCount::Id, true, chip::NullOptional);
         }
-        case 32: {
-            LogStep(32, "Validate constraints of attribute: TxDataPollCount");
+        case 34: {
+            LogStep(34, "Validate constraints of attribute: TxDataPollCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id, true, chip::NullOptional);
         }
-        case 33: {
-            LogStep(33, "Validate constraints of attribute: TxBeaconCount");
+        case 35: {
+            LogStep(35, "Validate constraints of attribute: TxBeaconCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id, true, chip::NullOptional);
         }
-        case 34: {
-            LogStep(34, "Validate constraints of attribute: TxBeaconRequestCount");
+        case 36: {
+            LogStep(36, "Validate constraints of attribute: TxBeaconRequestCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id, true, chip::NullOptional);
         }
-        case 35: {
-            LogStep(35, "Validate constraints of attribute: TxOtherCount");
+        case 37: {
+            LogStep(37, "Validate constraints of attribute: TxOtherCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id, true, chip::NullOptional);
         }
-        case 36: {
-            LogStep(36, "Validate constraints of attribute: TxRetryCount");
+        case 38: {
+            LogStep(38, "Validate constraints of attribute: TxRetryCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id, true, chip::NullOptional);
         }
-        case 37: {
-            LogStep(37, "Validate constraints of attribute: TxDirectMaxRetryExpiryCount");
+        case 39: {
+            LogStep(39, "Validate constraints of attribute: TxDirectMaxRetryExpiryCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id, true, chip::NullOptional);
         }
-        case 38: {
-            LogStep(38, "Validate constraints of attribute: TxIndirectMaxRetryExpiryCount");
+        case 40: {
+            LogStep(40, "Validate constraints of attribute: TxIndirectMaxRetryExpiryCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id, true, chip::NullOptional);
         }
-        case 39: {
-            LogStep(39, "Validate constraints of attribute: TxErrCcaCount");
+        case 41: {
+            LogStep(41, "Validate constraints of attribute: TxErrCcaCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id, true, chip::NullOptional);
         }
-        case 40: {
-            LogStep(40, "Validate constraints of attribute: TxErrAbortCount");
+        case 42: {
+            LogStep(42, "Validate constraints of attribute: TxErrAbortCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id, true, chip::NullOptional);
         }
-        case 41: {
-            LogStep(41, "Validate constraints of attribute: TxErrBusyChannelCount");
+        case 43: {
+            LogStep(43, "Validate constraints of attribute: TxErrBusyChannelCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id, true, chip::NullOptional);
         }
-        case 42: {
-            LogStep(42, "Validate constraints of attribute: RxTotalCount");
+        case 44: {
+            LogStep(44, "Validate constraints of attribute: RxTotalCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id, true, chip::NullOptional);
         }
-        case 43: {
-            LogStep(43, "Validate constraints of attribute: RxUnicastCount");
+        case 45: {
+            LogStep(45, "Validate constraints of attribute: RxUnicastCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id, true, chip::NullOptional);
         }
-        case 44: {
-            LogStep(44, "Validate constraints of attribute: RxBroadcastCount");
+        case 46: {
+            LogStep(46, "Validate constraints of attribute: RxBroadcastCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id, true, chip::NullOptional);
         }
-        case 45: {
-            LogStep(45, "Validate constraints of attribute: RxDataCount");
+        case 47: {
+            LogStep(47, "Validate constraints of attribute: RxDataCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxDataCount::Id, true, chip::NullOptional);
         }
-        case 46: {
-            LogStep(46, "Validate constraints of attribute: RxDataPollCount");
+        case 48: {
+            LogStep(48, "Validate constraints of attribute: RxDataPollCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id, true, chip::NullOptional);
         }
-        case 47: {
-            LogStep(47, "Validate constraints of attribute: RxBeaconCount");
+        case 49: {
+            LogStep(49, "Validate constraints of attribute: RxBeaconCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id, true, chip::NullOptional);
         }
-        case 48: {
-            LogStep(48, "Validate constraints of attribute: RxBeaconRequestCount");
+        case 50: {
+            LogStep(50, "Validate constraints of attribute: RxBeaconRequestCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id, true, chip::NullOptional);
         }
-        case 49: {
-            LogStep(49, "Validate constraints of attribute: RxOtherCount");
+        case 51: {
+            LogStep(51, "Validate constraints of attribute: RxOtherCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id, true, chip::NullOptional);
         }
-        case 50: {
-            LogStep(50, "Validate constraints of attribute: RxAddressFilteredCount");
+        case 52: {
+            LogStep(52, "Validate constraints of attribute: RxAddressFilteredCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id, true, chip::NullOptional);
         }
-        case 51: {
-            LogStep(51, "Validate constraints of attribute: RxDestAddrFilteredCount");
+        case 53: {
+            LogStep(53, "Validate constraints of attribute: RxDestAddrFilteredCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id, true, chip::NullOptional);
         }
-        case 52: {
-            LogStep(52, "Validate constraints of attribute: RxDuplicatedCount");
+        case 54: {
+            LogStep(54, "Validate constraints of attribute: RxDuplicatedCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id, true, chip::NullOptional);
         }
-        case 53: {
-            LogStep(53, "Validate constraints of attribute: RxErrNoFrameCount");
+        case 55: {
+            LogStep(55, "Validate constraints of attribute: RxErrNoFrameCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id, true, chip::NullOptional);
         }
-        case 54: {
-            LogStep(54, "Validate constraints of attribute: RxErrUnknownNeighborCount");
+        case 56: {
+            LogStep(56, "Validate constraints of attribute: RxErrUnknownNeighborCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id, true, chip::NullOptional);
         }
-        case 55: {
-            LogStep(55, "Validate constraints of attribute: RxErrInvalidSrcAddrCount");
+        case 57: {
+            LogStep(57, "Validate constraints of attribute: RxErrInvalidSrcAddrCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id, true, chip::NullOptional);
         }
-        case 56: {
-            LogStep(56, "Validate constraints of attribute: RxErrInvalidSrcAddrCount");
+        case 58: {
+            LogStep(58, "Validate constraints of attribute: RxErrInvalidSrcAddrCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id, true, chip::NullOptional);
         }
-        case 57: {
-            LogStep(57, "Validate constraints of attribute: RxErrFcsCount");
+        case 59: {
+            LogStep(59, "Validate constraints of attribute: RxErrFcsCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id, true, chip::NullOptional);
         }
-        case 58: {
-            LogStep(58, "Validate constraints of attribute: RxErrOtherCount");
+        case 60: {
+            LogStep(60, "Validate constraints of attribute: RxErrOtherCount");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id, true, chip::NullOptional);
         }
-        case 59: {
-            LogStep(59, "Validate constraints of attribute: ActiveTimestamp");
+        case 61: {
+            LogStep(61, "Validate constraints of attribute: ActiveTimestamp");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id, true, chip::NullOptional);
         }
-        case 60: {
-            LogStep(60, "Validate constraints of attribute: PendingTimestamp");
+        case 62: {
+            LogStep(62, "Validate constraints of attribute: PendingTimestamp");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id, true, chip::NullOptional);
         }
-        case 61: {
-            LogStep(61, "Validate constraints of attribute: delay");
+        case 63: {
+            LogStep(63, "Validate constraints of attribute: delay");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::Delay::Id, true, chip::NullOptional);
         }
-        case 62: {
-            LogStep(62, "read SecurityPolicy struct attribute from DUT and Verify the each field");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 63: {
-            LogStep(63, "Validate constraints of attribute: ChannelPage0Mask");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
-                                 ThreadNetworkDiagnostics::Attributes::ChannelMask::Id, true, chip::NullOptional);
-        }
         case 64: {
-            LogStep(64, "read OperationalDatasetComponents struct attribute from DUT and Verify the each field");
+            LogStep(64, "read SecurityPolicy struct attribute from DUT and Verify the each field");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
@@ -34486,7 +34496,22 @@ private:
             return UserPrompt(kIdentityAlpha, value);
         }
         case 65: {
-            LogStep(65, "read ActiveNetworkFaults attribute value");
+            LogStep(65, "Validate constraints of attribute: ChannelPage0Mask");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ChannelMask::Id, true, chip::NullOptional);
+        }
+        case 66: {
+            LogStep(66, "read OperationalDatasetComponents struct attribute from DUT and Verify the each field");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 67: {
+            LogStep(67, "read ActiveNetworkFaults attribute value");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                  ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id, true, chip::NullOptional);

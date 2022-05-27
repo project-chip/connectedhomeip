@@ -1123,12 +1123,12 @@ typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
         data);
 typedef void (*ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & data);
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & data);
 typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & data);
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & data);
 typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
 typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
@@ -8875,8 +8875,8 @@ public:
                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge
@@ -8909,8 +8909,8 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
+                const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge
