@@ -66,7 +66,9 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-    virtual void DispatchSessionEvent(SessionDelegate::Event event) { /* There is not delegate, nothing to do here */ }
+    virtual void DispatchSessionEvent(SessionDelegate::Event event)
+    { /* There is not delegate, nothing to do here */
+    }
 
 private:
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
