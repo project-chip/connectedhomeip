@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include <platform/android/CHIPP256KeypairBridge.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <platform/android/CHIPP256KeypairBridge.h>
 
 #include <array>
 #include <cstdint>

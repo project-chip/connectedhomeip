@@ -26,8 +26,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TimeUtils.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/android/CHIPP256KeypairBridge.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include "AndroidOperationalCredentialsIssuer.h"
 

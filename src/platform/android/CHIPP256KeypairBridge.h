@@ -59,8 +59,7 @@ public:
 
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const override;
 
-    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
-                                  P256ECDHDerivedSecret & out_secret) const override;
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
     const P256PublicKey & Pubkey() const override { return mPublicKey; };
 
