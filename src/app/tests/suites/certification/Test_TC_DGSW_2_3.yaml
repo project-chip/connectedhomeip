@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 45.1.1. [TC-SWDIAG-1.1] Attributes with server as DUT
+name: 42.2.3. [TC-DGSW-2.3] Command received functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -28,9 +28,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue 873
-    - label:
-          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
+    - label: "Sends ResetWatermarks to DUT"
+      command: "ResetWatermarks"
+      PICS: CR_RESETWATERMARKS
+
+    - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
@@ -38,15 +40,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
-      optional: true
-      command: "readAttribute"
-      attribute: "CurrentHeapFree"
-      response:
-          constraints:
-              type: uint64
-
-    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+    #issue #830
+    - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
@@ -55,8 +50,8 @@ tests:
           constraints:
               type: uint64
 
-    - label:
-          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+    #issue #830
+    - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"

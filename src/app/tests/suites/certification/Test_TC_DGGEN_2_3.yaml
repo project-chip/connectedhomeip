@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    92.5. [TC-LC-2.4]User Label cluster constraint_error verification [DUT -
-    Commissionee]
+name: 84.2.3. [TC-DGGEN-2.3] Command at server as DUT
 
 config:
     nodeId: 0x12344321
@@ -24,10 +22,11 @@ config:
 
 tests:
     - label:
-          "TH1 writes LabelList attribute of the DUT by setting
-          'room:bedroombedroombedroomdroombedroombedroomdroombedroobedroo
-          bedroomoobedroobedroooobedroobedroooobedroobedroooobedroobedroo
-          oobedroobedroo 1','Orientation:east', 'floor:3'"
+          "Provision TH with EnableKey with 128 bit value provided and matched a
+          value chosen by the manufacturer and configured on the DUT using
+          manufacturer-specific means. EventTrigger value is configured and
+          SHALL indicate the test or test mode which TH wants to trigger the
+          testing use by manufacturers."
       verification: |
-          sudo ./chip-tool userlabel write label-list '[{"label":"bedroombedroombedroomdroombedroombedroomdroombedroobedroo", "value":"bedroom1"}, {"label":"orientation", "value":"east"}, {"label":"floor", "value":"3"}]' 1 0
+          NOT AVAILABLE
       disabled: true
