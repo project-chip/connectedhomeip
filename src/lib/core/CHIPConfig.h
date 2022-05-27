@@ -655,25 +655,6 @@
 #endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_MS
- *
- * @brief After what period of inactivity is a peer connection considered
- * expired.
- */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_MS 120000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_MS
-
-/**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
- *
- * @brief How frequent are peer connections checked for timeouts.
- */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS 5000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
-
-/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
