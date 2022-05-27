@@ -1509,7 +1509,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_MISSING_SECURE_SESSION                      CHIP_CORE_ERROR(0x77)
 
-// unused CHIP_CORE_ERROR(0x78)
+/**
+ * @def CHIP_ERROR_INVALID_ADMIN_SUBJECT
+ *
+ * @brief
+ *   The CaseAdminSubject field is not valid.
+ *
+ */
+#define CHIP_ERROR_INVALID_ADMIN_SUBJECT                      CHIP_CORE_ERROR(0x78)
 
 // unused CHIP_CORE_ERROR(0x79)
 

@@ -1213,7 +1213,7 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
     case OperationalCertStatus::kInvalidAdminSubject:
-        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:

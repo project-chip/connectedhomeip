@@ -73,8 +73,15 @@ constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
-                                                             FabricIndex fabricIndex, NodeId subject)
+                                                             FabricIndex fabricIndex, uint64_t subject)
 {
+    NodeId subjectAsNodeID = static_cast<NodeId>(subject);
+
+    if (!IsOperationalNodeId(subjectAsNodeID) && !IsCASEAuthTag(subjectAsNodeID))
+    {
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
+    }
+
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
@@ -607,6 +614,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidFabricIndex;
     }
+    if (err == CHIP_ERROR_INVALID_ADMIN_SUBJECT)
+    {
+        return OperationalCertStatus::kInvalidAdminSubject;
+    }
 
     return OperationalCertStatus::kInvalidNOC;
 }
@@ -631,7 +642,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     Credentials::GroupDataProvider::KeySet keyset;
     FabricInfo * newFabricInfo = nullptr;
 
-    auto * secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    auto * secureSession              = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -644,16 +656,16 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         return true;
     }
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::UnsupportedAccess);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
-
-    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
 
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -690,7 +702,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
      * . If the current secure session was established with CASE, subsequent configuration
      *   of the newly installed Fabric requires the opening of a new CASE session from the
      *   Administrator from the Fabric just installed. This Administrator is the one listed
-     *   in the `CaseAdminNode` argument.
+     *   in the `caseAdminSubject` argument.
      *
      */
     if (secureSession->GetSecureSessionType() == SecureSession::Type::kPASE)
@@ -722,17 +734,17 @@ exit:
     gFabricBeingCommissioned.Reset();
     if (nonDefaultStatus == Status::Success)
     {
-        // We have an NOC response and did not have IM failures before on field validations
+        // We have an NOC response but had IM failures before on field validations
         SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
         if (nocResponse != OperationalCertStatus::kSuccess)
         {
             ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
                          err.Format(), to_underlying(nocResponse));
         }
-        // We have an NOC response but had IM failures before on field validations
+        // Success
         else
         {
-            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", fabricIndex);
+            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(fabricIndex));
         }
     }
     else
@@ -774,7 +786,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(ICACValue.HasValue() && ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
 
     err = fabric->SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
