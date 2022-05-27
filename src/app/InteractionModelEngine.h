@@ -244,21 +244,6 @@ public:
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
-     * We only allow one active read transaction per fabric, and the number of paths used is limited by
-     * kMinSupportedPathsPerReadRequest. This function will check if the given ReadHandler will exceed the limitations for the
-     * accessing fabric.
-     *
-     * If CHIP_NO_ERROR is returned, it's OK to proceed with the read.
-     *
-     * Otherwise the CHIP_ERROR encodes an interaction model status that needs
-     * to turn into a Status Response to the client.
-     *
-     * TODO: (#17418) We are now reserving resources for read requests, could be changed to similar algorithm for read resources
-     * minimas.
-     */
-    CHIP_ERROR CanEstablishReadTransaction(const ReadHandler * apReadHandler);
-
-    /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
      * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
      * true.

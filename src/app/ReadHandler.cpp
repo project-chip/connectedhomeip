@@ -384,10 +384,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
-    // Ensure the read transaction doesn't exceed the resources dedicated to
-    // read transactions.
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this));
-
     bool isFabricFiltered;
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));
     mFlags.Set(ReadHandlerFlags::FabricFiltered, isFabricFiltered);

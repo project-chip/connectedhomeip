@@ -798,7 +798,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
 
     // It is safe to use & here since this function will be called on current stack.
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() != aFabricIndex || !handler->IsType(ReadHandler::InteractionType::Subscribe))
+        if (handler->GetAccessingFabricIndex() != aFabricIndex || !handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
         }
@@ -888,9 +888,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
 
     countResourceUsage();
 
-    ChipLogDetail(DataManagement, "--> EnsureResourceForRead: Attr: %zu/%zu / Event: %zu/%zu / ReadHandler: %zu/%zu",
-                  usedAttributePaths, attributePathCap, usedEventPaths, eventPathCap, usedReadHandlers, readHandlerCap);
-
     if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
         usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
     {
@@ -909,6 +906,33 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     // If we have commissioned CHIP_CONFIG_MAX_FABRIC already, and this transaction don't have an associated fabric index, reject
     // the request if we don't have sufficient resources for this request.
     if (mpFabricTable->FabricCount() == CHIP_CONFIG_MAX_FABRICS && aFabricIndex == kUndefinedFabricIndex)
+    {
+        return Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+
+    size_t usedAttributePathsInFabric = 0;
+    size_t usedEventPathsInFabric     = 0;
+    size_t usedReadHandlersInFabric   = 0;
+    mReadHandlers.ForEachActiveObject([&](auto * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Read) || handler->GetAccessingFabricIndex() != aFabricIndex)
+        {
+            return Loop::Continue;
+        }
+        usedAttributePathsInFabric += handler->GetAttributePathCount();
+        usedEventPathsInFabric += handler->GetEventPathCount();
+        usedReadHandlersInFabric++;
+        return Loop::Continue;
+    });
+
+    // Resources exhausted, since there is already some read requests ongoing on this fabric, please retry later.
+    if (usedAttributePathsInFabric + aRequestedAttributePathCount >
+            kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric ||
+        usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric)
+    {
+        return Protocols::InteractionModel::Status::PathsExhausted;
+    }
+
+    if (usedReadHandlersInFabric >= kMinSupportedReadRequestsPerFabric)
     {
         return Protocols::InteractionModel::Status::ResourceExhausted;
     }
@@ -957,49 +981,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     }
 
     return Protocols::InteractionModel::Status::Success;
-}
-
-CHIP_ERROR InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
-{
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    const bool allowUnlimited = !mForceHandlerQuota;
-#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
-       // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
-    const bool allowUnlimited = true;
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
-#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-    const bool allowUnlimited = false;
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-
-    FabricIndex currentFabricIndex           = apReadHandler->GetAccessingFabricIndex();
-    size_t activeReadHandlersOnCurrentFabric = 0;
-
-    // It is safe to use & here since this function will be called on current stack.
-    if (apReadHandler->GetAttributePathCount() > kMinSupportedPathsPerReadRequest ||
-        apReadHandler->GetEventPathCount() > kMinSupportedPathsPerReadRequest ||
-        apReadHandler->GetDataVersionFilterCount() > kMinSupportedPathsPerReadRequest)
-    {
-        // Doesn't matter how many other reads are in progress; we are not
-        // going to handle this request.
-        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(PathsExhausted));
-    }
-
-    mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() == currentFabricIndex && handler->IsType(ReadHandler::InteractionType::Read))
-        {
-            activeReadHandlersOnCurrentFabric++;
-        }
-        return Loop::Continue;
-    });
-
-    // The incoming read handler here is also counted above.
-    if (activeReadHandlersOnCurrentFabric > kMinSupportedReadRequestsPerFabric)
-    {
-        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(Busy));
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
