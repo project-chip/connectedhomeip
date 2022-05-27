@@ -743,7 +743,7 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
 
     if (!g_hash_table_lookup(mConnectionMap, remoteAddr))
     {
-        ChipLogProgress(DeviceLayer, "Not Found in Map");
+        ChipLogProgress(DeviceLayer, "Connection not found in map [%s]", remoteAddr);
         conn           = static_cast<BLEConnection *>(g_malloc0(sizeof(BLEConnection)));
         conn->peerAddr = g_strdup(remoteAddr);
 
@@ -782,10 +782,10 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     BLEConnection * conn = nullptr;
     ChipLogProgress(DeviceLayer, "Connection Remove Request for [%s]", remoteAddr);
 
-    VerifyOrReturn(mConnectionMap != nullptr, ChipLogError(DeviceLayer, "connection map does not exist"));
+    VerifyOrReturn(mConnectionMap != nullptr, ChipLogError(DeviceLayer, "Connection map does not exist"));
 
     conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddr));
-    VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "connection does not exist for [%s]", remoteAddr));
+    VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Connection does not exist for [%s]", remoteAddr));
 
     g_hash_table_remove(mConnectionMap, conn->peerAddr);
 

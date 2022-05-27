@@ -122,7 +122,7 @@ void OnRegister(dnssd_error_e error, dnssd_service_h service, void * data)
 
     g_main_loop_quit(loop);
 
-    VerifyOrReturn(CheckForSuccess(rCtx, (int) error, __func__));
+    VerifyOrReturn(CheckForSuccess(rCtx, static_cast<int>(error), __func__));
     rCtx->isRegistered = true;
     ChipLogDetail(DeviceLayer, "Dnssd: %s name: %s, type: %s, port: %u, interfaceId: %u", __func__, rCtx->name, rCtx->type,
                   rCtx->port, rCtx->interfaceId);
