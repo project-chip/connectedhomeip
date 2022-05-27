@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    92.4. [TC-LC-2.3] User Label cluster write verification [DUT - Commissionee]
+name: 84.3.2. [TC-DGGEN-3.2] Commands generated with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -23,13 +22,11 @@ config:
 
 tests:
     - label:
-          "TH1 writes LabelList attribute of the DUT by setting 'room:bedroom
-          1','Orientation:east', 'floor:3', 'direction:down'"
+          "Provision DUT with EnableKey with 128 bit value provided and matched
+          a value chosen by the manufacturer and configured on the TH using
+          manufacturer-specific means. EventTrigger value is configured and
+          SHALL indicate the test or test mode which DUT wants to trigger the
+          testing use by manufacturers."
       verification: |
-          sudo ./chip-tool userlabel write label-list '[{"label":"bedroom", "value":"bedroom1"}, {"label":"orientation", "value":"east"}, {"label":"floor", "value":"3"}, {"label":"direction", "value":"down"}]' 1 0
-      disabled: true
-
-    - label: "TH1 reads LabelList attribute of the DUT"
-      verification: |
-          sudo ./chip-tool userlabel read label-list 1 0
+          NOT AVAILABLE
       disabled: true

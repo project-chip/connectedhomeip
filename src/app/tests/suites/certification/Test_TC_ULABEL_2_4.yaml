@@ -1,0 +1,118 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    92.5. [TC-ULABEL-2.4] User Label cluster empty entry verification
+    [DUT-server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH writes LabelList attribute of the DUT with entry as following:
+          room:bedroom 1,orientation:east"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool userlabel write label-list '[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]' 1 0
+
+          [1652852700.376918][2525:2531] CHIP:DMG:                        StatusIB =
+          [1652852700.376998][2525:2531] CHIP:DMG:                        {
+          [1652852700.377088][2525:2531] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652852700.377150][2525:2531] CHIP:DMG:                        },
+          [1652852700.377232][2525:2531] CHIP:DMG:
+          [1652852700.377288][2525:2531] CHIP:DMG:                },
+          [1652852700.377367][2525:2531] CHIP:DMG:
+          [1652852700.377415][2525:2531] CHIP:DMG:        ],
+          [1652852700.377485][2525:2531] CHIP:DMG:
+          [1652852700.377562][2525:2531] CHIP:DMG:        InteractionModelRevision = 1
+          [1652852700.377610][2525:2531] CHIP:DMG: }
+          [1652852700.377854][2525:2531] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1652852700.377964][2525:2531] CHIP:EM: Sending Standalone Ack for MessageCounter:15172483 on exchange 24009i
+      disabled: true
+
+    - label: "TH reads LabelList attribute of the DUT"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool userlabel read label-list 1 0
+
+          [1652852732.588993][2533:2538] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3783457112
+          [1652852732.589067][2533:2538] CHIP:TOO:   label list: 2 entries
+          [1652852732.589106][2533:2538] CHIP:TOO:     [1]: {
+          [1652852732.589130][2533:2538] CHIP:TOO:       Label: room
+          [1652852732.589150][2533:2538] CHIP:TOO:       Value: bedroom 1
+          [1652852732.589173][2533:2538] CHIP:TOO:      }
+          [1652852732.589200][2533:2538] CHIP:TOO:     [2]: {
+          [1652852732.589222][2533:2538] CHIP:TOO:       Label: orientation
+          [1652852732.589242][2533:2538] CHIP:TOO:       Value: east
+          [1652852732.589263][2533:2538] CHIP:TOO:      }
+          [1652852732.589353][2533:2538] CHIP:EM: Sending Standalone Ack for MessageCounter:8693476 on exchange 25383i
+      disabled: true
+
+    - label: "TH writes LabelList attribute of the DUT with an empty list"
+      verification: |
+          ./chip-tool userlabel write label-list '[{"label":"bedroom", "value":"bedroom1"}, {"label":"orientation", "value":"east"}, {"label":"floor", "value":"3"},{"label":"", "value":""},{"label":"", "value":""},{"label":"", "value":""},{"label":"direction", "value":"down"}]' 1 0
+
+          [1652852775.647503][2544:2549] CHIP:DMG:                        StatusIB =
+          [1652852775.647578][2544:2549] CHIP:DMG:                        {
+          [1652852775.647658][2544:2549] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652852775.647739][2544:2549] CHIP:DMG:                        },
+          [1652852775.647817][2544:2549] CHIP:DMG:
+          [1652852775.647878][2544:2549] CHIP:DMG:                },
+          [1652852775.647950][2544:2549] CHIP:DMG:
+          [1652852775.648008][2544:2549] CHIP:DMG:        ],
+          [1652852775.648140][2544:2549] CHIP:DMG:
+          [1652852775.648199][2544:2549] CHIP:DMG:        InteractionModelRevision = 1
+          [1652852775.648256][2544:2549] CHIP:DMG: }
+          [1652852775.648618][2544:2549] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1652852775.648688][2544:2549] CHIP:EM: Sending Standalone Ack for MessageCounter:1498701 on exchange 38524i
+      disabled: true
+
+    - label: "TH reads LabelList attribute of the DUT"
+      verification: |
+          ./chip-tool userlabel read label-list 1 0
+
+          [1652852798.906689][2551:2556] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3783457120
+          [1652852798.906799][2551:2556] CHIP:TOO:   label list: 7 entries
+          [1652852798.906849][2551:2556] CHIP:TOO:     [1]: {
+          [1652852798.906881][2551:2556] CHIP:TOO:       Label: bedroom
+          [1652852798.906910][2551:2556] CHIP:TOO:       Value: bedroom1
+          [1652852798.906941][2551:2556] CHIP:TOO:      }
+          [1652852798.906978][2551:2556] CHIP:TOO:     [2]: {
+          [1652852798.907009][2551:2556] CHIP:TOO:       Label: orientation
+          [1652852798.907038][2551:2556] CHIP:TOO:       Value: east
+          [1652852798.907067][2551:2556] CHIP:TOO:      }
+          [1652852798.907103][2551:2556] CHIP:TOO:     [3]: {
+          [1652852798.907133][2551:2556] CHIP:TOO:       Label: floor
+          [1652852798.907161][2551:2556] CHIP:TOO:       Value: 3
+          [1652852798.907189][2551:2556] CHIP:TOO:      }
+          [1652852798.907224][2551:2556] CHIP:TOO:     [4]: {
+          [1652852798.907254][2551:2556] CHIP:TOO:       Label:
+          [1652852798.907282][2551:2556] CHIP:TOO:       Value:
+          [1652852798.907311][2551:2556] CHIP:TOO:      }
+          [1652852798.907346][2551:2556] CHIP:TOO:     [5]: {
+          [1652852798.907377][2551:2556] CHIP:TOO:       Label:
+          [1652852798.907406][2551:2556] CHIP:TOO:       Value:
+          [1652852798.907434][2551:2556] CHIP:TOO:      }
+          [1652852798.907470][2551:2556] CHIP:TOO:     [6]: {
+          [1652852798.907500][2551:2556] CHIP:TOO:       Label:
+          [1652852798.907528][2551:2556] CHIP:TOO:       Value:
+          [1652852798.907557][2551:2556] CHIP:TOO:      }
+          [1652852798.907593][2551:2556] CHIP:TOO:     [7]: {
+          [1652852798.907623][2551:2556] CHIP:TOO:       Label: direction
+          [1652852798.907652][2551:2556] CHIP:TOO:       Value: down
+          [1652852798.907681][2551:2556] CHIP:TOO:      }
+          [1652852798.907829][2551:2556] CHIP:EM: Sending Standalone Ack for MessageCounter:5323311 on exchange 60022i:2906] CHIP:EM: Sending Standalone Ack for MessageCounter:6017277 on exchange 38328i
+      disabled: true
