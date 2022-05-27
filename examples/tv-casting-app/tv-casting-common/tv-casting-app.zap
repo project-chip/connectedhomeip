@@ -11213,14 +11213,6 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
-            },
-            {
-              "name": "GetRelayStatusLog",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 1
             }
           ],
           "attributes": [
@@ -11257,14 +11249,6 @@
               "source": "server",
               "incoming": 1,
               "outgoing": 1
-            },
-            {
-              "name": "GetRelayStatusLogResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
             }
           ],
           "attributes": [

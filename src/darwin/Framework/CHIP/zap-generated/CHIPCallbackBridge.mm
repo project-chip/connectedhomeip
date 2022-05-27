@@ -13525,31 +13525,6 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
-{
-    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
-    {
-        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
-    }
-    {
-        response.relayStatus = [NSNumber numberWithUnsignedChar:data.relayStatus];
-    }
-    {
-        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
-    }
-    {
-        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
-    }
-    {
-        response.setpoint = [NSNumber numberWithShort:data.setpoint];
-    }
-    {
-        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
-    }
-    DispatchSuccess(context, response);
-};
-
 void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value)
 {
