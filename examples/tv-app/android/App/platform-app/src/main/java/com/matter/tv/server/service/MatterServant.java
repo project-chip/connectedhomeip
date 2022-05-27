@@ -30,6 +30,7 @@ import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
+import com.matter.tv.server.MatterCommissioningPrompter;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
@@ -42,6 +43,7 @@ import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
 import com.tcl.chip.tvapp.OnOffManagerStub;
 import com.tcl.chip.tvapp.TvApp;
+import com.tcl.chip.tvapp.UserPrompter;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
@@ -50,6 +52,7 @@ public class MatterServant {
   public int testDiscriminator = 0xF00;
 
   private ChipAppServer chipAppServer;
+  private MatterCommissioningPrompter commissioningPrompter;
   private TvApp mTvApp;
   private boolean mIsOn = true;
   private int mOnOffEndpoint;
@@ -113,6 +116,7 @@ public class MatterServant {
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());
+    mTvApp.setUserPrompter(new MatterCommissioningPrompter(context));
 
     mTvApp.setChipDeviceEventProvider(
         new DeviceEventProvider() {
