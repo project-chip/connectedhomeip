@@ -40,14 +40,14 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-bool isTestEventTriggerEnabled()
+bool IsTestEventTriggerEnabled()
 {
     auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
     if (testEventTrigger == nullptr)
     {
         return false;
     }
-    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kExpectedEnableKeyLength] = { 0 };
+    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
     if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
     {
         return false;
@@ -192,7 +192,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
     case TestEventTriggersEnabled::Id: {
-        bool isTestEventTriggersEnabled = isTestEventTriggerEnabled();
+        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
     default: {
@@ -327,7 +327,7 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
                                                               const Commands::TestEventTrigger::DecodableType & commandData)
 {
 
-    if (commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
+    if (commandData.enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
