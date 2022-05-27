@@ -18,6 +18,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <memory>
+#include <wifi-manager.h>
+
 #include "MainLoop.h"
 #include "WiFiManager.h"
 
@@ -748,6 +751,37 @@ CHIP_ERROR WiFiManager::RemoveAllConfigs(void)
     }
 
     return err;
+}
+
+CHIP_ERROR WiFiManager::GetDeviceMACAddress(uint8_t * macAddress, size_t macAddressLen)
+{
+    VerifyOrReturnError(macAddress != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(macAddressLen >= 6, CHIP_ERROR_INVALID_ARGUMENT);
+
+    char * macAddrStr = nullptr;
+    // Make sure that string allocated by wifi_manager_get_mac_address() will be freed
+    std::unique_ptr<char, decltype(&::free)> _{ macAddrStr, &::free };
+
+    int wifiErr = wifi_manager_get_mac_address(sInstance.mWiFiManagerHandle, &macAddrStr);
+    if (wifiErr == WIFI_MANAGER_ERROR_NOT_SUPPORTED)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "FAIL: get MAC address [%s]", get_error_message(wifiErr));
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Parse MAC address
+    if (sscanf(macAddrStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &macAddress[0], &macAddress[1], &macAddress[2], &macAddress[3],
+               &macAddress[4], &macAddress[5]) != 6)
+    {
+        ChipLogError(DeviceLayer, "FAIL: parse MAC address");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiManager::GetDeviceState(wifi_manager_device_state_e * deviceState)
