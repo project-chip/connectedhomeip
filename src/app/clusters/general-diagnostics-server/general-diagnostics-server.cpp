@@ -352,7 +352,7 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
         return true;
     }
 
-    Status returnStatus = Status::Failure;
+    Status returnStatus                 = Status::Failure;
     CHIP_ERROR handleEventTriggerResult = testEventTrigger->HandleEventTrigger(commandData.eventTrigger);
 
     if (handleEventTriggerResult == CHIP_NO_ERROR)
