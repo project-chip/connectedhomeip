@@ -618,6 +618,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidAdminSubject;
     }
+    if (err == CHIP_ERROR_INSUFFICIENT_PRIVILEGE)
+    {
+        return OperationalCertStatus::kInsufficientPrivilege;
+    }
 
     return OperationalCertStatus::kInvalidNOC;
 }
@@ -776,10 +780,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    // Fetch current fabric
+    // Fetch current fabric. If not available, command was invoked over PASE which is not legal
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    fabricIndex         = fabric->GetFabricIndex();
-    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_INDEX));
+    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
+    fabricIndex = fabric->GetFabricIndex();
 
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
 

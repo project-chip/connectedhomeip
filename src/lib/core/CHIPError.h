@@ -1518,7 +1518,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_ADMIN_SUBJECT                      CHIP_CORE_ERROR(0x78)
 
-// unused CHIP_CORE_ERROR(0x79)
+/**
+ * @def CHIP_ERROR_INSUFFICIENT_PRIVILEGE
+ *
+ * @brief
+ *   Required privilege was insufficient during an operation.
+ *
+ */
+#define CHIP_ERROR_INSUFFICIENT_PRIVILEGE                          CHIP_CORE_ERROR(0x79)
+
 
 // unused CHIP_CORE_ERROR(0x7a)
 
