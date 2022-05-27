@@ -26,7 +26,7 @@ tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
           [1648725985.943503][2528:2528] CHIP:DMG: ReadRequestMessage =
@@ -36,10 +36,10 @@ tests:
           [1648725985.943610][2528:2528] CHIP:DMG:                 EventPath =
           [1648725985.943638][2528:2528] CHIP:DMG:                 {
           [1648725985.943673][2528:2528] CHIP:DMG:                 },
-          [1648725985.943706][2528:2528] CHIP:DMG:                 
+          [1648725985.943706][2528:2528] CHIP:DMG:
           [1648725985.943731][2528:2528] CHIP:DMG:         ],
-          [1648725985.943761][2528:2528] CHIP:DMG:         
-          [1648725985.943788][2528:2528] CHIP:DMG:         isFabricFiltered = true, 
+          [1648725985.943761][2528:2528] CHIP:DMG:
+          [1648725985.943788][2528:2528] CHIP:DMG:         isFabricFiltered = true,
           [1648725985.943815][2528:2528] CHIP:DMG:         InteractionModelRevision = 1
           [1648725985.943839][2528:2528] CHIP:DMG: },
           [1648725985.943900][2528:2528] CHIP:DMG: IM RH moving to [GeneratingReports]
