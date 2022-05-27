@@ -54,9 +54,15 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
         ChipLogDetail(Controller, "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64 "]: State change %d --> %d",
                       ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
+
+        if (mState == State::RecoveringBackoff && aTargetState != State::RecoveringBackoff)
+        {
+            mSystemLayer->CancelTimer(HandleBackoffTimer, this);
+        }
+
         mState = aTargetState;
 
-        if (aTargetState != State::Connecting)
+        if (aTargetState != State::Connecting && aTargetState != State::Recovering)
         {
             CleanupCASEClient();
         }
@@ -127,7 +133,7 @@ void OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onC
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
-            err = EstablishConnection();
+            err = EstablishConnection(false /* isRecovering */);
         }
 
         break;
@@ -137,6 +143,9 @@ void OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onC
 
     case State::SecureConnected:
         isConnected = true;
+        break;
+
+    case State::Recovering:
         break;
 
     default:
@@ -188,7 +197,7 @@ void OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & add
     if (mState == State::ResolvingAddress)
     {
         MoveToState(State::HasAddress);
-        err = EstablishConnection();
+        err = EstablishConnection(false /* isRecovering */);
         if (err != CHIP_NO_ERROR)
         {
             DequeueConnectionCallbacks(err);
@@ -209,7 +218,7 @@ void OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & add
     }
 }
 
-CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
+CHIP_ERROR OperationalDeviceProxy::EstablishConnection(bool isRecovering)
 {
     mCASEClient = mInitParams.clientPool->Allocate(
         CASEClientInitParams{ mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.exchangeMgr,
@@ -223,7 +232,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
         return err;
     }
 
-    MoveToState(State::Connecting);
+    MoveToState(isRecovering ? State::Recovering : State::Connecting);
 
     return CHIP_NO_ERROR;
 }
@@ -285,32 +294,44 @@ void OperationalDeviceProxy::DequeueConnectionCallbacks(CHIP_ERROR error)
 
 void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
+    VerifyOrReturn(mState == State::Connecting || mState == State::Recovering,
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
 
-    //
-    // We don't need to reset the state all the way back to NeedsAddress since all that transpired
-    // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
-    // if need-be.
-    //
-    MoveToState(State::HasAddress);
+    if (mState == State::Connecting)
+    {
+        //
+        // We don't need to reset the state all the way back to NeedsAddress since all that transpired
+        // was just CASE connection failure. So let's re-use the cached address to re-do CASE again
+        // if need-be.
+        //
+        MoveToState(State::HasAddress);
 
-    DequeueConnectionCallbacks(error);
+        DequeueConnectionCallbacks(error);
+    }
+    else if (mState == State::Recovering)
+    {
+        RecoveringBackoff();
+    }
 
     // Do not touch device instance anymore; it might have been destroyed by a failure callback.
 }
 
 void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 {
-    VerifyOrReturn(mState != State::Uninitialized,
+    VerifyOrReturn(mState == State::Connecting || mState == State::Recovering,
                    ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
+
+    mRecoveringBackoffTimeout = System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_INITIAL_MS);
+    bool report               = (mState == State::Connecting);
 
     if (!mSecureSession.Grab(session))
         return; // Got an invalid session, do not change any state
 
     MoveToState(State::SecureConnected);
     mInitParams.sessionManager->ShiftToSession(session);
-    DequeueConnectionCallbacks(CHIP_NO_ERROR);
+
+    if (report)
+        DequeueConnectionCallbacks(CHIP_NO_ERROR);
 
     // Do not touch this instance anymore; it might have been destroyed by a callback.
 }
@@ -348,7 +369,37 @@ void OperationalDeviceProxy::OnFirstMessageDeliveryFailed()
 
 void OperationalDeviceProxy::OnSessionHang()
 {
-    // TODO: establish a new session
+    TryRecoverSession();
+}
+
+void OperationalDeviceProxy::TryRecoverSession()
+{
+    MoveToState(State::Recovering);
+    CHIP_ERROR err = EstablishConnection(true /* isRecovering */);
+    if (err != CHIP_NO_ERROR)
+    {
+        RecoveringBackoff();
+    }
+}
+
+void OperationalDeviceProxy::RecoveringBackoff()
+{
+    MoveToState(State::RecoveringBackoff);
+    CHIP_ERROR err = mSystemLayer->StartTimer(mRecoveringBackoffTimeout, HandleBackoffTimer, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Unable to setup session recovery backoff timer: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mRecoveringBackoffTimeout = std::chrono::duration_cast<std::chrono::milliseconds>(
+        mRecoveringBackoffTimeout * CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_MULTIPLIER);
+    if (mRecoveringBackoffTimeout > System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_MAX_MS))
+        mRecoveringBackoffTimeout = System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_MAX_MS);
+}
+
+void OperationalDeviceProxy::HandleBackoffTimer(System::Layer * aSystemLayer, void * aAppState)
+{
+    OperationalDeviceProxy * me = static_cast<OperationalDeviceProxy *>(aAppState);
+    me->TryRecoverSession();
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
@@ -371,11 +422,7 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
         }
     }
 
-    if (mCASEClient)
-    {
-        // Make sure we don't leak it.
-        mInitParams.clientPool->Release(mCASEClient);
-    }
+    MoveToState(State::Uninitialized);
 }
 
 CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()

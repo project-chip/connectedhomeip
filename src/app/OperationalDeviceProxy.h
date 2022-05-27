@@ -213,12 +213,14 @@ public:
 private:
     enum class State
     {
-        Uninitialized,    // Error state: OperationalDeviceProxy is useless
-        NeedsAddress,     // No address known, lookup not started yet.
-        ResolvingAddress, // Address lookup in progress.
-        HasAddress,       // Have an address, CASE handshake not started yet.
-        Connecting,       // CASE handshake in progress.
-        SecureConnected,  // CASE session established.
+        Uninitialized,     // Error state: OperationalDeviceProxy is useless
+        NeedsAddress,      // No address known, lookup not started yet.
+        ResolvingAddress,  // Address lookup in progress.
+        HasAddress,        // Have an address, CASE handshake not started yet.
+        Connecting,        // CASE handshake in progress.
+        Recovering,        // CASE session hang, trying to establish a new one, the old session is hanging but left untouched.
+        RecoveringBackoff, // CASE session hang, unable to connection a new one, backoff
+        SecureConnected,   // CASE session established.
     };
 
     DeviceProxyInitParams mInitParams;
@@ -245,7 +247,7 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
-    CHIP_ERROR EstablishConnection();
+    CHIP_ERROR EstablishConnection(bool isRecovering);
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
@@ -277,6 +279,13 @@ private:
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
     void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+
+    static void HandleBackoffTimer(System::Layer * aSystemLayer, void * aAppState);
+    void TryRecoverSession();
+    void RecoveringBackoff();
+
+    System::Clock::Timeout mRecoveringBackoffTimeout =
+        System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_INITIAL_MS);
 };
 
 } // namespace chip
