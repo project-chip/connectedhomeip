@@ -732,10 +732,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
 exit:
     gFabricBeingCommissioned.Reset();
+    // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {
-        // We have an NOC response but had IM failures before on field validations
         SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
+        // Failed to add NOC
         if (nocResponse != OperationalCertStatus::kSuccess)
         {
             ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
@@ -747,9 +748,9 @@ exit:
             ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(fabricIndex));
         }
     }
+    // No NOC response - Failed constraints
     else
     {
-        // No NOC response - Failed constraints
         commandObj->AddStatus(commandPath, nonDefaultStatus);
         ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
     }
@@ -780,14 +781,14 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     fabricIndex         = fabric->GetFabricIndex();
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_INDEX));
 
+    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::UnsupportedAccess);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
-
-    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-
-    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
 
     err = fabric->SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -805,10 +806,11 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     app::DnssdServer::Instance().StartServer();
 
 exit:
+    // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {
-        // We have an NOC response and did not have IM failures before on field validations
         SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
+        // Failed to update NOC
         if (nocResponse != OperationalCertStatus::kSuccess)
         {
             ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
@@ -820,9 +822,9 @@ exit:
             ChipLogProgress(Zcl, "OpCreds: UpdateNOC successful.");
         }
     }
+    // No NOC response - Failed constraints
     else
     {
-        // No NOC response - Failed constraints
         commandObj->AddStatus(commandPath, nonDefaultStatus);
         ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
     }
