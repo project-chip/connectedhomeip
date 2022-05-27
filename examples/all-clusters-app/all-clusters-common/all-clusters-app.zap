@@ -14829,14 +14829,6 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
-            },
-            {
-              "name": "GetRelayStatusLog",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 1
             }
           ],
           "attributes": [
@@ -14869,14 +14861,6 @@
             {
               "name": "GetWeeklyScheduleResponse",
               "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "GetRelayStatusLogResponse",
-              "code": 1,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -15141,6 +15125,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ThermostatRunningMode",
+              "code": 30,
+              "mfgCode": null,
+              "side": "server",
+              "type": "enum8",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "StartOfWeek",
               "code": 32,
               "mfgCode": null,
@@ -15214,7 +15214,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x000b",
+              "defaultValue": "0x002b",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

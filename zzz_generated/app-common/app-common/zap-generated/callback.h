@@ -13505,13 +13505,6 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster GetRelayStatusLogResponse Command callback (from server)
- */
-bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint16_t TimeOfDay, uint8_t RelayStatus, int16_t LocalTemperature,
-                                                               uint8_t HumidityInPercentage, int16_t Setpoint,
-                                                               uint16_t UnreadEntries);
-/**
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */
 bool emberAfThermostatClusterGetWeeklyScheduleCallback(
@@ -13523,12 +13516,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster GetRelayStatusLog Command callback (from client)
- */
-bool emberAfThermostatClusterGetRelayStatusLogCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */

@@ -40,6 +40,11 @@ class ProvisioningDataSet;
 
 namespace Internal {
 
+#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+template <class ConfigClass>
+class LegacyDeviceInstanceInfoProvider;
+#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 template <class ConfigClass>
 class LegacyTemporaryCommissionableDataProvider;
@@ -63,23 +68,18 @@ public:
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
-    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer) override;
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
-    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
     CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override;
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
@@ -126,6 +126,10 @@ protected:
     chip::LifetimePersistedCounter<uint32_t> mLifetimePersistedCounter;
     uint8_t mRotatingDeviceIdUniqueId[kRotatingDeviceIDUniqueIDLength] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 #endif
+
+#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    friend LegacyDeviceInstanceInfoProvider<ConfigClass>;
+#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;

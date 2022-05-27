@@ -2993,9 +2993,9 @@ class LevelControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentFrequency", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="minFrequency", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxFrequency", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="options", Tag=0x0000000F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="options", Tag=0x0000000F, Type=uint),
                 ClusterObjectFieldDescriptor(Label="onOffTransitionTime", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="onLevel", Tag=0x00000011, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="onLevel", Tag=0x00000011, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="onTransitionTime", Tag=0x00000012, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="offTransitionTime", Tag=0x00000013, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="defaultMoveRate", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
@@ -3014,9 +3014,9 @@ class LevelControl(Cluster):
     currentFrequency: 'typing.Optional[uint]' = None
     minFrequency: 'typing.Optional[uint]' = None
     maxFrequency: 'typing.Optional[uint]' = None
-    options: 'typing.Optional[uint]' = None
+    options: 'uint' = None
     onOffTransitionTime: 'typing.Optional[uint]' = None
-    onLevel: 'typing.Union[None, Nullable, uint]' = None
+    onLevel: 'typing.Union[Nullable, uint]' = None
     onTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     offTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     defaultMoveRate: 'typing.Union[None, Nullable, uint]' = None
@@ -3313,9 +3313,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class OnOffTransitionTime(ClusterAttributeDescriptor):
@@ -3345,9 +3345,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class OnTransitionTime(ClusterAttributeDescriptor):
@@ -20101,7 +20101,6 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="remoteSensing", Tag=0x0000001A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ThermostatControlSequence),
                 ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=uint),
-                ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x0000001D, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfWeeklyTransitions", Tag=0x00000021, Type=typing.Optional[uint]),
@@ -20158,7 +20157,6 @@ class Thermostat(Cluster):
     remoteSensing: 'typing.Optional[uint]' = None
     controlSequenceOfOperation: 'Thermostat.Enums.ThermostatControlSequence' = None
     systemMode: 'uint' = None
-    alarmMask: 'typing.Optional[uint]' = None
     thermostatRunningMode: 'typing.Optional[uint]' = None
     startOfWeek: 'typing.Optional[uint]' = None
     numberOfWeeklyTransitions: 'typing.Optional[uint]' = None
@@ -20299,31 +20297,6 @@ class Thermostat(Cluster):
             transitions: 'typing.List[Thermostat.Structs.ThermostatScheduleTransition]' = field(default_factory=lambda: [])
 
         @dataclass
-        class GetRelayStatusLogResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="timeOfDay", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="relayStatus", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="localTemperature", Tag=2, Type=int),
-                            ClusterObjectFieldDescriptor(Label="humidityInPercentage", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="setpoint", Tag=4, Type=int),
-                            ClusterObjectFieldDescriptor(Label="unreadEntries", Tag=5, Type=uint),
-                    ])
-
-            timeOfDay: 'uint' = 0
-            relayStatus: 'uint' = 0
-            localTemperature: 'int' = 0
-            humidityInPercentage: 'uint' = 0
-            setpoint: 'int' = 0
-            unreadEntries: 'uint' = 0
-
-        @dataclass
         class GetWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0002
@@ -20344,19 +20317,6 @@ class Thermostat(Cluster):
         class ClearWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0003
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
-
-        @dataclass
-        class GetRelayStatusLog(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0201
-            command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
@@ -20735,22 +20695,6 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-        @dataclass
-        class AlarmMask(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000001D
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ThermostatRunningMode(ClusterAttributeDescriptor):

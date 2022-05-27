@@ -1326,7 +1326,6 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePICoolingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePIHeatingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeAlarmMaskWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeThermostatRunningModeWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeStartOfWeekWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

@@ -33,10 +33,5 @@ tests:
       attribute: "StateValue"
       response:
           value: 0
-
-    - label: "Read mandatory non-global attribute constraints: StateValue"
-      command: "readAttribute"
-      attribute: "StateValue"
-      response:
           constraints:
               type: bool

@@ -22,6 +22,7 @@
 #include "LightSwitch.h"
 #include "ThreadUtil.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -79,6 +80,8 @@ bool sWasDimmerTriggered = false;
 k_timer sFunctionTimer;
 k_timer sDimmerPressKeyTimer;
 k_timer sDimmerTimer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 } /* namespace */
 
@@ -164,6 +167,10 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif

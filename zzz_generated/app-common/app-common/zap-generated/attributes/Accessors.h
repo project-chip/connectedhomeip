@@ -3279,11 +3279,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace SystemMode
 
-namespace AlarmMask {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace AlarmMask
-
 namespace ThermostatRunningMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);

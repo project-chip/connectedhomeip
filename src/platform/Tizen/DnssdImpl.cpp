@@ -122,7 +122,7 @@ void OnRegister(dnssd_error_e error, dnssd_service_h service, void * data)
 
     g_main_loop_quit(loop);
 
-    VerifyOrReturn(CheckForSuccess(rCtx, (int) error, __func__));
+    VerifyOrReturn(CheckForSuccess(rCtx, static_cast<int>(error), __func__));
     rCtx->isRegistered = true;
     ChipLogDetail(DeviceLayer, "Dnssd: %s name: %s, type: %s, port: %u, interfaceId: %u", __func__, rCtx->name, rCtx->type,
                   rCtx->port, rCtx->interfaceId);
@@ -319,7 +319,7 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     dnssd_browser_h browser;
     if (interfaceId == 0)
     {
-        ret = dnssd_browse_service(bCtx->type, NULL, &browser, OnBrowse, bCtx);
+        ret = dnssd_browse_service(bCtx->type, nullptr, &browser, OnBrowse, bCtx);
     }
     else
     {
@@ -500,7 +500,7 @@ CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, D
 
     if (interfaceId == 0)
     {
-        ret = dnssd_create_remote_service(type, name, NULL, &service);
+        ret = dnssd_create_remote_service(type, name, nullptr, &service);
     }
     else
     {

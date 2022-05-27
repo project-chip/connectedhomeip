@@ -3396,6 +3396,7 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
+  readonly attribute enum8 thermostatRunningMode = 30;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
   readonly attribute int8u numberOfDailyTransitions = 34;
@@ -4394,10 +4395,11 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
+    ram      attribute thermostatRunningMode;
     ram      attribute startOfWeek;
     ram      attribute numberOfWeeklyTransitions default = 7;
     ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x000b;
+    ram      attribute featureMap default = 0x002b;
     ram      attribute clusterRevision default = 5;
   }
 

@@ -96,7 +96,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
             Zcl,
             "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
             endpointId);
-        numberOfYearDaySchedulesPerUser = 10;
+        numberOfHolidaySchedules = 10;
     }
 
     mEndpoints.emplace_back(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,

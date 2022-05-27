@@ -16,7 +16,7 @@ name: 3.2.2. [TC-DM-2.2] Operational Credential Attributes
 
 config:
     nodeId: 0x12344321
-    cluster: "Operational Credentials"
+    cluster: "Basic"
     endpoint: 0
 
 tests:
@@ -28,65 +28,80 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Query NOCs"
+    - label: "Query SoftwareVersion"
       command: "readAttribute"
-      # TODO: Enabled and update value when SDK supports this.
-      disabled: true
-      attribute: "NOCs"
-      PICS: DM_ICACERT
+      attribute: "SoftwareVersion"
       response:
-          value: [{ NOC: 0 }]
-          constraints:
-              type: list
-
-    - label: "Query NOCs"
-      command:
-          "readAttribute"
-          # TODO: Enabled and update value when SDK supports this.
-      disabled: true
-      attribute: "NOCs"
-      PICS: DM_ICACERT
-      response:
-          value: [{ NOC: 0, ICAC: 0 }]
-          constraints:
-              type: list
-
-    - label: "Query fabrics list"
-      command: "readAttribute"
-      attribute: "Fabrics"
-      response:
-          value: [
-                  {
-                      # We really don't know what values to expect for any of
-                      # the fields, except Label.
-                      Label: "",
-                  },
-              ]
-          constraints:
-              type: list
-
-    - label: "Query Supported Fabrics"
-      command: "readAttribute"
-      attribute: "SupportedFabrics"
-      response:
-          value: 16
+          saveAs: SoftwareVersionValue
           constraints:
               type: uint8
 
-    - label: "Query Commissioned Fabrics"
+    - label: "Query Reachable Fabrics"
       command: "readAttribute"
-      attribute: "CommissionedFabrics"
+      attribute: "Reachable"
       response:
-          value: 1
           constraints:
-              type: uint8
+              type: bool
 
-    - label: "Query User Trusted Root Certificates"
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Query SoftwareVersion"
       command: "readAttribute"
-      attribute: "TrustedRootCertificates"
+      attribute: "SoftwareVersion"
       response:
-          # Can't check for the expected value here, since we don't know it.
-          # TODO: Check the length, at least?
-          # value: [237]
+          value: SoftwareVersionValue
+
+    ##Event 11343 implementation not done
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Factory Reset the accessory"
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ###Event 11343 implementation not done
+    - label: "Query Reachable Fabrics"
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
           constraints:
-              type: list
+              type: bool

@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.3.6. [TC-DD-3.6] Commissioning Flow - Non-concurrent [DUT - Commissioner]
+    3.3.6. [TC-DD-3.6] Commissioning Flow - Non-concurrent [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -23,174 +23,21 @@ config:
 
 tests:
     - label:
+          "Commissioner has regulatory and fabric information available and has
+          accurate date, time and timezone"
+      verification: |
+
+      disabled: true
+
+    - label:
           "Commissioner and Commissionee discover each other and connect via the
           discovery mode applicable for the DUT."
       verification: |
-          On DUT: sudo ./chip-all-clusters-app
+          On TH: start BLE Advertising by specific DUT implementation
 
+          On DUT: start commissioning process(need to obtain the Thread dataset first)
 
-          On Controller: ./chip-tool discover commissionables
-
-          1. Connect the device to Ethernet
-          2. Disover the device using CHIP Tool . ./chip-tool discover commissionables
-          3. connect -ip <IPaddress discovered above> <Passcode> <node ID> ,
-          4. Once device is provisioned, read 'Product Name' attribute from the Basic cluster. Example:./chip-tool basic read product-name 1 0
-
-          Reference : below Full log for the above commands (click on this cell if you like to see complete log)
-
-
-          controller >  ./chip-tool discover commissionables
-          Waiting for device responses...
-          CHIP:CTL: Generating ICAC
-          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
-          CHIP:DL: AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * buf1: 3BE3E264C0A0A053248E93609D22044A
-          CHIP:DL: AUDIT: * buf2: E69C8767AD6B60907AD3633E774F38EB
-          CHIP:DL: AUDIT: * r1: 0x2A0E6454 r2: 0x16315893
-          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-9yXPat)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/reboot-count = 23 (0x17)
-          CHIP:DL: Got Ethernet interface: eth0
-          CHIP:DL: Found the primary Ethernet interface:eth0
-          CHIP:DL: Got WiFi interface: wlan0
-          CHIP:DL: Failed to reset WiFi statistic counts
-          CHIP:IN: UDP::Init bind&listen port=5541
-          CHIP:IN: UDP::Init bound to port=5541
-          CHIP:IN: UDP::Init bind&listen port=5541
-          CHIP:IN: UDP::Init bound to port=5541
-          CHIP:IN: TransportMgr initialized
-          CHIP:DIS: Init fabric pairing table with server storage
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-zgCtZd)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/GlobalMCTR = 25000 (0x61A8)
-          CHIP:CTL: System State Initialized...
-          CHIP:DL: MDNS failed to join multicast group on veth5731933 for address type IPv4: ../th
-          CHIP:DL: MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../th
-          CHIP:DL: MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../th
-          CHIP:ZCL: Using ZAP configuration...
-          CHIP:DIS: Verifying the received credentials
-          CHIP:IN: Generating compressed fabric ID using uncompressed fabric ID 0x0000000000000000
-          CHIP:IN: 0x04, 0x66, 0xd6, 0xcf, 0x4c, 0x1e, 0x11, 0xc3,
-          CHIP:IN: 0x52, 0x4f, 0xa6, 0x8c, 0x6e, 0x65, 0x46, 0xdc,
-          CHIP:IN: 0x90, 0x1b, 0x5f, 0x42, 0x9f, 0x69, 0xd1, 0xb7,
-          CHIP:IN: 0x7d, 0xf3, 0x6b, 0x54, 0x12, 0x6c, 0x12, 0x59,
-          CHIP:IN: 0x5b, 0xc3, 0x07, 0x1c, 0x5c, 0xf4, 0x4e, 0x5f,
-          CHIP:IN: 0x71, 0x06, 0x9a, 0xbb, 0x2f, 0xef, 0x20, 0x0d,
-          CHIP:IN: 0x0e, 0x9b, 0x26, 0x3e, 0x8d, 0x46, 0x09, 0xd8,
-          CHIP:IN: 0xfd, 0xa1, 0xc0, 0x10, 0x4f, 0x05, 0x14, 0x99,
-          CHIP:IN: 0x22,
-          CHIP:IN: Generated compressed fabric ID
-          CHIP:IN: 0x4a, 0x53, 0x1e, 0x52, 0x06, 0xed, 0x06, 0xda,
-          CHIP:DIS: Added new fabric at index: 1, Initialized: 1
-          CHIP:DIS: Assigned compressed fabric ID: 0x4A531E5206ED06DA, node ID: 0x000000000001B669
-          CHIP:CTL: Joined the fabric at index 1. Compressed fabric ID is: 0x4A531E5206ED06DA
-          CHIP:DL: CHIP task running
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
-          CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-
-
-          controller> sudo ./chip-tool pairing ethernet 112233 20202021 3840 192.168.1.12 5540
-
-          Output of this command in cell number I6 and J6 due to cell constraint of maximum size.
-
-
-
-          controller> sudo ./chip-tool basic read product-name 0x000000000001B669 0
-
+          ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd27e57b1b1e22d9051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f01021234041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
           ,,
       disabled: true
 
@@ -198,90 +45,364 @@ tests:
           "Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
-
+          On DUT:
+          CHIP:SC: Received PBKDF param response
       disabled: true
 
     - label:
-          "Commissioner arms Fail-safe timer on the Commissionee using
-          ArmFailSafe command"
+          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
+          (the autonomously Fail-safe timer length set by Commissionee)"
       verification: |
-
+          On DUT:
+          CHIP:CTL: Arming failsafe (60 seconds)
       disabled: true
 
     - label:
-          "Commissioner configures the Commissionee UTC time, timezone, DST
-          offset, and regulatory information at the Commissionee."
+          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
+          regulatory information in the Commissionee."
       verification: |
-
-      disabled: true
-
-    - label:
-          "Commissioner establishes the authenticity of the Commissionee as a
-          certified CHIP device."
-      verification: |
-
-      disabled: true
-
-    - label:
-          "Commissioner configures Fabric information using SetFabric command."
-      verification: |
-
+          Need chip-tool implementation
       disabled: true
 
     - label:
           "Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
-
+          On DUT:
+          CHIP:CTL: Sending CSR request to 0xffffa4001730 device
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:IN: Prepared secure message 0xffffb9ba6db8 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 45042i with MessageCounter:12011388.
+          CHIP:IN: Sending encrypted msg 0xffffb9ba6db8 with MessageCounter:12011388 to 0x0000000000000001 (1) at monotonic time: 304120 msec
+          CHIP:DMG: ICR moving to [CommandSen]
+          CHIP:CTL: Sent CSR request, waiting for the CSR
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffffb0044210
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:DL: Indication received, conn = 0xffffb0044210
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:8508040 on exchange 45042i
+          CHIP:EM: Found matching exchange: 45042i, Delegate: 0xffffb0040000
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        suppressResponse = false,
+          CHIP:DMG:        InvokeResponseIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                InvokeResponseIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        CommandDataIB =
+          CHIP:DMG:                        {
+          CHIP:DMG:                                CommandPathIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        EndpointId = 0x0,
+          CHIP:DMG:                                        ClusterId = 0x3e,
+          CHIP:DMG:                                        CommandId = 0x5,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                                CommandData =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        0x0 = [
+          CHIP:DMG:                                                0x15, 0x30, 0x1, 0xcd, 0x30, 0x81, 0xca, 0x30, 0x70, 0x2, 0x1, 0x0, 0x30, 0xe, 0x31, 0xc, 0x30, 0xa, 0x6, 0x3, 0x55, 0x4, 0xa, 0xc, 0x3, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x6, 0x7, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x2, 0x1, 0x6, 0x8, 0x2a, 0x86
+          CHIP:DMG:                                ]
+          CHIP:DMG:                                        0x1 = [
+          CHIP:DMG:                                                0xea, 0xd6, 0x96, 0x53, 0x4d, 0x46, 0x1d, 0xd6, 0xcc, 0x7f, 0x25, 0x50, 0x80, 0x4c, 0x2a, 0xe9, 0xc8, 0xb8, 0x1b, 0x34, 0xca, 0x98, 0x38, 0x42, 0x74, 0xc2, 0x13, 0xf4, 0x10, 0x4d, 0xa2, 0x44, 0x38, 0x98, 0x28, 0xb6, 0xb1, 0x94, 0x6b, 0xd, 0x29, 0x1b
+          CHIP:DMG:                                ]
+          CHIP:DMG:                                },
+          CHIP:DMG:                        },
+          CHIP:DMG:
+          CHIP:DMG:                },
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          CHIP:CTL: Received certificate signing request from the device
+          CHIP:CTL: Getting certificate chain for the device from the issuer
+          CHIP:CTL: Verifying Certificate Signing Request
+          CHIP:CTL: Generating NOC
+          CHIP:CTL: Providing certificate chain to the commissioner
+          CHIP:CTL: Received callback from the CA for NOC Chain generation. Status ../../src/controller/ExampleOperationalCredentialsIssuer.cpp:225: Success
       disabled: true
 
     - label:
-          "Commissioner generates or otherwise obtains an Operational
-          Certificate containing Operational ID in response
-          OperationalCSRRequest command using ecosystem-specific means"
+          "Commissioner configures operational credentials on DUT if not
+          previously installed"
       verification: |
-
-      disabled: true
-
-    - label: "Commissioner configures operational credentials"
-      verification: |
-
-      disabled: true
-
-    - label: "Commissioner configures ACL."
-      verification: |
-
+          On DUT:
+          [1651218829.220063][3273:3278] CHIP:CTL: Sending root certificate to the device
+          [1651218829.220201][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
+          [1651218829.222415][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
+          [1651218829.222549][3273:3278] CHIP:IN: Prepared secure message 0xffffb9ba6b98 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 45043i with MessageCounter:12011389.
+          [1651218829.222616][3273:3278] CHIP:IN: Sending encrypted msg 0xffffb9ba6b98 with MessageCounter:12011389 to 0x0000000000000001 (1) at monotonic time: 305872 msec
+          [1651218829.222746][3273:3278] CHIP:DMG: ICR moving to [CommandSen]
+          [1651218829.222789][3273:3278] CHIP:CTL: Sent root certificate to the device
+          [1651218829.223121][3273:3278] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1651218829.306861][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218829.404144][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218829.454121][3273:3276] CHIP:DL: Indication received, conn = 0xffffb0044210
+          [1651218829.454352][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:8508041 on exchange 45043i
+          CHIP:EM: Found matching exchange: 45043i, Delegate: 0xffffa400def0
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        suppressResponse = false,
+          CHIP:DMG:        InvokeResponseIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                InvokeResponseIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        CommandStatusIB =
+          CHIP:DMG:                        {
+          CHIP:DMG:                                CommandPathIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        EndpointId = 0x0,
+          CHIP:DMG:                                        ClusterId = 0x3e,
+          CHIP:DMG:                                        CommandId = 0xb,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                                StatusIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        status = 0x0,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                        },
+          CHIP:DMG:
+          CHIP:DMG:                },
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          CHIP:CTL: Device confirmed that it has received the root certificate
       disabled: true
 
     - label:
-          "Commissioner configures the operational network at the Commissionee."
+          "Commissioner configures itself as administrator in ACL on TH if
+          needed"
       verification: |
-
+          On DUT:
+          [1651218829.457248][3273:3278] CHIP:CTL: Sending operational certificate chain to the device
+          [1651218829.457372][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
+          [1651218829.460013][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
+          [1651218829.460273][3273:3278] CHIP:IN: Prepared secure message 0xffffb9ba7828 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 45044i with MessageCounter:12011390.
+          [1651218829.460374][3273:3278] CHIP:IN: Sending encrypted msg 0xffffb9ba7828 with MessageCounter:12011390 to 0x0000000000000001 (1) at monotonic time: 306110 msec
+          [1651218829.460602][3273:3278] CHIP:DMG: ICR moving to [CommandSen]
+          [1651218829.460684][3273:3278] CHIP:CTL: Sent operational certificate to the device
+          [1651218829.460778][3273:3278] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1651218829.550574][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218829.648065][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218829.745594][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218833.988087][3273:3276] CHIP:DL: Indication received, conn = 0xffffb0044210
+          [1651218833.988336][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1651218833.988598][3273:3278] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:8508042 on exchange 45044i
+          CHIP:EM: Found matching exchange: 45044i, Delegate: 0xffffb0040000
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        suppressResponse = false,
+          CHIP:DMG:        InvokeResponseIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                InvokeResponseIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        CommandDataIB =
+          CHIP:DMG:                        {
+          CHIP:DMG:                                CommandPathIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        EndpointId = 0x0,
+          CHIP:DMG:                                        ClusterId = 0x3e,
+          CHIP:DMG:                                        CommandId = 0x8,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                                CommandData =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        0x0 = 0,
+          CHIP:DMG:                                        0x1 = 1,
+          CHIP:DMG:                                },
+          CHIP:DMG:                        },
+          CHIP:DMG:
+          CHIP:DMG:                },
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:CTL: Device returned status 0 on receiving the NOC
+          CHIP:CTL: Operational credentials provisioned on device 0xffffa4001730
       disabled: true
 
     - label:
-          "Commissioner triggers the Commissionee to connect to the operational
-          network"
+          "Commissioner configures operational network on TH if TH both supports
+          and requires"
       verification: |
-
+          On DUT:
+          [1651218833.995054][3273:3278] CHIP:CTL: Adding thread network
+          [1651218833.995176][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
+          [1651218833.995253][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
+          [1651218833.995431][3273:3278] CHIP:IN: Prepared secure message 0xffffb9ba7848 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 45045i with MessageCounter:12011391.
+          [1651218833.995523][3273:3278] CHIP:IN: Sending encrypted msg 0xffffb9ba7848 with MessageCounter:12011391 to 0x0000000000000001 (1) at monotonic time: 310645 msec
+          [1651218833.995723][3273:3278] CHIP:DMG: ICR moving to [CommandSen]
+          [1651218833.995823][3273:3278] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1651218834.084548][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218834.134690][3273:3276] CHIP:DL: Indication received, conn = 0xffffb0044210
+          [1651218834.134918][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:8508043 on exchange 45045i
+          CHIP:EM: Found matching exchange: 45045i, Delegate: 0xffffa400def0
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        suppressResponse = false,
+          CHIP:DMG:        InvokeResponseIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                InvokeResponseIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        CommandDataIB =
+          CHIP:DMG:                        {
+          CHIP:DMG:                                CommandPathIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        EndpointId = 0x0,
+          CHIP:DMG:                                        ClusterId = 0x31,
+          CHIP:DMG:                                        CommandId = 0x5,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                                CommandData =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        0x0 = 0,
+          CHIP:DMG:                                        0x1 = "",
+          CHIP:DMG:                                },
+          CHIP:DMG:                        },
+          CHIP:DMG:
+          CHIP:DMG:                },
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          CHIP:CTL: Received NetworkConfig response
       disabled: true
 
     - label:
-          "Commissioner and Commissionee discover each other on the operational
-          network using operational discovery"
+          "Commissioner instructs Commissionee to connect to operational network
+          if not already connected"
       verification: |
-
-      disabled: true
-
-    - label: "Commissioner and Commissionee establish encryption keys with CASE"
-      verification: |
-
+          On DUT:
+          [1651218834.137891][3273:3278] CHIP:CTL: Enabling thread network
+          [1651218834.138014][3273:3278] CHIP:DMG: ICR moving to [AddingComm]
+          [1651218834.138086][3273:3278] CHIP:DMG: ICR moving to [AddedComma]
+          [1651218834.138236][3273:3278] CHIP:IN: Prepared secure message 0xffffb9ba7938 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 45046i with MessageCounter:12011392.
+          [1651218834.138325][3273:3278] CHIP:IN: Sending encrypted msg 0xffffb9ba7938 with MessageCounter:12011392 to 0x0000000000000001 (1) at monotonic time: 310788 msec
+          [1651218834.138522][3273:3278] CHIP:DMG: ICR moving to [CommandSen]
+          [1651218834.138628][3273:3278] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1651218834.231701][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1651218834.426948][3273:3276] CHIP:DL: Indication received, conn = 0xffffb0044210
+          [1651218834.427186][3273:3278] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1651218834.427443][3273:3278] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:8508044 on exchange 45046i
+          CHIP:EM: Found matching exchange: 45046i, Delegate: 0xffffb0040000
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        suppressResponse = false,
+          CHIP:DMG:        InvokeResponseIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                InvokeResponseIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        CommandDataIB =
+          CHIP:DMG:                        {
+          CHIP:DMG:                                CommandPathIB =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        EndpointId = 0x0,
+          CHIP:DMG:                                        ClusterId = 0x31,
+          CHIP:DMG:                                        CommandId = 0x7,
+          CHIP:DMG:                                },
+          CHIP:DMG:
+          CHIP:DMG:                                CommandData =
+          CHIP:DMG:                                {
+          CHIP:DMG:                                        0x0 = 0,
+          CHIP:DMG:                                        0x1 = "",
+          CHIP:DMG:                                        0x2 = 0,
+          CHIP:DMG:                                },
+          CHIP:DMG:                        },
+          CHIP:DMG:
+          CHIP:DMG:                },
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          CHIP:CTL: Received ConnectNetwork response
       disabled: true
 
     - label:
-          "Commissioner and Commissionee perform commissioning complete message
-          exchange using CommissioningComplete command and
-          CommissioningCompleteResponse command"
+          "Commissioning channel between the Commissioner and Commissionee is
+          terminated."
       verification: |
+          1. Verify the channel was terminated on DUT=chip-tool
+          [1651271753284] [23287:743790] CHIP: [CTL] Received CommissioningComplete response
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651271753284] [23287:743790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651271753284] [23287:743790] CHIP: [TOO] Device commissioning completed with success
+      disabled: true
 
+    - label: "Commissioner starts discovery of TH using Operational Discovery"
+      verification: |
+          On DUT:
+          CHIP:DL: Avahi resolve found
+          CHIP:DIS: Node ID resolved for 0x0000000000000001
+          CHIP:DIS:     Addr 0: [fd11:22::9d96:8fcf:10cf:799e]:5540
+          CHIP:CTL: OperationalDiscoveryComplete for device ID 0x0000000000000001
+      disabled: true
+
+    - label:
+          "Commissioner opens a CASE session with TH over operational network"
+      verification: |
+          On DUT:
+          CHIP:SC: Sent Sigma1 msg
+          CHIP:CTL: Address resolved for node: 0x0000000000000001
+          CHIP:EM: Received message of type 0x31 with protocolId (0, 0) and MessageCounter:1066460336 on exchange 45047i
+          CHIP:EM: Found matching exchange: 45047i, Delegate: 0xffffa400f7f8
+          CHIP:EM: Rxd Ack; Removing MessageCounter:2352378411 from Retrans Table on exchange 45047i
+          CHIP:EM: Removed CHIP MessageCounter:2352378411 from RetransTable on exchange 45047i
+          CHIP:SC: Received Sigma2 msg
+          CHIP:SC: Peer assigned session session ID 2
+          CHIP:SC: The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.
+          CHIP:IN: Generating compressed fabric ID using uncompressed fabric ID 0x0000000000000001 and root pubkey
+          CHIP:IN: 0x04, 0x6e, 0x3e, 0x58, 0x9d, 0x08, 0xd6, 0xae,
+          CHIP:IN: 0xe9, 0xff, 0x9b, 0x8f, 0xba, 0x6f, 0x57, 0x73,
+          CHIP:IN: 0x21, 0xc4, 0xe2, 0x7b, 0x09, 0xe4, 0x24, 0x7f,
+          CHIP:IN: 0x55, 0x44, 0x3b, 0xf2, 0x7c, 0x13, 0x45, 0x3b,
+          CHIP:IN: 0x82, 0xa8, 0x42, 0x96, 0xb4, 0x36, 0x78, 0x20,
+          CHIP:IN: 0xa1, 0x37, 0x69, 0xf0, 0x20, 0xc9, 0x20, 0x7e,
+          CHIP:IN: 0x66, 0x45, 0x84, 0x53, 0x1b, 0x3e, 0xd2, 0x61,
+          CHIP:IN: 0xb6, 0x89, 0x27, 0xfd, 0xe8, 0x23, 0x69, 0x6d,
+          CHIP:IN: 0x93,
+          CHIP:IN: Generated compressed fabric ID
+          CHIP:IN: 0xa3, 0x54, 0xab, 0x2a, 0xa2, 0x1f, 0x8e, 0x48,
+          CHIP:SC: Found MRP parameters in the message
+          CHIP:SC: Sending Sigma3
+          CHIP:EM: Piggybacking Ack for MessageCounter:1066460336 on exchange: 45047i
+          CHIP:IN: Prepared unauthenticated message 0xaaaad7ce1bf8 to 0x0000000000000000 (0)  of type 0x32 and protocolId (0, 0) on exchange 45047i with MessageCounter:2352378412.
+          CHIP:IN: Sending unauthenticated msg 0xaaaad7ce1bf8 with MessageCounter:2352378412 to 0x0000000000000000 at monotonic time: 315803 msec
+          CHIP:SC: Sent Sigma3 msg
+          CHIP:EM: Received message of type 0x40 with protocolId (0, 0) and MessageCounter:1066460337 on exchange 45047i
+          CHIP:EM: Found matching exchange: 45047i, Delegate: 0xffffa400f7f8
+          CHIP:EM: Rxd Ack; Removing MessageCounter:2352378412 from Retrans Table on exchange 45047i
+          CHIP:EM: Removed CHIP MessageCounter:2352378412 from RetransTable on exchange 45047i
+          CHIP:SC: Success status report received. Session was established
+          CHIP:IN: New secure session created for device 0x0000000000000001, LSID:2 PSID:2!
+      disabled: true
+
+    - label: "Commissioner sends CommissioningComplete command"
+      verification: |
+          On DUT:
+          CHIP:CTL: Received CommissioningComplete response
+          CHIP:CTL: Rendezvous cleanup
+          CHIP:TOO: Device commissioning completed with success
       disabled: true

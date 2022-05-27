@@ -17501,11 +17501,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearWeeklyScheduleWithParams:(CHIPThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                     completionHandler:(StatusCompletion)completionHandler;
 - (void)clearWeeklyScheduleWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)getRelayStatusLogWithParams:(CHIPThermostatClusterGetRelayStatusLogParams * _Nullable)params
-                  completionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
-- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
-                                                   NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeLocalTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
@@ -18000,22 +17995,6 @@ NS_ASSUME_NONNULL_BEGIN
                                             queue:(dispatch_queue_t)queue
                                 completionHandler:
                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(
-                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * CHIPSubscribeParams.
- */
-- (void)subscribeAttributeAlarmMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                       maxInterval:(NSNumber * _Nonnull)maxInterval
-                                            params:(CHIPSubscribeParams * _Nullable)params
-                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeAlarmMaskWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                        endpoint:(NSNumber *)endpoint
-                                           queue:(dispatch_queue_t)queue
-                               completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeThermostatRunningModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;

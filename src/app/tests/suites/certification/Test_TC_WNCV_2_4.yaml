@@ -35,12 +35,6 @@ tests:
       PICS: A_TYPE
       response:
           value: 0
-
-    - label: "Reads Type attribute constraints"
-      command: "readAttribute"
-      attribute: "Type"
-      PICS: A_TYPE
-      response:
           constraints:
               type: enum8
               minValue: 0
