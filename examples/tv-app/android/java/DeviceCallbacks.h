@@ -28,8 +28,8 @@ public:
     void InitializeWithObjects(jobject manager);
 
 private:
-    jobject mProvider                     = nullptr;
-    jmethodID commissioningCompleteMethod = nullptr;
+    jobject mProvider                      = nullptr;
+    jmethodID mCommissioningCompleteMethod = nullptr;
     void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnCommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
 };

@@ -49,7 +49,7 @@ void OnPlatformEventWrapper(const chip::DeviceLayer::ChipDeviceEvent * event, in
 } // namespace
 void DeviceCallbacks::NewManager(jobject manager)
 {
-    ChipLogProgress(Zcl, "TV Android App: set ChipDeviceEvent delegate");
+    ChipLogProgress(AppServer , "TV Android App: set ChipDeviceEvent delegate");
     DeviceCallbacks * mgr = new DeviceCallbacks();
     PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(mgr));
     mgr->InitializeWithObjects(manager);
@@ -58,17 +58,17 @@ void DeviceCallbacks::NewManager(jobject manager)
 void DeviceCallbacks::InitializeWithObjects(jobject provider)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceEventProvider"));
+    VerifyOrReturn(env != nullptr, ChipLogError(AppServer , "Failed to GetEnvForCurrentThread for DeviceEventProvider"));
 
     mProvider = env->NewGlobalRef(provider);
-    VerifyOrReturn(mProvider != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef DeviceEventProvider"));
+    VerifyOrReturn(mProvider != nullptr, ChipLogError(AppServer , "Failed to NewGlobalRef DeviceEventProvider"));
     jclass deviceEventProviderCls = env->GetObjectClass(mProvider);
-    VerifyOrReturn(deviceEventProviderCls != nullptr, ChipLogError(Zcl, "Failed to get KeypadInputManager Java class"));
+    VerifyOrReturn(deviceEventProviderCls != nullptr, ChipLogError(AppServer , "Failed to get KeypadInputManager Java class"));
 
-    commissioningCompleteMethod = env->GetMethodID(deviceEventProviderCls, "onCommissioningComplete", "()V");
-    if (commissioningCompleteMethod == nullptr)
+    mCommissioningCompleteMethod = env->GetMethodID(deviceEventProviderCls, "onCommissioningComplete", "()V");
+    if (mCommissioningCompleteMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access DeviceEventProvider 'onCommissioningComplete' method");
+        ChipLogError(AppServer , "Failed to access DeviceEventProvider 'onCommissioningComplete' method");
         env->ExceptionClear();
     }
 }
@@ -90,14 +90,14 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
 {
     if (event->SessionEstablished.IsCommissioner)
     {
-        printf("Commissioner detected!");
+        ChipLogProgress(AppServer, "Commissioner detected!");
     }
 }
 void DeviceCallbacks::OnCommissioningComplete(const ChipDeviceEvent * event)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceEventProvider"));
-    env->CallVoidMethod(mProvider, commissioningCompleteMethod);
+    env->CallVoidMethod(mProvider, mCommissioningCompleteMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in DeviceEventProvider::onCommissioningComplete");
