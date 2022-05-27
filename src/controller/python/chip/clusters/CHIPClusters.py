@@ -6221,12 +6221,6 @@ class ChipClusters:
                     "args": {
                     },
                 },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "GetRelayStatusLog",
-                    "args": {
-                    },
-                },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "GetWeeklySchedule",

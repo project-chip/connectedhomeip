@@ -30,6 +30,7 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -581,7 +582,7 @@ CHIP_ERROR BLEManagerImpl::PrepareC3CharData()
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
-    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
     err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
     SuccessOrExit(err);

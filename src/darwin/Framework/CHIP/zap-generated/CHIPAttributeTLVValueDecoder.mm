@@ -14562,17 +14562,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::AlarmMask::Id: {
-            using TypeInfo = Attributes::AlarmMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
         case Attributes::ThermostatRunningMode::Id: {
             using TypeInfo = Attributes::ThermostatRunningMode::TypeInfo;
             TypeInfo::DecodableType cppValue;

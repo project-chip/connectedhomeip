@@ -1014,7 +1014,6 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterThermostatAttributeRemoteSensingID = 0x0000001A,
     kMatterClusterThermostatAttributeControlSequenceOfOperationID = 0x0000001B,
     kMatterClusterThermostatAttributeSystemModeID = 0x0000001C,
-    kMatterClusterThermostatAttributeAlarmMaskID = 0x0000001D,
     kMatterClusterThermostatAttributeThermostatRunningModeID = 0x0000001E,
     kMatterClusterThermostatAttributeStartOfWeekID = 0x00000020,
     kMatterClusterThermostatAttributeNumberOfWeeklyTransitionsID = 0x00000021,
@@ -2345,10 +2344,8 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterThermostatCommandSetpointRaiseLowerID = 0x00000000,
     kMatterClusterThermostatCommandGetWeeklyScheduleResponseID = 0x00000000,
     kMatterClusterThermostatCommandSetWeeklyScheduleID = 0x00000001,
-    kMatterClusterThermostatCommandGetRelayStatusLogResponseID = 0x00000001,
     kMatterClusterThermostatCommandGetWeeklyScheduleID = 0x00000002,
     kMatterClusterThermostatCommandClearWeeklyScheduleID = 0x00000003,
-    kMatterClusterThermostatCommandGetRelayStatusLogID = 0x00000004,
 
     // Cluster ColorControl commands
     kMatterClusterColorControlCommandMoveToHueID = 0x00000000,

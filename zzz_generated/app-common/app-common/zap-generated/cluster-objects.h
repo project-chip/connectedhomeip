@@ -22053,11 +22053,6 @@ struct Type;
 struct DecodableType;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-struct Type;
-struct DecodableType;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 struct Type;
 struct DecodableType;
@@ -22067,11 +22062,6 @@ namespace ClearWeeklySchedule {
 struct Type;
 struct DecodableType;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-struct Type;
-struct DecodableType;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 
@@ -22193,53 +22183,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
-namespace GetRelayStatusLogResponse {
-enum class Fields
-{
-    kTimeOfDay            = 0,
-    kRelayStatus          = 1,
-    kLocalTemperature     = 2,
-    kHumidityInPercentage = 3,
-    kSetpoint             = 4,
-    kUnreadEntries        = 5,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint16_t timeOfDay           = static_cast<uint16_t>(0);
-    uint8_t relayStatus          = static_cast<uint8_t>(0);
-    int16_t localTemperature     = static_cast<int16_t>(0);
-    uint8_t humidityInPercentage = static_cast<uint8_t>(0);
-    int16_t setpoint             = static_cast<int16_t>(0);
-    uint16_t unreadEntries       = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint16_t timeOfDay           = static_cast<uint16_t>(0);
-    uint8_t relayStatus          = static_cast<uint8_t>(0);
-    int16_t localTemperature     = static_cast<int16_t>(0);
-    uint8_t humidityInPercentage = static_cast<uint8_t>(0);
-    int16_t setpoint             = static_cast<int16_t>(0);
-    uint16_t unreadEntries       = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetRelayStatusLogResponse
 namespace GetWeeklySchedule {
 enum class Fields
 {
@@ -22303,34 +22246,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearWeeklySchedule
-namespace GetRelayStatusLog {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetRelayStatusLog
 } // namespace Commands
 
 namespace Attributes {
@@ -22611,18 +22526,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SystemMode
-namespace AlarmMask {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AlarmMask
 namespace ThermostatRunningMode {
 struct TypeInfo
 {
@@ -23028,7 +22931,6 @@ struct TypeInfo
         Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType controlSequenceOfOperation =
             static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(0);
         Attributes::SystemMode::TypeInfo::DecodableType systemMode                               = static_cast<uint8_t>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask                                 = static_cast<uint8_t>(0);
         Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode         = static_cast<uint8_t>(0);
         Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek                             = static_cast<uint8_t>(0);
         Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);

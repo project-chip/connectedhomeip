@@ -25,23 +25,18 @@ config:
 tests:
     - label: "Locate and scan/read the Commissionees QR code using DUT"
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
+          $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
 
-          ...[1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          [1651165486.365306][4112:4112] CHIP:DL: Device Configuration:
+          [1651165486.365374][4112:4112] CHIP:DL:   Serial Number: TEST_SN
+          [1651165486.365415][4112:4112] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651165486.365449][4112:4112] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651165486.365479][4112:4112] CHIP:DL:   Hardware Version: 0
+          [1651165486.365502][4112:4112] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651165486.365522][4112:4112] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651165486.365549][4112:4112] CHIP:DL:   Manufacturing Date: (not set)
+          [1651165486.365570][4112:4112] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651165486.365646][4112:4112] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
       disabled: true
 
     - label:
@@ -49,21 +44,15 @@ tests:
           but substituting out the current Version String with an invalid
           Version String (i.e. '010' or any non-zero 3-bit value)"
       verification: |
-          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --version 001 --vendor-id 65521 --product-id 0x8001 --commissioning-mode 2 --rendezvous 2
-          [1649826848.599869][3121:3121] CHIP:TOO: QR Code: MT:.24J048N01KA0648G00
+          MT:034J029Q00KA0648G00
       disabled: true
 
     - label:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:.24J0AFN00KA0648G00
-          ...
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains invalid version string=2 (spec says it should be 000)
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:034J029Q00KA0648G00
       disabled: true
 
     - label:
@@ -72,26 +61,16 @@ tests:
           components except for the Custom Flow field, set it to 1: User-Intent
           Commissioning Flow"
       verification: |
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65522 -pi 32770 -cf 1 -dc 4 -dv 3840 -ps 20202021
-          2022-02-26 03:42:39 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:42:39 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:86PS06VO00KA0648G00]
+          MT:-24J06VO00KA0648G00
       disabled: true
 
     - label:
           "If (PICS_USER_INTENT_COMM_FLOW), Scan/read the QR code, generated in
           the previous step, using the DUT"
       verification: |
-          chip-tool does not prevent commissioning because of invalid VID/PID values. This is handled after the commissioning process.
-          This test step is not valid and is addressed in PR#893
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains user-intent flow but device uses custom commissioning flow
 
-          DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:86PS06VO00KA0648G00
-          ...
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J06VO00KA0648G00
       disabled: true
 
     - label:
@@ -99,32 +78,16 @@ tests:
           new QR code using all the same Onboarding Payload components except
           for the Custom Flow field, set it to 2: Custom Commissioning Flow"
       verification: |
-          INVALID TEST STEP
-
-          This test step is not valid because the scenario here should always be supported for standard commissioning flow. This is addressed in PR#893
-
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 2 -dv 3840 -ps 20202021
-          2022-02-26 03:50:13 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:50:13 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J042C00KA0648G00]
+          MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
           "If (PICS_CUSTOM_COMM_FLOW), Scan/read the QR code, generated in the
           previous step, using the DUT"
       verification: |
-          INVALID TEST STEP
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains custom commissioning flow but device uses standard commissioning flow
 
-          This test step is not valid because the scenario here should always be supported for standard commissioning flow. This is addressed in PR#893
-
-          DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
-          ...
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
@@ -132,21 +95,15 @@ tests:
           generate a new QR code using all the same Onboarding Payload
           components except for the Custom Flow field, set it to 3: Reserved"
       verification: |
-          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --version 000 --vendor-id 65521 --product-id 0x8001 --commissioning-mode 1 --rendezvous 2
-          [1649827720.845213][3171:3171] CHIP:TOO: QR Code: MT:-24J08UL01KA0648G00
+          MT:-24J0-OR00KA0648G00
       disabled: true
 
     - label:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
-          DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J08UL01KA0648G00
-          ...
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains Reserved commissioning flow but device uses custom commissioning flow
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0-OR00KA0648G00
       disabled: true
 
     - label:
@@ -154,22 +111,16 @@ tests:
           code using all the same Onboarding Payload components except for the
           Discovery Capability bit string, set it to BLE for discovery"
       verification: |
-          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --version 000 --vendor-id 65521 --product-id 0x8001 --commissioning-mode 2 --rendezvous 2
-          [1649827755.759091][3173:3173] CHIP:TOO: QR Code: MT:-24J048N01KA0648G00
+          MT:-24J0YXE00KA0648G00
       disabled: true
 
     - label:
           "If (PICS_DT_BLE), Scan/read the QR code, generated in the previous
           step, using the DUT"
       verification: |
-          DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J048N01KA0648G00
-          ...
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains BLE device discovery but device uses IP device discovery
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0YXE00KA0648G00
       disabled: true
 
     - label:
@@ -177,22 +128,14 @@ tests:
           code using all the same Onboarding Payload components except for the
           Discovery Capability bit string, set it to IP Network for discovery"
       verification: |
-          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --version 000 --vendor-id 65521 --product-id 0x8001 --commissioning-mode 3 --rendezvous 2
-          [1649827827.266780][3178:3178] CHIP:TOO: QR Code: MT:-24J00OO01KA0648G00
+          MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
           "If (PICS_DT_IP), Scan/read the QR code, generated in the previous
           step, using the DUT"
       verification: |
-          DUT Commissioner:
-          '' ./examples/chip-tool/out/debug/chip-tool pairing code 1234  MT:-24J00OO01KA0648G00
-          ...
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
@@ -201,31 +144,15 @@ tests:
           components except for the Discovery Capability bit string, set it to
           non-zeros"
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app BUG: chip-all-clusters-app advertises over BLE when the discovery capability should not be advertising with capabilites set to '0'
-
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 2 -dv 3840 -ps 20202021
-          2022-02-26 03:50:13 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:50:13 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J042C00KA0648G00]
+          MT:-24J0EZA10KA0648G00
       disabled: true
 
     - label:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
-          BLOCKED
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains the Reserved discovery capability but device supports IP discovery
 
-          chip-all-clusters-app BUG: chip-all-clusters-app advertises over BLE when the discovery capability should not be advertising with capabilites set to '0'
-
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
-          ...
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0EZA10KA0648G00
       disabled: true
 
     - label:
@@ -237,31 +164,92 @@ tests:
           00000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666,
           77777777, 88888888, 99999999, 12345678, 87654321"
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app BUG: chip-all-clusters-app advertises over IP when the discovery capability should not be advertising with capabilites set to '0'
-
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 4 -dv 3840 -ps 20202021
-          2022-02-26 03:58:28 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:58:28 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J0AFN00KA0648G00]
+          "MT:-24J029Q00OC0000000" (00000000),
+          "MT:-24J029Q00KMSP0Z800" (11111111),
+          "MT:-24J029Q00GWID1WH00" (22222222),
+          "MT:-24J029Q00C4912TQ00" (33333333),
+          "MT:-24J029Q008E.Q2QZ00" (44444444),
+          "MT:-24J029Q004ORE3N610" (55555555),
+          "MT:-24J029Q000YH24KF10" (66666666),
+          "MT:-24J029Q00Y58S4HO10" (77777777),
+          "MT:-24J029Q00UF-F5EX10" (88888888),
+          "MT:-24J029Q00QPQ36B420" (99999999),
+          "MT:-24J029Q004QG46Y900" (12345678),
+          "MT:-24J029Q00YX018EW10" (87654321)
       disabled: true
 
     - label:
           "Scan each of the generated QR codes from the previous step using DUT"
       verification: |
-          BLOCKED
+          TH chip-all-clusters-app Commissionee:
+          [1651179082.761318][12346:12346] CHIP:SC: Received error (protocol code 2) during PASE process. ../../examples/all-clusters-app/linux/third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:784: CHIP Error 0x00000038: Invalid PASE parameter
+          [1651179082.761425][12346:12346] CHIP:SC: Failed during PASE session setup. ../../examples/all-clusters-app/linux/third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:784: CHIP Error 0x00000038: Invalid PASE parameter
+          [1651179082.761479][12346:12346] CHIP:SVR: Commissioning failed (attempt 1): ../../examples/all-clusters-app/linux/third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:784: CHIP Error 0x00000038: Invalid PASE parameter
 
-          chip-all-clusters-app BUG: chip-all-clusters-app advertises over IP when the discovery capability should not be advertising with capabilites set to '0'
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00OC0000000
+          [1651179082655] [10999:245999] CHIP: [SC] Failed to verify peer's MAC. This can happen when setup code is incorrect.
+          [1651179082655] [10999:245999] CHIP: [SC] Sending status report. Protocol code 2, exchange 65469
+          [1651179082655] [10999:245999] CHIP: [EM] Piggybacking Ack for MessageCounter:380681523 on exchange: 65469i
+          [1651179082655] [10999:245999] CHIP: [IN] Prepared unauthenticated message 0x7fcc93820a68 to 0x0000000000000000 (0)  of type 0x40 and protocolId (0, 0) on exchange 65469i with MessageCounter:515375235.
+          [1651179082655] [10999:245999] CHIP: [IN] Sending unauthenticated msg 0x7fcc93820a68 with MessageCounter:515375235 to 0x0000000000000000 at monotonic time: 0000000001094FBF msec
+          [1651179082655] [10999:245999] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179082655] [10999:245999] CHIP: [TOO] Secure Pairing Failed
+          [1651179082655] [10999:245999] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
 
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J0AFN00KA0648G00
-          ...
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00KMSP0Z800
+          [1651179338231] [11042:248762] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179338231] [11042:248762] CHIP: [TOO] Secure Pairing Failed
+          [1651179338231] [11042:248762] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00GWID1WH00
+          [1651179360470] [11053:249083] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179360470] [11053:249083] CHIP: [TOO] Secure Pairing Failed
+          [1651179360470] [11053:249083] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00C4912TQ00
+          [1651179360470] [11053:249083] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179360470] [11053:249083] CHIP: [TOO] Secure Pairing Failed
+          [1651179360470] [11053:249083] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q008E.Q2QZ00
+          [1651179528926] [11097:251129] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179528926] [11097:251129] CHIP: [TOO] Secure Pairing Failed
+          [1651179528926] [11097:251129] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q004ORE3N610
+          [1651179553222] [11099:251475] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179553222] [11099:251475] CHIP: [TOO] Secure Pairing Failed
+          [1651179553222] [11099:251475] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q000YH24KF10
+          [1651179566539] [11100:251638] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179566539] [11100:251638] CHIP: [TOO] Secure Pairing Failed
+          [1651179566539] [11100:251638] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00Y58S4HO10
+          [1651179578818] [11110:251820] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179578818] [11110:251820] CHIP: [TOO] Secure Pairing Failed
+          [1651179578818] [11110:251820] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00UF-F5EX10
+          [1651179592485] [11111:251958] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179592485] [11111:251958] CHIP: [TOO] Secure Pairing Failed
+          [1651179592485] [11111:251958] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00QPQ36B420
+          [1651179606579] [11112:252148] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179606579] [11112:252148] CHIP: [TOO] Secure Pairing Failed
+          [1651179606579] [11112:252148] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q004QG46Y900
+          [1651179619185] [11114:252273] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179619185] [11114:252273] CHIP: [TOO] Secure Pairing Failed
+          [1651179619185] [11114:252273] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J029Q00YX018EW10
+          [1651179633201] [11129:252492] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
+          [1651179633201] [11129:252492] CHIP: [TOO] Secure Pairing Failed
+          [1651179633201] [11129:252492] CHIP: [TOO] Pairing Failure: ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
       disabled: true
 
     - label:
@@ -269,24 +257,12 @@ tests:
           substituting out the current Prefix with an invalid Prefix that is not
           'MT:' (i.e. Prefix='AB:')"
       verification: |
-          NEED SUPPORT
-
-          Unable to generate fals QR codes with discovery capability set to an invalid number (i.e. 8 or above for chip-device-ctrl)
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 8 -dv 3840 -ps 20202021
-          2022-03-05 00:31:33 matter-te-6 chip.SPL[394173] INFO Manual pairing code: [34970112332]
-          Chip Stack Error 47
+          AB:-24J029Q00KA0648G00
       disabled: true
 
     - label:
           "Scan/read the QR code, generated in the previous step, using the DUT"
       verification: |
-          NEED SUPPORT
-
-          Unable to generate false QR codes with discovery capability set to an invalid number (i.e. 8 or above for chip-device-ctrl)
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          DUT has not commissioned the TH to the Matter network
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 AB:-24J029Q00KA0648G00
+          [1651179728083] [11173:253719] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true

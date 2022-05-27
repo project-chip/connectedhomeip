@@ -45,6 +45,7 @@ namespace {
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
+constexpr uint8_t kMaxInvalidSessionRetries        = 1;  // Max # of query image retries to perform on invalid session error
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
@@ -58,9 +59,10 @@ DefaultOTARequestorDriver * ToDriver(void * context)
 
 void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
 {
-    mRequestor          = requestor;
-    mImageProcessor     = processor;
-    mProviderRetryCount = 0;
+    mRequestor                = requestor;
+    mImageProcessor           = processor;
+    mProviderRetryCount       = 0;
+    mInvalidSessionRetryCount = 0;
 
     if (mImageProcessor->IsFirstImageRun())
     {
@@ -127,6 +129,11 @@ void DefaultOTARequestorDriver::HandleIdleStateExit()
 
 void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
 {
+    if (reason != IdleStateReason::kInvalidSession)
+    {
+        mInvalidSessionRetryCount = 0;
+    }
+
     switch (reason)
     {
     case IdleStateReason::kUnknown:
@@ -138,8 +145,20 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         break;
     case IdleStateReason::kInvalidSession:
-        // An invalid session is detected which may be temporary so try to query the same provider again
-        SendQueryImage();
+        if (mInvalidSessionRetryCount < kMaxInvalidSessionRetries)
+        {
+            // An invalid session is detected which may be temporary (such as provider being restarted)
+            // so try to query the same provider again. Since the session has already been disconnected prior to
+            // getting here, this new query should trigger an attempt to re-establish CASE. If that subsequently fails,
+            // we conclusively know the provider is not available, and will fall into the else clause below on that attempt.
+            SendQueryImage();
+            mInvalidSessionRetryCount++;
+        }
+        else
+        {
+            mInvalidSessionRetryCount = 0;
+            StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+        }
         break;
     }
 }

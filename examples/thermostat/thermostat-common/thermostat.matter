@@ -1099,20 +1099,10 @@ server cluster Thermostat = 513 {
     ThermostatScheduleTransition transitions[] = 3;
   }
 
-  response struct GetRelayStatusLogResponse = 1 {
-    INT16U timeOfDay = 0;
-    BITMAP8 relayStatus = 1;
-    INT16S localTemperature = 2;
-    INT8U humidityInPercentage = 3;
-    INT16S setpoint = 4;
-    INT16U unreadEntries = 5;
-  }
-
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {

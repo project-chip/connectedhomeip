@@ -20770,16 +20770,6 @@ public class ChipClusters {
       clearWeeklySchedule(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
-    public void getRelayStatusLog(GetRelayStatusLogResponseCallback callback) {
-      getRelayStatusLog(chipClusterPtr, callback, null);
-    }
-
-    public void getRelayStatusLog(
-        GetRelayStatusLogResponseCallback callback, int timedInvokeTimeoutMs) {
-
-      getRelayStatusLog(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
     public void getWeeklySchedule(
         GetWeeklyScheduleResponseCallback callback, Integer daysToReturn, Integer modeToReturn) {
       getWeeklySchedule(chipClusterPtr, callback, daysToReturn, modeToReturn, null);
@@ -20840,11 +20830,6 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    private native void getRelayStatusLog(
-        long chipClusterPtr,
-        GetRelayStatusLogResponseCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     private native void getWeeklySchedule(
         long chipClusterPtr,
         GetWeeklyScheduleResponseCallback Callback,
@@ -20867,18 +20852,6 @@ public class ChipClusters {
         Integer mode,
         Integer amount,
         @Nullable Integer timedInvokeTimeoutMs);
-
-    public interface GetRelayStatusLogResponseCallback {
-      void onSuccess(
-          Integer timeOfDay,
-          Integer relayStatus,
-          Integer localTemperature,
-          Integer humidityInPercentage,
-          Integer setpoint,
-          Integer unreadEntries);
-
-      void onError(Exception error);
-    }
 
     public interface GetWeeklyScheduleResponseCallback {
       void onSuccess(
