@@ -197,12 +197,12 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) 
 
 void ConnectivityManagerImpl::StartWiFiManagement(void)
 {
-    SystemLayer().ScheduleWork(ActivateWiFiManager, NULL);
+    SystemLayer().ScheduleWork(ActivateWiFiManager, nullptr);
 }
 
 void ConnectivityManagerImpl::StopWiFiManagement(void)
 {
-    SystemLayer().ScheduleWork(DeactivateWiFiManager, NULL);
+    SystemLayer().ScheduleWork(DeactivateWiFiManager, nullptr);
 }
 
 void ConnectivityManagerImpl::ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
