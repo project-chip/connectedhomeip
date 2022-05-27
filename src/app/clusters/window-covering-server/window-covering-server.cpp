@@ -948,10 +948,9 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 /**
  * @brief Cluster Attribute Changed Callback
  *
- * The method is implemented by default as a weak function and it takes care about updating
- * the server attribute values by calling PostAttributeChange method. In case of overriding the method
- * by the application, it needs to handle updating attributes using its own way or either calling
- * PostAttributeChange method.
+ * The method is implemented by default as a weak function and it takes care of updating
+ * the server attribute values by calling the PostAttributeChange method. If the application overrides
+ * this method, it needs to handle updating attributes (ideally by calling PostAttributeChange).
  *
  */
 void __attribute__((weak))
