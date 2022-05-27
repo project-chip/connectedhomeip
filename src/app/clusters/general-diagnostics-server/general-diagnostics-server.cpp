@@ -42,13 +42,13 @@ namespace {
 
 bool IsTestEventTriggerEnabled()
 {
-    auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
-    if (testEventTrigger == nullptr)
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+    if (triggerDelegate == nullptr)
     {
         return false;
     }
     uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    if (testEventTrigger->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
+    if (triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
     {
         return false;
     }
@@ -339,21 +339,16 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
         return true;
     }
 
-    auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
-    if (testEventTrigger == nullptr)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
-    if (!testEventTrigger->DoesEnableKeyMatch(commandData.enableKey))
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
     {
         commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
         return true;
     }
 
-    Status returnStatus                 = Status::Failure;
-    CHIP_ERROR handleEventTriggerResult = testEventTrigger->HandleEventTrigger(commandData.eventTrigger);
+    Status returnStatus                 = Status::Success;
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
 
     if (handleEventTriggerResult == CHIP_NO_ERROR)
     {
@@ -362,6 +357,10 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
     else if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
     {
         returnStatus = Status::InvalidCommand;
+    }
+    else
+    {
+        returnStatus = Status::Failure;
     }
 
     commandObj->AddStatus(commandPath, returnStatus);
