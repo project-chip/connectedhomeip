@@ -609,23 +609,18 @@ CHIP_ERROR DefaultOTARequestor::AddDefaultOtaProvider(const ProviderLocationType
 
 void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)
 {
-    ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestor::OnDownloadStateChanged");
-
     VerifyOrDie(mOtaRequestorDriver != nullptr);
 
     switch (state)
     {
     case OTADownloader::State::kComplete:
-        ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestor::OnDownloadStateChanged - kComplete");
         mOtaRequestorDriver->UpdateDownloaded();
         break;
     case OTADownloader::State::kIdle:
-        ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestor::OnDownloadStateChanged - kIdle");
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
-
         break;
     default:
         break;
