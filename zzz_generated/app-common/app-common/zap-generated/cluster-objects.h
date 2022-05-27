@@ -15459,8 +15459,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminSubject = static_cast<chip::NodeId>(0);
-    chip::VendorId adminVendorId  = static_cast<chip::VendorId>(0);
+    uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15478,8 +15478,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminSubject = static_cast<chip::NodeId>(0);
-    chip::VendorId adminVendorId  = static_cast<chip::VendorId>(0);
+    uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddNOC
