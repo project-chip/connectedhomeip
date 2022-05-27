@@ -61,9 +61,6 @@
 #define CHIP_DEFAULT_DATA_PATH                                                                                                     \
     LOCALSTATEDIR "/"                                                                                                              \
                   "chip_counters.ini"
-#define CHIP_DEVICE_INFO_PATH                                                                                                      \
-    DEVICEINFODIR "/"                                                                                                              \
-                  "chip_device_info.ini"
 
 namespace chip {
 namespace DeviceLayer {
