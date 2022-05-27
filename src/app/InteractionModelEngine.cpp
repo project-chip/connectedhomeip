@@ -390,7 +390,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         reader.Init(aPayload.Retain());
 
         ReadRequestMessage::Parser readRequestParser;
-        ReturnErrorOnFailure(readRequestParser.Init(reader));
+        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
 
         {
             size_t requestedAttributePathCount = 0;
@@ -405,8 +405,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
-                aStatus = Protocols::InteractionModel::Status::InvalidAction;
-                return CHIP_NO_ERROR;
+                return Protocols::InteractionModel::Status::InvalidAction;
             }
             EventPathIBs::Parser eventpathListParser;
             err = readRequestParser.GetEventRequests(&eventpathListParser);
@@ -418,8 +417,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
-                aStatus = Protocols::InteractionModel::Status::InvalidAction;
-                return CHIP_NO_ERROR;
+                return Protocols::InteractionModel::Status::InvalidAction;
             }
 
             // The following cast is safe, since we can only hold a few tens of paths in one request.
@@ -427,8 +425,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount, requestedEventPathCount);
             if (checkResult != Protocols::InteractionModel::Status::Success)
             {
-                aStatus = checkResult;
-                return CHIP_NO_ERROR;
+                return checkResult;
             }
         }
     }
@@ -836,9 +833,11 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
     });
 
     if (candidate != nullptr &&
-        (attributePathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
-         eventPathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
-         readTransactionsOnCurrentFabric > kMinSupportedReadRequestsPerFabric))
+        ((attributePathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
+          eventPathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
+          readTransactionsOnCurrentFabric > kMinSupportedReadRequestsPerFabric) ||
+         // Always evict the transactions on PASE sessions if the fabric table is full.
+         (aFabricIndex == kUndefinedFabricIndex && mpFabricTable->FabricCount() == GetConfigMaxFabrics())))
     {
         candidate->Abort();
         return true;
@@ -903,9 +902,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         return Protocols::InteractionModel::Status::PathsExhausted;
     }
 
-    // If we have commissioned CHIP_CONFIG_MAX_FABRIC already, and this transaction don't have an associated fabric index, reject
+    // If we have commissioned CHIP_CONFIG_MAX_FABRICS already, and this transaction don't have an associated fabric index, reject
     // the request if we don't have sufficient resources for this request.
-    if (mpFabricTable->FabricCount() == CHIP_CONFIG_MAX_FABRICS && aFabricIndex == kUndefinedFabricIndex)
+    if (mpFabricTable->FabricCount() == GetConfigMaxFabrics() && aFabricIndex == kUndefinedFabricIndex)
     {
         return Protocols::InteractionModel::Status::ResourceExhausted;
     }
@@ -956,6 +955,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     while (didEvictHandler)
     {
         didEvictHandler = false;
+        didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(kUndefinedFabricIndex);
+        if (didEvictHandler)
+        {
+            continue;
+        }
         for (const auto & fabric : *mpFabricTable)
         {
             // The resources are enough to serve this request, do not evict anything.

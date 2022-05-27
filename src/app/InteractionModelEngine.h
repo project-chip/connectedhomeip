@@ -269,11 +269,15 @@ public:
     auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
+    // Override the maximal capacity of the fabric table only for interaction model engine
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetConfigMaxFabrics(int32_t sz) { mMaxNumFabricsOverride = sz; }
+
+    //
     // Override the maximal capacity of the underlying read handler pool to mimic
     // out of memory scenarios in unit-tests.
-    //
-    // This function did not considered the resources reserved for read handlers,
-    // SetHandlerCapacityForSubscriptions if there are subscriptions in the tests.
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
@@ -283,9 +287,6 @@ public:
     //
     // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
     // out of paths exhausted scenarios in unit-tests.
-    //
-    // This function did not considered the resources reserved for read handlers,
-    // SetPathPoolCapacityForSubscriptions if there are subscriptions in the tests.
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
@@ -431,6 +432,15 @@ private:
 #endif
     }
 
+    inline uint8_t GetConfigMaxFabrics() const
+    {
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        return (mMaxNumFabricsOverride == -1) ? CHIP_CONFIG_MAX_FABRICS : static_cast<uint8_t>(mMaxNumFabricsOverride);
+#else
+        return CHIP_CONFIG_MAX_FABRICS;
+#endif
+    }
+
     /**
      * Verify and ensure (by killing oldest read handlers that make the resources used by the current fabric exceed the fabric
      * quota)
@@ -519,6 +529,8 @@ private:
 
     int mReadHandlerCapacityForReadsOverride = -1;
     int mPathPoolCapacityForReadsOverride    = -1;
+
+    int mMaxNumFabricsOverride = -1;
 
     // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
