@@ -48,10 +48,6 @@
 #define LOCALSTATEDIR "/tmp"
 #endif
 
-#ifndef DEVICEINFODIR
-#define DEVICEINFODIR "/tmp"
-#endif
-
 #define CHIP_DEFAULT_FACTORY_PATH                                                                                                  \
     FATCONFDIR "/"                                                                                                                 \
                "chip_factory.ini"
