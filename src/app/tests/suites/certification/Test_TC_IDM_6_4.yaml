@@ -66,7 +66,7 @@ tests:
           [1653402203.752975][2753:2753] CHIP:IM: Received Subscribe request
           [1653402203.753118][2753:2753] CHIP:DMG: SubscribeRequestMessage =
           [1653402203.753166][2753:2753] CHIP:DMG: {
-          [1653402203.753209][2753:2753] CHIP:DMG:         KeepSubscriptions = false, 
+          [1653402203.753209][2753:2753] CHIP:DMG:         KeepSubscriptions = false,
           [1653402203.753257][2753:2753] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
           [1653402203.753306][2753:2753] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1653402203.753350][2753:2753] CHIP:DMG:         EventPathIBs =
@@ -77,10 +77,10 @@ tests:
           [1653402203.753705][2753:2753] CHIP:DMG:                         Cluster = 0x33,
           [1653402203.753764][2753:2753] CHIP:DMG:                         Event = 0x3,
           [1653402203.753818][2753:2753] CHIP:DMG:                 },
-          [1653402203.753873][2753:2753] CHIP:DMG:                 
+          [1653402203.753873][2753:2753] CHIP:DMG:
           [1653402203.753916][2753:2753] CHIP:DMG:         ],
-          [1653402203.753967][2753:2753] CHIP:DMG:         
-          [1653402203.754012][2753:2753] CHIP:DMG:         isFabricFiltered = true, 
+          [1653402203.753967][2753:2753] CHIP:DMG:
+          [1653402203.754012][2753:2753] CHIP:DMG:         isFabricFiltered = true,
           [1653402203.754058][2753:2753] CHIP:DMG:         InteractionModelRevision = 1
           [1653402203.754101][2753:2753] CHIP:DMG: },
 
@@ -100,20 +100,20 @@ tests:
           [1653402203.781743][12097:12102] CHIP:DMG:                                         Cluster = 0x33,
           [1653402203.781746][12097:12102] CHIP:DMG:                                         Event = 0x3,
           [1653402203.781749][12097:12102] CHIP:DMG:                                 },
-          [1653402203.781753][12097:12102] CHIP:DMG:                                 
+          [1653402203.781753][12097:12102] CHIP:DMG:
           [1653402203.781756][12097:12102] CHIP:DMG:                                 EventNumber = 0x1,
           [1653402203.781759][12097:12102] CHIP:DMG:                                 PriorityLevel = 0x2,
           [1653402203.781763][12097:12102] CHIP:DMG:                                 SystemTimestamp = 0x1499a24,
-          [1653402203.781766][12097:12102] CHIP:DMG:                                 EventData = 
+          [1653402203.781766][12097:12102] CHIP:DMG:                                 EventData =
           [1653402203.781770][12097:12102] CHIP:DMG:                                 {
-          [1653402203.781774][12097:12102] CHIP:DMG:                                         0x0 = 0, 
+          [1653402203.781774][12097:12102] CHIP:DMG:                                         0x0 = 0,
           [1653402203.781778][12097:12102] CHIP:DMG:                                 },
           [1653402203.781781][12097:12102] CHIP:DMG:                         },
-          [1653402203.781786][12097:12102] CHIP:DMG:                         
+          [1653402203.781786][12097:12102] CHIP:DMG:
           [1653402203.781790][12097:12102] CHIP:DMG:                 },
-          [1653402203.781795][12097:12102] CHIP:DMG:                 
+          [1653402203.781795][12097:12102] CHIP:DMG:
           [1653402203.781798][12097:12102] CHIP:DMG:         ],
-          [1653402203.781804][12097:12102] CHIP:DMG:         
+          [1653402203.781804][12097:12102] CHIP:DMG:
           [1653402203.781807][12097:12102] CHIP:DMG:         InteractionModelRevision = 1
           [1653402203.781810][12097:12102] CHIP:DMG: }
           [1653402203.781845][12097:12102] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
@@ -162,7 +162,7 @@ tests:
           times). TH resubscribes to the same event after bootup to the DUT."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
 
           sudo ./chip-tool generaldiagnostics subscribe-event-by-id  3 0 100 1 0
 
