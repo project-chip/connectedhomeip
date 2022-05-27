@@ -44,14 +44,14 @@ tests:
           [1653032653.157797][7631:7636] CHIP:DMG:                                         Cluster = 0x6,
           [1653032653.157816][7631:7636] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1653032653.157834][7631:7636] CHIP:DMG:                                 }
-          [1653032653.157855][7631:7636] CHIP:DMG:                                         
-          [1653032653.157874][7631:7636] CHIP:DMG:                                         Data = false, 
+          [1653032653.157855][7631:7636] CHIP:DMG:
+          [1653032653.157874][7631:7636] CHIP:DMG:                                         Data = false,
           [1653032653.157891][7631:7636] CHIP:DMG:                         },
-          [1653032653.157912][7631:7636] CHIP:DMG:                         
+          [1653032653.157912][7631:7636] CHIP:DMG:
           [1653032653.157927][7631:7636] CHIP:DMG:                 },
-          [1653032653.157948][7631:7636] CHIP:DMG:                 
+          [1653032653.157948][7631:7636] CHIP:DMG:
           [1653032653.157963][7631:7636] CHIP:DMG:         ],
-          [1653032653.157986][7631:7636] CHIP:DMG:         
+          [1653032653.157986][7631:7636] CHIP:DMG:
           [1653032653.158001][7631:7636] CHIP:DMG:         InteractionModelRevision = 1
           [1653032653.158016][7631:7636] CHIP:DMG: }
           [1653032653.158145][7631:7636] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 783889596
@@ -77,7 +77,7 @@ tests:
 
           [1653032653.150668][2293:2293] CHIP:DMG: SubscribeRequestMessage =
           [1653032653.150706][2293:2293] CHIP:DMG: {
-          [1653032653.150742][2293:2293] CHIP:DMG:         KeepSubscriptions = false, 
+          [1653032653.150742][2293:2293] CHIP:DMG:         KeepSubscriptions = false,
           [1653032653.150781][2293:2293] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
           [1653032653.150820][2293:2293] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1653032653.150857][2293:2293] CHIP:DMG:         AttributePathIBs =
@@ -88,10 +88,10 @@ tests:
           [1653032653.151068][2293:2293] CHIP:DMG:                         Cluster = 0x6,
           [1653032653.151119][2293:2293] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1653032653.151167][2293:2293] CHIP:DMG:                 }
-          [1653032653.151212][2293:2293] CHIP:DMG:                         
+          [1653032653.151212][2293:2293] CHIP:DMG:
           [1653032653.151252][2293:2293] CHIP:DMG:         ],
-          [1653032653.151294][2293:2293] CHIP:DMG:                 
-          [1653032653.151368][2293:2293] CHIP:DMG:         isFabricFiltered = true, 
+          [1653032653.151294][2293:2293] CHIP:DMG:
+          [1653032653.151368][2293:2293] CHIP:DMG:         isFabricFiltered = true,
           [1653032653.151407][2293:2293] CHIP:DMG:         InteractionModelRevision = 1
           [1653032653.151441][2293:2293] CHIP:DMG: },
           [1653032653.151541][2293:2293] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
