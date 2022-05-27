@@ -72,13 +72,22 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
     emberAfDoorLockClusterPrintln("Door Lock cluster initialized at endpoint #%u", endpointId);
 
-    SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kUnspecified);
+    auto status = Attributes::LockState::SetNull(endpointId);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "[InitDoorLockServer] Unable to set the Lock State attribute to null [status=%d]", status);
+    }
     SetActuatorEnabled(endpointId, true);
+}
+
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
+{
+    return SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource)
 {
-    bool success = SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
+    bool success = SetLockState(endpointId, newLockState);
 
     // Remote operations are handled separately as they use more data unavailable here
     VerifyOrReturnError(DlOperationSource::kRemote != opSource, success);

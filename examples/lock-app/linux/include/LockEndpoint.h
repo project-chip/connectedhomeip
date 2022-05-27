@@ -57,6 +57,8 @@ public:
         {
             lockUser.credentials.reserve(numberOfCredentialsPerUser);
         }
+
+        DoorLockServer::Instance().SetLockState(endpointId, mLockState);
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
