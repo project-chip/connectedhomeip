@@ -186,14 +186,14 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
-    static PeerAddress UDP(char *addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kUdp); }
+    static PeerAddress UDP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return UDP(addr).SetPort(port).SetInterface(interface);
     }
     static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
-    static PeerAddress TCP(char *addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kTcp); }
+    static PeerAddress TCP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return TCP(addr).SetPort(port).SetInterface(interface);
