@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
+    targetvalue1:
+        type: INT8U
+        defaultValue: 1
+    targetvalue2:
+        type: INT8U
+        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,15 +34,42 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition: one or more navigation targets available"
-      disabled: true
-
     - label: "Reads the CurrentTarget attribute"
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
           constraints:
               type: uint8
+
+    #Below steps disabled due to issue- #13029
+    #Disabled due to issue - #13087
+    - label: "Reads the TargetList attribute"
+      command: "readAttribute"
+      attribute: "TargetList"
+      response:
+          saveAs: TargetListValues
+          constraints:
+              type: list
+
+    #Issue 18205
+    - label: "Sends a NavigateTarget command"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "NavigateTarget"
+      arguments:
+          values:
+              - name: "Target"
+                value: targetvalue1
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Reads the CurrentTarget attribute"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "CurrentTarget"
+      response:
+          value: targetvalue1
 
     - label: "Reads the TargetList attribute"
       command: "readAttribute"
@@ -45,58 +78,22 @@ tests:
           constraints:
               type: list
 
-    #Below steps disabled due to issue- #13029
-    #Disabled due to issue - #13087
-    - label: "Reads the TargetList attribute"
-      disabled: true
-      command: "readAttribute"
-      attribute: "target navigator list"
-      response:
-          saveAs: TargetListValue
-          constraints:
-              type: list
-
+    #Issue 18205
     - label: "Sends a NavigateTarget command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "NavigateTarget"
       arguments:
           values:
               - name: "Target"
-                value: TargetListValue
-                saveAs: targetValue
-              - name: "Data"
-                value: TargetListvalue
-
-    - label: "Reads the CurrentTarget attribute"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current navigator target"
+                value: targetvalue2
       response:
-          value: targetValue
-
-    - label: "Reads the TargetList attribute"
-      disabled: true
-      command: "readAttribute"
-      attribute: "target navigator list"
-      response:
-          saveAs: TargetListvalue
-          constraints:
-              type: list
-
-    - label: "Sends a NavigateTarget command"
-      disabled: true
-      command: "NavigateTarget"
-      arguments:
           values:
-              - name: "Target"
-                value: TargetListvalue
-                saveAs: targetvalue
-              - name: "Data"
-                value: TargetListvalue
+              - name: "status"
+                value: 0
 
     - label: "Reads the CurrentTarget attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "current navigator target"
+      attribute: "CurrentTarget"
       response:
-          value: targetvalue
+          value: targetvalue2
