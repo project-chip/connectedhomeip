@@ -30,12 +30,6 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_mdns == "platform") {
-  pkg_config("avahi_client_config") {
-    packages = [ "avahi-client" ]
-  }
-}
-
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
