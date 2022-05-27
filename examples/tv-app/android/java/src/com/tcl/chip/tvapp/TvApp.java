@@ -78,6 +78,7 @@ public class TvApp {
       ContentAppEndpointManager manager);
 
   public native void sendTestMessage(int endpoint, String message);
+  public native void setUserPrompter(UserPrompter userPrompter);
 
   static {
     System.loadLibrary("TvApp");

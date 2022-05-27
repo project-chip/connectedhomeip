@@ -67,6 +67,8 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/MyUserPrompter-JNI.cpp",
+    "java/MyUserPrompter-JNI.h",
   ]
 
   deps = [
@@ -129,6 +131,7 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/OnOffManagerStub.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
+    "java/src/com/tcl/chip/tvapp/UserPrompter.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
   ]
