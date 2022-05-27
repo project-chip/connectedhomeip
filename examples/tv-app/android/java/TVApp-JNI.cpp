@@ -20,6 +20,7 @@
 #include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
+#include "DeviceCallbacks.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
@@ -175,6 +176,11 @@ JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject mana
 JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return LevelManager::SetLevel(endpoint, value);
+}
+
+JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider)
+{
+    DeviceCallbacks::NewManager(provider);
 }
 
 JNI_METHOD(jint, addContentApp)
