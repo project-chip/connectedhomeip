@@ -123,7 +123,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     ThreadDeviceRoleChangedHandler(deviceRole);
 
     /* Set callback for change of device role */
-    threadErr = thread_set_device_role_changed_cb(mThreadInstance, _ThreadDeviceRoleChangedCb, NULL);
+    threadErr = thread_set_device_role_changed_cb(mThreadInstance, _ThreadDeviceRoleChangedCb, nullptr);
     VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: set device role changed cb"));
 
     mIsInitialized = true;
@@ -564,7 +564,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
         ChipLogError(DeviceLayer, "FAIL: thread_srp_client_set_host_name");
 
     /* Get external ip address */
-    threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, NULL);
+    threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, nullptr);
     VerifyOrExit(threadErr == THREAD_ERROR_NONE, error = CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

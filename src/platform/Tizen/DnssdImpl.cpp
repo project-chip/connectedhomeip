@@ -319,7 +319,7 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     dnssd_browser_h browser;
     if (interfaceId == 0)
     {
-        ret = dnssd_browse_service(bCtx->type, NULL, &browser, OnBrowse, bCtx);
+        ret = dnssd_browse_service(bCtx->type, nullptr, &browser, OnBrowse, bCtx);
     }
     else
     {
@@ -500,7 +500,7 @@ CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, D
 
     if (interfaceId == 0)
     {
-        ret = dnssd_create_remote_service(type, name, NULL, &service);
+        ret = dnssd_create_remote_service(type, name, nullptr, &service);
     }
     else
     {
