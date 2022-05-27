@@ -1,0 +1,88 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 84.1.1. [TC-DGGEN-1.1] Global attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+          ./chip-tool pairing ble-wifi NODEID SSID PASSWD 20202021 3840 (commissioner side)
+      disabled: true
+
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool generaldiagnostics read  cluster-revision 1 0
+
+
+          [1651787397.675518][241008:241013] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFD DataVersion: 617063494
+          [1651787397.675578][241008:241013] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
+
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool generaldiagnostics read feature-map 1 0
+
+
+          [1653459853.915964][29210:29215] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFC DataVersion: 2987758560
+          [1653459853.916080][29210:29215] CHIP:TOO:   FeatureMap: 0
+          [1653459853.916251][29210:29215] CHIP:EM: Sending Standalone Ack for MessageCounter:4270461 on exchange 29230i
+      disabled: true
+
+    - label: "TH reads AttribubteList from DUT"
+      verification: |
+          ./chip-tool generaldiagnostics read attribute-list 1 0
+
+          [1651787510.529122][241036:241041] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFB DataVersion: 617063494
+          [1651787510.529206][241036:241041] CHIP:TOO:   AttributeList: 12 entries
+          [1651787510.529232][241036:241041] CHIP:TOO:     [1]: 0
+          [1651787510.529250][241036:241041] CHIP:TOO:     [2]: 1
+          [1651787510.529266][241036:241041] CHIP:TOO:     [3]: 2
+          [1651787510.529282][241036:241041] CHIP:TOO:     [4]: 3
+          [1651787510.529298][241036:241041] CHIP:TOO:     [5]: 4
+          [1651787510.529313][241036:241041] CHIP:TOO:     [6]: 5
+          [1651787510.529329][241036:241041] CHIP:TOO:     [7]: 6
+          [1651787510.529345][241036:241041] CHIP:TOO:     [8]: 7
+          [1651787510.529362][241036:241041] CHIP:TOO:     [9]: 65528
+          [1651787510.529379][241036:241041] CHIP:TOO:     [10]: 65529
+          [1651787510.529395][241036:241041] CHIP:TOO:     [11]: 65531
+          [1651787510.529412][241036:241041] CHIP:TOO:     [12]: 65533
+      disabled: true
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool generaldiagnostics read accepted-command-list 1 0 
+
+
+          [1651787557.955586][241046:241051] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFF9 DataVersion: 617063494
+          [1651787557.955664][241046:241051] CHIP:TOO:   AcceptedCommandList: 0 entries
+      disabled: true
+
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool generaldiagnostics read generated-command-list 1 0
+
+          [1651787616.837029][241058:241063] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFF8 DataVersion: 617063494
+          [1651787616.837104][241058:241063] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true
+
+    - label: "TH reads EventList from DUT"
+      verification: |
+          Out of scope for V1.0
+      disabled: true

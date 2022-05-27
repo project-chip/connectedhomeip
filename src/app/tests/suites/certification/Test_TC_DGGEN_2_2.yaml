@@ -1,0 +1,89 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 84.2.2. [TC-DGGEN-2.2] Event functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Induce a DUT hardware failure two times as addressed in HardwareFault
+          ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off causing power
+          source failure, and rejoin DUT back to previous TH fabric. Next,
+          repeat power plug off and rejoining DUT back to previous TH fabric one
+          more time.)"
+      verification: |
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in RadioFault ENUM
+          table 11.11.6.2. (Ex. Put the DUT under metalic cover causing WiFi
+          failure. Uncover DUT and make DUT rejoining DUT back to previous TH
+          fabric. Repeat the radio failure one more time and rejoin DUT back to
+          previous TH fabric."
+      verification: |
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in NetworkFault
+          ENUM table 11.11.6.3. (Ex. Put the DUT under metalic cover causing
+          network failure. Uncover DUT and rejoin DUT back to previous TH
+          fabric. Pull the DUT power plug off causing power source failure.
+          rejoining DUT back to previous TH fabric.)"
+      verification: |
+          ./chip-tool generaldiagnostics read-event network-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label:
+          "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
+          TH fabric."
+      verification: |
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1651562139.644134][7873:7878] CHIP:TOO:          Event number: 1
+          [1651562139.644157][7873:7878] CHIP:TOO:          Priority: Critical
+          [1651562139.644179][7873:7878] CHIP:TOO:          Timestamp: 8347991
+          [1651562139.644273][7873:7878] CHIP:TOO:   BootReason: {
+          [1651562139.644317][7873:7878] CHIP:TOO:     BootReason: 0
+          [1651562139.644343][7873:7878] CHIP:TOO:    }
+          [1651562139.644431][7873:7878] CHIP:EM: Sending Standalone Ack for MessageCounter:9685408 on exchange 6383i
+      disabled: true

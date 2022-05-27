@@ -366,7 +366,6 @@ tests:
           time specified during the subscription activation."
       verification: |
           In case of chip tool, here is an example command to use
-
           sudo ./chip-tool basic write  node-label new 1 0
 
           On TH--
@@ -443,7 +442,6 @@ tests:
           interval time specified during the subscription activation.'
       verification: |
           In case of chip tool, here is an example command to use
-
           sudo ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
           [1651581271.466102][2595:2600] CHIP:DMG: WriteResponseMessage =
           [1651581271.466135][2595:2600] CHIP:DMG: {
