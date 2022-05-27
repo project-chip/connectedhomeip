@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -37,6 +36,7 @@ using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -327,38 +327,44 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
                                                               const Commands::TestEventTrigger::DecodableType & commandData)
 {
 
-    if (commandData.enableKey.empty() || commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
+    if (commandData.enableKey.size() != TestEventTriggerDelegate::kExpectedEnableKeyLength)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
     if (IsByteSpanAllZeros(commandData.enableKey))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
     auto * testEventTrigger = Server::GetInstance().GetTestEventTriggerDelegate();
     if (testEventTrigger == nullptr)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     if (!testEventTrigger->DoesEnableKeyMatch(commandData.enableKey))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
         return true;
     }
 
-    if (CHIP_NO_ERROR != testEventTrigger->HandleEventTrigger(commandData.eventTrigger))
+    Status returnStatus = Status::Failure;
+    CHIP_ERROR handleEventTriggerResult = testEventTrigger->HandleEventTrigger(commandData.eventTrigger);
+
+    if (handleEventTriggerResult == CHIP_NO_ERROR)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
+        returnStatus = Status::Success;
+    }
+    else if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        returnStatus = Status::InvalidCommand;
     }
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, returnStatus);
     return true;
 }
 
