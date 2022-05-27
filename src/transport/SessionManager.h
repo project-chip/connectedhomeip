@@ -150,10 +150,6 @@ public:
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
-    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
-
     // Test-only: create a session on the fly.
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
                                             uint16_t peerSessionId, FabricIndex fabricIndex,
@@ -266,9 +262,6 @@ private:
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
-
-    ObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
-        mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
