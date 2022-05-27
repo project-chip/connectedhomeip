@@ -296,9 +296,13 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         }
     }
 
+    // Delay action time is only applicable when the provider is busy
+    if (mQueryImageStatus == OTAQueryStatus::kBusy) {
+        response.delayedActionTime.Emplace(mDelayedQueryActionTimeSec);
+    }
+
     // Set remaining fields common to all status types
     response.status = mQueryImageStatus;
-    response.delayedActionTime.Emplace(mDelayedQueryActionTimeSec);
     if (mUserConsentNeeded && requestorCanConsent)
     {
         response.userConsentNeeded.Emplace(true);
