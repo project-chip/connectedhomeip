@@ -50,7 +50,7 @@ public:
      * Output values are returned in ISO 8601, where:
      *      The first month of the year is January and its returning value is equal to 1.
      *      The first day of a month starts from 1.
-     * 
+     *
      * @param[out] year Reference to location where manufacturing year will be stored
      * @param[out] month 1-based value [range 1-12] Reference to location where manufacturing month will be stored
      * @param[out] day 1-based value [range 1-31] Reference to location where manufacturing day will be stored
