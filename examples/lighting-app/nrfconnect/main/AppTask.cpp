@@ -176,10 +176,11 @@ CHIP_ERROR AppTask::Init()
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
