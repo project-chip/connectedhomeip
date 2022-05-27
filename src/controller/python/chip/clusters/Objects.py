@@ -3021,9 +3021,9 @@ class LevelControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentFrequency", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="minFrequency", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxFrequency", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="options", Tag=0x0000000F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="options", Tag=0x0000000F, Type=uint),
                 ClusterObjectFieldDescriptor(Label="onOffTransitionTime", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="onLevel", Tag=0x00000011, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="onLevel", Tag=0x00000011, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="onTransitionTime", Tag=0x00000012, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="offTransitionTime", Tag=0x00000013, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="defaultMoveRate", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
@@ -3042,9 +3042,9 @@ class LevelControl(Cluster):
     currentFrequency: 'typing.Optional[uint]' = None
     minFrequency: 'typing.Optional[uint]' = None
     maxFrequency: 'typing.Optional[uint]' = None
-    options: 'typing.Optional[uint]' = None
+    options: 'uint' = None
     onOffTransitionTime: 'typing.Optional[uint]' = None
-    onLevel: 'typing.Union[None, Nullable, uint]' = None
+    onLevel: 'typing.Union[Nullable, uint]' = None
     onTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     offTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     defaultMoveRate: 'typing.Union[None, Nullable, uint]' = None
@@ -3341,9 +3341,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class OnOffTransitionTime(ClusterAttributeDescriptor):
@@ -3373,9 +3373,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class OnTransitionTime(ClusterAttributeDescriptor):
