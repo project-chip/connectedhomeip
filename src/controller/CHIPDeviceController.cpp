@@ -1214,11 +1214,10 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_NO_MEMORY;
     case OperationalCertStatus::kInvalidAdminSubject:
         return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
-    case OperationalCertStatus::kInsufficientPrivilege:
-        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:
+        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
