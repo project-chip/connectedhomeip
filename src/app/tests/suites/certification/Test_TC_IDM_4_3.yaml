@@ -366,6 +366,10 @@ tests:
           time specified during the subscription activation."
       verification: |
           In case of chip tool, here is an example command to use
+<<<<<<< HEAD
+=======
+
+>>>>>>> Restyled by whitespace
           sudo ./chip-tool basic write  node-label new 1 0
 
           On TH--
