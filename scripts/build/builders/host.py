@@ -45,7 +45,7 @@ class HostApp(Enum):
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         elif self == HostApp.CHIP_TOOL_DARWIN:
-            return 'chip-tool-darwin'
+            return 'darwin-framework-tool'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
@@ -81,8 +81,8 @@ class HostApp(Enum):
             yield 'chip-tool'
             yield 'chip-tool.map'
         elif self == HostApp.CHIP_TOOL_DARWIN:
-            yield 'chip-tool-darwin'
-            yield 'chip-tool-darwin.map'
+            yield 'darwin-framework-tool'
+            yield 'darwin-framework-tool.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
             yield 'thermostat-app.map'

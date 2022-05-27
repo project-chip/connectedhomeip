@@ -244,7 +244,7 @@ def HostTargets():
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         if (HostBoard.NATIVE.PlatformName() == 'darwin'):
             app_targets.append(target.Extend(
-                'chip-tool-darwin', app=HostApp.CHIP_TOOL_DARWIN))
+                'darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
@@ -262,7 +262,7 @@ def HostTargets():
     # Possible build variants. Note that number of potential
     # builds is exponential here
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool', '-chip-tool-darwin']), separate_event_loop=False),
+        ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
         ['-chip-tool']), interactive_mode=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),

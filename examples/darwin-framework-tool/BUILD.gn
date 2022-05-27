@@ -23,7 +23,7 @@ assert(chip_build_tools)
 config("config") {
   include_dirs = [
     ".",
-    "${chip_root}/zzz_generated/chip-tool-darwin",
+    "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
   ]
 
@@ -35,7 +35,7 @@ config("config") {
   ]
 }
 
-executable("chip-tool-darwin") {
+executable("darwin-framework-tool") {
   sources = [
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ClusterCommandBridge.h",
@@ -54,7 +54,7 @@ executable("chip-tool-darwin") {
   ]
 
   if (config_enable_yaml_tests) {
-    sources += [ "${chip_root}/zzz_generated/chip-tool-darwin/zap-generated/cluster/CHIPTestClustersObjc.mm" ]
+    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/CHIPTestClustersObjc.mm" ]
   }
 
   deps = [
