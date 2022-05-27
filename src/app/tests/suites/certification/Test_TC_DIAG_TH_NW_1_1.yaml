@@ -25,7 +25,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read cluster-revision 24 0
 
-          [1649747941.607337][9541:9546] CHIP:DMG:         SuppressResponse = true, 
+          [1649747941.607337][9541:9546] CHIP:DMG:         SuppressResponse = true,
           [1649747941.607399][9541:9546] CHIP:DMG:         InteractionModelRevision = 1
           [1649747941.607455][9541:9546] CHIP:DMG: }
           [1649747941.607752][9541:9546] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFD DataVersion: 1406212801
@@ -36,7 +36,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read feature-map 24 0
 
-          [1649747973.385016][9548:9553] CHIP:DMG: 	SuppressResponse = true, 
+          [1649747973.385016][9548:9553] CHIP:DMG: 	SuppressResponse = true,
           [1649747973.385080][9548:9553] CHIP:DMG: 	InteractionModelRevision = 1
           [1649747973.385138][9548:9553] CHIP:DMG: }
           [1649747973.385437][9548:9553] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFC DataVersion: 1406212801
@@ -47,7 +47,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read attribute-list 24 0
 
-          [1649748119.656589][9559:9564] CHIP:DMG:         SuppressResponse = true, 
+          [1649748119.656589][9559:9564] CHIP:DMG:         SuppressResponse = true,
           [1649748119.656616][9559:9564] CHIP:DMG:         InteractionModelRevision = 1
           [1649748119.656639][9559:9564] CHIP:DMG: }
           [1649748119.656908][9559:9564] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFB DataVersion: 1406212801
@@ -131,7 +131,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read accepted-command-list 24 0
 
-          [1649748231.835572][9579:9584] CHIP:DMG: 	SuppressResponse = true, 
+          [1649748231.835572][9579:9584] CHIP:DMG: 	SuppressResponse = true,
           [1649748231.835633][9579:9584] CHIP:DMG: 	InteractionModelRevision = 1
           [1649748231.835690][9579:9584] CHIP:DMG: }
           [1649748231.836192][9579:9584] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF9 DataVersion: 1406212801
@@ -143,7 +143,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read generated-command-list 24 0
 
-          [1649748201.118100][9570:9575] CHIP:DMG: 	SuppressResponse = true, 
+          [1649748201.118100][9570:9575] CHIP:DMG: 	SuppressResponse = true,
           [1649748201.118163][9570:9575] CHIP:DMG: 	InteractionModelRevision = 1
           [1649748201.118221][9570:9575] CHIP:DMG: }
           [1649748201.118561][9570:9575] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFF8 DataVersion: 1406212801
