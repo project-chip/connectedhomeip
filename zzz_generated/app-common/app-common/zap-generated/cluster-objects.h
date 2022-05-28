@@ -12485,9 +12485,9 @@ struct TypeInfo
 namespace RoutingRole {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
@@ -13187,12 +13187,11 @@ struct TypeInfo
 namespace SecurityPolicy {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type>>;
-    using DecodableType = chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> &;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityPolicy::Id; }
@@ -13215,12 +13214,12 @@ struct TypeInfo
 namespace OperationalDatasetComponents {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-        const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> &;
+    using Type =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalDatasetComponents::Id; }
