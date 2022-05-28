@@ -14,23 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import optparse
-import os
-import sys
-import textwrap
-import shutil
-import yaml
 import hashlib
 import json
+import optparse
+import os
+import shutil
+import sys
 import tarfile
-import subprocess
+import textwrap
+from typing import Any, Dict, Sequence
+
+import yaml
 
 import constants
 import stateful_shell
-import chef_util
-
-from typing import Sequence
 
 TermColors = constants.TermColors
 
@@ -42,7 +39,9 @@ _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
 _CI_MANIFEST_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cimanifest.json")
-_CHEF_DEVICES_DIR = os.path.join(_CHEF_SCRIPT_PATH, "devices")
+_CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
+_CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
+_CI_ALLOW_LIST = ["lighting-app"]
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -58,7 +57,7 @@ def splash() -> None:
         |  `----.|  |  |  | |  |____ |  |
          \\______||__|  |__| |_______||__|{TermColors.STRRESET}
         """)
-    print(splashText, flush=True)
+    flush_print(splashText)
 
 
 def load_config() -> None:
@@ -72,9 +71,9 @@ def load_config() -> None:
         config = yaml.load(configStream, Loader=yaml.SafeLoader)
         configStream.close()
     else:
-        print("Running for the first time and configuring config.yaml. " +
-              "Change this configuration file to include correct configuration " +
-              "for the vendor's SDK", flush=True)
+        flush_print("Running for the first time and configuring config.yaml. " +
+                    "Change this configuration file to include correct configuration " +
+                    "for the vendor's SDK")
         configStream = open(configFile, 'w')
         config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
         config["nrfconnect"]["TTY"] = None
@@ -84,7 +83,7 @@ def load_config() -> None:
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
 
-        print(yaml.dump(config), flush=True)
+        flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
         configStream.close()
 
@@ -93,21 +92,86 @@ def load_config() -> None:
 
 def check_python_version() -> None:
     if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
+        flush_print('Must use Python 3. Current version is ' +
+                    str(sys.version_info[0]))
         exit(1)
+
+
+def check_zap_master() -> str:
+    """Produces hash of ZAP submodule in branch master
+    This will need to be replaced with stateful shell once it supports output
+    The branch should be taken as a parameter
+    Old code to show intent:
+    # git_cmd = ["git", "ls-tree", "master", "third_party/zap/repo"]
+    # zap_commit = str(subprocess.check_output(git_cmd, cwd=_REPO_BASE_PATH))
+    # zap_commit = zap_commit.split(" ")[2]
+    # zap_commit = zap_commit[:zap_commit.index("\\")]
+    """
+    zap_commit = 'TEMP DISABLED'
+    flush_print(f"zap commit: {zap_commit}")
+    return zap_commit
+
+
+def generate_device_manifest(
+        include_zap_submod: bool = False,
+        write_manifest_file: bool = False) -> Dict[str, Any]:
+    """Produces dictionary containing md5 of device dir zap files.
+
+    Args:
+        include_zap_submod: Include ZAP commit in manifest
+        write_manifest_file: Serialize manifest in file and tree
+    Returns:
+        Dict containing MD5 of device dir zap files.
+    """
+    ci_manifest = {}
+    for device_name in _DEVICE_LIST:
+        device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
+        with open(device_file_path, "rb") as device_file:
+            device_file_data = device_file.read()
+            device_file_md5 = hashlib.md5(device_file_data).hexdigest()
+            ci_manifest[device_name] = device_file_md5
+            flush_print(f"Manifest for {device_name} : {device_file_md5}")
+        if write_manifest_file:
+            device_zzz_dir_root = os.path.join(_CHEF_ZZZ_ROOT, device_name)
+            device_zzz_md5_file = os.path.join(device_zzz_dir_root, _CI_DEVICE_MANIFEST_NAME)
+            with open(device_zzz_md5_file, "w+", encoding="utf-8") as md5file:
+                md5file.write(device_file_md5)
+    if include_zap_submod:
+        ci_manifest["zap_commit"] = check_zap_master()
+    if write_manifest_file:
+        with open(_CI_MANIFEST_FILE_NAME, "w+", encoding="utf-8") as ci_manifest_file:
+            ci_manifest_file.write(json.dumps(ci_manifest, indent=4)+"\n")
+    return ci_manifest
+
+
+def load_cicd_config() -> Dict[str, Any]:
+    with open(_CICD_CONFIG_FILE_NAME, "r", encoding="utf-8") as config_file:
+        config = json.loads(config_file.read())
+        for platform_name, platform_config in config.items():
+            has_build_dir = "build_dir" in platform_config
+            has_plat_label = "platform_label" in platform_config
+            if not has_build_dir or not has_plat_label:
+                flush_print(f"{platform_name} CICD config missing build_dir or platform_label")
+                exit(1)
+    return config
+
+
+def flush_print(to_print: str) -> None:
+    """Prints and flushes stdout buffer"""
+    print(to_print, flush=True)
 
 
 def main(argv: Sequence[str]) -> None:
     check_python_version()
     config = load_config()
+    cicd_config = load_cicd_config()
 
     #
     # Build environment switches
     #
 
     if sys.platform == "win32":
-        print('Windows is currently not supported. Use Linux or MacOS platforms')
+        flush_print('Windows is currently not supported. Use Linux or MacOS platforms')
         exit(1)
 
     #
@@ -181,7 +245,7 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
     parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in chef_util.ci_allowlist. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+        "", "--ci", help="Builds Chef examples defined in _CI_ALLOW_LIST. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
 
     options, _ = parser.parse_args(argv)
 
@@ -192,37 +256,45 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.validate_zzz:
-        fix_instructions = "Cached files out of date. Please bootstrap, activate, install zap, run chef with the flag --generate_zzz and commit /examples/chef/zzz_generated and /examples/chef/cimanifes.json"
-        ci_manifest = chef_util.generate_device_manifest(_CHEF_DEVICES_DIR)
+        fix_instructions = """Cached files out of date!
+        Please:
+        bootstrap, activate, and install zap
+        run chef with the flag --generate_zzz
+        git add examples/chef/zzz_generated
+        git add examples/chef/cimanifes.json
+        Ensure you are running with the latest version of ZAP from master!"""
+        ci_manifest = generate_device_manifest()
         with open(_CI_MANIFEST_FILE_NAME, "r", encoding="utf-8") as ci_manifest_file:
             cached_manifest = json.loads(ci_manifest_file.read())
-            for device in ci_manifest:
-                if device != "zap_commit":
-                    try:
-                        if cached_manifest[device] != ci_manifest[device]:
-                            print("MISMATCH INPUT - "+fix_instructions)
+        for device in ci_manifest:
+            if device != "zap_commit":
+                try:
+                    if cached_manifest[device] != ci_manifest[device]:
+                        flush_print("MISMATCH INPUT - "+fix_instructions)
+                        exit(1)
+                    else:
+                        zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
+                        device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
+                        if not os.path.exists(device_md5_file):
+                            flush_print("MISSING RESULT - "+fix_instructions)
                             exit(1)
                         else:
-                            zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
-                            device_md5_file = os.path.join(zzz_dir, "INPUTMD5.txt")
-                            if not os.path.exists(device_md5_file):
-                                print("MISSING RESULT - "+fix_instructions)
-                                exit(1)
-                            else:
-                                with open(device_md5_file, "r", encoding="utf-8") as md5_file:
-                                    md5 = md5_file.read()
-                                    if ci_manifest[device] != md5:
-                                        print("MISMATCH OUTPUT - "+fix_instrucitons)
-                                        exit(1)
-                    except KeyError:
-                        print("MISSING DEVICE CACHE - "+fix_instructions)
-                        exit(1)
-                if device == "zap_commit" and False:
-                    # Disabled for now, ci_manifest above created without include_zap_submod, fails in CI env.
-                    if cached_manifest[device] != ci_manifest[device]:
-                        print("BAD ZAP VERSION - "+fix_instructions)
-                        exit(1)
-        print("Cached ZAP output is up to date!")
+                            with open(device_md5_file, "r", encoding="utf-8") as md5_file:
+                                md5 = md5_file.read()
+                                if ci_manifest[device] != md5:
+                                    flush_print("MISMATCH OUTPUT - "+fix_instrucitons)
+                                    exit(1)
+                except KeyError:
+                    flush_print("MISSING DEVICE CACHE - "+fix_instructions)
+                    exit(1)
+                    if device == "zap_commit" and False:
+                        # Disabled; should check:
+                        #   Current branch when writing manifest
+                        #   Master in CI
+                        if cached_manifest[device] != ci_manifest[device]:
+                            flush_print("BAD ZAP VERSION - "+fix_instructions)
+                            exit(1)
+        flush_print("Cached ZAP output is up to date!")
         exit(0)
 
     #
@@ -231,18 +303,19 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_bootstrap_zap:
         if sys.platform == "linux" or sys.platform == "linux2":
-            print("Installing ZAP OS package dependencies")
+            flush_print("Installing ZAP OS package dependencies")
             shell.run_cmd(
-                f"sudo apt-get install sudo apt-get install node node-yargs npm\
- libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp libjpeg9-dev libgif\
--dev node-typescript")
+                textwrap.dedent(""" \
+                sudo apt-get install sudo apt-get install node node-yargs npm \
+                libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp \
+                libjpeg9-dev libgif-dev node-typescript \""""))
         if sys.platform == "darwin":
-            print("Installation of ZAP OS packages not supported on MacOS")
+            flush_print("Installation of ZAP OS packages not supported on MacOS")
         if sys.platform == "win32":
-            print(
+            flush_print(
                 "Installation of ZAP OS packages not supported on Windows")
 
-        print("Running NPM to install ZAP Node.JS dependencies")
+        flush_print("Running NPM to install ZAP Node.JS dependencies")
         shell.run_cmd(
             f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
 
@@ -251,29 +324,27 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.generate_zzz:
-        print(f"Cleaning {_CHEF_ZZZ_ROOT}")
+        flush_print(f"Cleaning {_CHEF_ZZZ_ROOT}")
         if not os.path.exists(_CHEF_ZZZ_ROOT):
-            print(f"{_CHEF_ZZZ_ROOT} doesn't exist; creating")
+            flush_print(f"{_CHEF_ZZZ_ROOT} doesn't exist; creating")
             os.mkdir(_CHEF_ZZZ_ROOT)
         else:
-            print(f"Deleting and recreating existing {_CHEF_ZZZ_ROOT}")
+            flush_print(f"Deleting and recreating existing {_CHEF_ZZZ_ROOT}")
             shutil.rmtree(_CHEF_ZZZ_ROOT)
             os.mkdir(_CHEF_ZZZ_ROOT)
-        print(f"Generating files in {_CHEF_ZZZ_ROOT} for all devices", flush=True)
-        for device_dir_item in os.listdir(_CHEF_DEVICES_DIR):
-            target_file_ext = ".zap"
-            if device_dir_item.endswith(target_file_ext):  # and device_dir_item in chef_util.ci_allowlist:
-                device_name = device_dir_item[:-len(target_file_ext)]
-                print(f"Generating files for {device_name}", flush=True)
-                device_out_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-                os.mkdir(device_out_dir)
-                device_out_dir = os.path.join(device_out_dir, "zap-generated")
-                os.mkdir(device_out_dir)
-                shell.run_cmd(f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py\
- {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}")
-                shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
-        chef_util.generate_device_manifest(_CHEF_DEVICES_DIR, include_zap_submod=True, write_manifest_file=True,
-                                           ci_manifest_file_name=_CI_MANIFEST_FILE_NAME, repo_base_path=_REPO_BASE_PATH, chef_zzz_root=_CHEF_ZZZ_ROOT)
+        flush_print(f"Generating files in {_CHEF_ZZZ_ROOT} for all devices")
+        for device_name in _DEVICE_LIST:
+            flush_print(f"Generating files for {device_name}")
+            device_out_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
+            os.mkdir(device_out_dir)
+            device_out_dir = os.path.join(device_out_dir, "zap-generated")
+            os.mkdir(device_out_dir)
+            shell.run_cmd(textwrap.dedent(f"""\
+            {_REPO_BASE_PATH}/scripts/tools/zap/generate.py \
+            {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""))
+            shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
+        generate_device_manifest(include_zap_submod=True,
+                                 write_manifest_file=True)
         exit(0)
 
     #
@@ -281,14 +352,11 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.ci:
-        if options.build_target == "nrfconnect":
-            os.environ['GNUARMEMB_TOOLCHAIN_PATH'] = os.environ['PW_ARM_CIPD_INSTALL_DIR']
-        for device_dir_item in os.listdir(_CHEF_DEVICES_DIR):
-            target_file_ext = ".zap"
-            if device_dir_item.endswith(target_file_ext) and device_dir_item in chef_util.ci_allowlist:
-                device_name = device_dir_item[:-len(target_file_ext)]
-                command = './chef.py -cbr --use_zzz -d {} -t {}'.format(device_name, options.build_target)
-                subprocess.check_call(command, cwd=_CHEF_SCRIPT_PATH, shell=True)
+        for device_name in [d for d in _DEVICE_LIST if d in _CI_ALLOW_LIST]:
+            if options.build_target == "nrfconnect":
+                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+            shell.run_cmd(f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}")
         exit(0)
 
     #
@@ -296,55 +364,52 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
-        print("Building all chef examples", flush=True)
-        os.environ['GNUARMEMB_TOOLCHAIN_PATH'] = os.environ['PW_ARM_CIPD_INSTALL_DIR']
+        # Needs testing after refactor
+        # Needs to call per-platform bundle function
+        flush_print("Build all disabled")
+        exit(1)
+        flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
-        if not os.path.exists(archive_prefix):
-            # shutil.rmtree(archive_prefix)
-            os.mkdir(archive_prefix)
         archive_suffix = ".tar.gz"
-
-        cd_platforms_meta = chef_util.cd_platforms_meta
-        for device in os.listdir(_CHEF_DEVICES_DIR):
-            target_file_ext = ".zap"
-            if device.endswith(target_file_ext):
-                device_name = device[:-len(target_file_ext)]
-                for platform, platform_meta in cd_platforms_meta.items():
-                    # shutil.rmitem(configFile)
-                    directory = platform_meta['build_dir']
-                    label = platform_meta['platform_label']
-                    output_dir = os.path.join(_CHEF_SCRIPT_PATH, directory)
-                    command = './chef.py -cbr --use_zzz -d {} -t {}'.format(device_name, platform)
-                    print('-' * 64, flush=True)
-                    print(f"Building {command}", flush=True)
-                    print('-' * 64, flush=True)
-                    subprocess.check_call(command, cwd=_CHEF_SCRIPT_PATH, shell=True)
-                    archive_name = f"{label}-chef-{device_name}-wifi-rpc"
-                    archive_full_name = archive_prefix + archive_name + archive_suffix
-                    print(f"Adding build output to archive {archive_full_name}", flush=True)
-                    with tarfile.open(archive_full_name, "w:gz") as tar:
-                        tar.add(output_dir, arcname=".")
+        os.makedirs(archive_prefix, exist_ok=True)
+        for device_name in _DEVICE_LIST:
+            for platform, platform_meta in cicd_config.items():
+                directory = platform_meta['build_dir']
+                label = platform_meta['platform_label']
+                output_dir = os.path.join(_CHEF_SCRIPT_PATH, directory)
+                command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
+                flush_print("-" * 64)
+                flush_print(f"Building {command}")
+                flush_print("-" * 64)
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                shell.run_cmd(command)
+                archive_name = f"{label}-chef-{device_name}-wifi-rpc"
+                archive_full_name = archive_prefix + archive_name + archive_suffix
+                flush_print(f"Adding build output to archive {archive_full_name}")
+                with tarfile.open(archive_full_name, "w:gz") as tar:
+                    tar.add(output_dir, arcname=".")
         exit(0)
 
     #
     # Platform Folder
     #
 
-    print(f"Target is set to {options.sample_device_type_name}")
+    flush_print(f"Target is set to {options.sample_device_type_name}")
     global gen_dir
     gen_dir = (
         f"{_CHEF_SCRIPT_PATH}/out/{options.sample_device_type_name}/zap-generated/")
 
-    print("Setting up environment...")
+    flush_print("Setting up environment...")
     if options.build_target == "esp32":
         if config['esp32']['IDF_PATH'] is None:
-            print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
+            flush_print('Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
         plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/esp32")
         shell.run_cmd(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.build_target == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
-            print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
+            flush_print('Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
         plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/nrfconnect")
         shell.run_cmd(f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
@@ -352,9 +417,9 @@ def main(argv: Sequence[str]) -> None:
     elif options.build_target == "linux":
         pass
     elif options.build_target == "silabs-thread":
-        print('Path to gecko sdk is configured within Matter.')
+        flush_print('Path to gecko sdk is configured within Matter.')
     else:
-        print(f"Target {options.build_target} not supported")
+        flush_print(f"Target {options.build_target} not supported")
 
     shell.run_cmd(f"source {_REPO_BASE_PATH}/scripts/activate.sh")
 
@@ -364,28 +429,28 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_update_toolchain:
         if options.build_target == "esp32":
-            print("ESP32 toolchain update not supported. Skipping")
+            flush_print("ESP32 toolchain update not supported. Skipping")
         elif options.build_target == "nrfconnect":
-            print("Updating toolchain")
+            flush_print("Updating toolchain")
             shell.run_cmd(
                 f"cd {_REPO_BASE_PATH} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
         elif options.build_target == "silabs-thread":
-            print("Silabs-thread toolchain not supported. Skipping")
+            flush_print("Silabs-thread toolchain not supported. Skipping")
         elif options.build_target == "linux":
-            print("Linux toolchain update not supported. Skipping")
+            flush_print("Linux toolchain update not supported. Skipping")
 
     #
     # Cluster customization
     #
 
     if options.do_run_gui:
-        print("Starting ZAP GUI editor")
+        flush_print("Starting ZAP GUI editor")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/devices")
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/run_zaptool.sh {options.sample_device_type_name}.zap")
 
     if options.do_run_zap:
-        print("Running ZAP script to generate artifacts", flush=True)
+        flush_print("Running ZAP script to generate artifacts")
         shell.run_cmd(f"mkdir -p {gen_dir}/")
         shell.run_cmd(f"rm {gen_dir}/*")
         shell.run_cmd(
@@ -405,9 +470,9 @@ def main(argv: Sequence[str]) -> None:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             shell.run_cmd("west build -t menuconfig")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
-            print("Menuconfig not available on Silabs-thread target. Skipping")
+            flush_print("Menuconfig not available on Silabs-thread target. Skipping")
         elif options.build_target == "linux":
-            print("Menuconfig not available on Linux target. Skipping")
+            flush_print("Menuconfig not available on Linux target. Skipping")
 
     #
     # Build
@@ -415,28 +480,30 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_build:
         if options.use_zzz:
-            print("Using pre-generated ZAP output", flush=True)
-            zzz_dir = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated", options.sample_device_type_name, "zap-generated")
-            if os.path.exists(gen_dir):
-                shutil.rmtree(gen_dir)
+            flush_print("Using pre-generated ZAP output")
+            zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
+                                   "zzz_generated",
+                                   options.sample_device_type_name,
+                                   "zap-generated")
+            shutil.rmtree(gen_dir, ignore_errors=True)
             shutil.copytree(zzz_dir, gen_dir)
 
-        print("Building...")
+        flush_print("Building...")
         if options.do_rpc:
-            print("RPC PW enabled")
+            flush_print("RPC PW enabled")
             if options.build_target == "esp32":
                 shell.run_cmd(
                     f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
             else:
-                print(f"RPC PW on {options.build_target} not supported")
+                flush_print(f"RPC PW on {options.build_target} not supported")
 
         else:
-            print("RPC PW disabled")
+            flush_print("RPC PW disabled")
         if (options.build_target == "esp32"):
             shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
 
-        print(
+        flush_print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
@@ -476,7 +543,8 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                args_gni = os.path.join(_REPO_BASE_PATH, "config/standalone/args.gni")
+                args_gni = os.path.join(
+                    _REPO_BASE_PATH, "config/standalone/args.gni")
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
                         import("{args_gni}")
@@ -502,10 +570,10 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_flash:
-        print("Flashing target")
+        flush_print("Flashing target")
         if options.build_target == "esp32":
             if config['esp32']['TTY'] is None:
-                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                flush_print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.do_erase:
@@ -529,28 +597,29 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_interact:
-        print("Starting terminal...")
+        flush_print("Starting terminal...")
         if options.build_target == "esp32":
             if config['esp32']['TTY'] is None:
-                print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                flush_print('The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.build_target == "nrfconnect":
             if config['nrfconnect']['TTY'] is None:
-                print('The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
+                flush_print('The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd("killall screen")
             shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
         elif (options.build_target == "silabs-thread"):
             if config['silabs-thread']['TTY'] is None:
-                print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                flush_print(
+                    'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
                 exit(1)
 
             shell.run_cmd("killall screen")
             shell.run_cmd(f"screen {config['silabs-thread']['TTY']} 115200 8-N-1")
         elif options.build_target == "linux":
-            print(
+            flush_print(
                 f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sample_device_type_name}")
             shell.run_cmd(
                 f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sample_device_type_name}")
@@ -565,16 +634,18 @@ def main(argv: Sequence[str]) -> None:
         elif (options.build_target == "silabs-thread"):
             if (sys.platform == "linux") or (sys.platform == "linux2"):
                 if(config['silabs-thread']['TTY'] is None):
-                    print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                    flush_print(
+                        'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
             elif sys.platform == "darwin":
                 if(config['silabs-thread']['CU'] is None):
-                    print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
+                    flush_print(
+                        'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
 
-    print("Done")
+    flush_print("Done")
 
 
 if __name__ == '__main__':
