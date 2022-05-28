@@ -1544,6 +1544,7 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayThermostatServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfThermostatClusterServerInitCallback,                                                \
+        (EmberAfGenericClusterFunction) MatterThermostatClusterServerPreAttributeChangedCallback,                                  \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayFanControlServer[] = {                                                        \
         (EmberAfGenericClusterFunction) MatterFanControlClusterServerAttributeChangedCallback,                                     \
@@ -2459,7 +2460,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(404), \
       .attributeCount = 20, \
       .clusterSize = 35, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayThermostatServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 155 ) ,\
       .generatedCommandList = nullptr ,\
