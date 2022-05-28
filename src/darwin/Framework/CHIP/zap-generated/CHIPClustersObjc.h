@@ -21934,6 +21934,7 @@ typedef NS_ENUM(uint8_t, CHIPOperationalCredentialsOperationalCertStatus) {
     CHIPOperationalCredentialsOperationalCertStatusInvalidNOC = 0x03,
     CHIPOperationalCredentialsOperationalCertStatusMissingCsr = 0x04,
     CHIPOperationalCredentialsOperationalCertStatusTableFull = 0x05,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidAdminSubject = 0x06,
     CHIPOperationalCredentialsOperationalCertStatusInsufficientPrivilege = 0x08,
     CHIPOperationalCredentialsOperationalCertStatusFabricConflict = 0x09,
     CHIPOperationalCredentialsOperationalCertStatusLabelConflict = 0x0A,

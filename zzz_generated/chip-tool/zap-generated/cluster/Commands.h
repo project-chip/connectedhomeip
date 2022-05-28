@@ -6642,7 +6642,7 @@ public:
         AddArgument("NOCValue", &mRequest.NOCValue);
         AddArgument("ICACValue", &mRequest.ICACValue);
         AddArgument("IPKValue", &mRequest.IPKValue);
-        AddArgument("CaseAdminNode", 0, UINT64_MAX, &mRequest.caseAdminNode);
+        AddArgument("CaseAdminSubject", 0, UINT64_MAX, &mRequest.caseAdminSubject);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId);
         ClusterCommand::AddArguments();
     }

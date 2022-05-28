@@ -4352,7 +4352,7 @@ class ChipClusters:
                         "NOCValue": "bytes",
                         "ICACValue": "bytes",
                         "IPKValue": "bytes",
-                        "caseAdminNode": "int",
+                        "caseAdminSubject": "int",
                         "adminVendorId": "int",
                     },
                 },

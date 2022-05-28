@@ -11162,7 +11162,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNOCValue)), NOCValue));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kICACValue)), ICACValue));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIPKValue)), IPKValue));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCaseAdminNode)), caseAdminNode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCaseAdminSubject)), caseAdminSubject));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminVendorId)), adminVendorId));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -11191,8 +11191,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kIPKValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, IPKValue));
             break;
-        case to_underlying(Fields::kCaseAdminNode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminNode));
+        case to_underlying(Fields::kCaseAdminSubject):
+            ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminSubject));
             break;
         case to_underlying(Fields::kAdminVendorId):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));

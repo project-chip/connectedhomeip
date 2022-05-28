@@ -3161,7 +3161,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull ipkValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull caseAdminNode;
+@property (strong, nonatomic) NSNumber * _Nonnull caseAdminSubject;
 
 @property (strong, nonatomic) NSNumber * _Nonnull adminVendorId;
 /**

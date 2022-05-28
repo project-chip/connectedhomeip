@@ -1181,11 +1181,11 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::AddNOC::Type request;
-    request.NOCValue      = nocCertBuf;
-    request.ICACValue     = icaCertBuf;
-    request.IPKValue      = ipk;
-    request.caseAdminNode = adminSubject;
-    request.adminVendorId = mVendorId;
+    request.NOCValue         = nocCertBuf;
+    request.ICACValue        = icaCertBuf;
+    request.IPKValue         = ipk;
+    request.caseAdminSubject = adminSubject;
+    request.adminVendorId    = mVendorId;
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
@@ -1212,9 +1212,12 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
+    case OperationalCertStatus::kInvalidAdminSubject:
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:
+        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:

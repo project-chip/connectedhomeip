@@ -13903,7 +13903,7 @@ public class ChipClusters {
         byte[] NOCValue,
         Optional<byte[]> ICACValue,
         byte[] IPKValue,
-        Long caseAdminNode,
+        Long caseAdminSubject,
         Integer adminVendorId) {
       addNOC(
           chipClusterPtr,
@@ -13911,7 +13911,7 @@ public class ChipClusters {
           NOCValue,
           ICACValue,
           IPKValue,
-          caseAdminNode,
+          caseAdminSubject,
           adminVendorId,
           null);
     }
@@ -13921,7 +13921,7 @@ public class ChipClusters {
         byte[] NOCValue,
         Optional<byte[]> ICACValue,
         byte[] IPKValue,
-        Long caseAdminNode,
+        Long caseAdminSubject,
         Integer adminVendorId,
         int timedInvokeTimeoutMs) {
       addNOC(
@@ -13930,7 +13930,7 @@ public class ChipClusters {
           NOCValue,
           ICACValue,
           IPKValue,
-          caseAdminNode,
+          caseAdminSubject,
           adminVendorId,
           timedInvokeTimeoutMs);
     }
@@ -14022,7 +14022,7 @@ public class ChipClusters {
         byte[] NOCValue,
         Optional<byte[]> ICACValue,
         byte[] IPKValue,
-        Long caseAdminNode,
+        Long caseAdminSubject,
         Integer adminVendorId,
         @Nullable Integer timedInvokeTimeoutMs);
 
