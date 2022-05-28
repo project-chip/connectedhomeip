@@ -287,13 +287,13 @@ def main(argv: Sequence[str]) -> None:
                 except KeyError:
                     flush_print("MISSING DEVICE CACHE - "+fix_instructions)
                     exit(1)
-                    if device == "zap_commit" and False:
-                        # Disabled; should check:
-                        #   Current branch when writing manifest
-                        #   Master in CI
-                        if cached_manifest[device] != ci_manifest[device]:
-                            flush_print("BAD ZAP VERSION - "+fix_instructions)
-                            exit(1)
+            if device == "zap_commit" and False:
+                # Disabled; should check:
+                #   Current branch when writing manifest
+                #   Master in CI
+                if cached_manifest[device] != ci_manifest[device]:
+                    flush_print("BAD ZAP VERSION - "+fix_instructions)
+                    exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
