@@ -1806,75 +1806,62 @@
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Channel (server) */\
   /*   AcceptedCommandList (index=179) */ \
-  0x00000000 /* ChangeChannel */, \
   0x00000002 /* ChangeChannelByNumber */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=182)*/ \
-  0x00000001 /* ChangeChannelResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Target Navigator (server) */\
-  /*   AcceptedCommandList (index=184) */ \
+  /*   AcceptedCommandList (index=181) */ \
   0x00000000 /* NavigateTarget */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=186)*/ \
+  /*   GeneratedCommandList (index=183)*/ \
   0x00000001 /* NavigateTargetResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Media Playback (server) */\
-  /*   AcceptedCommandList (index=188) */ \
+  /*   AcceptedCommandList (index=185) */ \
   0x00000000 /* Play */, \
   0x00000001 /* Pause */, \
   0x00000002 /* StopPlayback */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=192)*/ \
+  /*   GeneratedCommandList (index=189)*/ \
   0x0000000A /* PlaybackResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Media Input (server) */\
-  /*   AcceptedCommandList (index=194) */ \
+  /*   AcceptedCommandList (index=191) */ \
   0x00000000 /* SelectInput */, \
   0x00000001 /* ShowInputStatus */, \
   0x00000002 /* HideInputStatus */, \
   0x00000003 /* RenameInput */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Low Power (server) */\
-  /*   AcceptedCommandList (index=199) */ \
+  /*   AcceptedCommandList (index=196) */ \
   0x00000000 /* Sleep */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Keypad Input (server) */\
-  /*   AcceptedCommandList (index=201) */ \
+  /*   AcceptedCommandList (index=198) */ \
   0x00000000 /* SendKey */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=203)*/ \
+  /*   GeneratedCommandList (index=200)*/ \
   0x00000001 /* SendKeyResponse */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Content Launcher (server) */\
-  /*   AcceptedCommandList (index=205) */ \
-  0x00000000 /* LaunchContent */, \
-  0x00000001 /* LaunchURL */, \
-  chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=208)*/ \
-  0x00000002 /* LaunchResponse */, \
-  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Audio Output (server) */\
-  /*   AcceptedCommandList (index=210) */ \
+  /*   AcceptedCommandList (index=202) */ \
   0x00000000 /* SelectOutput */, \
-  0x00000001 /* RenameOutput */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Application Launcher (server) */\
-  /*   AcceptedCommandList (index=213) */ \
+  /*   AcceptedCommandList (index=204) */ \
   0x00000000 /* LaunchApp */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=215)*/ \
+  /*   GeneratedCommandList (index=206)*/ \
   0x00000003 /* LauncherResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Account Login (server) */\
-  /*   AcceptedCommandList (index=217) */ \
+  /*   AcceptedCommandList (index=208) */ \
   0x00000000 /* GetSetupPIN */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=219)*/ \
+  /*   GeneratedCommandList (index=210)*/ \
   0x00000001 /* GetSetupPINResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Test Cluster (server) */\
-  /*   AcceptedCommandList (index=221) */ \
+  /*   AcceptedCommandList (index=212) */ \
   0x00000000 /* Test */, \
   0x00000001 /* TestNotHandled */, \
   0x00000002 /* TestSpecific */, \
@@ -1894,7 +1881,7 @@
   0x00000014 /* TestEmitTestEventRequest */, \
   0x00000015 /* TestEmitTestFabricScopedEventRequest */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=240)*/ \
+  /*   GeneratedCommandList (index=231)*/ \
   0x00000000 /* TestSpecificResponse */, \
   0x00000001 /* TestAddArgumentsResponse */, \
   0x00000004 /* TestListInt8UReverseResponse */, \
@@ -1906,7 +1893,7 @@
   0x0000000B /* TestEmitTestFabricScopedEventResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=250) */ \
+  /*   AcceptedCommandList (index=241) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -1914,20 +1901,20 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=257)*/ \
+  /*   GeneratedCommandList (index=248)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=262) */ \
+  /*   AcceptedCommandList (index=253) */ \
   0x00000000 /* Off */, \
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 65534, Cluster: Network Commissioning (server) */\
-  /*   AcceptedCommandList (index=266) */ \
+  /*   AcceptedCommandList (index=257) */ \
   0x00000000 /* ScanNetworks */, \
   0x00000002 /* AddOrUpdateWiFiNetwork */, \
   0x00000003 /* AddOrUpdateThreadNetwork */, \
@@ -1935,7 +1922,7 @@
   0x00000006 /* ConnectNetwork */, \
   0x00000008 /* ReorderNetwork */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=273)*/ \
+  /*   GeneratedCommandList (index=264)*/ \
   0x00000001 /* ScanNetworksResponse */, \
   0x00000005 /* NetworkConfigResponse */, \
   0x00000007 /* ConnectNetworkResponse */, \
@@ -2607,7 +2594,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 179 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 182 ) ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Target Navigator (server) */ \
@@ -2617,8 +2604,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 184 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 186 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 181 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 183 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Playback (server) */ \
@@ -2628,8 +2615,8 @@
       .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 188 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 185 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 189 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Input (server) */ \
@@ -2639,7 +2626,7 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 194 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 191 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -2650,7 +2637,7 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 199 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 196 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -2661,8 +2648,8 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 201 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 203 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 198 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 200 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Content Launcher (server) */ \
@@ -2672,8 +2659,8 @@
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 205 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
+      .acceptedCommandList = nullptr ,\
+      .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Audio Output (server) */ \
@@ -2683,7 +2670,7 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 210 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 202 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -2694,8 +2681,8 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 213 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 215 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 204 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 206 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Application Basic (server) */ \
@@ -2716,8 +2703,8 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 217 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 219 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 210 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Test Cluster (server) */ \
@@ -2727,8 +2714,8 @@
       .clusterSize = 2289, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 221 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 240 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 212 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 231 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Electrical Measurement (server) */ \
@@ -2749,8 +2736,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 250 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 257 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 241 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 248 ) ,\
     },\
   { \
       /* Endpoint: 2, Cluster: On/Off (server) */ \
@@ -2760,7 +2747,7 @@
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 262 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 253 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -2804,8 +2791,8 @@
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 266 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 273 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 257 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 264 ) ,\
     },\
 }
 
