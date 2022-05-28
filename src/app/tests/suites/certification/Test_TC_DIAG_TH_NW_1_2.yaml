@@ -28,13 +28,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #disabled due to this issue #18244
     - label: "read configured Channel attribute value"
-      disabled: true
       command: "readAttribute"
       attribute: "channel"
       response:
-          value: 0
+          value: null
 
     - label: "Validate constraints of attribute: Channel"
       command: "readAttribute"
@@ -47,17 +45,22 @@ tests:
       command: "readAttribute"
       attribute: "RoutingRole"
       response:
+          value: null
+
+    - label: "Validate constraints of attribute: RoutingRole"
+      command: "readAttribute"
+      attribute: "RoutingRole"
+      response:
           constraints:
               type: RoutingRole
               minValue: 0
               maxValue: 6
 
-    #Issue #18135
     - label: "read NetworkName attribute from DUT"
       command: "readAttribute"
       attribute: "NetworkName"
       response:
-          value: ""
+          value: null
 
     - label:
           "read NetworkName attribute from DUT and verify response value, If
