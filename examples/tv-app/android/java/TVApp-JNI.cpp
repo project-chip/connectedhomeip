@@ -27,9 +27,9 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
-#include "MyUserPrompter-JNI.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
