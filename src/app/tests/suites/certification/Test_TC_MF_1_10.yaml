@@ -34,7 +34,7 @@ config:
         defaultValue: 3840
     payload:
         type: CHAR_STRING
-        defaultValue: "MT:-24J0AFN00KA0648G01" # This value needs to be generated automatically
+        defaultValue: "MT:0000000000I31506010"
     payload2:
         type: CHAR_STRING
         defaultValue: "MT:0000000000I.0648G00"
