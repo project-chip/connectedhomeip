@@ -22,8 +22,11 @@ public class UserPrompterResolver {
   private static final String TAG = "UserPrompterResolver";
 
   public native void OnPinCodeEntered(int pinCode);
+
   public native void OnPinCodeDeclined();
+
   public native void OnPromptAccepted();
+
   public native void OnPromptDeclined();
 
   static {

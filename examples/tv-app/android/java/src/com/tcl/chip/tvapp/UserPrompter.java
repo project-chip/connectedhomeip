@@ -18,7 +18,7 @@
 package com.tcl.chip.tvapp;
 
 public interface UserPrompter {
-  
+
   /*
    *  Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
    * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
@@ -28,7 +28,7 @@ public interface UserPrompter {
    *
    */
   void promptForCommissionOkPermission(int vendorId, int productId, String commissioneeName);
-  
+
   /*
    *  Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
    * commissioned. For example "Please enter pin displayed in casting app."

@@ -60,10 +60,7 @@ public class TerminalFragment extends Fragment {
 
               AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-              builder.setMessage(message)
-                     .setTitle("Response")
-                     .create()
-                     .show();
+              builder.setMessage(message).setTitle("Response").create().show();
             });
   }
 }
