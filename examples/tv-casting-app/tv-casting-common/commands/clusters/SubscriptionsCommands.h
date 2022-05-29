@@ -26,7 +26,7 @@ class ShutdownSubscription : public CHIPCommand
 public:
     ShutdownSubscription(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("shutdown-subscription", credsIssuerConfig)
     {
-        AddArgument("subscription-id", 0, UINT64_MAX, &mSubscriptionId);
+        AddArgument("subscription-id", 0, UINT32_MAX, &mSubscriptionId);
     }
 
     /////////// CHIPCommand Interface /////////

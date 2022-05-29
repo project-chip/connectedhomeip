@@ -29,11 +29,12 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <lib/support/EnforceFormat.h>
 
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
-void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...);
+void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...) ENFORCE_FORMAT(2, 3);
 void IncreaseDepth();
 void DecreaseDepth();
 #define PRETTY_PRINT(fmt, ...)                                                                                                     \
