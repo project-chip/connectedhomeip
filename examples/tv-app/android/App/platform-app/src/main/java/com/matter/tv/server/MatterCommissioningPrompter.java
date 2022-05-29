@@ -1,5 +1,6 @@
 package com.matter.tv.server;
 
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -10,58 +11,62 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 
 import com.tcl.chip.tvapp.UserPrompter;
+import com.tcl.chip.tvapp.UserPrompterResolver;
 
 import static androidx.core.content.ContextCompat.getSystemService;
 
-public class MatterCommissioningPrompter implements UserPrompter {
+public class MatterCommissioningPrompter extends UserPrompterResolver implements UserPrompter {
 
-    private Context context;
+    private Activity activity;
     private NotificationManager notificationManager;
     private final String CHANNEL_ID = "MatterCommissioningPrompter.CHANNEL";
     private final int SUCCESS_ID = 0;
     private final int FAIL_ID = 1;
 
-    public MatterCommissioningPrompter(Context context) {
-        this.context = context;
+    public MatterCommissioningPrompter(Activity activity) {
+        this.activity = activity;
         this.createNotificationChannel();
     }
 
-    public boolean promptForCommissionOkPermission(int vendorId, int productId, String commissioneeName) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public void promptForCommissionOkPermission(int vendorId,
+                                                int productId,
+                                                String commissioneeName) {
+        // TODO: find app by vendorId and productId
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         builder.setMessage("Will you allow access to " + commissioneeName + "?")
                 .setTitle("Allow access to " + commissioneeName)
                 .setPositiveButton("Ok", (dialog, which) -> {
-
+                    OnPromptAccepted();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
-
+                    OnPromptDeclined();
                 })
                 .create()
                 .show();
-
-        return true;
     }
 
-    public int promptForCommissionPinCode(int vendorId, int productId, String commissioneeName) {
+    @Override
+    public void promptForCommissionPinCode(int vendorId,
+                                           int productId,
+                                           String commissioneeName) {
+        // TODO: find app by vendorId and productId
 
-        EditText editText = new EditText(context);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        EditText editText = new EditText(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         builder.setMessage("Enter PIN code sent to your other device")
                 .setTitle("Allow access to " + commissioneeName)
                 .setView(editText)
                 .setPositiveButton("Ok", (dialog, which) -> {
                     String pinCode = editText.getText().toString();
-
+                    OnPinCodeEntered(Integer.parseInt(pinCode));
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
-
+                    OnPinCodeDeclined();
                 })
                 .create()
                 .show();
-        return 20202021;
     }
 
     public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {

@@ -18,8 +18,34 @@
 package com.tcl.chip.tvapp;
 
 public interface UserPrompter {
-  boolean promptForCommissionOkPermission(int vendorId, int productId, String commissioneeName);
-  int promptForCommissionPinCode(int vendorId, int productId, String commissioneeName);
+  
+  /*
+   *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+   * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+   *
+   * If user responds with OK then implementor should call OnPromptAccepted;
+   * If user responds with Cancel then implementor should call OnPromptDeclined();
+   *
+   */
+  void promptForCommissionOkPermission(int vendorId, int productId, String commissioneeName);
+  
+  /*
+   *   Called to prompt the user for PIN code to allow the given commissioneeName/vendorId/productId to be commissioned.
+   * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+   *
+   * If user responds with OK then implementor should call OnPinCodeEntered();
+   * If user responds with Cancel then implementor should call OnPinCodeDeclined();
+   *
+   */
+  void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName);
+
+  /*
+   *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
+   */
   void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName);
+
+  /*
+   *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
+   */
   void promptCommissioningFailed(String commissioneeName, String error);
 }
