@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.1.5. [TC-DD-1.5] NFC Rules of advertisement and Onboarding
+name:
+    3.1.5. [TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT -
+    Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,13 +23,76 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify that the onboarding payload for NFC tags SHALL use
-                    NDEF URI Record Type Definition as defined by NFC Forum in
-                    URI Record Type Definition RTD URI"
+    - label:
+          "If (PICS_SCAN_NFC), Keep the DUT in packaging and bring in TH NFC
+          scanner close to the DUT packaging."
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_NFC), Unpack DUT from its packaging, make sure DUT is
+          not powered on and do not put the DUT in pairing mode. Bring in TH NFC
+          scanner close to the DUTs NFC tag"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If (PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT and do not
+          put the DUT in pairing mode. Bring in TH NFC scanner close to the DUTs
+          NFC tag"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If (PICS_PHYSICAL_TEMPERING) DUT must have an explicit trigger of the
+          the NFC pairing mode"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If (PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT and put the
+          DUT in pairing mode. Bring in TH NFC scanner close to NFC tag"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If !(PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT. Bring in
+          NFC scanner close to NFC tag"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label: "Wait for the pairing mode to expire on device"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label: "For Read only Tags, try to write using NFC tool a payload to DUT"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "For Programmable Tag, NFC tag must be read only OTA. Try to write a
+          payload to DUT using NFC tool"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "Optional  For Programmable Tag, NFC tag may be reconfigured using
+          wired means"
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_NFC), Using TH NFC scanner - read NFC tag Reader type"
+      verification: |
+          Vendor specific field verification
+      disabled: true

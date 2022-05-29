@@ -3108,12 +3108,6 @@ class ChipClusters:
                         "identifyTime": "int",
                     },
                 },
-            0x00000001: {
-                    "commandId": 0x00000001,
-                    "commandName": "IdentifyQuery",
-                    "args": {
-                    },
-                },
             0x00000040: {
                     "commandId": 0x00000040,
                     "commandName": "TriggerEffect",
@@ -4358,7 +4352,7 @@ class ChipClusters:
                         "NOCValue": "bytes",
                         "ICACValue": "bytes",
                         "IPKValue": "bytes",
-                        "caseAdminNode": "int",
+                        "caseAdminSubject": "int",
                         "adminVendorId": "int",
                     },
                 },
@@ -6210,12 +6204,6 @@ class ChipClusters:
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "ClearWeeklySchedule",
-                    "args": {
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "GetRelayStatusLog",
                     "args": {
                     },
                 },

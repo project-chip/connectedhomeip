@@ -89,14 +89,11 @@ protected:
                            const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
                            const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
-    void Shutdown()
-    {
-        mSubscribeClient.reset();
-        mReadClient.reset();
-    }
+    void Shutdown() { mReadClients.clear(); }
 
-    std::unique_ptr<chip::app::ReadClient> mReadClient;
-    std::unique_ptr<chip::app::ReadClient> mSubscribeClient;
+    void CleanupReadClient(chip::app::ReadClient * aReadClient);
+
+    std::vector<std::unique_ptr<chip::app::ReadClient>> mReadClients;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 };
 

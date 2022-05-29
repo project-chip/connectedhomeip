@@ -904,6 +904,15 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
 
 CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
+    // If we literally have no read handlers right now that care about any events,
+    // we don't need to call schedule run for event.
+    // If schedule run is called, actually we would not delivery events as well.
+    // Just wanna save one schedule run here
+    if (InteractionModelEngine::GetInstance()->mEventPathPool.Allocated() == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     bool isUrgentEvent = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))

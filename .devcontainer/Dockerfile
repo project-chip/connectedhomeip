@@ -74,3 +74,6 @@ RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
 RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
 
 RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.10-hardknott/
+
+# Add access to openocd for VSCode debugging
+RUN chown -R $USERNAME:$USERNAME /opt/openocd

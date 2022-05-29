@@ -52,7 +52,7 @@ limitations under the License.
       <access op="invoke" privilege="administer"/>
     </command>
 
-    <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="true">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
       <arg name="CommissioningTimeout" type="INT16U"/>
       <access op="invoke" privilege="administer"/>

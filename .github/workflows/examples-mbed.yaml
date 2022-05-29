@@ -121,6 +121,16 @@ jobs:
                     examples/all-clusters-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build all-clusters-minimal-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              timeout-minutes: 20
+              run: |
+                  scripts/examples/mbed_example.sh -a=all-clusters-minimal-app -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE all-clusters-minimal-app \
+                    examples/all-clusters-minimal-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-minimal-app-example.elf \
+                    /tmp/bloat_reports/
+
             - name: Build shell example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20

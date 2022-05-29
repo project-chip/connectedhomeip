@@ -25,7 +25,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST"        type="ARRAY" entryType="INT16U" length="254" reportable="true"  writable="false" optional="false">CatalogList</attribute>
+    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST"        type="ARRAY" entryType="INT16U" length="254" reportable="true"  writable="false" optional="true">CatalogList</attribute>
     <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationEP"            default="0x0" isNullable="true" writable="true"  optional="true">CurrentApp</attribute>
 
     <command source="client" code="0x00" name="LaunchApp" response="LauncherResponse" optional="false">

@@ -209,6 +209,12 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger():
         desc = "Missing secure session";
         break;
+    case CHIP_ERROR_INVALID_ADMIN_SUBJECT.AsInteger():
+        desc = "CaseAdminSubject is not valid";
+        break;
+    case CHIP_ERROR_INSUFFICIENT_PRIVILEGE.AsInteger():
+        desc = "Required privilege was insufficient during an operation";
+        break;
     case CHIP_ERROR_INVALID_PATH_LIST.AsInteger():
         desc = "Invalid TLV path list";
         break;

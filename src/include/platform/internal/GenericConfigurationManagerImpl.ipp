@@ -38,6 +38,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -51,6 +52,161 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+template <class ConfigClass>
+class LegacyDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+
+public:
+    // GenericConfigurationManagerImpl will own a LegacyDeviceInstanceInfoProvider which
+    // *refers back to that GenericConfigurationManagerImpl*, due to how CRTP-based
+    // storage APIs are defined. This is a bit unclean, but only applicable to the
+    // transition path when `CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER` is true.
+    // This circular dependency is NOT needed by DeviceInstanceInfoProvider, but required
+    // to keep legacy code running.
+    LegacyDeviceInstanceInfoProvider(GenericConfigurationManagerImpl<ConfigClass> & configManager) :
+        mGenericConfigManager(configManager)
+    {}
+
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+
+private:
+    GenericConfigurationManagerImpl<ConfigClass> & mGenericConfigManager;
+};
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
+{
+    ChipError err       = CHIP_NO_ERROR;
+    size_t serialNumLen = 0; // without counting null-terminator
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
+
+#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
+        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
+    }
+#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+{
+#if CHIP_DEVICE_LAYER_TARGET_FAKE
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
+
+    CHIP_ERROR err;
+    enum
+    {
+        kDateStringLength = 10 // YYYY-MM-DD
+    };
+    char dateStr[kDateStringLength + 1];
+    size_t dateLen;
+    char * parseEnd;
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    SuccessOrExit(err);
+
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    day = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+    }
+    return err;
+#endif
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = mGenericConfigManager.ReadConfigValue(ConfigClass::kConfigKey_HardwareVersion, valInt);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        hardwareVersion = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
+        err             = CHIP_NO_ERROR;
+    }
+    else
+    {
+        hardwareVersion = static_cast<uint16_t>(valInt);
+    }
+
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionString(char * buf, size_t bufSize)
+{
+#if CHIP_DEVICE_LAYER_TARGET_ANDROID
+    CHIP_ERROR err;
+    size_t hardwareVersionLen = 0; // without counting null-terminator
+    err = ConfigClass::ReadConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionLen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+    }
+
+    return err;
+#else
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+    return CHIP_NO_ERROR;
+#endif
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                  "Length of unique ID for rotating device ID is smaller than minimum.");
+    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+    uniqueIdSpan.reduce_size(sizeof(uniqueId));
+    return CHIP_NO_ERROR;
+#endif
+    return err;
+}
+#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
@@ -231,6 +387,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
+#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    // Using a temporary singleton here because the overall GenericConfigurationManagerImpl is
+    // a singleton. This is TEMPORARY code to set the table for clients to set their own
+    // implementation properly, without loss of functionality for legacy in the meantime.
+    static LegacyDeviceInstanceInfoProvider<ConfigClass> sLegacyDeviceInstanceInfoProvider(*this);
+
+    SetDeviceInstanceInfoProvider(&sLegacyDeviceInstanceInfoProvider);
+#endif
+
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     // Using a temporary singleton here because the overall GenericConfigurationManagerImpl is
     // a singleton. This is TEMPORARY code to set the table for clients to set their own
@@ -264,13 +429,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
         if (err == CHIP_NO_ERROR)
         {
-            DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+            DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked,
+                                                                                                 updateNocCommandInvoked);
         }
         else
         {
             // This should not happen, but we should not fail system init based on it!
-            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!", err.Format());
-            (void)SetFailSafeArmed(false);
+            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!",
+                         err.Format());
+            (void) SetFailSafeArmed(false);
             err = CHIP_NO_ERROR;
         }
     }
@@ -351,31 +518,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionStrin
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err;
-    size_t serialNumLen = 0; // without counting null-terminator
-    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
-
-#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
     return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNum, serialNumLen);
@@ -423,78 +565,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimary802154MACAddr
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardwareVersionString(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardwareVersion(uint16_t & hardwareVer)
-{
-    CHIP_ERROR err;
-    uint32_t val;
-
-    err = ReadConfigValue(ConfigClass::kConfigKey_HardwareVersion, val);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        hardwareVer = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
-        err         = CHIP_NO_ERROR;
-    }
-    else
-    {
-        hardwareVer = static_cast<uint16_t>(val);
-    }
-
-    return err;
-}
-
-template <class ConfigClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersion(uint16_t hardwareVer)
 {
     return WriteConfigValue(ConfigClass::kConfigKey_HardwareVersion, static_cast<uint32_t>(hardwareVer));
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month,
-                                                                              uint8_t & dayOfMonth)
-{
-    CHIP_ERROR err;
-    enum
-    {
-        kDateStringLength = 10 // YYYY-MM-DD
-    };
-    char dateStr[kDateStringLength + 1];
-    size_t dateLen;
-    char * parseEnd;
-
-    err = ReadConfigValueStr(ConfigClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
-    SuccessOrExit(err);
-
-    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 4 digits, so our number can't be bigger than 9999.
-    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Cast does not lose information, because we then check that we only parsed
-    // 2 digits, so our number can't be bigger than 99.
-    dayOfMonth = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
-    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-exit:
-    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
-    }
-    return err;
 }
 
 template <class ConfigClass>
@@ -646,17 +719,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetRotatingDeviceIdUniq
     return CHIP_NO_ERROR;
 }
 
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
-{
-    static_assert(kRotatingDeviceIDUniqueIDLength >= kMinRotatingDeviceIDUniqueIDLength,
-                  "Length of unique ID for rotating device ID is smaller than minimum.");
-    ReturnErrorCodeIf(sizeof(mRotatingDeviceIdUniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(mRotatingDeviceIdUniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, sizeof(mRotatingDeviceIdUniqueId));
-    uniqueIdSpan = uniqueIdSpan.SubSpan(0, sizeof(mRotatingDeviceIdUniqueId));
-    return CHIP_NO_ERROR;
-}
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 
 template <class ConfigClass>
@@ -773,9 +835,11 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 
     ChipLogProgress(DeviceLayer, "Device Configuration:");
 
+    DeviceInstanceInfoProvider * deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
-        err = GetSerialNumber(serialNum, sizeof(serialNum));
+        err = deviceInstanceInfoProvider->GetSerialNumber(serialNum, sizeof(serialNum));
         ChipLogProgress(DeviceLayer, "  Serial Number: %s", (err == CHIP_NO_ERROR) ? serialNum : "(not set)");
     }
 
@@ -799,7 +863,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 
     {
         uint16_t hardwareVer;
-        if (GetHardwareVersion(hardwareVer) != CHIP_NO_ERROR)
+        if (deviceInstanceInfoProvider->GetHardwareVersion(hardwareVer) != CHIP_NO_ERROR)
         {
             hardwareVer = 0;
         }
@@ -823,14 +887,14 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             setupDiscriminator = 0xFFFF;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %u (0x%X)",
-                        setupDiscriminator, setupDiscriminator);
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %u (0x%X)", setupDiscriminator,
+                        setupDiscriminator);
     }
 
     {
         uint16_t year;
         uint8_t month, dayOfMonth;
-        err = GetManufacturingDate(year, month, dayOfMonth);
+        err = deviceInstanceInfoProvider->GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04u/%02u/%02u", year, month, dayOfMonth);

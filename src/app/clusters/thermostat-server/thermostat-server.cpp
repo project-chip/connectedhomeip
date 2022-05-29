@@ -365,13 +365,6 @@ bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * c
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetRelayStatusLog::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
 
 bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
                                                        const app::ConcreteCommandPath & commandPath,

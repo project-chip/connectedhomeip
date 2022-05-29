@@ -28,10 +28,13 @@ import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
+import com.matter.tv.server.model.ContentApp;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.DACProviderStub;
+import com.tcl.chip.tvapp.DeviceEventProvider;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LevelManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
@@ -62,7 +65,12 @@ public class MatterServant {
     return SingletonHolder.instance;
   }
 
+  private Context context;
+
   public void init(@NonNull Context context) {
+
+    this.context = context;
+
     // The order is important, must
     // first new TvApp to load dynamic library
     // then chipPlatform to prepare platform
@@ -106,6 +114,13 @@ public class MatterServant {
             });
     mTvApp.setDACProvider(new DACProviderStub());
 
+    mTvApp.setChipDeviceEventProvider(
+        new DeviceEventProvider() {
+          @Override
+          public void onCommissioningComplete() {
+            Log.d("lz", "onCommissioningComplete: ");
+          }
+        });
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
@@ -144,5 +159,19 @@ public class MatterServant {
 
   public void updateLevel(int value) {
     mTvApp.setCurrentLevel(mLevelEndpoint, value);
+  }
+
+  public int addContentApp(ContentApp app) {
+    return mTvApp.addContentApp(
+        app.getVendorName(),
+        app.getVendorId(),
+        app.getAppName(),
+        app.getProductId(),
+        "1.0",
+        new ContentAppEndpointManagerImpl(context));
+  }
+
+  public void sendTestMessage(int endpoint, String message) {
+    mTvApp.sendTestMessage(endpoint, message);
   }
 }

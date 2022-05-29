@@ -53,14 +53,6 @@
               "outgoing": 1
             },
             {
-              "name": "IdentifyQuery",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "TriggerEffect",
               "code": 64,
               "mfgCode": null,
@@ -95,16 +87,7 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "IdentifyQueryResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "identify time",
@@ -595,7 +578,7 @@
           ],
           "attributes": [
             {
-              "name": "scene count",
+              "name": "SceneCount",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -611,7 +594,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current scene",
+              "name": "CurrentScene",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -627,11 +610,11 @@
               "reportableChange": 0
             },
             {
-              "name": "current group",
+              "name": "CurrentGroup",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "group_id",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -643,7 +626,7 @@
               "reportableChange": 0
             },
             {
-              "name": "scene valid",
+              "name": "SceneValid",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -659,7 +642,7 @@
               "reportableChange": 0
             },
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -675,7 +658,7 @@
               "reportableChange": 0
             },
             {
-              "name": "last configured by",
+              "name": "LastConfiguredBy",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -9440,7 +9423,7 @@
               "code": 17,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -9448,7 +9431,7 @@
               "code": 18,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -9456,7 +9439,7 @@
               "code": 19,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -11546,7 +11529,7 @@
               "code": 16,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap16",
+              "type": "PumpStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11702,22 +11685,6 @@
               "reportableChange": 0
             },
             {
-              "name": "AlarmMask",
-              "code": 34,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -11838,14 +11805,6 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
-            },
-            {
-              "name": "GetRelayStatusLog",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 1
             }
           ],
           "attributes": [
@@ -11882,19 +11841,11 @@
               "source": "server",
               "incoming": 1,
               "outgoing": 0
-            },
-            {
-              "name": "GetRelayStatusLogResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
             }
           ],
           "attributes": [
             {
-              "name": "local temperature",
+              "name": "LocalTemperature",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -11910,7 +11861,7 @@
               "reportableChange": 0
             },
             {
-              "name": "abs min heat setpoint limit",
+              "name": "AbsMinHeatSetpointLimit",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -11926,7 +11877,7 @@
               "reportableChange": 0
             },
             {
-              "name": "abs max heat setpoint limit",
+              "name": "AbsMaxHeatSetpointLimit",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -11942,7 +11893,7 @@
               "reportableChange": 0
             },
             {
-              "name": "abs min cool setpoint limit",
+              "name": "AbsMinCoolSetpointLimit",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -11958,7 +11909,7 @@
               "reportableChange": 0
             },
             {
-              "name": "abs max cool setpoint limit",
+              "name": "AbsMaxCoolSetpointLimit",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -11974,7 +11925,7 @@
               "reportableChange": 0
             },
             {
-              "name": "pi cooling demand",
+              "name": "PICoolingDemand",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -11990,7 +11941,7 @@
               "reportableChange": 0
             },
             {
-              "name": "pi heating demand",
+              "name": "PIHeatingDemand",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -12006,7 +11957,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupied cooling setpoint",
+              "name": "OccupiedCoolingSetpoint",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -12022,7 +11973,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupied heating setpoint",
+              "name": "OccupiedHeatingSetpoint",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -12038,7 +11989,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min heat setpoint limit",
+              "name": "MinHeatSetpointLimit",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -12054,7 +12005,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max heat setpoint limit",
+              "name": "MaxHeatSetpointLimit",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -12070,7 +12021,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min cool setpoint limit",
+              "name": "MinCoolSetpointLimit",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -12086,7 +12037,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max cool setpoint limit",
+              "name": "MaxCoolSetpointLimit",
               "code": 24,
               "mfgCode": null,
               "side": "server",
@@ -12102,7 +12053,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min setpoint dead band",
+              "name": "MinSetpointDeadBand",
               "code": 25,
               "mfgCode": null,
               "side": "server",
@@ -12118,7 +12069,7 @@
               "reportableChange": 0
             },
             {
-              "name": "control sequence of operation",
+              "name": "ControlSequenceOfOperation",
               "code": 27,
               "mfgCode": null,
               "side": "server",
@@ -12134,7 +12085,7 @@
               "reportableChange": 0
             },
             {
-              "name": "system mode",
+              "name": "SystemMode",
               "code": 28,
               "mfgCode": null,
               "side": "server",
@@ -12150,7 +12101,7 @@
               "reportableChange": 0
             },
             {
-              "name": "start of week",
+              "name": "StartOfWeek",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -12166,7 +12117,7 @@
               "reportableChange": 0
             },
             {
-              "name": "number of weekly transitions",
+              "name": "NumberOfWeeklyTransitions",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -12182,7 +12133,7 @@
               "reportableChange": 0
             },
             {
-              "name": "number of daily transitions",
+              "name": "NumberOfDailyTransitions",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -19545,6 +19496,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 22
     }
-  ],
-  "log": []
+  ]
 }

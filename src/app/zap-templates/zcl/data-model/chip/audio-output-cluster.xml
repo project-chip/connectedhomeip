@@ -32,7 +32,7 @@ limitations under the License.
       <arg name="index" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x01" name="RenameOutput" optional="false">
+    <command source="client" code="0x01" name="RenameOutput" optional="true">
       <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
       <arg name="index" type="INT8U"/>
       <arg name="name" type="CHAR_STRING"/>

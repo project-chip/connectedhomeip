@@ -30,12 +30,6 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_mdns != "none") {
-  pkg_config("avahi_client_config") {
-    packages = [ "avahi-client" ]
-  }
-}
-
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
@@ -55,6 +49,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
+
+    # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    chip_use_transitional_device_instance_info_provider = true
 
     # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
@@ -116,7 +114,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
-        chip_device_platform == "k32w0") {
+        chip_device_platform == "k32w0" || chip_device_platform == "webos") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -152,6 +150,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
     } else {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
+    }
+
+    if (chip_use_transitional_device_instance_info_provider) {
+      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=1" ]
+    } else {
+      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -249,7 +253,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "webos") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_WEBOS=1",
-        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_LAYER_TARGET=webos",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
       defines -=
@@ -303,6 +307,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
+      "../include/platform/DeviceInstanceInfoProvider.h",
       "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
@@ -339,6 +344,7 @@ if (chip_device_platform != "none") {
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
+      "DeviceInstanceInfoProvider.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "FailSafeContext.cpp",
@@ -351,7 +357,7 @@ if (chip_device_platform != "none") {
 
     # Linux has its own NetworkCommissioningThreadDriver
     if (chip_enable_openthread && chip_device_platform != "linux" &&
-        chip_device_platform != "tizen") {
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",

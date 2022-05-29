@@ -79,6 +79,13 @@ tests:
           saveAs: NumberOfYearDaySchedulesSupportedPerUser
           value: 10
 
+    - label: "Get Max number of Holiday schedules and verify default value"
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          saveAs: NumberOfHolidaySchedulesSupported
+          value: 10
+
     #
     # Excercise SetWeekDay schedules with invalid parameters
     #
@@ -592,8 +599,9 @@ tests:
                 value: 1
               - name: "status"
                 value: 0x8B
+
     #
-    # Excercise GetWeekDay schedules with invalid parameters
+    # Excercise GetYearDay schedules with invalid parameters
     #
     - label: "Get Year Day schedule with 0 index"
       command: "GetYearDaySchedule"
@@ -679,6 +687,144 @@ tests:
                 value: 2
               - name: "status"
                 value: 0x8B
+
+    #
+    # Excercise Set Holiday schedules with invalid parameters
+    #
+    - label: "Create Holiday schedule with 0 index"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+      response:
+          error: INVALID_FIELD
+
+    - label: "Create Holiday schedule with out-of-bounds index"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported + 1
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+      response:
+          error: INVALID_FIELD
+
+    - label: "Create Holiday schedule with start hour later that end hour"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "localStartTime"
+                value: 12345689
+              - name: "localEndTime"
+                value: 12345688
+              - name: "operatingMode"
+                value: 0
+      response:
+          error: INVALID_FIELD
+
+    - label: "Create Holiday schedule with invalid operating mode"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 5
+      response:
+          error: INVALID_FIELD
+
+    - label: "Make sure that previous operations did not create a schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x8B
+
+    #
+    # Excercise Get Holiday schedules with invalid parameters
+    #
+    - label: "Get Holiday schedule with 0 index"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 0
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 0
+              - name: "status"
+                value: 0x85
+
+    - label: "Get Holiday schedule with out-of-bounds index"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported + 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported + 1
+              - name: "status"
+                value: 0x85
+
+    # Verify that schedule creation works
+    - label: "Create Holiday schedule with valid parameters"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    - label: "Verify created schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
 
     - label: "Create Week Day schedule with valid parameters"
       command: "SetWeekDaySchedule"
@@ -818,6 +964,73 @@ tests:
       response:
           error: NOT_FOUND
 
+    - label: "Make sure that week day schedule was not deleted"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                value: 0x01
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 16
+              - name: "endHour"
+                value: 18
+              - name: "endMinute"
+                value: 00
+
+    - label: "Make sure that year day schedule was not deleted"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
     #
     # Excercise ClearYearDay schedules with invalid parameters
     #
@@ -924,6 +1137,112 @@ tests:
               - name: "localEndTime"
                 value: 12345689
 
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    # Excercise ClearHolidaySchedule with invalid parameters
+    - label: "Clear Holiday schedule with 0 index"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 0
+      response:
+          error: INVALID_FIELD
+
+    - label: "Clear Holiday schedule with out-of-bounds index"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+      response:
+          error: INVALID_FIELD
+
+    - label: "Make sure that week day schedule was not deleted"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                value: 0x01
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 16
+              - name: "endHour"
+                value: 18
+              - name: "endMinute"
+                value: 00
+
+    - label: "Make sure that year day schedule was not deleted"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    # Verify that clearing schedules works
     - label: "Create another Week Day schedule with valid parameters"
       command: "SetWeekDaySchedule"
       arguments:
@@ -1003,6 +1322,38 @@ tests:
                 value: 9000
               - name: "localEndTime"
                 value: 888888888
+
+    - label: "Create another Holiday schedule with valid parameters"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "localStartTime"
+                value: 123456
+              - name: "localEndTime"
+                value: 1234567
+              - name: "operatingMode"
+                value: 1
+
+    - label: "Verify created holiday schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 123456
+              - name: "localEndTime"
+                value: 1234567
+              - name: "operatingMode"
+                value: 1
 
     - label: "Clear a single week day schedule for the first user"
       command: "ClearWeekDaySchedule"
@@ -1097,6 +1448,44 @@ tests:
                 value: 9000
               - name: "localEndTime"
                 value: 888888888
+
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 123456
+              - name: "localEndTime"
+                value: 1234567
+              - name: "operatingMode"
+                value: 1
 
     # We create it to test that clearing year day schedules does not delete week day schedules
     - label: "Create another Week Day schedule with valid parameters"
@@ -1387,7 +1776,7 @@ tests:
               - name: "localEndTime"
                 value: 7777777
 
-    - label: "Cleanup"
+    - label: "Cleanup the user"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -1462,3 +1851,346 @@ tests:
                 value: 2
               - name: "status"
                 value: 0x8B
+
+    # Make sure that all the manipulations did not affect the holiday schedules
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 123456
+              - name: "localEndTime"
+                value: 1234567
+              - name: "operatingMode"
+                value: 1
+
+    - label: "Create another Holiday schedule at the last slot"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+              - name: "localStartTime"
+                value: 1
+              - name: "localEndTime"
+                value: 100
+              - name: "operatingMode"
+                value: 4
+
+    - label: "Verify Created Holiday Schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+      response:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 1
+              - name: "localEndTime"
+                value: 100
+              - name: "operatingMode"
+                value: 4
+
+    # Those steps are required to validate that clearing holiday schedules does not delete weekday and year day schedules
+    - label: "Create new PIN credential and schedule user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0x00
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Create Week Day schedule for first user"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 0x01
+              - name: "startHour"
+                value: 0
+              - name: "startMinute"
+                value: 0
+              - name: "endHour"
+                value: 23
+              - name: "endMinute"
+                value: 59
+
+    - label: "Create Year Day schedule for first user"
+      command: "SetYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "localStartTime"
+                value: 9000
+              - name: "localEndTime"
+                value: 888888888
+
+    # Start clearing holiday schedules
+    - label: "Clear a single holiday schedule"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 12345
+              - name: "localEndTime"
+                value: 12345689
+              - name: "operatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x8B
+
+    - label: "Make sure that third holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+      response:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 1
+              - name: "localEndTime"
+                value: 100
+              - name: "operatingMode"
+                value: 4
+
+    - label:
+          "Make sure clearing holiday schedule did not clear week day schedule"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                value: 0x01
+              - name: "startHour"
+                value: 0
+              - name: "startMinute"
+                value: 0
+              - name: "endHour"
+                value: 23
+              - name: "endMinute"
+                value: 59
+
+    - label:
+          "Make sure clearing holiday schedule did not clear year day schedule"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 9000
+              - name: "localEndTime"
+                value: 888888888
+
+    - label: "Clear all remaining holiday schedules"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 0xFE
+
+    - label: "Make sure that first holiday is still deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 1
+              - name: "status"
+                value: 0x8B
+
+    - label: "Make sure that second holiday schedule was deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "holidayIndex"
+                value: 2
+              - name: "status"
+                value: 0x8B
+
+    - label: "Make sure that third holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+      response:
+          values:
+              - name: "holidayIndex"
+                value: NumberOfHolidaySchedulesSupported
+              - name: "status"
+                value: 0x8B
+
+    - label:
+          "Make sure clearing holiday schedule did not clear week day schedule"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                value: 0x01
+              - name: "startHour"
+                value: 0
+              - name: "startMinute"
+                value: 0
+              - name: "endHour"
+                value: 23
+              - name: "endMinute"
+                value: 59
+
+    - label:
+          "Make sure clearing holiday schedule did not clear year day schedule"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "yearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "localStartTime"
+                value: 9000
+              - name: "localEndTime"
+                value: 888888888
+
+    - label: "Final Cleanup"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 0xFFFE

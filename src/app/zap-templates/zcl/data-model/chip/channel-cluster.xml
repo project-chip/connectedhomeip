@@ -28,7 +28,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfo"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
     <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
 
-    <command source="client" code="0x00" name="ChangeChannel" response="ChangeChannelResponse" optional="false">
+    <command source="client" code="0x00" name="ChangeChannel" response="ChangeChannelResponse" optional="true">
       <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
       <arg name="match" type="CHAR_STRING"/>
     </command>
@@ -44,7 +44,7 @@ limitations under the License.
       <arg name="count" type="INT16U"/>
     </command>
 
-    <command source="server" code="0x01" name="ChangeChannelResponse" optional="false">
+    <command source="server" code="0x01" name="ChangeChannelResponse" optional="true">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
       <arg name="status" type="ChannelStatusEnum"/>
       <arg name="data"   type="CHAR_STRING" optional="true"/>

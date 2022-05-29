@@ -10354,7 +10354,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readPartitionIdAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPartitionIdAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.PartitionIdAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsPartitionIdCommandParams);
@@ -10367,7 +10369,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readWeightingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readWeightingAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.WeightingAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsWeightingCommandParams);
@@ -10379,7 +10383,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readDataVersionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readDataVersionAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.DataVersionAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsDataVersionCommandParams);
@@ -10392,7 +10398,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readStableDataVersionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readStableDataVersionAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster
+                              .StableDataVersionAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsStableDataVersionCommandParams);
@@ -10405,7 +10414,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readLeaderRouterIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readLeaderRouterIdAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.LeaderRouterIdAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsLeaderRouterIdCommandParams);
@@ -10990,7 +11001,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readActiveTimestampAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readActiveTimestampAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster
+                              .ActiveTimestampAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsActiveTimestampCommandParams);
@@ -11003,7 +11017,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readPendingTimestampAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readPendingTimestampAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster
+                              .PendingTimestampAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsPendingTimestampCommandParams);
@@ -11016,7 +11033,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readDelayAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readDelayAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.DelayAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsDelayCommandParams);
@@ -11045,7 +11064,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readChannelMaskAttribute((ChipClusters.OctetStringAttributeCallback) callback);
+                  .readChannelMaskAttribute(
+                      (ChipClusters.ThreadNetworkDiagnosticsCluster.ChannelMaskAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
             readThreadNetworkDiagnosticsChannelMaskCommandParams);

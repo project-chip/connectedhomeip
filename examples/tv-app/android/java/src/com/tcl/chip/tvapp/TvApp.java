@@ -67,6 +67,18 @@ public class TvApp {
 
   public native void setDACProvider(DACProvider provider);
 
+  public native void setChipDeviceEventProvider(DeviceEventProvider provider);
+
+  public native int addContentApp(
+      String vendorName,
+      int vendorId,
+      String appName,
+      int productId,
+      String appVersion,
+      ContentAppEndpointManager manager);
+
+  public native void sendTestMessage(int endpoint, String message);
+
   static {
     System.loadLibrary("TvApp");
   }

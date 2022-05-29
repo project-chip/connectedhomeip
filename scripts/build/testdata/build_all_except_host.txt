@@ -4,6 +4,9 @@ cd "{root}"
 # Generating ameba-amebad-all-clusters
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters all-clusters-app'
 
+# Generating ameba-amebad-all-clusters-minimal
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters-minimal all-clusters-minimal-app'
+
 # Generating ameba-amebad-light
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
@@ -150,6 +153,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating cc13x2x7_26x2x7-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
+
+# Generating cc13x2x7_26x2x7-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters-minimal
 
 # Generating cc13x2x7_26x2x7-lock-ftd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
@@ -525,6 +531,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters reconfigure'
 
+# Generating esp32-c3devkit-all-clusters-minimal
+mkdir -p {out}/esp32-c3devkit-all-clusters-minimal
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig_c3devkit.defaults {out}/esp32-c3devkit-all-clusters-minimal/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-c3devkit-all-clusters-minimal reconfigure'
+
 # Generating esp32-devkitc-all-clusters
 mkdir -p {out}/esp32-devkitc-all-clusters
 
@@ -548,6 +565,30 @@ bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
+
+# Generating esp32-devkitc-all-clusters-minimal
+mkdir -p {out}/esp32-devkitc-all-clusters-minimal
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-minimal/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal reconfigure'
+
+# Generating esp32-devkitc-all-clusters-minimal-ipv6only
+mkdir -p {out}/esp32-devkitc-all-clusters-minimal-ipv6only
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal-ipv6only reconfigure'
 
 # Generating esp32-devkitc-bridge
 mkdir -p {out}/esp32-devkitc-bridge
@@ -639,6 +680,54 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
 
+# Generating esp32-m5stack-all-clusters-minimal
+mkdir -p {out}/esp32-m5stack-all-clusters-minimal
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-minimal/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal reconfigure'
+
+# Generating esp32-m5stack-all-clusters-minimal-ipv6only
+mkdir -p {out}/esp32-m5stack-all-clusters-minimal-ipv6only
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-ipv6only reconfigure'
+
+# Generating esp32-m5stack-all-clusters-minimal-rpc
+mkdir -p {out}/esp32-m5stack-all-clusters-minimal-rpc
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5stack-all-clusters-minimal-rpc/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc reconfigure'
+
+# Generating esp32-m5stack-all-clusters-minimal-rpc-ipv6only
+mkdir -p {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only
+
+cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only reconfigure'
+
 # Generating esp32-m5stack-all-clusters-rpc
 mkdir -p {out}/esp32-m5stack-all-clusters-rpc
 
@@ -684,6 +773,16 @@ bash -c '
 PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-all-clusters-app-release'
 
+# Generating imx-all-clusters-minimal-app
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-all-clusters-minimal-app'
+
+# Generating imx-all-clusters-minimal-app-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-all-clusters-minimal-app-release'
+
 # Generating imx-chip-tool
 bash -c '
 PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
@@ -727,6 +826,9 @@ PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-l
 # Generating infineon-p6-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
+# Generating infineon-p6-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters-minimal
+
 # Generating infineon-p6-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-light
 
@@ -769,6 +871,24 @@ mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-cl
 
 # Generating mbed-CY8CPROTO_062_4343W-all-clusters-develop
 cmake -S {root}/examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-minimal-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug --mbed-os-path {root}/third_party/mbed-os/repo
+
+# Generating mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug
+cmake -S {root}/examples/all-clusters-minimal-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-minimal-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop --mbed-os-path {root}/third_party/mbed-os/repo
+
+# Generating mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop
+cmake -S {root}/examples/all-clusters-minimal-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-minimal-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release --mbed-os-path {root}/third_party/mbed-os/repo
+
+# Generating mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
+cmake -S {root}/examples/all-clusters-minimal-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-release
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release --mbed-os-path {root}/third_party/mbed-os/repo
@@ -858,6 +978,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-all-clusters -b nrf52840dk_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
 
+# Generating nrf-nrf52840dk-all-clusters-minimal
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dk-all-clusters-minimal -b nrf52840dk_nrf52840 {root}/examples/all-clusters-minimal-app/nrfconnect'
+
 # Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
@@ -893,6 +1018,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dongle-all-clusters -b nrf52840dongle_nrf52840 {root}/examples/all-clusters-app/nrfconnect'
 
+# Generating nrf-nrf52840dongle-all-clusters-minimal
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840dongle-all-clusters-minimal -b nrf52840dongle_nrf52840 {root}/examples/all-clusters-minimal-app/nrfconnect'
+
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
@@ -902,6 +1032,11 @@ west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf5
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-all-clusters -b nrf5340dk_nrf5340_cpuapp {root}/examples/all-clusters-app/nrfconnect'
+
+# Generating nrf-nrf5340dk-all-clusters-minimal
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340dk-all-clusters-minimal -b nrf5340dk_nrf5340_cpuapp {root}/examples/all-clusters-minimal-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -985,6 +1120,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
+
+# Building ameba-amebad-all-clusters-minimal
+ninja -C {out}/ameba-amebad-all-clusters-minimal
 
 # Building ameba-amebad-light
 ninja -C {out}/ameba-amebad-light
@@ -1256,6 +1394,9 @@ ninja -C {out}/bl602-light
 
 # Building cc13x2x7_26x2x7-all-clusters
 ninja -C {out}/cc13x2x7_26x2x7-all-clusters
+
+# Building cc13x2x7_26x2x7-all-clusters-minimal
+ninja -C {out}/cc13x2x7_26x2x7-all-clusters-minimal
 
 # Building cc13x2x7_26x2x7-lock-ftd
 ninja -C {out}/cc13x2x7_26x2x7-lock-ftd
@@ -1627,6 +1768,13 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters build'
 
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-c3devkit-all-clusters-minimal
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-c3devkit-all-clusters-minimal build'
+
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters
@@ -1640,6 +1788,20 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters-minimal
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal build'
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters-minimal-ipv6only
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal-ipv6only build'
 
 rm -f examples/bridge-app/esp32/sdkconfig
 
@@ -1697,6 +1859,34 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
 
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-minimal
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal build'
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-minimal-ipv6only
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-ipv6only build'
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-minimal-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc build'
+
+rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-minimal-rpc-ipv6only
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only build'
+
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-rpc
@@ -1724,6 +1914,12 @@ ninja -C {out}/imx-all-clusters-app
 # Building imx-all-clusters-app-release
 ninja -C {out}/imx-all-clusters-app-release
 
+# Building imx-all-clusters-minimal-app
+ninja -C {out}/imx-all-clusters-minimal-app
+
+# Building imx-all-clusters-minimal-app-release
+ninja -C {out}/imx-all-clusters-minimal-app-release
+
 # Building imx-chip-tool
 ninja -C {out}/imx-chip-tool
 
@@ -1750,6 +1946,9 @@ ninja -C {out}/imx-thermostat-release
 
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters
+
+# Building infineon-p6-all-clusters-minimal
+ninja -C {out}/infineon-p6-all-clusters-minimal
 
 # Building infineon-p6-light
 ninja -C {out}/infineon-p6-light
@@ -1783,6 +1982,24 @@ bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-all-clusters-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug/chip-*'
+
+# Building mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug
+cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop/chip-*'
+
+# Building mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop
+cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release/chip-*'
+
+# Building mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
+cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
 
 # Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-release
 bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release/chip-*'
@@ -1871,6 +2088,9 @@ ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-6
 # Building nrf-nrf52840dk-all-clusters
 ninja -C {out}/nrf-nrf52840dk-all-clusters
 
+# Building nrf-nrf52840dk-all-clusters-minimal
+ninja -C {out}/nrf-nrf52840dk-all-clusters-minimal
+
 # Building nrf-nrf52840dk-light
 ninja -C {out}/nrf-nrf52840dk-light
 
@@ -1892,11 +2112,17 @@ ninja -C {out}/nrf-nrf52840dk-shell
 # Building nrf-nrf52840dongle-all-clusters
 ninja -C {out}/nrf-nrf52840dongle-all-clusters
 
+# Building nrf-nrf52840dongle-all-clusters-minimal
+ninja -C {out}/nrf-nrf52840dongle-all-clusters-minimal
+
 # Building nrf-nrf52840dongle-light
 ninja -C {out}/nrf-nrf52840dongle-light
 
 # Building nrf-nrf5340dk-all-clusters
 ninja -C {out}/nrf-nrf5340dk-all-clusters
+
+# Building nrf-nrf5340dk-all-clusters-minimal
+ninja -C {out}/nrf-nrf5340dk-all-clusters-minimal
 
 # Building nrf-nrf5340dk-light
 ninja -C {out}/nrf-nrf5340dk-light
