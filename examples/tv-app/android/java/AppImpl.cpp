@@ -411,7 +411,7 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-    if (cdc != nullptr)
+    if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPincodeService(&gMyPincodeService);
         cdc->SetUserPrompter(userPrompter);
