@@ -72,7 +72,7 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
  * If user responds with Cancel then implementor calls calls UserPrompterResolver.OnPromptDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -102,7 +102,7 @@ exit:
         ChipLogError(Zcl, "PromptForCommissionOKPermission error: %s", err.AsString());
     }
 }
-    
+
 
 /*
  *  Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
@@ -112,7 +112,7 @@ exit:
  * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -147,7 +147,7 @@ exit:
 /*
  *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
  */
-void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -182,8 +182,8 @@ exit:
 /*
  *   Called to notify the user that commissioning failed. It can be in form of UI Notification.
  */
-void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) 
-{ 
+void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
