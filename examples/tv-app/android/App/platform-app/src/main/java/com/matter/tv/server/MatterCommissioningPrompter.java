@@ -3,7 +3,6 @@ package com.matter.tv.server;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.os.Build;
 import android.widget.EditText;
 
@@ -70,7 +69,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     }
 
     public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_check_24)
                 .setContentTitle("Device connected")
                 .setContentText("Your device " + commissioneeName + " is ready for use.")
@@ -80,7 +79,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     }
 
     public void promptCommissioningFailed(String commissioneeName, String error) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_clear_24)
                 .setContentTitle("Error occurred")
                 .setContentText("Device " + commissioneeName + " experienced error: " + error)
@@ -100,7 +99,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
-            this.notificationManager = getSystemService(context, NotificationManager.class);
+            this.notificationManager = getSystemService(activity.getApplicationContext(), NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
     }

@@ -20,21 +20,21 @@ package com.tcl.chip.tvapp;
 public interface UserPrompter {
   
   /*
-   *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+   *  Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
    * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
    *
-   * If user responds with OK then implementor should call OnPromptAccepted;
-   * If user responds with Cancel then implementor should call OnPromptDeclined();
+   * If user responds with OK then implementor calls UserPrompterResolver.OnPromptAccepted;
+   * If user responds with Cancel then implementor calls calls UserPrompterResolver.OnPromptDeclined();
    *
    */
   void promptForCommissionOkPermission(int vendorId, int productId, String commissioneeName);
   
   /*
-   *   Called to prompt the user for PIN code to allow the given commissioneeName/vendorId/productId to be commissioned.
-   * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+   *  Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
+   * commissioned. For example "Please enter pin displayed in casting app."
    *
-   * If user responds with OK then implementor should call OnPinCodeEntered();
-   * If user responds with Cancel then implementor should call OnPinCodeDeclined();
+   * If user responds with OK then implementor calls UserPrompterResolver.OnPinCodeEntered();
+   * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
    *
    */
   void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName);
