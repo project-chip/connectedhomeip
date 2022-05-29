@@ -35,28 +35,32 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     jclass JNIMyUserPrompterClass = env->GetObjectClass(provider);
     VerifyOrReturn(JNIMyUserPrompterClass != nullptr, ChipLogError(Zcl, "Failed to get JNIMyUserPrompter Java class"));
 
-    mPromptForCommissionOKPermissionMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionOkPermission", "(IILjava/lang/String;)V");
+    mPromptForCommissionOKPermissionMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionOkPermission", "(IILjava/lang/String;)V");
     if (mPromptForCommissionOKPermissionMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptForCommissionOkPermission' method");
         env->ExceptionClear();
     }
 
-    mPromptForCommissionPincodeMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IILjava/lang/String;)V");
+    mPromptForCommissionPincodeMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IILjava/lang/String;)V");
     if (mPromptForCommissionPincodeMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptForCommissionPinCode' method");
         env->ExceptionClear();
     }
 
-    mPromptCommissioningSucceededMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningSucceeded", "(IILjava/lang/String;)V");
+    mPromptCommissioningSucceededMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningSucceeded", "(IILjava/lang/String;)V");
     if (mPromptCommissioningSucceededMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptCommissioningSucceeded' method");
         env->ExceptionClear();
     }
 
-    mPromptCommissioningFailedMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningFailed", "(Ljava/lang/String;Ljava/lang/String;)V");
+    mPromptCommissioningFailedMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningFailed", "(Ljava/lang/String;Ljava/lang/String;)V");
     if (mPromptCommissioningFailedMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptCommissioningFailed' method");
@@ -72,10 +76,10 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
  * If user responds with Cancel then implementor calls calls UserPrompterResolver.OnPromptDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -85,7 +89,8 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionOKPermissionMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionOKPermissionMethod, static_cast<jint>(vendorId),
+                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptForCommissionOKPermission");
@@ -102,7 +107,6 @@ exit:
         ChipLogError(Zcl, "PromptForCommissionOKPermission error: %s", err.AsString());
     }
 }
-    
 
 /*
  *  Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
@@ -112,10 +116,10 @@ exit:
  * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -125,7 +129,8 @@ void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t p
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
+                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in PromptForCommissionPincode");
@@ -143,14 +148,13 @@ exit:
     }
 }
 
-
 /*
  *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
  */
-void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
+void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -160,7 +164,8 @@ void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId),
+                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
 
         if (env->ExceptionCheck())
         {
@@ -182,10 +187,10 @@ exit:
 /*
  *   Called to notify the user that commissioning failed. It can be in form of UI Notification.
  */
-void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) 
-{ 
+void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -195,7 +200,8 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(),
+                            jniCommissioneeName.jniValue());
 
         if (env->ExceptionCheck())
         {

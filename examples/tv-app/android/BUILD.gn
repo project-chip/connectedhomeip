@@ -62,15 +62,15 @@ shared_library("jni") {
     "java/MediaInputManager.h",
     "java/MediaPlaybackManager.cpp",
     "java/MediaPlaybackManager.h",
+    "java/MyUserPrompter-JNI.cpp",
+    "java/MyUserPrompter-JNI.h",
+    "java/MyUserPrompterResolver-JNI.cpp",
+    "java/MyUserPrompterResolver-JNI.h",
     "java/OnOffManager.cpp",
     "java/OnOffManager.h",
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
-    "java/MyUserPrompter-JNI.cpp",
-    "java/MyUserPrompter-JNI.h",
-    "java/MyUserPrompterResolver-JNI.cpp",
-    "java/MyUserPrompterResolver-JNI.h"
   ]
 
   deps = [

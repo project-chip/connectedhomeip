@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "TvApp-JNI.h"
 #include "MyUserPrompterResolver-JNI.h"
+#include "TvApp-JNI.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -25,30 +25,30 @@
 
 using namespace chip;
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_UserPrompterResolver_##METHOD_NAME
-
+#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_UserPrompterResolver_##METHOD_NAME
 
 JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 {
     uint32_t pinCode = (uint32_t) jPinCode;
     ChipLogProgress(Zcl, "OnPinCodeEntered %d", pinCode);
-	GetCommissionerDiscoveryController()->CommissionWithPincode(pinCode);
+    GetCommissionerDiscoveryController()->CommissionWithPincode(pinCode);
 }
 
 JNI_METHOD(void, OnPinCodeDeclined)(JNIEnv *, jobject)
 {
     ChipLogProgress(Zcl, "OnPinCodeDeclined");
-	GetCommissionerDiscoveryController()->Cancel();
+    GetCommissionerDiscoveryController()->Cancel();
 }
 
 JNI_METHOD(void, OnPromptAccepted)(JNIEnv *, jobject)
 {
     ChipLogProgress(Zcl, "OnPromptAccepted");
-	GetCommissionerDiscoveryController()->Ok();
+    GetCommissionerDiscoveryController()->Ok();
 }
 
 JNI_METHOD(void, OnPromptDeclined)(JNIEnv *, jobject)
 {
     ChipLogProgress(Zcl, "OnPromptDeclined");
-	GetCommissionerDiscoveryController()->Cancel();
+    GetCommissionerDiscoveryController()->Cancel();
 }

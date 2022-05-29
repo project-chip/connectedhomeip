@@ -30,9 +30,9 @@ public:
     void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override;
 
 private:
-    jobject mJNIMyUserPrompterObject                       = nullptr;
-    jmethodID mPromptForCommissionOKPermissionMethod       = nullptr;
-    jmethodID mPromptForCommissionPincodeMethod            = nullptr;
-    jmethodID mPromptCommissioningSucceededMethod          = nullptr;
-    jmethodID mPromptCommissioningFailedMethod             = nullptr;
+    jobject mJNIMyUserPrompterObject                 = nullptr;
+    jmethodID mPromptForCommissionOKPermissionMethod = nullptr;
+    jmethodID mPromptForCommissionPincodeMethod      = nullptr;
+    jmethodID mPromptCommissioningSucceededMethod    = nullptr;
+    jmethodID mPromptCommissioningFailedMethod       = nullptr;
 };

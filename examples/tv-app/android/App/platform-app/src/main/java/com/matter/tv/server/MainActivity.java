@@ -8,7 +8,6 @@ import com.matter.tv.server.fragments.ContentAppFragment;
 import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.TerminalFragment;
 import com.matter.tv.server.service.MatterServant;
-
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
