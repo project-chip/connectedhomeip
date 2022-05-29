@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "TvApp-JNI.h"
 #include "MyUserPrompter-JNI.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -36,14 +35,14 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     jclass JNIMyUserPrompterClass = env->GetObjectClass(provider);
     VerifyOrReturn(JNIMyUserPrompterClass != nullptr, ChipLogError(Zcl, "Failed to get JNIMyUserPrompter Java class"));
 
-    mPromptForCommissionOKPermissionMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionOkPermission", "(IILjava/lang/String;)Z");
+    mPromptForCommissionOKPermissionMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionOkPermission", "(IILjava/lang/String;)V");
     if (mPromptForCommissionOKPermissionMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptForCommissionOkPermission' method");
         env->ExceptionClear();
     }
 
-    mPromptForCommissionPincodeMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IILjava/lang/String;)I");
+    mPromptForCommissionPincodeMethod = env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IILjava/lang/String;)V");
     if (mPromptForCommissionPincodeMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptForCommissionPinCode' method");
@@ -65,9 +64,16 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     }
 }
 
+/*
+ *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+ * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+ *
+ * If user responds with OK then implementor should call OnPromptAccepted;
+ * If user responds with Cancel then implementor should call OnPromptDeclined();
+ *
+ */
 void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
 {
-    jboolean ret = JNI_FALSE;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
@@ -79,7 +85,7 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        ret = env->CallBooleanMethod(mJNIMyUserPrompterObject, mPromptForCommissionOKPermissionMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionOKPermissionMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptForCommissionOKPermission");
@@ -87,20 +93,6 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
             env->ExceptionClear();
             err = CHIP_ERROR_INCORRECT_STATE;
             goto exit;
-        }
-
-        /*
-         *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
-         * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
-         *
-         * If user responds with OK then implementor should call CommissionerRespondOk();
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         *
-         */
-        if (static_cast<bool>(ret)) {
-            GetCommissionerDiscoveryController()->Ok();    
-        } else {
-            GetCommissionerDiscoveryController()->Cancel();
         }
     }
 
@@ -112,12 +104,19 @@ exit:
 }
     
 
+/*
+ *   Called to prompt the user for PIN code to allow the given commissioneeName/vendorId/productId to be commissioned.
+ * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+ *
+ * If user responds with OK then implementor should call OnPinCodeEntered();
+ * If user responds with Cancel then implementor should call OnPinCodeDeclined();
+ *
+ */
 void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
-    uint16_t pinCode = 0;
 
     VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionPincodeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -126,8 +125,7 @@ void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t p
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        jint jPinCode = env->CallIntMethod(mJNIMyUserPrompterObject, mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
-        pinCode = (uint16_t) jPinCode;
+        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in PromptForCommissionPincode");
@@ -136,15 +134,6 @@ void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t p
             err = CHIP_ERROR_INCORRECT_STATE;
             goto exit;
         }
-
-        /*
-         *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
-         * commissioned. For example "Please enter pin displayed in casting app."
-         *
-         * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         */
-        GetCommissionerDiscoveryController()->CommissionWithPincode(pinCode);
     }
 
 exit:
@@ -154,7 +143,10 @@ exit:
     }
 }
 
-// tv should override this with a dialog prompt
+
+/*
+ *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
+ */
 void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -187,7 +179,9 @@ exit:
     }
 }
 
-// tv should override this with a dialog prompt
+/*
+ *   Called to notify the user that commissioning failed. It can be in form of UI Notification.
+ */
 void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) 
 { 
     CHIP_ERROR err = CHIP_NO_ERROR;

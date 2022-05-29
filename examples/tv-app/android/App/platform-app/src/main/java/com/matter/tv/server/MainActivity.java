@@ -7,12 +7,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.matter.tv.server.fragments.ContentAppFragment;
 import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.TerminalFragment;
+import com.matter.tv.server.service.MatterServant;
+
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
 
   private LinkedHashMap<String, String> packages = new LinkedHashMap<>();
-  private MatterCommissioningPrompter commissioningPrompter;
 
   private BottomNavigationView.OnNavigationItemSelectedListener navListener =
       item -> {
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    commissioningPrompter = new MatterCommissioningPrompter(this);
+    MatterServant.get().setActivity(this);
 
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
     bottomNavigationView.setOnItemSelectedListener(navListener);

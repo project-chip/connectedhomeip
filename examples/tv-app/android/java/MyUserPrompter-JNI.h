@@ -30,7 +30,6 @@ public:
     void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override;
 
 private:
-    CHIP_ERROR GetJavaByteByMethod(jmethodID method, chip::MutableByteSpan & out_buffer);
     jobject mJNIMyUserPrompterObject                       = nullptr;
     jmethodID mPromptForCommissionOKPermissionMethod       = nullptr;
     jmethodID mPromptForCommissionPincodeMethod            = nullptr;

@@ -17,6 +17,7 @@
  */
 package com.matter.tv.server.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -43,7 +44,6 @@ import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
 import com.tcl.chip.tvapp.OnOffManagerStub;
 import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.UserPrompter;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
@@ -52,7 +52,6 @@ public class MatterServant {
   public int testDiscriminator = 0xF00;
 
   private ChipAppServer chipAppServer;
-  private MatterCommissioningPrompter commissioningPrompter;
   private TvApp mTvApp;
   private boolean mIsOn = true;
   private int mOnOffEndpoint;
@@ -69,6 +68,7 @@ public class MatterServant {
   }
 
   private Context context;
+  private Activity activity;
 
   public void init(@NonNull Context context) {
 
@@ -116,7 +116,7 @@ public class MatterServant {
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());
-    mTvApp.setUserPrompter(new MatterCommissioningPrompter(context));
+    mTvApp.setUserPrompter(new MatterCommissioningPrompter(activity));
 
     mTvApp.setChipDeviceEventProvider(
         new DeviceEventProvider() {
@@ -154,6 +154,10 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
+  }
+
+  public void setActivity(Activity activity) {
+    this.activity = activity;
   }
 
   public void sendCustomCommand(String customCommand) {
