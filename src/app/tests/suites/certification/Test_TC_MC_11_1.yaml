@@ -43,7 +43,7 @@ tests:
           [1653089767279] [88361:1149415] CHIP: [DIS]         Device Type: 35
           [1653089767279] [88361:1149415] CHIP: [DIS]         Instance Name: 3DC86F5236D636CB
           [1653089767279] [88361:1149415] CHIP: [DIS]         Commissioning Mode: 0
-          [1653089767279] [88361:1149415] CHIP: [SVR] 1 commissioner(s) discovered. Select one (by number# above) to request commissioning from: 
+          [1653089767279] [88361:1149415] CHIP: [SVR] 1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
           [1653089767279] [88361:1149415] CHIP: [SVR] Example: cast request 0
       disabled: true
 

@@ -77,7 +77,7 @@ tests:
 
           ./chip-tool networkcommissioning read generated-command-list 1 0
 
-          [1652255227.644007][7509:7514] CHIP:DMG:         SuppressResponse = true, 
+          [1652255227.644007][7509:7514] CHIP:DMG:         SuppressResponse = true,
           [1652255227.644083][7509:7514] CHIP:DMG:         InteractionModelRevision = 1
           [1652255227.644139][7509:7514] CHIP:DMG: }
           [1652255227.644480][7509:7514] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFF9 DataVersion: 2580824733

@@ -25,7 +25,7 @@ config:
 tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -34,13 +34,13 @@ tests:
           argument value as 'Userwifi_ssid1', Credentials argument value as
           'Userwifi_Credentials' and Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads MaxNetworks attribute from the DUT"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -49,7 +49,7 @@ tests:
           argument value as 'Userwifi_ssid2', Credentials argument value as
           'Userwifi_Credentials' and Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -58,7 +58,7 @@ tests:
           argument value as 'Userwifi_ssid3', Credentials argument value as
           'Userwifi_Credentials' and Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -67,12 +67,12 @@ tests:
           arguments: NetworkID argument value as 'Userwifi_ssid1' NetworkIndex
           argument value as 'Userwifi_netidx3' Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads Networks attribute list from the DUT"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
