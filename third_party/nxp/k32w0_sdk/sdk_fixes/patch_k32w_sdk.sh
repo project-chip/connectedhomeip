@@ -56,10 +56,10 @@ if [ "$exitCode" -ne 0 ]; then
 fi
 
 unzip patch_for_K32W061_SDK_2_6_4.zip
-cp patch_for_K32W061_SDK_2_6_4/controller_config.c    "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/config/
+cp patch_for_K32W061_SDK_2_6_4/controller_config.c "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/config/
 cp patch_for_K32W061_SDK_2_6_4/controller_interface.h "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/interface/
-cp patch_for_K32W061_SDK_2_6_4/lib_ble_controller.a   "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/lib/
-cp patch_for_K32W061_SDK_2_6_4/libPDM_extFlash.a      "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/PDM/Library/
+cp patch_for_K32W061_SDK_2_6_4/lib_ble_controller.a "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/lib/
+cp patch_for_K32W061_SDK_2_6_4/libPDM_extFlash.a "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/PDM/Library/
 
 echo "K32W SDK MR3 QP1 was patched!"
 exit 0
