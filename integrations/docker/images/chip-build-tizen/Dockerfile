@@ -43,7 +43,8 @@ RUN set -x \
     http://download.tizen.org/sdk/tizenstudio/official/binary/certificate-encryptor_1.0.7_ubuntu-64.zip \
     http://download.tizen.org/sdk/tizenstudio/official/binary/certificate-generator_0.1.3_ubuntu-64.zip \
     http://download.tizen.org/sdk/tizenstudio/official/binary/new-common-cli_2.5.7_ubuntu-64.zip \
-    http://download.tizen.org/sdk/tizenstudio/official/binary/new-native-cli_2.5.7_ubuntu-64.zip \
+    http://download.tizen.org/sdk/tizenstudio/official/binary/new-native-cli_2.5.7_ubuntu-64.zip \ 
+    http://download.tizen.org/sdk/tizenstudio/official/binary/sdb_4.2.23_ubuntu-64.zip \
     # Install tizen studio CLI
     && unzip -o '*.zip' \
     && cp -rf data/* $TIZEN_SDK_ROOT \
@@ -56,7 +57,7 @@ RUN set -x \
 
 COPY secret-tool.py $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
 RUN chmod 0755 $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
-ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$PATH"
+ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
 
 # ------------------------------------------------------------------------------
 # Get toolchain
