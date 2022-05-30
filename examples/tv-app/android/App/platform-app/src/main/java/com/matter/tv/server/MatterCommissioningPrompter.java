@@ -29,7 +29,14 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   public void promptForCommissionOkPermission(
       int vendorId, int productId, String commissioneeName) {
     // TODO: find app by vendorId and productId
-    Log.d(TAG, "Received prompt for OK permission vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
+    Log.d(
+        TAG,
+        "Received prompt for OK permission vendor id:"
+            + vendorId
+            + " productId:"
+            + productId
+            + ". Commissionee: "
+            + commissioneeName);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
     builder
@@ -52,7 +59,14 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   @Override
   public void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName) {
     // TODO: find app by vendorId and productId
-    Log.d(TAG, "Received prompt for PIN code vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
+    Log.d(
+        TAG,
+        "Received prompt for PIN code vendor id:"
+            + vendorId
+            + " productId:"
+            + productId
+            + ". Commissionee: "
+            + commissioneeName);
     EditText editText = new EditText(activity);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
@@ -76,7 +90,14 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {
-    Log.d(TAG, "Received prompt for success vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
+    Log.d(
+        TAG,
+        "Received prompt for success vendor id:"
+            + vendorId
+            + " productId:"
+            + productId
+            + ". Commissionee: "
+            + commissioneeName);
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
@@ -91,7 +112,14 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   public void promptCommissioningFailed(String commissioneeName, String error) {
-Log.d(TAG, "Received prompt for failure vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
+    Log.d(
+        TAG,
+        "Received prompt for failure vendor id:"
+            + vendorId
+            + " productId:"
+            + productId
+            + ". Commissionee: "
+            + commissioneeName);
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)
