@@ -192,6 +192,66 @@
             "problemMatcher": {
                 "base": "$gcc"
             }
+        },
+        {
+            "label": "Build LightingApp (Tizen)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "${workspaceFolder}/scripts/build/build_examples.py --target tizen-arm-light --enable-flashbundle build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Connect to device (Tizen)",
+            "type": "shell",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "args": ["connect", "${env:TIZEN_TARGET_DEVICE}:26101"],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Install LightingApp (Tizen)",
+            "type": "shell",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "args": [
+                "install",
+                "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Launch LightingApp with gdbserver attached (Tizen)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/helpers/tizen_gdbserver_run.sh",
+                "--app-name",
+                "org.tizen.matter.example.lighting",
+                "--",
+                "vendor-id 65521 product-id 32769 discriminator 42 passcode 1234"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            },
+            "isBackground": false,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            }
         }
     ],
     "inputs": [
