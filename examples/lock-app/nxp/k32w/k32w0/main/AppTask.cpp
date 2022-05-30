@@ -756,3 +756,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }
+
+extern "C" void OTAIdleActivities(void)
+{
+}
