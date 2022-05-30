@@ -67,25 +67,12 @@ run the software :
 
   <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-home.png" style="zoom:70%;" align=left />
 
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
   <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-iot.png" style="zoom:70%;" />
 
-  The following picture shows the burning interface. To download the firmware, you need to enter the download mode: press and hold the Boot (IO8) pin of the development board, press the **RST** button, and then release the Boot button to enter the burning and downloading mode.
+The following picture shows the burning interface. To download the firmware, you
+need to enter the download mode: press and hold the Boot (IO8) pin of the
+development board, press the **RST** button, and then release the Boot button to
+enter the burning and downloading mode.
 
 <img src="../../../platform/bouffalolab/bl602/doc/images/image-dev-cube.png" style="zoom:70%;" align=left />
 
