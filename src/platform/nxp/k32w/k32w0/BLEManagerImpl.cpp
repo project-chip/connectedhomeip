@@ -1282,8 +1282,8 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
     {
         ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
 
-        (void)Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c,
-                           gConnPhyUpdateReqRxPhySettings_c, (uint16_t)gConnPhyUpdateReqPhyOptions_c);
+        (void) Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c, gConnPhyUpdateReqRxPhySettings_c,
+                            (uint16_t) gConnPhyUpdateReqPhyOptions_c);
 
         /* Notify App Task that the BLE is connected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_CONNECTED, (uint8_t) deviceId);

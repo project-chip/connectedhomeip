@@ -764,7 +764,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     sLightLED.Set(onoffAttrValue);
 }
 
-extern "C" void OTAIdleActivities( void )
+extern "C" void OTAIdleActivities(void)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();
