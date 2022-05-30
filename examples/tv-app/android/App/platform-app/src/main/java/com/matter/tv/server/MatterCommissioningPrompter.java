@@ -55,7 +55,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
     builder
-        .setMessage("Enter PIN code sent to your other device")
+        .setMessage("Please enter PIN displayed in casting app.")
         .setTitle("Allow access to " + commissioneeName)
         .setView(editText)
         .setPositiveButton(
