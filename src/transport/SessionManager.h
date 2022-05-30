@@ -275,17 +275,6 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
 
-    /** Schedules a new oneshot timer for checking connection expiry. */
-    void ScheduleExpiryTimer();
-
-    /** Cancels any active timers for connection expiry checks. */
-    void CancelExpiryTimer();
-
-    /**
-     * Callback for timer expiry check
-     */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param);
-
     void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);
 

@@ -86,6 +86,7 @@ var endpointClusterWithPreAttribute = [
   'Localization Configuration',
   'Mode Select',
   'Fan Control',
+  'Thermostat',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 

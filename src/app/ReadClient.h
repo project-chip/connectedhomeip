@@ -302,6 +302,16 @@ public:
     // that's the only case when the consumer moved a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
 
+    // Like SendSubscribeRequest, but allows sending certain forms of invalid
+    // subscribe requests that servers are expected to reject, for testing
+    // purposes.  Should only be called from tests.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    CHIP_ERROR SendSubscribeRequestWithoutValidation(const ReadPrepareParams & aReadPrepareParams)
+    {
+        return SendSubscribeRequestImpl(aReadPrepareParams);
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -358,7 +368,10 @@ private:
     bool ResubscribeIfNeeded();
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+    // SendSubscribeRequest performs som validation on aSubscribePrepareParams
+    // and then calls SendSubscribeRequestImpl.
+    CHIP_ERROR SendSubscribeRequest(const ReadPrepareParams & aSubscribePrepareParams);
+    CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 

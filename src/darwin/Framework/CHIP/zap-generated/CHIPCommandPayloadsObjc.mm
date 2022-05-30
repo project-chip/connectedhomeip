@@ -1833,7 +1833,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ipkValue = [NSData data];
 
-        _caseAdminNode = @(0);
+        _caseAdminSubject = @(0);
 
         _adminVendorId = @(0);
         _timedInvokeTimeoutMs = nil;

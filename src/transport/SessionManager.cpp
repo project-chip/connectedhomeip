@@ -95,8 +95,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
     ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
 
-    ScheduleExpiryTimer();
-
     mTransportMgr->SetSessionManager(this);
 
     return CHIP_NO_ERROR;
@@ -104,8 +102,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
-    CancelExpiryTimer();
-
     mSessionRecoveryDelegates.ReleaseAll();
 
     mMessageCounterManager = nullptr;
@@ -413,22 +409,6 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
-}
-
-void SessionManager::ScheduleExpiryTimer()
-{
-    CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
-                                              SessionManager::ExpiryTimerCallback, this);
-
-    VerifyOrDie(err == CHIP_NO_ERROR);
-}
-
-void SessionManager::CancelExpiryTimer()
-{
-    if (mSystemLayer != nullptr)
-    {
-        mSystemLayer->CancelTimer(SessionManager::ExpiryTimerCallback, this);
-    }
 }
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
@@ -772,12 +752,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession),
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
     }
-}
-
-void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
-{
-    SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
-    mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,

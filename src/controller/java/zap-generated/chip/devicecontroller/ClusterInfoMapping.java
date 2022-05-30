@@ -6588,7 +6588,7 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
+        @Nullable List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
@@ -6617,7 +6617,9 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents> valueList) {
+        @Nullable
+            List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>
+                valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
@@ -10957,10 +10959,10 @@ public class ClusterInfoMapping {
     operationalCredentialsaddNOCCommandParams.put(
         "IPKValue", operationalCredentialsaddNOCIPKValueCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo =
-        new CommandParameterInfo("caseAdminNode", Long.class);
+    CommandParameterInfo operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo =
+        new CommandParameterInfo("caseAdminSubject", Long.class);
     operationalCredentialsaddNOCCommandParams.put(
-        "caseAdminNode", operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo);
+        "caseAdminSubject", operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialsaddNOCadminVendorIdCommandParameterInfo =
         new CommandParameterInfo("adminVendorId", Integer.class);
@@ -10976,7 +10978,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("NOCValue"),
                       (Optional<byte[]>) commandArguments.get("ICACValue"),
                       (byte[]) commandArguments.get("IPKValue"),
-                      (Long) commandArguments.get("caseAdminNode"),
+                      (Long) commandArguments.get("caseAdminSubject"),
                       (Integer) commandArguments.get("adminVendorId"));
             },
             () -> new DelegatedNOCResponseCallback(),

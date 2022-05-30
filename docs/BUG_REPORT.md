@@ -88,8 +88,8 @@ build) to get started. Beyond that, you can refine if more items seem relevant:
 *   `Tested with avahi-build and it passes/fails` helps the developer with
     information of non-default builds that pass/fail to narrow down the problem
 
-*   `Passes with chip-tool-darwin and repl but fails with chip-tool` helps the
-    developer in narrowing down the problem
+*   `Passes with darwin-framework-tool and repl but fails with chip-tool` helps
+    the developer in narrowing down the problem
 
 ### Additional information
 

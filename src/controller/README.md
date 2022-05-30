@@ -21,7 +21,7 @@ The POSIX CLI chip-tool is located in
 ### Darwin CLI
 
 The POSIX CLI chip-tool is located in
-[../../examples/chip-tool-darwin](../../examples/chip-tool).
+[../../examples/darwin-framework-tool](../../examples/chip-tool).
 
 ### Python
 

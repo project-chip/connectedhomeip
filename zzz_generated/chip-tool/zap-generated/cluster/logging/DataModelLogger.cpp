@@ -9402,27 +9402,27 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RouteTableList", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PartitionId", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("weighting", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DataVersion", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StableDataVersion", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LeaderRouterId", 1, value);
         }
@@ -9637,35 +9637,35 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RxErrOtherCount", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveTimestamp", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PendingTimestamp", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::Delay::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("delay", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SecurityPolicy", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id: {
-            chip::ByteSpan value;
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChannelMask", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalDatasetComponents", 1, value);

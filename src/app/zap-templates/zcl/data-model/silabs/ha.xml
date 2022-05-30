@@ -278,8 +278,8 @@ limitations under the License.
       <access op="write" role="manage"/>
     </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
-    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">CoupleColorTempToLevelMinMireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="false">
+    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">CoupleColorTempToLevelMinMireds</attribute>
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <description>StartUpColorTemperatureMireds</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
@@ -351,7 +351,7 @@ limitations under the License.
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x07" name="MoveToColor" optional="false" cli="zcl color-control movetocolor">
+    <command source="client" code="0x07" name="MoveToColor" optional="true" cli="zcl color-control movetocolor">
       <description>
         Move to specified color.
       </description>
@@ -361,7 +361,7 @@ limitations under the License.
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x08" name="MoveColor" optional="false" cli="zcl color-control movecolor">
+    <command source="client" code="0x08" name="MoveColor" optional="true" cli="zcl color-control movecolor">
       <description>
         Moves the color.
       </description>
@@ -370,7 +370,7 @@ limitations under the License.
       <arg name="OptionsMask" type="BITMAP8"/>
       <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x09" name="StepColor" optional="false" cli="zcl color-control stepcolor">
+    <command source="client" code="0x09" name="StepColor" optional="true" cli="zcl color-control stepcolor">
       <description>
         Steps the lighting to a specific color.
       </description>
