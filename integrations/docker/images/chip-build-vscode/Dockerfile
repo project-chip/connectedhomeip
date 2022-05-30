@@ -57,6 +57,7 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
+# Required for the Tizen SDK
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
