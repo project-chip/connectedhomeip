@@ -52,7 +52,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   @Override
   public void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName) {
     // TODO: find app by vendorId and productId
-
+    Log.d(TAG, "Received prompt for PIN code vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
     EditText editText = new EditText(activity);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
