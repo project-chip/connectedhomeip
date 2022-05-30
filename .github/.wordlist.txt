@@ -1107,6 +1107,7 @@ RPi
 RPis
 rsn
 RSSI
+RST
 rsync
 RTL
 rtld
