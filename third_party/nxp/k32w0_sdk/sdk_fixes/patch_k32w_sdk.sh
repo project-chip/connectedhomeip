@@ -50,7 +50,7 @@ echo "Downloading PDM and BLE libraries from NXP server..."
 rm -rf patch_for_K32W061_SDK_2_6_4.zip patch_for_K32W061_SDK_2_6_4
 wget https://www.nxp.com/downloads/en/libraries/patch_for_K32W061_SDK_2_6_4.zip
 exitCode=$?
-if [ $exitCode -ne 0 ]; then
+if [ "$exitCode" -ne 0 ]; then
     echo "Download error"
     exit
 fi
