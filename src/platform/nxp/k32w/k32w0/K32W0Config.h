@@ -29,6 +29,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "PDM.h"
+#include "RamStorage.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -131,13 +132,12 @@ public:
     static void RunConfigUnitTest(void);
 
 protected:
-    using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & PDMIdKey, const size_t & length)>;
-    static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
     static constexpr uint8_t GetPDMId(uint32_t key);
     static constexpr uint8_t GetRecordKey(uint32_t key);
 
 private:
     static CHIP_ERROR MapPdmStatus(PDM_teStatus pdmStatus);
+    static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
     static CHIP_ERROR MapPdmInitStatus(int pdmStatus);
     static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
