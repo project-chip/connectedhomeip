@@ -66,11 +66,14 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
+    // There is not delegate, nothing to do here
+    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+
 private:
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
 };
 
-// @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination
+/// @brief Extends SessionHolder to allow propagate SessionDelegate::* events to a given destination
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
@@ -85,6 +88,8 @@ public:
         // Note, the session is already cleared during mDelegate.OnSessionReleased
         mDelegate.OnSessionReleased();
     }
+
+    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
 
 private:
     SessionDelegate & mDelegate;

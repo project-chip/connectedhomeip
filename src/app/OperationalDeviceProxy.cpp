@@ -340,6 +340,16 @@ void OperationalDeviceProxy::OnSessionReleased()
     MoveToState(State::HasAddress);
 }
 
+void OperationalDeviceProxy::OnFirstMessageDeliveryFailed()
+{
+    LookupPeerAddress();
+}
+
+void OperationalDeviceProxy::OnSessionHang()
+{
+    // TODO: establish a new session
+}
+
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
     return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());

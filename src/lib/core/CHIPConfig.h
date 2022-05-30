@@ -1054,17 +1054,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
- *
- * @brief Defines the max number of SessionRecoveryDelegate
- *
- * // TODO: Explain what this is for.
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
-#endif
-
-/**
  * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
  *
  * @brief
