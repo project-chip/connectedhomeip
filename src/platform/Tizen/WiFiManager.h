@@ -45,6 +45,7 @@ public:
     CHIP_ERROR Disconnect(const char * ssid);
     CHIP_ERROR RemoveAllConfigs(void);
 
+    CHIP_ERROR GetDeviceMACAddress(uint8_t * macAddress, size_t macAddressLen);
     CHIP_ERROR GetDeviceState(wifi_manager_device_state_e * deviceState);
     CHIP_ERROR SetDeviceState(wifi_manager_device_state_e deviceState);
     CHIP_ERROR GetModuleState(wifi_manager_module_state_e * moduleState);
