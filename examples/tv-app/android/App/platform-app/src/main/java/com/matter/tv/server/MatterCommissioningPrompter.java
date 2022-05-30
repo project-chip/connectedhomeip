@@ -89,7 +89,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)
             .setContentTitle("Connection Failed")
-            .setContentText("Device " + commissioneeName + " experienced error: " + error)
+            .setContentText("Failed. " + commissioneeName + " experienced error: " + error + ".")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     notificationManager.notify(FAIL_ID, builder.build());
