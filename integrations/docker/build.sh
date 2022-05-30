@@ -40,11 +40,12 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --no-cache passed as a docker build argument
-   --latest   update latest to the current built version (\"$VERSION\")
-   --push     push image(s) to docker.io (requires docker login for \"$ORG\")
-   --help     get this message
-   --squash   squash docker layers before push them to docker.io (requires docker-squash python module)
+   --no-cache       passed as a docker build argument
+   --host-network   use the network host during image build
+   --latest         update latest to the current built version (\"$VERSION\")
+   --push           push image(s) to docker.io (requires docker login for \"$ORG\")
+   --help           get this message
+   --squash         squash docker layers before push them to docker.io (requires docker-squash python module)
 
 "
     exit 0
@@ -70,6 +71,9 @@ done
 BUILD_ARGS=()
 if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
+fi
+if [[ ${*/--host-network//} != "${*}" ]]; then
+    BUILD_ARGS+=(--network=host)
 fi
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
