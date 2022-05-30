@@ -95,8 +95,6 @@ static OTAImageProcessorImpl gImageProcessor;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
-extern bool shouldReset;
-
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -690,13 +688,6 @@ void AppTask::OTAResumeEventHandler(AppEvent * aEvent)
     }
 }
 
-extern "C" void vApplicationIdleHook(void)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    OTA_TransactionResume();
-#endif
-}
-
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
@@ -752,4 +743,11 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);
+}
+
+extern "C" void OTAIdleActivities(void)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OTA_TransactionResume();
+#endif
 }

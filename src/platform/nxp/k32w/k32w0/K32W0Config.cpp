@@ -36,14 +36,87 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#define BUFFER_LOG_SIZE 256
+#define CHIP_CONFIG_RAM_BUFFER_SIZE 3072
+
+#ifndef NVM_ID_CHIP_CONFIG_DATA
+#define NVM_ID_CHIP_CONFIG_DATA 0x5000
+#endif
+
+typedef struct
+{
+    uint16_t chipConfigRamBufferLen;
+    uint8_t chipConfigRamBuffer[1];
+} ChipConfigRamStruct_t;
+
+static ChipConfigRamStruct_t * chipConfigRamStruct;
+static ramBufferDescriptor * ramDescr;
+
+#define RAM_DESC_HEADER_SIZE (sizeof(ramDescr->ramBufferLen + ramDescr->ramBufferMaxLen))
+
+static rsError AddToRamStorage(ramBufferDescriptor ** pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
+{
+    rsError err;
+    uint32_t allocSize        = (*pBuffer)->ramBufferMaxLen;
+    ramBufferDescriptor * ptr = NULL;
+
+    if (allocSize <= (*pBuffer)->ramBufferLen + aValueLength)
+    {
+        while (allocSize < (*pBuffer)->ramBufferLen + aValueLength)
+        {
+            /* Need to realocate the memory buffer, increase size by 512B until nvm data fits */
+            allocSize += 512;
+        }
+
+        allocSize += RAM_DESC_HEADER_SIZE;
+
+        ptr = (ramBufferDescriptor *) realloc((void *) (*pBuffer), allocSize);
+        VerifyOrExit((NULL != ptr), err = RS_ERROR_NO_BUFS);
+        *pBuffer                    = ptr;
+        (*pBuffer)->ramBufferMaxLen = allocSize;
+    }
+
+    err = ramStorageSet(*pBuffer, aKey, aValue, aValueLength);
+
+exit:
+    return err;
+}
 CHIP_ERROR K32WConfig::Init()
 {
     CHIP_ERROR err;
     int pdmStatus;
+    ;
+    uint16_t bytesRead, recordSize;
+    bool bLoadDataFromNvm = false;
+    uint32_t allocSize    = CHIP_CONFIG_RAM_BUFFER_SIZE;
 
     /* Initialise the Persistent Data Manager */
     pdmStatus = PDM_Init();
     SuccessOrExit(err = MapPdmInitStatus(pdmStatus));
+
+    /* Check if dataset is present and get its size */
+    if (PDM_bDoesDataExist((uint16_t) NVM_ID_CHIP_CONFIG_DATA, &recordSize))
+    {
+        bLoadDataFromNvm = true;
+        while (recordSize > allocSize)
+        {
+            // increase size by 1k until nvm data fits
+            allocSize += 1024;
+        }
+    }
+
+    ramDescr = (ramBufferDescriptor *) malloc(allocSize);
+    VerifyOrExit((NULL != ramDescr), err = CHIP_ERROR_NO_MEMORY);
+
+    ramDescr->ramBufferLen    = 0;
+    ramDescr->ramBufferMaxLen = allocSize - RAM_DESC_HEADER_SIZE;
+
+    if (bLoadDataFromNvm)
+    {
+        /* Try to load the dataset in RAM */
+        // PDM_vDeleteDataRecord((uint16_t) NVM_ID_CHIP_CONFIG_DATA);
+        PDM_eReadDataFromRecord((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, recordSize, &bytesRead);
+    }
 
 exit:
     return err;
@@ -53,12 +126,12 @@ CHIP_ERROR K32WConfig::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
     bool tempVal;
-    uint16_t bytesRead;
-    PDM_teStatus pdmStatus;
+    rsError status;
+    uint16_t sizeToRead = sizeof(tempVal);
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(bool), &bytesRead);
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
+    status = ramStorageGet(ramDescr, key, 0, (uint8_t *) &tempVal, &sizeToRead);
+    SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
 exit:
@@ -69,22 +142,13 @@ CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err;
     uint32_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
+    rsError status;
+    uint16_t sizeToRead = sizeof(tempVal);
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint32_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
+    status = ramStorageGet(ramDescr, key, 0, (uint8_t *) &tempVal, &sizeToRead);
+    SuccessOrExit(err = MapRamStorageStatus(status));
+    val = tempVal;
 
 exit:
     return err;
@@ -93,24 +157,14 @@ exit:
 CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err;
-    uint64_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
+    uint32_t tempVal;
+    rsError status;
+    uint16_t sizeToRead = sizeof(tempVal);
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint64_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
+    status = ramStorageGet(ramDescr, key, 0, (uint8_t *) &tempVal, &sizeToRead);
+    SuccessOrExit(err = MapRamStorageStatus(status));
+    val = tempVal;
 
 exit:
     return err;
@@ -119,130 +173,44 @@ exit:
 CHIP_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    const uint8_t * strEnd;
-    char * pData = NULL;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    outLen = 0;
+    rsError status;
+    uint16_t sizeToRead = bufSize;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pData = (char *) pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
-
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, pData, recordSize, &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-        strEnd = (const uint8_t *) memchr(pData, 0, bytesRead);
-        VerifyOrExit(strEnd != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        outLen = strEnd - (const uint8_t *) pData;
-
-        // NOTE: the caller is allowed to pass NULL for buf to query the length of the stored value.
-
-        if (buf != NULL)
-        {
-            VerifyOrExit(bufSize > outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            memcpy(buf, pData, outLen + 1);
-        }
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
+    // We can call ramStorageGet with null pointer to only retrieve the size
+    status = ramStorageGet(ramDescr, key, 0, (uint8_t *) buf, &sizeToRead);
+    SuccessOrExit(err = MapRamStorageStatus(status));
+    outLen = sizeToRead;
 
 exit:
-    if (pData != NULL)
-    {
-        vPortFree((void *) pData);
-    }
     return err;
 }
 
 CHIP_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err;
-    uint8_t * pData = NULL;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    outLen = 0;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pData = (uint8_t *) pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
-
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, pData, recordSize, &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-        if (buf != NULL)
-        {
-            VerifyOrExit((bufSize >= bytesRead), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-            memcpy(buf, pData, bytesRead);
-        }
-        outLen = bytesRead;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
-    if (pData != NULL)
-    {
-        vPortFree((void *) pData);
-    }
-
-    return err;
+    return ReadConfigValueStr(key, (char *) buf, bufSize, outLen);
 }
 
 CHIP_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
-    CHIP_ERROR err;
-    uint32_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
     Key key = kMinConfigKey_ChipCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint32_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
-    return err;
+    return ReadConfigValue(key, val);
 }
 
 CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
+    rsError status;
     PDM_teStatus pdmStatus;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(bool));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
+    status = AddToRamStorage(&ramDescr, key, (uint8_t *) &val, sizeof(bool));
+    SuccessOrExit(err = MapRamStorageStatus(status));
 
+    pdmStatus =
+        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+    SuccessOrExit(err = MapPdmStatus(pdmStatus));
 exit:
     return err;
 }
@@ -250,10 +218,15 @@ exit:
 CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
+    rsError status;
     PDM_teStatus pdmStatus;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint32_t));
+    status = AddToRamStorage(&ramDescr, key, (uint8_t *) &val, sizeof(uint32_t));
+    SuccessOrExit(err = MapRamStorageStatus(status));
+
+    pdmStatus =
+        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -263,10 +236,15 @@ exit:
 CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
+    rsError status;
     PDM_teStatus pdmStatus;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint64_t));
+    status = AddToRamStorage(&ramDescr, key, (uint8_t *) &val, sizeof(uint64_t));
+    SuccessOrExit(err = MapRamStorageStatus(status));
+
+    pdmStatus =
+        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -282,25 +260,18 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
+    rsError status;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
     if (str != NULL)
     {
-        uint8_t * pData = (uint8_t *) pvPortMalloc(strLen + 1);
+        status = AddToRamStorage(&ramDescr, key, (uint8_t *) str, strLen);
+        SuccessOrExit(err = MapRamStorageStatus(status));
 
-        if (pData != NULL)
-        {
-            memcpy(pData, str, strLen);
-            pData[strLen] = '\0';
-            pdmStatus     = PDM_eSaveRecordData((uint16_t) key, (void *) pData, strLen + 1);
-            vPortFree((void *) pData);
-            SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        }
-        else
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
+        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr,
+                                                  ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        SuccessOrExit(err = MapPdmStatus(pdmStatus));
     }
     else
     {
@@ -314,48 +285,28 @@ exit:
 
 CHIP_ERROR K32WConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if ((data != NULL) && (dataLen > 0))
-    {
-        pdmStatus = PDM_eSaveRecordData((uint16_t) key, (void *) data, dataLen);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-    }
-    else
-    {
-        err = ClearConfigValue(key);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
+    return WriteConfigValueStr(key, (char *) data, dataLen);
 }
 
 CHIP_ERROR K32WConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
     Key key = kMinConfigKey_ChipCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint32_t));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-exit:
-    return err;
+    return WriteConfigValue(key, val);
 }
 
 CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    rsError status;
+    PDM_teStatus pdmStatus;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    PDM_vDeleteDataRecord((uint16_t) key);
+    status = ramStorageDelete(ramDescr, key, 0);
+    SuccessOrExit(err = MapRamStorageStatus(status));
 
-    SuccessOrExit(err);
+    pdmStatus =
+        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+    SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
     return err;
@@ -363,20 +314,22 @@ exit:
 
 bool K32WConfig::ConfigValueExists(Key key)
 {
-    CHIP_ERROR err;
-    uint16_t size = 0;
+    rsError status;
+    uint16_t sizeToRead;
+    bool found = false;
 
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    VerifyOrExit(PDM_bDoesDataExist((uint16_t) key, &size), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-
-exit:
-    // Return true if the record was found.
-    return (err == CHIP_NO_ERROR);
+    if (ValidConfigKey(key))
+    {
+        status = ramStorageGet(ramDescr, key, 0, NULL, &sizeToRead);
+        found  = (status == RS_ERROR_NONE && sizeToRead != 0);
+    }
+    return found;
 }
 
 CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
     CHIP_ERROR err;
+    PDM_teStatus pdmStatus;
 
     err = FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
 
@@ -385,28 +338,20 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
         err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
     }
 
+    pdmStatus = PDM_eSaveRecordData((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+    SuccessOrExit(err = MapPdmStatus(pdmStatus));
+
+exit:
     return err;
 }
 
 CHIP_ERROR K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Iterate over all the CHIP Config PDM ID records and delete each one
-    err = ForEachRecord(firstKey, lastKey, false, [](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
-        CHIP_ERROR err2;
-
-        err2 = ClearConfigValue(pdmKey);
-        SuccessOrExit(err2);
-
-    exit:
-        return err2;
-    });
-
-    // Return success at end of iterations.
-    if (err == CHIP_END_OF_INPUT)
+    for (Key key = firstKey; key <= lastKey; key++)
     {
-        err = CHIP_NO_ERROR;
+        ramStorageDelete(ramDescr, key, 0);
     }
 
     return err;
@@ -429,6 +374,26 @@ CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
     return err;
 }
 
+CHIP_ERROR K32WConfig::MapRamStorageStatus(rsError rsStatus)
+{
+    CHIP_ERROR err;
+
+    switch (rsStatus)
+    {
+    case RS_ERROR_NONE:
+        err = CHIP_NO_ERROR;
+        break;
+    case RS_ERROR_NOT_FOUND:
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        break;
+    default:
+        err = CHIP_ERROR_BUFFER_TOO_SMALL;
+        break;
+    }
+
+    return err;
+}
+
 CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
 {
     return (pdmStatus == 0) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, pdmStatus);
@@ -437,47 +402,12 @@ CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
 bool K32WConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-
     if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS))
     {
         return true;
     }
 
     return false;
-}
-
-CHIP_ERROR K32WConfig::ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (Key pdmKey = firstKey; pdmKey <= lastKey; pdmKey++)
-    {
-        uint16_t dataLen;
-
-        if (PDM_bDoesDataExist((uint16_t) pdmKey, &dataLen))
-        {
-            if (!addNewRecord)
-            {
-                // Invoke the caller's function
-                // (for retrieve,store,delete,enumerate GroupKey operations).
-                err = funct(pdmKey, dataLen);
-            }
-        }
-        else
-        {
-            if (addNewRecord)
-            {
-                // Invoke caller's function
-                // (for add GroupKey operation).
-                err = funct(pdmKey, dataLen);
-            }
-        }
-
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
 }
 
 void K32WConfig::RunConfigUnitTest() {}
