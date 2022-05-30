@@ -28,11 +28,11 @@
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 #include <platform/Zephyr/SysHeapMalloc.h>
 
-#include <drivers/hwinfo.h>
-#include <sys/util.h>
+#include <zephyr/drivers/hwinfo.h>
+#include <zephyr/sys/util.h>
 
 #ifdef CONFIG_MCUBOOT_IMG_MANAGER
-#include <dfu/mcuboot.h>
+#include <zephyr/dfu/mcuboot.h>
 #endif
 
 #include <malloc.h>

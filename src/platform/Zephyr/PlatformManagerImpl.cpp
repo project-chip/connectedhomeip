@@ -32,8 +32,8 @@
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
-#include <drivers/entropy.h>
 #include <malloc.h>
+#include <zephyr/drivers/entropy.h>
 
 namespace chip {
 namespace DeviceLayer {

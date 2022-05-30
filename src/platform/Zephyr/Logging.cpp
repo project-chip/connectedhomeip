@@ -6,9 +6,9 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
-#include <kernel.h>
-#include <logging/log.h>
-#include <sys/cbprintf.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/cbprintf.h>
 
 // If CONFIG_LOG_MODE_MINIMAL the timestamp is NOT added automatically by the Zephyr logger
 #ifdef CONFIG_LOG_MODE_MINIMAL

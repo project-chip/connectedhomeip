@@ -17,11 +17,11 @@
 
 #include "AppTask.h"
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 #if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
-#include <drivers/uart.h>
-#include <usb/usb_device.h>
+#include <zephyr/drivers/uart.h>
+#include <zephyr/usb/usb_device.h>
 #endif
 
 LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
