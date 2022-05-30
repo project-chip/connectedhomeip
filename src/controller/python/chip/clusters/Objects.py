@@ -14408,21 +14408,6 @@ class OperationalCredentials(Cluster):
 
             rootCertificate: 'bytes' = b""
 
-        @dataclass
-        class RemoveTrustedRootCertificate(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x000C
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="trustedRootIdentifier", Tag=0, Type=bytes),
-                    ])
-
-            trustedRootIdentifier: 'bytes' = b""
-
 
     class Attributes:
         @dataclass

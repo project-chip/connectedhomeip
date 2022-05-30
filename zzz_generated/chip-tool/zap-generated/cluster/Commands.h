@@ -6521,7 +6521,6 @@ private:
 | * UpdateFabricLabel                                                 |   0x09 |
 | * RemoveFabric                                                      |   0x0A |
 | * AddTrustedRootCertificate                                         |   0x0B |
-| * RemoveTrustedRootCertificate                                      |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -6787,37 +6786,6 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type mRequest;
-};
-
-/*
- * Command RemoveTrustedRootCertificate
- */
-class OperationalCredentialsRemoveTrustedRootCertificate : public ClusterCommand
-{
-public:
-    OperationalCredentialsRemoveTrustedRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("remove-trusted-root-certificate", credsIssuerConfig)
-    {
-        AddArgument("TrustedRootIdentifier", &mRequest.trustedRootIdentifier);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000C, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000C, mRequest);
-    }
-
-private:
-    chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -21632,16 +21600,15 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
-        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),           //
-        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),      //
-        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                   //
-        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                       //
-        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                    //
-        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),            //
-        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                 //
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),    //
-        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                              //
+        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),        //
+        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),   //
+        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                //
+        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                    //
+        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                 //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),         //
+        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),              //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig), //
         //
         // Attributes
         //

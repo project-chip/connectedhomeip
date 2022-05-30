@@ -13983,17 +13983,6 @@ public class ChipClusters {
       removeFabric(chipClusterPtr, callback, fabricIndex, timedInvokeTimeoutMs);
     }
 
-    public void removeTrustedRootCertificate(
-        DefaultClusterCallback callback, byte[] trustedRootIdentifier) {
-      removeTrustedRootCertificate(chipClusterPtr, callback, trustedRootIdentifier, null);
-    }
-
-    public void removeTrustedRootCertificate(
-        DefaultClusterCallback callback, byte[] trustedRootIdentifier, int timedInvokeTimeoutMs) {
-      removeTrustedRootCertificate(
-          chipClusterPtr, callback, trustedRootIdentifier, timedInvokeTimeoutMs);
-    }
-
     public void updateFabricLabel(NOCResponseCallback callback, String label) {
       updateFabricLabel(chipClusterPtr, callback, label, null);
     }
@@ -14054,12 +14043,6 @@ public class ChipClusters {
         long chipClusterPtr,
         NOCResponseCallback Callback,
         Integer fabricIndex,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void removeTrustedRootCertificate(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        byte[] trustedRootIdentifier,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void updateFabricLabel(

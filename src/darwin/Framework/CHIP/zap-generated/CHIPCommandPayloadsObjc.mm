@@ -1889,17 +1889,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
-@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _trustedRootIdentifier = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
 @implementation CHIPGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init
 {

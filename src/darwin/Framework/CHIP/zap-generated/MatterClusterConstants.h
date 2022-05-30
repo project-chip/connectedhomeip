@@ -2264,7 +2264,6 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterOperationalCredentialsCommandUpdateFabricLabelID = 0x00000009,
     kMatterClusterOperationalCredentialsCommandRemoveFabricID = 0x0000000A,
     kMatterClusterOperationalCredentialsCommandAddTrustedRootCertificateID = 0x0000000B,
-    kMatterClusterOperationalCredentialsCommandRemoveTrustedRootCertificateID = 0x0000000C,
 
     // Cluster GroupKeyManagement commands
     kMatterClusterGroupKeyManagementCommandKeySetWriteID = 0x00000000,
