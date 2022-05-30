@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.10. [TC-DM-4.10][Thread] Verification for RemoveNetwork Command
+    10.4.10. [TC-DM-4.10] [Thread] Verification for RemoveNetwork Command
     [DUT-Commissionee]
 
 config:
@@ -23,22 +23,22 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 sends ArmFailSafe command to the DUT"
+    - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0 
 
           [1650391404.723087][10042:10047] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650391404.723164][10042:10047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650391404.723269][10042:10047] CHIP:TOO:   ArmFailSafeResponse: {
           [1650391404.723342][10042:10047] CHIP:TOO:     errorCode: 0
-          [1650391404.723381][10042:10047] CHIP:TOO:     debugText:
+          [1650391404.723381][10042:10047] CHIP:TOO:     debugText: 
           [1650391404.723419][10042:10047] CHIP:TOO:    }
           [1650391404.723479][10042:10047] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
-          "TH1 sends RemoveNetwork Command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 0"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID argument
+          value as 'Userth_op' and Breadcrumb argument value as 1"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
 
@@ -50,7 +50,7 @@ tests:
           [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH1 reads MaxNetworks attribute from the DUT"
+    - label: "TH reads MaxNetworks attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 62 0
 
@@ -59,7 +59,7 @@ tests:
           [1650391430.631837][10054:10059] CHIP:EM: Sending Standalone Ack for MessageCounter:6413170 on exchange 3154i
       disabled: true
 
-    - label: "TH1 reads LastNetworkingStatus attribute from the DUT"
+    - label: "TH reads LastNetworkingStatus attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 62 0
 

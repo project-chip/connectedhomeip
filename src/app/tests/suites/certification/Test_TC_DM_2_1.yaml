@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.1. [TC-DM-2.1] Operational Credential Commands
+name: 10.2.1. [TC-DM-2.1] Basic Information Cluster Server Attributes
 
 config:
     nodeId: 0x12344321
@@ -21,83 +21,172 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Query Data Model Revision"
+      command: "readAttribute"
+      attribute: "DataModelRevision"
+      response:
+          constraints:
+              type: uint16
 
-    - label: "TH Sends Attestation Request to DUT"
-      verification: |
-          https://github.com/project-chip/connectedhomeip/issues/14395
-      disabled: true
+    - label: "Query Vendor Name"
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
 
-    - label: "TH Sends Attestation Certificate Chain Request to DUT"
-      verification: |
-          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
-      disabled: true
+    - label: "Query VendorID"
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          constraints:
+              type: uint16
 
-    - label: "TH Sends CSR Request to DUT"
-      verification: |
+    - label: "Query Product Name"
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
 
-      disabled: true
+    - label: "Query ProductID"
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          constraints:
+              type: uint16
 
-    - label: "TH Sends Add Trusted Root Certificate Request to DUT"
-      verification: |
+    - label: "Query Node Label"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
 
-      disabled: true
+    - label: "Query User Location"
+      command: "readAttribute"
+      attribute: "Location"
+      response:
+          constraints:
+              type: string
+              maxLength: 2
+              format: "ISO 3166-1 alpha-2" # Step 6 11.2.3.1-6 Verify it follows ISO 3166-1 alpha-2 code / or it is empty, since it is user-defined
 
-    - label: "TH Sends Add Op Cert Request to DUT"
-      verification: |
+    - label: "Query HardwareVersion"
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          constraints:
+              type: uint16
 
-      disabled: true
+    - label: "Query HardwareVersionString"
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          constraints:
+              type: string
+              minLength: 1
+              maxLength: 64
 
-    - label: "Verify DUT and TH are on the same Fabric"
-      verification: |
+    - label: "Query SoftwareVersion"
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          constraints:
+              type: uint32
 
-      disabled: true
+    - label: "Query SoftwareVersionString"
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          constraints:
+              type: string
+              minLength: 1
+              maxLength: 64
+              format: "ASCII" # Step 10 11.2.3.1-10 Verify it uses 7-bit ASCII alphanumeric and punctuation characters
 
-    - label: "TH Sends Update Op Cert Request to DUT"
-      verification: |
+    - label: "Query ManufacturingDate"
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      PICS: MANF_DATE
+      optional: true
+      response:
+          constraints:
+              type: string
+              minLength: 8
+              maxLength: 16
+              format: "ISO 8601" # Step 11  11.2.3.1-11 Verify if the first 8 characters specify date according to ISO 8601, i.e, YYYYMMDD
 
-      disabled: true
+    - label: "Query PartNumber"
+      command: "readAttribute"
+      attribute: "PartNumber"
+      PICS: PART_NUM
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
 
-    - label:
-          "TH Sends Update Op Cert Request to DUT with a Fabric Label not
-          already in use"
-      verification: |
+    - label: "Query ProductURL"
+      command: "readAttribute"
+      attribute: "ProductURL"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 256
+              format: "RFC3986" # Step 13 11.2.3.1-13 Verify that it follows the syntax rules specified in RFC 3986
 
-      disabled: true
+    - label: "Query ProductLabel"
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 64
 
-    - label:
-          "TH Sends Update Op Cert Request to DUT with a Fabric label already in
-          use"
-      verification: |
+    - label: "Query SerialNumber"
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
 
-      disabled: true
+    - label: "Query LocalConfigDisabled"
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      optional: true
+      response:
+          constraints:
+              type: boolean
 
-    - label:
-          "TH Sends Remove Fabric Request to DUT with a non-Valid Fabric index"
-      verification: |
-          ./chip-tool operationalcredentials remove-fabric 2 1 0
+    - label: "Query Reachable"
+      command: "readAttribute"
+      attribute: "Reachable"
+      optional: true
+      response:
+          constraints:
+              type: boolean
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1646390608.860327][6336:6341] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1646390608.860465][6336:6341] CHIP:TOO:   NOCResponse: {
-          [1646390608.860548][6336:6341] CHIP:TOO:     statusCode: 11
-          [1646390608.860611][6336:6341] CHIP:TOO:    }
-          [1646390608.860695][6336:6341] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646390608.860801][6336:6341] CHIP:EM: Sending Standalone Ack for MessageCounter:1477607 on exchange 51257i
-      disabled: true
-
-    - label: "TH Sends Remove Fabric Request to DUT with a valid Fabric ID"
-      verification: |
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
-
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1646390764.134501][6347:6352] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1646390764.134673][6347:6352] CHIP:TOO:   NOCResponse: {
-          [1646390764.134894][6347:6352] CHIP:TOO:     statusCode: 0
-          [1646390764.134985][6347:6352] CHIP:TOO:     fabricIndex: 1
-          [1646390764.135047][6347:6352] CHIP:TOO:    }
-          [1646390764.135157][6347:6352] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+    - label: "Query UniqueID"
+      command: "readAttribute"
+      attribute: "UniqueID"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
