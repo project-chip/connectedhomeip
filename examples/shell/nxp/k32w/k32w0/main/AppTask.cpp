@@ -434,3 +434,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         K32W_LOG("Event received with no handler. Dropping event.");
     }
 }
+
+extern "C" void OTAIdleActivities(void)
+{
+}
