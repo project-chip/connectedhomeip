@@ -185,6 +185,7 @@ efr32_executable("light_switch_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/light-switch-app/light-switch-common",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

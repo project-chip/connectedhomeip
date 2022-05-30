@@ -38,6 +38,9 @@ function getManualTests() {
     'Test_TC_DD_1_10',
     'Test_TC_DD_1_11',
     'Test_TC_DD_1_12',
+    'Test_TC_DD_1_13',
+    'Test_TC_DD_1_14',
+    'Test_TC_DD_1_15',
     'Test_TC_DD_2_1',
     'Test_TC_DD_2_2',
     'Test_TC_DD_3_1',
@@ -54,12 +57,22 @@ function getManualTests() {
     'Test_TC_DD_3_12',
     'Test_TC_DD_3_13',
     'Test_TC_DD_3_14',
-    'Test_TC_DD_4_1',
+    'Test_TC_DD_3_15',
+    'Test_TC_DD_3_16',
+    'Test_TC_DD_3_17',
+    'Test_TC_DD_3_18',
+    'Test_TC_DD_3_19',
+    'Test_TC_DD_3_20',
   ];
 
   const Groups = [
     'TestGroupDemoCommand',
     'TestGroupDemoConfig',
+    'Test_TC_GR_1_1',
+    'Test_TC_GR_2_1',
+    'Test_TC_GR_2_2',
+    'Test_TC_GR_3_1',
+    'Test_TC_GR_3_2',
   ];
 
   const BulkDataExchangeProtocol = [
@@ -96,6 +109,7 @@ function getManualTests() {
     'Test_TC_DM_1_2',
     'Test_TC_DM_1_4',
     'Test_TC_DM_2_1',
+    'Test_TC_DM_2_2',
     'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
     'Test_TC_DM_3_4',
@@ -280,6 +294,7 @@ function getManualTests() {
   ];
 
   const FlowMeasurement = [
+    'Test_TC_FLW_2_2',
     'Test_TC_FLW_3_1',
   ];
 
@@ -322,9 +337,7 @@ function getManualTests() {
     'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_7',
-    'Test_TC_DL_2_8',
     'Test_TC_DL_2_10',
-    'Test_TC_DL_2_11',
     'Test_TC_DL_2_13',
     'Test_TC_DL_2_14',
     'Test_TC_DL_2_15',
@@ -333,7 +346,6 @@ function getManualTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_1',
     'Test_TC_LC_2_3',
     'Test_TC_LC_2_4',
     'Test_TC_LC_2_5',
@@ -347,42 +359,24 @@ function getManualTests() {
     'Test_TC_LVL_2_3',
   ];
 
-  const NetworkCommissioning = [
-    'Test_TC_NC_1_1',
-    'Test_TC_NC_1_2',
-    'Test_TC_NC_1_3',
-    'Test_TC_NC_1_4',
-    'Test_TC_NC_1_5',
-    'Test_TC_NC_1_6',
-    'Test_TC_NC_1_7',
-    'Test_TC_NC_1_8',
-    'Test_TC_NC_1_9',
-    'Test_TC_NC_1_10',
-    'Test_TC_NC_1_11',
-    'Test_TC_NC_1_12',
-    'Test_TC_NC_1_13',
-    'Test_TC_NC_1_14',
-    'Test_TC_NC_1_15',
-    'Test_TC_NC_1_16',
-    'Test_TC_NC_1_17',
-    'Test_TC_NC_1_18',
-  ];
-
   const OnOff = [
     'Test_TC_OO_3_1',
     'Test_TC_OO_3_2',
   ];
 
   const RelativeHumidityMeasurement = [
+    'Test_TC_RH_2_2',
     'Test_TC_RH_3_1',
   ];
 
   const Switch = [
     'Test_TC_SWTCH_1_1',
+    'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
   ];
 
   const TemperatureMeasurement = [
+    'Test_TC_TM_2_2',
     'Test_TC_TM_3_1',
   ];
 
@@ -402,6 +396,26 @@ function getManualTests() {
     'Test_TC_DIAG_TH_NW_2_9',
   ];
 
+  const Actions = [
+    'Test_TC_ACT_1_1',
+    'Test_TC_ACT_2_1',
+    'Test_TC_ACT_2_2',
+    'Test_TC_ACT_3_1',
+  ];
+
+  const TimeFormatLocalization = [
+    'Test_TC_TFL_1_1',
+    'Test_TC_TFL_1_2',
+    'Test_TC_TFL_2_1',
+    'Test_TC_TFL_2_2',
+  ];
+
+  const UnitLocalization = [
+    'Test_TC_UL_1_1',
+    'Test_TC_UL_1_2',
+    'Test_TC_UL_2_1',
+    'Test_TC_UL_2_2',
+  ];
 
   const tests = [
     DeviceDiscovery,
@@ -438,7 +452,6 @@ function getManualTests() {
     UserLabel,
     LocalizationConfiguration,
     LevelControl,
-    NetworkCommissioning,
     OnOff,
     RelativeHumidityMeasurement,
     Switch,
@@ -446,6 +459,9 @@ function getManualTests() {
     Thermostat,
     ThermostatUserConfiguration,
     ThreadNetworkDiagnostics,
+    Actions,
+    TimeFormatLocalization,
+    UnitLocalization,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
@@ -501,7 +517,6 @@ function getTests() {
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
-    'Test_TC_DM_2_2',
   ];
 
   const ElectricalMeasurement = [
@@ -516,7 +531,6 @@ function getTests() {
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
-    'Test_TC_FLW_2_2',
   ];
 
   const GeneralCommissioning = [
@@ -551,7 +565,8 @@ function getTests() {
   ];
 
   const UserLabel = [
-    'Test_TC_LC_1_2',
+    'Test_TC_ULABEL_1_1',
+    'Test_TC_ULABEL_2_2',
   ];
 
   const MediaControl = [
@@ -640,7 +655,6 @@ function getTests() {
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
-    'Test_TC_RH_2_2',
   ];
 
   const SecureChannel = [
@@ -649,13 +663,11 @@ function getTests() {
 
   const Switch = [
     'Test_TC_SWTCH_2_1',
-    'Test_TC_SWTCH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
-    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [
@@ -761,6 +773,8 @@ function getTests() {
     'Test_TC_DL_2_2',
     'Test_TC_DL_2_3',
     'Test_TC_DL_2_4',
+    'Test_TC_DL_2_8',
+    'Test_TC_DL_2_11',
   ];
 
   const Groups = [

@@ -66,6 +66,19 @@ static CHIP_ERROR PrintAllCommands()
     return CHIP_NO_ERROR;
 }
 
+void PrintBindings()
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+    }
+    return;
+}
+
 static CHIP_ERROR CastingHandler(int argc, char ** argv)
 {
     if (argc == 0 || strcmp(argv[0], "help") == 0)
@@ -79,7 +92,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
-        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex, HandleCommissioningCompleteCallback);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "discover") == 0)
     {
@@ -107,7 +120,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * url     = argv[1];
         char * display = argv[2];
-        return CastingServer::GetInstance()->ContentLauncherLaunchURL(url, display);
+        return CastingServer::GetInstance()->ContentLauncherLaunchURL(url, display, LaunchURLResponseCallback);
     }
     if (strcmp(argv[0], "access") == 0)
     {
@@ -135,7 +148,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (strcmp(argv[0], "print-bindings") == 0)
     {
-        CastingServer::GetInstance()->PrintBindings();
+        PrintBindings();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "print-fabrics") == 0)
@@ -160,7 +173,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
             streamer_printf(streamer_get(), "ERROR - invalid fabric or video player nodeId not found\r\n");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex, HandleCommissioningCompleteCallback);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "cluster") == 0)
     {

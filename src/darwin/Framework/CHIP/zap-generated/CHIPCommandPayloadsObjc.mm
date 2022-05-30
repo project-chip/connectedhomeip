@@ -32,26 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
-@implementation CHIPIdentifyClusterIdentifyQueryResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeout = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPIdentifyClusterIdentifyQueryParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
 @implementation CHIPIdentifyClusterTriggerEffectParams
 - (instancetype)init
 {
@@ -1840,7 +1820,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ipkValue = [NSData data];
 
-        _caseAdminNode = @(0);
+        _caseAdminSubject = @(0);
 
         _adminVendorId = @(0);
         _timedInvokeTimeoutMs = nil;
@@ -2776,7 +2756,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2793,28 +2773,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeForSequence = @(0);
 
-        _payload = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeOfDay = @(0);
-
-        _relayStatus = @(0);
-
-        _localTemperature = @(0);
-
-        _humidityInPercentage = @(0);
-
-        _setpoint = @(0);
-
-        _unreadEntries = @(0);
+        _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2834,15 +2793,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 @implementation CHIPThermostatClusterClearWeeklyScheduleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPThermostatClusterGetRelayStatusLogParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3169,9 +3119,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _rate = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 
@@ -3192,9 +3142,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _colorTemperatureMinimum = @(0);
+        _colorTemperatureMinimumMireds = @(0);
 
-        _colorTemperatureMaximum = @(0);
+        _colorTemperatureMaximumMireds = @(0);
 
         _optionsMask = @(0);
 

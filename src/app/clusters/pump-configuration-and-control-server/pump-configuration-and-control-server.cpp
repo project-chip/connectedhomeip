@@ -261,14 +261,15 @@ bool IsFeatureSupported(EndpointId endpoint, EmberAfStatus (*getFn1)(chip::Endpo
     return false;
 }
 
+template <typename T1, typename T2>
+const char * FeatureSupportedDebugString(EndpointId endpoint, EmberAfStatus (*getFn1)(chip::EndpointId endpointId, T1 & value),
+                                         EmberAfStatus (*getFn2)(chip::EndpointId endpointId, T2 & value))
+{
+    return IsFeatureSupported(endpoint, getFn1, getFn2) ? "Supported" : "Not Supported";
+}
+
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
-    bool constPressureSupported     = false;
-    bool constPropPressureSupported = false;
-    bool constFlowSupported         = false;
-    bool constTemperatureSupported  = false;
-    bool constSpeedSupported        = false;
-
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
 
     // Determine the internal feature set of the pump, depending on the pump
@@ -283,16 +284,17 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     // has finished its init process, it might setup these attributevalues
     // to something NonNull, and then we must re-calcualte the feature set.
 
-    constPressureSupported = IsFeatureSupported(endpoint, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get);
-    emberAfDebugPrintln("Constant Pressure %s", constPressureSupported ? "Supported" : "Not Supported");
-    constPropPressureSupported = IsFeatureSupported(endpoint, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get);
-    emberAfDebugPrintln("Constant Proportional Pressure %s", constPropPressureSupported ? "Supported" : "Not Supported");
-    constFlowSupported = IsFeatureSupported(endpoint, Attributes::MinConstFlow::Get, Attributes::MaxConstFlow::Get);
-    emberAfDebugPrintln("Constant Flow %s", constFlowSupported ? "Supported" : "Not Supported");
-    constTemperatureSupported = IsFeatureSupported(endpoint, Attributes::MinConstTemp::Get, Attributes::MaxConstTemp::Get);
-    emberAfDebugPrintln("Constant Temperature %s", constTemperatureSupported ? "Supported" : "Not Supported");
-    constSpeedSupported = IsFeatureSupported(endpoint, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get);
-    emberAfDebugPrintln("Constant Speed %s", constSpeedSupported ? "Supported" : "Not Supported");
+    emberAfDebugPrintln(
+        "Constant Pressure %s",
+        FeatureSupportedDebugString(endpoint, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get));
+    emberAfDebugPrintln("Constant Proportional Pressure %s",
+                        FeatureSupportedDebugString(endpoint, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get));
+    emberAfDebugPrintln("Constant Flow %s",
+                        FeatureSupportedDebugString(endpoint, Attributes::MinConstFlow::Get, Attributes::MaxConstFlow::Get));
+    emberAfDebugPrintln("Constant Temperature %s",
+                        FeatureSupportedDebugString(endpoint, Attributes::MinConstTemp::Get, Attributes::MaxConstTemp::Get));
+    emberAfDebugPrintln("Constant Speed %s",
+                        FeatureSupportedDebugString(endpoint, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get));
 }
 
 chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(

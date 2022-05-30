@@ -17,14 +17,18 @@
  */
 
 #include "AppContentLauncherManager.h"
+#include "../../java/ContentAppCommandDelegate.h"
 
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
 
-AppContentLauncherManager::AppContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+AppContentLauncherManager::AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, list<std::string> acceptHeaderList,
+                                                     uint32_t supportedStreamingProtocols) :
+    mCommandDelegate(commandDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
     mSupportedStreamingProtocols = supportedStreamingProtocols;
@@ -36,6 +40,22 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
+
+    ChipLogProgress(Zcl, " AutoPlay=%s", (autoplay ? "true" : "false"));
+
+    bool foundMatch = false;
+    auto iter       = parameterList.begin();
+    while (iter.Next())
+    {
+        auto & parameterType = iter.GetValue();
+        ChipLogProgress(Zcl, " TEST CASE found match=Example TV Show type=%d", static_cast<uint16_t>(parameterType.type));
+        foundMatch = true;
+    }
+
+    if (!foundMatch)
+    {
+        ChipLogProgress(Zcl, " TEST CASE did not find a match");
+    }
 
     LaunchResponseType response;
     // TODO: Insert code here
@@ -53,8 +73,11 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
     string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
+
+    const char * resStr = mCommandDelegate.sendCommand(mEndpointId, contentUrlString);
+
     LaunchResponseType response;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional(CharSpan::fromCharString(resStr));
     response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
     helper.Success(response);
 }

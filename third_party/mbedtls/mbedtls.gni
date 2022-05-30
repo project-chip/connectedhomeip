@@ -57,6 +57,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/cipher.c",
       "${_mbedtls_root}/library/cipher_wrap.c",
       "${_mbedtls_root}/library/cmac.c",
+      "${_mbedtls_root}/library/constant_time.c",
       "${_mbedtls_root}/library/ctr_drbg.c",
       "${_mbedtls_root}/library/debug.c",
       "${_mbedtls_root}/library/des.c",

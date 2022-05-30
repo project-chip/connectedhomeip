@@ -81,8 +81,6 @@ typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterRemoveGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
-typedef void (*CHIPIdentifyClusterIdentifyQueryResponseCallbackType)(
-    void *, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &);
 typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
 typedef void (*CHIPMediaPlaybackClusterPlaybackResponseCallbackType)(
@@ -151,8 +149,6 @@ typedef void (*CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseCallba
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
 typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
-typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -1127,12 +1123,12 @@ typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
         data);
 typedef void (*ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & data);
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & data);
 typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & data);
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & data);
 typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
 typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
@@ -8879,8 +8875,8 @@ public:
                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge
@@ -8913,8 +8909,8 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
+                const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge
@@ -9985,18 +9981,6 @@ public:
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
 };
 
-class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>
-{
-public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data);
-};
-
 class CHIPKeypadInputClusterSendKeyResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>
 {
@@ -10424,19 +10408,6 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
-};
-
-class CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
-{
-public:
-    CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge

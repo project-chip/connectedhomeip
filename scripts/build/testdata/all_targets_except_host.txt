@@ -1,4 +1,5 @@
 ameba-amebad-all-clusters
+ameba-amebad-all-clusters-minimal
 ameba-amebad-light
 ameba-amebad-pigweed
 android-androidstudio-arm-chip-tool
@@ -18,6 +19,7 @@ android-x86-chip-tool
 android-x86-chip-tvserver
 bl602-light
 cc13x2x7_26x2x7-all-clusters
+cc13x2x7_26x2x7-all-clusters-minimal
 cc13x2x7_26x2x7-lock-ftd
 cc13x2x7_26x2x7-lock-mtd
 cc13x2x7_26x2x7-pump
@@ -140,8 +142,11 @@ efr32-brd4304a-unit-test-with-ota-requestor (NOGLOB: only user requested)
 efr32-brd4304a-window-covering (NOGLOB: only user requested)
 efr32-brd4304a-window-covering-with-ota-requestor (NOGLOB: only user requested)
 esp32-c3devkit-all-clusters
+esp32-c3devkit-all-clusters-minimal
 esp32-devkitc-all-clusters
 esp32-devkitc-all-clusters-ipv6only
+esp32-devkitc-all-clusters-minimal
+esp32-devkitc-all-clusters-minimal-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-light
 esp32-devkitc-lock
@@ -150,11 +155,17 @@ esp32-devkitc-temperature-measurement
 esp32-devkitc-temperature-measurement-rpc
 esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
+esp32-m5stack-all-clusters-minimal
+esp32-m5stack-all-clusters-minimal-ipv6only
+esp32-m5stack-all-clusters-minimal-rpc
+esp32-m5stack-all-clusters-minimal-rpc-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 esp32-qemu-tests
 imx-all-clusters-app
 imx-all-clusters-app-release
+imx-all-clusters-minimal-app
+imx-all-clusters-minimal-app-release
 imx-chip-tool
 imx-chip-tool-release
 imx-lighting-app
@@ -164,6 +175,7 @@ imx-ota-provider-app-release
 imx-thermostat
 imx-thermostat-release
 infineon-p6-all-clusters
+infineon-p6-all-clusters-minimal
 infineon-p6-light
 infineon-p6-lock
 k32w-light-ota-se (NOGLOB: Only on demand build)
@@ -173,6 +185,9 @@ k32w-lock-release
 k32w-shell-release
 mbed-CY8CPROTO_062_4343W-all-clusters-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
+mbed-CY8CPROTO_062_4343W-all-clusters-minimal-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
+mbed-CY8CPROTO_062_4343W-all-clusters-minimal-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
+mbed-CY8CPROTO_062_4343W-all-clusters-minimal-release
 mbed-CY8CPROTO_062_4343W-all-clusters-release
 mbed-CY8CPROTO_062_4343W-light-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-light-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
@@ -188,6 +203,7 @@ mbed-CY8CPROTO_062_4343W-shell-develop (NOGLOB: Compile only for debugging purpo
 mbed-CY8CPROTO_062_4343W-shell-release
 nrf-native-posix-64-tests
 nrf-nrf52840dk-all-clusters
+nrf-nrf52840dk-all-clusters-minimal
 nrf-nrf52840dk-light
 nrf-nrf52840dk-light-rpc
 nrf-nrf52840dk-lock
@@ -195,8 +211,10 @@ nrf-nrf52840dk-pump
 nrf-nrf52840dk-pump-controller
 nrf-nrf52840dk-shell
 nrf-nrf52840dongle-all-clusters
+nrf-nrf52840dongle-all-clusters-minimal
 nrf-nrf52840dongle-light
 nrf-nrf5340dk-all-clusters
+nrf-nrf5340dk-all-clusters-minimal
 nrf-nrf5340dk-light
 nrf-nrf5340dk-light-rpc (NOGLOB: Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760)
 nrf-nrf5340dk-lock

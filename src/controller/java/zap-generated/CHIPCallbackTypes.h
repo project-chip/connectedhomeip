@@ -39,6 +39,8 @@ typedef void (*CHIPAccessControlClusterAcceptedCommandListAttributeCallbackType)
     void *, const chip::app::Clusters::AccessControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAccessControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::AccessControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPAccessControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::AccessControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPAccessControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::AccessControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
@@ -50,6 +52,8 @@ typedef void (*CHIPAccountLoginClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAccountLoginClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPAccountLoginClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::AccountLogin::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPAccountLoginClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::AccountLogin::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -65,6 +69,8 @@ typedef void (*CHIPAdministratorCommissioningClusterAcceptedCommandListAttribute
     void *, const chip::app::Clusters::AdministratorCommissioning::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAdministratorCommissioningClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPAdministratorCommissioningClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::AdministratorCommissioning::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPAdministratorCommissioningClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::AdministratorCommissioning::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -90,6 +96,8 @@ typedef void (*CHIPApplicationBasicClusterAcceptedCommandListAttributeCallbackTy
     void *, const chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPApplicationBasicClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationLauncherClusterLauncherResponseCallbackType)(
@@ -105,6 +113,8 @@ typedef void (*CHIPApplicationLauncherClusterAcceptedCommandListAttributeCallbac
     void *, const chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationLauncherClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -118,6 +128,8 @@ typedef void (*CHIPAudioOutputClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::AudioOutput::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPAudioOutputClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::AudioOutput::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPAudioOutputClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::AudioOutput::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPAudioOutputClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::AudioOutput::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -135,6 +147,8 @@ typedef void (*CHIPBarrierControlClusterAcceptedCommandListAttributeCallbackType
     void *, const chip::app::Clusters::BarrierControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBarrierControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BarrierControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBarrierControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BarrierControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBarrierControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -184,6 +198,8 @@ typedef void (*CHIPBasicClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Basic::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBasicClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Basic::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Basic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -199,6 +215,8 @@ typedef void (*CHIPBinaryInputBasicClusterAcceptedCommandListAttributeCallbackTy
     void *, const chip::app::Clusters::BinaryInputBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBinaryInputBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBinaryInputBasicClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BinaryInputBasic::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBinaryInputBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -210,6 +228,8 @@ typedef void (*CHIPBindingClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Binding::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBindingClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Binding::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBindingClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Binding::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBindingClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Binding::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -221,6 +241,8 @@ typedef void (*CHIPBooleanStateClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::BooleanState::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBooleanStateClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BooleanState::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBooleanStateClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BooleanState::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBooleanStateClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -236,6 +258,8 @@ typedef void (*CHIPBridgedActionsClusterAcceptedCommandListAttributeCallbackType
     void *, const chip::app::Clusters::BridgedActions::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBridgedActionsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BridgedActions::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBridgedActionsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedActions::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBridgedActionsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -275,6 +299,8 @@ typedef void (*CHIPBridgedDeviceBasicClusterAcceptedCommandListAttributeCallback
     void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBridgedDeviceBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBridgedDeviceBasicClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPBridgedDeviceBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPChannelClusterChangeChannelResponseCallbackType)(
@@ -292,6 +318,8 @@ typedef void (*CHIPChannelClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Channel::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPChannelClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Channel::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPChannelClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Channel::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPChannelClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Channel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -313,8 +341,8 @@ typedef void (*CHIPColorControlClusterColorTemperatureAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorModeAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorControlOptionsAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterOptionsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::Options::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterNumberOfPrimariesAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterPrimary1XAttributeCallbackType)(
@@ -391,10 +419,10 @@ typedef void (*CHIPColorControlClusterColorLoopStoredEnhancedHueAttributeCallbac
     void *, chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorCapabilitiesAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTempPhysicalMinAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTempPhysicalMaxAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTempPhysicalMinMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMinMireds::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTempPhysicalMaxMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMaxMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterCoupleColorTempToLevelMinMiredsAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterStartUpColorTemperatureMiredsAttributeCallbackType)(
@@ -405,6 +433,8 @@ typedef void (*CHIPColorControlClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::ColorControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPColorControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ColorControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPColorControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
@@ -420,6 +450,8 @@ typedef void (*CHIPContentLauncherClusterAcceptedCommandListAttributeCallbackTyp
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPContentLauncherClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPContentLauncherClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPContentLauncherClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -437,6 +469,8 @@ typedef void (*CHIPDescriptorClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Descriptor::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPDescriptorClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Descriptor::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPDescriptorClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Descriptor::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPDescriptorClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Descriptor::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
@@ -448,6 +482,10 @@ typedef void (*CHIPDiagnosticLogsClusterAcceptedCommandListAttributeCallbackType
     void *, const chip::app::Clusters::DiagnosticLogs::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPDiagnosticLogsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::DiagnosticLogs::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPDiagnosticLogsClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::DiagnosticLogs::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
@@ -517,6 +555,8 @@ typedef void (*CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPDoorLockClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -548,6 +588,8 @@ typedef void (*CHIPElectricalMeasurementClusterAcceptedCommandListAttributeCallb
     void *, const chip::app::Clusters::ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPElectricalMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPElectricalMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ElectricalMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPElectricalMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -621,6 +663,8 @@ typedef void (*CHIPFixedLabelClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::FixedLabel::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPFixedLabelClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::FixedLabel::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPFixedLabelClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::FixedLabel::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPFixedLabelClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::FixedLabel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -638,6 +682,8 @@ typedef void (*CHIPFlowMeasurementClusterAcceptedCommandListAttributeCallbackTyp
     void *, const chip::app::Clusters::FlowMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPFlowMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPFlowMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::FlowMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPFlowMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
@@ -663,6 +709,8 @@ typedef void (*CHIPGeneralCommissioningClusterAcceptedCommandListAttributeCallba
     void *, const chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -688,6 +736,8 @@ typedef void (*CHIPGeneralDiagnosticsClusterAcceptedCommandListAttributeCallback
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralDiagnosticsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
@@ -709,6 +759,8 @@ typedef void (*CHIPGroupKeyManagementClusterAcceptedCommandListAttributeCallback
     void *, const chip::app::Clusters::GroupKeyManagement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupKeyManagementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::GroupKeyManagement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupKeyManagementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GroupKeyManagement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(
@@ -728,10 +780,10 @@ typedef void (*CHIPGroupsClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Groups::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Groups::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Groups::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Groups::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPIdentifyClusterIdentifyQueryResponseCallbackType)(
-    void *, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &);
 
 typedef void (*CHIPIdentifyClusterIdentifyTimeAttributeCallbackType)(
     void *, chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo::DecodableArgType);
@@ -743,6 +795,8 @@ typedef void (*CHIPIdentifyClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Identify::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPIdentifyClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPIdentifyClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Identify::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPIdentifyClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Identify::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -762,6 +816,8 @@ typedef void (*CHIPIlluminanceMeasurementClusterAcceptedCommandListAttributeCall
     void *, const chip::app::Clusters::IlluminanceMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPIlluminanceMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPIlluminanceMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::IlluminanceMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPIlluminanceMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
@@ -773,6 +829,8 @@ typedef void (*CHIPKeypadInputClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPKeypadInputClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPKeypadInputClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPKeypadInputClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -823,6 +881,8 @@ typedef void (*CHIPLocalizationConfigurationClusterGeneratedCommandListAttribute
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPLocalizationConfigurationClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPLocalizationConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::LocalizationConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPLocalizationConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -832,6 +892,8 @@ typedef void (*CHIPLowPowerClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPLowPowerClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPLowPowerClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::LowPower::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPLowPowerClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LowPower::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -845,6 +907,8 @@ typedef void (*CHIPMediaInputClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::MediaInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPMediaInputClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::MediaInput::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPMediaInputClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::MediaInput::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaInputClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaPlaybackClusterPlaybackResponseCallbackType)(
@@ -870,6 +934,8 @@ typedef void (*CHIPMediaPlaybackClusterAcceptedCommandListAttributeCallbackType)
     void *, const chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPMediaPlaybackClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaPlaybackClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -933,6 +999,8 @@ typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackTyp
 
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -946,6 +1014,8 @@ typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttribute
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo::DecodableArgType);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateRequestorClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -961,6 +1031,8 @@ typedef void (*CHIPOccupancySensingClusterAcceptedCommandListAttributeCallbackTy
     void *, const chip::app::Clusters::OccupancySensing::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOccupancySensingClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OccupancySensing::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPOccupancySensingClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::OccupancySensing::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPOccupancySensingClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -995,6 +1067,8 @@ typedef void (*CHIPOnOffSwitchConfigurationClusterAcceptedCommandListAttributeCa
     void *, const chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOnOffSwitchConfigurationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPOnOffSwitchConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::OnOffSwitchConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPOnOffSwitchConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPOperationalCredentialsClusterAttestationResponseCallbackType)(
@@ -1024,6 +1098,8 @@ typedef void (*CHIPOperationalCredentialsClusterAcceptedCommandListAttributeCall
     void *, const chip::app::Clusters::OperationalCredentials::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::OperationalCredentials::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPOperationalCredentialsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OperationalCredentials::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1108,6 +1184,8 @@ typedef void (*CHIPPowerSourceConfigurationClusterAcceptedCommandListAttributeCa
     void *, const chip::app::Clusters::PowerSourceConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPowerSourceConfigurationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPPowerSourceConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSourceConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSourceConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1131,6 +1209,8 @@ typedef void (*CHIPPressureMeasurementClusterScaleAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::Scale::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPPressureMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1205,6 +1285,8 @@ typedef void (*CHIPRelativeHumidityMeasurementClusterAcceptedCommandListAttribut
     void *, const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPRelativeHumidityMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPRelativeHumidityMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::RelativeHumidityMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPRelativeHumidityMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPScenesClusterAddSceneResponseCallbackType)(
@@ -1236,6 +1318,8 @@ typedef void (*CHIPScenesClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Scenes::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPScenesClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::Scenes::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPScenesClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::Scenes::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPScenesClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Scenes::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1287,6 +1371,8 @@ typedef void (*CHIPTargetNavigatorClusterAcceptedCommandListAttributeCallbackTyp
     void *, const chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTargetNavigatorClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPTargetNavigatorClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTargetNavigatorClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1300,6 +1386,8 @@ typedef void (*CHIPTemperatureMeasurementClusterToleranceAttributeCallbackType)(
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::Tolerance::TypeInfo::DecodableArgType);
 typedef void (*CHIPTemperatureMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPTemperatureMeasurementClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::TemperatureMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTemperatureMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
@@ -1487,10 +1575,10 @@ typedef void (*CHIPTestClusterClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPTestClusterClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
 typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
@@ -1552,6 +1640,8 @@ typedef void (*CHIPThermostatUserInterfaceConfigurationClusterAcceptedCommandLis
     const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPThermostatUserInterfaceConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatUserInterfaceConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1704,6 +1794,8 @@ typedef void (*CHIPTimeFormatLocalizationClusterGeneratedCommandListAttributeCal
     void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPTimeFormatLocalizationClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::TimeFormatLocalization::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPTimeFormatLocalizationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::TimeFormatLocalization::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTimeFormatLocalizationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1722,6 +1814,8 @@ typedef void (*CHIPUserLabelClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::UserLabel::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPUserLabelClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::UserLabel::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPUserLabelClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::UserLabel::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPUserLabelClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1733,6 +1827,8 @@ typedef void (*CHIPWakeOnLanClusterAcceptedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPWakeOnLanClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPWakeOnLanClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPWakeOnLanClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 

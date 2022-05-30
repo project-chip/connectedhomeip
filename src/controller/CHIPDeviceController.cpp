@@ -282,44 +282,6 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
-{
-    if (session->GetSessionType() != Session::SessionType::kSecure)
-    {
-        // Definitely not a CASE session.
-        return;
-    }
-
-    auto * secureSession = session->AsSecureSession();
-    if (secureSession->GetSecureSessionType() != SecureSession::Type::kCASE)
-    {
-        // Still not CASE.
-        return;
-    }
-
-    FabricIndex ourIndex = kUndefinedFabricIndex;
-    CHIP_ERROR err       = GetFabricIndex(&ourIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        // We can't really do CASE, now can we?
-        return;
-    }
-
-    if (ourIndex != session->GetFabricIndex())
-    {
-        // Not one of our sessions.
-        return;
-    }
-
-    err = UpdateDevice(secureSession->GetPeerNodeId());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller,
-                     "OnFirstMessageDeliveryFailed was called, but UpdateDevice did not succeed (%" CHIP_ERROR_FORMAT ")",
-                     err.Format());
-    }
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -359,8 +321,6 @@ DeviceCommissioner::DeviceCommissioner() :
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(params));
-
-    params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     mPairingDelegate = params.pairingDelegate;
 
@@ -433,8 +393,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
         OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
     }
     // TODO: If we have a commissioning step in progress, is there a way to cancel that callback?
-
-    mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
@@ -1181,11 +1139,11 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::AddNOC::Type request;
-    request.NOCValue      = nocCertBuf;
-    request.ICACValue     = icaCertBuf;
-    request.IPKValue      = ipk;
-    request.caseAdminNode = adminSubject;
-    request.adminVendorId = mVendorId;
+    request.NOCValue         = nocCertBuf;
+    request.ICACValue        = icaCertBuf;
+    request.IPKValue         = ipk;
+    request.caseAdminSubject = adminSubject;
+    request.adminVendorId    = mVendorId;
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
@@ -1212,9 +1170,12 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
+    case OperationalCertStatus::kInvalidAdminSubject:
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:
+        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
@@ -1575,7 +1536,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 }
 
 // ClusterStateCache::Callback impl
-void DeviceCommissioner::OnDone()
+void DeviceCommissioner::OnDone(app::ReadClient *)
 {
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;

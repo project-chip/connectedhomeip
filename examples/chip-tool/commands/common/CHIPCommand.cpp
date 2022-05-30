@@ -31,6 +31,7 @@
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
@@ -180,7 +181,18 @@ CHIP_ERROR CHIPCommand::Run()
 
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
+    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
     Shutdown();
+
+    if (deferCleanup)
+    {
+        sDeferredCleanups.insert(this);
+    }
+    else
+    {
+        Cleanup();
+    }
 
     ReturnErrorOnFailure(MaybeTearDownStack());
 
@@ -421,4 +433,13 @@ void CHIPCommand::StopWaiting()
 #else  // CONFIG_USE_SEPARATE_EVENTLOOP
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
+}
+
+void CHIPCommand::ExecuteDeferredCleanups()
+{
+    for (auto * cmd : sDeferredCleanups)
+    {
+        cmd->Cleanup();
+    }
+    sDeferredCleanups.clear();
 }

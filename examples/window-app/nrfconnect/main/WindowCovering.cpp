@@ -322,3 +322,22 @@ uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveT
 
     return Percent100thsToValue(pwmLimits, aPosition);
 }
+
+void WindowCovering::SchedulePostAttributeChange(chip::EndpointId aEndpoint, chip::AttributeId aAttributeId)
+{
+    AttributeUpdateData * data = chip::Platform::New<AttributeUpdateData>();
+    VerifyOrReturn(data != nullptr);
+
+    data->mEndpoint    = aEndpoint;
+    data->mAttributeId = aAttributeId;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+}
+
+void WindowCovering::DoPostAttributeChange(intptr_t aArg)
+{
+    AttributeUpdateData * data = reinterpret_cast<AttributeUpdateData *>(aArg);
+    VerifyOrReturn(data != nullptr);
+
+    PostAttributeChange(data->mEndpoint, data->mAttributeId);
+}

@@ -229,6 +229,17 @@ protected:
         return CheckConstraintMinValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
+    template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, const T & current, const chip::Optional<U> & expected)
+    {
+        if (!expected.HasValue())
+        {
+            Exit(std::string(itemName) + ": expected min value does not have a value");
+            return false;
+        }
+        return CheckConstraintMinValue(itemName, current, expected.Value());
+    }
+
     template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
@@ -267,6 +278,17 @@ protected:
             return true;
         }
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, const T & current, const chip::Optional<U> & expected)
+    {
+        if (!expected.HasValue())
+        {
+            Exit(std::string(itemName) + ": expected max value does not have a value");
+            return false;
+        }
+        return CheckConstraintMaxValue(itemName, current, expected.Value());
     }
 
     template <typename T>
@@ -366,5 +388,35 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, const T & current, const chip::Optional<U> & expected)
+    {
+        if (!expected.HasValue())
+        {
+            Exit(std::string(itemName) + ": expected disallowed value does not have a value");
+            return false;
+        }
+        return CheckConstraintNotValue(itemName, current, expected.Value());
+    }
+
+    template <typename T>
+    bool CheckConstraintHasValue(const char * itemName, const chip::Optional<T> & current, bool expected)
+    {
+        if (current.HasValue() == expected)
+        {
+            return true;
+        }
+
+        if (current.HasValue())
+        {
+            Exit(std::string(itemName) + " not expected to have a value but does");
+        }
+        else
+        {
+            Exit(std::string(itemName) + " expected to have a value but doesn't");
+        }
+        return false;
     }
 };

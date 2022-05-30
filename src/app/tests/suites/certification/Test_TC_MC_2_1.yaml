@@ -28,5 +28,5 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Put the device into low power mode"
+    - label: "TH sends Sleep command to DUT"
       command: "Sleep"

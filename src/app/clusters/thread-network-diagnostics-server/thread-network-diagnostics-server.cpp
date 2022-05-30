@@ -59,23 +59,79 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
-
-    // If it isn't a run time assigned attribute, e.g. ClusterRevision, or if
-    // not implemented, clear the error so we fall back to the standard read
-    // path.
-    //
-    // TODO: This is probably broken in practice.  The standard read path is not
-    // going to produce useful values for these things.  We need to either have
-    // fallbacks in the connectivity manager that encode some sort of default
-    // values or error out on reads we can't actually handle.
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
+    switch (aPath.mAttributeId)
     {
-        err = CHIP_NO_ERROR;
+    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
+    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
+    case ThreadNetworkDiagnostics::Attributes::Channel::Id:
+    case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id:
+    case ThreadNetworkDiagnostics::Attributes::NetworkName::Id:
+    case ThreadNetworkDiagnostics::Attributes::PanId::Id:
+    case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id:
+    case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id:
+    case ThreadNetworkDiagnostics::Attributes::PartitionId::Id:
+    case ThreadNetworkDiagnostics::Attributes::Weighting::Id:
+    case ThreadNetworkDiagnostics::Attributes::DataVersion::Id:
+    case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id:
+    case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id:
+    case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxDataCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxDataCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
+    case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
+    case ThreadNetworkDiagnostics::Attributes::Delay::Id:
+    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id:
+        return ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
+    default:
+        break;
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
+
 } // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,

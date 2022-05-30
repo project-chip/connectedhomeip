@@ -67,7 +67,7 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 // Declaration of callback types corresponding to DnssdResolveCallback and DnssdBrowseCallback to avoid circular including.
-using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & extraIPs,
+using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & addresses,
                                     CHIP_ERROR error);
 using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT

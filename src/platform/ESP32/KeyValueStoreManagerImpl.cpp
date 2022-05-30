@@ -29,11 +29,39 @@
 
 #include "nvs.h"
 #include "nvs_flash.h"
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
+
+namespace {
+// Implementation Note: esp-idf nvs implementation cannot handle key length > 15,
+// Below implementation tries to handle that case by hashing the key
+// If key length is > 15 then take the SHA1 of the key and convert the first 7.5 bytes to hex string.
+// Not sure how likely we would run into a conflict as we are only using 8 bytes out of 20
+//
+// key returned by below function will not collide with any existing "normal" keys because those always have a "/" in
+// the first few chars and the output of this code never will.
+//
+// Returns true if key is hashed, false otherwise.
+bool HashIfLongKey(const char * key, char * keyHash)
+{
+    ReturnErrorCodeIf(strlen(key) < NVS_KEY_NAME_MAX_SIZE, false);
+
+    uint8_t hashBuffer[chip::Crypto::kSHA1_Hash_Length];
+    ReturnErrorCodeIf(Crypto::Hash_SHA1(Uint8::from_const_char(key), strlen(key), hashBuffer) != CHIP_NO_ERROR, false);
+
+    BitFlags<Encoding::HexFlags> flags(Encoding::HexFlags::kNone);
+    Encoding::BytesToHex(hashBuffer, NVS_KEY_NAME_MAX_SIZE / 2, keyHash, NVS_KEY_NAME_MAX_SIZE, flags);
+    keyHash[NVS_KEY_NAME_MAX_SIZE - 1] = 0;
+
+    ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, key);
+    return true;
+}
+} // namespace
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
@@ -48,6 +76,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     Internal::ScopedNvsHandle handle;
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY));
+
+    char keyHash[NVS_KEY_NAME_MAX_SIZE];
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
+
     ReturnMappedErrorOnFailure(nvs_get_blob(handle, key, value, &value_size));
 
     if (read_bytes_size)
@@ -65,6 +97,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     Internal::ScopedNvsHandle handle;
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
+    char keyHash[NVS_KEY_NAME_MAX_SIZE];
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
+
     ReturnMappedErrorOnFailure(nvs_set_blob(handle, key, value, value_size));
 
     // Commit the value to the persistent store.
@@ -78,6 +113,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     Internal::ScopedNvsHandle handle;
 
     ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
+
+    char keyHash[NVS_KEY_NAME_MAX_SIZE];
+    VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
 
     ReturnMappedErrorOnFailure(nvs_erase_key(handle, key));
 

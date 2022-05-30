@@ -547,6 +547,14 @@ typedef struct _TestListStructOctet
     chip::ByteSpan operationalCert;
 } TestListStructOctet;
 
+// Struct for ThermostatScheduleTransition
+typedef struct _ThermostatScheduleTransition
+{
+    uint16_t TransitionTime;
+    int16_t HeatSetpoint;
+    int16_t CoolSetpoint;
+} ThermostatScheduleTransition;
+
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {

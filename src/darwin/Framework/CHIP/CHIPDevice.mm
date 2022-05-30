@@ -293,7 +293,7 @@ private:
 
     void OnError(CHIP_ERROR aError) override;
 
-    void OnDone() override;
+    void OnDone(ReadClient * aReadClient) override;
 
     void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
 
@@ -789,7 +789,7 @@ private:
 
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone() override { mOnDone(this); }
+    void OnDone(ReadClient *) override { mOnDone(this); }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
@@ -1487,7 +1487,7 @@ void SubscriptionCallback::OnAttributeData(
 
 void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
 
-void SubscriptionCallback::OnDone()
+void SubscriptionCallback::OnDone(ReadClient *)
 {
     if (mOnDoneHandler) {
         mOnDoneHandler();

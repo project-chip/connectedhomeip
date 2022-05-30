@@ -11,6 +11,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-ipv6only'
 
+# Generating linux-arm64-all-clusters-minimal
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-minimal'
+
+# Generating linux-arm64-all-clusters-minimal-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-minimal-ipv6only'
+
 # Generating linux-arm64-bridge
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -133,6 +143,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
 
+# Generating linux-x64-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux {out}/linux-x64-all-clusters-minimal
+
+# Generating linux-x64-all-clusters-minimal-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-minimal-ipv6only
+
 # Generating linux-x64-bridge
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux {out}/linux-x64-bridge
 
@@ -223,6 +239,12 @@ ninja -C {out}/linux-arm64-all-clusters
 # Building linux-arm64-all-clusters-ipv6only
 ninja -C {out}/linux-arm64-all-clusters-ipv6only
 
+# Building linux-arm64-all-clusters-minimal
+ninja -C {out}/linux-arm64-all-clusters-minimal
+
+# Building linux-arm64-all-clusters-minimal-ipv6only
+ninja -C {out}/linux-arm64-all-clusters-minimal-ipv6only
+
 # Building linux-arm64-bridge
 ninja -C {out}/linux-arm64-bridge
 
@@ -300,6 +322,12 @@ ninja -C {out}/linux-x64-all-clusters
 
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
+
+# Building linux-x64-all-clusters-minimal
+ninja -C {out}/linux-x64-all-clusters-minimal
+
+# Building linux-x64-all-clusters-minimal-ipv6only
+ninja -C {out}/linux-x64-all-clusters-minimal-ipv6only
 
 # Building linux-x64-bridge
 ninja -C {out}/linux-x64-bridge

@@ -37,7 +37,7 @@ namespace Dnssd {
 
 namespace {
 
-static void HandleNodeResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs, CHIP_ERROR error)
+static void HandleNodeResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
 
@@ -52,15 +52,10 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
     Platform::CopyString(nodeData.commissionData.instanceName, result->mName);
 
-    size_t addressesFound = 0;
-    if (result->mAddress.HasValue())
-    {
-        nodeData.resolutionData.ipAddress[addressesFound] = result->mAddress.Value();
-        nodeData.resolutionData.interfaceId               = result->mInterface;
-        ++addressesFound;
-    }
+    nodeData.resolutionData.interfaceId = result->mInterface;
 
-    for (auto & ip : extraIPs)
+    size_t addressesFound = 0;
+    for (auto & ip : addresses)
     {
         if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
         {
@@ -88,7 +83,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     proxy->Release();
 }
 
-static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs, CHIP_ERROR error)
+static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
     if (CHIP_NO_ERROR != error)
@@ -127,12 +122,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     nodeData.operationalData.peerId     = peerId;
 
     size_t addressesFound = 0;
-    if (result->mAddress.HasValue())
-    {
-        nodeData.resolutionData.ipAddress[addressesFound] = result->mAddress.Value();
-        ++addressesFound;
-    }
-    for (auto & ip : extraIPs)
+    for (auto & ip : addresses)
     {
         if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
         {
@@ -171,7 +161,8 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         }
         else
         {
-            HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(), error);
+            Inet::IPAddress * address = &(services[i].mAddress.Value());
+            HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(address, 1), error);
         }
     }
     proxy->Release();

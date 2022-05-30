@@ -31,15 +31,19 @@ DefaultOTARequestorStorage sOTARequestorStorage;
 DefaultOTARequestorDriver sOTARequestorDriver;
 chip::BDXDownloader sBDXDownloader;
 chip::DefaultOTARequestor sOTARequestor;
-
 } // namespace
+
+FlashHandler & GetFlashHandler()
+{
+    static FlashHandler sFlashHandler;
+    return sFlashHandler;
+}
 
 // compile-time factory method
 OTAImageProcessorImpl & GetOTAImageProcessor()
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
-    static ExtFlashHandler sQSPIHandler;
-    static OTAImageProcessorImplPMDevice sOTAImageProcessor{ sQSPIHandler };
+    static OTAImageProcessorImpl sOTAImageProcessor(&GetFlashHandler());
 #else
     static OTAImageProcessorImpl sOTAImageProcessor;
 #endif
@@ -55,4 +59,5 @@ void InitBasicOTARequestor()
     sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
+    imageProcessor.TriggerFlashAction(FlashHandler::Action::SLEEP);
 }

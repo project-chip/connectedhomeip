@@ -1868,65 +1868,6 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, groupName);
 }
-CHIPIdentifyClusterIdentifyQueryResponseCallback::CHIPIdentifyClusterIdentifyQueryResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPIdentifyClusterIdentifyQueryResponseCallback::~CHIPIdentifyClusterIdentifyQueryResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPIdentifyClusterIdentifyQueryResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPIdentifyClusterIdentifyQueryResponseCallback, void (*)(CHIPIdentifyClusterIdentifyQueryResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPIdentifyClusterIdentifyQueryResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject timeout;
-    std::string timeoutClassName     = "java/lang/Integer";
-    std::string timeoutCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeoutClassName.c_str(), timeoutCtorSignature.c_str(),
-                                                                   dataResponse.timeout, timeout);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, timeout);
-}
 CHIPKeypadInputClusterSendKeyResponseCallback::CHIPKeypadInputClusterSendKeyResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>(CallbackFn, this)
 {
@@ -4248,97 +4189,6 @@ void CHIPTestClusterClusterTestSpecificResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
-CHIPThermostatClusterGetRelayStatusLogResponseCallback::CHIPThermostatClusterGetRelayStatusLogResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPThermostatClusterGetRelayStatusLogResponseCallback::~CHIPThermostatClusterGetRelayStatusLogResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPThermostatClusterGetRelayStatusLogResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPThermostatClusterGetRelayStatusLogResponseCallback,
-                    void (*)(CHIPThermostatClusterGetRelayStatusLogResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPThermostatClusterGetRelayStatusLogResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPThermostatClusterGetRelayStatusLogResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(
-        env, javaCallbackRef, "onSuccess",
-        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-        &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject timeOfDay;
-    std::string timeOfDayClassName     = "java/lang/Integer";
-    std::string timeOfDayCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeOfDayClassName.c_str(), timeOfDayCtorSignature.c_str(),
-                                                                   dataResponse.timeOfDay, timeOfDay);
-    jobject relayStatus;
-    std::string relayStatusClassName     = "java/lang/Integer";
-    std::string relayStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(relayStatusClassName.c_str(), relayStatusCtorSignature.c_str(),
-                                                                   dataResponse.relayStatus, relayStatus);
-    jobject localTemperature;
-    std::string localTemperatureClassName     = "java/lang/Integer";
-    std::string localTemperatureCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(
-        localTemperatureClassName.c_str(), localTemperatureCtorSignature.c_str(), dataResponse.localTemperature, localTemperature);
-    jobject humidityInPercentage;
-    std::string humidityInPercentageClassName     = "java/lang/Integer";
-    std::string humidityInPercentageCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(humidityInPercentageClassName.c_str(),
-                                                                  humidityInPercentageCtorSignature.c_str(),
-                                                                  dataResponse.humidityInPercentage, humidityInPercentage);
-    jobject setpoint;
-    std::string setpointClassName     = "java/lang/Integer";
-    std::string setpointCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(setpointClassName.c_str(), setpointCtorSignature.c_str(),
-                                                                  dataResponse.setpoint, setpoint);
-    jobject unreadEntries;
-    std::string unreadEntriesClassName     = "java/lang/Integer";
-    std::string unreadEntriesCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-        unreadEntriesClassName.c_str(), unreadEntriesCtorSignature.c_str(), dataResponse.unreadEntries, unreadEntries);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, timeOfDay, relayStatus, localTemperature, humidityInPercentage, setpoint,
-                        unreadEntries);
-}
 CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CHIPThermostatClusterGetWeeklyScheduleResponseCallback(
     jobject javaCallback) :
     Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(CallbackFn, this)
@@ -4394,40 +4244,88 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
         &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject numberOfTransitionsForSequence;
-    std::string numberOfTransitionsForSequenceClassName     = "java/lang/Integer";
-    std::string numberOfTransitionsForSequenceCtorSignature = "(I)V";
+    jobject NumberOfTransitionsForSequence;
+    std::string NumberOfTransitionsForSequenceClassName     = "java/lang/Integer";
+    std::string NumberOfTransitionsForSequenceCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-        numberOfTransitionsForSequenceClassName.c_str(), numberOfTransitionsForSequenceCtorSignature.c_str(),
-        dataResponse.numberOfTransitionsForSequence, numberOfTransitionsForSequence);
-    jobject dayOfWeekForSequence;
-    std::string dayOfWeekForSequenceClassName     = "java/lang/Integer";
-    std::string dayOfWeekForSequenceCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(dayOfWeekForSequenceClassName.c_str(),
-                                                                  dayOfWeekForSequenceCtorSignature.c_str(),
-                                                                  dataResponse.dayOfWeekForSequence.Raw(), dayOfWeekForSequence);
-    jobject modeForSequence;
-    std::string modeForSequenceClassName     = "java/lang/Integer";
-    std::string modeForSequenceCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(modeForSequenceClassName.c_str(),
-                                                                  modeForSequenceCtorSignature.c_str(),
-                                                                  dataResponse.modeForSequence.Raw(), modeForSequence);
-    jobject payload;
-    chip::JniReferences::GetInstance().CreateArrayList(payload);
+        NumberOfTransitionsForSequenceClassName.c_str(), NumberOfTransitionsForSequenceCtorSignature.c_str(),
+        dataResponse.numberOfTransitionsForSequence, NumberOfTransitionsForSequence);
+    jobject DayOfWeekForSequence;
+    std::string DayOfWeekForSequenceClassName     = "java/lang/Integer";
+    std::string DayOfWeekForSequenceCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(DayOfWeekForSequenceClassName.c_str(),
+                                                                  DayOfWeekForSequenceCtorSignature.c_str(),
+                                                                  dataResponse.dayOfWeekForSequence.Raw(), DayOfWeekForSequence);
+    jobject ModeForSequence;
+    std::string ModeForSequenceClassName     = "java/lang/Integer";
+    std::string ModeForSequenceCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ModeForSequenceClassName.c_str(),
+                                                                  ModeForSequenceCtorSignature.c_str(),
+                                                                  dataResponse.modeForSequence.Raw(), ModeForSequence);
+    jobject Transitions;
+    chip::JniReferences::GetInstance().CreateArrayList(Transitions);
 
-    auto iter_payload_0 = dataResponse.payload.begin();
-    while (iter_payload_0.Next())
+    auto iter_Transitions_0 = dataResponse.transitions.begin();
+    while (iter_Transitions_0.Next())
     {
-        auto & entry_0 = iter_payload_0.GetValue();
+        auto & entry_0 = iter_Transitions_0.GetValue();
         jobject newElement_0;
-        std::string newElement_0ClassName     = "java/lang/Integer";
-        std::string newElement_0CtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
-                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToList(payload, newElement_0);
+        jobject newElement_0_transitionTime;
+        std::string newElement_0_transitionTimeClassName     = "java/lang/Integer";
+        std::string newElement_0_transitionTimeCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_transitionTimeClassName.c_str(),
+                                                                       newElement_0_transitionTimeCtorSignature.c_str(),
+                                                                       entry_0.transitionTime, newElement_0_transitionTime);
+        jobject newElement_0_heatSetpoint;
+        if (entry_0.heatSetpoint.IsNull())
+        {
+            newElement_0_heatSetpoint = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_heatSetpointClassName     = "java/lang/Integer";
+            std::string newElement_0_heatSetpointCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(newElement_0_heatSetpointClassName.c_str(),
+                                                                          newElement_0_heatSetpointCtorSignature.c_str(),
+                                                                          entry_0.heatSetpoint.Value(), newElement_0_heatSetpoint);
+        }
+        jobject newElement_0_coolSetpoint;
+        if (entry_0.coolSetpoint.IsNull())
+        {
+            newElement_0_coolSetpoint = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_coolSetpointClassName     = "java/lang/Integer";
+            std::string newElement_0_coolSetpointCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(newElement_0_coolSetpointClassName.c_str(),
+                                                                          newElement_0_coolSetpointCtorSignature.c_str(),
+                                                                          entry_0.coolSetpoint.Value(), newElement_0_coolSetpoint);
+        }
+
+        jclass thermostatScheduleTransitionStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$ThermostatClusterThermostatScheduleTransition",
+            thermostatScheduleTransitionStructClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterThermostatScheduleTransition");
+            return;
+        }
+        jmethodID thermostatScheduleTransitionStructCtor = env->GetMethodID(
+            thermostatScheduleTransitionStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        if (thermostatScheduleTransitionStructCtor == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterThermostatScheduleTransition constructor");
+            return;
+        }
+
+        newElement_0 = env->NewObject(thermostatScheduleTransitionStructClass, thermostatScheduleTransitionStructCtor,
+                                      newElement_0_transitionTime, newElement_0_heatSetpoint, newElement_0_coolSetpoint);
+        chip::JniReferences::GetInstance().AddToList(Transitions, newElement_0);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence,
-                        payload);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NumberOfTransitionsForSequence, DayOfWeekForSequence, ModeForSequence,
+                        Transitions);
 }
 } // namespace chip

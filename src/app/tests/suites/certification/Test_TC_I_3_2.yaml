@@ -59,40 +59,6 @@ tests:
           [1646010972.584474][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to d4fdf424
       disabled: true
 
-    - label: "DUT issues an IdentifyQuery command to the Test Harness."
-      verification: |
-          On TestHarnes (all-cluster-app) a received IdentifyQuery command looks like this:
-
-          [1646011933.240584][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:11711341 on exchange 17409r
-          [1646011933.240642][33190:33190] CHIP:EM: Handling via exchange: 17409r, Delegate: 0xaaaace1730c8
-          [1646011933.240779][33190:33190] CHIP:DMG: InvokeRequestMessage =
-          [1646011933.240832][33190:33190] CHIP:DMG: {
-          [1646011933.240865][33190:33190] CHIP:DMG: 	suppressResponse = false,
-          [1646011933.240918][33190:33190] CHIP:DMG: 	timedRequest = false,
-          [1646011933.240954][33190:33190] CHIP:DMG: 	InvokeRequests =
-          [1646011933.240996][33190:33190] CHIP:DMG: 	[
-          [1646011933.241041][33190:33190] CHIP:DMG: 		CommandDataIB =
-          [1646011933.241085][33190:33190] CHIP:DMG: 		{
-          [1646011933.241131][33190:33190] CHIP:DMG: 			CommandPathIB =
-          [1646011933.241173][33190:33190] CHIP:DMG: 			{
-          [1646011933.241228][33190:33190] CHIP:DMG: 				EndpointId = 0x1,
-          [1646011933.241291][33190:33190] CHIP:DMG: 				ClusterId = 0x3,
-          [1646011933.241338][33190:33190] CHIP:DMG: 				CommandId = 0x1,
-          [1646011933.241392][33190:33190] CHIP:DMG: 			},
-          [1646011933.241451][33190:33190] CHIP:DMG:
-          [1646011933.241489][33190:33190] CHIP:DMG: 			CommandData =
-          [1646011933.241543][33190:33190] CHIP:DMG: 			{
-          [1646011933.241584][33190:33190] CHIP:DMG: 			},
-          [1646011933.241634][33190:33190] CHIP:DMG: 		},
-          [1646011933.241676][33190:33190] CHIP:DMG:
-          [1646011933.241720][33190:33190] CHIP:DMG: 	],
-          [1646011933.241759][33190:33190] CHIP:DMG:
-          [1646011933.241803][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
-          [1646011933.241835][33190:33190] CHIP:DMG: },
-          [1646011933.241914][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
-          [1646011933.241979][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0001
-      disabled: true
-
     - label:
           "DUT issues an Identify command to the Test Harness, with the
           IdentifyTime argument set to 0x0000 (Stop)."

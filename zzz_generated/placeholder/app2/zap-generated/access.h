@@ -32,7 +32,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -45,13 +45,13 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -62,7 +62,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -75,13 +75,13 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -92,7 +92,7 @@
     /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: view */ \
+    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -105,13 +105,13 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -124,7 +124,7 @@
     40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    768, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    768, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -132,13 +132,13 @@
     512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     516, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
@@ -149,7 +149,7 @@
     5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    16400, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    16400, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -157,13 +157,13 @@
     23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     32, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     33, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    21, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
-    22, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
-    23, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
-    24, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
-    25, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
-    27, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
-    28, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    21, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
+    22, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
+    23, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
+    24, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
+    25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
+    27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
+    28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     2, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
@@ -174,7 +174,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: start up color temperature mireds, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -182,13 +182,13 @@
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: schedule programming visibility, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
@@ -209,7 +209,6 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -244,7 +243,6 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -279,7 +277,6 @@
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \

@@ -36,6 +36,7 @@ struct LockUserInfo
 struct LockCredentialInfo;
 struct WeekDaysScheduleInfo;
 struct YearDayScheduleInfo;
+struct HolidayScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 
@@ -43,17 +44,21 @@ class LockEndpoint
 {
 public:
     LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
-                 uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser) :
+                 uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser,
+                 uint8_t numberOfHolidaySchedules) :
         mEndpointId{ endpointId },
         mLockState{ DlLockState::kLocked }, mLockUsers(numberOfLockUsersSupported),
         mLockCredentials(numberOfCredentialsSupported + 1),
         mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
-        mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser))
+        mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser)),
+        mHolidaySchedules(numberOfHolidaySchedules)
     {
         for (auto & lockUser : mLockUsers)
         {
             lockUser.credentials.reserve(numberOfCredentialsPerUser);
         }
+
+        DoorLockServer::Instance().SetLockState(endpointId, mLockState);
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
@@ -74,10 +79,14 @@ public:
 
     DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
     DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
+
     DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DlDaysMaskMap daysMask,
                          uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
     DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime);
+    DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                         DlOperatingMode operatingMode);
 
 private:
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
@@ -92,6 +101,7 @@ private:
     std::vector<LockCredentialInfo> mLockCredentials;
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
     std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
+    std::vector<HolidayScheduleInfo> mHolidaySchedules;
 };
 
 struct LockCredentialInfo
@@ -114,4 +124,10 @@ struct YearDayScheduleInfo
 {
     DlScheduleStatus status;
     EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
 };

@@ -25,7 +25,7 @@
 
 #include <mbedtls/platform.h>
 
-#if SILABS_WIFI
+#ifdef SL_WIFI
 #include "wfx_host_events.h"
 #endif /* RS911X_WIFI */
 
@@ -142,7 +142,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     EFR32_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
-#if SILABS_WIFI
+#ifdef SL_WIFI
     InitWiFi();
 #endif
     // Init Matter OTA
@@ -157,7 +157,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     return CHIP_NO_ERROR;
 }
 
-#if SILABS_WIFI
+#ifdef SL_WIFI
 void EFR32MatterConfig::InitWiFi(void)
 {
 #ifdef WF200_WIFI
@@ -176,7 +176,7 @@ void EFR32MatterConfig::InitWiFi(void)
      */
 #endif
 }
-#endif // SILABS_WIFI
+#endif // SL_WIFI
 
 // ================================================================================
 // FreeRTOS Callbacks

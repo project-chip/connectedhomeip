@@ -96,7 +96,7 @@ private:
 
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone() override { mOnDone(this); }
+    void OnDone(app::ReadClient *) override { mOnDone(this); }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
@@ -134,7 +134,7 @@ class TypedReadEventCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
-    using OnDoneCallbackType    = std::function<void(TypedReadEventCallback * callback)>;
+    using OnDoneCallbackType    = std::function<void(app::ReadClient * apReadClient)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
@@ -173,7 +173,16 @@ private:
 
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
-    void OnDone() override { mOnDone(this); }
+    void OnDone(app::ReadClient * apReadClient) override
+    {
+        if (mOnDone != nullptr)
+        {
+            mOnDone(apReadClient);
+        }
+
+        // Always needs to be the last call
+        chip::Platform::Delete(this);
+    }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {

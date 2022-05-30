@@ -20,6 +20,7 @@
 #include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
+#include "DeviceCallbacks.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
@@ -37,6 +38,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -174,4 +176,30 @@ JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject mana
 JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return LevelManager::SetLevel(endpoint, value);
+}
+
+JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider)
+{
+    DeviceCallbacks::NewManager(provider);
+}
+
+JNI_METHOD(jint, addContentApp)
+(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jobject manager)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    JniUtfString vName(env, vendorName);
+    JniUtfString aName(env, appName);
+    JniUtfString aVersion(env, appVersion);
+    EndpointId epId = AddContentApp(vName.c_str(), static_cast<uint16_t>(vendorId), aName.c_str(), static_cast<uint16_t>(productId),
+                                    aVersion.c_str(), manager);
+    return static_cast<uint16_t>(epId);
+}
+
+JNI_METHOD(void, sendTestMessage)(JNIEnv *, jobject, jint endpoint, jstring message)
+{
+    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+    const char * nmessage = env->GetStringUTFChars(message, 0);
+    ChipLogProgress(Zcl, "TvApp-JNI SendTestMessage called with message %s", nmessage);
+    SendTestMessage(static_cast<EndpointId>(endpoint), nmessage);
 }

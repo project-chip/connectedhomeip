@@ -23,6 +23,7 @@ class cc13x2x7_26x2x7App(Enum):
     PUMP = auto()
     PUMP_CONTROLLER = auto()
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     SHELL = auto()
 
     def ExampleName(self):
@@ -34,6 +35,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'pump-controller-app'
         elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
             return 'all-clusters-app'
+        elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
         elif self == cc13x2x7_26x2x7App.SHELL:
             return 'shell'
         else:
@@ -48,6 +51,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'chip-LP_CC2652R7-pump-controller-example'
         elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
             return 'chip-LP_CC2652R7-all-clusters-example'
+        elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL:
+            return 'chip-LP_CC2652R7-all-clusters-minimal-example'
         elif self == cc13x2x7_26x2x7App.SHELL:
             return 'chip-LP_CC2652R7-shell-example'
         else:
@@ -92,7 +97,7 @@ class cc13x2x7_26x2x7Builder(GnBuilder):
                 or self.app == cc13x2x7_26x2x7App.PUMP_CONTROLLER):
             extensions = [".out", ".bin", ".out.map", "-bim.hex"]
 
-        elif self.app == cc13x2x7_26x2x7App.ALL_CLUSTERS or self.app == cc13x2x7_26x2x7App.SHELL:
+        elif self.app == cc13x2x7_26x2x7App.ALL_CLUSTERS or cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL or self.app == cc13x2x7_26x2x7App.SHELL:
             extensions = [".out", ".out.map"]
 
         else:
