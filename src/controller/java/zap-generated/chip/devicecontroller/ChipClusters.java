@@ -9053,6 +9053,26 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void testEventTrigger(
+        DefaultClusterCallback callback, byte[] enableKey, Long eventTrigger) {
+      testEventTrigger(chipClusterPtr, callback, enableKey, eventTrigger, null);
+    }
+
+    public void testEventTrigger(
+        DefaultClusterCallback callback,
+        byte[] enableKey,
+        Long eventTrigger,
+        int timedInvokeTimeoutMs) {
+      testEventTrigger(chipClusterPtr, callback, enableKey, eventTrigger, timedInvokeTimeoutMs);
+    }
+
+    private native void testEventTrigger(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        byte[] enableKey,
+        Long eventTrigger,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     public interface NetworkInterfacesAttributeCallback {
       void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterfaceType> valueList);
 
@@ -9181,6 +9201,16 @@ public class ChipClusters {
       subscribeActiveNetworkFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readTestEventTriggersEnabledAttribute(BooleanAttributeCallback callback) {
+      readTestEventTriggersEnabledAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTestEventTriggersEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTestEventTriggersEnabledAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -9284,6 +9314,12 @@ public class ChipClusters {
         ActiveNetworkFaultsAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readTestEventTriggersEnabledAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeTestEventTriggersEnabledAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

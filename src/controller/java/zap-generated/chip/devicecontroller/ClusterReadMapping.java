@@ -4478,6 +4478,20 @@ public class ClusterReadMapping {
     readGeneralDiagnosticsInteractionInfo.put(
         "readActiveNetworkFaultsAttribute",
         readGeneralDiagnosticsActiveNetworkFaultsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralDiagnosticsTestEventTriggersEnabledCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralDiagnosticsTestEventTriggersEnabledAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .readTestEventTriggersEnabledAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readGeneralDiagnosticsTestEventTriggersEnabledCommandParams);
+    readGeneralDiagnosticsInteractionInfo.put(
+        "readTestEventTriggersEnabledAttribute",
+        readGeneralDiagnosticsTestEventTriggersEnabledAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralDiagnosticsGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralDiagnosticsGeneratedCommandListAttributeInteractionInfo =

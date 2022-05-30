@@ -2339,7 +2339,7 @@ endpoint 1 {
   server cluster TargetNavigator {
     callback attribute targetList;
     ram      attribute currentTarget;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
