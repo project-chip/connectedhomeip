@@ -430,6 +430,7 @@ DS
 duplicative
 DUT
 DV
+DVK
 dynload
 eabi
 EB
@@ -532,6 +533,7 @@ fsync
 ftd
 fullclean
 fuzzer
+FW
 gbl
 gcloud
 GDB
@@ -977,6 +979,7 @@ percentageLiftValue
 periodicQueryTimeout
 pexpect
 pickString
+picocom
 PID
 Pigweed
 PinCode

@@ -59,34 +59,48 @@ connectedhomeip$ source ./scripts/activate.sh
 
     Log in to the site as a guest.
 
-    <img src="../../../platform/bouffalolab/bl602/doc/images/image-web-login.png" style="zoom:25%;" />
+    <img src="../../../platform/bouffalolab/bl602/doc/images/image-web-login.png" style="zoom:30%;" align=left />
 
-    <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube.png" style="zoom:30%;" />
+    <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube.png" style="zoom:30%;" align=left />
 
-run the softaware :
+run the software :
 
-  <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-home.png" style="zoom:50%;" />
-  
-  
-  
-  <img src="../../../platform/bouffalolab/bl602/doc/images/devcub-iot.png" style="zoom:70%;" />
-  
-  The following picture shows the burning interface. To download the firmware, you need to enter the download mode: press and hold the Boot (IO8) pin of the development board, press the RST button, and then release the Boot button to enter the burning and downloading mode.
+  <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-home.png" style="zoom:70%;" align=left />
 
-<img src="../../../platform/bouffalolab/bl602/doc/images/image-dev-cube.png" style="zoom:60%;" />
+ 
 
-Notice: Latest version Bouffalolab devcub is recommeded.
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+  <img src="../../../platform/bouffalolab/bl602/doc/images/devcube-iot.png" style="zoom:70%;" />
+
+  The following picture shows the burning interface. To download the firmware, you need to enter the download mode: press and hold the Boot (IO8) pin of the development board, press the **RST** button, and then release the Boot button to enter the burning and downloading mode.
+
+<img src="../../../platform/bouffalolab/bl602/doc/images/image-dev-cube.png" style="zoom:70%;" align=left />
+
+Notice: Latest version Bouffalolab dev cube is recommended.
 
 Factory Params:
-BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts
+`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts`
 
 Partition Table:
-BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/partition/partition_cfg_2M.toml
+`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/partition/partition_cfg_2M.toml`
 
 Boot2 Bin:
-BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/builtin_imgs/boot2_iap_v5.5/boot2_iap_release.bin
+`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/builtin_imgs/boot2_iap_v5.5/boot2_iap_release.bin`
 
-Firmware Bin: connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin
+Firmware Bin: `connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin`
 
 Partition Table：
 
