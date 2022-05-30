@@ -22,8 +22,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <tcpip.h>
-#include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_api.h>
+#include <wifi_mgmr_ext.h>
 
 #include <limits>
 #include <stdint.h>
@@ -230,11 +230,11 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     {
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        err = (CHIP_ERROR)wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
+        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
     }
     else
     {
-        err = (CHIP_ERROR)wifi_mgmr_scan(NULL, NULL);
+        err = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
     }
     if (err != CHIP_NO_ERROR)
     {

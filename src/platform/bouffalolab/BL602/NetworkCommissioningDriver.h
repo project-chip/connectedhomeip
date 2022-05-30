@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include <wifi_mgmr.h>
 #include <platform/NetworkCommissioning.h>
+#include <wifi_mgmr.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -42,7 +42,9 @@ public:
         }
 
         item.security.SetRaw(mpScanResults[mIternum].auth);
-        item.ssidLen = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength ? mpScanResults[mIternum].ssid_len : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        item.ssidLen = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+            ? mpScanResults[mIternum].ssid_len
+            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
         item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;
