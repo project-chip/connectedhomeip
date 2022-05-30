@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.18. [TC-DM-4.18][Thread] Verification for attributes check
+    10.4.18. [TC-DM-4.18] [Thread] Verification for attributes check
     [DUT-Commissioner]
 
 config:
@@ -28,7 +28,7 @@ tests:
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
 
 
-          [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
+          [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true, 
           [1645772548.257381][3837:3842] CHIP:DMG:         InteractionModelRevision = 1
           [1645772548.257437][3837:3842] CHIP:DMG: }
           [1645772548.257735][3837:3842] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 92121563
@@ -40,7 +40,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 
-          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
+          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true, 
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
           [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
@@ -56,7 +56,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
 
-          [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
+          [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true, 
           [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
           [1645772820.740903][3867:3872] CHIP:DMG: }
           [1645772820.741209][3867:3872] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002DataVersion: 92121563
@@ -68,7 +68,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
 
-          [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
+          [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true, 
           [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
           [1645772901.119141][3879:3884] CHIP:DMG: }
           [1645772901.119684][3879:3884] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003DataVersion: 92121563
@@ -80,7 +80,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 162 0
 
-          [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
+          [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true, 
           [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
           [1645772984.654084][3895:3900] CHIP:DMG: }
           [1645772984.654310][3895:3900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 92121563
@@ -88,11 +88,11 @@ tests:
           [1645772984.654530][3895:3900] CHIP:EM: Sending Standalone Ack for MessageCounter:14026610 on exchange 33717i
       disabled: true
 
-    - label: "DUT reads LastNetowrkingStatus attribute from the TH"
+    - label: "DUT reads LastNetworkingStatus attribute from the TH"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
 
-          [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
+          [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true, 
           [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
           [1645773078.930635][3905:3910] CHIP:DMG: }
           [1645773078.930943][3905:3910] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 92121563
@@ -104,7 +104,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-network-id 162 0
 
-          [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
+          [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true, 
           [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
           [1645773167.178618][3913:3918] CHIP:DMG: }
           [1645773167.178919][3913:3918] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006DataVersion: 92121563
@@ -116,7 +116,7 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-connect-error-value 162 0
 
-          [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
+          [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true, 
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1
           [1645773318.753043][3938:3943] CHIP:DMG: }
           [1645773318.753543][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007DataVersion: 92121563
