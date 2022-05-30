@@ -81,7 +81,7 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 
 void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
-    SetResponseTimeout(mSession->SuggestEndToEndTimeout(applicationProcessingTimeout));
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)

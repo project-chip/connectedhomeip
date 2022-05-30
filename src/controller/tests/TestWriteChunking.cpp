@@ -579,7 +579,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     err = writeClient->SendWriteRequest(sessionHandle);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.GetIOContext().DriveIOUntil(sessionHandle->SuggestEndToEndTimeout(app::kExpectedIMProcessingTime) +
+    ctx.GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
                                         System::Clock::Seconds16(1),
                                     [&]() { return ctx.GetExchangeManager().GetNumActiveExchanges() == 0; });
 

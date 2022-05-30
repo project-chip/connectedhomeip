@@ -46,7 +46,7 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
-System::Clock::Timeout Session::SuggestEndToEndTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
 {
     if (IsGroupSession())
     {
