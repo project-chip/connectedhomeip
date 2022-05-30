@@ -2029,6 +2029,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -2075,7 +2076,7 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -3001,14 +3002,14 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
-  readonly attribute int32u partitionId = 9;
-  readonly attribute int8u weighting = 10;
-  readonly attribute int8u dataVersion = 11;
-  readonly attribute int8u stableDataVersion = 12;
-  readonly attribute int8u leaderRouterId = 13;
-  readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string<4> channelMask = 60;
-  readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute nullable int32u partitionId = 9;
+  readonly attribute nullable int8u weighting = 10;
+  readonly attribute nullable int8u dataVersion = 11;
+  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int8u leaderRouterId = 13;
+  readonly attribute nullable SecurityPolicy securityPolicy[] = 59;
+  readonly attribute nullable octet_string<4> channelMask = 60;
+  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents[] = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -3370,21 +3371,21 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    ram      attribute channel;
-    ram      attribute routingRole;
-    ram      attribute networkName;
-    ram      attribute panId;
-    ram      attribute extendedPanId;
-    ram      attribute meshLocalPrefix;
+    callback attribute channel;
+    callback attribute routingRole;
+    callback attribute networkName;
+    callback attribute panId;
+    callback attribute extendedPanId;
+    callback attribute meshLocalPrefix;
     callback attribute neighborTableList;
     callback attribute routeTableList;
-    ram      attribute partitionId;
-    ram      attribute weighting;
-    ram      attribute dataVersion;
-    ram      attribute stableDataVersion;
-    ram      attribute leaderRouterId;
+    callback attribute partitionId;
+    callback attribute weighting;
+    callback attribute dataVersion;
+    callback attribute stableDataVersion;
+    callback attribute leaderRouterId;
     callback attribute securityPolicy;
-    ram      attribute channelMask;
+    callback attribute channelMask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap;
