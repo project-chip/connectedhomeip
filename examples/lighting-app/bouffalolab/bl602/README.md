@@ -1,6 +1,7 @@
 # BL602
 
-This example functions as a wifi light bulb device type, with on/off capabilities. The steps were verified on BL602-IoT-DVK-3S board.
+This example functions as a wifi light bulb device type, with on/off
+capabilities. The steps were verified on BL602-IoT-DVK-3S board.
 
 BL602-IoT-DVK-3S
 <img src="../../../platform/bouffalolab/bl602/doc/images/bl602_iot_3S_v2.jpg" style="zoom:25%;" />
@@ -17,7 +18,8 @@ $ sudo apt-get install pi-bluetooth (if not raspberry pi, sudo apt-get install b
 $ reboot
 
 ```
-- Clone and initialize the connectedhomeip repo
+
+-   Clone and initialize the connectedhomeip repo
 
 ```
 git clone https://github.com/project-chip/connectedhomeip.git
@@ -34,7 +36,8 @@ connectedhomeip$ source ./scripts/activate.sh
 
 ```
 
- ## Build the image 
+## Build the image
+
 -   Build the example application:
 
     `connectedhomeip$ ./scripts/build/build_examples.py --target bl602-light build`
@@ -52,18 +55,16 @@ connectedhomeip$ source ./scripts/activate.sh
 
 ## Flash the board
 
-- Download  [Bouffalo Lab Dev Cube](https://dev.bouffalolab.com/download/).
+-   Download [Bouffalo Lab Dev Cube](https://dev.bouffalolab.com/download/).
 
-  Log in to the site as a guest.
+    Log in to the site as a guest.
 
-  <img src="../../../platform/bouffalolab/bl602/doc/images/image-web-login.png" style="zoom:25%;" />
+    <img src="../../../platform/bouffalolab/bl602/doc/images/image-web-login.png" style="zoom:25%;" />
 
-  <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube.png" style="zoom:30%;" />
+    <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube.png" style="zoom:30%;" />
 
-  
+run the softaware :
 
-  run the softaware :
-  
   <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-home.png" style="zoom:50%;" />
   
   
@@ -76,17 +77,21 @@ connectedhomeip$ source ./scripts/activate.sh
 
 Notice: Latest version Bouffalolab devcub is recommeded.
 
-Factory Params: BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts
+Factory Params:
+BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts
 
-Partition Table: BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/partition/partition_cfg_2M.toml 
+Partition Table:
+BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/partition/partition_cfg_2M.toml
 
-Boot2 Bin: BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/builtin_imgs/boot2_iap_v5.5/boot2_iap_release.bin
+Boot2 Bin:
+BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/builtin_imgs/boot2_iap_v5.5/boot2_iap_release.bin
 
 Firmware Bin: connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin
 
-Partition Table： 
+Partition Table：
 
-1. FW: The size of FW size0 must be larger than the bin size, we can do it by reducing the size of FW size1 and media partition size0.
+1. FW: The size of FW size0 must be larger than the bin size, we can do it by
+   reducing the size of FW size1 and media partition size0.
 
 COM Port:
 
@@ -94,23 +99,26 @@ COM Port:
    ls -la /dev/ttyUSB*
 ```
 
-   select the big one.
+select the big one.
 
 ## Validate the example
 
-   1.The device should present itself as a USB serial device on your computer. You may look it up in `/dev/`:
+1.The device should present itself as a USB serial device on your computer. You
+may look it up in `/dev/`:
 
-   ```
-   ls -la /dev/tty*
-   ```
+```
+ls -la /dev/tty*
+```
 
-You can open the serial console with minicom or picocom. For example, if the device is at `/dev/USB1`:
+You can open the serial console with minicom or picocom. For example, if the
+device is at `/dev/USB1`:
 
 ```
 picocom -b 2000000 /dev/ttyUSB1
 ```
 
-To  reset the board, press the **RST** button. And you will see the log from the demo board.
+To reset the board, press the **RST** button. And you will see the log from the
+demo board.
 
 ## Commission a device using chip-tool
 
@@ -146,4 +154,4 @@ $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
 
 -   Use ColorControl cluster command to control the color attributes:
 
-    `$ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1`   
+    `$ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1`
