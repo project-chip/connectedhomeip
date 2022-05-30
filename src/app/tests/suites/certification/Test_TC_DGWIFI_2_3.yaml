@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 48.1.3. [TC-ETHDIAG-2.1] Command received functionality with server as DUT
+name: 51.2.3. [TC-DGWIFI-2.3] Command received functionality with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Ethernet Network Diagnostics"
+    cluster: "WiFi Network Diagnostics"
     endpoint: 0
 
 tests:
@@ -28,42 +28,51 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #13648
-    - label: "Sends ResetCounts command"
+    #issue #13645
+    # Also, ResetCounts may not work on some platforms yet?
+    # And on Linux since we don't have actual Wi-Fi these error out.
+    - label: "TH sends ResetCounts command to DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "ResetCounts"
 
-    - label: "Read the PacketRxCount attribute"
+    - label: "Reads BeaconLostCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "PacketRxCount"
+      attribute: "BeaconLostCount"
       response:
           value: 0
 
-    - label: "Read the PacketTxCount attribute"
+    - label: "Reads BeaconRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "PacketTxCount"
+      attribute: "BeaconRxCount"
       response:
           value: 0
 
-    - label: "Read the TxErrCount attribute"
+    - label: "Reads PacketMulticastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "TxErrCount"
+      attribute: "PacketMulticastRxCount"
       response:
           value: 0
 
-    - label: "Read the CollisionCount attribute"
+    - label: "Reads PacketMulticastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "CollisionCount"
+      attribute: "PacketMulticastTxCount"
       response:
           value: 0
 
-    - label: "Read the OverrunCount attribute"
+    - label: "Reads PacketUnicastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "OverrunCount"
+      attribute: "PacketUnicastRxCount"
+      response:
+          value: 0
+
+    - label: "Reads PacketUnicastTxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketUnicastTxCount"
       response:
           value: 0
