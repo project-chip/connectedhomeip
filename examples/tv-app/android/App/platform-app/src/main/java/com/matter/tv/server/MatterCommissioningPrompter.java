@@ -76,6 +76,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {
+    Log.d(TAG, "Received prompt for success vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
