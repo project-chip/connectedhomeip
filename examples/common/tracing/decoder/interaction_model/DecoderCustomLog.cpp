@@ -16,9 +16,9 @@
  *
  */
 
-#include "TraceDecoderProtocolInteractionModelCustomLog.h"
+#include "DecoderCustomLog.h"
 
-#include "../TraceDecoderLog.h"
+#include "../../TraceDecoderLog.h"
 
 #include <app/AttributeAccessInterface.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
@@ -46,6 +46,7 @@ bool IsTag(const chip::TLV::TLVReader & reader, T tag)
 
 namespace chip {
 namespace trace {
+namespace interaction_model {
 
 CHIP_ERROR LogCertificateChainResponse(TLV::TLVReader & reader)
 {
@@ -492,5 +493,6 @@ CHIP_ERROR MaybeDecodeNestedCommandRequest(const uint8_t * data, size_t dataLen)
     return reader.ExitContainer(containerType);
 }
 
+} // namespace interaction_model
 } // namespace trace
 } // namespace chip

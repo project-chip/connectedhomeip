@@ -18,11 +18,11 @@
 
 #include "TraceDecoderProtocols.h"
 
-#include "TraceDecoderProtocolBDX.h"
-#include "TraceDecoderProtocolEcho.h"
-#include "TraceDecoderProtocolInteractionModel.h"
-#include "TraceDecoderProtocolSecureChannel.h"
-#include "TraceDecoderProtocolUserDirectedCommissioning.h"
+#include "bdx/Decoder.h"
+#include "echo/Decoder.h"
+#include "interaction_model/Decoder.h"
+#include "secure_channel/Decoder.h"
+#include "udc/Decoder.h"
 
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/BytesToHex.h>
@@ -49,11 +49,11 @@ const char * ToProtocolName(uint16_t protocolId)
     auto protocol = Protocols::Id(VendorId::Common, protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
-        return securechannel::ToProtocolName();
+        return secure_channel::ToProtocolName();
     }
     else if (protocol == Protocols::InteractionModel::Id)
     {
-        return im::ToProtocolName();
+        return interaction_model::ToProtocolName();
     }
     else if (protocol == Protocols::BDX::Id)
     {
@@ -78,11 +78,11 @@ const char * ToProtocolMessageTypeName(uint16_t protocolId, uint8_t protocolCode
     auto protocol = Protocols::Id(VendorId::Common, protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
-        return securechannel::ToProtocolMessageTypeName(protocolCode);
+        return secure_channel::ToProtocolMessageTypeName(protocolCode);
     }
     else if (protocol == Protocols::InteractionModel::Id)
     {
-        return im::ToProtocolMessageTypeName(protocolCode);
+        return interaction_model::ToProtocolMessageTypeName(protocolCode);
     }
     else if (protocol == Protocols::BDX::Id)
     {
@@ -115,11 +115,11 @@ CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const
     auto protocol = Protocols::Id(VendorId::Common, protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
-        err = securechannel::LogAsProtocolMessage(protocolCode, data, dataLen);
+        err = secure_channel::LogAsProtocolMessage(protocolCode, data, dataLen);
     }
     else if (protocol == Protocols::InteractionModel::Id)
     {
-        err = im::LogAsProtocolMessage(protocolCode, data, dataLen, interactionModelResponse);
+        err = interaction_model::LogAsProtocolMessage(protocolCode, data, dataLen, interactionModelResponse);
     }
     else if (protocol == Protocols::BDX::Id)
     {

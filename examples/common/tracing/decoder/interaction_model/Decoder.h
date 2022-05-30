@@ -25,14 +25,14 @@
 
 namespace chip {
 namespace trace {
-namespace securechannel {
+namespace interaction_model {
 
 const char * ToProtocolName();
 
 const char * ToProtocolMessageTypeName(uint8_t protocolCode);
 
-CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len);
+CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len, bool decodeResponse);
 
-} // namespace securechannel
+} // namespace interaction_model
 } // namespace trace
 } // namespace chip

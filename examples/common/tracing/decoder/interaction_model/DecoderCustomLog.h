@@ -25,14 +25,14 @@
 
 namespace chip {
 namespace trace {
-namespace im {
+namespace interaction_model {
 
-const char * ToProtocolName();
+CHIP_ERROR MaybeDecodeNestedReadResponse(const uint8_t * data, size_t dataLen);
 
-const char * ToProtocolMessageTypeName(uint8_t protocolCode);
+CHIP_ERROR MaybeDecodeNestedCommandResponse(const uint8_t * data, size_t dataLen);
 
-CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len, bool decodeResponse);
+CHIP_ERROR MaybeDecodeNestedCommandRequest(const uint8_t * data, size_t dataLen);
 
-} // namespace im
+} // namespace interaction_model
 } // namespace trace
 } // namespace chip

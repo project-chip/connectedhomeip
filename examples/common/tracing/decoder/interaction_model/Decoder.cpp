@@ -16,8 +16,8 @@
  *
  */
 
-#include "TraceDecoderProtocolInteractionModel.h"
-#include "TraceDecoderProtocolInteractionModelCustomLog.h"
+#include "Decoder.h"
+#include "DecoderCustomLog.h"
 
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
@@ -51,7 +51,7 @@ using MessageType = chip::Protocols::InteractionModel::MsgType;
 
 namespace chip {
 namespace trace {
-namespace im {
+namespace interaction_model {
 
 CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode);
 CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader, bool decode);
@@ -256,6 +256,6 @@ CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader, bool decode)
     return CHIP_NO_ERROR;
 }
 
-} // namespace im
+} // namespace interaction_model
 } // namespace trace
 } // namespace chip

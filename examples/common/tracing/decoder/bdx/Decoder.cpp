@@ -16,7 +16,7 @@
  *
  */
 
-#include "TraceDecoderProtocolBDX.h"
+#include "Decoder.h"
 
 #include <protocols/bdx/BdxMessages.h>
 

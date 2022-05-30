@@ -16,8 +16,8 @@
  *
  */
 
-#include "TraceDecoderProtocolSecureChannel.h"
-#include "../TraceDecoderLog.h"
+#include "Decoder.h"
+#include "../../TraceDecoderLog.h"
 
 #include <lib/support/BufferReader.h>
 #include <protocols/secure_channel/Constants.h>
@@ -47,7 +47,7 @@ using MessageType = chip::Protocols::SecureChannel::MsgType;
 
 namespace chip {
 namespace trace {
-namespace securechannel {
+namespace secure_channel {
 
 CHIP_ERROR DecodeSEDParams(TLV::TLVReader & reader);
 CHIP_ERROR DecodeMessageCounterSyncRequest(TLV::TLVReader & reader);
@@ -573,6 +573,6 @@ CHIP_ERROR DecodeSEDParams(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace securechannel
+} // namespace secure_channel
 } // namespace trace
 } // namespace chip

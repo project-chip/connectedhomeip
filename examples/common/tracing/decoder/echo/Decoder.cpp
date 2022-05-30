@@ -16,23 +16,23 @@
  *
  */
 
-#include "TraceDecoderProtocolUserDirectedCommissioning.h"
+#include "Decoder.h"
 
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <protocols/echo/Echo.h>
 
 namespace {
-constexpr const char * kProtocolName = "User Directed Commissioning";
+constexpr const char * kProtocolName = "Echo";
 
-constexpr const char * kUnknown                   = "Unknown";
-constexpr const char * kIdentificationDeclaration = "Identification Declaration";
+constexpr const char * kUnknown      = "Unknown";
+constexpr const char * kEchoRequest  = "Echo Request";
+constexpr const char * kEchoResponse = "Echo Response";
 } // namespace
 
-using MessageType = chip::Protocols::UserDirectedCommissioning::MsgType;
+using MessageType = chip::Protocols::Echo::MsgType;
 
 namespace chip {
 namespace trace {
-namespace udc {
+namespace echo {
 
 const char * ToProtocolName()
 {
@@ -43,8 +43,10 @@ const char * ToProtocolMessageTypeName(uint8_t protocolCode)
 {
     switch (protocolCode)
     {
-    case to_underlying(MessageType::IdentificationDeclaration):
-        return kIdentificationDeclaration;
+    case to_underlying(MessageType::EchoRequest):
+        return kEchoRequest;
+    case to_underlying(MessageType::EchoResponse):
+        return kEchoResponse;
     default:
         return kUnknown;
     }
@@ -56,13 +58,15 @@ CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size
 
     switch (protocolCode)
     {
-    case to_underlying(MessageType::IdentificationDeclaration):
+    case to_underlying(MessageType::EchoRequest):
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    case to_underlying(MessageType::EchoResponse):
         return CHIP_ERROR_NOT_IMPLEMENTED;
     default:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 }
 
-} // namespace udc
+} // namespace echo
 } // namespace trace
 } // namespace chip

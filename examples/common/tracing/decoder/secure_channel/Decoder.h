@@ -20,16 +20,19 @@
 
 #include <lib/core/CHIPError.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 namespace chip {
 namespace trace {
+namespace secure_channel {
 
-CHIP_ERROR MaybeDecodeNestedReadResponse(const uint8_t * data, size_t dataLen);
+const char * ToProtocolName();
 
-CHIP_ERROR MaybeDecodeNestedCommandResponse(const uint8_t * data, size_t dataLen);
+const char * ToProtocolMessageTypeName(uint8_t protocolCode);
 
-CHIP_ERROR MaybeDecodeNestedCommandRequest(const uint8_t * data, size_t dataLen);
+CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size_t len);
 
+} // namespace secure_channel
 } // namespace trace
 } // namespace chip
