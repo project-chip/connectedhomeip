@@ -347,20 +347,14 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
         return true;
     }
 
-    Status returnStatus                 = Status::Success;
     CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
+    Status returnStatus = StatusIB(handleEventTriggerResult).mStatus;
 
-    if (handleEventTriggerResult == CHIP_NO_ERROR)
-    {
-        returnStatus = Status::Success;
-    }
-    else if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
+    // When HandleEventTrigger returns INVALID_ARGUMENT we convert that into InvalidCommand to be spec
+    // compliant.
+    if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
     {
         returnStatus = Status::InvalidCommand;
-    }
-    else
-    {
-        returnStatus = Status::Failure;
     }
 
     commandObj->AddStatus(commandPath, returnStatus);
