@@ -185,6 +185,9 @@
 #define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 #define ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID (0x01)
 
+// Commands for cluster: General Diagnostics
+#define ZCL_TEST_EVENT_TRIGGER_COMMAND_ID (0x00)
+
 // Commands for cluster: Software Diagnostics
 #define ZCL_RESET_WATERMARKS_COMMAND_ID (0x00)
 

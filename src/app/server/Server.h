@@ -25,6 +25,7 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -105,6 +106,9 @@ struct ServerInitParams
     // Network native params can be injected depending on the
     // selected Endpoint implementation
     void * endpointNativeParams = nullptr;
+    // Optional. Support test event triggers when provided. Must be initialized before being
+    // provided.
+    TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
 };
 
 /**
@@ -241,6 +245,8 @@ public:
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
+
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     /**
      * This function send the ShutDown event before stopping
@@ -380,6 +386,8 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+    TestEventTriggerDelegate * mTestEventTriggerDelegate;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
