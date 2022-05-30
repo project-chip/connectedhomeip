@@ -34,31 +34,6 @@ connectedhomeip$ source ./scripts/activate.sh
 
 ```
 
-## Check project configuration
-
--   Update the `VENDOR_ID` in your example project config (**`CHIPProjectConfig.h`**). This should be your VID as per the CSA Matter specification, or [a VID allocated for testing purposes](https://developers.home.google.com/home/matter/eap#vendor_id). The value you provide for `VENDOR_ID` **must match** the one you use when [creating the Matter integration](https://developers.home.google.com/matter/eap/vendors/nxp#next_steps) in the Google Home Developer Center Console.
-
-    ```
-    grep VENDOR_ID ./examples/lighting-app/boullalolab/bl602/include/CHIPProjectConfig.h
-    ```
-
-    ```
-     * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-    #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID your-hex-VID
-    ```
-    
--   Check the `PRODUCT_ID` in your example project config (`CHIPProjectConfig.h`). The `PRODUCT_ID` value can remain the same as the example's default, or changed as desired, but it must adhere to the current [Product ID restrictions described in the Prerequisites](https://developers.home.google.com/home/matter/eap#product_id). Also note that the value you provide for `PRODUCT_ID` **must match** the one you use when [creating the Matter integration](https://developers.home.google.com/matter/eap/vendors/nxp#next_steps) in the Google Home Developer Center Console.
-
-    ```
-    grep PRODUCT_ID ./examples/lighting-app/bouffalolab/bl602/include/CHIPProjectConfig.h
-    ```
-
-    ```
-     * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-    #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4B4C
-     
-    ```
-    
  ## Build the image 
 -   Build the example application:
 
@@ -137,12 +112,38 @@ picocom -b 2000000 /dev/ttyUSB1
 
 To  reset the board, press the **RST** button. And you will see the log from the demo board.
 
-## Commissioning prerequisites
+## Commission a device using chip-tool
 
-Before commissioning the bouffaloalab bl602 development board, be aware of the following:
+To initiate a client commissioning request to a device, run the built executable
+and choose the pairing mode.
 
-1. BLE advertising must be enabled before the device can be discovered and commissioned within the Google Home ecosystem. To temporarily enable advertising (for 1 minutes, per the Matter specification), reset the board by pressing RST button, the ble will start advertising.
+#### Commissioning over BLE
 
-## Next steps
+Run the built executable and pass it the discriminator and pairing code of the
+remote device, as well as the network credentials to use.
 
-When your Matter example has been successfully built, [create a Matter Integration](https://developers.home.google.com/matter/eap/project/create).
+The command below uses the default values hard-coded into the debug versions of
+the BL602 lighting-app to commission it onto a Wi-Fi network:
+
+```
+$ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
+
+ Parameters:
+ 1. Discriminator: 3840
+ 2. Setup-pin-code: 20202021
+ 3. Node ID: 1
+ 4. SSID : Wi-Fi SSID
+ 5. PASSWORD : Wi-Fi Password
+```
+
+### Cluster control
+
+-   After successful commissioning, use the OnOff cluster commands to control
+    the OnOff attribute. This allows you to toggle a parameter implemented by
+    the device to be On or Off.
+
+    `$ sudo ./chip-tool onoff on 1 1`
+
+-   Use ColorControl cluster command to control the color attributes:
+
+    `$ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1`   
