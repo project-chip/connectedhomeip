@@ -49,10 +49,20 @@ public:
      */
     virtual void OnSessionReleased() = 0;
 
-    /// @brief Called when the first message delivery in a session failed, so actions aiming to recover connection can be performed.
+    /**
+     * @brief
+     *   Called when the first message delivery in an exchange fails, so actions aiming to recover connection can be performed.
+     *
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     */
     virtual void OnFirstMessageDeliveryFailed() {}
 
-    /// @brief Called when a session is unresponsive for a while (detected by MRP)
+    /**
+     * @brief
+     *   Called when a session is unresponsive for a while (detected by MRP)
+     *
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     */
     virtual void OnSessionHang() {}
 };
 
