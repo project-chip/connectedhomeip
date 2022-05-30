@@ -198,10 +198,12 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
+        std::string stringError(error.AsString());
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        UtfString jniCommissioneeError(env, stringError.data());
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(),
-                            jniCommissioneeName.jniValue());
+                            jniCommissioneeError.jniValue());
 
         if (env->ExceptionCheck())
         {
