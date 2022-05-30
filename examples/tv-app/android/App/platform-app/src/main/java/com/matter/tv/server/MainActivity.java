@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    // MainActivity is needed to launch dialog prompt
+    // in UserPrompter
     MatterServant.get().setActivity(this);
 
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
