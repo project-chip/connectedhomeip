@@ -233,10 +233,6 @@ def HostTargets():
     app_targets.append(
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
-        target_native.Extend('tv-app', app=HostApp.TV_APP))
-    app_targets.append(
-        target_native.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
-    app_targets.append(
         target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
@@ -258,6 +254,9 @@ def HostTargets():
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
         app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
+        app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
+        app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
+        app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
     builder = VariantBuilder()
 
