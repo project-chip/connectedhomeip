@@ -31,7 +31,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
     builder
-        .setMessage("Will you allow access to " + commissioneeName + "?")
+        .setMessage(commissioneeName + " is requesting permission to cast to this device, approve?")
         .setTitle("Allow access to " + commissioneeName)
         .setPositiveButton(
             "Ok",
