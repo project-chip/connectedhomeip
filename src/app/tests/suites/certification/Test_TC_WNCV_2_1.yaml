@@ -148,7 +148,8 @@ tests:
               maxValue: 10000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
-    - label: "2e: read the RO optional attribute default: InstalledOpenLimitLift"
+    - label:
+          "2e: read the RO optional attribute default: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
       PICS: A_INSTALLEDOPENLIMITLIFT
@@ -171,7 +172,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
-    - label: "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
+    - label:
+          "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
       PICS: A_INSTALLEDOPENLIMITTILT
@@ -270,7 +272,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
-    - label: "3f: read the RO optional attribute default: NumberOfActuationsLift"
+    - label:
+          "3f: read the RO optional attribute default: NumberOfActuationsLift"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: A_NUMBEROFACTUATIONSLIFT
@@ -281,7 +284,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
-    - label: "3g: read the RO optional attribute default: NumberOfActuationsTilt"
+    - label:
+          "3g: read the RO optional attribute default: NumberOfActuationsTilt"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: A_NUMBEROFACTUATIONSTILT
@@ -292,7 +296,8 @@ tests:
               maxValue: 65535
 
     ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
-    - label: "3h: read the RO optional attribute default:
+    - label:
+          "3h: read the RO optional attribute default:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
@@ -304,7 +309,9 @@ tests:
               maxValue: 100
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
-    - label: "3i:read the RO optional attribute default: CurrentPositionTiltPercentage"
+    - label:
+          "3i:read the RO optional attribute default:
+          CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       PICS: A_CURRENTPOSITIONTILTPERCENTAGE
@@ -313,7 +320,6 @@ tests:
               type: Percent
               minValue: 0
               maxValue: 100
-
     ###################################################
     # FYI Non Tested deprecated attributes
     # 20 VelocityLift
