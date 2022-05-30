@@ -29,6 +29,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   public void promptForCommissionOkPermission(
       int vendorId, int productId, String commissioneeName) {
     // TODO: find app by vendorId and productId
+    Log.d(TAG, "Received prompt for OK permission vendor id:" + vendorId + " productId:" + productId + ". Commissionee: " + commissioneeName);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
     builder
