@@ -109,8 +109,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
       channel.setDescription(description);
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
-      this.notificationManager =
-          getSystemService(activity, NotificationManager.class);
+      this.notificationManager = getSystemService(activity, NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
     }
   }
