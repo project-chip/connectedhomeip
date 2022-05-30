@@ -64,7 +64,8 @@ namespace System {
 // Pool allocation for PacketBuffer objects.
 //
 
-PacketBuffer::BufferPoolElement PacketBuffer::sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE]  __attribute__ ((section (".packet_buffer")));
+PacketBuffer::BufferPoolElement PacketBuffer::sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE]
+    __attribute__((section(".packet_buffer")));
 
 PacketBuffer * PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
 
