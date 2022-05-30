@@ -35,10 +35,10 @@ public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(chip::EndpointId endpointId,
                                                                                  chip::ClusterId clusterId,
-                                                                                 chip::AttributeId attributeId, uint8_t mask,
-                                                                                 uint8_t type, uint16_t size, uint8_t * value);
+                                                                                 chip::AttributeId attributeId, uint8_t type,
+                                                                                 uint16_t size, uint8_t * value);
     virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);
+                                             uint8_t type, uint16_t size, uint8_t * value);
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
