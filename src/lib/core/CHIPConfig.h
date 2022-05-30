@@ -752,7 +752,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READS
+ *      * #CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
@@ -780,7 +783,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics.
  *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 4) after we can hold more read handlers on more concise
+ * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 3) after we can hold more read handlers on more concise
  * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
@@ -794,9 +797,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * server.
  *
  * The default value is one per fabric * max number of fabrics.
- *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 4) after we can hold more read handlers on more concise
- * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_READS
 #define CHIP_IM_MAX_NUM_READS (CHIP_CONFIG_MAX_FABRICS)
@@ -821,7 +821,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
 // #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
-// TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
+// TODO: (#17085) Should be (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
 #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 2)
 #endif
 
@@ -834,8 +834,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * paths for each fabric.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
-// TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
 #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS (CHIP_IM_MAX_NUM_READS * 9)
 #endif
 

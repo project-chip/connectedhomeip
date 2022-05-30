@@ -401,7 +401,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
-                TLV::Utilities::Count(pathReader, requestedAttributePathCount, false);
+                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
+                                  Protocols::InteractionModel::Status::Failure);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -413,7 +414,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
-                TLV::Utilities::Count(pathReader, requestedEventPathCount, false);
+                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
+                                  Protocols::InteractionModel::Status::Failure);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -597,7 +599,7 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvict)
+bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex, bool aForceEvict)
 {
     const size_t pathPoolCapacity        = GetPathPoolCapacityForSubscriptions();
     const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacityForSubscriptions();
@@ -616,8 +618,8 @@ bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvi
     size_t perFabricSubscriptionCapacity = readHandlerPoolCapacity / static_cast<size_t>(fabricCount);
 
     ReadHandler * candidate            = nullptr;
-    size_t candicateAttributePathsUsed = 0;
-    size_t candicateEventPathsUsed     = 0;
+    size_t candidateAttributePathsUsed = 0;
+    size_t candidateEventPathsUsed     = 0;
 
     // It is safe to use & here since this function will be called on current stack.
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
@@ -639,17 +641,17 @@ bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvi
         }
         // This handler uses more resources than the one we picked before.
         else if ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) &&
-                 (candicateAttributePathsUsed <= perFabricPathCapacity && candicateEventPathsUsed <= perFabricPathCapacity))
+                 (candidateAttributePathsUsed <= perFabricPathCapacity && candidateEventPathsUsed <= perFabricPathCapacity))
         {
             candidate                   = handler;
-            candicateAttributePathsUsed = attributePathsUsed;
-            candicateEventPathsUsed     = eventPathsUsed;
+            candidateAttributePathsUsed = attributePathsUsed;
+            candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
         else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
-                  (candicateAttributePathsUsed > perFabricPathCapacity || candicateEventPathsUsed > perFabricPathCapacity)))
+                  (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
         {
             candidate = handler;
         }
@@ -729,7 +731,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     }
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret = TrimFabric(fabricIndex, forceEvict);
+        bool ret = TrimFabricForSubscriptions(fabricIndex, forceEvict);
         countResourceUsage();
         return ret;
     };
@@ -790,8 +792,8 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
     size_t readTransactionsOnCurrentFabric   = 0;
 
     ReadHandler * candidate            = nullptr;
-    size_t candicateAttributePathsUsed = 0;
-    size_t candicateEventPathsUsed     = 0;
+    size_t candidateAttributePathsUsed = 0;
+    size_t candidateEventPathsUsed     = 0;
 
     // It is safe to use & here since this function will be called on current stack.
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
@@ -813,21 +815,25 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
         }
         // Oversized read handlers will be evicted first.
         else if ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) &&
-                 (candicateAttributePathsUsed <= kMinSupportedPathsPerReadRequest &&
-                  candicateEventPathsUsed <= kMinSupportedPathsPerReadRequest))
+                 (candidateAttributePathsUsed <= kMinSupportedPathsPerReadRequest &&
+                  candidateEventPathsUsed <= kMinSupportedPathsPerReadRequest))
         {
-            candidate                   = handler;
-            candicateAttributePathsUsed = attributePathsUsed;
-            candicateEventPathsUsed     = eventPathsUsed;
+            candidate = handler;
         }
         // This handler is older than the one we picked before.
         else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
-                  (candicateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
-                   candicateEventPathsUsed > kMinSupportedPathsPerReadRequest)))
+                  (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
+                   candidateEventPathsUsed > kMinSupportedPathsPerReadRequest)))
         {
             candidate = handler;
+        }
+
+        if (candidate == handler)
+        {
+            candidateAttributePathsUsed = attributePathsUsed;
+            candidateEventPathsUsed     = eventPathsUsed;
         }
         return Loop::Continue;
     });
@@ -928,12 +934,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
             kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric ||
         usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric)
     {
-        return Protocols::InteractionModel::Status::PathsExhausted;
+        return Protocols::InteractionModel::Status::Busy;
     }
 
     if (usedReadHandlersInFabric >= kMinSupportedReadRequestsPerFabric)
     {
-        return Protocols::InteractionModel::Status::ResourceExhausted;
+        return Protocols::InteractionModel::Status::Busy;
     }
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex) {
@@ -947,15 +953,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     // means that we definitely have handlers on existing fabrics that are over limits and need to evict at least one of them to
     // make space.
     //
-    // There might be cases that one fabric has lots of subscriptions with one interested path, while the other fabrics are not
-    // using excess resources. So we need to do this multiple times until we have enough room or no fabrics are using excess
-    // resources.
-    //
     bool didEvictHandler = true;
     while (didEvictHandler)
     {
         didEvictHandler = false;
         didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(kUndefinedFabricIndex);
+        if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
+            usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
+        {
+            break;
+        }
         if (didEvictHandler)
         {
             continue;
@@ -973,15 +980,15 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     }
 
     // The read requests that are not using exceeded resources will be first-come-first-served, since the read transactions will be
-    // relative short, the client is expected to retry later if the server is busy now.
+    // relatively short, the client is expected to retry later if the server is busy now.
     if (usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
         usedEventPaths + aRequestedEventPathCount > eventPathCap)
     {
-        return Protocols::InteractionModel::Status::PathsExhausted;
+        return Protocols::InteractionModel::Status::Busy;
     }
     else if (usedReadHandlers >= readHandlerCap)
     {
-        return Protocols::InteractionModel::Status::ResourceExhausted;
+        return Protocols::InteractionModel::Status::Busy;
     }
 
     return Protocols::InteractionModel::Status::Success;

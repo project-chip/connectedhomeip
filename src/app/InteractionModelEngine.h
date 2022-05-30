@@ -250,7 +250,7 @@ public:
      *
      * @retval Whether we have evicted a subscription.
      */
-    bool TrimFabric(FabricIndex aFabricIndex, bool aForceEvict);
+    bool TrimFabricForSubscriptions(FabricIndex aFabricIndex, bool aForceEvict);
 
     /**
      * Select the oldest (and the one that exceeds the per read resource minimum if there are any) read handler on the fabric with
@@ -458,21 +458,23 @@ private:
 
     /**
      * Verify and ensure (by killing oldest read handlers that make the resources used by the current fabric exceed the fabric
-     * quota)
+     * quota) the resources for handling a new read transaction with the given resource requirments.
      * - PASE sessions will be counted in a virtual fabric (i.e. kInvalidFabricIndex will be consided as a "valid" fabric in this
      * function)
-     * - If the existing resources can serve this read transaction, this function will return true.
+     * - If the existing resources can serve this read transaction, this function will return Status::Success.
      * - or if the resources used by read transactions in the fabric index meets the per fabric resource limit (i.e. 9 paths & 1
-     * read) after accepting this read request, this function will always return true by evicting existing read transactions which
-     * uses more resources than kMinSupportedPathsPerReadRequest from the oldest to the newest.
+     * read) after accepting this read request, this function will always return Status::Success by evicting existing read
+     * transactions which uses more resources than kMinSupportedPathsPerReadRequest from the oldest to the newest.
      * - or if the resources used by read transactions in the fabric index will exceed the per fabric resource limit (i.e. 9 paths &
      * 1 read) after accepting this read request, this function will return false without evicting any existing transaction.
      * - However, read transactions on PASE sessions won't evict any existing read transactions when we have already commissioned
      * CHIP_CONFIG_MAX_FABRICS fabrics on the device.
      *
-     * @retval CHIP_NO_ERROR: The read transaction can be accepted.
-     * @retval CHIP_IM_GLOBAL_STATUS(ResourceExhausted): The read handler pool is exhausted.
-     * @retval CHIP_IM_GLOBAL_STATUS(PathsExhausted): The attribute / event path pool is exhausted.
+     * @retval Status::Success: The read transaction can be accepted.
+     * @retval Status::Busy: The read handler pool is exhausted. But the client are expected to retry later.
+     * @retval Status::ResourceExhausted: The read handler pool is exhausted. But the client are not expected to retry later (PASE
+     * session with a full fabric table).
+     * @retval Status::PathsExhausted: The attribute / event path pool is exhausted.
      */
     Protocols::InteractionModel::Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
                                                               size_t aRequestedEventPathCount);

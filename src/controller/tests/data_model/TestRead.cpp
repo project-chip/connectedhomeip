@@ -1882,7 +1882,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(Busy));
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
@@ -2439,17 +2439,19 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(
         2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
-    // Case 1: 2 reads used all resources, and one incoming oversized read request => resource exhausted.
+    // Case 1: 2 reads used all resources, and one incoming oversized read request => busy.
     {
         TestReadCallback readCallback;
         TestPerpetualListReadCallback backgroundReadCallback1;
         TestPerpetualListReadCallback backgroundReadCallback2;
         std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-        EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1, 1,
+        EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                                     app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                      app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                      app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-        EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1, 1,
+        EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                                     app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                      app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                      app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
@@ -2466,10 +2468,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
             app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
-            return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0 &&
-                readCallback.mAttributeCount != 0;
-        });
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
         // The two subscriptions should still alive
         NL_TEST_ASSERT(apSuite, backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
@@ -2542,7 +2541,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
         NL_TEST_ASSERT(apSuite, backgroundReadCallback1.reportsReceived != 0);
         // The new read request should be rejected.
         NL_TEST_ASSERT(apSuite, readCallback.mOnError != 0);
-        NL_TEST_ASSERT(apSuite, readCallback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+        NL_TEST_ASSERT(apSuite, readCallback.mLastError == CHIP_IM_GLOBAL_STATUS(Busy));
         // Cleanup for next case
         app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
         ctx.DrainAndServiceIO();
