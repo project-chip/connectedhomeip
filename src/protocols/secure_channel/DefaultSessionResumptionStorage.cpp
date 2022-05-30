@@ -80,7 +80,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     if (err == CHIP_NO_ERROR)
     {
         err = DeleteLink(resumptionId);
-        if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             ChipLogError(SecureChannel,
                          "Unable to delete session resumption link for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
