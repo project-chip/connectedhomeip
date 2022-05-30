@@ -35885,7 +35885,7 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
@@ -35995,7 +35995,7 @@ private:
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::SafetyStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -36830,7 +36830,7 @@ private:
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
@@ -36867,7 +36867,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 5));
@@ -36929,7 +36929,7 @@ private:
         case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -37235,7 +37235,7 @@ private:
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
@@ -37272,7 +37272,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 10));
@@ -37334,7 +37334,7 @@ private:
         case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -37610,7 +37610,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
@@ -37625,7 +37625,7 @@ private:
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -37638,7 +37638,7 @@ private:
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -37883,7 +37883,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -38075,7 +38075,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -38286,7 +38286,7 @@ private:
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -38332,7 +38332,7 @@ private:
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -38582,7 +38582,7 @@ private:
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
@@ -38628,7 +38628,7 @@ private:
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("operationalStatus", value, 0));
             }
