@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.16. [TC-DM-4.16][Thread] NetworkIDNotFound value as
+    10.4.16. [TC-DM-4.16] [Thread] NetworkIDNotFound value as
     LastNetworkingStatus argument validation [DUT-Commissionee]
 
 config:
@@ -23,7 +23,25 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 sends ArmFailSafe command to the DUT"
+    - label:
+          "TH reads Network attribute from the DUT TH saves the single entrys
+          NetworkID value as 'Userth_op' value for the future use"
+      verification: |
+          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
+
+          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true, 
+          [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
+          [1645772651.445209][3856:3861] CHIP:DMG: }
+          [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
+          [1645772651.445875][3856:3861] CHIP:TOO:   Networks: 1 entries
+          [1645772651.446057][3856:3861] CHIP:TOO:     [1]: {
+          [1645772651.446120][3856:3861] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1650389742.394958][9809:9814] CHIP:TOO:       Connected: TRUE
+          [1645772651.446228][3856:3861] CHIP:TOO:      }
+          [1645772651.446431][3856:3861] CHIP:EM: Sending Standalone Ack for MessageCounter:12695576 on exchange 11133i
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
 
@@ -31,15 +49,16 @@ tests:
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650392597.976539][10152:10157] CHIP:TOO:   ArmFailSafeResponse: {
           [1650392597.976665][10152:10157] CHIP:TOO:     errorCode: 0
-          [1650392597.976729][10152:10157] CHIP:TOO:     debugText:
+          [1650392597.976729][10152:10157] CHIP:TOO:     debugText: 
           [1650392597.976785][10152:10157] CHIP:TOO:    }
           [1650392597.976874][10152:10157] CHIP:DMG: ICR moving to [AwaitingDe]
           [1650392597.976987][10152:10157] CHIP:EM: Sending Standalone Ack for MessageCounter:10494017 on exchange 14665i
       disabled: true
 
     - label:
-          "TH1 sends RemoveNetwork Command to the DUT with NetworkID argument
-          value as 'Userth_op1' and Breadcrumb argument value as 0"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID argument
+          value as 'Userth_op1' that not matches 'Userth_op' value and
+          Breadcrumb argument value as 1"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 0119100899082022 62 0
 
@@ -53,8 +72,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ConnectNetwork Command to the DUT with NetworkID value as
-          'Userth_op1' and Breadcrumb value as 0"
+          "TH sends ConnectNetwork Command to the DUT with NetworkID value as
+          'Userth_op1' that not matches 'Userth_op' value and Breadcrumb
+          argument value as 1"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 0119100899082022 62 0
 
