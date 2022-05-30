@@ -442,6 +442,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-extern "C" void OTAIdleActivities(void)
-{
-}
+extern "C" void OTAIdleActivities(void) {}
