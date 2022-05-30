@@ -25,7 +25,7 @@ config:
 tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -34,12 +34,12 @@ tests:
           arguments: NetworkID argument value as 'Userth_op1' NetworkIndex
           argument value as 'Userth_netidx2' Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label: "TH reads Networks attribute list from the DUT"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true

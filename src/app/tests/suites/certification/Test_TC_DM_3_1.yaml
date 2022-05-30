@@ -213,7 +213,7 @@ tests:
           'TH sends UpdateFabricLabel command with "Node Ope Credits 1" as Label
           field to DUT'
       verification: |
-          ./chip-tool operationalcredentials update-fabric-label  2 1 0 
+          ./chip-tool operationalcredentials update-fabric-label  2 1 0
 
           [1650455515.088785][4397:4402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1650455515.088888][4397:4402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
