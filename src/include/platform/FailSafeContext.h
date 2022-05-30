@@ -121,9 +121,9 @@ private:
      */
     void ResetState()
     {
-        mFailSafeArmed                  = false;
-        mAddNocCommandHasBeenInvoked    = false;
-        mUpdateNocCommandHasBeenInvoked = false;
+        mFailSafeArmed                    = false;
+        mAddNocCommandHasBeenInvoked      = false;
+        mUpdateNocCommandHasBeenInvoked   = false;
         mAddTrustedRootCertHasBeenInvoked = false;
     }
 

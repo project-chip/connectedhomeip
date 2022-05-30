@@ -470,7 +470,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x", static_cast<unsigned>(fabricBeingRemoved));
+    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricBeingRemoved));
 
     if ((fabricBeingRemoved < 1) || (fabricBeingRemoved > 254))
     {
@@ -675,7 +676,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit((adminVendorId != VendorId::Common) && (adminVendorId <= static_cast<uint16_t>(VendorId::TestVendor4)), nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit((adminVendorId != VendorId::Common) && (adminVendorId <= static_cast<uint16_t>(VendorId::TestVendor4)),
+                 nonDefaultStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::UnsupportedAccess);
@@ -798,7 +800,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
+    FabricInfo * fabric               = RetrieveCurrentFabric(commandObj);
 
     VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
@@ -910,7 +912,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     auto & attestationNonce = commandData.attestationNonce;
 
     auto finalStatus = Status::Failure;
-    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+    CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
 
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen = 0;
@@ -1062,8 +1064,8 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
 
-        err = Credentials::ConstructNOCSRElements(ByteSpan{ csr.Get(), csrLength }, CSRNonce, kNoVendorReserved,
-                                                  kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
+        err = Credentials::ConstructNOCSRElements(ByteSpan{ csr.Get(), csrLength }, CSRNonce, kNoVendorReserved, kNoVendorReserved,
+                                                  kNoVendorReserved, nocsrElementsSpan);
         VerifyOrExit((err == CHIP_NO_ERROR) && (nocsrElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
     }
 

@@ -67,7 +67,7 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 {
     ResetState();
 
-    mFailSafeBusy                   = true;
+    mFailSafeBusy = true;
 
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;

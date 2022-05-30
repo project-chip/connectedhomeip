@@ -64,7 +64,8 @@ constexpr EndpointId kTestEndpointId3 = 3;
 constexpr EndpointId kTestEndpointId4    = 4;
 constexpr EndpointId kTestEndpointId5    = 5;
 constexpr AttributeId kTestListAttribute = 6;
-constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_ERROR_NO_MEMORY but nothing is actually encoded.
+constexpr AttributeId kTestBadAttribute =
+    7; // Reading this attribute will return CHIP_ERROR_NO_MEMORY but nothing is actually encoded.
 
 class TestCommandInteraction
 {
