@@ -78,7 +78,10 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
             .setContentTitle("Connection Complete")
-            .setContentText("Success. " + commissioneeName + " can now cast to this device. Visit settings to manage access control for casting.")
+            .setContentText(
+                "Success. "
+                    + commissioneeName
+                    + " can now cast to this device. Visit settings to manage access control for casting.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     notificationManager.notify(SUCCESS_ID, builder.build());
