@@ -53,8 +53,8 @@ source_set("trace_handlers_decoder") {
 executable("chip-trace-decoder") {
   sources = [
     "TraceDecoder.cpp",
-    "TraceDecoderLog.cpp",
     "TraceDecoderArgumentParser.cpp",
+    "TraceDecoderLog.cpp",
     "decoder/TraceDecoderProtocolBDX.cpp",
     "decoder/TraceDecoderProtocolEcho.cpp",
     "decoder/TraceDecoderProtocolInteractionModel.cpp",
