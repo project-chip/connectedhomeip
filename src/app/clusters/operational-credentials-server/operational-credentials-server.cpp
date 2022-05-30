@@ -673,8 +673,9 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
+                 nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit((adminVendorId != VendorId::Common) && (adminVendorId <= static_cast<uint16_t>(VendorId::TestVendor4)),
                  nonDefaultStatus = Status::InvalidCommand);
@@ -802,9 +803,9 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     FabricInfo * fabric               = RetrieveCurrentFabric(commandObj);
 
-    VerifyOrExit(NOCValue.size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= 400, nonDefaultStatus = Status::InvalidCommand);
-
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
+                 nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::UnsupportedAccess);
 
@@ -1113,9 +1114,11 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & RootCertificate = commandData.rootCertificate;
+    auto & rootCertificate = commandData.rootCertificate;
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
+
+    VerifyOrExit(rootCertificate.size() <= Credentials::kMaxCHIPCertLength, finalStatus = Status::InvalidCommand);
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
@@ -1129,7 +1132,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
 
     // TODO: Validate cert signature prior to setting.
-    err = gFabricBeingCommissioned.SetRootCert(RootCertificate);
+    err = gFabricBeingCommissioned.SetRootCert(rootCertificate);
 
     // CHIP_ERROR_INVALID_ARGUMENT by the time we reach here means bad format
     VerifyOrExit(err != CHIP_ERROR_INVALID_ARGUMENT, finalStatus = Status::InvalidCommand);
