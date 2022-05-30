@@ -192,6 +192,62 @@
             "problemMatcher": {
                 "base": "$gcc"
             }
+        },
+        {
+            "label": "Build LightingApp (Tizen)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "${workspaceFolder}/scripts/build/build_examples.py --target linux-x64-chip-tool --enable-flashbundle build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Connect to Tizen device",
+            "type": "shell",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "args": ["connect", "${input:tizenTargetDeviceAddress}:26101"],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Install LightingApp (Tizen)",
+            "type": "shell",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "args": [
+                "install",
+                "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Launch Tizen App with gdbserver attached",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/examples/lighting-app/tizen/gdb_debug.sh"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            },
+            "isBackground": true,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": false
+            }
         }
     ],
     "inputs": [
@@ -377,6 +433,11 @@
                 "telink-tlsr9518adk80d-light-switch",
                 "tizen-arm-light"
             ]
+        },
+        {
+            "type": "promptString",
+            "id": "tizenTargetDeviceAddress",
+            "description": "Enter the target device address"
         }
     ]
 }

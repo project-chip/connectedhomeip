@@ -387,6 +387,24 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "LightingApp (Tizen)[remote]",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/out/tizen-arm-light",
+            "program": "${workspaceFolder}/out/tizen-arm-light/chip-lighting-app",
+            "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gdb",
+            "additionalSOLibSearchPath": "${env:ROOTFS}",
+            "miDebuggerServerAddress": "${input:tizenTargetDeviceAddressLaunch}:9999",
+            "linux": {
+                "MIMode": "gdb"
+            },
+            "setupCommands": [
+                {
+                    "text": "set solib-absolute-prefix ${env:ROOTFS}"
+                }
+            ]
         }
     ],
     "inputs": [
@@ -424,6 +442,11 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "promptString",
+            "id": "tizenTargetDeviceAddressLaunch",
+            "description": "Enter the target device address"
         }
     ]
 }
