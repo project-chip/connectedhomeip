@@ -1115,12 +1115,11 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
     auto & rootCertificate = commandData.rootCertificate;
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
 
     VerifyOrExit(rootCertificate.size() <= Credentials::kMaxCHIPCertLength, finalStatus = Status::InvalidCommand);
-
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::UnsupportedAccess);
 
