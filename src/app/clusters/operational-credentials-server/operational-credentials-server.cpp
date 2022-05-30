@@ -1114,7 +1114,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & rootCertificate = commandData.rootCertificate;
+    auto & rootCertificate            = commandData.rootCertificate;
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
