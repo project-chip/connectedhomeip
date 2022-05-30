@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.1. [TC-DM-4.1][WiFi] Verification for attributes check [DUT -
+    10.4.1. [TC-DM-4.1] [WiFi] Verification for attributes check [DUT -
     Commissionee]
 
 config:
@@ -28,16 +28,16 @@ tests:
 
       disabled: true
 
-    - label: "TH1 is commissioned with DUT"
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 reads Descriptor Cluster from the DUT with EP0 TH1 reads
-          ServerList from the DUT"
+          "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList
+          from the DUT"
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool descriptor read server-list 1 0
+          ./chip-tool descriptor read server-list 1 0
 
           [1646214614.113925][6900:6905] CHIP:DMG:        SuppressResponse = true,
           [1646214614.113950][6900:6905] CHIP:DMG:        InteractionModelRevision = 1
@@ -72,7 +72,7 @@ tests:
           [1646214614.116434][6900:6905] CHIP:EM: Sending Standalone Ack for MessageCounter:1857540 on exchange 31492i
       disabled: true
 
-    - label: "TH1 reads FeatureMap attribute from the DUT"
+    - label: "TH reads FeatureMap attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read feature-map 1 0
 
@@ -81,9 +81,9 @@ tests:
           [1649244936.458371][30450:30455] CHIP:EM: Sending Standalone Ack for MessageCounter:12082532 on exchange 64223i
       disabled: true
 
-    - label: "TH1 reads the MaxNetworks attribute from the DUT"
+    - label: "TH reads the MaxNetworks attribute from the DUT"
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read max-networks 1 0
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
 
           [1646216356.472036][7021:7026] CHIP:DMG:        SuppressResponse = true,
           [1646216356.472088][7021:7026] CHIP:DMG:        InteractionModelRevision = 1
@@ -94,13 +94,13 @@ tests:
       disabled: true
 
     - label:
-          "TH1 saves the MaxNetworks attribute value as 'maxvalue' for furture
-          use"
+          "TH saves the MaxNetworks attribute value as 'MaxNetworksValue' for
+          future use"
       verification: |
-
+          TH1 saves the MaxNetworks attribute value
       disabled: true
 
-    - label: "TH1 reads the Networks attribute list from the DUT"
+    - label: "TH reads the Networks attribute list from the DUT"
       verification: |
           ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
 
@@ -113,7 +113,7 @@ tests:
           [1649249212.073266][30681:30686] CHIP:EM: Sending Standalone Ack for MessageCounter:8988360 on exchange 58610i
       disabled: true
 
-    - label: "TH1 reads ScanMaxTimeSeconds attribute from the DUT"
+    - label: "TH reads ScanMaxTimeSeconds attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read scan-max-time-seconds 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
 
@@ -122,7 +122,7 @@ tests:
           [1648122894.380642][8770:8775] CHIP:EM: Sending Standalone Ack for MessageCounter:12629308 on exchange 33084i
       disabled: true
 
-    - label: "TH1 reads ConnectMaxTimeSeconds Attribute from the DUT"
+    - label: "TH reads ConnectMaxTimeSeconds Attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read connect-max-time-seconds 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
 
@@ -131,7 +131,7 @@ tests:
           [1648122935.626539][8780:8785] CHIP:EM: Sending Standalone Ack for MessageCounter:11607262 on exchange 19306i
       disabled: true
 
-    - label: "TH1 reads InterfaceEnabled attribute from the DUT"
+    - label: "TH reads InterfaceEnabled attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 1 0
 
@@ -140,7 +140,7 @@ tests:
           [1649250241.092852][30726:30731] CHIP:EM: Sending Standalone Ack for MessageCounter:3120276 on exchange 4316i
       disabled: true
 
-    - label: "TH1 reads LastNetworkingStatus attribute from the DUT"
+    - label: "TH reads LastNetworkingStatus attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-networking-status 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
 
@@ -150,7 +150,7 @@ tests:
       disabled: true
 
     - label:
-          "TH1 reads the LastNetworkID attribute from the DUT TH1 reads the
+          "TH reads the LastNetworkID attribute from the DUT TH reads the
           Networks attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-network-id 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
@@ -160,7 +160,7 @@ tests:
           [1648123296.959180][8824:8829] CHIP:EM: Sending Standalone Ack for MessageCounter:7786733 on exchange 2835i
       disabled: true
 
-    - label: "TH1 reads the LastConnectErrorValue attribute from the DUT"
+    - label: "TH reads the LastConnectErrorValue attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-connect-error-value 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
 

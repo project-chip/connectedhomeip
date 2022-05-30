@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 18.12.6. [TC-MC-10.6] Launch URL Verification (DUT as Client)
+name: 51.2.2. [TC-DGWIFI-2.2] Event functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -21,30 +21,22 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "DUT sends a LaunchURL command to the TH with a known good content URL
-          string"
+    - label: "Commission DUT to TH"
       verification: |
-          ./chip-tool contentlauncher launch-urlrequest https://csa-iot.org/ 1 1
+
       disabled: true
 
-    - label:
-          "DUT sends a LaunchURL command to the TH with a known good content URL
-          string and a display string"
+    - label: "TH sends chip-tool command to DUT"
       verification: |
-          ./chip-tool contentlauncher launch-urlrequest  https://csa-iot.org/  'Test content' 1 1
+          chip-tool wifinetworkdiagnostics read-event disconnection 1 0
       disabled: true
 
-    - label:
-          "DUT sends a LaunchURL command to the TH with a known good content URL
-          string and a brand information object."
+    - label: "TH sends chip-tool command to DUT"
       verification: |
-          Not supported by chip-tool
+          chip-tool wifinetworkdiagnostics read-event association-failure 1 0
       disabled: true
 
-    - label:
-          "DUT sends a LaunchURL command to the DUT with a known unreachable
-          content URL string."
+    - label: "TH sends chip-tool command to DUT"
       verification: |
-          ./chip-tool contentlauncher launch-urlrequest  https://badurl 1 1
+          chip-tool wifinetworkdiagnostics read-event connection-status 1 0
       disabled: true
