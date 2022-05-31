@@ -473,7 +473,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
                     static_cast<unsigned>(fabricBeingRemoved));
 
-    if ((fabricBeingRemoved < 1) || (fabricBeingRemoved > 254))
+    if (!IsValidFabricIndex(fabricBeingRemoved))
     {
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to invalid FabricIndex");
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -537,7 +537,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
-    if ((label.size() < 1) || (label.size() > 32))
+    if (label.size() > 32)
     {
         ChipLogError(Zcl, "OpCreds: Failed UpdateFabricLabel due to invalid label size %u", static_cast<unsigned>(label.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -677,8 +677,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
                  nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit((adminVendorId != VendorId::Common) && (adminVendorId <= static_cast<uint16_t>(VendorId::TestVendor4)),
-                 nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::UnsupportedAccess);
@@ -811,7 +810,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
-    // Fetch current fabric. If not available, command was invoked over PASE which is not legal
+    // If current fabric is not available, command was invoked over PASE which is not legal
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
     fabricIndex = fabric->GetFabricIndex();
 
@@ -948,7 +947,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     if (!attestationElements.Alloc(attestationElementsLen))
     {
         err = CHIP_ERROR_NO_MEMORY;
-        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
     }
 
     attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
@@ -1038,7 +1037,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         if (!csr.Alloc(csrLength))
         {
             err = CHIP_ERROR_NO_MEMORY;
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
         }
 
         err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
@@ -1060,7 +1059,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         if (!nocsrElements.Alloc(nocsrLengthEstimate))
         {
             err = CHIP_ERROR_NO_MEMORY;
-            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
         }
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
@@ -1151,7 +1150,6 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
                                            OperationalCredentials::Attributes::TrustedRootCertificates::Id);
 
 exit:
-    // If failed constraints or internal errors, send a status report instead of the response sent above
     if (finalStatus != Status::Success)
     {
         ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02u (err = %" CHIP_ERROR_FORMAT ")",

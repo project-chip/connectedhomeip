@@ -41,12 +41,6 @@
 
 namespace chip {
 
-static constexpr FabricIndex kMinValidFabricIndex = 1;
-static constexpr FabricIndex kMaxValidFabricIndex = UINT8_MAX - 1;
-
-static_assert(kMinValidFabricIndex <= CHIP_CONFIG_MAX_FABRICS, "Must support some fabrics.");
-static_assert(CHIP_CONFIG_MAX_FABRICS <= kMaxValidFabricIndex, "Max fabric count out of range.");
-
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
