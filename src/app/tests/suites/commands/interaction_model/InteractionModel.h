@@ -76,10 +76,11 @@ protected:
                               uint16_t minInterval = 0, uint16_t maxInterval = 0,
                               const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
                               const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional)
+                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
+                              const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions);
+                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions, isUrgents);
     }
 
     CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
@@ -87,7 +88,8 @@ protected:
                            chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
                            uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
                            const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
+                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
+                           const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional);
 
     void Shutdown() { mReadClients.clear(); }
 
