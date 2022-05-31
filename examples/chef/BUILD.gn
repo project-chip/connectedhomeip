@@ -21,12 +21,24 @@ import("$dir_pw_build/python.gni")
 pw_python_package("chef") {
   setup = [ "setup.py" ]
 
+  inputs = [
+    "sample_app_util/test_files/sample_zap_file.zap",
+    "sample_app_util/test_files/sample_zap_file_hashmeta.yaml",
+  ]
+
   sources = [
     "__init__.py",
     "chef.py",
     "constants.py",
+    "sample_app_util/__init__.py",
+    "sample_app_util/sample_app_util.py",
+    "sample_app_util/test_zap_file_parser.py",
+    "sample_app_util/zap_file_parser.py",
     "stateful_shell.py",
   ]
 
-  tests = [ "test_stateful_shell.py" ]
+  tests = [
+    "test_stateful_shell.py",
+    "sample_app_util/test_zap_file_parser.py",
+  ]
 }
