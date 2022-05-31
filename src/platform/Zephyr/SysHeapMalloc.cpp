@@ -21,10 +21,10 @@
 #include <system/SystemError.h>
 
 extern "C" {
-#include <zephyr/init.h>
-#include <zephyr/sys/math_extras.h>
-#include <zephyr/sys/mutex.h>
-#include <zephyr/sys/sys_heap.h>
+#include <init.h>
+#include <sys/math_extras.h>
+#include <sys/mutex.h>
+#include <sys/sys_heap.h>
 }
 
 #include <cstdint>

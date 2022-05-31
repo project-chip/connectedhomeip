@@ -487,7 +487,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t)
         break;
     case DeviceEventType::kThreadConnectivityChange:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
         {
             InitBasicOTARequestor();
         }

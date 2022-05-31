@@ -27,7 +27,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
 
-#include <zephyr/settings/settings.h>
+#include <settings/settings.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -27,9 +27,9 @@
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
 #include <dfu/mcuboot.h>
-#include <zephyr/logging/log.h>
-#include <zephyr/pm/device.h>
-#include <zephyr/sys/reboot.h>
+#include <logging/log.h>
+#include <pm/device.h>
+#include <sys/reboot.h>
 
 namespace chip {
 namespace DeviceLayer {

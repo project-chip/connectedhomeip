@@ -25,7 +25,7 @@
 
 #include <platform/CHIPDeviceEvent.h>
 
-#include <zephyr/bluetooth/bluetooth.h>
+#include <bluetooth/bluetooth.h>
 
 namespace chip {
 namespace DeviceLayer {

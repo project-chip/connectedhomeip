@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <zephyr/zephyr.h>
+#include <zephyr.h>
 
 namespace chip {
 namespace DeviceLayer {
