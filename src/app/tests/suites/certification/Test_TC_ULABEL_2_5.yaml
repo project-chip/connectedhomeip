@@ -13,23 +13,25 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    92.4. [TC-LC-2.3] User Label cluster write verification [DUT - Commissionee]
+name: 92.6. [TC-ULABEL-2.5] User label cluster [DUT-client]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "User Label"
+    endpoint: 1
 
 tests:
-    - label:
-          "TH1 writes LabelList attribute of the DUT by setting 'room:bedroom
-          1','Orientation:east', 'floor:3', 'direction:down'"
-      verification: |
-          sudo ./chip-tool userlabel write label-list '[{"label":"bedroom", "value":"bedroom1"}, {"label":"orientation", "value":"east"}, {"label":"floor", "value":"3"}, {"label":"direction", "value":"down"}]' 1 0
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "TH1 reads LabelList attribute of the DUT"
-      verification: |
-          sudo ./chip-tool userlabel read label-list 1 0
-      disabled: true
+    - label: "TH reads LabelList attribute of the DUT"
+      command: "readAttribute"
+      attribute: "label list"
+      response:
+          constraints:
+              type: list
