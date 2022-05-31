@@ -27,12 +27,12 @@ tests:
           "TH reads NumberOfTotalUsersSupported attribute and saves for future
           use."
       verification: |
-          ./chip-tool doorlock read number-of-total-users-supported 1 1 
+          ./chip-tool doorlock read number-of-total-users-supported 1 1
 
 
-          [1649927485.980884][4704:4709] CHIP:DMG: SuppressResponse = true, 
-          [1649927485.980918][4704:4709] CHIP:DMG: InteractionModelRevision = 1 
-          [1649927485.980949][4704:4709] CHIP:DMG: } 
+          [1649927485.980884][4704:4709] CHIP:DMG: SuppressResponse = true,
+          [1649927485.980918][4704:4709] CHIP:DMG: InteractionModelRevision = 1
+          [1649927485.980949][4704:4709] CHIP:DMG: }
           [1649927485.981156][4704:4709] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0011 DataVersion: 343041314 [1649927485.981254][4704:4709] CHIP:TOO: NumberOfTotalUsersSupported: 10
       disabled: true
 
