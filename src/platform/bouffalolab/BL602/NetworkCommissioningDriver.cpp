@@ -307,20 +307,6 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 #if 0
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err != ESP_OK)
-    {
-        return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
-    }
-    uint8_t length = strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    if (length > sizeof(network.networkID))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-    memcpy(network.networkID, ap_info.ssid, length);
-    network.networkIDLen = length;
     return CHIP_NO_ERROR;
 }
 #endif
