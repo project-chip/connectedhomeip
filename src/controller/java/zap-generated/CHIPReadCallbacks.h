@@ -9799,7 +9799,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -10236,38 +10238,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback
-    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallbackType>
-{
-public:
-    CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback();
-
-    static void maybeDestroy(CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback
     : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType>
 {
@@ -10290,40 +10260,6 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback
-    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType>
-{
-public:
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback();
-
-    static void maybeDestroy(CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback>(callback);
-        }
-    }
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                   chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback *>(context)
-                ->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

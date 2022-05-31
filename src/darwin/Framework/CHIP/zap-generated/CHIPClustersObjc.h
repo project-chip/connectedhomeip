@@ -19878,8 +19878,8 @@ NS_ASSUME_NONNULL_BEGIN
                                        queue:(dispatch_queue_t)queue
                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSecurityPolicyWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                             NSError * _Nullable error))completionHandler;
+- (void)readAttributeSecurityPolicyWithCompletionHandler:
+    (void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
@@ -19889,12 +19889,13 @@ NS_ASSUME_NONNULL_BEGIN
                                                  params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
-                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+                                              (void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
+                                                  NSError * _Nullable error))reportHandler;
 + (void)readAttributeSecurityPolicyWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
-                                    completionHandler:
-                                        (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+                                    completionHandler:(void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
+                                                          NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -19912,24 +19913,31 @@ NS_ASSUME_NONNULL_BEGIN
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                           NSError * _Nullable error))completionHandler;
+- (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:
+    (void (^)(CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+        NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                               params:(CHIPSubscribeParams * _Nullable)params
-                                              subscriptionEstablished:
-                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                        reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                          NSError * _Nullable error))reportHandler;
-+ (void)readAttributeOperationalDatasetComponentsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                           endpoint:(NSNumber *)endpoint
-                                                              queue:(dispatch_queue_t)queue
-                                                  completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))completionHandler;
+- (void)
+    subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:
+                                                        (void (^)(
+                                                            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler;
++ (void)
+    readAttributeOperationalDatasetComponentsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:
+                                                  (void (^)(
+                                                      CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+                                                      NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
