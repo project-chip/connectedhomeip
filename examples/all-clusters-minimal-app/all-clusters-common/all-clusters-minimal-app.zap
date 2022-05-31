@@ -3348,7 +3348,7 @@
               "incoming": 1,
               "outgoing": 0
             }
-          ],          
+          ],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -3515,7 +3515,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "false",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
