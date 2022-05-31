@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
 #include <app/util/im-client-callbacks.h>
@@ -30,12 +30,7 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-typedef void (*AccessControlAclListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        data);
-typedef void (*AccessControlExtensionListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
-typedef void (*AccessControlAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AccessControlAclListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> & data);
+typedef void (*AccessControlExtensionListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
+typedef void (*AccessControlAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+

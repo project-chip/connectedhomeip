@@ -21,30 +21,5 @@
 
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
-#define MATTER_PLUGINS_INIT                                                                                                        \
-    MatterAccessControlPluginServerInitCallback();                                                                                 \
-    MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
-    MatterBasicPluginServerInitCallback();                                                                                         \
-    MatterDescriptorPluginServerInitCallback();                                                                                    \
-    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
-    MatterFixedLabelPluginServerInitCallback();                                                                                    \
-    MatterFlowMeasurementPluginClientInitCallback();                                                                               \
-    MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
-    MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
-    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
-    MatterGroupsPluginServerInitCallback();                                                                                        \
-    MatterIdentifyPluginServerInitCallback();                                                                                      \
-    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
-    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
-    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
-    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
-    MatterOnOffPluginClientInitCallback();                                                                                         \
-    MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
-    MatterPressureMeasurementPluginClientInitCallback();                                                                           \
-    MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
-    MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
-    MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
-    MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
-    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
-    MatterUnitLocalizationPluginServerInitCallback();                                                                              \
-    MatterUserLabelPluginServerInitCallback();
+#define MATTER_PLUGINS_INIT MatterAccessControlPluginServerInitCallback(); MatterAdministratorCommissioningPluginServerInitCallback(); MatterBasicPluginServerInitCallback(); MatterDescriptorPluginServerInitCallback(); MatterDiagnosticLogsPluginServerInitCallback(); MatterFixedLabelPluginServerInitCallback(); MatterFlowMeasurementPluginClientInitCallback(); MatterGeneralCommissioningPluginServerInitCallback(); MatterGeneralDiagnosticsPluginServerInitCallback(); MatterGroupKeyManagementPluginServerInitCallback(); MatterGroupsPluginServerInitCallback(); MatterIdentifyPluginServerInitCallback(); MatterLocalizationConfigurationPluginServerInitCallback(); MatterNetworkCommissioningPluginServerInitCallback(); MatterOtaSoftwareUpdateProviderPluginClientInitCallback(); MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); MatterOnOffPluginClientInitCallback(); MatterOperationalCredentialsPluginServerInitCallback(); MatterPressureMeasurementPluginClientInitCallback(); MatterPumpConfigurationAndControlPluginClientInitCallback(); MatterSoftwareDiagnosticsPluginServerInitCallback(); MatterTemperatureMeasurementPluginClientInitCallback(); MatterThreadNetworkDiagnosticsPluginServerInitCallback(); MatterTimeFormatLocalizationPluginServerInitCallback(); MatterUnitLocalizationPluginServerInitCallback(); MatterUserLabelPluginServerInitCallback(); 
+

@@ -21,1732 +21,1967 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+
+
+
+
+
+
+
 @implementation CHIPScenesClusterAttributeValuePair
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _attributeId = nil;
-
-        _attributeValue = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+    _attributeId = nil;
+    
+      _attributeValue = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPScenesClusterExtensionFieldSet
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _clusterId = @(0);
-
-        _attributeValueList = [NSArray array];
-    }
-    return self;
+    
+      _attributeValueList = [NSArray array];
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @implementation CHIPPowerProfileClusterPowerProfileRecord
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _powerProfileId = @(0);
-
+    
         _energyPhaseId = @(0);
-
+    
         _powerProfileRemoteControl = @(0);
-
+    
         _powerProfileState = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterScheduledPhase
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _energyPhaseId = @(0);
-
+    
         _scheduledTime = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPowerProfileClusterTransferredPhase
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _energyPhaseId = @(0);
-
+    
         _macroPhaseId = @(0);
-
+    
         _expectedDuration = @(0);
-
+    
         _peakPower = @(0);
-
+    
         _energy = @(0);
-
+    
         _maxActivationDelay = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
 
 @implementation CHIPDescriptorClusterDeviceType
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _type = @(0);
-
+    
         _revision = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPBindingClusterTargetStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _node = nil;
-
-        _group = nil;
-
-        _endpoint = nil;
-
-        _cluster = nil;
-
+  if (self = [super init]) {
+    
+    _node = nil;
+    
+    _group = nil;
+    
+    _endpoint = nil;
+    
+    _cluster = nil;
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPAccessControlClusterTarget
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _cluster = nil;
-
-        _endpoint = nil;
-
-        _deviceType = nil;
-    }
-    return self;
+  if (self = [super init]) {
+    
+    _cluster = nil;
+    
+    _endpoint = nil;
+    
+    _deviceType = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPAccessControlClusterAccessControlEntry
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _privilege = @(0);
-
+    
         _authMode = @(0);
-
-        _subjects = nil;
-
-        _targets = nil;
-
+    
+    _subjects = nil;
+    
+    _targets = nil;
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPAccessControlClusterExtensionEntry
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _data = [NSData data];
-
+  if (self = [super init]) {
+    
+      _data = [NSData data];
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPAccessControlClusterAccessControlEntryChangedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _adminNodeID = nil;
-
-        _adminPasscodeID = nil;
-
+  if (self = [super init]) {
+    
+    _adminNodeID = nil;
+    
+    _adminPasscodeID = nil;
+    
         _changeType = @(0);
-
-        _latestValue = nil;
-
+    
+    _latestValue = nil;
+    
         _adminFabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPAccessControlClusterAccessControlExtensionChangedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _adminNodeID = nil;
-
-        _adminPasscodeID = nil;
-
+  if (self = [super init]) {
+    
+    _adminNodeID = nil;
+    
+    _adminPasscodeID = nil;
+    
         _changeType = @(0);
-
-        _latestValue = nil;
-
+    
+    _latestValue = nil;
+    
         _adminFabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
 
 @implementation CHIPBridgedActionsClusterActionStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _actionID = @(0);
-
-        _name = @"";
-
+    
+      _name = @"";
+    
         _type = @(0);
-
+    
         _endpointListID = @(0);
-
+    
         _supportedCommands = @(0);
-
+    
         _status = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterEndpointListStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _endpointListID = @(0);
-
-        _name = @"";
-
+    
+      _name = @"";
+    
         _type = @(0);
-
-        _endpoints = [NSArray array];
-    }
-    return self;
+    
+      _endpoints = [NSArray array];
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPBridgedActionsClusterStateChangedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _actionID = @(0);
-
+    
         _invokeID = @(0);
-
+    
         _newState = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBridgedActionsClusterActionFailedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _actionID = @(0);
-
+    
         _invokeID = @(0);
-
+    
         _newState = @(0);
-
+    
         _error = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPBasicClusterCapabilityMinimaStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _caseSessionsPerFabric = @(0);
-
+    
         _subscriptionsPerFabric = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPBasicClusterStartUpEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _softwareVersion = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBasicClusterShutDownEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBasicClusterLeaveEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBasicClusterReachableChangedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _reachableNewValue = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
 
 @implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _providerNodeID = @(0);
-
+    
         _endpoint = @(0);
-
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _previousState = @(0);
-
+    
         _newState = @(0);
-
+    
         _reason = @(0);
-
-        _targetSoftwareVersion = nil;
-    }
-    return self;
+    
+    _targetSoftwareVersion = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _softwareVersion = @(0);
-
+    
         _productID = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _softwareVersion = @(0);
-
+    
         _bytesDownloaded = @(0);
-
-        _progressPercent = nil;
-
-        _platformCode = nil;
-    }
-    return self;
+    
+    _progressPercent = nil;
+    
+    _platformCode = nil;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
+
+
+
 
 @implementation CHIPPowerSourceClusterBatChargeFaultChangeType
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPowerSourceClusterBatFaultChangeType
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPowerSourceClusterWiredFaultChangeType
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPGeneralCommissioningClusterBasicCommissioningInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _failSafeExpiryLengthSeconds = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPNetworkCommissioningClusterNetworkInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _networkID = [NSData data];
-
+  if (self = [super init]) {
+    
+      _networkID = [NSData data];
+    
         _connected = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterThreadInterfaceScanResult
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _panId = @(0);
-
+    
         _extendedPanId = @(0);
-
-        _networkName = @"";
-
+    
+      _networkName = @"";
+    
         _channel = @(0);
-
+    
         _version = @(0);
-
-        _extendedAddress = [NSData data];
-
+    
+      _extendedAddress = [NSData data];
+    
         _rssi = @(0);
-
+    
         _lqi = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPNetworkCommissioningClusterWiFiInterfaceScanResult
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _security = @(0);
-
-        _ssid = [NSData data];
-
-        _bssid = [NSData data];
-
+    
+      _ssid = [NSData data];
+    
+      _bssid = [NSData data];
+    
         _channel = @(0);
-
+    
         _wiFiBand = @(0);
-
+    
         _rssi = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
+
 
 @implementation CHIPGeneralDiagnosticsClusterNetworkInterfaceType
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _name = @"";
-
+  if (self = [super init]) {
+    
+      _name = @"";
+    
         _isOperational = @(0);
-
-        _offPremiseServicesReachableIPv4 = nil;
-
-        _offPremiseServicesReachableIPv6 = nil;
-
-        _hardwareAddress = [NSData data];
-
-        _iPv4Addresses = [NSArray array];
-
-        _iPv6Addresses = [NSArray array];
-
+    
+    _offPremiseServicesReachableIPv4 = nil;
+    
+    _offPremiseServicesReachableIPv6 = nil;
+    
+      _hardwareAddress = [NSData data];
+    
+      _iPv4Addresses = [NSArray array];
+    
+      _iPv6Addresses = [NSArray array];
+    
         _type = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _current = [NSArray array];
-
-        _previous = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _current = [NSArray array];
+    
+      _previous = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPGeneralDiagnosticsClusterBootReasonEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _bootReason = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _id = @(0);
-
-        _name = @"";
-
-        _faultRecording = [NSData data];
-    }
-    return self;
+    
+      _name = @"";
+    
+      _faultRecording = [NSData data];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSoftwareDiagnosticsClusterThreadMetrics
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _id = @(0);
-
-        _name = @"";
-
+    
+      _name = @"";
+    
         _stackFreeCurrent = @(0);
-
+    
         _stackFreeMinimum = @(0);
-
+    
         _stackSize = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _softwareFault = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPThreadNetworkDiagnosticsClusterNeighborTable
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _extAddress = @(0);
-
+    
         _age = @(0);
-
+    
         _rloc16 = @(0);
-
+    
         _linkFrameCounter = @(0);
-
+    
         _mleFrameCounter = @(0);
-
+    
         _lqi = @(0);
-
-        _averageRssi = nil;
-
-        _lastRssi = nil;
-
+    
+    _averageRssi = nil;
+    
+    _lastRssi = nil;
+    
         _frameErrorRate = @(0);
-
+    
         _messageErrorRate = @(0);
-
+    
         _rxOnWhenIdle = @(0);
-
+    
         _fullThreadDevice = @(0);
-
+    
         _fullNetworkData = @(0);
-
+    
         _isChild = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _activeTimestampPresent = @(0);
-
+    
         _pendingTimestampPresent = @(0);
-
+    
         _masterKeyPresent = @(0);
-
+    
         _networkNamePresent = @(0);
-
+    
         _extendedPanIdPresent = @(0);
-
+    
         _meshLocalPrefixPresent = @(0);
-
+    
         _delayPresent = @(0);
-
+    
         _panIdPresent = @(0);
-
+    
         _channelPresent = @(0);
-
+    
         _pskcPresent = @(0);
-
+    
         _securityPolicyPresent = @(0);
-
+    
         _channelMaskPresent = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPThreadNetworkDiagnosticsClusterRouteTable
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _extAddress = @(0);
-
+    
         _rloc16 = @(0);
-
+    
         _routerId = @(0);
-
+    
         _nextHop = @(0);
-
+    
         _pathCost = @(0);
-
+    
         _lqiIn = @(0);
-
+    
         _lqiOut = @(0);
-
+    
         _age = @(0);
-
+    
         _allocated = @(0);
-
+    
         _linkEstablished = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPThreadNetworkDiagnosticsClusterSecurityPolicy
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _rotationTime = @(0);
-
+    
         _flags = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _connectionStatus = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _reasonCode = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _associationFailure = @(0);
-
+    
         _status = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _connectionStatus = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
 
 @implementation CHIPBridgedDeviceBasicClusterStartUpEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _softwareVersion = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBridgedDeviceBasicClusterShutDownEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBridgedDeviceBasicClusterLeaveEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPBridgedDeviceBasicClusterReachableChangedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _reachableNewValue = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPSwitchClusterSwitchLatchedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _newPosition = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterInitialPressEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _newPosition = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterLongPressEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _newPosition = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterShortReleaseEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _previousPosition = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterLongReleaseEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _previousPosition = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterMultiPressOngoingEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _newPosition = @(0);
-
+    
         _currentNumberOfPressesCounted = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPSwitchClusterMultiPressCompleteEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _newPosition = @(0);
-
+    
         _totalNumberOfPressesCounted = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
 
 @implementation CHIPOperationalCredentialsClusterFabricDescriptor
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _rootPublicKey = [NSData data];
-
+  if (self = [super init]) {
+    
+      _rootPublicKey = [NSData data];
+    
         _vendorId = @(0);
-
+    
         _fabricId = @(0);
-
+    
         _nodeId = @(0);
-
-        _label = @"";
-
+    
+      _label = @"";
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPOperationalCredentialsClusterNOCStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _noc = [NSData data];
-
-        _icac = nil;
-
+  if (self = [super init]) {
+    
+      _noc = [NSData data];
+    
+    _icac = nil;
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _groupId = @(0);
-
-        _endpoints = [NSArray array];
-
-        _groupName = nil;
-
+    
+      _endpoints = [NSArray array];
+    
+    _groupName = nil;
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterGroupKeyMapStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _groupId = @(0);
-
+    
         _groupKeySetID = @(0);
-
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPGroupKeyManagementClusterGroupKeySetStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _groupKeySetID = @(0);
-
+    
         _groupKeySecurityPolicy = @(0);
-
-        _epochKey0 = nil;
-
-        _epochStartTime0 = nil;
-
-        _epochKey1 = nil;
-
-        _epochStartTime1 = nil;
-
-        _epochKey2 = nil;
-
-        _epochStartTime2 = nil;
-    }
-    return self;
+    
+    _epochKey0 = nil;
+    
+    _epochStartTime0 = nil;
+    
+    _epochKey1 = nil;
+    
+    _epochStartTime1 = nil;
+    
+    _epochKey2 = nil;
+    
+    _epochStartTime2 = nil;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPFixedLabelClusterLabelStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _value = @"";
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _label = @"";
+    
+      _value = @"";
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPUserLabelClusterLabelStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _value = @"";
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _label = @"";
+    
+      _value = @"";
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
+
+
+
 
 @implementation CHIPBooleanStateClusterStateChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _stateValue = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPModeSelectClusterSemanticTag
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _mfgCode = @(0);
-
+    
         _value = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _label = @"";
-
+  if (self = [super init]) {
+    
+      _label = @"";
+    
         _mode = @(0);
-
-        _semanticTags = [NSArray array];
-    }
-    return self;
+    
+      _semanticTags = [NSArray array];
+  }
+  return self;
 }
 @end
+
+
+
+
 
 @implementation CHIPDoorLockClusterDlCredential
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _credentialType = @(0);
-
+    
         _credentialIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPDoorLockClusterDoorLockAlarmEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _alarmCode = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterDoorStateChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _doorState = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterLockOperationEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _lockOperationType = @(0);
-
+    
         _operationSource = @(0);
-
-        _userIndex = nil;
-
-        _fabricIndex = nil;
-
-        _sourceNode = nil;
-
-        _credentials = nil;
-    }
-    return self;
+    
+    _userIndex = nil;
+    
+    _fabricIndex = nil;
+    
+    _sourceNode = nil;
+    
+    _credentials = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterLockOperationErrorEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _lockOperationType = @(0);
-
+    
         _operationSource = @(0);
-
+    
         _operationError = @(0);
-
-        _userIndex = nil;
-
-        _fabricIndex = nil;
-
-        _sourceNode = nil;
-
-        _credentials = nil;
-    }
-    return self;
+    
+    _userIndex = nil;
+    
+    _fabricIndex = nil;
+    
+    _sourceNode = nil;
+    
+    _credentials = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPDoorLockClusterLockUserChangeEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _lockDataType = @(0);
-
+    
         _dataOperationType = @(0);
-
+    
         _operationSource = @(0);
-
-        _userIndex = nil;
-
-        _fabricIndex = nil;
-
-        _sourceNode = nil;
-
-        _dataIndex = nil;
-    }
-    return self;
+    
+    _userIndex = nil;
+    
+    _fabricIndex = nil;
+    
+    _sourceNode = nil;
+    
+    _dataIndex = nil;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
 
 @implementation CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterDryRunningEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterPumpBlockedEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterSensorFailureEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterGeneralFaultEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterLeakageEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterAirDetectionEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
 
 @implementation CHIPPumpConfigurationAndControlClusterTurbineOperationEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-    }
-    return self;
+  if (self = [super init]) {
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPThermostatClusterThermostatScheduleTransition
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _transitionTime = @(0);
-
-        _heatSetpoint = nil;
-
-        _coolSetpoint = nil;
-    }
-    return self;
+    
+    _heatSetpoint = nil;
+    
+    _coolSetpoint = nil;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @implementation CHIPIasAceClusterIasAceZoneStatusResult
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _zoneId = @(0);
-
+    
         _zoneStatus = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
 
 @implementation CHIPChannelClusterChannelInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _majorNumber = @(0);
-
+    
         _minorNumber = @(0);
-
-        _name = nil;
-
-        _callSign = nil;
-
-        _affiliateCallSign = nil;
-    }
-    return self;
+    
+    _name = nil;
+    
+    _callSign = nil;
+    
+    _affiliateCallSign = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPChannelClusterLineupInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _operatorName = @"";
-
-        _lineupName = nil;
-
-        _postalCode = nil;
-
+  if (self = [super init]) {
+    
+      _operatorName = @"";
+    
+    _lineupName = nil;
+    
+    _postalCode = nil;
+    
         _lineupInfoType = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPTargetNavigatorClusterTargetInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _identifier = @(0);
-
-        _name = @"";
-    }
-    return self;
+    
+      _name = @"";
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPMediaPlaybackClusterPlaybackPosition
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _updatedAt = @(0);
-
-        _position = nil;
-    }
-    return self;
+    
+    _position = nil;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPMediaInputClusterInputInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _index = @(0);
-
+    
         _inputType = @(0);
-
-        _name = @"";
-
-        _descriptionString = @"";
-    }
-    return self;
+    
+      _name = @"";
+    
+      _descriptionString = @"";
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
 
 @implementation CHIPContentLauncherClusterDimension
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _width = @(0);
-
+    
         _height = @(0);
-
+    
         _metric = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterAdditionalInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _name = @"";
-
-        _value = @"";
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _name = @"";
+    
+      _value = @"";
+  }
+  return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterParameter
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _type = @(0);
-
-        _value = @"";
-
-        _externalIDList = nil;
-    }
-    return self;
+    
+      _value = @"";
+    
+    _externalIDList = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterContentSearch
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _parameterList = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _parameterList = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterStyleInformation
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _imageUrl = nil;
-
-        _color = nil;
-
-        _size = nil;
-    }
-    return self;
+  if (self = [super init]) {
+    
+    _imageUrl = nil;
+    
+    _color = nil;
+    
+    _size = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPContentLauncherClusterBrandingInformation
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _providerName = @"";
-
-        _background = nil;
-
-        _logo = nil;
-
-        _progressBar = nil;
-
-        _splash = nil;
-
-        _waterMark = nil;
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _providerName = @"";
+    
+    _background = nil;
+    
+    _logo = nil;
+    
+    _progressBar = nil;
+    
+    _splash = nil;
+    
+    _waterMark = nil;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPAudioOutputClusterOutputInfo
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _index = @(0);
-
+    
         _outputType = @(0);
-
-        _name = @"";
-    }
-    return self;
+    
+      _name = @"";
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPApplicationLauncherClusterApplication
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _catalogVendorId = @(0);
-
-        _applicationId = @"";
-    }
-    return self;
+    
+      _applicationId = @"";
+  }
+  return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterApplicationEP
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _application = [CHIPApplicationLauncherClusterApplication new];
-
-        _endpoint = nil;
-    }
-    return self;
+    
+    _endpoint = nil;
+  }
+  return self;
 }
 @end
+
+
 
 @implementation CHIPApplicationBasicClusterApplicationBasicApplication
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _catalogVendorId = @(0);
-
-        _applicationId = @"";
-    }
-    return self;
+    
+      _applicationId = @"";
+  }
+  return self;
 }
 @end
+
+
+
+
 
 @implementation CHIPTestClusterClusterSimpleStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _a = @(0);
-
+    
         _b = @(0);
-
+    
         _c = @(0);
-
-        _d = [NSData data];
-
-        _e = @"";
-
+    
+      _d = [NSData data];
+    
+      _e = @"";
+    
         _f = @(0);
-
+    
         _g = @(0);
-
+    
         _h = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestFabricScoped
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _fabricSensitiveInt8u = @(0);
-
-        _optionalFabricSensitiveInt8u = nil;
-
-        _nullableFabricSensitiveInt8u = nil;
-
-        _nullableOptionalFabricSensitiveInt8u = nil;
-
-        _fabricSensitiveCharString = @"";
-
+    
+    _optionalFabricSensitiveInt8u = nil;
+    
+    _nullableFabricSensitiveInt8u = nil;
+    
+    _nullableOptionalFabricSensitiveInt8u = nil;
+    
+      _fabricSensitiveCharString = @"";
+    
         _fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
-
-        _fabricSensitiveInt8uList = [NSArray array];
-
+    
+      _fabricSensitiveInt8uList = [NSArray array];
+    
         _fabricIndex = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterNullablesAndOptionalsStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _nullableInt = nil;
-
-        _optionalInt = nil;
-
-        _nullableOptionalInt = nil;
-
-        _nullableString = nil;
-
-        _optionalString = nil;
-
-        _nullableOptionalString = nil;
-
-        _nullableStruct = nil;
-
-        _optionalStruct = nil;
-
-        _nullableOptionalStruct = nil;
-
-        _nullableList = nil;
-
-        _optionalList = nil;
-
-        _nullableOptionalList = nil;
-    }
-    return self;
+  if (self = [super init]) {
+    
+    _nullableInt = nil;
+    
+    _optionalInt = nil;
+    
+    _nullableOptionalInt = nil;
+    
+    _nullableString = nil;
+    
+    _optionalString = nil;
+    
+    _nullableOptionalString = nil;
+    
+    _nullableStruct = nil;
+    
+    _optionalStruct = nil;
+    
+    _nullableOptionalStruct = nil;
+    
+    _nullableList = nil;
+    
+    _optionalList = nil;
+    
+    _nullableOptionalList = nil;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterNestedStruct
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _a = @(0);
-
+    
         _b = @(0);
-
+    
         _c = [CHIPTestClusterClusterSimpleStruct new];
-    }
-    return self;
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterNestedStructList
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _a = @(0);
-
+    
         _b = @(0);
-
+    
         _c = [CHIPTestClusterClusterSimpleStruct new];
-
-        _d = [NSArray array];
-
-        _e = [NSArray array];
-
-        _f = [NSArray array];
-
-        _g = [NSArray array];
-    }
-    return self;
+    
+      _d = [NSArray array];
+    
+      _e = [NSArray array];
+    
+      _f = [NSArray array];
+    
+      _g = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterDoubleNestedStructList
 - (instancetype)init
 {
-    if (self = [super init]) {
-
-        _a = [NSArray array];
-    }
-    return self;
+  if (self = [super init]) {
+    
+      _a = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestListStructOctet
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _fabricIndex = @(0);
-
-        _operationalCert = [NSData data];
-    }
-    return self;
+    
+      _operationalCert = [NSData data];
+  }
+  return self;
 }
 @end
+
 
 @implementation CHIPTestClusterClusterTestEventEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _arg1 = @(0);
-
+    
         _arg2 = @(0);
-
+    
         _arg3 = @(0);
-
+    
         _arg4 = [CHIPTestClusterClusterSimpleStruct new];
-
-        _arg5 = [NSArray array];
-
-        _arg6 = [NSArray array];
-    }
-    return self;
+    
+      _arg5 = [NSArray array];
+    
+      _arg6 = [NSArray array];
+  }
+  return self;
 }
 @end
 
 @implementation CHIPTestClusterClusterTestFabricScopedEventEvent
 - (instancetype)init
 {
-    if (self = [super init]) {
-
+  if (self = [super init]) {
+    
         _arg1 = @(0);
-    }
-    return self;
+  }
+  return self;
 }
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 NS_ASSUME_NONNULL_END

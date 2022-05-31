@@ -22,53 +22,41 @@
 
 #include <lib/core/CHIPConfig.h>
 
+
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
 // Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
-#define GENERATED_DEFAULTS                                                                                                         \
-    {                                                                                                                              \
-    }
+#define GENERATED_DEFAULTS { \
+}
+
 
 #else // !BIGENDIAN_CPU
-#define GENERATED_DEFAULTS                                                                                                         \
-    {                                                                                                                              \
-    }
+#define GENERATED_DEFAULTS { \
+}
 
 #endif // BIGENDIAN_CPU
 
 #define GENERATED_DEFAULTS_COUNT (0)
 
-#define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
-#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
-    {                                                                                                                              \
-        &generatedDefaults[index]                                                                                                  \
-    }
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
-    {                                                                                                                              \
-        &minMaxDefaults[index]                                                                                                     \
-    }
-#define ZAP_EMPTY_DEFAULT()                                                                                                        \
-    {                                                                                                                              \
-        (uint32_t) 0                                                                                                               \
-    }
-#define ZAP_SIMPLE_DEFAULT(x)                                                                                                      \
-    {                                                                                                                              \
-        (uint32_t) x                                                                                                               \
-    }
+#define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
+#define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
+#define ZAP_EMPTY_DEFAULT() {(uint32_t) 0}
+#define ZAP_SIMPLE_DEFAULT(x) {(uint32_t) x}
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
-#define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {                                                                                                                              \
-    }
+#define GENERATED_MIN_MAX_DEFAULTS { \
+}
 
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
+
+#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_ ## mask
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 0
-#define GENERATED_ATTRIBUTES                                                                                                       \
-    {                                                                                                                              \
-    }
+#define GENERATED_ATTRIBUTES { \
+}
+
 
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
@@ -76,10 +64,14 @@
 #define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS
+#define GENERATED_FUNCTION_ARRAYS   \
 
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
+
+
+
+#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
 #define GENERATED_CLUSTER_COUNT 64
+
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -796,15 +788,17 @@
 #define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 0
 
 // This is an array of EmberAfEndpointType structures.
-#define GENERATED_ENDPOINT_TYPES                                                                                                   \
-    {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 64, 0 },                                                                                           \
-    }
+#define GENERATED_ENDPOINT_TYPES { \
+  { ZAP_CLUSTER_INDEX(0), 64, 0 }, \
+}
+
+
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (1)
 
-static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE, "ATTRIBUTE_LARGEST larger than expected");
+static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
+              "ATTRIBUTE_LARGEST larger than expected");
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
@@ -817,45 +811,23 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY                                                                                                       \
-    {                                                                                                                              \
-        0x0001                                                                                                                     \
-    }
+#define FIXED_ENDPOINT_ARRAY { 0x0001 }
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS                                                                                                          \
-    {                                                                                                                              \
-        0x0103                                                                                                                     \
-    }
+#define FIXED_PROFILE_IDS { 0x0103 }
 
 // Array of device types
-#define FIXED_DEVICE_TYPES                                                                                                         \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x0016, 1                                                                                                              \
-        }                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPES {{0x0016,1}}
 
 // Array of device type offsets
-#define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_OFFSETS { 0}
 
 // Array of device type lengths
-#define FIXED_DEVICE_TYPE_LENGTHS                                                                                                  \
-    {                                                                                                                              \
-        1                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_LENGTHS { 1}
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES                                                                                                       \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_ENDPOINT_TYPES { 0 }
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS                                                                                                             \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_NETWORKS { 0 }
+

@@ -39,46 +39,43 @@ namespace Identify {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyEffectIdentifier
-enum class IdentifyEffectIdentifier : uint8_t
-{
-    kBlink         = 0x00,
-    kBreathe       = 0x01,
-    kOkay          = 0x02,
-    kChannelChange = 0x0B,
-    kFinishEffect  = 0xFE,
-    kStopEffect    = 0xFF,
+enum class IdentifyEffectIdentifier : uint8_t {
+kBlink = 0x00,
+kBreathe = 0x01,
+kOkay = 0x02,
+kChannelChange = 0x0B,
+kFinishEffect = 0xFE,
+kStopEffect = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectIdentifier        = EmberAfIdentifyEffectIdentifier;
+using IdentifyEffectIdentifier = EmberAfIdentifyEffectIdentifier;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyEffectVariant
-enum class IdentifyEffectVariant : uint8_t
-{
-    kDefault = 0x00,
+enum class IdentifyEffectVariant : uint8_t {
+kDefault = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectVariant           = EmberAfIdentifyEffectVariant;
+using IdentifyEffectVariant = EmberAfIdentifyEffectVariant;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyIdentifyType
-enum class IdentifyIdentifyType : uint8_t
-{
-    kNone         = 0x00,
-    kVisibleLight = 0x01,
-    kVisibleLED   = 0x02,
-    kAudibleBeep  = 0x03,
-    kDisplay      = 0x04,
-    kActuator     = 0x05,
+enum class IdentifyIdentifyType : uint8_t {
+kNone = 0x00,
+kVisibleLight = 0x01,
+kVisibleLED = 0x02,
+kAudibleBeep = 0x03,
+kDisplay = 0x04,
+kActuator = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyIdentifyType            = EmberAfIdentifyIdentifyType;
+using IdentifyIdentifyType = EmberAfIdentifyIdentifyType;
 #endif
 } // namespace Identify
 
@@ -88,9 +85,8 @@ namespace Groups {
 namespace Scenes {
 
 // Bitmap for ScenesCopyMode
-enum class ScenesCopyMode : uint8_t
-{
-    kCopyAllScenes = 0x1,
+enum class ScenesCopyMode : uint8_t {
+kCopyAllScenes = 0x1,
 };
 } // namespace Scenes
 
@@ -100,11 +96,10 @@ namespace OnOff {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffDelayedAllOffEffectVariant
-enum class OnOffDelayedAllOffEffectVariant : uint8_t
-{
-    kFadeToOffIn0p8Seconds                                = 0x00,
-    kNoFade                                               = 0x01,
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
+enum class OnOffDelayedAllOffEffectVariant : uint8_t {
+kFadeToOffIn0p8Seconds = 0x00,
+kNoFade = 0x01,
+k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDelayedAllOffEffectVariant = EmberAfOnOffDelayedAllOffEffectVariant;
@@ -114,51 +109,45 @@ using OnOffDelayedAllOffEffectVariant = EmberAfOnOffDelayedAllOffEffectVariant;
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffDyingLightEffectVariant
-enum class OnOffDyingLightEffectVariant : uint8_t
-{
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
+enum class OnOffDyingLightEffectVariant : uint8_t {
+k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OnOffDyingLightEffectVariant    = EmberAfOnOffDyingLightEffectVariant;
+using OnOffDyingLightEffectVariant = EmberAfOnOffDyingLightEffectVariant;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffEffectIdentifier
-enum class OnOffEffectIdentifier : uint8_t
-{
-    kDelayedAllOff = 0x00,
-    kDyingLight    = 0x01,
+enum class OnOffEffectIdentifier : uint8_t {
+kDelayedAllOff = 0x00,
+kDyingLight = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
+using OnOffEffectIdentifier = EmberAfOnOffEffectIdentifier;
 #endif
 
 // Enum for OnOffStartUpOnOff
-enum class OnOffStartUpOnOff : uint8_t
-{
-    kOff                 = 0x00,
-    kOn                  = 0x01,
-    kTogglePreviousOnOff = 0x02,
+enum class OnOffStartUpOnOff : uint8_t {
+kOff = 0x00,
+kOn = 0x01,
+kTogglePreviousOnOff = 0x02,
 };
 
 // Bitmap for OnOffControl
-enum class OnOffControl : uint8_t
-{
-    kAcceptOnlyWhenOn = 0x1,
+enum class OnOffControl : uint8_t {
+kAcceptOnlyWhenOn = 0x1,
 };
 
 // Bitmap for OnOffFeature
-enum class OnOffFeature : uint32_t
-{
-    kLighting = 0x1,
+enum class OnOffFeature : uint32_t {
+kLighting = 0x1,
 };
 
 // Bitmap for SceneFeatures
-enum class SceneFeatures : uint32_t
-{
-    kSceneNames = 0x1,
+enum class SceneFeatures : uint32_t {
+kSceneNames = 0x1,
 };
 } // namespace OnOff
 
@@ -171,34 +160,31 @@ namespace LevelControl {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MoveMode
-enum class MoveMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
+enum class MoveMode : uint8_t {
+kUp = 0x00,
+kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                        = EmberAfMoveMode;
+using MoveMode = EmberAfMoveMode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StepMode
-enum class StepMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
+enum class StepMode : uint8_t {
+kUp = 0x00,
+kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                        = EmberAfStepMode;
+using StepMode = EmberAfStepMode;
 #endif
 
 // Bitmap for LevelControlFeature
-enum class LevelControlFeature : uint32_t
-{
-    kOnOff     = 0x1,
-    kLighting  = 0x2,
-    kFrequency = 0x4,
+enum class LevelControlFeature : uint32_t {
+kOnOff = 0x1,
+kLighting = 0x2,
+kFrequency = 0x4,
 };
 } // namespace LevelControl
 
@@ -217,56 +203,52 @@ namespace PowerProfile {
 namespace ApplianceControl {
 
 // Enum for ApplianceStatus
-enum class ApplianceStatus : uint8_t
-{
-    kOff                      = 0x01,
-    kStandBy                  = 0x02,
-    kProgrammed               = 0x03,
-    kProgrammedWaitingToStart = 0x04,
-    kRunning                  = 0x05,
-    kPause                    = 0x06,
-    kEndProgrammed            = 0x07,
-    kFailure                  = 0x08,
-    kProgrammeInterrupted     = 0x09,
-    kIdle                     = 0x0A,
-    kRinseHold                = 0x0B,
-    kService                  = 0x0C,
-    kSuperfreezing            = 0x0D,
-    kSupercooling             = 0x0E,
-    kSuperheating             = 0x0F,
+enum class ApplianceStatus : uint8_t {
+kOff = 0x01,
+kStandBy = 0x02,
+kProgrammed = 0x03,
+kProgrammedWaitingToStart = 0x04,
+kRunning = 0x05,
+kPause = 0x06,
+kEndProgrammed = 0x07,
+kFailure = 0x08,
+kProgrammeInterrupted = 0x09,
+kIdle = 0x0A,
+kRinseHold = 0x0B,
+kService = 0x0C,
+kSuperfreezing = 0x0D,
+kSupercooling = 0x0E,
+kSuperheating = 0x0F,
 };
 
 // Enum for CommandIdentification
-enum class CommandIdentification : uint8_t
-{
-    kStart                = 0x01,
-    kStop                 = 0x02,
-    kPause                = 0x03,
-    kStartSuperfreezing   = 0x04,
-    kStopSuperfreezing    = 0x05,
-    kStartSupercooling    = 0x06,
-    kStopSupercooling     = 0x07,
-    kDisableGas           = 0x08,
-    kEnableGas            = 0x09,
-    kEnableEnergyControl  = 0x0A,
-    kDisableEnergyControl = 0x0B,
+enum class CommandIdentification : uint8_t {
+kStart = 0x01,
+kStop = 0x02,
+kPause = 0x03,
+kStartSuperfreezing = 0x04,
+kStopSuperfreezing = 0x05,
+kStartSupercooling = 0x06,
+kStopSupercooling = 0x07,
+kDisableGas = 0x08,
+kEnableGas = 0x09,
+kEnableEnergyControl = 0x0A,
+kDisableEnergyControl = 0x0B,
 };
 
 // Enum for WarningEvent
-enum class WarningEvent : uint8_t
-{
-    kWarning1OverallPowerAboveAvailablePowerLevel                                      = 0x00,
-    kWarning2OverallPowerAbovePowerThresholdLevel                                      = 0x01,
-    kWarning3OverallPowerBackBelowTheAvailablePowerLevel                               = 0x02,
-    kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
-    kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
+enum class WarningEvent : uint8_t {
+kWarning1OverallPowerAboveAvailablePowerLevel = 0x00,
+kWarning2OverallPowerAbovePowerThresholdLevel = 0x01,
+kWarning3OverallPowerBackBelowTheAvailablePowerLevel = 0x02,
+kWarning4OverallPowerBackBelowThePowerThresholdLevel = 0x03,
+kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
 };
 
 // Bitmap for RemoteEnableFlagsAndDeviceStatus2
-enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
-{
-    kRemoteEnableFlags      = 0xF,
-    kDeviceStatus2Structure = 0xF0,
+enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t {
+kRemoteEnableFlags = 0xF,
+kDeviceStatus2Structure = 0xF0,
 };
 } // namespace ApplianceControl
 
@@ -282,29 +264,26 @@ namespace Binding {
 namespace AccessControl {
 
 // Enum for AuthMode
-enum class AuthMode : uint8_t
-{
-    kPase  = 0x01,
-    kCase  = 0x02,
-    kGroup = 0x03,
+enum class AuthMode : uint8_t {
+kPase = 0x01,
+kCase = 0x02,
+kGroup = 0x03,
 };
 
 // Enum for ChangeTypeEnum
-enum class ChangeTypeEnum : uint8_t
-{
-    kChanged = 0x00,
-    kAdded   = 0x01,
-    kRemoved = 0x02,
+enum class ChangeTypeEnum : uint8_t {
+kChanged = 0x00,
+kAdded = 0x01,
+kRemoved = 0x02,
 };
 
 // Enum for Privilege
-enum class Privilege : uint8_t
-{
-    kView       = 0x01,
-    kProxyView  = 0x02,
-    kOperate    = 0x03,
-    kManage     = 0x04,
-    kAdminister = 0x05,
+enum class Privilege : uint8_t {
+kView = 0x01,
+kProxyView = 0x02,
+kOperate = 0x03,
+kManage = 0x04,
+kAdminister = 0x05,
 };
 } // namespace AccessControl
 
@@ -314,56 +293,51 @@ namespace PollControl {
 namespace BridgedActions {
 
 // Enum for ActionErrorEnum
-enum class ActionErrorEnum : uint8_t
-{
-    kUnknown     = 0x00,
-    kInterrupted = 0x01,
+enum class ActionErrorEnum : uint8_t {
+kUnknown = 0x00,
+kInterrupted = 0x01,
 };
 
 // Enum for ActionStateEnum
-enum class ActionStateEnum : uint8_t
-{
-    kInactive = 0x00,
-    kActive   = 0x01,
-    kPaused   = 0x02,
-    kDisabled = 0x03,
+enum class ActionStateEnum : uint8_t {
+kInactive = 0x00,
+kActive = 0x01,
+kPaused = 0x02,
+kDisabled = 0x03,
 };
 
 // Enum for ActionTypeEnum
-enum class ActionTypeEnum : uint8_t
-{
-    kOther        = 0x00,
-    kScene        = 0x01,
-    kSequence     = 0x02,
-    kAutomation   = 0x03,
-    kException    = 0x04,
-    kNotification = 0x05,
-    kAlarm        = 0x06,
+enum class ActionTypeEnum : uint8_t {
+kOther = 0x00,
+kScene = 0x01,
+kSequence = 0x02,
+kAutomation = 0x03,
+kException = 0x04,
+kNotification = 0x05,
+kAlarm = 0x06,
 };
 
 // Enum for EndpointListTypeEnum
-enum class EndpointListTypeEnum : uint8_t
-{
-    kOther = 0x00,
-    kRoom  = 0x01,
-    kZone  = 0x02,
+enum class EndpointListTypeEnum : uint8_t {
+kOther = 0x00,
+kRoom = 0x01,
+kZone = 0x02,
 };
 
 // Bitmap for CommandBits
-enum class CommandBits : uint16_t
-{
-    kInstantAction               = 0x1,
-    kInstantActionWithTransition = 0x2,
-    kStartAction                 = 0x4,
-    kStartActionWithDuration     = 0x8,
-    kStopAction                  = 0x10,
-    kPauseAction                 = 0x20,
-    kPauseActionWithDuration     = 0x40,
-    kResumeAction                = 0x80,
-    kEnableAction                = 0x100,
-    kEnableActionWithDuration    = 0x200,
-    kDisableAction               = 0x400,
-    kDisableActionWithDuration   = 0x800,
+enum class CommandBits : uint16_t {
+kInstantAction = 0x1,
+kInstantActionWithTransition = 0x2,
+kStartAction = 0x4,
+kStartActionWithDuration = 0x8,
+kStopAction = 0x10,
+kPauseAction = 0x20,
+kPauseActionWithDuration = 0x40,
+kResumeAction = 0x80,
+kEnableAction = 0x100,
+kEnableActionWithDuration = 0x200,
+kDisableAction = 0x400,
+kDisableActionWithDuration = 0x800,
 };
 } // namespace BridgedActions
 
@@ -373,64 +347,58 @@ namespace Basic {
 namespace OtaSoftwareUpdateProvider {
 
 // Enum for OTAApplyUpdateAction
-enum class OTAApplyUpdateAction : uint8_t
-{
-    kProceed         = 0x00,
-    kAwaitNextAction = 0x01,
-    kDiscontinue     = 0x02,
+enum class OTAApplyUpdateAction : uint8_t {
+kProceed = 0x00,
+kAwaitNextAction = 0x01,
+kDiscontinue = 0x02,
 };
 
 // Enum for OTADownloadProtocol
-enum class OTADownloadProtocol : uint8_t
-{
-    kBDXSynchronous  = 0x00,
-    kBDXAsynchronous = 0x01,
-    kHttps           = 0x02,
-    kVendorSpecific  = 0x03,
+enum class OTADownloadProtocol : uint8_t {
+kBDXSynchronous = 0x00,
+kBDXAsynchronous = 0x01,
+kHttps = 0x02,
+kVendorSpecific = 0x03,
 };
 
 // Enum for OTAQueryStatus
-enum class OTAQueryStatus : uint8_t
-{
-    kUpdateAvailable              = 0x00,
-    kBusy                         = 0x01,
-    kNotAvailable                 = 0x02,
-    kDownloadProtocolNotSupported = 0x03,
+enum class OTAQueryStatus : uint8_t {
+kUpdateAvailable = 0x00,
+kBusy = 0x01,
+kNotAvailable = 0x02,
+kDownloadProtocolNotSupported = 0x03,
 };
 } // namespace OtaSoftwareUpdateProvider
 
 namespace OtaSoftwareUpdateRequestor {
 
 // Enum for OTAAnnouncementReason
-enum class OTAAnnouncementReason : uint8_t
-{
-    kSimpleAnnouncement    = 0x00,
-    kUpdateAvailable       = 0x01,
-    kUrgentUpdateAvailable = 0x02,
+enum class OTAAnnouncementReason : uint8_t {
+kSimpleAnnouncement = 0x00,
+kUpdateAvailable = 0x01,
+kUrgentUpdateAvailable = 0x02,
 };
 
 // Enum for OTAChangeReasonEnum
-enum class OTAChangeReasonEnum : uint8_t
-{
-    kUnknown         = 0x00,
-    kSuccess         = 0x01,
-    kFailure         = 0x02,
-    kTimeOut         = 0x03,
-    kDelayByProvider = 0x04,
+enum class OTAChangeReasonEnum : uint8_t {
+kUnknown = 0x00,
+kSuccess = 0x01,
+kFailure = 0x02,
+kTimeOut = 0x03,
+kDelayByProvider = 0x04,
 };
 
 // Enum for OTAUpdateStateEnum
-enum class OTAUpdateStateEnum : uint8_t
-{
-    kUnknown              = 0x00,
-    kIdle                 = 0x01,
-    kQuerying             = 0x02,
-    kDelayedOnQuery       = 0x03,
-    kDownloading          = 0x04,
-    kApplying             = 0x05,
-    kDelayedOnApply       = 0x06,
-    kRollingBack          = 0x07,
-    kDelayedOnUserConsent = 0x08,
+enum class OTAUpdateStateEnum : uint8_t {
+kUnknown = 0x00,
+kIdle = 0x01,
+kQuerying = 0x02,
+kDelayedOnQuery = 0x03,
+kDownloading = 0x04,
+kApplying = 0x05,
+kDelayedOnApply = 0x06,
+kRollingBack = 0x07,
+kDelayedOnUserConsent = 0x08,
 };
 } // namespace OtaSoftwareUpdateRequestor
 
@@ -440,44 +408,40 @@ namespace LocalizationConfiguration {
 namespace TimeFormatLocalization {
 
 // Enum for CalendarType
-enum class CalendarType : uint8_t
-{
-    kBuddhist  = 0x00,
-    kChinese   = 0x01,
-    kCoptic    = 0x02,
-    kEthiopian = 0x03,
-    kGregorian = 0x04,
-    kHebrew    = 0x05,
-    kIndian    = 0x06,
-    kIslamic   = 0x07,
-    kJapanese  = 0x08,
-    kKorean    = 0x09,
-    kPersian   = 0x0A,
-    kTaiwanese = 0x0B,
+enum class CalendarType : uint8_t {
+kBuddhist = 0x00,
+kChinese = 0x01,
+kCoptic = 0x02,
+kEthiopian = 0x03,
+kGregorian = 0x04,
+kHebrew = 0x05,
+kIndian = 0x06,
+kIslamic = 0x07,
+kJapanese = 0x08,
+kKorean = 0x09,
+kPersian = 0x0A,
+kTaiwanese = 0x0B,
 };
 
 // Enum for HourFormat
-enum class HourFormat : uint8_t
-{
-    k12hr = 0x00,
-    k24hr = 0x01,
+enum class HourFormat : uint8_t {
+k12hr = 0x00,
+k24hr = 0x01,
 };
 } // namespace TimeFormatLocalization
 
 namespace UnitLocalization {
 
 // Enum for TempUnit
-enum class TempUnit : uint8_t
-{
-    kFahrenheit = 0x00,
-    kCelsius    = 0x01,
-    kKelvin     = 0x02,
+enum class TempUnit : uint8_t {
+kFahrenheit = 0x00,
+kCelsius = 0x01,
+kKelvin = 0x02,
 };
 
 // Bitmap for UnitLocalizationFeature
-enum class UnitLocalizationFeature : uint32_t
-{
-    kTemperatureUnit = 0x1,
+enum class UnitLocalizationFeature : uint32_t {
+kTemperatureUnit = 0x1,
 };
 } // namespace UnitLocalization
 
@@ -487,270 +451,247 @@ namespace PowerSourceConfiguration {
 namespace PowerSource {
 
 // Enum for BatChargeFaultType
-enum class BatChargeFaultType : uint8_t
-{
-    kUnspecfied          = 0x00,
-    kAmbientTooHot       = 0x01,
-    kAmbientTooCold      = 0x02,
-    kBatteryTooHot       = 0x03,
-    kBatteryTooCold      = 0x04,
-    kBatteryAbsent       = 0x05,
-    kBatteryOverVoltage  = 0x06,
-    kBatteryUnderVoltage = 0x07,
-    kChargerOverVoltage  = 0x08,
-    kChargerUnderVoltage = 0x09,
-    kSafetyTimeout       = 0x0A,
+enum class BatChargeFaultType : uint8_t {
+kUnspecfied = 0x00,
+kAmbientTooHot = 0x01,
+kAmbientTooCold = 0x02,
+kBatteryTooHot = 0x03,
+kBatteryTooCold = 0x04,
+kBatteryAbsent = 0x05,
+kBatteryOverVoltage = 0x06,
+kBatteryUnderVoltage = 0x07,
+kChargerOverVoltage = 0x08,
+kChargerUnderVoltage = 0x09,
+kSafetyTimeout = 0x0A,
 };
 
 // Enum for BatChargeLevel
-enum class BatChargeLevel : uint8_t
-{
-    kOk       = 0x00,
-    kWarning  = 0x01,
-    kCritical = 0x02,
+enum class BatChargeLevel : uint8_t {
+kOk = 0x00,
+kWarning = 0x01,
+kCritical = 0x02,
 };
 
 // Enum for BatChargeState
-enum class BatChargeState : uint8_t
-{
-    kUnknown        = 0x00,
-    kIsCharging     = 0x01,
-    kIsAtFullCharge = 0x02,
-    kIsNotCharging  = 0x03,
+enum class BatChargeState : uint8_t {
+kUnknown = 0x00,
+kIsCharging = 0x01,
+kIsAtFullCharge = 0x02,
+kIsNotCharging = 0x03,
 };
 
 // Enum for BatFaultType
-enum class BatFaultType : uint8_t
-{
-    kUnspecfied = 0x00,
-    kOverTemp   = 0x01,
-    kUnderTemp  = 0x02,
+enum class BatFaultType : uint8_t {
+kUnspecfied = 0x00,
+kOverTemp = 0x01,
+kUnderTemp = 0x02,
 };
 
 // Enum for BatReplaceability
-enum class BatReplaceability : uint8_t
-{
-    kUnspecified        = 0x00,
-    kNotReplaceable     = 0x01,
-    kUserReplaceable    = 0x02,
-    kFactoryReplaceable = 0x03,
+enum class BatReplaceability : uint8_t {
+kUnspecified = 0x00,
+kNotReplaceable = 0x01,
+kUserReplaceable = 0x02,
+kFactoryReplaceable = 0x03,
 };
 
 // Enum for PowerSourceStatus
-enum class PowerSourceStatus : uint8_t
-{
-    kUnspecfied  = 0x00,
-    kActive      = 0x01,
-    kStandby     = 0x02,
-    kUnavailable = 0x03,
+enum class PowerSourceStatus : uint8_t {
+kUnspecfied = 0x00,
+kActive = 0x01,
+kStandby = 0x02,
+kUnavailable = 0x03,
 };
 
 // Enum for WiredCurrentType
-enum class WiredCurrentType : uint8_t
-{
-    kAc = 0x00,
-    kDc = 0x01,
+enum class WiredCurrentType : uint8_t {
+kAc = 0x00,
+kDc = 0x01,
 };
 
 // Enum for WiredFaultType
-enum class WiredFaultType : uint8_t
-{
-    kUnspecfied   = 0x00,
-    kOverVoltage  = 0x01,
-    kUnderVoltage = 0x02,
+enum class WiredFaultType : uint8_t {
+kUnspecfied = 0x00,
+kOverVoltage = 0x01,
+kUnderVoltage = 0x02,
 };
 
 // Bitmap for PowerSourceFeature
-enum class PowerSourceFeature : uint32_t
-{
-    kWired        = 0x1,
-    kBattery      = 0x2,
-    kRechargeable = 0x4,
-    kReplaceable  = 0x8,
+enum class PowerSourceFeature : uint32_t {
+kWired = 0x1,
+kBattery = 0x2,
+kRechargeable = 0x4,
+kReplaceable = 0x8,
 };
 } // namespace PowerSource
 
 namespace GeneralCommissioning {
 
 // Enum for CommissioningError
-enum class CommissioningError : uint8_t
-{
-    kOk                    = 0x00,
-    kValueOutsideRange     = 0x01,
-    kInvalidAuthentication = 0x02,
-    kNoFailSafe            = 0x03,
-    kBusyWithOtherAdmin    = 0x04,
+enum class CommissioningError : uint8_t {
+kOk = 0x00,
+kValueOutsideRange = 0x01,
+kInvalidAuthentication = 0x02,
+kNoFailSafe = 0x03,
+kBusyWithOtherAdmin = 0x04,
 };
 
 // Enum for RegulatoryLocationType
-enum class RegulatoryLocationType : uint8_t
-{
-    kIndoor        = 0x00,
-    kOutdoor       = 0x01,
-    kIndoorOutdoor = 0x02,
+enum class RegulatoryLocationType : uint8_t {
+kIndoor = 0x00,
+kOutdoor = 0x01,
+kIndoorOutdoor = 0x02,
 };
 } // namespace GeneralCommissioning
 
 namespace NetworkCommissioning {
 
 // Enum for NetworkCommissioningStatus
-enum class NetworkCommissioningStatus : uint8_t
-{
-    kSuccess                = 0x00,
-    kOutOfRange             = 0x01,
-    kBoundsExceeded         = 0x02,
-    kNetworkIDNotFound      = 0x03,
-    kDuplicateNetworkID     = 0x04,
-    kNetworkNotFound        = 0x05,
-    kRegulatoryError        = 0x06,
-    kAuthFailure            = 0x07,
-    kUnsupportedSecurity    = 0x08,
-    kOtherConnectionFailure = 0x09,
-    kIPV6Failed             = 0x0A,
-    kIPBindFailed           = 0x0B,
-    kUnknownError           = 0x0C,
+enum class NetworkCommissioningStatus : uint8_t {
+kSuccess = 0x00,
+kOutOfRange = 0x01,
+kBoundsExceeded = 0x02,
+kNetworkIDNotFound = 0x03,
+kDuplicateNetworkID = 0x04,
+kNetworkNotFound = 0x05,
+kRegulatoryError = 0x06,
+kAuthFailure = 0x07,
+kUnsupportedSecurity = 0x08,
+kOtherConnectionFailure = 0x09,
+kIPV6Failed = 0x0A,
+kIPBindFailed = 0x0B,
+kUnknownError = 0x0C,
 };
 
 // Enum for WiFiBand
-enum class WiFiBand : uint8_t
-{
-    k2g4  = 0x00,
-    k3g65 = 0x01,
-    k5g   = 0x02,
-    k6g   = 0x03,
-    k60g  = 0x04,
+enum class WiFiBand : uint8_t {
+k2g4 = 0x00,
+k3g65 = 0x01,
+k5g = 0x02,
+k6g = 0x03,
+k60g = 0x04,
 };
 
 // Bitmap for NetworkCommissioningFeature
-enum class NetworkCommissioningFeature : uint32_t
-{
-    kWiFiNetworkInterface     = 0x1,
-    kThreadNetworkInterface   = 0x2,
-    kEthernetNetworkInterface = 0x4,
+enum class NetworkCommissioningFeature : uint32_t {
+kWiFiNetworkInterface = 0x1,
+kThreadNetworkInterface = 0x2,
+kEthernetNetworkInterface = 0x4,
 };
 
 // Bitmap for WiFiSecurity
-enum class WiFiSecurity : uint8_t
-{
-    kUnencrypted  = 0x1,
-    kWepPersonal  = 0x2,
-    kWpaPersonal  = 0x4,
-    kWpa2Personal = 0x8,
-    kWpa3Personal = 0x10,
+enum class WiFiSecurity : uint8_t {
+kUnencrypted = 0x1,
+kWepPersonal = 0x2,
+kWpaPersonal = 0x4,
+kWpa2Personal = 0x8,
+kWpa3Personal = 0x10,
 };
 } // namespace NetworkCommissioning
 
 namespace DiagnosticLogs {
 
 // Enum for LogsIntent
-enum class LogsIntent : uint8_t
-{
-    kEndUserSupport = 0x00,
-    kNetworkDiag    = 0x01,
-    kCrashLogs      = 0x02,
+enum class LogsIntent : uint8_t {
+kEndUserSupport = 0x00,
+kNetworkDiag = 0x01,
+kCrashLogs = 0x02,
 };
 
 // Enum for LogsStatus
-enum class LogsStatus : uint8_t
-{
-    kSuccess   = 0x00,
-    kExhausted = 0x01,
-    kNoLogs    = 0x02,
-    kBusy      = 0x03,
-    kDenied    = 0x04,
+enum class LogsStatus : uint8_t {
+kSuccess = 0x00,
+kExhausted = 0x01,
+kNoLogs = 0x02,
+kBusy = 0x03,
+kDenied = 0x04,
 };
 
 // Enum for LogsTransferProtocol
-enum class LogsTransferProtocol : uint8_t
-{
-    kResponsePayload = 0x00,
-    kBdx             = 0x01,
+enum class LogsTransferProtocol : uint8_t {
+kResponsePayload = 0x00,
+kBdx = 0x01,
 };
 } // namespace DiagnosticLogs
 
 namespace GeneralDiagnostics {
 
 // Enum for BootReasonType
-enum class BootReasonType : uint8_t
-{
-    kUnspecified             = 0x00,
-    kPowerOnReboot           = 0x01,
-    kBrownOutReset           = 0x02,
-    kSoftwareWatchdogReset   = 0x03,
-    kHardwareWatchdogReset   = 0x04,
-    kSoftwareUpdateCompleted = 0x05,
-    kSoftwareReset           = 0x06,
+enum class BootReasonType : uint8_t {
+kUnspecified = 0x00,
+kPowerOnReboot = 0x01,
+kBrownOutReset = 0x02,
+kSoftwareWatchdogReset = 0x03,
+kHardwareWatchdogReset = 0x04,
+kSoftwareUpdateCompleted = 0x05,
+kSoftwareReset = 0x06,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HardwareFaultType
-enum class HardwareFaultType : uint8_t
-{
-    kUnspecified            = 0x00,
-    kRadio                  = 0x01,
-    kSensor                 = 0x02,
-    kResettableOverTemp     = 0x03,
-    kNonResettableOverTemp  = 0x04,
-    kPowerSource            = 0x05,
-    kVisualDisplayFault     = 0x06,
-    kAudioOutputFault       = 0x07,
-    kUserInterfaceFault     = 0x08,
-    kNonVolatileMemoryError = 0x09,
-    kTamperDetected         = 0x0A,
+enum class HardwareFaultType : uint8_t {
+kUnspecified = 0x00,
+kRadio = 0x01,
+kSensor = 0x02,
+kResettableOverTemp = 0x03,
+kNonResettableOverTemp = 0x04,
+kPowerSource = 0x05,
+kVisualDisplayFault = 0x06,
+kAudioOutputFault = 0x07,
+kUserInterfaceFault = 0x08,
+kNonVolatileMemoryError = 0x09,
+kTamperDetected = 0x0A,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFaultType               = EmberAfHardwareFaultType;
+using HardwareFaultType = EmberAfHardwareFaultType;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for InterfaceType
-enum class InterfaceType : uint8_t
-{
-    kUnspecified = 0x00,
-    kWiFi        = 0x01,
-    kEthernet    = 0x02,
-    kCellular    = 0x03,
-    kThread      = 0x04,
+enum class InterfaceType : uint8_t {
+kUnspecified = 0x00,
+kWiFi = 0x01,
+kEthernet = 0x02,
+kCellular = 0x03,
+kThread = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceType                   = EmberAfInterfaceType;
+using InterfaceType = EmberAfInterfaceType;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFaultType
-enum class NetworkFaultType : uint8_t
-{
-    kUnspecified      = 0x00,
-    kHardwareFailure  = 0x01,
-    kNetworkJammed    = 0x02,
-    kConnectionFailed = 0x03,
+enum class NetworkFaultType : uint8_t {
+kUnspecified = 0x00,
+kHardwareFailure = 0x01,
+kNetworkJammed = 0x02,
+kConnectionFailed = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultType                = EmberAfNetworkFaultType;
+using NetworkFaultType = EmberAfNetworkFaultType;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RadioFaultType
-enum class RadioFaultType : uint8_t
-{
-    kUnspecified   = 0x00,
-    kWiFiFault     = 0x01,
-    kCellularFault = 0x02,
-    kThreadFault   = 0x03,
-    kNFCFault      = 0x04,
-    kBLEFault      = 0x05,
-    kEthernetFault = 0x06,
+enum class RadioFaultType : uint8_t {
+kUnspecified = 0x00,
+kWiFiFault = 0x01,
+kCellularFault = 0x02,
+kThreadFault = 0x03,
+kNFCFault = 0x04,
+kBLEFault = 0x05,
+kEthernetFault = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultType                  = EmberAfRadioFaultType;
+using RadioFaultType = EmberAfRadioFaultType;
 #endif
 } // namespace GeneralDiagnostics
 
@@ -760,99 +701,91 @@ namespace SoftwareDiagnostics {
 namespace ThreadNetworkDiagnostics {
 
 // Enum for NetworkFault
-enum class NetworkFault : uint8_t
-{
-    kUnspecified     = 0x00,
-    kLinkDown        = 0x01,
-    kHardwareFailure = 0x02,
-    kNetworkJammed   = 0x03,
+enum class NetworkFault : uint8_t {
+kUnspecified = 0x00,
+kLinkDown = 0x01,
+kHardwareFailure = 0x02,
+kNetworkJammed = 0x03,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RoutingRole
-enum class RoutingRole : uint8_t
-{
-    kUnspecified     = 0x00,
-    kUnassigned      = 0x01,
-    kSleepyEndDevice = 0x02,
-    kEndDevice       = 0x03,
-    kReed            = 0x04,
-    kRouter          = 0x05,
-    kLeader          = 0x06,
+enum class RoutingRole : uint8_t {
+kUnspecified = 0x00,
+kUnassigned = 0x01,
+kSleepyEndDevice = 0x02,
+kEndDevice = 0x03,
+kReed = 0x04,
+kRouter = 0x05,
+kLeader = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RoutingRole                     = EmberAfRoutingRole;
+using RoutingRole = EmberAfRoutingRole;
 #endif
 
 // Enum for ThreadConnectionStatus
-enum class ThreadConnectionStatus : uint8_t
-{
-    kConnected    = 0x00,
-    kNotConnected = 0x01,
+enum class ThreadConnectionStatus : uint8_t {
+kConnected = 0x00,
+kNotConnected = 0x01,
 };
 
 // Bitmap for ThreadNetworkDiagnosticsFeature
-enum class ThreadNetworkDiagnosticsFeature : uint32_t
-{
-    kPacketCounts = 0x1,
-    kErrorCounts  = 0x2,
-    kMLECounts    = 0x4,
-    kMACCounts    = 0x8,
+enum class ThreadNetworkDiagnosticsFeature : uint32_t {
+kPacketCounts = 0x1,
+kErrorCounts = 0x2,
+kMLECounts = 0x4,
+kMACCounts = 0x8,
 };
 } // namespace ThreadNetworkDiagnostics
 
 namespace WiFiNetworkDiagnostics {
 
 // Enum for AssociationFailureCause
-enum class AssociationFailureCause : uint8_t
-{
-    kUnknown              = 0x00,
-    kAssociationFailed    = 0x01,
-    kAuthenticationFailed = 0x02,
-    kSsidNotFound         = 0x03,
+enum class AssociationFailureCause : uint8_t {
+kUnknown = 0x00,
+kAssociationFailed = 0x01,
+kAuthenticationFailed = 0x02,
+kSsidNotFound = 0x03,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SecurityType
-enum class SecurityType : uint8_t
-{
-    kUnspecified = 0x00,
-    kNone        = 0x01,
-    kWep         = 0x02,
-    kWpa         = 0x03,
-    kWpa2        = 0x04,
-    kWpa3        = 0x05,
+enum class SecurityType : uint8_t {
+kUnspecified = 0x00,
+kNone = 0x01,
+kWep = 0x02,
+kWpa = 0x03,
+kWpa2 = 0x04,
+kWpa3 = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SecurityType                    = EmberAfSecurityType;
+using SecurityType = EmberAfSecurityType;
 #endif
 
 // Enum for WiFiConnectionStatus
-enum class WiFiConnectionStatus : uint8_t
-{
-    kConnected    = 0x00,
-    kNotConnected = 0x01,
+enum class WiFiConnectionStatus : uint8_t {
+kConnected = 0x00,
+kNotConnected = 0x01,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
-enum class WiFiVersionType : uint8_t
-{
-    k80211a  = 0x00,
-    k80211b  = 0x01,
-    k80211g  = 0x02,
-    k80211n  = 0x03,
-    k80211ac = 0x04,
-    k80211ax = 0x05,
+enum class WiFiVersionType : uint8_t {
+k80211a = 0x00,
+k80211b = 0x01,
+k80211g = 0x02,
+k80211n = 0x03,
+k80211ac = 0x04,
+k80211ax = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WiFiVersionType                 = EmberAfWiFiVersionType;
+using WiFiVersionType = EmberAfWiFiVersionType;
 #endif
 } // namespace WiFiNetworkDiagnostics
 
@@ -862,21 +795,20 @@ namespace EthernetNetworkDiagnostics {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PHYRateType
-enum class PHYRateType : uint8_t
-{
-    k10m   = 0x00,
-    k100m  = 0x01,
-    k1000m = 0x02,
-    k25g   = 0x03,
-    k5g    = 0x04,
-    k10g   = 0x05,
-    k40g   = 0x06,
-    k100g  = 0x07,
-    k200g  = 0x08,
-    k400g  = 0x09,
+enum class PHYRateType : uint8_t {
+k10m = 0x00,
+k100m = 0x01,
+k1000m = 0x02,
+k25g = 0x03,
+k5g = 0x04,
+k10g = 0x05,
+k40g = 0x06,
+k100g = 0x07,
+k200g = 0x08,
+k400g = 0x09,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateType                     = EmberAfPHYRateType;
+using PHYRateType = EmberAfPHYRateType;
 #endif
 } // namespace EthernetNetworkDiagnostics
 
@@ -892,54 +824,50 @@ namespace Switch {
 namespace AdministratorCommissioning {
 
 // Enum for CommissioningWindowStatus
-enum class CommissioningWindowStatus : uint8_t
-{
-    kWindowNotOpen      = 0x00,
-    kEnhancedWindowOpen = 0x01,
-    kBasicWindowOpen    = 0x02,
+enum class CommissioningWindowStatus : uint8_t {
+kWindowNotOpen = 0x00,
+kEnhancedWindowOpen = 0x01,
+kBasicWindowOpen = 0x02,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StatusCode
-enum class StatusCode : uint8_t
-{
-    kBusy               = 0x01,
-    kPAKEParameterError = 0x02,
-    kWindowNotOpen      = 0x03,
+enum class StatusCode : uint8_t {
+kBusy = 0x01,
+kPAKEParameterError = 0x02,
+kWindowNotOpen = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StatusCode                      = EmberAfStatusCode;
+using StatusCode = EmberAfStatusCode;
 #endif
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
 
 // Enum for OperationalCertStatus
-enum class OperationalCertStatus : uint8_t
-{
-    kSuccess               = 0x00,
-    kInvalidPublicKey      = 0x01,
-    kInvalidNodeOpId       = 0x02,
-    kInvalidNOC            = 0x03,
-    kMissingCsr            = 0x04,
-    kTableFull             = 0x05,
-    kInvalidAdminSubject   = 0x06,
-    kInsufficientPrivilege = 0x08,
-    kFabricConflict        = 0x09,
-    kLabelConflict         = 0x0A,
-    kInvalidFabricIndex    = 0x0B,
+enum class OperationalCertStatus : uint8_t {
+kSuccess = 0x00,
+kInvalidPublicKey = 0x01,
+kInvalidNodeOpId = 0x02,
+kInvalidNOC = 0x03,
+kMissingCsr = 0x04,
+kTableFull = 0x05,
+kInvalidAdminSubject = 0x06,
+kInsufficientPrivilege = 0x08,
+kFabricConflict = 0x09,
+kLabelConflict = 0x0A,
+kInvalidFabricIndex = 0x0B,
 };
 } // namespace OperationalCredentials
 
 namespace GroupKeyManagement {
 
 // Enum for GroupKeySecurityPolicy
-enum class GroupKeySecurityPolicy : uint8_t
-{
-    kTrustFirst   = 0x00,
-    kCacheAndSync = 0x01,
+enum class GroupKeySecurityPolicy : uint8_t {
+kTrustFirst = 0x00,
+kCacheAndSync = 0x01,
 };
 } // namespace GroupKeyManagement
 
@@ -964,9 +892,8 @@ namespace BooleanState {
 namespace ModeSelect {
 
 // Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kDeponoff = 0x1,
+enum class ModeSelectFeature : uint32_t {
+kDeponoff = 0x1,
 };
 } // namespace ModeSelect
 
@@ -976,517 +903,474 @@ namespace ShadeConfiguration {
 namespace DoorLock {
 
 // Enum for DlAlarmCode
-enum class DlAlarmCode : uint8_t
-{
-    kLockJammed              = 0x00,
-    kLockFactoryReset        = 0x01,
-    kLockRadioPowerCycled    = 0x03,
-    kWrongCodeEntryLimit     = 0x04,
-    kFrontEsceutcheonRemoved = 0x05,
-    kDoorForcedOpen          = 0x06,
-    kDoorAjar                = 0x07,
-    kForcedUser              = 0x08,
+enum class DlAlarmCode : uint8_t {
+kLockJammed = 0x00,
+kLockFactoryReset = 0x01,
+kLockRadioPowerCycled = 0x03,
+kWrongCodeEntryLimit = 0x04,
+kFrontEsceutcheonRemoved = 0x05,
+kDoorForcedOpen = 0x06,
+kDoorAjar = 0x07,
+kForcedUser = 0x08,
 };
 
 // Enum for DlCredentialRule
-enum class DlCredentialRule : uint8_t
-{
-    kSingle = 0x00,
-    kDouble = 0x01,
-    kTri    = 0x02,
+enum class DlCredentialRule : uint8_t {
+kSingle = 0x00,
+kDouble = 0x01,
+kTri = 0x02,
 };
 
 // Enum for DlCredentialType
-enum class DlCredentialType : uint8_t
-{
-    kProgrammingPIN = 0x00,
-    kPin            = 0x01,
-    kRfid           = 0x02,
-    kFingerprint    = 0x03,
-    kFingerVein     = 0x04,
-    kFace           = 0x05,
+enum class DlCredentialType : uint8_t {
+kProgrammingPIN = 0x00,
+kPin = 0x01,
+kRfid = 0x02,
+kFingerprint = 0x03,
+kFingerVein = 0x04,
+kFace = 0x05,
 };
 
 // Enum for DlDataOperationType
-enum class DlDataOperationType : uint8_t
-{
-    kAdd    = 0x00,
-    kClear  = 0x01,
-    kModify = 0x02,
+enum class DlDataOperationType : uint8_t {
+kAdd = 0x00,
+kClear = 0x01,
+kModify = 0x02,
 };
 
 // Enum for DlDoorState
-enum class DlDoorState : uint8_t
-{
-    kDoorOpen             = 0x00,
-    kDoorClosed           = 0x01,
-    kDoorJammed           = 0x02,
-    kDoorForcedOpen       = 0x03,
-    kDoorUnspecifiedError = 0x04,
-    kDoorAjar             = 0x05,
+enum class DlDoorState : uint8_t {
+kDoorOpen = 0x00,
+kDoorClosed = 0x01,
+kDoorJammed = 0x02,
+kDoorForcedOpen = 0x03,
+kDoorUnspecifiedError = 0x04,
+kDoorAjar = 0x05,
 };
 
 // Enum for DlLockDataType
-enum class DlLockDataType : uint8_t
-{
-    kUnspecified     = 0x00,
-    kProgrammingCode = 0x01,
-    kUserIndex       = 0x02,
-    kWeekDaySchedule = 0x03,
-    kYearDaySchedule = 0x04,
-    kHolidaySchedule = 0x05,
-    kPin             = 0x06,
-    kRfid            = 0x07,
-    kFingerprint     = 0x08,
+enum class DlLockDataType : uint8_t {
+kUnspecified = 0x00,
+kProgrammingCode = 0x01,
+kUserIndex = 0x02,
+kWeekDaySchedule = 0x03,
+kYearDaySchedule = 0x04,
+kHolidaySchedule = 0x05,
+kPin = 0x06,
+kRfid = 0x07,
+kFingerprint = 0x08,
 };
 
 // Enum for DlLockOperationType
-enum class DlLockOperationType : uint8_t
-{
-    kLock               = 0x00,
-    kUnlock             = 0x01,
-    kNonAccessUserEvent = 0x02,
-    kForcedUserEvent    = 0x03,
+enum class DlLockOperationType : uint8_t {
+kLock = 0x00,
+kUnlock = 0x01,
+kNonAccessUserEvent = 0x02,
+kForcedUserEvent = 0x03,
 };
 
 // Enum for DlLockState
-enum class DlLockState : uint8_t
-{
-    kNotFullyLocked = 0x00,
-    kLocked         = 0x01,
-    kUnlocked       = 0x02,
+enum class DlLockState : uint8_t {
+kNotFullyLocked = 0x00,
+kLocked = 0x01,
+kUnlocked = 0x02,
 };
 
 // Enum for DlLockType
-enum class DlLockType : uint8_t
-{
-    kDeadBolt           = 0x00,
-    kMagnetic           = 0x01,
-    kOther              = 0x02,
-    kMortise            = 0x03,
-    kRim                = 0x04,
-    kLatchBolt          = 0x05,
-    kCylindricalLock    = 0x06,
-    kTubularLock        = 0x07,
-    kInterconnectedLock = 0x08,
-    kDeadLatch          = 0x09,
-    kDoorFurniture      = 0x0A,
+enum class DlLockType : uint8_t {
+kDeadBolt = 0x00,
+kMagnetic = 0x01,
+kOther = 0x02,
+kMortise = 0x03,
+kRim = 0x04,
+kLatchBolt = 0x05,
+kCylindricalLock = 0x06,
+kTubularLock = 0x07,
+kInterconnectedLock = 0x08,
+kDeadLatch = 0x09,
+kDoorFurniture = 0x0A,
 };
 
 // Enum for DlOperatingMode
-enum class DlOperatingMode : uint8_t
-{
-    kNormal             = 0x00,
-    kVacation           = 0x01,
-    kPrivacy            = 0x02,
-    kNoRemoteLockUnlock = 0x03,
-    kPassage            = 0x04,
+enum class DlOperatingMode : uint8_t {
+kNormal = 0x00,
+kVacation = 0x01,
+kPrivacy = 0x02,
+kNoRemoteLockUnlock = 0x03,
+kPassage = 0x04,
 };
 
 // Enum for DlOperationError
-enum class DlOperationError : uint8_t
-{
-    kUnspecified         = 0x00,
-    kInvalidCredential   = 0x01,
-    kDisabledUserDenied  = 0x02,
-    kRestricted          = 0x03,
-    kInsufficientBattery = 0x04,
+enum class DlOperationError : uint8_t {
+kUnspecified = 0x00,
+kInvalidCredential = 0x01,
+kDisabledUserDenied = 0x02,
+kRestricted = 0x03,
+kInsufficientBattery = 0x04,
 };
 
 // Enum for DlOperationSource
-enum class DlOperationSource : uint8_t
-{
-    kUnspecified       = 0x00,
-    kManual            = 0x01,
-    kProprietaryRemote = 0x02,
-    kKeypad            = 0x03,
-    kAuto              = 0x04,
-    kButton            = 0x05,
-    kSchedule          = 0x06,
-    kRemote            = 0x07,
-    kRfid              = 0x08,
-    kBiometric         = 0x09,
+enum class DlOperationSource : uint8_t {
+kUnspecified = 0x00,
+kManual = 0x01,
+kProprietaryRemote = 0x02,
+kKeypad = 0x03,
+kAuto = 0x04,
+kButton = 0x05,
+kSchedule = 0x06,
+kRemote = 0x07,
+kRfid = 0x08,
+kBiometric = 0x09,
 };
 
 // Enum for DlStatus
-enum class DlStatus : uint8_t
-{
-    kSuccess           = 0x00,
-    kFailure           = 0x01,
-    kDuplicate         = 0x02,
-    kOccupied          = 0x03,
-    kInvalidField      = 0x85,
-    kResourceExhausted = 0x89,
-    kNotFound          = 0x8B,
+enum class DlStatus : uint8_t {
+kSuccess = 0x00,
+kFailure = 0x01,
+kDuplicate = 0x02,
+kOccupied = 0x03,
+kInvalidField = 0x85,
+kResourceExhausted = 0x89,
+kNotFound = 0x8B,
 };
 
 // Enum for DlUserStatus
-enum class DlUserStatus : uint8_t
-{
-    kAvailable        = 0x00,
-    kOccupiedEnabled  = 0x01,
-    kOccupiedDisabled = 0x03,
+enum class DlUserStatus : uint8_t {
+kAvailable = 0x00,
+kOccupiedEnabled = 0x01,
+kOccupiedDisabled = 0x03,
 };
 
 // Enum for DlUserType
-enum class DlUserType : uint8_t
-{
-    kUnrestrictedUser       = 0x00,
-    kYearDayScheduleUser    = 0x01,
-    kWeekDayScheduleUser    = 0x02,
-    kProgrammingUser        = 0x03,
-    kNonAccessUser          = 0x04,
-    kForcedUser             = 0x05,
-    kDisposableUser         = 0x06,
-    kExpiringUser           = 0x07,
-    kScheduleRestrictedUser = 0x08,
-    kRemoteOnlyUser         = 0x09,
+enum class DlUserType : uint8_t {
+kUnrestrictedUser = 0x00,
+kYearDayScheduleUser = 0x01,
+kWeekDayScheduleUser = 0x02,
+kProgrammingUser = 0x03,
+kNonAccessUser = 0x04,
+kForcedUser = 0x05,
+kDisposableUser = 0x06,
+kExpiringUser = 0x07,
+kScheduleRestrictedUser = 0x08,
+kRemoteOnlyUser = 0x09,
 };
 
 // Enum for DoorLockOperationEventCode
-enum class DoorLockOperationEventCode : uint8_t
-{
-    kUnknownOrMfgSpecific  = 0x00,
-    kLock                  = 0x01,
-    kUnlock                = 0x02,
-    kLockInvalidPinOrId    = 0x03,
-    kLockInvalidSchedule   = 0x04,
-    kUnlockInvalidPinOrId  = 0x05,
-    kUnlockInvalidSchedule = 0x06,
-    kOneTouchLock          = 0x07,
-    kKeyLock               = 0x08,
-    kKeyUnlock             = 0x09,
-    kAutoLock              = 0x0A,
-    kScheduleLock          = 0x0B,
-    kScheduleUnlock        = 0x0C,
-    kManualLock            = 0x0D,
-    kManualUnlock          = 0x0E,
+enum class DoorLockOperationEventCode : uint8_t {
+kUnknownOrMfgSpecific = 0x00,
+kLock = 0x01,
+kUnlock = 0x02,
+kLockInvalidPinOrId = 0x03,
+kLockInvalidSchedule = 0x04,
+kUnlockInvalidPinOrId = 0x05,
+kUnlockInvalidSchedule = 0x06,
+kOneTouchLock = 0x07,
+kKeyLock = 0x08,
+kKeyUnlock = 0x09,
+kAutoLock = 0x0A,
+kScheduleLock = 0x0B,
+kScheduleUnlock = 0x0C,
+kManualLock = 0x0D,
+kManualUnlock = 0x0E,
 };
 
 // Enum for DoorLockProgrammingEventCode
-enum class DoorLockProgrammingEventCode : uint8_t
-{
-    kUnknownOrMfgSpecific = 0x00,
-    kMasterCodeChanged    = 0x01,
-    kPinAdded             = 0x02,
-    kPinDeleted           = 0x03,
-    kPinChanged           = 0x04,
-    kIdAdded              = 0x05,
-    kIdDeleted            = 0x06,
+enum class DoorLockProgrammingEventCode : uint8_t {
+kUnknownOrMfgSpecific = 0x00,
+kMasterCodeChanged = 0x01,
+kPinAdded = 0x02,
+kPinDeleted = 0x03,
+kPinChanged = 0x04,
+kIdAdded = 0x05,
+kIdDeleted = 0x06,
 };
 
 // Enum for DoorLockSetPinOrIdStatus
-enum class DoorLockSetPinOrIdStatus : uint8_t
-{
-    kSuccess            = 0x00,
-    kGeneralFailure     = 0x01,
-    kMemoryFull         = 0x02,
-    kDuplicateCodeError = 0x03,
+enum class DoorLockSetPinOrIdStatus : uint8_t {
+kSuccess = 0x00,
+kGeneralFailure = 0x01,
+kMemoryFull = 0x02,
+kDuplicateCodeError = 0x03,
 };
 
 // Enum for DoorLockUserStatus
-enum class DoorLockUserStatus : uint8_t
-{
-    kAvailable        = 0x00,
-    kOccupiedEnabled  = 0x01,
-    kOccupiedDisabled = 0x03,
-    kNotSupported     = 0xFF,
+enum class DoorLockUserStatus : uint8_t {
+kAvailable = 0x00,
+kOccupiedEnabled = 0x01,
+kOccupiedDisabled = 0x03,
+kNotSupported = 0xFF,
 };
 
 // Enum for DoorLockUserType
-enum class DoorLockUserType : uint8_t
-{
-    kUnrestricted        = 0x00,
-    kYearDayScheduleUser = 0x01,
-    kWeekDayScheduleUser = 0x02,
-    kMasterUser          = 0x03,
-    kNonAccessUser       = 0x04,
-    kNotSupported        = 0xFF,
+enum class DoorLockUserType : uint8_t {
+kUnrestricted = 0x00,
+kYearDayScheduleUser = 0x01,
+kWeekDayScheduleUser = 0x02,
+kMasterUser = 0x03,
+kNonAccessUser = 0x04,
+kNotSupported = 0xFF,
 };
 
 // Bitmap for DlAlarmMask
-enum class DlAlarmMask : uint16_t
-{
-    kLockingMechanismJammed                 = 0x1,
-    kLockResetToFactoryDefaults             = 0x2,
-    kReserved                               = 0x4,
-    kRFModulePowerCycled                    = 0x8,
-    kWrongCodeEntryLimit                    = 0x10,
-    kFrontEscutcheonRemovedFromMain         = 0x20,
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40,
+enum class DlAlarmMask : uint16_t {
+kLockingMechanismJammed = 0x1,
+kLockResetToFactoryDefaults = 0x2,
+kReserved = 0x4,
+kRFModulePowerCycled = 0x8,
+kWrongCodeEntryLimit = 0x10,
+kFrontEscutcheonRemovedFromMain = 0x20,
+kForcedDoorOpenUnderDoorLockedCondition = 0x40,
 };
 
 // Bitmap for DlCredentialRuleMask
-enum class DlCredentialRuleMask : uint8_t
-{
-    kSingle = 0x1,
-    kDual   = 0x2,
-    kTri    = 0x4,
+enum class DlCredentialRuleMask : uint8_t {
+kSingle = 0x1,
+kDual = 0x2,
+kTri = 0x4,
 };
 
 // Bitmap for DlCredentialRulesSupport
-enum class DlCredentialRulesSupport : uint8_t
-{
-    kSingle = 0x1,
-    kDual   = 0x2,
-    kTri    = 0x4,
+enum class DlCredentialRulesSupport : uint8_t {
+kSingle = 0x1,
+kDual = 0x2,
+kTri = 0x4,
 };
 
 // Bitmap for DlDaysMaskMap
-enum class DlDaysMaskMap : uint8_t
-{
-    kSunday    = 0x1,
-    kMonday    = 0x2,
-    kTuesday   = 0x4,
-    kWednesday = 0x8,
-    kThursday  = 0x10,
-    kFriday    = 0x20,
-    kSaturday  = 0x40,
+enum class DlDaysMaskMap : uint8_t {
+kSunday = 0x1,
+kMonday = 0x2,
+kTuesday = 0x4,
+kWednesday = 0x8,
+kThursday = 0x10,
+kFriday = 0x20,
+kSaturday = 0x40,
 };
 
 // Bitmap for DlDefaultConfigurationRegister
-enum class DlDefaultConfigurationRegister : uint16_t
-{
-    kEnableLocalProgrammingEnabled         = 0x1,
-    kKeypadInterfaceDefaultAccessEnabled   = 0x2,
-    kRemoteInterfaceDefaultAccessIsEnabled = 0x4,
-    kSoundEnabled                          = 0x20,
-    kAutoRelockTimeSet                     = 0x40,
-    kLEDSettingsSet                        = 0x80,
+enum class DlDefaultConfigurationRegister : uint16_t {
+kEnableLocalProgrammingEnabled = 0x1,
+kKeypadInterfaceDefaultAccessEnabled = 0x2,
+kRemoteInterfaceDefaultAccessIsEnabled = 0x4,
+kSoundEnabled = 0x20,
+kAutoRelockTimeSet = 0x40,
+kLEDSettingsSet = 0x80,
 };
 
 // Bitmap for DlKeypadOperationEventMask
-enum class DlKeypadOperationEventMask : uint16_t
-{
-    kUnknown               = 0x1,
-    kLock                  = 0x2,
-    kUnlock                = 0x4,
-    kLockInvalidPIN        = 0x8,
-    kLockInvalidSchedule   = 0x10,
-    kUnlockInvalidCode     = 0x20,
-    kUnlockInvalidSchedule = 0x40,
-    kNonAccessUserOpEvent  = 0x80,
+enum class DlKeypadOperationEventMask : uint16_t {
+kUnknown = 0x1,
+kLock = 0x2,
+kUnlock = 0x4,
+kLockInvalidPIN = 0x8,
+kLockInvalidSchedule = 0x10,
+kUnlockInvalidCode = 0x20,
+kUnlockInvalidSchedule = 0x40,
+kNonAccessUserOpEvent = 0x80,
 };
 
 // Bitmap for DlKeypadProgrammingEventMask
-enum class DlKeypadProgrammingEventMask : uint16_t
-{
-    kUnknown               = 0x1,
-    kProgrammingPINChanged = 0x2,
-    kPINAdded              = 0x4,
-    kPINCleared            = 0x8,
-    kPINChanged            = 0x10,
+enum class DlKeypadProgrammingEventMask : uint16_t {
+kUnknown = 0x1,
+kProgrammingPINChanged = 0x2,
+kPINAdded = 0x4,
+kPINCleared = 0x8,
+kPINChanged = 0x10,
 };
 
 // Bitmap for DlLocalProgrammingFeatures
-enum class DlLocalProgrammingFeatures : uint8_t
-{
-    kAddUsersCredentialsSchedulesLocally    = 0x1,
-    kModifyUsersCredentialsSchedulesLocally = 0x2,
-    kClearUsersCredentialsSchedulesLocally  = 0x4,
-    kAdjustLockSettingsLocally              = 0x8,
+enum class DlLocalProgrammingFeatures : uint8_t {
+kAddUsersCredentialsSchedulesLocally = 0x1,
+kModifyUsersCredentialsSchedulesLocally = 0x2,
+kClearUsersCredentialsSchedulesLocally = 0x4,
+kAdjustLockSettingsLocally = 0x8,
 };
 
 // Bitmap for DlManualOperationEventMask
-enum class DlManualOperationEventMask : uint16_t
-{
-    kUnknown         = 0x1,
-    kThumbturnLock   = 0x2,
-    kThumbturnUnlock = 0x4,
-    kOneTouchLock    = 0x8,
-    kKeyLock         = 0x10,
-    kKeyUnlock       = 0x20,
-    kAutoLock        = 0x40,
-    kScheduleLock    = 0x80,
-    kScheduleUnlock  = 0x100,
-    kManualLock      = 0x200,
-    kManualUnlock    = 0x400,
+enum class DlManualOperationEventMask : uint16_t {
+kUnknown = 0x1,
+kThumbturnLock = 0x2,
+kThumbturnUnlock = 0x4,
+kOneTouchLock = 0x8,
+kKeyLock = 0x10,
+kKeyUnlock = 0x20,
+kAutoLock = 0x40,
+kScheduleLock = 0x80,
+kScheduleUnlock = 0x100,
+kManualLock = 0x200,
+kManualUnlock = 0x400,
 };
 
 // Bitmap for DlRFIDOperationEventMask
-enum class DlRFIDOperationEventMask : uint16_t
-{
-    kUnknown               = 0x1,
-    kLock                  = 0x2,
-    kUnlock                = 0x4,
-    kLockInvalidRFID       = 0x8,
-    kLockInvalidSchedule   = 0x10,
-    kUnlockInvalidRFID     = 0x20,
-    kUnlockInvalidSchedule = 0x40,
+enum class DlRFIDOperationEventMask : uint16_t {
+kUnknown = 0x1,
+kLock = 0x2,
+kUnlock = 0x4,
+kLockInvalidRFID = 0x8,
+kLockInvalidSchedule = 0x10,
+kUnlockInvalidRFID = 0x20,
+kUnlockInvalidSchedule = 0x40,
 };
 
 // Bitmap for DlRFIDProgrammingEventMask
-enum class DlRFIDProgrammingEventMask : uint16_t
-{
-    kUnknown         = 0x1,
-    kRFIDCodeAdded   = 0x20,
-    kRFIDCodeCleared = 0x40,
+enum class DlRFIDProgrammingEventMask : uint16_t {
+kUnknown = 0x1,
+kRFIDCodeAdded = 0x20,
+kRFIDCodeCleared = 0x40,
 };
 
 // Bitmap for DlRemoteOperationEventMask
-enum class DlRemoteOperationEventMask : uint16_t
-{
-    kUnknown               = 0x1,
-    kLock                  = 0x2,
-    kUnlock                = 0x4,
-    kLockInvalidCode       = 0x8,
-    kLockInvalidSchedule   = 0x10,
-    kUnlockInvalidCode     = 0x20,
-    kUnlockInvalidSchedule = 0x40,
+enum class DlRemoteOperationEventMask : uint16_t {
+kUnknown = 0x1,
+kLock = 0x2,
+kUnlock = 0x4,
+kLockInvalidCode = 0x8,
+kLockInvalidSchedule = 0x10,
+kUnlockInvalidCode = 0x20,
+kUnlockInvalidSchedule = 0x40,
 };
 
 // Bitmap for DlRemoteProgrammingEventMask
-enum class DlRemoteProgrammingEventMask : uint16_t
-{
-    kUnknown               = 0x1,
-    kProgrammingPINChanged = 0x2,
-    kPINAdded              = 0x4,
-    kPINCleared            = 0x8,
-    kPINChanged            = 0x10,
-    kRFIDCodeAdded         = 0x20,
-    kRFIDCodeCleared       = 0x40,
+enum class DlRemoteProgrammingEventMask : uint16_t {
+kUnknown = 0x1,
+kProgrammingPINChanged = 0x2,
+kPINAdded = 0x4,
+kPINCleared = 0x8,
+kPINChanged = 0x10,
+kRFIDCodeAdded = 0x20,
+kRFIDCodeCleared = 0x40,
 };
 
 // Bitmap for DlSupportedOperatingModes
-enum class DlSupportedOperatingModes : uint16_t
-{
-    kNormal             = 0x1,
-    kVacation           = 0x2,
-    kPrivacy            = 0x4,
-    kNoRemoteLockUnlock = 0x8,
-    kPassage            = 0x10,
+enum class DlSupportedOperatingModes : uint16_t {
+kNormal = 0x1,
+kVacation = 0x2,
+kPrivacy = 0x4,
+kNoRemoteLockUnlock = 0x8,
+kPassage = 0x10,
 };
 
 // Bitmap for DoorLockDayOfWeek
-enum class DoorLockDayOfWeek : uint8_t
-{
-    kSunday    = 0x1,
-    kMonday    = 0x2,
-    kTuesday   = 0x4,
-    kWednesday = 0x8,
-    kThursday  = 0x10,
-    kFriday    = 0x20,
-    kSaturday  = 0x40,
+enum class DoorLockDayOfWeek : uint8_t {
+kSunday = 0x1,
+kMonday = 0x2,
+kTuesday = 0x4,
+kWednesday = 0x8,
+kThursday = 0x10,
+kFriday = 0x20,
+kSaturday = 0x40,
 };
 
 // Bitmap for DoorLockFeature
-enum class DoorLockFeature : uint32_t
-{
-    kPINCredentials     = 0x1,
-    kRFIDCredentials    = 0x2,
-    kFingerCredentials  = 0x4,
-    kLogging            = 0x8,
-    kAccessSchedules    = 0x10,
-    kDoorPositionSensor = 0x20,
-    kFaceCredentials    = 0x40,
-    kCredentialsOTA     = 0x80,
-    kUsersManagement    = 0x100,
-    kNotifications      = 0x200,
+enum class DoorLockFeature : uint32_t {
+kPINCredentials = 0x1,
+kRFIDCredentials = 0x2,
+kFingerCredentials = 0x4,
+kLogging = 0x8,
+kAccessSchedules = 0x10,
+kDoorPositionSensor = 0x20,
+kFaceCredentials = 0x40,
+kCredentialsOTA = 0x80,
+kUsersManagement = 0x100,
+kNotifications = 0x200,
 };
 } // namespace DoorLock
 
 namespace WindowCovering {
 
 // Enum for EndProductType
-enum class EndProductType : uint8_t
-{
-    kRollerShade               = 0x00,
-    kRomanShade                = 0x01,
-    kBalloonShade              = 0x02,
-    kWovenWood                 = 0x03,
-    kPleatedShade              = 0x04,
-    kCellularShade             = 0x05,
-    kLayeredShade              = 0x06,
-    kLayeredShade2D            = 0x07,
-    kSheerShade                = 0x08,
-    kTiltOnlyInteriorBlind     = 0x09,
-    kInteriorBlind             = 0x0A,
-    kVerticalBlindStripCurtain = 0x0B,
-    kInteriorVenetianBlind     = 0x0C,
-    kExteriorVenetianBlind     = 0x0D,
-    kLateralLeftCurtain        = 0x0E,
-    kLateralRightCurtain       = 0x0F,
-    kCentralCurtain            = 0x10,
-    kRollerShutter             = 0x11,
-    kExteriorVerticalScreen    = 0x12,
-    kAwningTerracePatio        = 0x13,
-    kAwningVerticalScreen      = 0x14,
-    kTiltOnlyPergola           = 0x15,
-    kSwingingShutter           = 0x16,
-    kSlidingShutter            = 0x17,
-    kUnknown                   = 0xFF,
+enum class EndProductType : uint8_t {
+kRollerShade = 0x00,
+kRomanShade = 0x01,
+kBalloonShade = 0x02,
+kWovenWood = 0x03,
+kPleatedShade = 0x04,
+kCellularShade = 0x05,
+kLayeredShade = 0x06,
+kLayeredShade2D = 0x07,
+kSheerShade = 0x08,
+kTiltOnlyInteriorBlind = 0x09,
+kInteriorBlind = 0x0A,
+kVerticalBlindStripCurtain = 0x0B,
+kInteriorVenetianBlind = 0x0C,
+kExteriorVenetianBlind = 0x0D,
+kLateralLeftCurtain = 0x0E,
+kLateralRightCurtain = 0x0F,
+kCentralCurtain = 0x10,
+kRollerShutter = 0x11,
+kExteriorVerticalScreen = 0x12,
+kAwningTerracePatio = 0x13,
+kAwningVerticalScreen = 0x14,
+kTiltOnlyPergola = 0x15,
+kSwingingShutter = 0x16,
+kSlidingShutter = 0x17,
+kUnknown = 0xFF,
 };
 
 // Enum for Type
-enum class Type : uint8_t
-{
-    kRollerShade               = 0x00,
-    kRollerShade2Motor         = 0x01,
-    kRollerShadeExterior       = 0x02,
-    kRollerShadeExterior2Motor = 0x03,
-    kDrapery                   = 0x04,
-    kAwning                    = 0x05,
-    kShutter                   = 0x06,
-    kTiltBlindTiltOnly         = 0x07,
-    kTiltBlindLiftAndTilt      = 0x08,
-    kProjectorScreen           = 0x09,
-    kUnknown                   = 0xFF,
+enum class Type : uint8_t {
+kRollerShade = 0x00,
+kRollerShade2Motor = 0x01,
+kRollerShadeExterior = 0x02,
+kRollerShadeExterior2Motor = 0x03,
+kDrapery = 0x04,
+kAwning = 0x05,
+kShutter = 0x06,
+kTiltBlindTiltOnly = 0x07,
+kTiltBlindLiftAndTilt = 0x08,
+kProjectorScreen = 0x09,
+kUnknown = 0xFF,
 };
 
 // Bitmap for ConfigStatus
-enum class ConfigStatus : uint8_t
-{
-    kOperational           = 0x1,
-    kOnlineReserved        = 0x2,
-    kLiftMovementReversed  = 0x4,
-    kLiftPositionAware     = 0x8,
-    kTiltPositionAware     = 0x10,
-    kLiftEncoderControlled = 0x20,
-    kTiltEncoderControlled = 0x40,
+enum class ConfigStatus : uint8_t {
+kOperational = 0x1,
+kOnlineReserved = 0x2,
+kLiftMovementReversed = 0x4,
+kLiftPositionAware = 0x8,
+kTiltPositionAware = 0x10,
+kLiftEncoderControlled = 0x20,
+kTiltEncoderControlled = 0x40,
 };
 
 // Bitmap for Mode
-enum class Mode : uint8_t
-{
-    kMotorDirectionReversed = 0x1,
-    kCalibrationMode        = 0x2,
-    kMaintenanceMode        = 0x4,
-    kLedFeedback            = 0x8,
+enum class Mode : uint8_t {
+kMotorDirectionReversed = 0x1,
+kCalibrationMode = 0x2,
+kMaintenanceMode = 0x4,
+kLedFeedback = 0x8,
 };
 
 // Bitmap for WcFeature
-enum class WcFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
+enum class WcFeature : uint32_t {
+kLift = 0x1,
+kTilt = 0x2,
+kPositionAwareLift = 0x4,
+kAbsolutePosition = 0x8,
+kPositionAwareTilt = 0x10,
 };
 
 // Bitmap for WcOperationalStatus
-enum class WcOperationalStatus : uint8_t
-{
-    kGlobal = 0x3,
-    kLift   = 0xC,
-    kTilt   = 0x30,
+enum class WcOperationalStatus : uint8_t {
+kGlobal = 0x3,
+kLift = 0xC,
+kTilt = 0x30,
 };
 
 // Bitmap for WcSafetyStatus
-enum class WcSafetyStatus : uint16_t
-{
-    kRemoteLockout       = 0x1,
-    kTamperDetection     = 0x2,
-    kFailedCommunication = 0x4,
-    kPositionFailure     = 0x8,
-    kThermalProtection   = 0x10,
-    kObstacleDetected    = 0x20,
-    kPower               = 0x40,
-    kStopInput           = 0x80,
-    kMotorJammed         = 0x100,
-    kHardwareFailure     = 0x200,
-    kManualOperation     = 0x400,
-    kProtection          = 0x800,
+enum class WcSafetyStatus : uint16_t {
+kRemoteLockout = 0x1,
+kTamperDetection = 0x2,
+kFailedCommunication = 0x4,
+kPositionFailure = 0x8,
+kThermalProtection = 0x10,
+kObstacleDetected = 0x20,
+kPower = 0x40,
+kStopInput = 0x80,
+kMotorJammed = 0x100,
+kHardwareFailure = 0x200,
+kManualOperation = 0x400,
+kProtection = 0x800,
 };
 } // namespace WindowCovering
 
@@ -1496,37 +1380,34 @@ namespace BarrierControl {
 namespace PumpConfigurationAndControl {
 
 // Enum for PumpControlMode
-enum class PumpControlMode : uint8_t
-{
-    kConstantSpeed        = 0x00,
-    kConstantPressure     = 0x01,
-    kProportionalPressure = 0x02,
-    kConstantFlow         = 0x03,
-    kConstantTemperature  = 0x05,
-    kAutomatic            = 0x07,
+enum class PumpControlMode : uint8_t {
+kConstantSpeed = 0x00,
+kConstantPressure = 0x01,
+kProportionalPressure = 0x02,
+kConstantFlow = 0x03,
+kConstantTemperature = 0x05,
+kAutomatic = 0x07,
 };
 
 // Enum for PumpOperationMode
-enum class PumpOperationMode : uint8_t
-{
-    kNormal  = 0x00,
-    kMinimum = 0x01,
-    kMaximum = 0x02,
-    kLocal   = 0x03,
+enum class PumpOperationMode : uint8_t {
+kNormal = 0x00,
+kMinimum = 0x01,
+kMaximum = 0x02,
+kLocal = 0x03,
 };
 
 // Bitmap for PumpStatus
-enum class PumpStatus : uint16_t
-{
-    kDeviceFault       = 0x1,
-    kSupplyfault       = 0x2,
-    kSpeedLow          = 0x4,
-    kSpeedHigh         = 0x8,
-    kLocalOverride     = 0x10,
-    kRunning           = 0x20,
-    kRemotePressure    = 0x40,
-    kRemoteFlow        = 0x80,
-    kRemoteTemperature = 0x100,
+enum class PumpStatus : uint16_t {
+kDeviceFault = 0x1,
+kSupplyfault = 0x2,
+kSpeedLow = 0x4,
+kSpeedHigh = 0x8,
+kLocalOverride = 0x10,
+kRunning = 0x20,
+kRemotePressure = 0x40,
+kRemoteFlow = 0x80,
+kRemoteTemperature = 0x100,
 };
 } // namespace PumpConfigurationAndControl
 
@@ -1536,133 +1417,120 @@ namespace Thermostat {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SetpointAdjustMode
-enum class SetpointAdjustMode : uint8_t
-{
-    kHeatSetpoint         = 0x00,
-    kCoolSetpoint         = 0x01,
-    kHeatAndCoolSetpoints = 0x02,
+enum class SetpointAdjustMode : uint8_t {
+kHeatSetpoint = 0x00,
+kCoolSetpoint = 0x01,
+kHeatAndCoolSetpoints = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SetpointAdjustMode              = EmberAfSetpointAdjustMode;
+using SetpointAdjustMode = EmberAfSetpointAdjustMode;
 #endif
 
 // Enum for ThermostatControlSequence
-enum class ThermostatControlSequence : uint8_t
-{
-    kCoolingOnly                 = 0x00,
-    kCoolingWithReheat           = 0x01,
-    kHeatingOnly                 = 0x02,
-    kHeatingWithReheat           = 0x03,
-    kCoolingAndHeating           = 0x04,
-    kCoolingAndHeatingWithReheat = 0x05,
+enum class ThermostatControlSequence : uint8_t {
+kCoolingOnly = 0x00,
+kCoolingWithReheat = 0x01,
+kHeatingOnly = 0x02,
+kHeatingWithReheat = 0x03,
+kCoolingAndHeating = 0x04,
+kCoolingAndHeatingWithReheat = 0x05,
 };
 
 // Enum for ThermostatRunningMode
-enum class ThermostatRunningMode : uint8_t
-{
-    kOff  = 0x00,
-    kCool = 0x03,
-    kHeat = 0x04,
+enum class ThermostatRunningMode : uint8_t {
+kOff = 0x00,
+kCool = 0x03,
+kHeat = 0x04,
 };
 
 // Enum for ThermostatSystemMode
-enum class ThermostatSystemMode : uint8_t
-{
-    kOff              = 0x00,
-    kAuto             = 0x01,
-    kCool             = 0x03,
-    kHeat             = 0x04,
-    kEmergencyHeating = 0x05,
-    kPrecooling       = 0x06,
-    kFanOnly          = 0x07,
+enum class ThermostatSystemMode : uint8_t {
+kOff = 0x00,
+kAuto = 0x01,
+kCool = 0x03,
+kHeat = 0x04,
+kEmergencyHeating = 0x05,
+kPrecooling = 0x06,
+kFanOnly = 0x07,
 };
 
 // Bitmap for DayOfWeek
-enum class DayOfWeek : uint8_t
-{
-    kSunday         = 0x1,
-    kMonday         = 0x2,
-    kTuesday        = 0x4,
-    kWednesday      = 0x8,
-    kThursday       = 0x10,
-    kFriday         = 0x20,
-    kSaturday       = 0x40,
-    kAwayOrVacation = 0x80,
+enum class DayOfWeek : uint8_t {
+kSunday = 0x1,
+kMonday = 0x2,
+kTuesday = 0x4,
+kWednesday = 0x8,
+kThursday = 0x10,
+kFriday = 0x20,
+kSaturday = 0x40,
+kAwayOrVacation = 0x80,
 };
 
 // Bitmap for ModeForSequence
-enum class ModeForSequence : uint8_t
-{
-    kHeatSetpointFieldPresent = 0x1,
-    kCoolSetpointFieldPresent = 0x2,
+enum class ModeForSequence : uint8_t {
+kHeatSetpointFieldPresent = 0x1,
+kCoolSetpointFieldPresent = 0x2,
 };
 
 // Bitmap for ThermostatFeature
-enum class ThermostatFeature : uint32_t
-{
-    kHeating   = 0x1,
-    kCooling   = 0x2,
-    kOccupancy = 0x4,
-    kSchedule  = 0x8,
-    kSetback   = 0x10,
-    kAutomode  = 0x20,
+enum class ThermostatFeature : uint32_t {
+kHeating = 0x1,
+kCooling = 0x2,
+kOccupancy = 0x4,
+kSchedule = 0x8,
+kSetback = 0x10,
+kAutomode = 0x20,
 };
 } // namespace Thermostat
 
 namespace FanControl {
 
 // Enum for FanModeSequenceType
-enum class FanModeSequenceType : uint8_t
-{
-    kOffLowMedHigh     = 0x00,
-    kOffLowHigh        = 0x01,
-    kOffLowMedHighAuto = 0x02,
-    kOffLowHighAuto    = 0x03,
-    kOffOnAuto         = 0x04,
-    kOffOn             = 0x05,
+enum class FanModeSequenceType : uint8_t {
+kOffLowMedHigh = 0x00,
+kOffLowHigh = 0x01,
+kOffLowMedHighAuto = 0x02,
+kOffLowHighAuto = 0x03,
+kOffOnAuto = 0x04,
+kOffOn = 0x05,
 };
 
 // Enum for FanModeType
-enum class FanModeType : uint8_t
-{
-    kOff    = 0x00,
-    kLow    = 0x01,
-    kMedium = 0x02,
-    kHigh   = 0x03,
-    kOn     = 0x04,
-    kAuto   = 0x05,
-    kSmart  = 0x06,
+enum class FanModeType : uint8_t {
+kOff = 0x00,
+kLow = 0x01,
+kMedium = 0x02,
+kHigh = 0x03,
+kOn = 0x04,
+kAuto = 0x05,
+kSmart = 0x06,
 };
 
 // Bitmap for FanControlFeature
-enum class FanControlFeature : uint32_t
-{
-    kMultiSpeed = 0x1,
-    kAuto       = 0x2,
-    kRocking    = 0x4,
-    kWind       = 0x8,
+enum class FanControlFeature : uint32_t {
+kMultiSpeed = 0x1,
+kAuto = 0x2,
+kRocking = 0x4,
+kWind = 0x8,
 };
 
 // Bitmap for RockSupportMask
-enum class RockSupportMask : uint8_t
-{
-    kRockLeftRight = 0x1,
-    kRockUpDown    = 0x2,
-    kRockRound     = 0x4,
+enum class RockSupportMask : uint8_t {
+kRockLeftRight = 0x1,
+kRockUpDown = 0x2,
+kRockRound = 0x4,
 };
 
 // Bitmap for WindSettingMask
-enum class WindSettingMask : uint8_t
-{
-    kSleepWind   = 0x1,
-    kNaturalWind = 0x2,
+enum class WindSettingMask : uint8_t {
+kSleepWind = 0x1,
+kNaturalWind = 0x2,
 };
 
 // Bitmap for WindSupportMask
-enum class WindSupportMask : uint8_t
-{
-    kSleepWind   = 0x1,
-    kNaturalWind = 0x2,
+enum class WindSupportMask : uint8_t {
+kSleepWind = 0x1,
+kNaturalWind = 0x2,
 };
 } // namespace FanControl
 
@@ -1678,139 +1546,128 @@ namespace ColorControl {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopAction
-enum class ColorLoopAction : uint8_t
-{
-    kDeactivate                            = 0x00,
-    kActivateFromColorLoopStartEnhancedHue = 0x01,
-    kActivateFromEnhancedCurrentHue        = 0x02,
+enum class ColorLoopAction : uint8_t {
+kDeactivate = 0x00,
+kActivateFromColorLoopStartEnhancedHue = 0x01,
+kActivateFromEnhancedCurrentHue = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopAction                 = EmberAfColorLoopAction;
+using ColorLoopAction = EmberAfColorLoopAction;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopDirection
-enum class ColorLoopDirection : uint8_t
-{
-    kDecrementHue = 0x00,
-    kIncrementHue = 0x01,
+enum class ColorLoopDirection : uint8_t {
+kDecrementHue = 0x00,
+kIncrementHue = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopDirection              = EmberAfColorLoopDirection;
+using ColorLoopDirection = EmberAfColorLoopDirection;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorMode
-enum class ColorMode : uint8_t
-{
-    kCurrentHueAndCurrentSaturation = 0x00,
-    kCurrentXAndCurrentY            = 0x01,
-    kColorTemperature               = 0x02,
+enum class ColorMode : uint8_t {
+kCurrentHueAndCurrentSaturation = 0x00,
+kCurrentXAndCurrentY = 0x01,
+kColorTemperature = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                       = EmberAfColorMode;
+using ColorMode = EmberAfColorMode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueDirection
-enum class HueDirection : uint8_t
-{
-    kShortestDistance = 0x00,
-    kLongestDistance  = 0x01,
-    kUp               = 0x02,
-    kDown             = 0x03,
+enum class HueDirection : uint8_t {
+kShortestDistance = 0x00,
+kLongestDistance = 0x01,
+kUp = 0x02,
+kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueDirection                    = EmberAfHueDirection;
+using HueDirection = EmberAfHueDirection;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueMoveMode
-enum class HueMoveMode : uint8_t
-{
-    kStop = 0x00,
-    kUp   = 0x01,
-    kDown = 0x03,
+enum class HueMoveMode : uint8_t {
+kStop = 0x00,
+kUp = 0x01,
+kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueMoveMode                     = EmberAfHueMoveMode;
+using HueMoveMode = EmberAfHueMoveMode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueStepMode
-enum class HueStepMode : uint8_t
-{
-    kUp   = 0x01,
-    kDown = 0x03,
+enum class HueStepMode : uint8_t {
+kUp = 0x01,
+kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueStepMode                     = EmberAfHueStepMode;
+using HueStepMode = EmberAfHueStepMode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationMoveMode
-enum class SaturationMoveMode : uint8_t
-{
-    kStop = 0x00,
-    kUp   = 0x01,
-    kDown = 0x03,
+enum class SaturationMoveMode : uint8_t {
+kStop = 0x00,
+kUp = 0x01,
+kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationMoveMode              = EmberAfSaturationMoveMode;
+using SaturationMoveMode = EmberAfSaturationMoveMode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationStepMode
-enum class SaturationStepMode : uint8_t
-{
-    kUp   = 0x01,
-    kDown = 0x03,
+enum class SaturationStepMode : uint8_t {
+kUp = 0x01,
+kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationStepMode              = EmberAfSaturationStepMode;
+using SaturationStepMode = EmberAfSaturationStepMode;
 #endif
 
 // Bitmap for ColorCapabilities
-enum class ColorCapabilities : uint16_t
-{
-    kHueSaturationSupported    = 0x1,
-    kEnhancedHueSupported      = 0x2,
-    kColorLoopSupported        = 0x4,
-    kXYAttributesSupported     = 0x8,
-    kColorTemperatureSupported = 0x10,
+enum class ColorCapabilities : uint16_t {
+kHueSaturationSupported = 0x1,
+kEnhancedHueSupported = 0x2,
+kColorLoopSupported = 0x4,
+kXYAttributesSupported = 0x8,
+kColorTemperatureSupported = 0x10,
 };
 
 // Bitmap for ColorControlFeature
-enum class ColorControlFeature : uint32_t
-{
-    kHueAndSaturation = 0x1,
-    kEnhancedHue      = 0x2,
-    kColorLoop        = 0x4,
-    kXy               = 0x8,
-    kColorTemperature = 0x10,
+enum class ColorControlFeature : uint32_t {
+kHueAndSaturation = 0x1,
+kEnhancedHue = 0x2,
+kColorLoop = 0x4,
+kXy = 0x8,
+kColorTemperature = 0x10,
 };
 
 // Bitmap for ColorLoopUpdateFlags
-enum class ColorLoopUpdateFlags : uint8_t
-{
-    kUpdateAction    = 0x1,
-    kUpdateDirection = 0x2,
-    kUpdateTime      = 0x4,
-    kUpdateStartHue  = 0x8,
+enum class ColorLoopUpdateFlags : uint8_t {
+kUpdateAction = 0x1,
+kUpdateDirection = 0x2,
+kUpdateTime = 0x4,
+kUpdateStartHue = 0x8,
 };
 } // namespace ColorControl
 
@@ -1820,10 +1677,9 @@ namespace BallastConfiguration {
 namespace IlluminanceMeasurement {
 
 // Enum for LightSensorType
-enum class LightSensorType : uint8_t
-{
-    kPhotodiode = 0x00,
-    kCmos       = 0x01,
+enum class LightSensorType : uint8_t {
+kPhotodiode = 0x00,
+kCmos = 0x01,
 };
 } // namespace IlluminanceMeasurement
 
@@ -1833,9 +1689,8 @@ namespace TemperatureMeasurement {
 namespace PressureMeasurement {
 
 // Bitmap for PressureFeature
-enum class PressureFeature : uint32_t
-{
-    kExt = 0x1,
+enum class PressureFeature : uint32_t {
+kExt = 0x1,
 };
 } // namespace PressureMeasurement
 
@@ -1944,188 +1799,175 @@ namespace IasZone {
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasEnrollResponseCode
-enum class IasEnrollResponseCode : uint8_t
-{
-    kSuccess        = 0x00,
-    kNotSupported   = 0x01,
-    kNoEnrollPermit = 0x02,
-    kTooManyZones   = 0x03,
+enum class IasEnrollResponseCode : uint8_t {
+kSuccess = 0x00,
+kNotSupported = 0x01,
+kNoEnrollPermit = 0x02,
+kTooManyZones = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasEnrollResponseCode           = EmberAfIasEnrollResponseCode;
+using IasEnrollResponseCode = EmberAfIasEnrollResponseCode;
 #endif
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasZoneType
-enum class IasZoneType : uint16_t
-{
-    kStandardCie             = 0x00,
-    kMotionSensor            = 0x0D,
-    kContactSwitch           = 0x15,
-    kFireSensor              = 0x28,
-    kWaterSensor             = 0x2A,
-    kGasSensor               = 0x2B,
-    kPersonalEmergencyDevice = 0x2C,
-    kVibrationMovementSensor = 0x2D,
-    kRemoteControl           = 0x10F,
-    kKeyFob                  = 0x115,
-    kKeypad                  = 0x21D,
-    kStandardWarningDevice   = 0x225,
-    kGlassBreakSensor        = 0x226,
-    kCarbonMonoxideSensor    = 0x227,
-    kSecurityRepeater        = 0x229,
-    kInvalidZoneType         = 0xFFFF,
+enum class IasZoneType : uint16_t {
+kStandardCie = 0x00,
+kMotionSensor = 0x0D,
+kContactSwitch = 0x15,
+kFireSensor = 0x28,
+kWaterSensor = 0x2A,
+kGasSensor = 0x2B,
+kPersonalEmergencyDevice = 0x2C,
+kVibrationMovementSensor = 0x2D,
+kRemoteControl = 0x10F,
+kKeyFob = 0x115,
+kKeypad = 0x21D,
+kStandardWarningDevice = 0x225,
+kGlassBreakSensor = 0x226,
+kCarbonMonoxideSensor = 0x227,
+kSecurityRepeater = 0x229,
+kInvalidZoneType = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                     = EmberAfIasZoneType;
+using IasZoneType = EmberAfIasZoneType;
 #endif
 
 // Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
+enum class IasZoneStatus : uint16_t {
+kAlarm1 = 0x1,
+kAlarm2 = 0x2,
+kTamper = 0x4,
+kBattery = 0x8,
+kSupervisionReports = 0x10,
+kRestoreReports = 0x20,
+kTrouble = 0x40,
+kAc = 0x80,
+kTest = 0x100,
+kBatteryDefect = 0x200,
 };
 } // namespace IasZone
 
 namespace IasAce {
 
 // Enum for IasAceAlarmStatus
-enum class IasAceAlarmStatus : uint8_t
-{
-    kNoAlarm        = 0x00,
-    kBurglar        = 0x01,
-    kFire           = 0x02,
-    kEmergency      = 0x03,
-    kPolicePanic    = 0x04,
-    kFirePanic      = 0x05,
-    kEmergencyPanic = 0x06,
+enum class IasAceAlarmStatus : uint8_t {
+kNoAlarm = 0x00,
+kBurglar = 0x01,
+kFire = 0x02,
+kEmergency = 0x03,
+kPolicePanic = 0x04,
+kFirePanic = 0x05,
+kEmergencyPanic = 0x06,
 };
 
 // Enum for IasAceArmMode
-enum class IasAceArmMode : uint8_t
-{
-    kDisarm                 = 0x00,
-    kArmDayHomeZonesOnly    = 0x01,
-    kArmNightSleepZonesOnly = 0x02,
-    kArmAllZones            = 0x03,
+enum class IasAceArmMode : uint8_t {
+kDisarm = 0x00,
+kArmDayHomeZonesOnly = 0x01,
+kArmNightSleepZonesOnly = 0x02,
+kArmAllZones = 0x03,
 };
 
 // Enum for IasAceArmNotification
-enum class IasAceArmNotification : uint8_t
-{
-    kAllZonesDisarmed         = 0x00,
-    kOnlyDayHomeZonesArmed    = 0x01,
-    kOnlyNightSleepZonesArmed = 0x02,
-    kAllZonesArmed            = 0x03,
-    kInvalidArmDisarmCode     = 0x04,
-    kNotReadyToArm            = 0x05,
-    kAlreadyDisarmed          = 0x06,
+enum class IasAceArmNotification : uint8_t {
+kAllZonesDisarmed = 0x00,
+kOnlyDayHomeZonesArmed = 0x01,
+kOnlyNightSleepZonesArmed = 0x02,
+kAllZonesArmed = 0x03,
+kInvalidArmDisarmCode = 0x04,
+kNotReadyToArm = 0x05,
+kAlreadyDisarmed = 0x06,
 };
 
 // Enum for IasAceAudibleNotification
-enum class IasAceAudibleNotification : uint8_t
-{
-    kMute         = 0x00,
-    kDefaultSound = 0x01,
+enum class IasAceAudibleNotification : uint8_t {
+kMute = 0x00,
+kDefaultSound = 0x01,
 };
 
 // Enum for IasAceBypassResult
-enum class IasAceBypassResult : uint8_t
-{
-    kZoneBypassed         = 0x00,
-    kZoneNotBypassed      = 0x01,
-    kNotAllowed           = 0x02,
-    kInvalidZoneId        = 0x03,
-    kUnknownZoneId        = 0x04,
-    kInvalidArmDisarmCode = 0x05,
+enum class IasAceBypassResult : uint8_t {
+kZoneBypassed = 0x00,
+kZoneNotBypassed = 0x01,
+kNotAllowed = 0x02,
+kInvalidZoneId = 0x03,
+kUnknownZoneId = 0x04,
+kInvalidArmDisarmCode = 0x05,
 };
 
 // Enum for IasAcePanelStatus
-enum class IasAcePanelStatus : uint8_t
-{
-    kPanelDisarmed = 0x00,
-    kArmedStay     = 0x01,
-    kArmedNight    = 0x02,
-    kArmedAway     = 0x03,
-    kExitDelay     = 0x04,
-    kEntryDelay    = 0x05,
-    kNotReadyToArm = 0x06,
-    kInAlarm       = 0x07,
-    kArmingStay    = 0x08,
-    kArmingNight   = 0x09,
-    kArmingAway    = 0x0A,
+enum class IasAcePanelStatus : uint8_t {
+kPanelDisarmed = 0x00,
+kArmedStay = 0x01,
+kArmedNight = 0x02,
+kArmedAway = 0x03,
+kExitDelay = 0x04,
+kEntryDelay = 0x05,
+kNotReadyToArm = 0x06,
+kInAlarm = 0x07,
+kArmingStay = 0x08,
+kArmingNight = 0x09,
+kArmingAway = 0x0A,
 };
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasZoneType
-enum class IasZoneType : uint16_t
-{
-    kStandardCie             = 0x00,
-    kMotionSensor            = 0x0D,
-    kContactSwitch           = 0x15,
-    kFireSensor              = 0x28,
-    kWaterSensor             = 0x2A,
-    kGasSensor               = 0x2B,
-    kPersonalEmergencyDevice = 0x2C,
-    kVibrationMovementSensor = 0x2D,
-    kRemoteControl           = 0x10F,
-    kKeyFob                  = 0x115,
-    kKeypad                  = 0x21D,
-    kStandardWarningDevice   = 0x225,
-    kGlassBreakSensor        = 0x226,
-    kCarbonMonoxideSensor    = 0x227,
-    kSecurityRepeater        = 0x229,
-    kInvalidZoneType         = 0xFFFF,
+enum class IasZoneType : uint16_t {
+kStandardCie = 0x00,
+kMotionSensor = 0x0D,
+kContactSwitch = 0x15,
+kFireSensor = 0x28,
+kWaterSensor = 0x2A,
+kGasSensor = 0x2B,
+kPersonalEmergencyDevice = 0x2C,
+kVibrationMovementSensor = 0x2D,
+kRemoteControl = 0x10F,
+kKeyFob = 0x115,
+kKeypad = 0x21D,
+kStandardWarningDevice = 0x225,
+kGlassBreakSensor = 0x226,
+kCarbonMonoxideSensor = 0x227,
+kSecurityRepeater = 0x229,
+kInvalidZoneType = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                     = EmberAfIasZoneType;
+using IasZoneType = EmberAfIasZoneType;
 #endif
 
 // Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
+enum class IasZoneStatus : uint16_t {
+kAlarm1 = 0x1,
+kAlarm2 = 0x2,
+kTamper = 0x4,
+kBattery = 0x8,
+kSupervisionReports = 0x10,
+kRestoreReports = 0x20,
+kTrouble = 0x40,
+kAc = 0x80,
+kTest = 0x100,
+kBatteryDefect = 0x200,
 };
 } // namespace IasAce
 
 namespace IasWd {
 
 // Bitmap for SquawkInfo
-enum class SquawkInfo : uint8_t
-{
-    kMode   = 0xF0,
-    kStrobe = 0x8,
-    kLevel  = 0x3,
+enum class SquawkInfo : uint8_t {
+kMode = 0xF0,
+kStrobe = 0x8,
+kLevel = 0x3,
 };
 
 // Bitmap for WarningInfo
-enum class WarningInfo : uint8_t
-{
-    kMode       = 0xF0,
-    kStrobe     = 0xC,
-    kSirenLevel = 0x3,
+enum class WarningInfo : uint8_t {
+kMode = 0xF0,
+kStrobe = 0xC,
+kSirenLevel = 0x3,
 };
 } // namespace IasWd
 
@@ -2135,84 +1977,76 @@ namespace WakeOnLan {
 namespace Channel {
 
 // Enum for ChannelStatusEnum
-enum class ChannelStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kMultipleMatches = 0x01,
-    kNoMatches       = 0x02,
+enum class ChannelStatusEnum : uint8_t {
+kSuccess = 0x00,
+kMultipleMatches = 0x01,
+kNoMatches = 0x02,
 };
 
 // Enum for LineupInfoTypeEnum
-enum class LineupInfoTypeEnum : uint8_t
-{
-    kMso = 0x00,
+enum class LineupInfoTypeEnum : uint8_t {
+kMso = 0x00,
 };
 
 // Bitmap for ChannelFeature
-enum class ChannelFeature : uint32_t
-{
-    kChannelList = 0x1,
-    kLineupInfo  = 0x2,
+enum class ChannelFeature : uint32_t {
+kChannelList = 0x1,
+kLineupInfo = 0x2,
 };
 } // namespace Channel
 
 namespace TargetNavigator {
 
 // Enum for TargetNavigatorStatusEnum
-enum class TargetNavigatorStatusEnum : uint8_t
-{
-    kSuccess        = 0x00,
-    kTargetNotFound = 0x01,
-    kNotAllowed     = 0x02,
+enum class TargetNavigatorStatusEnum : uint8_t {
+kSuccess = 0x00,
+kTargetNotFound = 0x01,
+kNotAllowed = 0x02,
 };
 } // namespace TargetNavigator
 
 namespace MediaPlayback {
 
 // Enum for MediaPlaybackStatusEnum
-enum class MediaPlaybackStatusEnum : uint8_t
-{
-    kSuccess                = 0x00,
-    kInvalidStateForCommand = 0x01,
-    kNotAllowed             = 0x02,
-    kNotActive              = 0x03,
-    kSpeedOutOfRange        = 0x04,
-    kSeekOutOfRange         = 0x05,
+enum class MediaPlaybackStatusEnum : uint8_t {
+kSuccess = 0x00,
+kInvalidStateForCommand = 0x01,
+kNotAllowed = 0x02,
+kNotActive = 0x03,
+kSpeedOutOfRange = 0x04,
+kSeekOutOfRange = 0x05,
 };
 
 // Enum for PlaybackStateEnum
-enum class PlaybackStateEnum : uint8_t
-{
-    kPlaying    = 0x00,
-    kPaused     = 0x01,
-    kNotPlaying = 0x02,
-    kBuffering  = 0x03,
+enum class PlaybackStateEnum : uint8_t {
+kPlaying = 0x00,
+kPaused = 0x01,
+kNotPlaying = 0x02,
+kBuffering = 0x03,
 };
 } // namespace MediaPlayback
 
 namespace MediaInput {
 
 // Enum for InputTypeEnum
-enum class InputTypeEnum : uint8_t
-{
-    kInternal  = 0x00,
-    kAux       = 0x01,
-    kCoax      = 0x02,
-    kComposite = 0x03,
-    kHdmi      = 0x04,
-    kInput     = 0x05,
-    kLine      = 0x06,
-    kOptical   = 0x07,
-    kVideo     = 0x08,
-    kScart     = 0x09,
-    kUsb       = 0x0A,
-    kOther     = 0x0B,
+enum class InputTypeEnum : uint8_t {
+kInternal = 0x00,
+kAux = 0x01,
+kCoax = 0x02,
+kComposite = 0x03,
+kHdmi = 0x04,
+kInput = 0x05,
+kLine = 0x06,
+kOptical = 0x07,
+kVideo = 0x08,
+kScart = 0x09,
+kUsb = 0x0A,
+kOther = 0x0B,
 };
 
 // Bitmap for MediaInputFeature
-enum class MediaInputFeature : uint32_t
-{
-    kNameUpdates = 0x1,
+enum class MediaInputFeature : uint32_t {
+kNameUpdates = 0x1,
 };
 } // namespace MediaInput
 
@@ -2222,209 +2056,196 @@ namespace LowPower {
 namespace KeypadInput {
 
 // Enum for CecKeyCode
-enum class CecKeyCode : uint8_t
-{
-    kSelect                    = 0x00,
-    kUp                        = 0x01,
-    kDown                      = 0x02,
-    kLeft                      = 0x03,
-    kRight                     = 0x04,
-    kRightUp                   = 0x05,
-    kRightDown                 = 0x06,
-    kLeftUp                    = 0x07,
-    kLeftDown                  = 0x08,
-    kRootMenu                  = 0x09,
-    kSetupMenu                 = 0x0A,
-    kContentsMenu              = 0x0B,
-    kFavoriteMenu              = 0x0C,
-    kExit                      = 0x0D,
-    kMediaTopMenu              = 0x10,
-    kMediaContextSensitiveMenu = 0x11,
-    kNumberEntryMode           = 0x1D,
-    kNumber11                  = 0x1E,
-    kNumber12                  = 0x1F,
-    kNumber0OrNumber10         = 0x20,
-    kNumbers1                  = 0x21,
-    kNumbers2                  = 0x22,
-    kNumbers3                  = 0x23,
-    kNumbers4                  = 0x24,
-    kNumbers5                  = 0x25,
-    kNumbers6                  = 0x26,
-    kNumbers7                  = 0x27,
-    kNumbers8                  = 0x28,
-    kNumbers9                  = 0x29,
-    kDot                       = 0x2A,
-    kEnter                     = 0x2B,
-    kClear                     = 0x2C,
-    kNextFavorite              = 0x2F,
-    kChannelUp                 = 0x30,
-    kChannelDown               = 0x31,
-    kPreviousChannel           = 0x32,
-    kSoundSelect               = 0x33,
-    kInputSelect               = 0x34,
-    kDisplayInformation        = 0x35,
-    kHelp                      = 0x36,
-    kPageUp                    = 0x37,
-    kPageDown                  = 0x38,
-    kPower                     = 0x40,
-    kVolumeUp                  = 0x41,
-    kVolumeDown                = 0x42,
-    kMute                      = 0x43,
-    kPlay                      = 0x44,
-    kStop                      = 0x45,
-    kPause                     = 0x46,
-    kRecord                    = 0x47,
-    kRewind                    = 0x48,
-    kFastForward               = 0x49,
-    kEject                     = 0x4A,
-    kForward                   = 0x4B,
-    kBackward                  = 0x4C,
-    kStopRecord                = 0x4D,
-    kPauseRecord               = 0x4E,
-    kReserved                  = 0x4F,
-    kAngle                     = 0x50,
-    kSubPicture                = 0x51,
-    kVideoOnDemand             = 0x52,
-    kElectronicProgramGuide    = 0x53,
-    kTimerProgramming          = 0x54,
-    kInitialConfiguration      = 0x55,
-    kSelectBroadcastType       = 0x56,
-    kSelectSoundPresentation   = 0x57,
-    kPlayFunction              = 0x60,
-    kPausePlayFunction         = 0x61,
-    kRecordFunction            = 0x62,
-    kPauseRecordFunction       = 0x63,
-    kStopFunction              = 0x64,
-    kMuteFunction              = 0x65,
-    kRestoreVolumeFunction     = 0x66,
-    kTuneFunction              = 0x67,
-    kSelectMediaFunction       = 0x68,
-    kSelectAvInputFunction     = 0x69,
-    kSelectAudioInputFunction  = 0x6A,
-    kPowerToggleFunction       = 0x6B,
-    kPowerOffFunction          = 0x6C,
-    kPowerOnFunction           = 0x6D,
-    kF1Blue                    = 0x71,
-    kF2Red                     = 0x72,
-    kF3Green                   = 0x73,
-    kF4Yellow                  = 0x74,
-    kF5                        = 0x75,
-    kData                      = 0x76,
+enum class CecKeyCode : uint8_t {
+kSelect = 0x00,
+kUp = 0x01,
+kDown = 0x02,
+kLeft = 0x03,
+kRight = 0x04,
+kRightUp = 0x05,
+kRightDown = 0x06,
+kLeftUp = 0x07,
+kLeftDown = 0x08,
+kRootMenu = 0x09,
+kSetupMenu = 0x0A,
+kContentsMenu = 0x0B,
+kFavoriteMenu = 0x0C,
+kExit = 0x0D,
+kMediaTopMenu = 0x10,
+kMediaContextSensitiveMenu = 0x11,
+kNumberEntryMode = 0x1D,
+kNumber11 = 0x1E,
+kNumber12 = 0x1F,
+kNumber0OrNumber10 = 0x20,
+kNumbers1 = 0x21,
+kNumbers2 = 0x22,
+kNumbers3 = 0x23,
+kNumbers4 = 0x24,
+kNumbers5 = 0x25,
+kNumbers6 = 0x26,
+kNumbers7 = 0x27,
+kNumbers8 = 0x28,
+kNumbers9 = 0x29,
+kDot = 0x2A,
+kEnter = 0x2B,
+kClear = 0x2C,
+kNextFavorite = 0x2F,
+kChannelUp = 0x30,
+kChannelDown = 0x31,
+kPreviousChannel = 0x32,
+kSoundSelect = 0x33,
+kInputSelect = 0x34,
+kDisplayInformation = 0x35,
+kHelp = 0x36,
+kPageUp = 0x37,
+kPageDown = 0x38,
+kPower = 0x40,
+kVolumeUp = 0x41,
+kVolumeDown = 0x42,
+kMute = 0x43,
+kPlay = 0x44,
+kStop = 0x45,
+kPause = 0x46,
+kRecord = 0x47,
+kRewind = 0x48,
+kFastForward = 0x49,
+kEject = 0x4A,
+kForward = 0x4B,
+kBackward = 0x4C,
+kStopRecord = 0x4D,
+kPauseRecord = 0x4E,
+kReserved = 0x4F,
+kAngle = 0x50,
+kSubPicture = 0x51,
+kVideoOnDemand = 0x52,
+kElectronicProgramGuide = 0x53,
+kTimerProgramming = 0x54,
+kInitialConfiguration = 0x55,
+kSelectBroadcastType = 0x56,
+kSelectSoundPresentation = 0x57,
+kPlayFunction = 0x60,
+kPausePlayFunction = 0x61,
+kRecordFunction = 0x62,
+kPauseRecordFunction = 0x63,
+kStopFunction = 0x64,
+kMuteFunction = 0x65,
+kRestoreVolumeFunction = 0x66,
+kTuneFunction = 0x67,
+kSelectMediaFunction = 0x68,
+kSelectAvInputFunction = 0x69,
+kSelectAudioInputFunction = 0x6A,
+kPowerToggleFunction = 0x6B,
+kPowerOffFunction = 0x6C,
+kPowerOnFunction = 0x6D,
+kF1Blue = 0x71,
+kF2Red = 0x72,
+kF3Green = 0x73,
+kF4Yellow = 0x74,
+kF5 = 0x75,
+kData = 0x76,
 };
 
 // Enum for KeypadInputStatusEnum
-enum class KeypadInputStatusEnum : uint8_t
-{
-    kSuccess                  = 0x00,
-    kUnsupportedKey           = 0x01,
-    kInvalidKeyInCurrentState = 0x02,
+enum class KeypadInputStatusEnum : uint8_t {
+kSuccess = 0x00,
+kUnsupportedKey = 0x01,
+kInvalidKeyInCurrentState = 0x02,
 };
 
 // Bitmap for KeypadInputFeature
-enum class KeypadInputFeature : uint32_t
-{
-    kNavigationKeyCodes = 0x1,
-    kLocationKeys       = 0x2,
-    kNumberKeys         = 0x4,
+enum class KeypadInputFeature : uint32_t {
+kNavigationKeyCodes = 0x1,
+kLocationKeys = 0x2,
+kNumberKeys = 0x4,
 };
 } // namespace KeypadInput
 
 namespace ContentLauncher {
 
 // Enum for ContentLaunchStatusEnum
-enum class ContentLaunchStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kUrlNotAvailable = 0x01,
-    kAuthFailed      = 0x02,
+enum class ContentLaunchStatusEnum : uint8_t {
+kSuccess = 0x00,
+kUrlNotAvailable = 0x01,
+kAuthFailed = 0x02,
 };
 
 // Enum for MetricTypeEnum
-enum class MetricTypeEnum : uint8_t
-{
-    kPixels     = 0x00,
-    kPercentage = 0x01,
+enum class MetricTypeEnum : uint8_t {
+kPixels = 0x00,
+kPercentage = 0x01,
 };
 
 // Enum for ParameterEnum
-enum class ParameterEnum : uint8_t
-{
-    kActor      = 0x00,
-    kChannel    = 0x01,
-    kCharacter  = 0x02,
-    kDirector   = 0x03,
-    kEvent      = 0x04,
-    kFranchise  = 0x05,
-    kGenre      = 0x06,
-    kLeague     = 0x07,
-    kPopularity = 0x08,
-    kProvider   = 0x09,
-    kSport      = 0x0A,
-    kSportsTeam = 0x0B,
-    kType       = 0x0C,
+enum class ParameterEnum : uint8_t {
+kActor = 0x00,
+kChannel = 0x01,
+kCharacter = 0x02,
+kDirector = 0x03,
+kEvent = 0x04,
+kFranchise = 0x05,
+kGenre = 0x06,
+kLeague = 0x07,
+kPopularity = 0x08,
+kProvider = 0x09,
+kSport = 0x0A,
+kSportsTeam = 0x0B,
+kType = 0x0C,
 };
 
 // Bitmap for ContentLauncherFeature
-enum class ContentLauncherFeature : uint32_t
-{
-    kContentSearch = 0x1,
-    kURLPlayback   = 0x2,
+enum class ContentLauncherFeature : uint32_t {
+kContentSearch = 0x1,
+kURLPlayback = 0x2,
 };
 
 // Bitmap for SupportedStreamingProtocol
-enum class SupportedStreamingProtocol : uint32_t
-{
-    kDash = 0x1,
-    kHls  = 0x2,
+enum class SupportedStreamingProtocol : uint32_t {
+kDash = 0x1,
+kHls = 0x2,
 };
 } // namespace ContentLauncher
 
 namespace AudioOutput {
 
 // Enum for OutputTypeEnum
-enum class OutputTypeEnum : uint8_t
-{
-    kHdmi      = 0x00,
-    kBt        = 0x01,
-    kOptical   = 0x02,
-    kHeadphone = 0x03,
-    kInternal  = 0x04,
-    kOther     = 0x05,
+enum class OutputTypeEnum : uint8_t {
+kHdmi = 0x00,
+kBt = 0x01,
+kOptical = 0x02,
+kHeadphone = 0x03,
+kInternal = 0x04,
+kOther = 0x05,
 };
 
 // Bitmap for AudioOutputFeature
-enum class AudioOutputFeature : uint32_t
-{
-    kNameUpdates = 0x1,
+enum class AudioOutputFeature : uint32_t {
+kNameUpdates = 0x1,
 };
 } // namespace AudioOutput
 
 namespace ApplicationLauncher {
 
 // Enum for ApplicationLauncherStatusEnum
-enum class ApplicationLauncherStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+enum class ApplicationLauncherStatusEnum : uint8_t {
+kSuccess = 0x00,
+kAppNotAvailable = 0x01,
+kSystemBusy = 0x02,
 };
 
 // Bitmap for ApplicationLauncherFeature
-enum class ApplicationLauncherFeature : uint32_t
-{
-    kApplicationPlatform = 0x1,
+enum class ApplicationLauncherFeature : uint32_t {
+kApplicationPlatform = 0x1,
 };
 } // namespace ApplicationLauncher
 
 namespace ApplicationBasic {
 
 // Enum for ApplicationStatusEnum
-enum class ApplicationStatusEnum : uint8_t
-{
-    kStopped               = 0x00,
-    kActiveVisibleFocus    = 0x01,
-    kActiveHidden          = 0x02,
-    kActiveVisibleNotFocus = 0x03,
+enum class ApplicationStatusEnum : uint8_t {
+kStopped = 0x00,
+kActiveVisibleFocus = 0x01,
+kActiveHidden = 0x02,
+kActiveVisibleNotFocus = 0x03,
 };
 } // namespace ApplicationBasic
 
@@ -2434,199 +2255,185 @@ namespace AccountLogin {
 namespace TestCluster {
 
 // Enum for SimpleEnum
-enum class SimpleEnum : uint8_t
-{
-    kUnspecified = 0x00,
-    kValueA      = 0x01,
-    kValueB      = 0x02,
-    kValueC      = 0x03,
+enum class SimpleEnum : uint8_t {
+kUnspecified = 0x00,
+kValueA = 0x01,
+kValueB = 0x02,
+kValueC = 0x03,
 };
 
 // Bitmap for Bitmap16MaskMap
-enum class Bitmap16MaskMap : uint16_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x4000,
+enum class Bitmap16MaskMap : uint16_t {
+kMaskVal1 = 0x1,
+kMaskVal2 = 0x2,
+kMaskVal3 = 0x4,
+kMaskVal4 = 0x4000,
 };
 
 // Bitmap for Bitmap32MaskMap
-enum class Bitmap32MaskMap : uint32_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x40000000,
+enum class Bitmap32MaskMap : uint32_t {
+kMaskVal1 = 0x1,
+kMaskVal2 = 0x2,
+kMaskVal3 = 0x4,
+kMaskVal4 = 0x40000000,
 };
 
 // Bitmap for Bitmap64MaskMap
-enum class Bitmap64MaskMap : uint64_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x4000000000000000,
+enum class Bitmap64MaskMap : uint64_t {
+kMaskVal1 = 0x1,
+kMaskVal2 = 0x2,
+kMaskVal3 = 0x4,
+kMaskVal4 = 0x4000000000000000,
 };
 
 // Bitmap for Bitmap8MaskMap
-enum class Bitmap8MaskMap : uint8_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x40,
+enum class Bitmap8MaskMap : uint8_t {
+kMaskVal1 = 0x1,
+kMaskVal2 = 0x2,
+kMaskVal3 = 0x4,
+kMaskVal4 = 0x40,
 };
 
 // Bitmap for SimpleBitmap
-enum class SimpleBitmap : uint8_t
-{
-    kValueA = 0x1,
-    kValueB = 0x2,
-    kValueC = 0x4,
+enum class SimpleBitmap : uint8_t {
+kValueA = 0x1,
+kValueB = 0x2,
+kValueC = 0x4,
 };
 } // namespace TestCluster
 
 namespace Messaging {
 
 // Enum for EventId
-enum class EventId : uint8_t
-{
-    kMeterCoverRemoved                  = 0x00,
-    kMeterCoverClosed                   = 0x01,
-    kStrongMagneticField                = 0x02,
-    kNoStrongMagneticField              = 0x03,
-    kBatteryFailure                     = 0x04,
-    kLowBattery                         = 0x05,
-    kProgramMemoryError                 = 0x06,
-    kRamError                           = 0x07,
-    kNvMemoryError                      = 0x08,
-    kMeasurementSystemError             = 0x09,
-    kWatchdogError                      = 0x0A,
-    kSupplyDisconnectFailure            = 0x0B,
-    kSupplyConnectFailure               = 0x0C,
-    kMeasurmentSoftwareChanged          = 0x0D,
-    kDstEnabled                         = 0x0E,
-    kDstDisabled                        = 0x0F,
-    kClockAdjBackward                   = 0x10,
-    kClockAdjForward                    = 0x11,
-    kClockInvalid                       = 0x12,
-    kCommsErrorHan                      = 0x13,
-    kCommsOkHan                         = 0x14,
-    kFraudAttempt                       = 0x15,
-    kPowerLoss                          = 0x16,
-    kIncorrectProtocol                  = 0x17,
-    kUnusualHanTraffic                  = 0x18,
-    kUnexpectedClockChange              = 0x19,
-    kCommsUsingUnauthenticatedComponent = 0x1A,
-    kErrorRegClear                      = 0x1B,
-    kAlarmRegClear                      = 0x1C,
-    kUnexpectedHwReset                  = 0x1D,
-    kUnexpectedProgramExecution         = 0x1E,
-    kEventLogCleared                    = 0x1F,
-    kManualDisconnect                   = 0x20,
-    kManualConnect                      = 0x21,
-    kRemoteDisconnection                = 0x22,
-    kLocalDisconnection                 = 0x23,
-    kLimitThresholdExceeded             = 0x24,
-    kLimitThresholdOk                   = 0x25,
-    kLimitThresholdChanged              = 0x26,
-    kMaximumDemandExceeded              = 0x27,
-    kProfileCleared                     = 0x28,
-    kFirmwareReadyForActivation         = 0x29,
-    kFirmwareActivated                  = 0x2A,
-    kPatchFailure                       = 0x2B,
-    kTouTariffActivation                = 0x2C,
-    k8x8Tariffactivated                 = 0x2D,
-    kSingleTariffRateActivated          = 0x2E,
-    kAsynchronousBillingOccurred        = 0x2F,
-    kSynchronousBillingOccurred         = 0x30,
-    kIncorrectPolarity                  = 0x80,
-    kCurrentNoVoltage                   = 0x81,
-    kUnderVoltage                       = 0x82,
-    kOverVoltage                        = 0x83,
-    kNormalVoltage                      = 0x84,
-    kPfBelowThreshold                   = 0x85,
-    kPfAboveThreshold                   = 0x86,
-    kTerminalCoverRemoved               = 0x87,
-    kTerminalCoverClosed                = 0x88,
-    kReverseFlow                        = 0xA0,
-    kTiltTamper                         = 0xA1,
-    kBatteryCoverRemoved                = 0xA2,
-    kBatteryCoverClosed                 = 0xA3,
-    kExcessFlow                         = 0xA4,
-    kCreditOk                           = 0xC0,
-    kLowCredit                          = 0xC1,
-    kEmergencyCreditInUse               = 0xC0,
-    kEmergencyCreditExhausted           = 0xC1,
-    kZeroCreditEcNotSelected            = 0xC2,
-    kSupplyOn                           = 0xC3,
-    kSupplyOffAarmed                    = 0xC4,
-    kSupplyOff                          = 0xC5,
-    kDiscountApplied                    = 0xC6,
-    kManufacturerSpecificA              = 0xE0,
-    kManufacturerSpecificB              = 0xE1,
-    kManufacturerSpecificC              = 0xE2,
-    kManufacturerSpecificD              = 0xE3,
-    kManufacturerSpecificE              = 0xE4,
-    kManufacturerSpecificF              = 0xE5,
-    kManufacturerSpecificG              = 0xE6,
-    kManufacturerSpecificH              = 0xE7,
-    kManufacturerSpecificI              = 0xE8,
+enum class EventId : uint8_t {
+kMeterCoverRemoved = 0x00,
+kMeterCoverClosed = 0x01,
+kStrongMagneticField = 0x02,
+kNoStrongMagneticField = 0x03,
+kBatteryFailure = 0x04,
+kLowBattery = 0x05,
+kProgramMemoryError = 0x06,
+kRamError = 0x07,
+kNvMemoryError = 0x08,
+kMeasurementSystemError = 0x09,
+kWatchdogError = 0x0A,
+kSupplyDisconnectFailure = 0x0B,
+kSupplyConnectFailure = 0x0C,
+kMeasurmentSoftwareChanged = 0x0D,
+kDstEnabled = 0x0E,
+kDstDisabled = 0x0F,
+kClockAdjBackward = 0x10,
+kClockAdjForward = 0x11,
+kClockInvalid = 0x12,
+kCommsErrorHan = 0x13,
+kCommsOkHan = 0x14,
+kFraudAttempt = 0x15,
+kPowerLoss = 0x16,
+kIncorrectProtocol = 0x17,
+kUnusualHanTraffic = 0x18,
+kUnexpectedClockChange = 0x19,
+kCommsUsingUnauthenticatedComponent = 0x1A,
+kErrorRegClear = 0x1B,
+kAlarmRegClear = 0x1C,
+kUnexpectedHwReset = 0x1D,
+kUnexpectedProgramExecution = 0x1E,
+kEventLogCleared = 0x1F,
+kManualDisconnect = 0x20,
+kManualConnect = 0x21,
+kRemoteDisconnection = 0x22,
+kLocalDisconnection = 0x23,
+kLimitThresholdExceeded = 0x24,
+kLimitThresholdOk = 0x25,
+kLimitThresholdChanged = 0x26,
+kMaximumDemandExceeded = 0x27,
+kProfileCleared = 0x28,
+kFirmwareReadyForActivation = 0x29,
+kFirmwareActivated = 0x2A,
+kPatchFailure = 0x2B,
+kTouTariffActivation = 0x2C,
+k8x8Tariffactivated = 0x2D,
+kSingleTariffRateActivated = 0x2E,
+kAsynchronousBillingOccurred = 0x2F,
+kSynchronousBillingOccurred = 0x30,
+kIncorrectPolarity = 0x80,
+kCurrentNoVoltage = 0x81,
+kUnderVoltage = 0x82,
+kOverVoltage = 0x83,
+kNormalVoltage = 0x84,
+kPfBelowThreshold = 0x85,
+kPfAboveThreshold = 0x86,
+kTerminalCoverRemoved = 0x87,
+kTerminalCoverClosed = 0x88,
+kReverseFlow = 0xA0,
+kTiltTamper = 0xA1,
+kBatteryCoverRemoved = 0xA2,
+kBatteryCoverClosed = 0xA3,
+kExcessFlow = 0xA4,
+kCreditOk = 0xC0,
+kLowCredit = 0xC1,
+kEmergencyCreditInUse = 0xC0,
+kEmergencyCreditExhausted = 0xC1,
+kZeroCreditEcNotSelected = 0xC2,
+kSupplyOn = 0xC3,
+kSupplyOffAarmed = 0xC4,
+kSupplyOff = 0xC5,
+kDiscountApplied = 0xC6,
+kManufacturerSpecificA = 0xE0,
+kManufacturerSpecificB = 0xE1,
+kManufacturerSpecificC = 0xE2,
+kManufacturerSpecificD = 0xE3,
+kManufacturerSpecificE = 0xE4,
+kManufacturerSpecificF = 0xE5,
+kManufacturerSpecificG = 0xE6,
+kManufacturerSpecificH = 0xE7,
+kManufacturerSpecificI = 0xE8,
 };
 
 // Enum for MessagingControlConfirmation
-enum class MessagingControlConfirmation : uint8_t
-{
-    kNotRequired = 0x00,
-    kRequired    = 0x80,
+enum class MessagingControlConfirmation : uint8_t {
+kNotRequired = 0x00,
+kRequired = 0x80,
 };
 
 // Enum for MessagingControlEnhancedConfirmation
-enum class MessagingControlEnhancedConfirmation : uint8_t
-{
-    kNotRequired = 0x00,
-    kRequired    = 0x20,
+enum class MessagingControlEnhancedConfirmation : uint8_t {
+kNotRequired = 0x00,
+kRequired = 0x20,
 };
 
 // Enum for MessagingControlImportance
-enum class MessagingControlImportance : uint8_t
-{
-    kLow      = 0x00,
-    kMedium   = 0x04,
-    kHigh     = 0x08,
-    kCritical = 0x0C,
+enum class MessagingControlImportance : uint8_t {
+kLow = 0x00,
+kMedium = 0x04,
+kHigh = 0x08,
+kCritical = 0x0C,
 };
 
 // Enum for MessagingControlTransmission
-enum class MessagingControlTransmission : uint8_t
-{
-    kNormal             = 0x00,
-    kNormalAndAnonymous = 0x01,
-    kAnonymous          = 0x02,
-    kReserved           = 0x03,
+enum class MessagingControlTransmission : uint8_t {
+kNormal = 0x00,
+kNormalAndAnonymous = 0x01,
+kAnonymous = 0x02,
+kReserved = 0x03,
 };
 
 // Bitmap for MessagingConfirmationControl
-enum class MessagingConfirmationControl : uint8_t
-{
-    kNoReturned  = 0x1,
-    kYesReturned = 0x2,
+enum class MessagingConfirmationControl : uint8_t {
+kNoReturned = 0x1,
+kYesReturned = 0x2,
 };
 
 // Bitmap for MessagingControlMask
-enum class MessagingControlMask : uint8_t
-{
-    kTransMechanism              = 0x3,
-    kMessageUrgency              = 0xC,
-    kEnhancedConfirmationRequest = 0x20,
-    kMessageConfirmation         = 0x80,
+enum class MessagingControlMask : uint8_t {
+kTransMechanism = 0x3,
+kMessageUrgency = 0xC,
+kEnhancedConfirmationRequest = 0x20,
+kMessageConfirmation = 0x80,
 };
 
 // Bitmap for MessagingExtendedControlMask
-enum class MessagingExtendedControlMask : uint8_t
-{
-    kMessageConfirmationStatus = 0x1,
+enum class MessagingExtendedControlMask : uint8_t {
+kMessageConfirmationStatus = 0x1,
 };
 } // namespace Messaging
 
@@ -2639,28 +2446,25 @@ namespace MeterIdentification {
 namespace ApplianceEventsAndAlert {
 
 // Enum for EventIdentification
-enum class EventIdentification : uint8_t
-{
-    kEndOfCycle         = 0x01,
-    kTemperatureReached = 0x04,
-    kEndOfCooking       = 0x05,
-    kSwitchingOff       = 0x06,
-    kWrongData          = 0x07,
+enum class EventIdentification : uint8_t {
+kEndOfCycle = 0x01,
+kTemperatureReached = 0x04,
+kEndOfCooking = 0x05,
+kSwitchingOff = 0x06,
+kWrongData = 0x07,
 };
 
 // Bitmap for AlertCount
-enum class AlertCount : uint8_t
-{
-    kNumberOfAlerts = 0xF,
-    kTypeOfAlert    = 0xF0,
+enum class AlertCount : uint8_t {
+kNumberOfAlerts = 0xF,
+kTypeOfAlert = 0xF0,
 };
 
 // Bitmap for AlertStructure
-enum class AlertStructure : uint32_t
-{
-    kAlertId          = 0xFF,
-    kCategory         = 0xF00,
-    kPresenceRecovery = 0x3000,
+enum class AlertStructure : uint32_t {
+kAlertId = 0xFF,
+kCategory = 0xF00,
+kPresenceRecovery = 0x3000,
 };
 } // namespace ApplianceEventsAndAlert
 

@@ -24,6 +24,7 @@
 
 namespace chip {
 
+
 struct PairWithCodeCommand
 {
     chip::NodeId nodeId;
@@ -1163,6 +1164,7 @@ using Type = struct UnpairCommand;
 } // namespace Commands
 } // namespace CommissionerCommands
 
+
 namespace DelayCommands {
 namespace Commands {
 namespace WaitForMs {
@@ -1179,6 +1181,7 @@ using Type = struct WaitForMessageCommand;
 }
 } // namespace Commands
 } // namespace DelayCommands
+
 
 namespace DiscoveryCommands {
 namespace Commands {
@@ -1218,6 +1221,7 @@ using DecodableType = struct DiscoveryCommandResponse;
 } // namespace Commands
 } // namespace DiscoveryCommands
 
+
 namespace LogCommands {
 namespace Commands {
 namespace Log {
@@ -1228,6 +1232,7 @@ using Type = struct UserPromptCommand;
 }
 } // namespace Commands
 } // namespace LogCommands
+
 
 namespace SystemCommands {
 namespace Commands {

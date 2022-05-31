@@ -26,6 +26,7 @@
 /**** Network Section ****/
 #define EMBER_SUPPORTED_NETWORKS (1)
 
+
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
@@ -62,120 +63,145 @@
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL
 
+
 // Use this macro to check if the server side of the AdministratorCommissioning cluster is included
 #define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING
+
 
 // Use this macro to check if the server side of the Basic cluster is included
 #define ZCL_USING_BASIC_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_BASIC_SERVER
 #define EMBER_AF_PLUGIN_BASIC
 
+
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_DESCRIPTOR_SERVER
 #define EMBER_AF_PLUGIN_DESCRIPTOR
+
 
 // Use this macro to check if the server side of the Ethernet Network Diagnostics cluster is included
 #define ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ETHERNET_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_ETHERNET_NETWORK_DIAGNOSTICS
 
+
 // Use this macro to check if the server side of the Fixed Label cluster is included
 #define ZCL_USING_FIXED_LABEL_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_FIXED_LABEL_SERVER
 #define EMBER_AF_PLUGIN_FIXED_LABEL
+
 
 // Use this macro to check if the server side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING
 
+
 // Use this macro to check if the server side of the General Diagnostics cluster is included
 #define ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_DIAGNOSTICS
+
 
 // Use this macro to check if the server side of the Group Key Management cluster is included
 #define ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GROUP_KEY_MANAGEMENT_SERVER
 #define EMBER_AF_PLUGIN_GROUP_KEY_MANAGEMENT
 
+
 // Use this macro to check if the server side of the Groups cluster is included
 #define ZCL_USING_GROUPS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GROUPS_SERVER
 #define EMBER_AF_PLUGIN_GROUPS
+
 
 // Use this macro to check if the server side of the Identify cluster is included
 #define ZCL_USING_IDENTIFY_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY
 
+
 // Use this macro to check if the server side of the Localization Configuration cluster is included
 #define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
 #define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION
+
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
 
+
 // Use this macro to check if the client side of the OTA Software Update Provider cluster is included
 #define ZCL_USING_OTA_PROVIDER_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_PROVIDER_CLIENT
+
 
 // Use this macro to check if the server side of the OTA Software Update Requestor cluster is included
 #define ZCL_USING_OTA_REQUESTOR_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_SERVER
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR
 
+
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS
+
 
 // Use this macro to check if the server side of the Power Source cluster is included
 #define ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_POWER_SOURCE_SERVER
 #define EMBER_AF_PLUGIN_POWER_SOURCE
 
+
 // Use this macro to check if the client side of the Scenes cluster is included
 #define ZCL_USING_SCENES_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_SCENES_CLIENT
+
 
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS
 
+
 // Use this macro to check if the server side of the Thread Network Diagnostics cluster is included
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
+
 
 // Use this macro to check if the server side of the Time Format Localization cluster is included
 #define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
 #define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION
 
+
 // Use this macro to check if the server side of the Unit Localization cluster is included
 #define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_UNIT_LOCALIZATION_SERVER
 #define EMBER_AF_PLUGIN_UNIT_LOCALIZATION
+
 
 // Use this macro to check if the server side of the User Label cluster is included
 #define ZCL_USING_USER_LABEL_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_USER_LABEL_SERVER
 #define EMBER_AF_PLUGIN_USER_LABEL
 
+
 // Use this macro to check if the server side of the WiFi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS
 
+
 // Use this macro to check if the server side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_WINDOW_COVERING_SERVER
 #define EMBER_AF_PLUGIN_WINDOW_COVERING
+
