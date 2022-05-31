@@ -147,13 +147,3 @@ RUN set -x \
 # Switch to the non-root user
 USER $USER_NAME
 WORKDIR $USER_HOME
-
-# ------------------------------------------------------------------------------
-# Setup tizen studio CLI
-RUN set -x \
-    # Generate author certificate
-    && tizen certificate --alias=CHIP --name=CHIP --email=chip@tizen.org --password=chiptizen \
-    # Add new security profile
-    && tizen security-profiles add --active --name=CHIP --author=$HOME/tizen-sdk-data/keystore/author/author.p12 --password=chiptizen \
-    # Cleanup
-    && : # last line
