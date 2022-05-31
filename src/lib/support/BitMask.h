@@ -40,6 +40,14 @@ public:
     explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
     explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
 
+    template <typename... Args>
+    BitMask(FlagsEnum flag, Args &&... args) : BitFlags<FlagsEnum, StorageType>(flag, std::forward<Args>(args)...)
+    {}
+
+    template <typename... Args>
+    BitMask(IntegerType value, Args &&... args) : BitFlags<FlagsEnum, StorageType>(value, std::forward<Args>(args)...)
+    {}
+
     /**
      * GetField to value via a mask shifting.
      *
