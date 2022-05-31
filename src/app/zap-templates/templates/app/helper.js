@@ -110,25 +110,25 @@ function chip_endpoint_generated_functions()
       {
         hasFunctionArray = true
         functionList     = functionList.concat(
-                `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-            hasFunctionArray = true
+        hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
-            hasFunctionArray = true
+        hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
-            hasFunctionArray = true
+        hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
@@ -294,7 +294,9 @@ async function asNativeType(type)
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => { return ChipTypesHelper.asBasicType(zclType); })
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      return ChipTypesHelper.asBasicType(zclType);
+    })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
@@ -515,14 +517,14 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app::.
-    let ns = options.hash.ns ? "chip::app::" : ""
+    let ns  = options.hash.ns ? "chip::app::" : ""
     typeStr = `${ns}DataModel::Nullable<${typeStr}>`;
   }
   if (this.isOptional && !options.hash.forceNotOptional) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::.
-    let ns = options.hash.ns ? "chip::" : ""
+    let ns  = options.hash.ns ? "chip::" : ""
     typeStr = `${ns}Optional<${typeStr}>`;
   }
   if (options.hash.isArgument && passByReference) {
