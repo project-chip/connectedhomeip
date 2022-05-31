@@ -14,9 +14,9 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    100.2.6. [TC-DL-2.6] Verification for the following Commands - Set PIN Code,
-    Get PIN Code, Get PIN Code Response, Clear PIN Code, Clear All PIN Codes
-    [DUT-Server]
+    112.2.6. [TC-DL-2.6] Verification for the following Commands - Set Holiday
+    Schedule, Get Holiday Schedule, Get Holiday Schedule Response , Clear
+    Holiday Schedule [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -25,79 +25,111 @@ config:
 
 tests:
     - label:
-          "TH saves the NumberOfPINUsersSupported attribute value as idvalue for
-          the future use"
+          "TH reads NumberOfHolidaySchedulesSupported and saves for future use."
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/15776
+          ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
+
+          [1651752699.633117][3671:3676] CHIP:DMG:                                StatusIB =
+          [1651752699.633165][3671:3676] CHIP:DMG:                                {
+          [1651752699.633213][3671:3676] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651752699.633262][3671:3676] CHIP:DMG:                                },
       disabled: true
 
     - label:
-          "TH sends Set PIN Code Command to the DUT with the following argument
-          values: User ID value as 3 User Status value as 1 'OccupiedEnabled'
-          User Type value as 0 'UnrestrictedUser' PIN value as 'xxxxxxxx'"
+          "TH sends Set Holiday Schedule Command to DUT with the following
+          values: HolidayIndex as 1 LocalStartTime as 20 LocalEndTime as 30
+          OperatingMode as 0"
       verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
 
+          [1651158181.346750][6202:6207] CHIP:DMG: },
+          [1651158181.346857][6202:6207] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0011 Status=0x81
+          [1651158181.346916][6202:6207] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
       disabled: true
 
     - label:
-          "TH sends Set PIN Code Command to the DUT with the following argument
-          values: User ID value as idvalue+1 User Status value as 1
-          'OccupiedEnabled' User Type value as 0 'UnrestrictedUser' PIN value as
-          'xxxxxxxx'"
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1"
       verification: |
+          ./chip-tool doorlock get-holiday-schedule 1 1 1
 
+          [1651158836.053711][6244:6249] CHIP:DMG: },
+          [1651158836.053780][6244:6249] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012 Status=0x81
+          [1651158836.053817][6244:6249] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
       disabled: true
 
     - label:
-          "TH sends Get PIN Code Command to the DUT with argument User ID value
-          as 3"
+          "TH sends Set Holiday Schedule Command to DUT with the following
+          values: HolidayIndex as 1 LocalStartTime as 20 LocalEndTime as 30
+          OperatingMode as 5"
       verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 5 1 1
 
+          [1651160907.922634][6407:6412] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0011 Status=0x81
+          [1651160907.922677][6407:6412] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
       disabled: true
 
     - label:
-          "TH sends Get PIN Code Command to the DUT with argument User ID value
-          as idvalue +1"
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1"
       verification: |
+          ./chip-tool doorlock get-holiday-schedule 1 1 1
 
+          [1651753075.971000][3714:3719] CHIP:DMG:                                StatusIB =
+          [1651753075.971049][3714:3719] CHIP:DMG:                                {
+          [1651753075.971098][3714:3719] CHIP:DMG:                                        status = 0x81 (UNSUPPORTED_COMMAND),
+          [1651753075.971148][3714:3719] CHIP:DMG:                                },
       disabled: true
 
     - label:
-          "TH sends Get PIN Code Command to the DUT with argument User ID value
-          as '5a3'"
+          "TH sends Set Holiday Schedule Command to DUT with the following
+          values: HolidayIndex as 1 LocalStartTime as 20 LocalEndTime as 30
+          OperatingMode as 3"
       verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 3 1 1
 
+          [1651753121.844770][3721:3726] CHIP:DMG:                                StatusIB =
+          [1651753121.844810][3721:3726] CHIP:DMG:                                {
+          [1651753121.844852][3721:3726] CHIP:DMG:                                        status = 0x81 (UNSUPPORTED_COMMAND),
+          [1651753121.844895][3721:3726] CHIP:DMG:                                },
       disabled: true
 
     - label:
-          "TH sends Clear PIN Code Command to the DUT with argument PINSlotIndex
-          value as 3"
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 10"
       verification: |
+          ./chip-tool doorlock get-holiday-schedule 10 1 1
 
+          [1651159091.759202][6270:6275] CHIP:DMG: },
+          [1651159091.759283][6270:6275] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012 Status=0x81
+          [1651159091.759327][6270:6275] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
       disabled: true
 
     - label:
-          "TH sends Get PIN Code Response Command to DUT with the User ID as 3"
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 6"
       verification: |
+          ./chip-tool doorlock get-holiday-schedule 6 1 1
 
+          [1651753204.977947][3745:3750] CHIP:DMG:                                StatusIB =
+          [1651753204.977985][3745:3750] CHIP:DMG:                                {
+          [1651753204.978022][3745:3750] CHIP:DMG:                                        status = 0x81 (UNSUPPORTED_COMMAND),
+          [1651753204.978063][3745:3750] CHIP:DMG:                                },
       disabled: true
 
     - label:
-          "TH sends clear PIN Code Command to the DUT with argument User ID
-          value as idvlaue +1"
+          "TH send Clear Holiday Schedule Command to DUT with HolidayIndex as 1"
       verification: |
+          ./chip-tool doorlock clear-holiday-schedule 1 1 1
 
+          [1651753246.493952][3753:3758] CHIP:DMG:                                StatusIB =
+          [1651753246.493984][3753:3758] CHIP:DMG:                                {
+          [1651753246.494020][3753:3758] CHIP:DMG:                                        status = 0x81 (UNSUPPORTED_COMMAND),
+          [1651753246.494054][3753:3758] CHIP:DMG:                                },
       disabled: true
 
     - label:
-          "TH sends clear PIN Code Command to the DUT with argument PINSlotIndex
-          value as 0xFFFE"
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 2"
       verification: |
+          ./chip-tool doorlock get-holiday-schedule 2 1 1
 
-      disabled: true
-
-    - label:
-          "TH sends Get PIN Code Response Command to DUT with the User ID as 8"
-      verification: |
-
+          [1651159091.759202][6270:6275] CHIP:DMG: },
+          [1651159091.759283][6270:6275] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012 Status=0x81
+          [1651159091.759327][6270:6275] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
       disabled: true
