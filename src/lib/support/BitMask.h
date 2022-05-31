@@ -40,6 +40,7 @@ public:
     BitMask() : BitFlags<FlagsEnum, StorageType>() {}
     BitMask(const BitFlags<FlagsEnum, StorageType> & other) : BitFlags<FlagsEnum, StorageType>(other) {}
     BitMask(BitFlags<FlagsEnum, StorageType> && other) : BitFlags<FlagsEnum, StorageType>(std::move(other)) {}
+    BitMask(const BitMask &) = default;
 
     explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
     explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
