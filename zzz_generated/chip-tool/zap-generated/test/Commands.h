@@ -65,7 +65,6 @@ public:
         printf("Test_TC_CC_9_2\n");
         printf("Test_TC_CC_9_3\n");
         printf("Test_TC_DM_2_1\n");
-        printf("Test_TC_DM_2_2\n");
         printf("Test_TC_EMR_1_1\n");
         printf("Test_TC_DGETH_2_1\n");
         printf("Test_TC_DGETH_2_2\n");
@@ -299,6 +298,7 @@ public:
         printf("Test_TC_DM_1_1\n");
         printf("Test_TC_DM_1_2\n");
         printf("Test_TC_DM_1_3\n");
+        printf("Test_TC_DM_2_2\n");
         printf("Test_TC_DM_2_4\n");
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_3_2\n");
@@ -12026,212 +12026,6 @@ private:
     }
 };
 
-class Test_TC_DM_2_2Suite : public TestCommand
-{
-public:
-    Test_TC_DM_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", 13, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_DM_2_2Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    uint32_t SoftwareVersionValue;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                SoftwareVersionValue = value;
-            }
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("softwareVersion", value, SoftwareVersionValue));
-            }
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 2: {
-            LogStep(2, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
-        case 3: {
-            LogStep(3, "Reboot target device");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 4: {
-            LogStep(4, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 6: {
-            LogStep(6, "Reboot target device");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 7: {
-            LogStep(7, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "Factory Reset the accessory");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
-            return FactoryReset(kIdentityAlpha, value);
-        }
-        case 9: {
-            LogStep(9, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 10: {
-            LogStep(10, "Reboot target device");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 11: {
-            LogStep(11, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 12: {
-            LogStep(12, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
 class Test_TC_EMR_1_1Suite : public TestCommand
 {
 public:
@@ -21588,11 +21382,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22059,11 +21853,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22115,11 +21909,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22176,11 +21970,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22759,11 +22553,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22812,11 +22606,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22832,11 +22626,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22885,11 +22679,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22905,11 +22699,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -64840,8 +64634,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64896,8 +64689,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64952,8 +64744,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65008,8 +64799,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65064,8 +64854,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65120,8 +64909,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65176,8 +64964,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65232,8 +65019,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65288,8 +65074,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65344,8 +65129,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65400,8 +65184,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65456,8 +65239,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65512,8 +65294,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65568,8 +65349,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65624,8 +65404,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65680,8 +65459,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65736,8 +65514,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65792,8 +65569,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65848,8 +65624,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65904,8 +65679,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65960,8 +65734,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66016,8 +65789,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66072,8 +65844,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66128,8 +65899,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66184,8 +65954,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66240,8 +66009,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66296,8 +66064,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66352,8 +66119,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66408,8 +66174,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66464,8 +66229,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66520,8 +66284,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66576,8 +66339,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66632,8 +66394,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67141,8 +66902,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67197,8 +66957,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67253,8 +67012,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67309,8 +67067,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67365,8 +67122,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67421,8 +67177,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67477,8 +67232,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67533,8 +67287,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67589,8 +67342,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67645,8 +67397,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67701,8 +67452,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67757,8 +67507,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67813,8 +67562,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67869,8 +67617,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67925,8 +67672,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67981,8 +67727,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68037,8 +67782,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68093,8 +67837,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68149,8 +67892,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68205,8 +67947,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68261,8 +68002,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68317,8 +68057,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68373,8 +68112,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68429,8 +68167,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68485,8 +68222,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68541,7 +68277,212 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DM_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_DM_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", 13, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DM_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    uint32_t SoftwareVersionValue;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
         {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                SoftwareVersionValue = value;
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("softwareVersion", value, SoftwareVersionValue));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Query SoftwareVersion");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
+                                 chip::NullOptional);
+        }
+        case 2: {
+            LogStep(2, "Query Reachable Fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
+                                 chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
+        }
+        case 4: {
+            LogStep(4, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 5: {
+            LogStep(5, "Query SoftwareVersion");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "Factory Reset the accessory");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            return FactoryReset(kIdentityAlpha, value);
+        }
+        case 9: {
+            LogStep(9, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 10: {
+            LogStep(10, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
+        }
+        case 11: {
+            LogStep(11, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "Query Reachable Fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
+                                 chip::NullOptional);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -68597,8 +68538,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68653,8 +68593,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68709,8 +68648,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68765,8 +68703,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68821,8 +68758,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68877,8 +68813,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68933,8 +68868,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68989,8 +68923,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69045,8 +68978,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69101,8 +69033,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69157,8 +69088,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69213,8 +69143,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69269,8 +69198,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69325,8 +69253,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69381,8 +69308,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69437,8 +69363,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69493,8 +69418,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69549,8 +69473,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69605,8 +69528,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69661,8 +69583,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69717,8 +69638,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69773,8 +69693,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69829,8 +69748,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69885,8 +69803,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69941,8 +69858,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69997,8 +69913,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70054,8 +69969,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70111,8 +70025,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70168,8 +70081,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70224,8 +70136,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70280,8 +70191,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70336,8 +70246,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70392,8 +70301,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70448,8 +70356,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70504,8 +70411,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70560,8 +70466,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70617,8 +70522,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70674,8 +70578,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70731,8 +70634,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70787,8 +70689,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70843,8 +70744,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70899,8 +70799,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70955,8 +70854,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71011,8 +70909,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71067,8 +70964,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71123,8 +71019,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71179,8 +71074,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71235,8 +71129,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71291,8 +71184,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71347,8 +71239,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71403,8 +71294,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71459,8 +71349,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71515,8 +71404,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71571,8 +71459,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71627,8 +71514,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71683,8 +71569,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71739,8 +71624,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71795,8 +71679,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71851,8 +71734,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71907,8 +71789,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71963,8 +71844,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72019,8 +71899,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72075,8 +71954,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72131,8 +72009,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72187,8 +72064,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72243,8 +72119,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72299,8 +72174,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72355,8 +72229,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72411,8 +72284,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72467,8 +72339,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72523,8 +72394,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73679,8 +73549,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73735,8 +73604,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73791,8 +73659,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73847,8 +73714,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73903,8 +73769,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73959,8 +73824,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74015,8 +73879,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74071,8 +73934,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74127,8 +73989,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74183,8 +74044,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74239,8 +74099,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74295,8 +74154,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74351,8 +74209,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74407,8 +74264,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74463,8 +74319,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74519,8 +74374,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74575,8 +74429,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74631,8 +74484,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74687,8 +74539,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74743,8 +74594,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74799,8 +74649,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74855,8 +74704,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74911,8 +74759,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74967,8 +74814,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75023,8 +74869,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75079,8 +74924,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75135,8 +74979,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75191,8 +75034,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75247,8 +75089,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75303,8 +75144,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75545,11 +75385,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75577,11 +75417,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 179U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75651,8 +75491,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75707,8 +75546,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75763,8 +75601,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75819,8 +75656,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75875,8 +75711,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75931,8 +75766,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75987,8 +75821,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76043,8 +75876,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76099,8 +75931,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76155,8 +75986,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76211,8 +76041,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76267,8 +76096,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76323,8 +76151,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76379,8 +76206,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76435,8 +76261,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76491,8 +76316,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76547,8 +76371,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76603,8 +76426,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76659,8 +76481,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76715,8 +76536,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76771,8 +76591,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76827,8 +76646,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76883,8 +76701,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76939,8 +76756,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76995,8 +76811,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77051,8 +76866,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77107,8 +76921,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77163,8 +76976,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77219,8 +77031,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77275,8 +77086,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77331,8 +77141,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77387,8 +77196,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77443,8 +77251,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77499,8 +77306,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77555,8 +77361,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77611,8 +77416,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77667,8 +77471,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77723,8 +77526,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77779,8 +77581,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77835,8 +77636,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78001,8 +77801,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78168,8 +77967,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78224,8 +78022,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78280,8 +78077,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78336,8 +78132,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78392,8 +78187,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78448,8 +78242,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78504,8 +78297,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78560,8 +78352,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78616,8 +78407,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78672,8 +78462,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78728,8 +78517,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78784,8 +78572,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78840,8 +78627,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78896,8 +78682,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78952,8 +78737,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79008,8 +78792,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79064,8 +78847,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79120,8 +78902,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79176,8 +78957,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79232,8 +79012,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79288,8 +79067,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79344,8 +79122,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79400,8 +79177,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79456,8 +79232,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79512,8 +79287,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79568,8 +79342,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79624,8 +79397,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79680,8 +79452,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79736,8 +79507,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79792,8 +79562,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79848,8 +79617,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79904,8 +79672,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79960,8 +79727,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80016,8 +79782,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80072,8 +79837,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80273,8 +80037,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80329,8 +80092,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80385,8 +80147,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80441,8 +80202,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80639,8 +80399,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80695,8 +80454,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80751,8 +80509,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80807,8 +80564,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80864,8 +80620,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80921,8 +80676,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80978,8 +80732,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81035,8 +80788,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81091,8 +80843,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81147,8 +80898,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81203,8 +80953,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81259,8 +81008,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81315,8 +81063,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81371,8 +81118,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81427,8 +81173,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81483,8 +81228,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81539,8 +81283,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81595,8 +81338,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81651,8 +81393,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81707,8 +81448,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81754,7 +81494,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CC_9_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DM_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_EMR_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DGETH_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DGETH_2_2Suite>(credsIssuerConfig),
@@ -81977,6 +81716,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DM_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_2Suite>(credsIssuerConfig),
