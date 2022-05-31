@@ -85,14 +85,15 @@ bool emberEventControlGetActive(EmberEventControl * control);
  */
 void emberEventControlSetActive(EmberEventControl * control);
 
-class MatterEventMetaContext: public chip::IntrusiveListNodeBase {
+class MatterEventMetaContext : public chip::IntrusiveListNodeBase
+{
 public:
     EmberAfEventContext context;
-    const char* eventString;
+    const char * eventString;
     EmberEventData event;
-    MatterEventMetaContext* nextContext;
+    MatterEventMetaContext * nextContext;
 };
 
-void MatterRegisterAfEvent(MatterEventMetaContext* newContext);
+void MatterRegisterAfEvent(MatterEventMetaContext * newContext);
 
 void MatterUnregisterAllAfEvents();

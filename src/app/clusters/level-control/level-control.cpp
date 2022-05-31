@@ -1131,18 +1131,18 @@ void MatterLevelControlClusterServerTickCallbackWrapperFunction(uint8_t endpoint
     clusterTickWrapper(&eventControl, emberAfLevelControlClusterServerTickCallback, endpoint);
 }
 
-void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint)
+{
     static MatterEventMetaContext metaContext;
 
-    metaContext.context = { .endpoint = endpoint,
-                            .clusterId = LevelControl::Id,
-                            .isClient = false,
-                            .pollControl = EMBER_AF_LONG_POLL,
+    metaContext.context     = { .endpoint     = endpoint,
+                            .clusterId    = LevelControl::Id,
+                            .isClient     = false,
+                            .pollControl  = EMBER_AF_LONG_POLL,
                             .sleepControl = EMBER_AF_OK_TO_SLEEP,
                             .eventControl = &eventControl };
     metaContext.eventString = "Level Control";
-    metaContext.event = { &eventControl,
-                          MatterLevelControlClusterServerTickCallbackWrapperFunction };
+    metaContext.event       = { &eventControl, MatterLevelControlClusterServerTickCallbackWrapperFunction };
     MatterRegisterAfEvent(&metaContext);
 }
 

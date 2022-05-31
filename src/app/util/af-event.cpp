@@ -68,7 +68,7 @@ EMBER_AF_GENERATED_EVENT_CODE
 
 static IntrusiveList<MatterEventMetaContext> eventMetaContexts;
 
-void MatterRegisterAfEvent(MatterEventMetaContext* newContext)
+void MatterRegisterAfEvent(MatterEventMetaContext * newContext)
 {
     eventMetaContexts.PushBack(newContext);
 }
@@ -94,12 +94,13 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
             return;
         }
 
-        for (auto metaContext : eventMetaContexts) {
+        for (auto metaContext : eventMetaContexts)
+        {
             const EmberEventData & event = metaContext.event;
             if (event.control != control)
                 continue;
             control->status = EMBER_EVENT_INACTIVE;
-            event.handler((uint8_t)metaContext.context.endpoint);
+            event.handler((uint8_t) metaContext.context.endpoint);
             break;
         }
     }
@@ -121,8 +122,10 @@ const char * emberAfGetEventString(uint8_t index)
     }
 
     uint8_t iteratorCounter = 0;
-    for (auto& metaContext : eventMetaContexts) {
-        if (iteratorCounter == index) {
+    for (auto & metaContext : eventMetaContexts)
+    {
+        if (iteratorCounter == index)
+        {
             return metaContext.eventString;
         }
         iteratorCounter++;
@@ -133,7 +136,8 @@ const char * emberAfGetEventString(uint8_t index)
 
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
-    for (auto& metaContext : eventMetaContexts) {
+    for (auto & metaContext : eventMetaContexts)
+    {
         auto context = metaContext.context;
         if (context.endpoint == endpoint && context.clusterId == clusterId && context.isClient == isClient)
         {
