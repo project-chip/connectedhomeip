@@ -33,13 +33,20 @@ template <typename FlagsEnum, typename StorageType = typename std::underlying_ty
 class BitMask : public BitFlags<FlagsEnum, StorageType>
 {
 public:
+    using IntegerType = typename BitFlags<FlagsEnum, StorageType>::IntegerType;
+
+    BitMask() : BitFlags<FlagsEnum, StorageType>() {}
+
+    explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
+    explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
+
     /**
      * GetField to value via a mask shifting.
      *
      * @param mask      Typed flag(s) to used as mask, flag(s) must be contiguous. Any flags not in @a v are unaffected.
      * @returns         Value from the underlying field/mask
      */
-    constexpr BitFlags & SetField(FlagsEnum mask, IntegerType value)
+    constexpr BitMask & SetField(FlagsEnum mask, IntegerType value)
     {
         IntegerType bitMask = static_cast<IntegerType>(mask);
         IntegerType shift   = GetShiftToFirstSetBit(bitMask);
@@ -48,9 +55,11 @@ public:
         assert((value & (mask >> shift)) == value);
 
         // Clear bits overlayed by the mask
-        mValue = static_cast<IntegerType>(mValue & ~bitMask);
+        IntegerType updated = static_cast<IntegerType>(BitFlags<FlagsEnum, StorageType>::Raw() & ~bitMask);
         // Set the right bits
-        mValue |= static_cast<IntegerType>(bitMask & (value << shift));
+        updated |= static_cast<IntegerType>(bitMask & (value << shift));
+
+        BitFlags<FlagsEnum, StorageType>::SetRaw(updated);
 
         return *this;
     }
@@ -68,7 +77,7 @@ public:
             IntegerType shift   = GetShiftToFirstSetBit(bitMask);
 
             // Forward the right bits
-            return static_cast<IntegerType>(((mValue & bitMask) >> shift));
+            return static_cast<IntegerType>(((BitFlags<FlagsEnum, StorageType>::Raw() & bitMask) >> shift));
         }
     }
 
@@ -94,3 +103,5 @@ protected:
         return count;
     }
 };
+
+} // namespace chip
