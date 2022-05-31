@@ -30,7 +30,6 @@ namespace app {
 CHIP_ERROR DataVersionFilterIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    size_t numDataVersionFilters = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("DataVersionFilterIBs =");
@@ -49,8 +48,6 @@ CHIP_ERROR DataVersionFilterIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(DataVersionFilter.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++numDataVersionFilters;
     }
 
     PRETTY_PRINT("],");
@@ -59,11 +56,7 @@ CHIP_ERROR DataVersionFilterIBs::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one event filter
-        if (numDataVersionFilters > 0)
-        {
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

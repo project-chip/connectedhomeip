@@ -2010,28 +2010,28 @@ using CHIP_ERROR = ::chip::ChipError;
  * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH
  *
  * @brief
- *   The Attribute path is malformed: it either does not contain
+ *   The Attribute path IB is malformed: it either does not contain
  *   the required path
  */
-#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH                 CHIP_CORE_ERROR(0xb5)
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH                CHIP_CORE_ERROR(0xb5)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_EVENT_PATH
  *
  * @brief
- *   The Attribute Path is malformed: it either does not contain
+ *   The Event Path IB is malformed: it either does not contain
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_PATH                     CHIP_CORE_ERROR(0xb6)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_COMMAND_PATH
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB
  *
  * @brief
- *   The Attribute DataElement is malformed: it either does not contain
+ *   The Command Path IB is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_COMMAND_PATH                   CHIP_CORE_ERROR(0xb7)
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB                  CHIP_CORE_ERROR(0xb7)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT
@@ -2052,13 +2052,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT           CHIP_CORE_ERROR(0xb9)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB
  *
  * @brief
  *   The Event DataElement is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT             CHIP_CORE_ERROR(0xba)
+#define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB             CHIP_CORE_ERROR(0xba)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_STATUS_CODE
@@ -2249,13 +2249,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd0)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB
  *
  * @brief
- *   The WriteResponseMessage is malformed: it either does not contain
+ *   The EventFilter IB is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd1)
+#define CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB    CHIP_CORE_ERROR(0xd1)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE
@@ -2394,6 +2394,43 @@ using CHIP_ERROR = ::chip::ChipError;
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB
+ *
+ * @brief
+ *   The AttributeReportIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB             CHIP_CORE_ERROR(0xe2)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB
+ *
+ * @brief
+ *   The AttributeStatusIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_IB             CHIP_CORE_ERROR(0xe3)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB
+ *
+ * @brief
+ *   The CommandDataIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB             CHIP_CORE_ERROR(0xe4)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB
+ *
+ * @brief
+ *   The Event Status IB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB             CHIP_CORE_ERROR(0xe5)
+
 
 // clang-format on
 

@@ -331,12 +331,11 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
         }
         else
         {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT;
+            err = CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB;
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -414,7 +413,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
     }
     else if (err == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(aEventHeader.mTimestamp.IsSystem(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT);
+        VerifyOrReturnError(aEventHeader.mTimestamp.IsSystem(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB);
         aEventHeader.mTimestamp.mValue += timeStampVal;
         hasDeltaSystemTimestamp = true;
     }
@@ -427,7 +426,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
     }
     else if (err == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(aEventHeader.mTimestamp.IsEpoch(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT);
+        VerifyOrReturnError(aEventHeader.mTimestamp.IsEpoch(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB);
         aEventHeader.mTimestamp.mValue += timeStampVal;
         hasDeltaEpochTimestamp = true;
     }
@@ -462,7 +461,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
     {
         return CHIP_NO_ERROR;
     }
-    return CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT;
+    return CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB;
 }
 
 CHIP_ERROR EventDataIB::Parser::DecodeEventHeader(EventHeader & aEventHeader)

@@ -80,6 +80,9 @@ CHIP_ERROR DataVersionFilterIB::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
+        default:
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
     PRETTY_PRINT("},");

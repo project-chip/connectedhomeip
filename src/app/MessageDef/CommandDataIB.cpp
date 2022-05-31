@@ -260,13 +260,12 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
         }
         else
         {
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE;
+            err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 

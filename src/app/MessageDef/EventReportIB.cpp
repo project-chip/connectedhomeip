@@ -108,8 +108,7 @@ CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -117,16 +116,14 @@ CHIP_ERROR EventReportIB::Parser::GetEventStatus(EventStatusIB::Parser * const a
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventStatus)), reader));
-    ReturnErrorOnFailure(apEventStatus->Init(reader));
-    return CHIP_NO_ERROR;
+    return apEventStatus->Init(reader);
 }
 
 CHIP_ERROR EventReportIB::Parser::GetEventData(EventDataIB::Parser * const apEventData) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventData)), reader));
-    ReturnErrorOnFailure(apEventData->Init(reader));
-    return CHIP_NO_ERROR;
+    return apEventData->Init(reader);
 }
 
 EventStatusIB::Builder & EventReportIB::Builder::CreateEventStatus()

@@ -40,7 +40,8 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
         {
             continue;
         }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
         case to_underlying(Tag::kStatus):
             VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kStatus))), CHIP_ERROR_INVALID_TLV_TAG);
@@ -58,7 +59,8 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
-            ReturnErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
     PRETTY_PRINT("}");

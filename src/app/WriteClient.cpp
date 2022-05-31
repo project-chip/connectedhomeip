@@ -85,29 +85,29 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 
     reader.Init(std::move(payload));
 
-    err = writeResponse.Init(reader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = writeResponse.CheckSchemaValidity();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writeResponse.CheckSchemaValidity());
 #endif
+
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
-    SuccessOrExit(err);
+    if (err == CHIP_END_OF_TLV)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
 
     attributeStatusesParser.GetReader(&attributeStatusesReader);
 
     while (CHIP_NO_ERROR == (err = attributeStatusesReader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag() == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
         AttributeStatusIB::Parser element;
 
-        err = element.Init(attributeStatusesReader);
-        SuccessOrExit(err);
-
-        err = ProcessAttributeStatusIB(element);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(element.Init(attributeStatusesReader));
+        ReturnErrorOnFailure(ProcessAttributeStatusIB(element));
     }
 
     // if we have exhausted this container
@@ -115,11 +115,8 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-    ReturnErrorOnFailure(writeResponse.ExitContainer());
-
-exit:
-    return err;
+    ReturnErrorOnFailure(err);
+    return writeResponse.ExitContainer();
 }
 
 CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & aPath)

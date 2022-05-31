@@ -35,7 +35,7 @@ AttributeDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
 
     if (aDepth == 0)
     {
-        PRETTY_PRINT("\tData = ");
+        PRETTY_PRINT("Data = ");
     }
     else
     {
@@ -261,12 +261,11 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
         }
         else
         {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT;
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT;
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -274,8 +273,7 @@ CHIP_ERROR AttributeDataIB::Parser::GetPath(AttributePathIB::Parser * const apPa
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
-    ReturnErrorOnFailure(apPath->Init(reader));
-    return CHIP_NO_ERROR;
+    return apPath->Init(reader);
 }
 
 CHIP_ERROR AttributeDataIB::Parser::GetDataVersion(chip::DataVersion * const apVersion) const
