@@ -30,8 +30,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-// TODO
-
 class OpenIoTSDKEthernetDriver final : public EthernetDriver
 {
 public:

@@ -43,7 +43,7 @@ if (chip_build_tests) {
         # "${chip_root}/src/system/tests",
         # "${chip_root}/src/transport/tests",
         # "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
-        #"${chip_root}/src/platform/tests",
+        "${chip_root}/src/platform/tests",
         # "${chip_root}/src/controller/tests",
         # "${chip_root}/src/controller/tests/data_model",
         # "${chip_root}/src/lib/shell/tests",

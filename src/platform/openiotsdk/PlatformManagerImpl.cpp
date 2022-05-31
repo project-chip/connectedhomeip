@@ -42,7 +42,22 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     // Members are initialized by the stack
 
-    // ToDo initalize platform-specific members of stack
+    // Reinitialize the Mutexes
+    mChipStackMutex = osMutexNew(nullptr);
+    mEventTaskMutex = osMutexNew(nullptr);
+    mPlatformFlags  = osEventFlagsNew(nullptr);
+    mQueue          = osMessageQueueNew(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), nullptr);
+
+    if (!mChipStackMutex || !mEventTaskMutex || !mPlatformFlags || !mQueue)
+    {
+        osMutexDelete(mChipStackMutex);
+        osMutexDelete(mEventTaskMutex);
+        osEventFlagsDelete(mPlatformFlags);
+        osMessageQueueDelete(mQueue);
+        mChipStackMutex = mEventTaskMutex = mPlatformFlags = mQueue = nullptr;
+
+        return CHIP_ERROR_INTERNAL;
+    }
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
@@ -60,47 +75,149 @@ exit:
 
 void PlatformManagerImpl::_LockChipStack()
 {
-    // ToDo
+    osMutexAcquire(mChipStackMutex, osWaitForever);
 }
 
 bool PlatformManagerImpl::_TryLockChipStack()
 {
-    // ToDo
-    return true;
+    if (osMutexAcquire(mChipStackMutex, 0U) == osOK)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void PlatformManagerImpl::_UnlockChipStack()
 {
-    // ToDo
+    osMutexRelease(mChipStackMutex);
 }
 
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
-    // ToDo
+    osStatus_t status = osMessageQueuePut(mQueue, eventPtr, 0, 0);
 
-    return CHIP_NO_ERROR;
+    CHIP_ERROR ret = (status == osOK) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return ret;
 }
 
 void PlatformManagerImpl::ProcessDeviceEvents()
 {
-    // ToDo
+    ChipDeviceEvent event;
+    osStatus_t status = osMessageQueueGet(mQueue, &event, nullptr, osWaitForever);
+    if (status == osOK)
+    {
+        LockChipStack();
+        DispatchEvent(&event);
+        UnlockChipStack();
+    }
 }
 
 void PlatformManagerImpl::_RunEventLoop()
 {
-    // ToDo
+    // this mutex only needed to guard against multiple launches
+    {
+        osMutexAcquire(mEventTaskMutex, osWaitForever);
+
+        if (FLAG_EVENT_TASK_RUNNING & osEventFlagsGet(mPlatformFlags))
+        {
+            // already running
+            osMutexRelease(mEventTaskMutex);
+            return;
+        }
+
+        osEventFlagsSet(mPlatformFlags, FLAG_EVENT_TASK_RUNNING);
+
+        osMutexRelease(mEventTaskMutex);
+    }
+
+    RunEventLoopInternal();
+}
+
+void PlatformManagerImpl::RunEventLoopInternal()
+{
+    while ((osEventFlagsGet(mPlatformFlags) & FLAG_STOP_EVENT_TASK) == 0)
+    {
+        ProcessDeviceEvents();
+    }
+
+    osEventFlagsClear(mPlatformFlags, FLAG_STOP_EVENT_TASK | FLAG_EVENT_TASK_RUNNING);
+}
+
+void PlatformManagerImpl::RunEventLoopTask(void * arg)
+{
+    (void) arg;
+    PlatformMgrImpl().RunEventLoopInternal();
+    osThreadTerminate(osThreadGetId());
 }
 
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 {
-    // ToDo
+    // this mutex only needed to guard against multiple launches
+    {
+        osMutexAcquire(mEventTaskMutex, osWaitForever);
+
+        if (FLAG_EVENT_TASK_RUNNING & osEventFlagsGet(mPlatformFlags))
+        {
+            osMutexRelease(mEventTaskMutex);
+            return CHIP_ERROR_BUSY;
+        }
+
+        const osThreadAttr_t tread_attr = {
+            .name       = CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
+            .stack_size = CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE,
+            .priority   = osPriorityNormal,
+
+        };
+        // this thread is self terminating
+        osThreadId_t mEventTask = osThreadNew(PlatformManagerImpl::RunEventLoopTask, NULL, &tread_attr);
+
+        if (mEventTask == nullptr)
+        {
+            osMutexRelease(mEventTaskMutex);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        osEventFlagsSet(mPlatformFlags, FLAG_EVENT_TASK_RUNNING);
+
+        osMutexRelease(mEventTaskMutex);
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-    // ToDo
+    // this mutex only needed to guard against multiple calls to stop
+    {
+        osMutexAcquire(mEventTaskMutex, osWaitForever);
+
+        uint32_t flags = osEventFlagsGet(mPlatformFlags);
+        if ((FLAG_EVENT_TASK_RUNNING & flags) == 0)
+        {
+            osMutexRelease(mEventTaskMutex);
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        if (FLAG_STOP_EVENT_TASK & flags)
+        {
+            osMutexRelease(mEventTaskMutex);
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        osEventFlagsSet(mPlatformFlags, FLAG_STOP_EVENT_TASK);
+
+        osMutexRelease(mEventTaskMutex);
+    }
+
+    {
+        // wake up the main loop by sending a NOP so that the flags get checked and loop can exit
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kNoOp;
+        _PostEvent(&event);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -117,6 +234,29 @@ void PlatformManagerImpl::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
+
+    (void) _StopEventLoopTask();
+
+    // the task thread is self terminating, we might have to wait if it's still processing
+    while (true)
+    {
+        uint32_t flags = osEventFlagsGet(mPlatformFlags);
+        if ((FLAG_EVENT_TASK_RUNNING & flags) == 0)
+        {
+            break;
+        }
+        osDelay(1);
+    }
+
+    osMutexDelete(mChipStackMutex);
+    osMutexDelete(mEventTaskMutex);
+    osEventFlagsDelete(mPlatformFlags);
+    osMessageQueueDelete(mQueue);
+    mChipStackMutex = nullptr;
+    mPlatformFlags  = nullptr;
+    mEventTaskMutex = nullptr;
+    mQueue          = nullptr;
+
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 

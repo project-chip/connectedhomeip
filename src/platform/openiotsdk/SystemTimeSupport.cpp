@@ -26,72 +26,65 @@
 
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include "cmsis_os2.h"
 
 namespace chip {
 namespace System {
 namespace Clock {
 
 namespace Internal {
+
 ClockImpl gClockImpl;
+
 } // namespace Internal
 
-static uint64_t get_clock_monotonic()
+const uint32_t TICKS_PER_SECOND = osKernelGetTickFreq();
+const uint32_t US_PER_TICK      = 1000000 / TICKS_PER_SECOND;
+const uint32_t MS_PER_TICK      = US_PER_TICK / 1000;
+
+extern "C" uint64_t GetTick(void);
+extern "C" void SetTick(uint64_t newTick);
+
+Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    // TODO implement
-    return 0;
+    uint64_t ret = GetTick() * US_PER_TICK;
+    return Clock::Microseconds64(ret);
 }
 
-// Platform-specific function for getting monotonic system time in microseconds.
-// Returns elapsed time in microseconds since an arbitrary, platform-defined epoch.
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return Microseconds64(get_clock_monotonic());
+    return Clock::Milliseconds64(GetTick() * MS_PER_TICK);
 }
 
-// Platform-specific function for getting monotonic system time in milliseconds.
-// Return elapsed time in milliseconds since an arbitrary, platform-defined epoch.
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
+uint64_t GetClock_Monotonic(void)
 {
-    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+    return (GetTick() * US_PER_TICK);
+}
+
+uint64_t GetClock_MonotonicMS(void)
+{
+    return (GetTick() * MS_PER_TICK);
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
-    // struct timeval tv;
-
-    // TODO get real time in us
-
-    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    // aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+    aCurTime = Clock::Microseconds64(GetClock_Monotonic());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
-    // struct timeval tv;
-
-    // TODO get real time in ms
-
-    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    // aCurTime =
-    //    Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
+    aCurTime = Clock::Milliseconds64(GetClock_MonotonicMS());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {
-    struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
-
-    // TODO set real time
-
-    const time_t timep = tv.tv_sec;
-    struct tm calendar;
-    localtime_r(&timep, &calendar);
-    ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04d/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec, calendar.tm_year,
-                    calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
-
+    uint64_t newTickCount;
+    newTickCount = static_cast<uint64_t>(aNewCurTime.count() / UINT64_C(1000000)) * TICKS_PER_SECOND;
+    SetTick(newTickCount);
     return CHIP_NO_ERROR;
 }
 

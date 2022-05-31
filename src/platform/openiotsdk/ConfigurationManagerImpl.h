@@ -18,8 +18,8 @@
 
 /**
  *    @file
- *          Provides an implementation of the Configuration Manager class
- *          for Open IOT SDK platform.
+ *          Provides an implementation of the ConfigurationManager class
+ *          for the Open IOT SDK platform.
  */
 
 #pragma once

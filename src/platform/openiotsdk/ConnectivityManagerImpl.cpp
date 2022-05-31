@@ -65,10 +65,5 @@ void ConnectivityManagerImpl::AddTask(AsyncWorkFunct workFunct, intptr_t arg)
     PlatformMgr().ScheduleWork(workFunct, arg);
 }
 
-void ConnectivityManagerImpl::AddQueueEvent(void * event)
-{
-    // ToDo add event to queue
-}
-
 } // namespace DeviceLayer
 } // namespace chip

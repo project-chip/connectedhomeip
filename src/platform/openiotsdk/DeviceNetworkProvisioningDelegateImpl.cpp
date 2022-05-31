@@ -24,6 +24,9 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/openiotsdk/DeviceNetworkProvisioningDelegateImpl.h>
+#include <platform/openiotsdk/NetworkCommissioningDriver.h>
+
+using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace DeviceLayer {

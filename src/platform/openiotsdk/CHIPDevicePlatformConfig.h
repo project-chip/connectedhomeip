@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer

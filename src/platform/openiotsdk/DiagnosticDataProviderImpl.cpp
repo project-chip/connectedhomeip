@@ -25,6 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/openiotsdk/DiagnosticDataProviderImpl.h>
 
 namespace chip {

@@ -23,7 +23,16 @@
 #pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
+#include "iotsdk/BufferedBlockDevice.h"
+#include "iotsdk/FlashIAPBlockDevice.h"
+
+extern "C" {
+#include "flash_cs300.h"
+#include "hal/flash_api.h"
+#include "iotsdk/TDBStore.h"
+}
 #include <string.h>
 
 namespace chip {
@@ -84,6 +93,7 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig();
+    static CHIP_ERROR Init(void);
 
     // NVS Namespace helper functions.
     static CHIP_ERROR ConstructCounterKey(Key id, char * buf, size_t bufSize);
@@ -92,6 +102,10 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);
+
+private:
+    static iotsdk::storage::TDBStore * tdb;
+    static iotsdk::storage::FlashIAPBlockDevice * flash_bd;
 };
 
 } // namespace Internal

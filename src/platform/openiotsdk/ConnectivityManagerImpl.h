@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer Connectivity Manager class
- *          for Open IOT SDK platform.
+ *          for the Open IOT SDK platform.
  */
 
 #pragma once
@@ -41,7 +41,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Open IOT SDK platform.
+ * Concrete implementation of the ConnectivityManager singleton object for the Open IoT SDK platform.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
@@ -70,7 +70,6 @@ private:
 public:
     CHIP_ERROR PostEvent(const ChipDeviceEvent * event, bool die);
     void AddTask(AsyncWorkFunct workFunct, intptr_t arg);
-    void AddQueueEvent(void * event);
 };
 
 /**

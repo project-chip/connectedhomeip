@@ -251,6 +251,8 @@ target_link_libraries(openiotsdk-chip INTERFACE
     $<$<TARGET_EXISTS:lwipcore>:lwipcore>
     $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
     $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>
+    $<$<TARGET_EXISTS:iotsdk-tdbstore>:$<TARGET_OBJECTS:iotsdk-tdbstore>>
+    $<$<TARGET_EXISTS:iotsdk-blockdevice>:$<TARGET_OBJECTS:iotsdk-blockdevice>>
 )
 add_dependencies(openiotsdk-chip chip-gn)
 

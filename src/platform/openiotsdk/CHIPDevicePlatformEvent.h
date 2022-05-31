@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the chip
- *          Device Layer on Open IOT SDK platforms.
+ *          Device Layer on the Open IOT SDK platform.
  */
 
 #pragma once

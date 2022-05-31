@@ -21,7 +21,6 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
@@ -78,40 +77,89 @@ const OpenIoTSDKConfig::Key OpenIoTSDKConfig::kConfigKey_RegulatoryLocation = { 
 const OpenIoTSDKConfig::Key OpenIoTSDKConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
 const OpenIoTSDKConfig::Key OpenIoTSDKConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };
 
-// TODO: implement below, replace commented out kv with OPENIOTSDK version of storage
+using iotsdk::storage::kv_status;
+using iotsdk::storage::KVStore;
 
 CHIP_ERROR OpenIoTSDKConfig::ReadConfigValue(Key key, bool & val)
 {
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     if (!ConfigValueExists(key))
     {
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    // ToDo get key-value
+    size_t actual_size = 0;
+    kv_status err      = tdb->get(key, reinterpret_cast<void *>(&val), sizeof(val), &actual_size);
+
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (actual_size != sizeof(val))
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::ReadConfigValue(Key key, uint32_t & val)
 {
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     if (!ConfigValueExists(key))
     {
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    // ToDo get key-value
+    size_t actual_size = 0;
+    kv_status err      = tdb->get(key, reinterpret_cast<void *>(&val), sizeof(val), &actual_size);
+
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (actual_size != sizeof(val))
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::ReadConfigValue(Key key, uint64_t & val)
 {
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     if (!ConfigValueExists(key))
     {
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    // ToDo get key-value
+    size_t actual_size = 0;
+    kv_status err      = tdb->get(key, &val, sizeof(val), &actual_size);
+
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (actual_size != sizeof(val))
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -134,32 +182,69 @@ CHIP_ERROR OpenIoTSDKConfig::ReadConfigValueStr(Key key, char * buf, size_t bufS
 
 CHIP_ERROR OpenIoTSDKConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     if (!ConfigValueExists(key))
     {
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    // ToDo get key-value
+    KVStore::info_t info;
+
+    kv_status err = tdb->get_info(key, &info);
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    err = tdb->get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (bufSize < info.size)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::WriteConfigValue(Key key, bool val)
 {
-    // ToDo set key-value
-    return CHIP_NO_ERROR;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    kv_status err = tdb->set(key, reinterpret_cast<const void *>(&val), sizeof(val), 0);
+    return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    // ToDo set key-value
-    return CHIP_NO_ERROR;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    kv_status err = tdb->set(key, reinterpret_cast<const void *>(&val), sizeof(val), 0);
+    return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    // ToDo set key-value
-    return CHIP_NO_ERROR;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    kv_status err = tdb->set(key, reinterpret_cast<void *>(&val), sizeof(val), 0);
+    return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::WriteConfigValueStr(Key key, const char * str)
@@ -174,12 +259,17 @@ CHIP_ERROR OpenIoTSDKConfig::WriteConfigValueStr(Key key, const char * str, size
 
 CHIP_ERROR OpenIoTSDKConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     // Two different behavior: If the pointer is not null, the value is updated
     // or create. If the pointer is null, the key is removed if it exist.
     if (data != nullptr)
     {
-        // ToDo set key-value
-        return CHIP_NO_ERROR;
+        kv_status err = tdb->set(key, reinterpret_cast<const void *>(data), dataLen, 0);
+        return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     }
     else if (ConfigValueExists(key))
     {
@@ -194,19 +284,30 @@ CHIP_ERROR OpenIoTSDKConfig::WriteConfigValueBin(Key key, const uint8_t * data, 
 
 CHIP_ERROR OpenIoTSDKConfig::ClearConfigValue(Key key)
 {
-    // ToDo remove key-value
-    return CHIP_NO_ERROR;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    kv_status err = tdb->remove(key);
+    return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 bool OpenIoTSDKConfig::ConfigValueExists(Key key)
 {
-    // ToDo check key-value exists
-    return false;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    KVStore::info_t info;
+    kv_status err = tdb->get_info(key, &info);
+    return err == kv_status::OK ? true : false;
 }
 
 CHIP_ERROR OpenIoTSDKConfig::FactoryResetConfig()
 {
-    // reset is not used, we want to preserve other setting and factory
+    // tdb->reset is not used, we want to preserve other setting and factory
     // configuration
     auto err = ClearNamespace(kConfigNamespace_ChipConfig);
     if (err != CHIP_NO_ERROR)
@@ -259,8 +360,40 @@ CHIP_ERROR OpenIoTSDKConfig::WriteCounter(Key counterId, uint32_t value)
 
 CHIP_ERROR OpenIoTSDKConfig::ClearNamespace(const char * ns)
 {
-    // ToDo clear key-values in namespace
-    return CHIP_NO_ERROR;
+    if (Init() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    iotsdk::storage::KVStore::iterator_t it;
+    char key[iotsdk::storage::KVStore::MAX_KEY_SIZE];
+    kv_status err = tdb->iterator_open(&it, ns);
+    if (err != kv_status::OK)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    while (true)
+    {
+        err = tdb->iterator_next(it, key, sizeof(key));
+        if (err == kv_status::OK)
+        {
+            tdb->remove(key);
+            memset(key, 0, sizeof(key));
+        }
+        else if (err == kv_status::ITEM_NOT_FOUND)
+        {
+            break;
+        }
+        else
+        {
+            (void) tdb->iterator_close(it);
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+
+    err = tdb->iterator_close(it);
+    return err == kv_status::OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 void OpenIoTSDKConfig::RunConfigUnitTest()
@@ -268,6 +401,47 @@ void OpenIoTSDKConfig::RunConfigUnitTest()
     // Run common unit test.
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<OpenIoTSDKConfig>();
 }
+
+CHIP_ERROR OpenIoTSDKConfig::Init(void)
+{
+    if (tdb)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    flash_bd = new iotsdk::storage::FlashIAPBlockDevice(get_ram_drive_instance(), 0, 0);
+
+    if (!flash_bd)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Create a TDBStore using the underlying storage
+    tdb = new iotsdk::storage::TDBStore(flash_bd);
+
+    if (!tdb)
+    {
+        delete flash_bd;
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // KVStore uses dual stage initialization so we can handle any errors
+    // Call the `init` method to setup the TDBStore
+    kv_status err = tdb->init();
+    if (err != kv_status::OK)
+    {
+        delete flash_bd;
+        delete tdb;
+        // zero tdb as we use it keep track of init
+        tdb = nullptr;
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+iotsdk::storage::TDBStore * OpenIoTSDKConfig::tdb                 = nullptr;
+iotsdk::storage::FlashIAPBlockDevice * OpenIoTSDKConfig::flash_bd = nullptr;
 
 } // namespace Internal
 } // namespace DeviceLayer

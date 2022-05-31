@@ -42,6 +42,7 @@ static_library("openiotsdk") {
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "OpenIoTSDKConfig.cpp",
+    "OpenIoTSDKConfig.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",

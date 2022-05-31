@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "cmsis_os2.h"
+#include "mbedtls/platform.h"
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
@@ -51,30 +53,46 @@ public:
     /* none so far */
 
 private:
+    static constexpr uint32_t FLAG_EVENT_TASK_RUNNING = 0x1;
+    static constexpr uint32_t FLAG_STOP_EVENT_TASK    = 0x2;
+
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
     void _LockChipStack();
     bool _TryLockChipStack();
     void _UnlockChipStack();
+
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
+
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
+
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     void _Shutdown();
 
     void ProcessDeviceEvents();
+
+    static void RunEventLoopTask(void * arg);
+    void RunEventLoopInternal();
 
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class ConnectivityManagerImpl;
+    friend class GapEventHandler;
+    friend class CHIPService;
 
     using PlatformManager::PostEvent;
     using PlatformManager::PostEventOrDie;
     static PlatformManagerImpl sInstance;
+
+    osEventFlagsId_t mPlatformFlags = nullptr;
+    osMutexId_t mChipStackMutex     = nullptr;
+    osMutexId_t mEventTaskMutex     = nullptr;
+    osMessageQueueId_t mQueue       = nullptr;
 };
 
 /**

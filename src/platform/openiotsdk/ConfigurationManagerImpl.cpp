@@ -18,13 +18,15 @@
 
 /**
  *    @file
- *          Provides the implementation of the Device Layer Configuration Manager class
- *          for Open IOT SDK platform.
+ *          Provides the implementation of the Device Layer ConfigurationManager class
+ *          for the Open IOT SDK platform.
  */
 
-#include <platform/ConfigurationManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#include <platform/ConfigurationManager.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -150,7 +152,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // ToDo reset system
+    // TODO: implement system_reset()
+    // system_reset();
 }
 
 } // namespace DeviceLayer

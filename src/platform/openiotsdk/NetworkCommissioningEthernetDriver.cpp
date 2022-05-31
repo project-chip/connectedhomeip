@@ -22,6 +22,7 @@
  *          for Open IOT SDK platform.
  */
 
+#include <lwip/netif.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/openiotsdk/NetworkCommissioningDriver.h>
 
@@ -36,9 +37,13 @@ namespace NetworkCommissioning {
 NetworkIterator * OpenIoTSDKEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
-    // TODO fill in
-    // memcpy(ret->interfaceName, src, len);
-    // ret->interfaceNameLen = len;
+
+    char buf[NETIF_NAMESIZE];
+    char * ifname = netif_index_to_name(0, buf);
+
+    ret->interfaceNameLen = strlen(ifname);
+    memcpy(ret->interfaceName, ifname, ret->interfaceNameLen);
+
     return ret;
 }
 

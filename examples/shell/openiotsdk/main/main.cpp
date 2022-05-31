@@ -39,7 +39,7 @@ int main()
     if (ret != osOK)
     {
         printf("osKernelInitialize failed: %d\r\n", ret);
-        return -1;
+        return EXIT_FAILURE;
     }
 
     static const osThreadAttr_t thread_attr = {
@@ -49,7 +49,7 @@ int main()
     if (thread == NULL)
     {
         printf("Failed to create thread\r\n");
-        return -1;
+        return EXIT_FAILURE;
     }
 
     osKernelState_t state = osKernelGetState();
@@ -60,13 +60,13 @@ int main()
         if (ret != osOK)
         {
             printf("Failed to start kernel: %d\r\n", ret);
-            return -1;
+            return EXIT_FAILURE;
         }
     }
     else
     {
         printf("Kernel not ready: %d\r\n", state);
-        return -1;
+        return EXIT_FAILURE;
     }
 
     return 0;
