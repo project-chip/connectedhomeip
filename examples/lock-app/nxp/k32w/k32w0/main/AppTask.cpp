@@ -740,6 +740,4 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     }
 }
 
-extern "C" void OTAIdleActivities(void)
-{
-}
+extern "C" void OTAIdleActivities(void) {}

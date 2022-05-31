@@ -66,7 +66,7 @@ static rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const
         currentBlock->length = aValueLength;
 
         memcpy(&pBuffer->pRamBuffer[pBuffer->ramBufferLen + sizeof(struct settingsBlock)], aValue, aValueLength);
-               pBuffer->ramBufferLen += newBlockLength;
+        pBuffer->ramBufferLen += newBlockLength;
 
         error = RS_ERROR_NONE;
     }
@@ -188,8 +188,7 @@ rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aInde
 
                 if (nextBlockStart < pBuffer->ramBufferLen)
                 {
-                    memmove(&pBuffer->pRamBuffer[i], &pBuffer->pRamBuffer[nextBlockStart],
-                            pBuffer->ramBufferLen - nextBlockStart);
+                    memmove(&pBuffer->pRamBuffer[i], &pBuffer->pRamBuffer[nextBlockStart], pBuffer->ramBufferLen - nextBlockStart);
                 }
 
                 assert(pBuffer->ramBufferLen >= currentBlockLength);
