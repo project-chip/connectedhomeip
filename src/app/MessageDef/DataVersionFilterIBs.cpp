@@ -29,7 +29,7 @@ namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR DataVersionFilterIBs::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("DataVersionFilterIBs =");

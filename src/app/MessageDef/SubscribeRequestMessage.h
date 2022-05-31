@@ -117,7 +117,6 @@ public:
      */
     CHIP_ERROR GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const;
 
-
     /**
      *  @brief Get IsFabricFiltered boolean
      *

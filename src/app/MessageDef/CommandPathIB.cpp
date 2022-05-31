@@ -103,7 +103,8 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields = (1 << to_underlying(Tag::kEndpointId)) | (1 << to_underlying(Tag::kCommandId)) | (1 << to_underlying(Tag::kClusterId));
+        const uint16_t RequiredFields =
+            (1 << to_underlying(Tag::kEndpointId)) | (1 << to_underlying(Tag::kCommandId)) | (1 << to_underlying(Tag::kClusterId));
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {

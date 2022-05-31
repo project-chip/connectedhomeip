@@ -2431,7 +2431,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB             CHIP_CORE_ERROR(0xe5)
 
-
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
