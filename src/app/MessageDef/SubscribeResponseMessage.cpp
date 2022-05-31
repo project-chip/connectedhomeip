@@ -48,7 +48,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 SubscriptionId subscriptionId;
                 ReturnErrorOnFailure(reader.Get(subscriptionId));
-                PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
+                PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx32 ",", subscriptionId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -87,7 +87,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
         }
     }
     PRETTY_PRINT("}");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {

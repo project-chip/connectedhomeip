@@ -84,7 +84,7 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {

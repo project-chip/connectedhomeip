@@ -41,41 +41,44 @@ char gLineBuffer[256];
 size_t gCurLineBufferSize = 0;
 } // namespace
 
-void ENFORCE_FORMAT(2, 3) PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
+void PrettyPrintIMBlankLine()
+{
+    if (gCurLineBufferSize)
+    {
+        // Don't need to explicitly NULL-terminate the string because
+        // snprintf takes care of that.
+        ChipLogDetail(DataManagement, "%s", gLineBuffer);
+        gCurLineBufferSize = 0;
+    }
+
+    for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
+    {
+        if (sizeof(gLineBuffer) > gCurLineBufferSize)
+        {
+            size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            if (ret > 0)
+            {
+                gCurLineBufferSize += std::min(ret, sizeLeft);
+            }
+        }
+    }
+}
+
+void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {
     va_list args;
-    size_t ret;
-    size_t sizeLeft;
     va_start(args, aFmt);
 
     if (aIsNewLine)
     {
-        if (gCurLineBufferSize)
-        {
-            // Don't need to explicitly NULL-terminate the string because
-            // snprintf takes care of that.
-            ChipLogDetail(DataManagement, "%s", gLineBuffer);
-            gCurLineBufferSize = 0;
-        }
-
-        for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
-        {
-            if (sizeof(gLineBuffer) > gCurLineBufferSize)
-            {
-                sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
-                if (ret > 0)
-                {
-                    gCurLineBufferSize += std::min(ret, sizeLeft);
-                }
-            }
-        }
+        PrettyPrintIMBlankLine();
     }
 
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
-        sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);
