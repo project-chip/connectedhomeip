@@ -96,7 +96,7 @@ class StatefulShell:
             returncode = proc.wait()
 
         # Load env state from envfile.
-        with open(self.envfile_path) as f:
+        with open(self.envfile_path, encoding="latin1") as f:
             # Split on null char because we use env -0.
             env_entries = f.read().split("\0")
             for entry in env_entries:
@@ -111,6 +111,6 @@ class StatefulShell:
                 f"Error. Return code is not 0. It is: {returncode}")
 
         if return_cmd_output:
-            with open(self.cmd_output_path) as f:
+            with open(self.cmd_output_path, encoding="latin1") as f:
                 output = f.read()
             return output
