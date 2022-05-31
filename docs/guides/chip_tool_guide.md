@@ -286,22 +286,23 @@ In this command:
 -   _<pin_code\>_ and _<discriminator\>_ are device specific keys determined in
     the step 4.
 
-##### Commissioning with QR code payload
+##### Commissioning with QR code payload or manual pairing code
 
-Matter devices log the QR code and its payload when they boot.
+Matter devices log the QR code payload and manual pairing code when they boot.
 
 Use the following command pattern to discover devices based on the given QR code
-payload and try to pair with the first discovered one:
+payload or manual pairing code and try to pair with the first discovered one:
 
 ```
-$ ./chip-tool qrcode <node_id> <qrcode_payload>
+$ ./chip-tool pairing code <node_id> <qrcode_payload-or-manual_code>
 ```
 
 In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
--   _<qrcode_payload\>_ is the QR code payload ID, for example
-    `MT:Y.K9042C00KA0648G00`.
+-   _<qrcode_payload-or-manual_code\>_ is the QR code payload ID, for example
+    `MT:Y.K9042C00KA0648G00`, or a manual pairing code like
+    `749701123365521327694`.
 
 #### Forgetting the already-commissioned device
 

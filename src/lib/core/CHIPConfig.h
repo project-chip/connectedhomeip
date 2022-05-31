@@ -655,25 +655,6 @@
 #endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_MS
- *
- * @brief After what period of inactivity is a peer connection considered
- * expired.
- */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_MS 120000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_MS
-
-/**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
- *
- * @brief How frequent are peer connections checked for timeouts.
- */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS 5000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
-
-/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
@@ -1070,17 +1051,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
 #error                                                                                                                             \
     "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
- *
- * @brief Defines the max number of SessionRecoveryDelegate
- *
- * // TODO: Explain what this is for.
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
 #endif
 
 /**

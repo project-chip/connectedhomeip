@@ -86,7 +86,7 @@ bool TizenWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan network
                         networkId.size());
         return false;
     }
-    else if (memcmp(networkId.data(), network.ssid, network.ssidLen) != 0)
+    if (memcmp(networkId.data(), network.ssid, network.ssidLen) != 0)
     {
         ChipLogProgress(NetworkProvisioning, "ssid is mismatched. network.ssid: %s, networkId.data(): %s", network.ssid,
                         networkId.data());

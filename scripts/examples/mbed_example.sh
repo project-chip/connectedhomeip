@@ -21,7 +21,7 @@ CHIP_ROOT=$PWD
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
-SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell ota-requestor-app)
+SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app all-clusters-minimal-app shell ota-requestor-app)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 SUPPORTED_TYPE=(simple boot upgrade)

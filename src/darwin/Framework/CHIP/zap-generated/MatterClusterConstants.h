@@ -594,6 +594,7 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID = 0x00000005,
     kMatterClusterGeneralDiagnosticsAttributeActiveRadioFaultsID = 0x00000006,
     kMatterClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID = 0x00000007,
+    kMatterClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID = 0x00000008,
     kMatterClusterGeneralDiagnosticsAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
     kMatterClusterGeneralDiagnosticsAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
     kMatterClusterGeneralDiagnosticsAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
@@ -1013,7 +1014,6 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterThermostatAttributeRemoteSensingID = 0x0000001A,
     kMatterClusterThermostatAttributeControlSequenceOfOperationID = 0x0000001B,
     kMatterClusterThermostatAttributeSystemModeID = 0x0000001C,
-    kMatterClusterThermostatAttributeAlarmMaskID = 0x0000001D,
     kMatterClusterThermostatAttributeThermostatRunningModeID = 0x0000001E,
     kMatterClusterThermostatAttributeStartOfWeekID = 0x00000020,
     kMatterClusterThermostatAttributeNumberOfWeeklyTransitionsID = 0x00000021,
@@ -2235,6 +2235,9 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterDiagnosticLogsCommandRetrieveLogsRequestID = 0x00000000,
     kMatterClusterDiagnosticLogsCommandRetrieveLogsResponseID = 0x00000001,
 
+    // Cluster GeneralDiagnostics commands
+    kMatterClusterGeneralDiagnosticsCommandTestEventTriggerID = 0x00000000,
+
     // Cluster SoftwareDiagnostics commands
     kMatterClusterSoftwareDiagnosticsCommandResetWatermarksID = 0x00000000,
 
@@ -2341,10 +2344,8 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterThermostatCommandSetpointRaiseLowerID = 0x00000000,
     kMatterClusterThermostatCommandGetWeeklyScheduleResponseID = 0x00000000,
     kMatterClusterThermostatCommandSetWeeklyScheduleID = 0x00000001,
-    kMatterClusterThermostatCommandGetRelayStatusLogResponseID = 0x00000001,
     kMatterClusterThermostatCommandGetWeeklyScheduleID = 0x00000002,
     kMatterClusterThermostatCommandClearWeeklyScheduleID = 0x00000003,
-    kMatterClusterThermostatCommandGetRelayStatusLogID = 0x00000004,
 
     // Cluster ColorControl commands
     kMatterClusterColorControlCommandMoveToHueID = 0x00000000,

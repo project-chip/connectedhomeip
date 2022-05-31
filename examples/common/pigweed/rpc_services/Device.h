@@ -28,6 +28,7 @@
 #include "platform/ConfigurationManager.h"
 #include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 namespace chip {
@@ -141,7 +142,7 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);

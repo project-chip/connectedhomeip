@@ -101,11 +101,11 @@ limitations under the License.
     <attribute side="server" code="0x06" define="DIAG_OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
     <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTable" length="254" writable="false" optional="false">NeighborTableList</attribute>
     <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTable" length="254" writable="false" optional="false">RouteTableList</attribute>
-    <attribute side="server" code="0x09" define="PARTITION_ID" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="false">PartitionId</attribute>
-    <attribute side="server" code="0x0A" define="WEIGHTING" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">weighting</attribute>
-    <attribute side="server" code="0x0B" define="DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">DataVersion</attribute>
-    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">StableDataVersion</attribute>
-    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">LeaderRouterId</attribute>
+    <attribute side="server" code="0x09" define="PARTITION_ID" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" isNullable="true" optional="false">PartitionId</attribute>
+    <attribute side="server" code="0x0A" define="WEIGHTING" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">weighting</attribute>
+    <attribute side="server" code="0x0B" define="DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
+    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">StableDataVersion</attribute>
+    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">LeaderRouterId</attribute>
     <!-- From 0x0E to 0x15 Conformance feature[MLECNT] - for now mandatory -->
     <attribute side="server" code="0x0E" define="DETACHED_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">DetachedRoleCount</attribute>
     <attribute side="server" code="0x0F" define="CHILD_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ChildRoleCount</attribute>
@@ -150,14 +150,14 @@ limitations under the License.
     <attribute side="server" code="0x35" define="RX_ERR_SEC_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrSecCount</attribute>
     <attribute side="server" code="0x36" define="RX_ERR_FCS_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrFcsCount</attribute>
     <attribute side="server" code="0x37" define="RX_ERR_OTHER_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrOtherCount</attribute>
-    <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">ActiveTimestamp</attribute>
-    <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PendingTimestamp</attribute>
-    <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">delay</attribute>
+    <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">ActiveTimestamp</attribute>
+    <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">PendingTimestamp</attribute>
+    <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" isNullable="true" optional="true">delay</attribute>
     <!-- SECURITY_POLICY Length = 2 + (arraysize(1) * Size of Struct (4b))-->
-    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="6" writable="false" optional="false">SecurityPolicy</attribute>
-    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" optional="false">ChannelMask</attribute>
+    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="6" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
+    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" isNullable="true" optional="false">ChannelMask</attribute>
     <!-- OPERATIONAL_DATASET_COMPONENTS Length = 2 + (arraysize(1) * Size of Struct (12b))-->
-    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="14" writable="false" optional="false">OperationalDatasetComponents</attribute>
+    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="14" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>

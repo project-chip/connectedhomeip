@@ -145,6 +145,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
 
+    mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
     {

@@ -56,13 +56,13 @@ The process of automatic conversion of test files depends on the
 Each of the CHIP device controller implementations uses a dedicated template
 translating the tests into an appropriate format.
 
-| Controllers | Template                                                                                                                                     |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| POSIX CLI   | [examples/chip-tool/templates/partials/test_cluster.zapt](../../../../examples/chip-tool/templates/partials/test_cluster.zapt)               |
-| Darwin CLI  | [examples/chip-tool-darwin/templates/partials/test_cluster.zapt](../../../../examples/chip-tool-darwin/templates/partials/test_cluster.zapt) |
-| iOS         | [src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt](../../../../src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt) |
-| Python      |                                                                                                                                              |
-| Android     |                                                                                                                                              |
+| Controllers | Template                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| POSIX CLI   | [examples/chip-tool/templates/partials/test_cluster.zapt](../../../../examples/chip-tool/templates/partials/test_cluster.zapt)                         |
+| Darwin CLI  | [examples/darwin-framework-tool/templates/partials/test_cluster.zapt](../../../../examples/darwin-framework-tool/templates/partials/test_cluster.zapt) |
+| iOS         | [src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt](../../../../src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt)           |
+| Python      |                                                                                                                                                        |
+| Android     |                                                                                                                                                        |
 
 These dedicated templates share a common
 [script](../../zap-templates/common/ClusterTestGeneration.js) which augments the
@@ -250,7 +250,7 @@ Top level key to define a YAML test: [test](#property-test)
     [tests.js](../../../../examples/placeholder/linux/apps/app1/tests.js)
 
 -   chip-tool(darwin) tests:
-    [tests.js](../../../../examples/chip-tool-darwin/templates/tests/tests.js)
+    [tests.js](../../../../examples/darwin-framework-tool/templates/tests/tests.js)
 
 -   chip-tool tests:
     [tests.js](../../../../examples/chip-tool/templates/tests/tests.js)

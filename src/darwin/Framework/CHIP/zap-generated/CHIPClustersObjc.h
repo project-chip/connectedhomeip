@@ -9240,6 +9240,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
+- (void)testEventTriggerWithParams:(CHIPGeneralDiagnosticsClusterTestEventTriggerParams *)params
+                 completionHandler:(StatusCompletion)completionHandler;
+
 - (void)readAttributeNetworkInterfacesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 /**
@@ -9381,6 +9384,25 @@ NS_ASSUME_NONNULL_BEGIN
                                                      queue:(dispatch_queue_t)queue
                                          completionHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTestEventTriggersEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeTestEventTriggersEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))reportHandler;
++ (void)readAttributeTestEventTriggersEnabledWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -17501,11 +17523,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearWeeklyScheduleWithParams:(CHIPThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                     completionHandler:(StatusCompletion)completionHandler;
 - (void)clearWeeklyScheduleWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)getRelayStatusLogWithParams:(CHIPThermostatClusterGetRelayStatusLogParams * _Nullable)params
-                  completionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
-- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
-                                                   NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeLocalTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
@@ -18000,22 +18017,6 @@ NS_ASSUME_NONNULL_BEGIN
                                             queue:(dispatch_queue_t)queue
                                 completionHandler:
                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(
-                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * CHIPSubscribeParams.
- */
-- (void)subscribeAttributeAlarmMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                       maxInterval:(NSNumber * _Nonnull)maxInterval
-                                            params:(CHIPSubscribeParams * _Nullable)params
-                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeAlarmMaskWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                        endpoint:(NSNumber *)endpoint
-                                           queue:(dispatch_queue_t)queue
-                               completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeThermostatRunningModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
@@ -21955,6 +21956,7 @@ typedef NS_ENUM(uint8_t, CHIPOperationalCredentialsOperationalCertStatus) {
     CHIPOperationalCredentialsOperationalCertStatusInvalidNOC = 0x03,
     CHIPOperationalCredentialsOperationalCertStatusMissingCsr = 0x04,
     CHIPOperationalCredentialsOperationalCertStatusTableFull = 0x05,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidAdminSubject = 0x06,
     CHIPOperationalCredentialsOperationalCertStatusInsufficientPrivilege = 0x08,
     CHIPOperationalCredentialsOperationalCertStatusFabricConflict = 0x09,
     CHIPOperationalCredentialsOperationalCertStatusLabelConflict = 0x0A,

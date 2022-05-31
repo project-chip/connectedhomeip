@@ -1742,6 +1742,10 @@ namespace ActiveNetworkFaults {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace ActiveNetworkFaults
 
+namespace TestEventTriggersEnabled {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TestEventTriggersEnabled
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3371,10 +3375,6 @@ static constexpr AttributeId Id = 0x0000001B;
 namespace SystemMode {
 static constexpr AttributeId Id = 0x0000001C;
 } // namespace SystemMode
-
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x0000001D;
-} // namespace AlarmMask
 
 namespace ThermostatRunningMode {
 static constexpr AttributeId Id = 0x0000001E;

@@ -31,7 +31,7 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
 {
     LoopData * loopData = reinterpret_cast<LoopData *>(userData);
 
-    VerifyOrReturnError(loopData != NULL, G_SOURCE_REMOVE);
+    VerifyOrReturnError(loopData != nullptr, G_SOURCE_REMOVE);
 
     if (loopData->mTimeoutFn)
     {
@@ -50,10 +50,10 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
 
 void MainLoop::SetThreadTimeout(LoopData * loopData, guint interval)
 {
-    VerifyOrReturn(loopData != NULL);
+    VerifyOrReturn(loopData != nullptr);
 
     GSource * source = g_timeout_source_new_seconds(interval);
-    g_source_set_callback(source, ThreadTimeout, reinterpret_cast<gpointer>(loopData), NULL);
+    g_source_set_callback(source, ThreadTimeout, reinterpret_cast<gpointer>(loopData), nullptr);
     g_source_attach(source, loopData->mMainContext);
     g_source_unref(source);
 }
@@ -69,14 +69,14 @@ gpointer MainLoop::ThreadMainHandler(gpointer data)
     g_main_loop_run(loopData->mMainLoop);
     ChipLogProgress(DeviceLayer, "[QUIT] main loop %p", loopData->mMainLoop);
     g_main_loop_unref(loopData->mMainLoop);
-    loopData->mMainLoop = NULL;
+    loopData->mMainLoop = nullptr;
 
     g_main_context_pop_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[POP] main context %p", loopData->mMainContext);
     g_main_context_unref(loopData->mMainContext);
-    loopData->mMainContext = NULL;
+    loopData->mMainContext = nullptr;
 
-    return NULL;
+    return nullptr;
 }
 
 gpointer MainLoop::ThreadAsyncHandler(gpointer data)
@@ -90,16 +90,16 @@ gpointer MainLoop::ThreadAsyncHandler(gpointer data)
     g_main_loop_run(loopData->mMainLoop);
     ChipLogProgress(DeviceLayer, "[QUIT] async loop %p", loopData->mMainLoop);
     g_main_loop_unref(loopData->mMainLoop);
-    loopData->mMainLoop = NULL;
+    loopData->mMainLoop = nullptr;
 
     g_main_context_pop_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[POP] async context %p", loopData->mMainContext);
     g_main_context_unref(loopData->mMainContext);
-    loopData->mMainContext = NULL;
+    loopData->mMainContext = nullptr;
 
     chip::Platform::Delete(loopData);
 
-    return NULL;
+    return nullptr;
 }
 
 bool MainLoop::Init(initFn_t initFn, gpointer userData)
@@ -107,7 +107,7 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     bool result;
     LoopData * loopData = chip::Platform::New<LoopData>();
 
-    VerifyOrReturnError(loopData != NULL, false);
+    VerifyOrReturnError(loopData != nullptr, false);
 
     loopData->mMainContext = g_main_context_new();
     loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);
@@ -157,7 +157,7 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint int
     bool result         = false;
     LoopData * loopData = chip::Platform::New<LoopData>();
 
-    VerifyOrReturnError(loopData != NULL, false);
+    VerifyOrReturnError(loopData != nullptr, false);
 
     loopData->mMainContext = g_main_context_new();
     loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);

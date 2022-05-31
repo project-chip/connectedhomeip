@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.1.8. [TC-DD-1.8] QR Code Onboarding Payload Verification [DUT -
+    3.1.8. [TC-DD-1.8] QR Code Onboarding Payload Verification [DUT -
     Commissioner]
 
 config:
@@ -23,20 +23,46 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value: "Scan the device QR code using DUT"
+    - label: "If (PICS_SCAN_QR_CODE), Scan the TH Devices QR code using DUT"
+      verification: |
+          1. Get the QR code from the TH
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi --discriminator 3841
 
-    - label: "Step 1 verification"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify the DUT is able to scan and parse the QR code
-                    successfully to onboard the device onto the CHIP network"
+          CHIP:SPT: PASE PBKDF iterations set to 1000
+          CHIP:SPT: LinuxCommissionableDataProvider didn't get a PASE salt, generating one.
+          CHIP:DL: Device Configuration:
+          CHIP:DL:   Serial Number: TEST_SN
+          CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          CHIP:DL:   Product Id: 32769 (0x8001)
+          CHIP:DL:   Hardware Version: 0
+          CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          CHIP:DL:   Manufacturing Date: (not set)
+          CHIP:DL:   Device Type: 65535 (0xFFFF)
+          CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
+          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          CHIP:SVR: Manual pairing code: [34970112332]
+          CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+
+          2. Parse the DUT's QR Code using the TH commissioner: chip-tool
+          ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J048N01KA0648G00
+
+          [1650266365.939678][10146:10146] CHIP:SPL: CommissioningFlow: 2
+          [1650266365.939704][10146:10146] CHIP:SPL: VendorID: 65521
+          [1650266365.939724][10146:10146] CHIP:SPL: Version: 0
+          [1650266365.939744][10146:10146] CHIP:SPL: ProductID: 32769
+          [1650266365.939763][10146:10146] CHIP:SPL: Discriminator: 3841
+          [1650266365.939782][10146:10146] CHIP:SPL: SetUpPINCode: 20202021
+          [1650266365.939801][10146:10146] CHIP:SPL: RendezvousInformation: 2
+      disabled: true
+
+    - label:
+          "Using the DUT, parse the THs QR code to onboard the TH Device onto
+          the Matter network."
+      verification: |
+          1. With chip-tool as DUT, observe this in the logs to signal the end of parsing when commissioning the TH
+          [1651190089249] [14497:411165] CHIP: [CTL] Successfully finished commissioning step 'ReadCommissioningInfo'
+      disabled: true

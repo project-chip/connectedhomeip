@@ -10515,27 +10515,31 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscription
 }
 
 void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>> & value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-            newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-            newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
-            [array_0 addObject:newElement_0];
+    NSArray * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = value.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_1;
+                newElement_1 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+                newElement_1.rotationTime = [NSNumber numberWithUnsignedShort:entry_1.rotationTime];
+                newElement_1.flags = [NSNumber numberWithUnsignedShort:entry_1.flags];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            objCValue = array_1;
         }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
     }
     DispatchSuccess(context, objCValue);
 };
@@ -10557,37 +10561,41 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscription
 }
 
 void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>> & value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-            newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
-            newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
-            newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
-            newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
-            newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
-            newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
-            newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
-            newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
-            newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
-            newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
-            newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
-            newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
-            [array_0 addObject:newElement_0];
+    NSArray * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = value.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_1;
+                newElement_1 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+                newElement_1.activeTimestampPresent = [NSNumber numberWithBool:entry_1.activeTimestampPresent];
+                newElement_1.pendingTimestampPresent = [NSNumber numberWithBool:entry_1.pendingTimestampPresent];
+                newElement_1.masterKeyPresent = [NSNumber numberWithBool:entry_1.masterKeyPresent];
+                newElement_1.networkNamePresent = [NSNumber numberWithBool:entry_1.networkNamePresent];
+                newElement_1.extendedPanIdPresent = [NSNumber numberWithBool:entry_1.extendedPanIdPresent];
+                newElement_1.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_1.meshLocalPrefixPresent];
+                newElement_1.delayPresent = [NSNumber numberWithBool:entry_1.delayPresent];
+                newElement_1.panIdPresent = [NSNumber numberWithBool:entry_1.panIdPresent];
+                newElement_1.channelPresent = [NSNumber numberWithBool:entry_1.channelPresent];
+                newElement_1.pskcPresent = [NSNumber numberWithBool:entry_1.pskcPresent];
+                newElement_1.securityPolicyPresent = [NSNumber numberWithBool:entry_1.securityPolicyPresent];
+                newElement_1.channelMaskPresent = [NSNumber numberWithBool:entry_1.channelMaskPresent];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            objCValue = array_1;
         }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
     }
     DispatchSuccess(context, objCValue);
 };
@@ -13521,31 +13529,6 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
             }
             response.transitions = array_0;
         }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
-{
-    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
-    {
-        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
-    }
-    {
-        response.relayStatus = [NSNumber numberWithUnsignedChar:data.relayStatus];
-    }
-    {
-        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
-    }
-    {
-        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
-    }
-    {
-        response.setpoint = [NSNumber numberWithShort:data.setpoint];
-    }
-    {
-        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
     }
     DispatchSuccess(context, response);
 };

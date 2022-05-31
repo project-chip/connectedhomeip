@@ -359,11 +359,7 @@ class ChipDeviceController():
     def ResolveNode(self, nodeid):
         self.CheckIsActive()
 
-        try:
-            self.GetConnectedDeviceSync(nodeid, allowPASE=False)
-            return 0
-        except ChipStackError as ex:
-            return ex.err
+        self.GetConnectedDeviceSync(nodeid, allowPASE=False)
 
     def GetAddressAndPort(self, nodeid):
         self.CheckIsActive()
@@ -501,18 +497,18 @@ class ChipDeviceController():
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
+        returnErr = None
         deviceAvailableCV = threading.Condition()
 
         @_DeviceAvailableFunct
         def DeviceAvailableCallback(device, err):
             nonlocal returnDevice
+            nonlocal returnErr
             nonlocal deviceAvailableCV
             with deviceAvailableCV:
                 returnDevice = c_void_p(device)
+                returnErr = err
                 deviceAvailableCV.notify_all()
-            if err != 0:
-                print("Failed in getting the connected device: {}".format(err))
-                raise self._ChipStack.ErrorToException(err)
 
         if allowPASE:
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
@@ -533,7 +529,7 @@ class ChipDeviceController():
                 deviceAvailableCV.wait()
 
         if returnDevice.value is None:
-            raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
+            raise self._ChipStack.ErrorToException(returnErr)
         return returnDevice
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None):

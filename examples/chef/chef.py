@@ -575,11 +575,9 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                args_gni = os.path.join(
-                    _REPO_BASE_PATH, "config/standalone/args.gni")
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
-                        import("{args_gni}")
+                        import("${{chip_root}}/config/standalone/args.gni")
                         chip_shell_cmd_server = false
                         target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
                         """))
@@ -590,7 +588,10 @@ def main(argv: Sequence[str]) -> None:
                         """))
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out")
-            shell.run_cmd("gn gen out")
+            if options.do_rpc:
+                shell.run_cmd("gn gen out --args='import(\"//with_pw_rpc.gni\")'")
+            else:
+                shell.run_cmd("gn gen out --args=''")
             shell.run_cmd("ninja -C out")
 
     #

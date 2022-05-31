@@ -730,6 +730,8 @@ typedef void (*CHIPGeneralDiagnosticsClusterActiveRadioFaultsAttributeCallbackTy
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterActiveNetworkFaultsAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralDiagnosticsClusterTestEventTriggersEnabledAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterAcceptedCommandListAttributeCallbackType)(
@@ -1579,8 +1581,6 @@ typedef void (*CHIPTestClusterClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
 typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
