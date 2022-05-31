@@ -3719,7 +3719,7 @@ void CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3743,7 +3743,7 @@ void CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3767,7 +3767,7 @@ void CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3791,7 +3791,7 @@ void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
 }
 
 void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3815,7 +3815,7 @@ void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPDoorLockAlarmMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlAlarmMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3839,7 +3839,7 @@ void CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEst
 }
 
 void CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3863,7 +3863,7 @@ void CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3887,7 +3887,7 @@ void CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3911,7 +3911,7 @@ void CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3935,7 +3935,7 @@ void CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3959,7 +3959,7 @@ void CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3983,7 +3983,7 @@ void CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -8359,7 +8359,7 @@ void CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9299,7 +9299,7 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9323,7 +9323,7 @@ void CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEs
 }
 
 void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9347,7 +9347,7 @@ void CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9371,7 +9371,7 @@ void CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -9895,7 +9895,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9923,7 +9923,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9951,7 +9951,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9979,7 +9979,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11451,7 +11451,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -11475,7 +11475,7 @@ void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];

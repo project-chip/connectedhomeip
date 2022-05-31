@@ -8803,7 +8803,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8964,7 +8964,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
 };
 
 class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
@@ -8991,7 +8991,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
@@ -9018,7 +9018,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
 };
 
 class WriteDoorLockManualOperationEventMask : public WriteAttribute
@@ -9045,7 +9045,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
 };
 
 class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
@@ -9072,7 +9072,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
 };
 
 class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
@@ -9099,7 +9099,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
@@ -9126,7 +9126,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
 };
 
 class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
@@ -9153,7 +9153,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9434,7 +9434,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
+    chip::BitMask<chip::app::Clusters::WindowCovering::Mode> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16355,7 +16355,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap16 : public WriteAttribute
@@ -16381,7 +16381,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap32 : public WriteAttribute
@@ -16407,7 +16407,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap64 : public WriteAttribute
@@ -16433,7 +16433,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
 };
 
 class WriteTestClusterInt8u : public WriteAttribute
@@ -17632,7 +17632,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap16 : public WriteAttribute
@@ -17659,7 +17659,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap32 : public WriteAttribute
@@ -17686,7 +17686,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap64 : public WriteAttribute
@@ -17713,7 +17713,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableInt8u : public WriteAttribute

@@ -755,29 +755,29 @@ typedef void (*DiagnosticLogsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DiagnosticLogsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
+typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(void *,
+                                                                chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
 typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
 typedef void (*DoorLockDefaultConfigurationRegisterAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>);
 typedef void (*DoorLockLocalProgrammingFeaturesAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>);
-typedef void (*DoorLockAlarmMaskAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>);
+typedef void (*DoorLockAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DoorLock::DlAlarmMask>);
 typedef void (*DoorLockKeypadOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
 typedef void (*DoorLockRemoteOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>);
 typedef void (*DoorLockManualOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlManualOperationEventMask>);
 typedef void (*DoorLockRFIDOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>);
 typedef void (*DoorLockKeypadProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
 typedef void (*DoorLockRemoteProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>);
 typedef void (*DoorLockRFIDProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>);
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
@@ -1012,7 +1012,7 @@ typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
 typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>);
+    void *, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>);
 typedef void (*PumpConfigurationAndControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallback)(
@@ -1062,10 +1062,10 @@ typedef void (*TemperatureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
-typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
-typedef void (*TestClusterBitmap32AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>);
-typedef void (*TestClusterBitmap64AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>);
+typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
+typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
+typedef void (*TestClusterBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>);
+typedef void (*TestClusterBitmap64AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>);
 typedef void (*TestClusterListInt8uListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<uint8_t> & data);
 typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context,
@@ -1086,13 +1086,13 @@ typedef void (*TestClusterListFabricScopedListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & data);
 typedef void (*TestClusterNullableBitmap8AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> &);
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> &);
 typedef void (*TestClusterNullableBitmap16AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> &);
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> &);
 typedef void (*TestClusterNullableBitmap32AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> &);
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> &);
 typedef void (*TestClusterNullableBitmap64AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
 typedef void (*TestClusterNullableStructStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
 typedef void (*TestClusterGeneratedCommandListListAttributeCallback)(
@@ -1173,8 +1173,8 @@ typedef void (*WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
 typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
-                                                            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
-typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
+                                                            chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::WindowCovering::Mode>);
 typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
@@ -3982,7 +3982,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
 };
 
 class CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge
@@ -4010,7 +4010,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
 };
 
 class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
@@ -4038,7 +4038,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
 };
 
 class CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
@@ -4066,7 +4066,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
 };
 
 class CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge
@@ -4093,7 +4093,7 @@ public:
                                                  bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlAlarmMask> value);
 };
 
 class CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge : public CHIPDoorLockAlarmMaskAttributeCallbackBridge
@@ -4120,7 +4120,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockKeypadOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
 };
 
 class CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge
@@ -4148,7 +4148,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockRemoteOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value);
 };
 
 class CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge
@@ -4176,7 +4176,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockManualOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value);
 };
 
 class CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge
@@ -4204,7 +4204,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockRFIDOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value);
 };
 
 class CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge
@@ -4232,7 +4232,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockKeypadProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
 };
 
 class CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge
@@ -4260,7 +4260,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockRemoteProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value);
 };
 
 class CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge
@@ -4288,7 +4288,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockRFIDProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value);
 };
 
 class CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackSubscriptionBridge
@@ -7407,7 +7407,7 @@ public:
         CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
 };
 
 class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
@@ -8093,7 +8093,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value);
 };
 
 class CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap8AttributeCallbackBridge
@@ -8119,7 +8119,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value);
 };
 
 class CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap16AttributeCallbackBridge
@@ -8145,7 +8145,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value);
 };
 
 class CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap32AttributeCallbackBridge
@@ -8171,7 +8171,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value);
 };
 
 class CHIPTestClusterBitmap64AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap64AttributeCallbackBridge
@@ -8402,7 +8402,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge
@@ -8432,7 +8432,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge
@@ -8462,7 +8462,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge
@@ -8492,7 +8492,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge
@@ -9540,7 +9540,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value);
 };
 
 class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
@@ -9567,7 +9567,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value);
 };
 
 class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
