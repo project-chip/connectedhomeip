@@ -11,64 +11,224 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.5. [TC-DL-1.5] Verification for Get Log Record, Get Log Record Response
-    Command [DUT-Server]
+    112.2.5. [TC-DL-2.5] Verification for the following Commands - Set Week Day
+    Schedule, Get Week Day Schedule , Get Week Day Schedule Response, Clear Week
+    Day Schedule [DUT-Server]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
-    - label:
-          "TH saves the NumberOfLogRecordsSupported attribute value as logcount
-          for the future use"
-      verification: |
-          https://github.com/project-chip/connectedhomeip/issues/15776
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Get Max number of Week Day schedules for user"
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          value: 10
+
+    - label: "Get number of supported users"
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupported
+          value: 10
+
+    - label: "Send Set Week Day Schedule Command to DUT"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 2
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+
+    #issue #18591
+    - label: "send GetWeekDay Schedule Command "
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                constraints:
+                    minValue: 1
+              - name: "userIndex"
+                constraints:
+                    minValue: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                constraints:
+                    hasValue: true
+                    minValue: 0
+                    maxValue: 6
+              - name: "startHour"
+                constraints:
+                    hasValue: true
+                    minValue: 0
+                    maxValue: 23
+              - name: "startMinute"
+                constraints:
+                    hasValue: true
+                    minValue: 0
+                    maxValue: 59
+              - name: "endHour"
+                constraints:
+                    hasValue: true
+                    minValue: 0
+                    maxValue: 23
+              - name: "endMinute"
+                constraints:
+                    hasValue: true
+                    minValue: 0
+                    maxValue: 59
 
     - label:
-          "TH sends Door lock command to the DUT with PINCode argument value as
-          'xxxxxxxx' for 5 times"
-      verification: |
-
-      disabled: true
-
-    - label: "Increment the logcount by 5."
-      verification: |
-
-      disabled: true
-
-    - label: "TH reads NumberOfLogRecordsSupported attribute from the DUT"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Get Log Record Command to the DUT with argument Log Index
-          value as 2"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Door lock command to the DUT with PINCode argument value as
-          'xxxxxxxx'"
-      verification: |
-
-      disabled: true
-
-    - label: "TH reads NumberOfLogRecordsSupported attribute from the DUT"
-      verification: |
-
-      disabled: true
+          "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND
+          response"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 7
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "TH sends Get Log Record Command to the DUT with argument Log Index
-          value as 0"
-      verification: |
+          "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND
+          response"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x85
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false
 
-      disabled: true
+    - label: "Clear all week day schedules for the first user"
+      command: "ClearWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0xFE
+              - name: "userIndex"
+                value: 1
+
+    - label: "send GetWeekDay Schedule Command "
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x8B
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false
