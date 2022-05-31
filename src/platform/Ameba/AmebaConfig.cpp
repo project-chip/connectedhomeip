@@ -56,9 +56,9 @@ const char AmebaConfig::kConfigNamespace_ChipAttributes[]             = "chip-at
 const char AmebaConfig::kConfigNamespace_ChipBindingTable[]           = "chip-bindingtable";
 const char AmebaConfig::kConfigNamespace_ChipOTA[]                    = "chip-ota";
 const char AmebaConfig::kConfigNamespace_ChipFailSafe[]               = "chip-failsafe";
-const char AmebaConfig::kConfigNamespace_ChipSessionResumptionIndex[] = "chip-sessionresumptionindex";
 const char AmebaConfig::kConfigNamespace_ChipSessionResumption[]      = "chip-sessionresumption";
 const char AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider[]     = "chip-deviceinfoprovider";
+const char AmebaConfig::kConfigNamespace_ChipGroupDataProvider[]      = "chip-groupdataprovider";
 const char AmebaConfig::kConfigNamespace_ChipOthers[]                 = "chip-others";
 const char AmebaConfig::kConfigNamespace_ChipOthers2[]                = "chip-others2";
 
