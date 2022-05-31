@@ -655,8 +655,7 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
     }
 
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err                                      = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
+    err = chipDevice->GetAttestationChallenge(attestationChallenge);
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 

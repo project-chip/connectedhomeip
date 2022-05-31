@@ -32,6 +32,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
@@ -59,6 +60,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mLastStationConnectFailTime   = System::Clock::kZero;
     mLastAPDemandTime             = System::Clock::kZero;
@@ -77,39 +79,32 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
     wifi_reg_event_handler(WIFI_EVENT_DISCONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
 
-    // Ensure that station mode is enabled.
-    wifi_on(RTW_MODE_STA);
-
-    // Ensure that station mode is enabled in the WiFi layer.
-    wifi_set_mode(RTW_MODE_STA);
-    ;
+    err = Internal::AmebaUtils::StartWiFi();
+    SuccessOrExit(err);
+    err = Internal::AmebaUtils::EnableStationMode();
+    SuccessOrExit(err);
 
     // If there is no persistent station provision...
     if (!IsWiFiStationProvisioned())
     {
         // If the code has been compiled with a default WiFi station provision, configure that now.
 #if !defined(CONFIG_DEFAULT_WIFI_SSID)
-        printf("%s %d pls define CONFIG_DEFAULT_WIFI_SSID\r\n", __func__, __LINE__);
+        ChipLogProgress(DeviceLayer, "Please define CONFIG_DEFAULT_WIFI_SSID");
 #else
         if (CONFIG_DEFAULT_WIFI_SSID[0] != 0)
         {
             ChipLogProgress(DeviceLayer, "Setting default WiFi station configuration (SSID: %s)", CONFIG_DEFAULT_WIFI_SSID);
 
             // Set a default station configuration.
-            rtw_wifi_setting_t wifiConfig;
-
-            // Set the wifi configuration
+            rtw_wifi_config_t wifiConfig;
             memset(&wifiConfig, 0, sizeof(wifiConfig));
             memcpy(wifiConfig.ssid, CONFIG_DEFAULT_WIFI_SSID, strlen(CONFIG_DEFAULT_WIFI_SSID) + 1);
             memcpy(wifiConfig.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
             wifiConfig.mode = RTW_MODE_STA;
 
             // Configure the WiFi interface.
-            int err = CHIP_SetWiFiConfig(&wifiConfig);
-            if (err != 0)
-            {
-                ChipLogError(DeviceLayer, "_Init _SetWiFiConfig() failed: %d", err);
-            }
+            err = Internal::AmebaUtils::SetWiFiConfig(&wifiConfig);
+            SuccessOrExit(err);
 
             // Enable WiFi station mode.
             ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
@@ -131,7 +126,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -149,8 +145,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
-        DriveStationState();
         DHCPProcess();
+        DriveStationState();
     }
     if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
     {
@@ -208,14 +204,15 @@ exit:
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-    rtw_wifi_setting_t mWiFiSetting;
-    CHIP_GetWiFiConfig(&mWiFiSetting);
-    return mWiFiSetting.ssid[0] != 0;
+    return Internal::AmebaUtils::IsStationProvisioned();
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    // TBD
+    // Clear Ameba WiFi station config
+    rtw_wifi_config_t wifiConfig;
+    memset(&wifiConfig, 0, sizeof(wifiConfig));
+    Internal::AmebaUtils::SetWiFiConfig(&wifiConfig);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -468,6 +465,7 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 
 void ConnectivityManagerImpl::DriveStationState()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     bool stationConnected;
 
     GetWiFiStationMode();
@@ -475,16 +473,14 @@ void ConnectivityManagerImpl::DriveStationState()
     // If the station interface is NOT under application control...
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        // Ensure that the WiFi layer is started.
-        wifi_on(RTW_MODE_STA);
-
-        // Ensure that station mode is enabled in the WiFi layer.
-        wifi_set_mode(RTW_MODE_STA);
-        ;
+        err = Internal::AmebaUtils::StartWiFi();
+        SuccessOrExit(err);
+        err = Internal::AmebaUtils::EnableStationMode();
+        SuccessOrExit(err);
     }
 
     // Determine if the WiFi layer thinks the station interface is currently connected.
-    stationConnected = (wifi_is_connected_to_ap() == RTW_SUCCESS) ? 1 : 0;
+    err = Internal::AmebaUtils::IsStationConnected(stationConnected);
 
     // If the station interface is currently connected ...
     if (stationConnected)
@@ -506,10 +502,10 @@ void ConnectivityManagerImpl::DriveStationState()
             (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            int err = wifi_disconnect();
-            if (err != 0)
+            err = Internal::AmebaUtils::WiFiDisconnect();
+            if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "wifi_disconnect() failed: %s", err);
+                ChipLogError(DeviceLayer, "WiFiDisconnect() failed: %s", err);
                 return;
             }
 
@@ -551,10 +547,13 @@ void ConnectivityManagerImpl::DriveStationState()
                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
-                rtw_wifi_setting_t wifi_info;
-                CHIP_GetWiFiConfig(&wifi_info);
-                wifi_connect((char *) wifi_info.ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) wifi_info.password,
-                             strlen((const char *) wifi_info.ssid), strlen((const char *) wifi_info.password), 0, NULL);
+                err = Internal::AmebaUtils::WiFiConnect();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "WiFiConnect() failed: %s", chip::ErrorStr(err));
+                }
+                SuccessOrExit(err);
+
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
 
@@ -571,6 +570,7 @@ void ConnectivityManagerImpl::DriveStationState()
         }
     }
 
+exit:
     ChipLogProgress(DeviceLayer, "Done driving station state, nothing else to do...");
     // Kick-off any pending network scan that might have been deferred due to the activity
     // of the WiFi station.
@@ -674,16 +674,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // address (2000::/3) that is in the valid state.  If such an address is found...
                 for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
                 {
-                    if (ip6_addr_isglobal(netif_ip6_addr(netif, i)) && ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
+                    if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
                     {
-                        // Determine if there is a default IPv6 router that is currently reachable
-                        // via the station interface.  If so, presume for now that the device has
-                        // IPv6 connectivity.
-                        struct netif * found_if = nd6_find_route(IP6_ADDR_ANY6);
-                        if (found_if && netif->num == found_if->num)
-                        {
-                            haveIPv6Conn = true;
-                        }
+                        haveIPv6Conn = true;
                     }
                 }
             }

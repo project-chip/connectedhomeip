@@ -21676,28 +21676,8 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface SecurityPolicyAttributeCallback {
-      void onSuccess(
-          @Nullable List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
     public interface ChannelMaskAttributeCallback {
       void onSuccess(@Nullable byte[] value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
-    public interface OperationalDatasetComponentsAttributeCallback {
-      void onSuccess(
-          @Nullable
-              List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>
-                  valueList);
 
       void onError(Exception ex);
 
@@ -22272,15 +22252,6 @@ public class ChipClusters {
       subscribeDelayAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSecurityPolicyAttribute(SecurityPolicyAttributeCallback callback) {
-      readSecurityPolicyAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeSecurityPolicyAttribute(
-        SecurityPolicyAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeSecurityPolicyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readChannelMaskAttribute(ChannelMaskAttributeCallback callback) {
       readChannelMaskAttribute(chipClusterPtr, callback);
     }
@@ -22288,17 +22259,6 @@ public class ChipClusters {
     public void subscribeChannelMaskAttribute(
         ChannelMaskAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeChannelMaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readOperationalDatasetComponentsAttribute(
-        OperationalDatasetComponentsAttributeCallback callback) {
-      readOperationalDatasetComponentsAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeOperationalDatasetComponentsAttribute(
-        OperationalDatasetComponentsAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeOperationalDatasetComponentsAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readActiveNetworkFaultsListAttribute(
@@ -22744,30 +22704,12 @@ public class ChipClusters {
     private native void subscribeDelayAttribute(
         long chipClusterPtr, DelayAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readSecurityPolicyAttribute(
-        long chipClusterPtr, SecurityPolicyAttributeCallback callback);
-
-    private native void subscribeSecurityPolicyAttribute(
-        long chipClusterPtr,
-        SecurityPolicyAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
     private native void readChannelMaskAttribute(
         long chipClusterPtr, ChannelMaskAttributeCallback callback);
 
     private native void subscribeChannelMaskAttribute(
         long chipClusterPtr,
         ChannelMaskAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readOperationalDatasetComponentsAttribute(
-        long chipClusterPtr, OperationalDatasetComponentsAttributeCallback callback);
-
-    private native void subscribeOperationalDatasetComponentsAttribute(
-        long chipClusterPtr,
-        OperationalDatasetComponentsAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

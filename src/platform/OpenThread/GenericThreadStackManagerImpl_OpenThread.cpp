@@ -1523,10 +1523,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             securityPolicy.rotationTime = policyAsInts[0];
             securityPolicy.flags        = policyAsInts[1];
 
-            err = encoder.EncodeList([securityPolicy](const auto & aEncoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(aEncoder.Encode(securityPolicy));
-                return CHIP_NO_ERROR;
-            });
+            err = encoder.Encode(securityPolicy);
         }
     }
     break;
@@ -1576,10 +1573,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             OpDatasetComponents.securityPolicyPresent   = activeDataset.mComponents.mIsSecurityPolicyPresent;
             OpDatasetComponents.channelMaskPresent      = activeDataset.mComponents.mIsChannelMaskPresent;
 
-            err = encoder.EncodeList([OpDatasetComponents](const auto & aEncoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(aEncoder.Encode(OpDatasetComponents));
-                return CHIP_NO_ERROR;
-            });
+            err = encoder.Encode(OpDatasetComponents);
         }
     }
     break;

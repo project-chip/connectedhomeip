@@ -1,1 +1,1 @@
-0.5.77 Version bump reason: Update nRF Connect SDK version.
+0.5.78 Version bump reason: [Tizen] Fix environment variable order, add missing tizen dependencies
