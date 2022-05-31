@@ -46,16 +46,16 @@ typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
-constexpr FabricIndex kMinValidFabricIndex = 1;
-constexpr FabricIndex kMaxValidFabricIndex = UINT8_MAX - 1;
+constexpr FabricIndex kMinValidFabricIndex  = 1;
+constexpr FabricIndex kMaxValidFabricIndex  = UINT8_MAX - 1;
 
 static_assert(kMinValidFabricIndex <= CHIP_CONFIG_MAX_FABRICS, "Must support some fabrics.");
 static_assert(CHIP_CONFIG_MAX_FABRICS <= kMaxValidFabricIndex, "Max fabric count out of range.");
 
-constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
-constexpr EndpointId kRootEndpointId        = 0;
-constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
-constexpr KeysetId kInvalidKeysetId         = 0xFFFF;
+constexpr EndpointId kInvalidEndpointId = 0xFFFF;
+constexpr EndpointId kRootEndpointId    = 0;
+constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
+constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.

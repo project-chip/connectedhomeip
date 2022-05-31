@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <app/InteractionModelEngine.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
 #include <app/util/im-client-callbacks.h>
@@ -30,13 +30,28 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<uint16_t> & data);
-typedef void (*AudioOutputOutputListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
-typedef void (*ChannelChannelListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
-typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
-typedef void (*DescriptorServerListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
-typedef void (*DescriptorClientListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
-typedef void (*DescriptorPartsListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
-typedef void (*MediaInputInputListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
-typedef void (*TargetNavigatorTargetListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
+typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * context,
+                                                                    const chip::app::DataModel::DecodableList<uint16_t> & data);
+typedef void (*AudioOutputOutputListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
+typedef void (*ChannelChannelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
+typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+typedef void (*DescriptorDeviceListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
+typedef void (*DescriptorServerListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
+typedef void (*DescriptorClientListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
+typedef void (*DescriptorPartsListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
+typedef void (*MediaInputInputListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
+typedef void (*TargetNavigatorTargetListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
