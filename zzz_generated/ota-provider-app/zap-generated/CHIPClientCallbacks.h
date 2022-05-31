@@ -33,4 +33,3 @@
 typedef void (*AccessControlAclListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> & data);
 typedef void (*AccessControlExtensionListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
 typedef void (*AccessControlAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

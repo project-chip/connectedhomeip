@@ -252,4 +252,3 @@ typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(void * 
 typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

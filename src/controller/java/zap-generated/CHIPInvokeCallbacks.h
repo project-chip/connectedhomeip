@@ -32,7 +32,7 @@ public:
     ~CHIPAccountLoginClusterGetSetupPINResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -45,7 +45,7 @@ public:
     ~CHIPApplicationLauncherClusterLauncherResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -58,7 +58,7 @@ public:
     ~CHIPChannelClusterChangeChannelResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -71,7 +71,7 @@ public:
     ~CHIPContentLauncherClusterLaunchResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -84,7 +84,7 @@ public:
     ~CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -97,7 +97,7 @@ public:
     ~CHIPDoorLockClusterGetCredentialStatusResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -110,7 +110,7 @@ public:
     ~CHIPDoorLockClusterGetHolidayScheduleResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -123,7 +123,7 @@ public:
     ~CHIPDoorLockClusterGetUserResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -136,7 +136,7 @@ public:
     ~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -149,7 +149,7 @@ public:
     ~CHIPDoorLockClusterGetYearDayScheduleResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -162,7 +162,7 @@ public:
     ~CHIPDoorLockClusterSetCredentialResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -175,7 +175,7 @@ public:
     ~CHIPGeneralCommissioningClusterArmFailSafeResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -188,7 +188,7 @@ public:
     ~CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -201,7 +201,7 @@ public:
     ~CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -214,7 +214,7 @@ public:
     ~CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -227,7 +227,7 @@ public:
     ~CHIPGroupKeyManagementClusterKeySetReadResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -240,7 +240,7 @@ public:
     ~CHIPGroupsClusterAddGroupResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -253,7 +253,7 @@ public:
     ~CHIPGroupsClusterGetGroupMembershipResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -266,7 +266,7 @@ public:
     ~CHIPGroupsClusterRemoveGroupResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -279,7 +279,7 @@ public:
     ~CHIPGroupsClusterViewGroupResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -292,7 +292,7 @@ public:
     ~CHIPKeypadInputClusterSendKeyResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -305,7 +305,7 @@ public:
     ~CHIPMediaPlaybackClusterPlaybackResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -318,7 +318,7 @@ public:
     ~CHIPNetworkCommissioningClusterConnectNetworkResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -331,7 +331,7 @@ public:
     ~CHIPNetworkCommissioningClusterNetworkConfigResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -344,7 +344,7 @@ public:
     ~CHIPNetworkCommissioningClusterScanNetworksResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -357,7 +357,7 @@ public:
     ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -370,7 +370,7 @@ public:
     ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -383,7 +383,7 @@ public:
     ~CHIPOperationalCredentialsClusterAttestationResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -396,7 +396,7 @@ public:
     ~CHIPOperationalCredentialsClusterCSRResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -409,7 +409,7 @@ public:
     ~CHIPOperationalCredentialsClusterCertificateChainResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -422,7 +422,7 @@ public:
     ~CHIPOperationalCredentialsClusterNOCResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -435,7 +435,7 @@ public:
     ~CHIPScenesClusterAddSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -448,7 +448,7 @@ public:
     ~CHIPScenesClusterGetSceneMembershipResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -461,7 +461,7 @@ public:
     ~CHIPScenesClusterRemoveAllScenesResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -474,7 +474,7 @@ public:
     ~CHIPScenesClusterRemoveSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -487,7 +487,7 @@ public:
     ~CHIPScenesClusterStoreSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -500,7 +500,7 @@ public:
     ~CHIPScenesClusterViewSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -513,7 +513,7 @@ public:
     ~CHIPTargetNavigatorClusterNavigateTargetResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -526,7 +526,7 @@ public:
     ~CHIPTestClusterClusterBooleanResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -539,7 +539,7 @@ public:
     ~CHIPTestClusterClusterSimpleStructResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -552,7 +552,7 @@ public:
     ~CHIPTestClusterClusterTestAddArgumentsResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -565,7 +565,7 @@ public:
     ~CHIPTestClusterClusterTestEmitTestEventResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -578,7 +578,7 @@ public:
     ~CHIPTestClusterClusterTestEnumsResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -591,7 +591,7 @@ public:
     ~CHIPTestClusterClusterTestListInt8UReverseResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -604,7 +604,7 @@ public:
     ~CHIPTestClusterClusterTestNullableOptionalResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -617,7 +617,7 @@ public:
     ~CHIPTestClusterClusterTestSpecificResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };
@@ -630,7 +630,7 @@ public:
     ~CHIPThermostatClusterGetWeeklyScheduleResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
-    
+
 private:
     jobject javaCallbackRef;
 };

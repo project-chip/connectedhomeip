@@ -61,7 +61,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)(JNIEnv * env, jobject 
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -85,7 +85,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)(JNIEnv * env, jobject 
             if (element_0_subjectsItem_1Size != 0) {
               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_subjectsItem_1Size);
               listFreer.add(listHolder_3);
-        
+
               for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_subjectsItem_1Size); ++i_3) {
                 jobject element_3;
                 chip::JniReferences::GetInstance().GetListItem(element_0_subjectsItem_1, i_3, element_3);
@@ -111,7 +111,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)(JNIEnv * env, jobject 
             if (element_0_targetsItem_1Size != 0) {
               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_targetsItem_1Size);
               listFreer.add(listHolder_3);
-        
+
               for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_targetsItem_1Size); ++i_3) {
                 jobject element_3;
                 chip::JniReferences::GetInstance().GetListItem(element_0_targetsItem_1, i_3, element_3);
@@ -198,7 +198,7 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)(JNIEnv * env, jo
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -440,7 +440,7 @@ JNI_METHOD(void, BindingCluster, writeBindingAttribute)(JNIEnv * env, jobject se
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -1679,7 +1679,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, writeGroupKeyMapAttribute)(JNIEnv * 
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -2209,7 +2209,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttr
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -3511,7 +3511,7 @@ JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)(JNIEnv * env, jobj
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -3565,7 +3565,7 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)(JNIEnv * env
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -3620,7 +3620,7 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)(JNIEnv
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -3899,7 +3899,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -4094,7 +4094,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
             if (element_0_nullableListItem_1Size != 0) {
               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_nullableListItem_1Size);
               listFreer.add(listHolder_3);
-        
+
               for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_nullableListItem_1Size); ++i_3) {
                 jobject element_3;
                 chip::JniReferences::GetInstance().GetListItem(element_0_nullableListItem_1, i_3, element_3);
@@ -4121,7 +4121,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
               if (optionalValue_2Size != 0) {
                 auto * listHolder_3 = new ListHolder<ListMemberType_3>(optionalValue_2Size);
                 listFreer.add(listHolder_3);
-          
+
                 for (size_t i_3 = 0; i_3 < static_cast<size_t>(optionalValue_2Size); ++i_3) {
                   jobject element_3;
                   chip::JniReferences::GetInstance().GetListItem(optionalValue_2, i_3, element_3);
@@ -4153,7 +4153,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                   if (optionalValue_2Size != 0) {
                     auto * listHolder_4 = new ListHolder<ListMemberType_4>(optionalValue_2Size);
                     listFreer.add(listHolder_4);
-              
+
                     for (size_t i_4 = 0; i_4 < static_cast<size_t>(optionalValue_2Size); ++i_4) {
                       jobject element_4;
                       chip::JniReferences::GetInstance().GetListItem(optionalValue_2, i_4, element_4);
@@ -4396,7 +4396,7 @@ JNI_METHOD(void, TestClusterCluster, writeListLongOctetStringAttribute)(JNIEnv *
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -4451,7 +4451,7 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)(JNIEnv * en
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
@@ -4533,7 +4533,7 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)(JNIEnv * en
         if (element_0_fabricSensitiveInt8uListItem_1Size != 0) {
           auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_fabricSensitiveInt8uListItem_1Size);
           listFreer.add(listHolder_2);
-    
+
           for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_fabricSensitiveInt8uListItem_1Size); ++i_2) {
             jobject element_2;
             chip::JniReferences::GetInstance().GetListItem(element_0_fabricSensitiveInt8uListItem_1, i_2, element_2);
@@ -6590,7 +6590,7 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)(JNIEnv * env, jobjec
         if (valueSize != 0) {
           auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
           listFreer.add(listHolder_0);
-    
+
           for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0) {
             jobject element_0;
             chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);

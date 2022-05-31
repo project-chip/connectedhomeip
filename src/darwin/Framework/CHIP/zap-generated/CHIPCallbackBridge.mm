@@ -20426,4 +20426,3 @@ void CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallb
          self->mEstablishedHandler = nil;
      }
 }
-

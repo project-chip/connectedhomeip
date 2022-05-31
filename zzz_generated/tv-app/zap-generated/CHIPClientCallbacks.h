@@ -35,4 +35,3 @@ typedef void (*NetworkCommissioningNetworksListAttributeCallback)(void * context
 typedef void (*OperationalCredentialsNOCsListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> & data);
 typedef void (*OperationalCredentialsFabricsListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-

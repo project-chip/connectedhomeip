@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull identifyTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -76,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -99,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -166,7 +166,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -189,7 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -210,7 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -233,7 +233,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -252,7 +252,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGroupsClusterRemoveAllGroupsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -275,7 +275,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -304,7 +304,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -329,7 +329,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -352,7 +352,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -383,7 +383,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -406,7 +406,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -431,7 +431,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -452,7 +452,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -475,7 +475,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -498,7 +498,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -523,7 +523,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -548,7 +548,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -569,7 +569,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -596,7 +596,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable sceneList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -625,7 +625,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -650,7 +650,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -673,7 +673,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -704,7 +704,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable extensionFieldSets;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -733,7 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneIdTo;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -758,7 +758,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull sceneIdFrom;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -777,7 +777,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOffClusterOffParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -796,7 +796,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOffClusterOnParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -815,7 +815,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOffClusterToggleParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -838,7 +838,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -857,7 +857,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOffClusterOnWithRecallGlobalSceneParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -882,7 +882,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull offWaitTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -909,7 +909,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -936,7 +936,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -965,7 +965,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -988,7 +988,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1011,7 +1011,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1034,7 +1034,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1059,7 +1059,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1078,7 +1078,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPLevelControlClusterStopWithOnOffParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1101,7 +1101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1124,7 +1124,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1143,7 +1143,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAlarmsClusterResetAllAlarmsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1170,7 +1170,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1189,7 +1189,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAlarmsClusterGetAlarmParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1208,7 +1208,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAlarmsClusterResetAlarmLogParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1229,7 +1229,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1256,7 +1256,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull transferredPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1275,7 +1275,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerProfileClusterPowerProfileStateRequestParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1302,7 +1302,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull transferredPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1329,7 +1329,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1352,7 +1352,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull powerProfileRecords;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1377,7 +1377,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1398,7 +1398,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1423,7 +1423,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1446,7 +1446,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull powerProfileRecords;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1471,7 +1471,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1490,7 +1490,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerProfileClusterGetOverallSchedulePriceParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1511,7 +1511,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1532,7 +1532,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1553,7 +1553,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1578,7 +1578,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1605,7 +1605,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1630,7 +1630,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1655,7 +1655,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stopBefore;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1680,7 +1680,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stopBefore;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1705,7 +1705,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileStartTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1726,7 +1726,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull commandId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1751,7 +1751,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull applianceStatus2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1770,7 +1770,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPApplianceControlClusterSignalStateParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1795,7 +1795,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull applianceStatus2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1820,7 +1820,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull functionData;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1839,7 +1839,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPApplianceControlClusterOverloadPauseResumeParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1858,7 +1858,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPApplianceControlClusterOverloadPauseParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1879,7 +1879,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull warningEvent;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1898,7 +1898,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPollControlClusterCheckInParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1921,7 +1921,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fastPollTimeout;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1940,7 +1940,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPollControlClusterFastPollStopParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1961,7 +1961,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, getter=getNewLongPollInterval) NSNumber * _Nonnull newLongPollInterval;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -1982,7 +1982,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, getter=getNewShortPollInterval) NSNumber * _Nonnull newShortPollInterval;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2005,7 +2005,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2030,7 +2030,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2053,7 +2053,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2078,7 +2078,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2101,7 +2101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2124,7 +2124,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2149,7 +2149,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2172,7 +2172,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2195,7 +2195,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2220,7 +2220,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2243,7 +2243,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2268,7 +2268,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2287,7 +2287,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBasicClusterMfgSpecificPingParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2322,7 +2322,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable metadataForProvider;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2357,7 +2357,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable metadataForRequestor;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2380,7 +2380,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2403,7 +2403,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2426,7 +2426,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2455,7 +2455,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2478,7 +2478,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2501,7 +2501,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2526,7 +2526,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2549,7 +2549,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2568,7 +2568,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralCommissioningClusterCommissioningCompleteParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2591,7 +2591,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2614,7 +2614,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2641,7 +2641,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable threadScanResults;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2666,7 +2666,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2689,7 +2689,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2712,7 +2712,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2737,7 +2737,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable networkIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2760,7 +2760,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2785,7 +2785,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable errorValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2810,7 +2810,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2835,7 +2835,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull transferFileDesignator;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2862,7 +2862,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull timeSinceBoot;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2885,7 +2885,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull eventTrigger;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2904,7 +2904,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2923,7 +2923,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPThreadNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2942,7 +2942,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2961,7 +2961,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPEthernetNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -2990,7 +2990,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull salt;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3011,7 +3011,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull commissioningTimeout;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3030,7 +3030,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAdministratorCommissioningClusterRevokeCommissioningParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3051,7 +3051,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull attestationNonce;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3074,7 +3074,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull signature;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3095,7 +3095,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull certificateType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3116,7 +3116,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull certificate;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3137,7 +3137,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3160,7 +3160,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull attestationSignature;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3189,7 +3189,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull adminVendorId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3212,7 +3212,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable icacValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3237,7 +3237,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable debugText;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3258,7 +3258,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull label;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3279,7 +3279,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3300,7 +3300,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull rootCertificate;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3321,7 +3321,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3342,7 +3342,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3363,7 +3363,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3384,7 +3384,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3405,7 +3405,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3426,7 +3426,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3447,7 +3447,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, getter=getNewMode) NSNumber * _Nonnull newMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3468,7 +3468,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3489,7 +3489,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3512,7 +3512,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3533,7 +3533,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull logIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3566,7 +3566,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull pin;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3593,7 +3593,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull pin;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3614,7 +3614,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3641,7 +3641,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable pin;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3662,7 +3662,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull pinSlotIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3681,7 +3681,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDoorLockClusterClearAllPINCodesParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3704,7 +3704,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3725,7 +3725,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3748,7 +3748,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3781,7 +3781,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull endMinute;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3804,7 +3804,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3839,7 +3839,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable endMinute;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3862,7 +3862,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3889,7 +3889,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3912,7 +3912,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3941,7 +3941,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable localEndTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3964,7 +3964,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -3991,7 +3991,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4012,7 +4012,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4041,7 +4041,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable operatingMode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4062,7 +4062,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4085,7 +4085,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4106,7 +4106,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4129,7 +4129,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4156,7 +4156,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull rfidCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4177,7 +4177,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4204,7 +4204,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable rfidCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4225,7 +4225,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull rfidSlotIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4244,7 +4244,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDoorLockClusterClearAllRFIDCodesParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4277,7 +4277,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable credentialRule;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4298,7 +4298,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4337,7 +4337,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable nextUserIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4358,7 +4358,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4389,7 +4389,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4424,7 +4424,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4455,7 +4455,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable userType;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4480,7 +4480,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4501,7 +4501,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4530,7 +4530,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4551,7 +4551,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nullable credential;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4570,7 +4570,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWindowCoveringClusterUpOrOpenParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4589,7 +4589,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWindowCoveringClusterDownOrCloseParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4608,7 +4608,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWindowCoveringClusterStopMotionParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4629,7 +4629,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull liftValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4650,7 +4650,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull liftPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4671,7 +4671,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull tiltValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4692,7 +4692,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull tiltPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4713,7 +4713,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull percentOpen;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4732,7 +4732,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBarrierControlClusterBarrierControlStopParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4755,7 +4755,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull amount;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4782,7 +4782,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4809,7 +4809,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull transitions;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4832,7 +4832,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull modeToReturn;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4851,7 +4851,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPThermostatClusterClearWeeklyScheduleParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4880,7 +4880,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4907,7 +4907,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4936,7 +4936,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4963,7 +4963,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -4990,7 +4990,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5019,7 +5019,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5048,7 +5048,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5077,7 +5077,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5104,7 +5104,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5133,7 +5133,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5160,7 +5160,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5189,7 +5189,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5216,7 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5245,7 +5245,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5274,7 +5274,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5307,7 +5307,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5330,7 +5330,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5361,7 +5361,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5394,7 +5394,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5417,7 +5417,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5444,7 +5444,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull delay;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5463,7 +5463,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasZoneClusterInitiateNormalOperationModeParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5486,7 +5486,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull manufacturerCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5509,7 +5509,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull currentZoneSensitivityLevel;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5528,7 +5528,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasZoneClusterInitiateNormalOperationModeResponseParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5547,7 +5547,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasZoneClusterInitiateTestModeResponseParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5572,7 +5572,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5593,7 +5593,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull armNotification;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5618,7 +5618,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull armDisarmCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5669,7 +5669,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull section15;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5688,7 +5688,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterEmergencyParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5715,7 +5715,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull zoneLabel;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5734,7 +5734,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterFireParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5761,7 +5761,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull zoneLabel;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5780,7 +5780,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterPanicParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5807,7 +5807,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull alarmStatus;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5826,7 +5826,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterGetZoneIdMapParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5853,7 +5853,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull alarmStatus;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5874,7 +5874,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5897,7 +5897,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull zoneIds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5916,7 +5916,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterGetPanelStatusParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5939,7 +5939,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull bypassResult;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5958,7 +5958,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPIasAceClusterGetBypassedZoneListParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -5983,7 +5983,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull zoneStatusResult;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6010,7 +6010,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull zoneStatusMask;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6037,7 +6037,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull strobeLevel;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6058,7 +6058,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull squawkInfo;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6079,7 +6079,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull match;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6102,7 +6102,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6125,7 +6125,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6146,7 +6146,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, getter=getCount) NSNumber * _Nonnull count;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6169,7 +6169,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6192,7 +6192,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6211,7 +6211,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterPlayParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6230,7 +6230,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterPauseParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6249,7 +6249,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterStopPlaybackParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6268,7 +6268,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterStartOverParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6287,7 +6287,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterPreviousParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6306,7 +6306,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterNextParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6325,7 +6325,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterRewindParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6344,7 +6344,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaPlaybackClusterFastForwardParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6365,7 +6365,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6386,7 +6386,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6409,7 +6409,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6430,7 +6430,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull position;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6451,7 +6451,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6470,7 +6470,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaInputClusterShowInputStatusParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6489,7 +6489,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMediaInputClusterHideInputStatusParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6512,7 +6512,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull name;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6531,7 +6531,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPLowPowerClusterSleepParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6552,7 +6552,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull keyCode;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6573,7 +6573,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6598,7 +6598,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6623,7 +6623,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6646,7 +6646,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6667,7 +6667,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6690,7 +6690,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull name;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6713,7 +6713,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6734,7 +6734,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6755,7 +6755,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6778,7 +6778,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6799,7 +6799,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6820,7 +6820,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull setupPIN;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6843,7 +6843,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull setupPIN;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6862,7 +6862,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAccountLoginClusterLogoutParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6881,7 +6881,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6902,7 +6902,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6921,7 +6921,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestNotHandledParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6942,7 +6942,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6961,7 +6961,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestSpecificParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -6982,7 +6982,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7001,7 +7001,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestUnknownCommandParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7032,7 +7032,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg6;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7055,7 +7055,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7076,7 +7076,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7097,7 +7097,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7120,7 +7120,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7151,7 +7151,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg6;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7178,7 +7178,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable originalValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7199,7 +7199,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7274,7 +7274,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalListValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7295,7 +7295,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPTestClusterClusterNestedStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7316,7 +7316,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7337,7 +7337,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7358,7 +7358,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7379,7 +7379,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7400,7 +7400,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7421,7 +7421,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPTestClusterClusterNestedStructList * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7442,7 +7442,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7463,7 +7463,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7484,7 +7484,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7507,7 +7507,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7528,7 +7528,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7571,7 +7571,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7592,7 +7592,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7611,7 +7611,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTimedInvokeRequestParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7632,7 +7632,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7657,7 +7657,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg3;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7678,7 +7678,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7709,7 +7709,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7728,7 +7728,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPMessagingClusterGetLastMessageParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7751,7 +7751,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull messageControl;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7778,7 +7778,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull messageResponse;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7809,7 +7809,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7830,7 +7830,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull earliestImplementationTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7851,7 +7851,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull implementationDateTime;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7870,7 +7870,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPApplianceEventsAndAlertClusterGetAlertsParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7893,7 +7893,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull alertStructures;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7916,7 +7916,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull alertStructures;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7939,7 +7939,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull eventId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7966,7 +7966,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull logPayload;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -7987,7 +7987,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull logId;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8014,7 +8014,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull logPayload;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8033,7 +8033,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPApplianceStatisticsClusterLogQueueRequestParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8056,7 +8056,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull logIds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8079,7 +8079,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull logIds;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8106,7 +8106,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull listOfAttributes;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8125,7 +8125,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8156,7 +8156,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nonnull intervals;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.
@@ -8181,7 +8181,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervals;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
- * 
+ *
  * If nil (the default value), a regular invoke is done for commands that do
  * not require a timed invoke and a timed invoke with some default timed request
  * timeout is done for commands that require a timed invoke.

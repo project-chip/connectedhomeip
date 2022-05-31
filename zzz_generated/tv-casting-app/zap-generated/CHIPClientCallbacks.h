@@ -40,4 +40,3 @@ typedef void (*DescriptorClientListListAttributeCallback)(void * context, const 
 typedef void (*DescriptorPartsListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
 typedef void (*MediaInputInputListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
-

@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _identifyTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -38,10 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _effectIdentifier = @(0);
 
-    
+
         _effectVariant = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -53,10 +53,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
       _groupName = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -68,10 +68,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -95,13 +95,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
       _groupName = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _groupList = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -125,10 +125,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _capacity = nil;
 
-    
+
       _groupList = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -140,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -152,10 +152,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -176,10 +176,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
       _groupName = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -191,19 +191,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
       _sceneName = @"";
 
-    
+
       _extensionFieldSets = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -215,13 +215,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -233,10 +233,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -248,22 +248,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
 
-    
+
     _transitionTime = nil;
 
-    
+
     _sceneName = nil;
 
-    
+
     _extensionFieldSets = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -275,10 +275,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -290,13 +290,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -308,7 +308,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -320,10 +320,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -335,10 +335,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -350,13 +350,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -368,13 +368,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
 
-    
+
     _transitionTime = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -386,7 +386,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -398,16 +398,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _capacity = nil;
 
-    
+
         _groupId = @(0);
 
-    
+
     _sceneList = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -419,19 +419,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
       _sceneName = @"";
 
-    
+
       _extensionFieldSets = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -443,13 +443,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -461,10 +461,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -476,22 +476,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupId = @(0);
 
-    
+
         _sceneId = @(0);
 
-    
+
     _transitionTime = nil;
 
-    
+
     _sceneName = nil;
 
-    
+
     _extensionFieldSets = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -503,19 +503,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _mode = @(0);
 
-    
+
         _groupIdFrom = @(0);
 
-    
+
         _sceneIdFrom = @(0);
 
-    
+
         _groupIdTo = @(0);
 
-    
+
         _sceneIdTo = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -527,13 +527,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _groupIdFrom = @(0);
 
-    
+
         _sceneIdFrom = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -572,10 +572,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _effectId = @(0);
 
-    
+
         _effectVariant = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -596,13 +596,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _onOffControl = @(0);
 
-    
+
         _onTime = @(0);
 
-    
+
         _offWaitTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -614,16 +614,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _level = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionMask = @(0);
 
-    
+
         _optionOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -635,16 +635,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
 
-    
+
         _optionMask = @(0);
 
-    
+
         _optionOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -656,19 +656,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionMask = @(0);
 
-    
+
         _optionOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -680,10 +680,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _optionMask = @(0);
 
-    
+
         _optionOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -695,10 +695,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _level = @(0);
 
-    
+
         _transitionTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -710,10 +710,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -725,13 +725,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -752,10 +752,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _alarmCode = @(0);
 
-    
+
         _clusterId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -767,10 +767,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _alarmCode = @(0);
 
-    
+
         _clusterId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -791,16 +791,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
         _alarmCode = @(0);
 
-    
+
         _clusterId = @(0);
 
-    
+
         _timeStamp = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -830,7 +830,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -842,16 +842,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _totalProfileNum = @(0);
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfTransferredPhases = @(0);
 
-    
+
       _transferredPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -872,16 +872,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _totalProfileNum = @(0);
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfTransferredPhases = @(0);
 
-    
+
       _transferredPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -893,16 +893,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _currency = @(0);
 
-    
+
         _price = @(0);
 
-    
+
         _priceTrailingDigit = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -914,10 +914,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileCount = @(0);
 
-    
+
       _powerProfileRecords = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -929,13 +929,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _currency = @(0);
 
-    
+
         _price = @(0);
 
-    
+
         _priceTrailingDigit = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -947,7 +947,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -959,13 +959,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfScheduledPhases = @(0);
 
-    
+
       _scheduledPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -977,10 +977,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileCount = @(0);
 
-    
+
       _powerProfileRecords = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -992,13 +992,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfScheduledPhases = @(0);
 
-    
+
       _scheduledPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -1019,7 +1019,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1031,7 +1031,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1043,7 +1043,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1055,13 +1055,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfScheduledPhases = @(0);
 
-    
+
       _scheduledPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -1073,16 +1073,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _currency = @(0);
 
-    
+
         _price = @(0);
 
-    
+
         _priceTrailingDigit = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1094,13 +1094,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _numOfScheduledPhases = @(0);
 
-    
+
       _scheduledPhases = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -1112,13 +1112,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _startAfter = @(0);
 
-    
+
         _stopBefore = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1130,13 +1130,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _startAfter = @(0);
 
-    
+
         _stopBefore = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1148,13 +1148,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _options = @(0);
 
-    
+
         _powerProfileId = @(0);
 
-    
+
         _powerProfileStartTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1166,7 +1166,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _commandId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1178,13 +1178,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _applianceStatus = @(0);
 
-    
+
         _remoteEnableFlagsAndDeviceStatus2 = @(0);
 
-    
+
         _applianceStatus2 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1205,13 +1205,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _applianceStatus = @(0);
 
-    
+
         _remoteEnableFlagsAndDeviceStatus2 = @(0);
 
-    
+
         _applianceStatus2 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1223,13 +1223,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _functionId = @(0);
 
-    
+
         _functionDataType = @(0);
 
-    
+
       _functionData = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -1259,7 +1259,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _warningEvent = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1280,10 +1280,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _startFastPolling = @(0);
 
-    
+
         _fastPollTimeout = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1304,7 +1304,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _newLongPollInterval = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1316,7 +1316,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _newShortPollInterval = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1328,10 +1328,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1343,13 +1343,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
 
-    
+
         _transitionTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1361,10 +1361,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1376,13 +1376,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
 
-    
+
         _duration = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1394,10 +1394,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1409,10 +1409,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1424,13 +1424,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
 
-    
+
         _duration = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1442,10 +1442,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1457,10 +1457,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1472,13 +1472,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
 
-    
+
         _duration = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1490,10 +1490,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1505,13 +1505,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _actionID = @(0);
 
-    
+
     _invokeID = nil;
 
-    
+
         _duration = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1532,28 +1532,28 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _vendorId = @(0);
 
-    
+
         _productId = @(0);
 
-    
+
         _softwareVersion = @(0);
 
-    
+
       _protocolsSupported = [NSArray array];
 
-    
+
     _hardwareVersion = nil;
 
-    
+
     _location = nil;
 
-    
+
     _requestorCanConsent = nil;
 
-    
+
     _metadataForProvider = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1565,28 +1565,28 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _delayedActionTime = nil;
 
-    
+
     _imageURI = nil;
 
-    
+
     _softwareVersion = nil;
 
-    
+
     _softwareVersionString = nil;
 
-    
+
     _updateToken = nil;
 
-    
+
     _userConsentNeeded = nil;
 
-    
+
     _metadataForRequestor = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1598,10 +1598,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _updateToken = [NSData data];
 
-    
+
         _newVersion = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1613,10 +1613,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _action = @(0);
 
-    
+
         _delayedActionTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1628,10 +1628,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _updateToken = [NSData data];
 
-    
+
         _softwareVersion = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1643,19 +1643,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _providerNodeId = @(0);
 
-    
+
         _vendorId = @(0);
 
-    
+
         _announcementReason = @(0);
 
-    
+
     _metadataForNode = nil;
 
-    
+
         _endpoint = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1667,10 +1667,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _expiryLengthSeconds = @(0);
 
-    
+
         _breadcrumb = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1682,10 +1682,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _errorCode = @(0);
 
-    
+
       _debugText = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -1697,13 +1697,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _newRegulatoryConfig = @(0);
 
-    
+
       _countryCode = @"";
 
-    
+
         _breadcrumb = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1715,10 +1715,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _errorCode = @(0);
 
-    
+
       _debugText = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -1739,10 +1739,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _errorCode = @(0);
 
-    
+
       _debugText = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -1754,10 +1754,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _ssid = nil;
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1769,16 +1769,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _networkingStatus = @(0);
 
-    
+
     _debugText = nil;
 
-    
+
     _wiFiScanResults = nil;
 
-    
+
     _threadScanResults = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1790,13 +1790,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _ssid = [NSData data];
 
-    
+
       _credentials = [NSData data];
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1808,10 +1808,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _operationalDataset = [NSData data];
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1823,10 +1823,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _networkID = [NSData data];
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1838,13 +1838,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _networkingStatus = @(0);
 
-    
+
     _debugText = nil;
 
-    
+
     _networkIndex = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1856,10 +1856,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _networkID = [NSData data];
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1871,13 +1871,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _networkingStatus = @(0);
 
-    
+
     _debugText = nil;
 
-    
+
     _errorValue = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1889,13 +1889,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _networkID = [NSData data];
 
-    
+
         _networkIndex = @(0);
 
-    
+
     _breadcrumb = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -1907,13 +1907,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _intent = @(0);
 
-    
+
         _requestedProtocol = @(0);
 
-    
+
       _transferFileDesignator = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -1925,16 +1925,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
       _content = [NSData data];
 
-    
+
         _timeStamp = @(0);
 
-    
+
         _timeSinceBoot = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1946,10 +1946,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _enableKey = [NSData data];
 
-    
+
         _eventTrigger = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -1997,19 +1997,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _commissioningTimeout = @(0);
 
-    
+
       _pakeVerifier = [NSData data];
 
-    
+
         _discriminator = @(0);
 
-    
+
         _iterations = @(0);
 
-    
+
       _salt = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2021,7 +2021,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _commissioningTimeout = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2042,7 +2042,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _attestationNonce = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2054,10 +2054,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _attestationElements = [NSData data];
 
-    
+
       _signature = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2069,7 +2069,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _certificateType = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2081,7 +2081,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _certificate = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2093,7 +2093,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _csrNonce = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2105,10 +2105,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _nocsrElements = [NSData data];
 
-    
+
       _attestationSignature = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2120,19 +2120,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _nocValue = [NSData data];
 
-    
+
     _icacValue = nil;
 
-    
+
       _ipkValue = [NSData data];
 
-    
+
         _caseAdminSubject = @(0);
 
-    
+
         _adminVendorId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2144,10 +2144,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _nocValue = [NSData data];
 
-    
+
     _icacValue = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2159,13 +2159,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _statusCode = @(0);
 
-    
+
     _fabricIndex = nil;
 
-    
+
     _debugText = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2177,7 +2177,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _label = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -2189,7 +2189,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _fabricIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2201,7 +2201,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _rootCertificate = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2213,7 +2213,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2225,7 +2225,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupKeySetID = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2237,7 +2237,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2249,7 +2249,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _groupKeySetID = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2261,7 +2261,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _groupKeySetIDs = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2273,7 +2273,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _groupKeySetIDs = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2285,7 +2285,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _newMode = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2297,7 +2297,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _pinCode = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2309,7 +2309,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _pinCode = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2321,10 +2321,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _timeout = @(0);
 
-    
+
     _pinCode = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2336,7 +2336,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _logIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2348,25 +2348,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _logEntryId = @(0);
 
-    
+
         _timestamp = @(0);
 
-    
+
         _eventType = @(0);
 
-    
+
         _source = @(0);
 
-    
+
         _eventIdOrAlarmCode = @(0);
 
-    
+
         _userId = @(0);
 
-    
+
       _pin = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2378,16 +2378,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
       _pin = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2399,7 +2399,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2411,16 +2411,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
     _pin = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2432,7 +2432,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _pinSlotIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2453,10 +2453,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
         _userStatus = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2468,7 +2468,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2480,10 +2480,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
         _userStatus = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2495,25 +2495,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _weekDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
 
-    
+
         _daysMask = @(0);
 
-    
+
         _startHour = @(0);
 
-    
+
         _startMinute = @(0);
 
-    
+
         _endHour = @(0);
 
-    
+
         _endMinute = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2525,10 +2525,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _weekDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2540,28 +2540,28 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _weekDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
 
-    
+
         _status = @(0);
 
-    
+
     _daysMask = nil;
 
-    
+
     _startHour = nil;
 
-    
+
     _startMinute = nil;
 
-    
+
     _endHour = nil;
 
-    
+
     _endMinute = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2573,10 +2573,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _weekDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2588,16 +2588,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _yearDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
 
-    
+
         _localStartTime = @(0);
 
-    
+
         _localEndTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2609,10 +2609,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _yearDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2624,19 +2624,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _yearDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
 
-    
+
         _status = @(0);
 
-    
+
     _localStartTime = nil;
 
-    
+
     _localEndTime = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2648,10 +2648,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _yearDayIndex = @(0);
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2663,16 +2663,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _holidayIndex = @(0);
 
-    
+
         _localStartTime = @(0);
 
-    
+
         _localEndTime = @(0);
 
-    
+
         _operatingMode = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2684,7 +2684,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _holidayIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2696,19 +2696,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _holidayIndex = @(0);
 
-    
+
         _status = @(0);
 
-    
+
     _localStartTime = nil;
 
-    
+
     _localEndTime = nil;
 
-    
+
     _operatingMode = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2720,7 +2720,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _holidayIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2732,10 +2732,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
         _userType = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2747,7 +2747,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2759,10 +2759,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
         _userType = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2774,16 +2774,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
       _rfidCode = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -2795,7 +2795,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2807,16 +2807,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userId = @(0);
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
     _rfidCode = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2828,7 +2828,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _rfidSlotIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2849,25 +2849,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _operationType = @(0);
 
-    
+
         _userIndex = @(0);
 
-    
+
     _userName = nil;
 
-    
+
     _userUniqueId = nil;
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
     _credentialRule = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2879,7 +2879,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2891,34 +2891,34 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userIndex = @(0);
 
-    
+
     _userName = nil;
 
-    
+
     _userUniqueId = nil;
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
 
-    
+
     _credentialRule = nil;
 
-    
+
     _credentials = nil;
 
-    
+
     _creatorFabricIndex = nil;
 
-    
+
     _lastModifiedFabricIndex = nil;
 
-    
+
     _nextUserIndex = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2930,7 +2930,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _userIndex = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -2942,22 +2942,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _operationEventSource = @(0);
 
-    
+
         _operationEventCode = @(0);
 
-    
+
         _userId = @(0);
 
-    
+
       _pin = [NSData data];
 
-    
+
         _localTime = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -2969,28 +2969,28 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _programEventSource = @(0);
 
-    
+
         _programEventCode = @(0);
 
-    
+
         _userId = @(0);
 
-    
+
       _pin = [NSData data];
 
-    
+
         _userType = @(0);
 
-    
+
         _userStatus = @(0);
 
-    
+
         _localTime = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -3002,22 +3002,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _operationType = @(0);
 
-    
+
         _credential = [CHIPDoorLockClusterDlCredential new];
 
-    
+
       _credentialData = [NSData data];
 
-    
+
     _userIndex = nil;
 
-    
+
     _userStatus = nil;
 
-    
+
     _userType = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -3029,13 +3029,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _userIndex = nil;
 
-    
+
     _nextCredentialIndex = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -3047,7 +3047,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _credential = [CHIPDoorLockClusterDlCredential new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -3059,19 +3059,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _credentialExists = @(0);
 
-    
+
     _userIndex = nil;
 
-    
+
     _creatorFabricIndex = nil;
 
-    
+
     _lastModifiedFabricIndex = nil;
 
-    
+
     _nextCredentialIndex = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -3083,7 +3083,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _credential = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -3122,7 +3122,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _liftValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3134,7 +3134,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _liftPercent100thsValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3146,7 +3146,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _tiltValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3158,7 +3158,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _tiltPercent100thsValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3170,7 +3170,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _percentOpen = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3191,10 +3191,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _mode = @(0);
 
-    
+
         _amount = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3206,16 +3206,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _numberOfTransitionsForSequence = @(0);
 
-    
+
         _dayOfWeekForSequence = @(0);
 
-    
+
         _modeForSequence = @(0);
 
-    
+
       _transitions = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -3227,16 +3227,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _numberOfTransitionsForSequence = @(0);
 
-    
+
         _dayOfWeekForSequence = @(0);
 
-    
+
         _modeForSequence = @(0);
 
-    
+
       _transitions = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -3248,10 +3248,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _daysToReturn = @(0);
 
-    
+
         _modeToReturn = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3272,19 +3272,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _hue = @(0);
 
-    
+
         _direction = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3296,16 +3296,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3317,19 +3317,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3341,16 +3341,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _saturation = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3362,16 +3362,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3383,19 +3383,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3407,19 +3407,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _hue = @(0);
 
-    
+
         _saturation = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3431,19 +3431,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _colorX = @(0);
 
-    
+
         _colorY = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3455,16 +3455,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _rateX = @(0);
 
-    
+
         _rateY = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3476,19 +3476,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepX = @(0);
 
-    
+
         _stepY = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3500,16 +3500,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _colorTemperature = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3521,19 +3521,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _enhancedHue = @(0);
 
-    
+
         _direction = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3545,16 +3545,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3566,19 +3566,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3590,19 +3590,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _enhancedHue = @(0);
 
-    
+
         _saturation = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3614,25 +3614,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _updateFlags = @(0);
 
-    
+
         _action = @(0);
 
-    
+
         _direction = @(0);
 
-    
+
         _time = @(0);
 
-    
+
         _startHue = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3644,10 +3644,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3659,22 +3659,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _moveMode = @(0);
 
-    
+
         _rate = @(0);
 
-    
+
         _colorTemperatureMinimumMireds = @(0);
 
-    
+
         _colorTemperatureMaximumMireds = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3686,25 +3686,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _stepMode = @(0);
 
-    
+
         _stepSize = @(0);
 
-    
+
         _transitionTime = @(0);
 
-    
+
         _colorTemperatureMinimumMireds = @(0);
 
-    
+
         _colorTemperatureMaximumMireds = @(0);
 
-    
+
         _optionsMask = @(0);
 
-    
+
         _optionsOverride = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3716,10 +3716,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _enrollResponseCode = @(0);
 
-    
+
         _zoneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3731,16 +3731,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneStatus = @(0);
 
-    
+
         _extendedStatus = @(0);
 
-    
+
         _zoneId = @(0);
 
-    
+
         _delay = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3761,10 +3761,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneType = @(0);
 
-    
+
         _manufacturerCode = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3776,10 +3776,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _testModeDuration = @(0);
 
-    
+
         _currentZoneSensitivityLevel = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3809,13 +3809,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _armMode = @(0);
 
-    
+
       _armDisarmCode = @"";
 
-    
+
         _zoneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3827,7 +3827,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _armNotification = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3839,13 +3839,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _numberOfZones = @(0);
 
-    
+
       _zoneIds = [NSArray array];
 
-    
+
       _armDisarmCode = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -3857,52 +3857,52 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _section0 = @(0);
 
-    
+
         _section1 = @(0);
 
-    
+
         _section2 = @(0);
 
-    
+
         _section3 = @(0);
 
-    
+
         _section4 = @(0);
 
-    
+
         _section5 = @(0);
 
-    
+
         _section6 = @(0);
 
-    
+
         _section7 = @(0);
 
-    
+
         _section8 = @(0);
 
-    
+
         _section9 = @(0);
 
-    
+
         _section10 = @(0);
 
-    
+
         _section11 = @(0);
 
-    
+
         _section12 = @(0);
 
-    
+
         _section13 = @(0);
 
-    
+
         _section14 = @(0);
 
-    
+
         _section15 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -3923,16 +3923,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneId = @(0);
 
-    
+
         _zoneType = @(0);
 
-    
+
         _ieeeAddress = @(0);
 
-    
+
       _zoneLabel = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -3953,16 +3953,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneId = @(0);
 
-    
+
         _zoneStatus = @(0);
 
-    
+
         _audibleNotification = @(0);
 
-    
+
       _zoneLabel = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -3983,16 +3983,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _panelStatus = @(0);
 
-    
+
         _secondsRemaining = @(0);
 
-    
+
         _audibleNotification = @(0);
 
-    
+
         _alarmStatus = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4013,16 +4013,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _panelStatus = @(0);
 
-    
+
         _secondsRemaining = @(0);
 
-    
+
         _audibleNotification = @(0);
 
-    
+
         _alarmStatus = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4034,7 +4034,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4046,10 +4046,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _numberOfZones = @(0);
 
-    
+
       _zoneIds = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4070,10 +4070,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _numberOfZones = @(0);
 
-    
+
       _bypassResult = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4094,13 +4094,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _zoneStatusComplete = @(0);
 
-    
+
         _numberOfZones = @(0);
 
-    
+
       _zoneStatusResult = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4112,16 +4112,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _startingZoneId = @(0);
 
-    
+
         _maxNumberOfZoneIds = @(0);
 
-    
+
         _zoneStatusMaskFlag = @(0);
 
-    
+
         _zoneStatusMask = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4133,16 +4133,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _warningInfo = @(0);
 
-    
+
         _warningDuration = @(0);
 
-    
+
         _strobeDutyCycle = @(0);
 
-    
+
         _strobeLevel = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4154,7 +4154,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _squawkInfo = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4166,7 +4166,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _match = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4178,10 +4178,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4193,10 +4193,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _majorNumber = @(0);
 
-    
+
         _minorNumber = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4208,7 +4208,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _count = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4220,10 +4220,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _target = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4235,10 +4235,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4322,7 +4322,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _deltaPositionMilliseconds = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4334,7 +4334,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _deltaPositionMilliseconds = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4346,10 +4346,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4361,7 +4361,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _position = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4373,7 +4373,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _index = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4403,10 +4403,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _index = @(0);
 
-    
+
       _name = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4427,7 +4427,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _keyCode = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4439,7 +4439,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4451,13 +4451,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _search = [CHIPContentLauncherClusterContentSearch new];
 
-    
+
         _autoPlay = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4469,13 +4469,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _contentURL = @"";
 
-    
+
     _displayString = nil;
 
-    
+
     _brandingInformation = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4487,10 +4487,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4502,7 +4502,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _index = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4514,10 +4514,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _index = @(0);
 
-    
+
       _name = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4529,10 +4529,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _application = [CHIPApplicationLauncherClusterApplication new];
 
-    
+
     _data = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4544,7 +4544,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _application = [CHIPApplicationLauncherClusterApplication new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4556,7 +4556,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _application = [CHIPApplicationLauncherClusterApplication new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4568,10 +4568,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _status = @(0);
 
-    
+
       _data = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4583,7 +4583,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _tempAccountIdentifier = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4595,7 +4595,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _setupPIN = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4607,10 +4607,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _tempAccountIdentifier = @"";
 
-    
+
       _setupPIN = @"";
     _timedInvokeTimeoutMs = nil;
   }
@@ -4640,7 +4640,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _returnValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4661,7 +4661,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _returnValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4682,7 +4682,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _returnValue = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4703,22 +4703,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
 
-    
+
       _arg2 = [NSArray array];
 
-    
+
       _arg3 = [NSArray array];
 
-    
+
       _arg4 = [NSArray array];
 
-    
+
         _arg5 = @(0);
 
-    
+
         _arg6 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4730,10 +4730,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
 
-    
+
         _arg2 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4745,7 +4745,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4757,7 +4757,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4769,10 +4769,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
 
-    
+
         _arg2 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4784,22 +4784,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
 
-    
+
       _arg2 = [NSArray array];
 
-    
+
       _arg3 = [NSArray array];
 
-    
+
       _arg4 = [NSArray array];
 
-    
+
         _arg5 = @(0);
 
-    
+
         _arg6 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4811,16 +4811,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _wasPresent = @(0);
 
-    
+
     _wasNull = nil;
 
-    
+
     _value = nil;
 
-    
+
     _originalValue = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4832,7 +4832,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4844,88 +4844,88 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _nullableIntWasNull = @(0);
 
-    
+
     _nullableIntValue = nil;
 
-    
+
         _optionalIntWasPresent = @(0);
 
-    
+
     _optionalIntValue = nil;
 
-    
+
         _nullableOptionalIntWasPresent = @(0);
 
-    
+
     _nullableOptionalIntWasNull = nil;
 
-    
+
     _nullableOptionalIntValue = nil;
 
-    
+
         _nullableStringWasNull = @(0);
 
-    
+
     _nullableStringValue = nil;
 
-    
+
         _optionalStringWasPresent = @(0);
 
-    
+
     _optionalStringValue = nil;
 
-    
+
         _nullableOptionalStringWasPresent = @(0);
 
-    
+
     _nullableOptionalStringWasNull = nil;
 
-    
+
     _nullableOptionalStringValue = nil;
 
-    
+
         _nullableStructWasNull = @(0);
 
-    
+
     _nullableStructValue = nil;
 
-    
+
         _optionalStructWasPresent = @(0);
 
-    
+
     _optionalStructValue = nil;
 
-    
+
         _nullableOptionalStructWasPresent = @(0);
 
-    
+
     _nullableOptionalStructWasNull = nil;
 
-    
+
     _nullableOptionalStructValue = nil;
 
-    
+
         _nullableListWasNull = @(0);
 
-    
+
     _nullableListValue = nil;
 
-    
+
         _optionalListWasPresent = @(0);
 
-    
+
     _optionalListValue = nil;
 
-    
+
         _nullableOptionalListWasPresent = @(0);
 
-    
+
     _nullableOptionalListWasNull = nil;
 
-    
+
     _nullableOptionalListValue = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -4937,7 +4937,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = [CHIPTestClusterClusterNestedStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4949,7 +4949,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _value = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -4961,7 +4961,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4973,7 +4973,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4985,7 +4985,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -4997,7 +4997,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _value = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5009,7 +5009,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = [CHIPTestClusterClusterNestedStructList new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5021,7 +5021,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _value = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5033,7 +5033,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5045,7 +5045,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
       _arg1 = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5057,10 +5057,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
 
-    
+
         _arg2 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5072,7 +5072,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _arg1 = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -5084,40 +5084,40 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _nullableInt = nil;
 
-    
+
     _optionalInt = nil;
 
-    
+
     _nullableOptionalInt = nil;
 
-    
+
     _nullableString = nil;
 
-    
+
     _optionalString = nil;
 
-    
+
     _nullableOptionalString = nil;
 
-    
+
     _nullableStruct = nil;
 
-    
+
     _optionalStruct = nil;
 
-    
+
     _nullableOptionalStruct = nil;
 
-    
+
     _nullableList = nil;
 
-    
+
     _optionalList = nil;
 
-    
+
     _nullableOptionalList = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -5129,7 +5129,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5150,7 +5150,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
     _arg1 = nil;
     _timedInvokeTimeoutMs = nil;
   }
@@ -5162,13 +5162,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
 
-    
+
         _arg2 = @(0);
 
-    
+
         _arg3 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5180,7 +5180,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _arg1 = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5192,22 +5192,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _messageId = @(0);
 
-    
+
         _messageControl = @(0);
 
-    
+
         _startTime = @(0);
 
-    
+
         _durationInMinutes = @(0);
 
-    
+
       _message = @"";
 
-    
+
         _optionalExtendedMessageControl = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5228,10 +5228,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _messageId = @(0);
 
-    
+
         _messageControl = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5243,16 +5243,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _messageId = @(0);
 
-    
+
         _confirmationTime = @(0);
 
-    
+
         _messageConfirmationControl = @(0);
 
-    
+
       _messageResponse = [NSData data];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5264,22 +5264,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _messageId = @(0);
 
-    
+
         _messageControl = @(0);
 
-    
+
         _startTime = @(0);
 
-    
+
         _durationInMinutes = @(0);
 
-    
+
       _message = @"";
 
-    
+
         _optionalExtendedMessageControl = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5291,7 +5291,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _earliestImplementationTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5303,7 +5303,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _implementationDateTime = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5324,10 +5324,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _alertsCount = @(0);
 
-    
+
       _alertStructures = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5339,10 +5339,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _alertsCount = @(0);
 
-    
+
       _alertStructures = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5354,10 +5354,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _eventHeader = @(0);
 
-    
+
         _eventId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5369,16 +5369,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _timeStamp = @(0);
 
-    
+
         _logId = @(0);
 
-    
+
         _logLength = @(0);
 
-    
+
       _logPayload = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5390,7 +5390,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _logId = @(0);
     _timedInvokeTimeoutMs = nil;
   }
@@ -5402,16 +5402,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _timeStamp = @(0);
 
-    
+
         _logId = @(0);
 
-    
+
         _logLength = @(0);
 
-    
+
       _logPayload = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5432,10 +5432,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _logQueueSize = @(0);
 
-    
+
       _logIds = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5447,10 +5447,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _logQueueSize = @(0);
 
-    
+
       _logIds = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5462,16 +5462,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _profileCount = @(0);
 
-    
+
         _profileIntervalPeriod = @(0);
 
-    
+
         _maxNumberOfIntervals = @(0);
 
-    
+
       _listOfAttributes = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5492,22 +5492,22 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _startTime = @(0);
 
-    
+
         _status = @(0);
 
-    
+
         _profileIntervalPeriod = @(0);
 
-    
+
         _numberOfIntervalsDelivered = @(0);
 
-    
+
         _attributeId = @(0);
 
-    
+
       _intervals = [NSArray array];
     _timedInvokeTimeoutMs = nil;
   }
@@ -5519,13 +5519,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
   if (self = [super init]) {
 
-    
+
         _attributeId = @(0);
 
-    
+
         _startTime = @(0);
 
-    
+
         _numberOfIntervals = @(0);
     _timedInvokeTimeoutMs = nil;
   }

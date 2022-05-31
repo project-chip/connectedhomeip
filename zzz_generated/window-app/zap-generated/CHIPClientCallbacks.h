@@ -31,4 +31,3 @@
 
 // List specific responses
 typedef void (*ScenesAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

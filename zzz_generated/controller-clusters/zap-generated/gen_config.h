@@ -415,4 +415,3 @@
 // Use this macro to check if the client side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_WINDOW_COVERING_CLIENT
-

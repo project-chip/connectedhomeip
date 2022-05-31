@@ -1309,4 +1309,3 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS { 0, 0, 0 }
-

@@ -63,4 +63,3 @@ typedef void (*TargetNavigatorAttributeListListAttributeCallback)(void * context
 typedef void (*ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-

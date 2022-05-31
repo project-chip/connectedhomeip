@@ -45,7 +45,7 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    
+
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
     {
         return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
@@ -219,7 +219,7 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    
+
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
     {
         return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
@@ -315,7 +315,7 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    
+
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
     {
         return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
