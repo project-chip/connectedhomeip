@@ -38,7 +38,7 @@ _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
-_CI_MANIFEST_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cimanifest.json")
+_CI_MANIFEST_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "ci_manifest.json")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
 _CI_ALLOW_LIST = ["lighting-app"]
@@ -107,6 +107,7 @@ def check_zap_master() -> str:
     # zap_commit = zap_commit.split(" ")[2]
     # zap_commit = zap_commit[:zap_commit.index("\\")]
     """
+    # TODO
     zap_commit = 'TEMP DISABLED'
     flush_print(f"zap commit: {zap_commit}")
     return zap_commit
@@ -123,14 +124,17 @@ def generate_device_manifest(
     Returns:
         Dict containing MD5 of device dir zap files.
     """
-    ci_manifest = {}
+    ci_manifest = {"devices": {}}
+    devices_manifest = ci_manifest["devices"]
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
         with open(device_file_path, "rb") as device_file:
-            device_file_data = device_file.read()
-            device_file_md5 = hashlib.md5(device_file_data).hexdigest()
-            ci_manifest[device_name] = device_file_md5
-            flush_print(f"Manifest for {device_name} : {device_file_md5}")
+            file_md5 = hashlib.md5()
+            while data := device_file.read(128 * 32):
+                file_md5.update(data)
+            device_file_md5 = file_md5.hexdigest()
+            devices_manifest[device_name] = device_file_md5
+            flush_print(f"Current digest for {device_name} : {device_file_md5}")
         if write_manifest_file:
             device_zzz_dir_root = os.path.join(_CHEF_ZZZ_ROOT, device_name)
             device_zzz_md5_file = os.path.join(device_zzz_dir_root, _CI_DEVICE_MANIFEST_NAME)
@@ -156,8 +160,20 @@ def load_cicd_config() -> Dict[str, Any]:
     return config
 
 
-def flush_print(to_print: str) -> None:
-    """Prints and flushes stdout buffer"""
+def flush_print(
+        to_print: str,
+        with_border: bool = False) -> None:
+    """Prints and flushes stdout buffer
+
+    Args:
+        to_print: The string to print
+        with_border: Add boarder above and below to_print
+    Returns:
+        None
+    """
+    if with_border:
+        border = ('-' * 64) + '\n'
+        to_print = f"{border}{to_print}\n{border}"
     print(to_print, flush=True)
 
 
@@ -256,44 +272,49 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.validate_zzz:
-        fix_instructions = """Cached files out of date!
+        flush_print(f"Validating\n{_CI_MANIFEST_FILE_NAME}\n{_CHEF_ZZZ_ROOT}\n",
+                    with_border=True)
+        fix_instructions = f"""
+
+        Cached files out of date!
         Please:
-        bootstrap, activate, and install zap
-        run chef with the flag --generate_zzz
-        git add examples/chef/zzz_generated
-        git add examples/chef/cimanifes.json
+          ./scripts/bootstrap.sh
+          source ./scripts/activate.sh
+          cd ./third_party/zap/repo
+          npm install
+          cd ../../..
+          ./examples/chef/chef.py --generate_zzz
+          git add {_CHEF_ZZZ_ROOT}
+          git add {_CI_MANIFEST_FILE_NAME}
         Ensure you are running with the latest version of ZAP from master!"""
         ci_manifest = generate_device_manifest()
         with open(_CI_MANIFEST_FILE_NAME, "r", encoding="utf-8") as ci_manifest_file:
             cached_manifest = json.loads(ci_manifest_file.read())
-        for device in ci_manifest:
-            if device != "zap_commit":
-                try:
-                    if cached_manifest[device] != ci_manifest[device]:
-                        flush_print("MISMATCH INPUT - "+fix_instructions)
-                        exit(1)
-                    else:
-                        zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
-                        device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-                        if not os.path.exists(device_md5_file):
-                            flush_print("MISSING RESULT - "+fix_instructions)
-                            exit(1)
-                        else:
-                            with open(device_md5_file, "r", encoding="utf-8") as md5_file:
-                                md5 = md5_file.read()
-                                if ci_manifest[device] != md5:
-                                    flush_print("MISMATCH OUTPUT - "+fix_instrucitons)
-                                    exit(1)
-                except KeyError:
-                    flush_print("MISSING DEVICE CACHE - "+fix_instructions)
+        cached_device_manifest = cached_manifest["devices"]
+        for device, device_md5 in ci_manifest["devices"].items():
+            zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
+            device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
+            if device not in cached_device_manifest:
+                flush_print(f"MANIFEST MISSING {device}: {fix_instructions}")
+            elif cached_device_manifest[device] != device_md5:
+                flush_print(f"MANIFEST MISMATCH {device}: {fix_instructions}")
+                exit(1)
+            elif not os.path.exists(device_md5_file):
+                flush_print(f"OUTPUT MISSING {device}: {fix_instructions}")
+                exit(1)
+            else:
+                with open(device_md5_file, "r", encoding="utf-8") as md5_file:
+                    output_cached_md5 = md5_file.read()
+                if output_cached_md5 != device_md5:
+                    flush_print(f"OUTPUT MISMATCH {device}: {fix_instrucitons}")
                     exit(1)
-            if device == "zap_commit" and False:
-                # Disabled; should check:
-                #   Current branch when writing manifest
-                #   Master in CI
-                if cached_manifest[device] != ci_manifest[device]:
-                    flush_print("BAD ZAP VERSION - "+fix_instructions)
-                    exit(1)
+        if False:
+            # TODO
+            # Disabled; should check:
+            #   Current branch when writing manifest
+            #   Master in CI
+            flush_print("BAD ZAP VERSION:  "+fix_instructions)
+            # should only warn in output and not stop builds
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
@@ -335,10 +356,10 @@ def main(argv: Sequence[str]) -> None:
         flush_print(f"Generating files in {_CHEF_ZZZ_ROOT} for all devices")
         for device_name in _DEVICE_LIST:
             flush_print(f"Generating files for {device_name}")
-            device_out_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-            os.mkdir(device_out_dir)
-            device_out_dir = os.path.join(device_out_dir, "zap-generated")
-            os.mkdir(device_out_dir)
+            device_out_dir = os.path.join(_CHEF_ZZZ_ROOT,
+                                          device_name,
+                                          "zap-generated")
+            os.makedirs(device_out_dir)
             shell.run_cmd(textwrap.dedent(f"""\
             {_REPO_BASE_PATH}/scripts/tools/zap/generate.py \
             {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""))
@@ -356,7 +377,9 @@ def main(argv: Sequence[str]) -> None:
             if options.build_target == "nrfconnect":
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            shell.run_cmd(f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}")
+            command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
+            flush_print(f"Building {command}", with_border=True)
+            shell.run_cmd(command)
         exit(0)
 
     #
@@ -364,6 +387,7 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
+        # TODO
         # Needs testing after refactor
         # Needs to call per-platform bundle function
         flush_print("Build all disabled")
@@ -378,9 +402,7 @@ def main(argv: Sequence[str]) -> None:
                 label = platform_meta['platform_label']
                 output_dir = os.path.join(_CHEF_SCRIPT_PATH, directory)
                 command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
-                flush_print("-" * 64)
-                flush_print(f"Building {command}")
-                flush_print("-" * 64)
+                flush_print(f"Building {command}", with_border=True)
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
                 shell.run_cmd(command)
@@ -485,9 +507,19 @@ def main(argv: Sequence[str]) -> None:
                                    "zzz_generated",
                                    options.sample_device_type_name,
                                    "zap-generated")
+            if not os.path.exists(zzz_dir):
+                flush_print(f"""
+                You have specified --use_zzz
+                for device {options.sample_device_type_name}
+                which does not exist in the cached ZAP output.
+                To cache ZAP output for this device:
+                ensure {options.sample_device_type_name}.zap
+                is placed in {_DEVICE_FOLDER}
+                run chef with the option --generate_zzz
+                """)
+                exit(1)
             shutil.rmtree(gen_dir, ignore_errors=True)
             shutil.copytree(zzz_dir, gen_dir)
-
         flush_print("Building...")
         if options.do_rpc:
             flush_print("RPC PW enabled")
