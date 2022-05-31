@@ -48,7 +48,7 @@ function getTests() {
   // TODO: Test_TC_DIAG_TH_NW_1_1 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_4');
 
-  // TODO: Test_TC_DIAG_TH_NW_1_2 does not work on Darwin for now.
+  // TODO: Test_TC_DIAG_TH_NW_2_1 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_1');
 
   // TODO: Test_TC_DIAG_TH_NW_2_2 does not work on Darwin for now.
