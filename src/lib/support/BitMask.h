@@ -60,6 +60,12 @@ public:
         return *this;
     }
 
+    BitMask & operator=(FlagsEnum value)
+    {
+        BitFlags<FlagsEnum, StorageType>::SetRaw(static_cast<StorageType>(value));
+        return *this;
+    }
+
     /**
      * GetField to value via a mask shifting.
      *
