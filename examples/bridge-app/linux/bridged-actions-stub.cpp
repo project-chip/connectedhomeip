@@ -65,7 +65,7 @@ CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoi
 CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     const char SetupUrl[] = "https://example.com";
-    return aEncoder.Encode(chip::Span<const char>(SetupUrl, strlen(SetupUrl)));
+    return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
