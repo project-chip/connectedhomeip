@@ -41,16 +41,9 @@ char gLineBuffer[256];
 size_t gCurLineBufferSize = 0;
 } // namespace
 
-void ENFORCE_FORMAT(2, 3) PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
+void PrettyPrintIMBlankLine()
 {
-    va_list args;
-    size_t ret;
-    size_t sizeLeft;
-    va_start(args, aFmt);
-
-    if (aIsNewLine)
-    {
-        if (gCurLineBufferSize)
+       if (gCurLineBufferSize)
         {
             // Don't need to explicitly NULL-terminate the string because
             // snprintf takes care of that.
@@ -62,20 +55,30 @@ void ENFORCE_FORMAT(2, 3) PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
         {
             if (sizeof(gLineBuffer) > gCurLineBufferSize)
             {
-                sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+                size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+                size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
                 if (ret > 0)
                 {
                     gCurLineBufferSize += std::min(ret, sizeLeft);
                 }
             }
         }
+ }
+
+void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
+{
+    va_list args;
+    va_start(args, aFmt);
+
+    if (aIsNewLine)
+    {
+        PrettyPrintIMBlankLine();
     }
 
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
-        sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);
