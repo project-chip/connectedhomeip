@@ -1,0 +1,116 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 81.3. [TC-DESC-2.2] Descriptor Cluster Attributes with DUT as Client
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT reads DeviceTypeList from TH."
+      verification: |
+          ./chip-tool descriptor read device-list 1 0
+
+          [1651220525.982478][11001:11001] CHIP:EM: Handling via exchange: 13340r, Delegate: 0xaaaaacdc5098
+          [1651220525.982545][11001:11001] CHIP:IM: Received Read request
+          [1651220525.982624][11001:11001] CHIP:DMG: ReadRequestMessage =
+          [1651220525.982667][11001:11001] CHIP:DMG: {
+          [1651220525.982703][11001:11001] CHIP:DMG:         AttributePathIBs =
+          [1651220525.982745][11001:11001] CHIP:DMG:         [
+          [1651220525.982784][11001:11001] CHIP:DMG:                 AttributePathIB =
+          [1651220525.982840][11001:11001] CHIP:DMG:                 {
+          [1651220525.982892][11001:11001] CHIP:DMG:                         Endpoint = 0x0,
+          [1651220525.982948][11001:11001] CHIP:DMG:                         Cluster = 0x1d,
+          [1651220525.983005][11001:11001] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1651220525.983054][11001:11001] CHIP:DMG:                 }
+          [1651220525.983104][11001:11001] CHIP:DMG:
+          [1651220525.983149][11001:11001] CHIP:DMG:         ],
+          [1651220525.983195][11001:11001] CHIP:DMG:
+          [1651220525.983238][11001:11001] CHIP:DMG:         isFabricFiltered = true,
+          [1651220525.983279][11001:11001] CHIP:DMG:         InteractionModelRevision = 1
+          [1651220525.983318][11001:11001] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads ServerList from the TH"
+      verification: |
+          ./chip-tool descriptor read server-list 1 0
+
+          [1651220576.025574][11001:11001] CHIP:IM: Received Read request
+          [1651220576.025629][11001:11001] CHIP:DMG: ReadRequestMessage =
+          [1651220576.025655][11001:11001] CHIP:DMG: {
+          [1651220576.025677][11001:11001] CHIP:DMG:         AttributePathIBs =
+          [1651220576.025703][11001:11001] CHIP:DMG:         [
+          [1651220576.025728][11001:11001] CHIP:DMG:                 AttributePathIB =
+          [1651220576.025763][11001:11001] CHIP:DMG:                 {
+          [1651220576.025792][11001:11001] CHIP:DMG:                         Endpoint = 0x0,
+          [1651220576.025823][11001:11001] CHIP:DMG:                         Cluster = 0x1d,
+          [1651220576.025856][11001:11001] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1651220576.025882][11001:11001] CHIP:DMG:                 }
+          [1651220576.025910][11001:11001] CHIP:DMG:
+          [1651220576.025936][11001:11001] CHIP:DMG:         ],
+          [1651220576.025964][11001:11001] CHIP:DMG:
+          [1651220576.025990][11001:11001] CHIP:DMG:         isFabricFiltered = true,
+          [1651220576.026015][11001:11001] CHIP:DMG:         InteractionModelRevision = 1
+          [1651220576.026039][11001:11001] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads ClientList from the TH"
+      verification: |
+          ./chip-tool descriptor read client-list 1 0
+
+          [1651220639.440188][11001:11001] CHIP:IM: Received Read request
+          [1651220639.440259][11001:11001] CHIP:DMG: ReadRequestMessage =
+          [1651220639.440298][11001:11001] CHIP:DMG: {
+          [1651220639.440330][11001:11001] CHIP:DMG:         AttributePathIBs =
+          [1651220639.440367][11001:11001] CHIP:DMG:         [
+          [1651220639.440402][11001:11001] CHIP:DMG:                 AttributePathIB =
+          [1651220639.440447][11001:11001] CHIP:DMG:                 {
+          [1651220639.440491][11001:11001] CHIP:DMG:                         Endpoint = 0x0,
+          [1651220639.440539][11001:11001] CHIP:DMG:                         Cluster = 0x1d,
+          [1651220639.440589][11001:11001] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1651220639.440634][11001:11001] CHIP:DMG:                 }
+          [1651220639.440675][11001:11001] CHIP:DMG:
+          [1651220639.440715][11001:11001] CHIP:DMG:         ],
+          [1651220639.440756][11001:11001] CHIP:DMG:
+          [1651220639.440794][11001:11001] CHIP:DMG:         isFabricFiltered = true,
+          [1651220639.440830][11001:11001] CHIP:DMG:         InteractionModelRevision = 1
+          [1651220639.440864][11001:11001] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads PartsList from the TH"
+      verification: |
+          ./chip-tool descriptor read  parts-list 1 0
+
+          [1651220678.308560][11001:11001] CHIP:EM: Handling via exchange: 30507r, Delegate: 0xaaaaacdc5098
+          [1651220678.308658][11001:11001] CHIP:IM: Received Read request
+          [1651220678.308766][11001:11001] CHIP:DMG: ReadRequestMessage =
+          [1651220678.308828][11001:11001] CHIP:DMG: {
+          [1651220678.308882][11001:11001] CHIP:DMG:         AttributePathIBs =
+          [1651220678.308945][11001:11001] CHIP:DMG:         [
+          [1651220678.309053][11001:11001] CHIP:DMG:                 AttributePathIB =
+          [1651220678.309137][11001:11001] CHIP:DMG:                 {
+          [1651220678.309210][11001:11001] CHIP:DMG:                         Endpoint = 0x0,
+          [1651220678.309284][11001:11001] CHIP:DMG:                         Cluster = 0x1d,
+          [1651220678.309355][11001:11001] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1651220678.309422][11001:11001] CHIP:DMG:                 }
+          [1651220678.309485][11001:11001] CHIP:DMG:
+          [1651220678.309558][11001:11001] CHIP:DMG:         ],
+          [1651220678.309629][11001:11001] CHIP:DMG:
+          [1651220678.309693][11001:11001] CHIP:DMG:         isFabricFiltered = true,
+          [1651220678.309755][11001:11001] CHIP:DMG:         InteractionModelRevision = 1
+          [1651220678.309810][11001:11001] CHIP:DMG: },
+      disabled: true

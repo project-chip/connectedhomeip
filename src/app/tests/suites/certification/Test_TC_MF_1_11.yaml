@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    22.1.11. [TC-MF-1.11] Device exits commissioning mode after 20 failed
+    3.1.11. [TC-MF-1.11] Device exits commissioning mode after 20 failed
     commission attempts [ECM] [DUT - Commissioner]
 
 config:
@@ -25,7 +25,7 @@ config:
 tests:
     - label: "TH_CR2 starts a commissioning process with TH_CE"
       verification: |
-          1. Provision the device using 2nd controller chip tool on the raspi (use above instructions) ,
+          "1. Provision the device using 2nd controller chip tool on the raspi (use above instructions) ,  "
       disabled: true
 
     - label:
@@ -66,17 +66,40 @@ tests:
           "Set up a DUT_CR1 to start attempting to do PASE to TH_CE and failing
           20 times. This can be done using an invalid passcode"
       verification: |
-          1. On your DUT controller connect using wrong manual code. Repeat the step for 20 times.
+          1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times.
 
-          Below the example when using chip tool as controller
-          ./chip-tool pairing code 1 36177160937  (With wrong passcode)
+          ./chip-tool pairing manualcode 1 36177160938  (With wrong manual code)
+
+          verify you got the following message in the TH log
+          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
+          CHIP:TOO: Secure Pairing Failed
+          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
       disabled: true
 
-    - label: "DUT_CR1 starts a 21st commissioning process with a valid passcode"
+    - label:
+          "DUT_CR1 starts a 21st commissioning process using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using ECM"
       verification: |
-          1. On your DUT controller  connect using correct manual code
+          1. On 2nd controller using chip tool connect using correct passcode.
 
-          Below the example when using chip tool as controller
+          ./chip-tool pairing manualcode 1 36177160937 (correct passcode)
 
-          ./chip-tool pairing code 1 35407541839 (correct passcode)
+          verify you got the following message in the TH log
+          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
+          CHIP:TOO: Secure Pairing Failed
+          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+      disabled: true
+
+    - label:
+          "TH_CR3 starts a commissioning process with TH_CE using the correct
+          PAKEVerifier"
+      verification: |
+          1. On 3rdd controller using chip-tool connect using correct passcode
+
+          ./chip-tool pairing manualcode 1 36177160938  (With wrong manual code)
+
+          verify you got the following message in the TH log
+          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
+          CHIP:TOO: Secure Pairing Failed
+          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
       disabled: true
