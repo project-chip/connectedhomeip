@@ -92,7 +92,7 @@ limitations under the License.
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
     <attribute side="server" code="0x00" define="CHANNEL" type="INT16U" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">channel</attribute>
-    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="ENUM8" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
+    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRole" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
     <attribute side="server" code="0x02" define="NETWORK_NAME" type="CHAR_STRING" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
     <attribute side="server" code="0x03" define="DIAG_PAN_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" isNullable="true" optional="false">PanId</attribute>
     <attribute side="server" code="0x04" define="DIAG_EXTENDED_PAN_ID" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="false">ExtendedPanId</attribute>
@@ -153,11 +153,9 @@ limitations under the License.
     <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">ActiveTimestamp</attribute>
     <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">PendingTimestamp</attribute>
     <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" isNullable="true" optional="true">delay</attribute>
-    <!-- SECURITY_POLICY Length = 2 + (arraysize(1) * Size of Struct (4b))-->
-    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="6" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
+    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="SecurityPolicy" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
     <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" isNullable="true" optional="false">ChannelMask</attribute>
-    <!-- OPERATIONAL_DATASET_COMPONENTS Length = 2 + (arraysize(1) * Size of Struct (12b))-->
-    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="14" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
+    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="OperationalDatasetComponents" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
