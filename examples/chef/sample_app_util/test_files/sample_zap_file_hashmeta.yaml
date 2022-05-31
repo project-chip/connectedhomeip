@@ -1,0 +1,122 @@
+-   RootNode/22:
+        client_clusters:
+            OtaSoftwareUpdateProvider/41:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+        server_clusters:
+            AccessControl/31:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            AdministratorCommissioning/60:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            Basic/40:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            Descriptor/29:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            DiagnosticLogs/50:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            EthernetNetworkDiagnostics/55:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '3'
+            FixedLabel/64:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            GeneralCommissioning/48:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '6'
+            GeneralDiagnostics/51:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            GroupKeyManagement/63:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            Groups/4:
+                attributes:
+                    ClusterRevision/65533: '4'
+                    FeatureMap/65532: '0'
+            LocalizationConfiguration/43:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            NetworkCommissioning/49:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '2'
+            OperationalCredentials/62:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            OtaSoftwareUpdateRequestor/42:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            SoftwareDiagnostics/52:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '1'
+            Switch/59:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            ThreadNetworkDiagnostics/53:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '15'
+            TimeFormatLocalization/44:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            UserLabel/65:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            WiFiNetworkDiagnostics/54:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '3'
+-   DimmableLight/257:
+        client_clusters: {}
+        server_clusters:
+            ColorControl/768:
+                attributes:
+                    ClusterRevision/65533: '5'
+                    FeatureMap/65532: '0'
+            Descriptor/29:
+                attributes:
+                    ClusterRevision/65533: '1'
+                    FeatureMap/65532: '0'
+            Groups/4:
+                attributes:
+                    ClusterRevision/65533: '4'
+                    FeatureMap/65532: '0'
+            Identify/3:
+                attributes:
+                    ClusterRevision/65533: '4'
+                    FeatureMap/65532: '0'
+            LevelControl/8:
+                attributes:
+                    ClusterRevision/65533: '5'
+                    FeatureMap/65532: '3'
+            OccupancySensing/1030:
+                attributes:
+                    ClusterRevision/65533: '3'
+                    FeatureMap/65532: '0'
+            OnOff/6:
+                attributes:
+                    ClusterRevision/65533: '4'
+                    FeatureMap/65532: '1'
