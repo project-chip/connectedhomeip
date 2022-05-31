@@ -48,6 +48,8 @@ const kPICSName          = 'PICS';
 const kSaveAsName        = 'saveAs';
 const kFabricFiltered    = 'fabricFiltered';
 
+const kHexPrefix = 'hex:';
+
 class NullObject {
   toString()
   {
@@ -826,6 +828,33 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function isHexString(value)
+{
+  return value && value.startsWith(kHexPrefix);
+}
+
+function octetStringFromHexString(value)
+{
+  const hexString = value.substring(kHexPrefix.length);
+
+  if (hexString.length % 2) {
+    throw new Error("The provided hexadecimal string contains an even number of characters");
+  }
+
+  if (!(/^[0-9a-fA-F]+$/.test(hexString))) {
+    throw new Error("The provided hexadecimal string contains invalid hexadecimal character.");
+  }
+
+  const bytes = hexString.match(/(..)/g);
+  return bytes.map(byte => '\\x' + byte).join('');
+}
+
+function octetStringLengthFromHexString(value)
+{
+  const hexString = value.substring(kHexPrefix.length);
+  return (hexString.length / 2);
+}
+
 function octetStringEscapedForCLiteral(value)
 {
   // Escape control characters, things outside the ASCII range, and single
@@ -996,3 +1025,6 @@ exports.chip_tests_only_cluster_commands            = chip_tests_only_cluster_co
 exports.chip_tests_only_cluster_command_parameters  = chip_tests_only_cluster_command_parameters;
 exports.chip_tests_only_cluster_responses           = chip_tests_only_cluster_responses;
 exports.chip_tests_only_cluster_response_parameters = chip_tests_only_cluster_response_parameters;
+exports.isHexString                                 = isHexString;
+exports.octetStringLengthFromHexString              = octetStringLengthFromHexString;
+exports.octetStringFromHexString                    = octetStringFromHexString;

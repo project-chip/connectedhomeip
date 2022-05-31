@@ -46,7 +46,11 @@
       {{#if (isCharString type)}}
         @"{{definedValue}}";
       {{else if (isOctetString type)}}
+        {{~#if (isHexString definedValue)}}
+        [[NSData alloc] initWithBytes:"{{octetStringFromHexString definedValue}}" length:{{octetStringLengthFromHexString definedValue}}];
+        {{else}}
         [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
+        {{/if}}
       {{else}}
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{asTypedExpressionFromObjectiveC definedValue type}}];
       {{/if}}

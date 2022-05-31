@@ -727,6 +727,18 @@ tests:
       response:
           value: "Tes\x00ti\x00ng"
 
+    - label: "Write attribute OCTET_STRING with hex: format"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "hex:000102030405"
+
+    - label: "Read attribute OCTET_STRING with hex: format"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "hex:000102030405"
+
     - label: "Write attribute OCTET_STRING with weird chars"
       command: "writeAttribute"
       attribute: "octet_string"
