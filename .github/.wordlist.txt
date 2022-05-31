@@ -979,7 +979,6 @@ percentageLiftValue
 periodicQueryTimeout
 pexpect
 pickString
-picocom
 PID
 Pigweed
 PinCode

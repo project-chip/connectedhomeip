@@ -111,7 +111,7 @@ may look it up in `/dev/`:
 ls -la /dev/tty*
 ```
 
-You can open the serial console with minicom or picocom. For example, if the
+You can open the serial console. For example, if the
 device is at `/dev/USB1`:
 
 ```
