@@ -38,6 +38,8 @@ public:
     using IntegerType = typename BitFlags<FlagsEnum, StorageType>::IntegerType;
 
     BitMask() : BitFlags<FlagsEnum, StorageType>() {}
+    BitMask(const BitFlags<FlagsEnum, StorageType> & other) : BitFlags<FlagsEnum, StorageType>(other) {}
+    BitMask(BitFlags<FlagsEnum, StorageType> && other) : BitFlags<FlagsEnum, StorageType>(std::move(other)) {}
 
     explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
     explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
@@ -49,6 +51,14 @@ public:
     template <typename... Args>
     BitMask(IntegerType value, Args &&... args) : BitFlags<FlagsEnum, StorageType>(value, std::forward<Args>(args)...)
     {}
+
+    BitMask & operator=(const BitMask &) = default;
+
+    BitMask & operator=(const BitFlags<FlagsEnum, StorageType> & other)
+    {
+        BitFlags<FlagsEnum, StorageType>::SetRaw(other.Raw());
+        return *this;
+    }
 
     /**
      * GetField to value via a mask shifting.

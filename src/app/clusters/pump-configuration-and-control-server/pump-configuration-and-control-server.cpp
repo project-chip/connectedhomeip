@@ -71,7 +71,7 @@ static void updateAttributeLinks(EndpointId endpoint)
 {
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
-    BitFlags<PumpStatus> pumpStatus;
+    BitMask<PumpStatus> pumpStatus;
 
     // Get the current control- and operation modes
     Attributes::ControlMode::Get(endpoint, &controlMode);
