@@ -1,0 +1,375 @@
+- Root Node:
+    client_clusters:
+      OTA Software Update Provider:
+        attributes:
+          ClusterRevision: '1'
+        commands:
+        - ApplyUpdateRequest
+        - NotifyUpdateApplied
+        - QueryImage
+    server_clusters:
+      Access Control:
+        attributes:
+          ACL: ''
+          AccessControlEntriesPerFabric: '3'
+          AttributeList: ''
+          ClusterRevision: '1'
+          Extension: ''
+          FeatureMap: '0'
+          SubjectsPerAccessControlEntry: '4'
+          TargetsPerAccessControlEntry: '3'
+        commands: []
+      AdministratorCommissioning:
+        attributes:
+          AdminFabricIndex: '1'
+          AdminVendorId: '0'
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          WindowStatus: '0'
+        commands: []
+      Basic:
+        attributes:
+          CapabilityMinima: ''
+          ClusterRevision: '1'
+          DataModelRevision: '10'
+          FeatureMap: '0'
+          HardwareVersion: '0'
+          HardwareVersionString: ''
+          LocalConfigDisabled: '0'
+          Location: ''
+          ManufacturingDate: ''
+          NodeLabel: ''
+          PartNumber: ''
+          ProductID: ''
+          ProductLabel: ''
+          ProductName: ''
+          ProductURL: ''
+          Reachable: '1'
+          SerialNumber: ''
+          SoftwareVersion: '0'
+          SoftwareVersionString: ''
+          UniqueID: ''
+          VendorID: ''
+          VendorName: ''
+        commands: []
+      Descriptor:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          client list: ''
+          device list: ''
+          parts list: ''
+          server list: ''
+        commands: []
+      Diagnostic Logs:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+        commands:
+        - RetrieveLogsRequest
+      Ethernet Network Diagnostics:
+        attributes:
+          CarrierDetect: '0'
+          ClusterRevision: '1'
+          CollisionCount: '0'
+          FeatureMap: '3'
+          FullDuplex: '0'
+          OverrunCount: '0'
+          PHYRate: ''
+          PacketRxCount: '0'
+          PacketTxCount: '0'
+          TimeSinceReset: '0'
+          TxErrCount: '0'
+        commands: []
+      Fixed Label:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          label list: ''
+        commands: []
+      General Commissioning:
+        attributes:
+          BasicCommissioningInfo: ''
+          Breadcrumb: '0'
+          ClusterRevision: '1'
+          FeatureMap: '6'
+          LocationCapability: '0'
+          RegulatoryConfig: '0'
+        commands:
+        - ArmFailSafeResponse
+        - CommissioningCompleteResponse
+      General Diagnostics:
+        attributes:
+          ActiveHardwareFaults: ''
+          ActiveNetworkFaults: ''
+          ActiveRadioFaults: ''
+          BootReasons: ''
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          NetworkInterfaces: ''
+          RebootCount: '0'
+          TotalOperationalHours: '0'
+          UpTime: '0'
+        commands: []
+      Group Key Management:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          GroupKeyMap: ''
+          GroupTable: ''
+          MaxGroupKeysPerFabric: ''
+          MaxGroupsPerFabric: ''
+        commands: []
+      Groups:
+        attributes:
+          ClusterRevision: '4'
+          FeatureMap: '0'
+          name support: ''
+        commands: []
+      Localization Configuration:
+        attributes:
+          ActiveLocale: ''
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          SupportedLocales: ''
+        commands: []
+      Network Commissioning:
+        attributes:
+          ClusterRevision: '1'
+          ConnectMaxTimeSeconds: ''
+          FeatureMap: '2'
+          InterfaceEnabled: ''
+          LastConnectErrorValue: ''
+          LastNetworkID: ''
+          LastNetworkingStatus: ''
+          MaxNetworks: ''
+          Networks: ''
+          ScanMaxTimeSeconds: ''
+        commands:
+        - ScanNetworksResponse
+      OTA Software Update Requestor:
+        attributes:
+          ClusterRevision: '1'
+          DefaultOtaProviders: '0'
+          FeatureMap: '0'
+          UpdatePossible: '1'
+          UpdateState: '0'
+          UpdateStateProgress: '0'
+        commands: []
+      Operational Credentials:
+        attributes:
+          ClusterRevision: '1'
+          CommissionedFabrics: ''
+          CurrentFabricIndex: ''
+          Fabrics: ''
+          FeatureMap: '0'
+          NOCs: ''
+          SupportedFabrics: ''
+          TrustedRootCertificates: ''
+        commands:
+        - AttestationResponse
+        - CSRResponse
+        - CertificateChainResponse
+        - NOCResponse
+      Software Diagnostics:
+        attributes:
+          ClusterRevision: '1'
+          CurrentHeapFree: '0'
+          CurrentHeapHighWatermark: '0'
+          CurrentHeapUsed: '0'
+          FeatureMap: '1'
+          ThreadMetrics: ''
+        commands: []
+      Switch:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+        commands: []
+      Thread Network Diagnostics:
+        attributes:
+          ActiveNetworkFaultsList: ''
+          ActiveTimestamp: '0'
+          AttachAttemptCount: '0'
+          BetterPartitionAttachAttemptCount: '0'
+          ChannelMask: '0'
+          ChildRoleCount: '0'
+          ClusterRevision: '1'
+          DataVersion: ''
+          DetachedRoleCount: '0'
+          ExtendedPanId: '0'
+          FeatureMap: '15'
+          LeaderRoleCount: '0'
+          LeaderRouterId: ''
+          MeshLocalPrefix: ''
+          NeighborTableList: ''
+          NetworkName: '0'
+          OperationalDatasetComponents: ''
+          OverrunCount: '0'
+          PanId: '0'
+          ParentChangeCount: '0'
+          PartitionId: ''
+          PartitionIdChangeCount: '0'
+          PendingTimestamp: '0'
+          RouteTableList: ''
+          RouterRoleCount: '0'
+          RoutingRole: ''
+          RxAddressFilteredCount: '0'
+          RxBeaconCount: '0'
+          RxBeaconRequestCount: '0'
+          RxBroadcastCount: '0'
+          RxDataCount: '0'
+          RxDataPollCount: '0'
+          RxDestAddrFilteredCount: '0'
+          RxDuplicatedCount: '0'
+          RxErrFcsCount: '0'
+          RxErrInvalidSrcAddrCount: '0'
+          RxErrNoFrameCount: '0'
+          RxErrOtherCount: '0'
+          RxErrSecCount: '0'
+          RxErrUnknownNeighborCount: '0'
+          RxOtherCount: '0'
+          RxTotalCount: '0'
+          RxUnicastCount: '0'
+          SecurityPolicy: ''
+          StableDataVersion: ''
+          TxAckRequestedCount: '0'
+          TxAckedCount: '0'
+          TxBeaconCount: '0'
+          TxBeaconRequestCount: '0'
+          TxBroadcastCount: '0'
+          TxDataCount: '0'
+          TxDataPollCount: '0'
+          TxDirectMaxRetryExpiryCount: '0'
+          TxErrAbortCount: '0'
+          TxErrBusyChannelCount: '0'
+          TxErrCcaCount: '0'
+          TxIndirectMaxRetryExpiryCount: '0'
+          TxNoAckRequestedCount: '0'
+          TxOtherCount: '0'
+          TxRetryCount: '0'
+          TxTotalCount: '0'
+          TxUnicastCount: '0'
+          channel: ''
+          delay: '0'
+          weighting: ''
+        commands: []
+      Time Format Localization:
+        attributes:
+          ActiveCalendarType: '0'
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          HourFormat: '0'
+          SupportedCalendarTypes: ''
+        commands: []
+      User Label:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          label list: ''
+        commands: []
+      WiFi Network Diagnostics:
+        attributes:
+          BeaconLostCount: '0'
+          BeaconRxCount: '0'
+          ChannelNumber: '0'
+          ClusterRevision: '1'
+          CurrentMaxRate: '0'
+          FeatureMap: '3'
+          OverrunCount: '0'
+          PacketMulticastRxCount: '0'
+          PacketMulticastTxCount: '0'
+          PacketUnicastRxCount: '0'
+          PacketUnicastTxCount: '0'
+          Rssi: '0'
+          SecurityType: ''
+          WiFiVersion: ''
+          bssid: ''
+        commands: []
+- Dimmable Light:
+    client_clusters: {}
+    server_clusters:
+      Color Control:
+        attributes:
+          ClusterRevision: '5'
+          ColorCapabilities: '0'
+          ColorLoopActive: '0'
+          ColorLoopDirection: '0'
+          ColorLoopStartEnhancedHue: '8960'
+          ColorLoopStoredEnhancedHue: '0'
+          ColorLoopTime: '25'
+          ColorMode: '1'
+          ColorTempPhysicalMaxMireds: '65279'
+          ColorTempPhysicalMinMireds: '0'
+          ColorTemperature: '250'
+          CoupleColorTempToLevelMinMireds: ''
+          CurrentHue: '0'
+          CurrentSaturation: '0'
+          CurrentX: '24939'
+          CurrentY: '24701'
+          EnhancedColorMode: '1'
+          EnhancedCurrentHue: '0'
+          FeatureMap: '0'
+          NumberOfPrimaries: ''
+          Options: '0'
+          RemainingTime: '0'
+          StartUpColorTemperatureMireds: ''
+        commands: []
+      Descriptor:
+        attributes:
+          ClusterRevision: '1'
+          FeatureMap: '0'
+          client list: ''
+          device list: ''
+          parts list: ''
+          server list: ''
+        commands: []
+      Groups:
+        attributes:
+          ClusterRevision: '4'
+          FeatureMap: '0'
+          name support: ''
+        commands: []
+      Identify:
+        attributes:
+          ClusterRevision: '4'
+          FeatureMap: '0'
+          identify time: '0'
+          identify type: '0'
+        commands: []
+      Level Control:
+        attributes:
+          ClusterRevision: '5'
+          FeatureMap: '3'
+          current frequency: '0'
+          current level: '1'
+          default move rate: ''
+          max frequency: '0'
+          max level: '254'
+          min frequency: '0'
+          min level: '0'
+          off transition time: ''
+          on level: '255'
+          on off transition time: '0'
+          on transition time: ''
+          options: '0'
+          remaining time: '0'
+          start up current level: '255'
+        commands: []
+      Occupancy Sensing:
+        attributes:
+          ClusterRevision: '3'
+          FeatureMap: '0'
+          occupancy: ''
+          occupancy sensor type: ''
+          occupancy sensor type bitmap: ''
+        commands: []
+      On/Off:
+        attributes:
+          ClusterRevision: '4'
+          FeatureMap: '1'
+          GlobalSceneControl: '1'
+          OffWaitTime: '0'
+          OnOff: '0'
+          OnTime: '0'
+          StartUpOnOff: '255'
+        commands: []
