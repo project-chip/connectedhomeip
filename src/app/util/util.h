@@ -145,7 +145,7 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-void emberAfStackDown(void);
+void emberAfStackDown();
 
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
 

@@ -40,6 +40,7 @@
 #pragma once
 
 #include <app/util/af.h>
+#include <lib/support/IntrusiveList.h>
 
 #define MAX_TIMER_UNITS_HOST 0x7fff
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)
@@ -84,7 +85,8 @@ bool emberEventControlGetActive(EmberEventControl * control);
  */
 void emberEventControlSetActive(EmberEventControl * control);
 
-struct MatterEventMetaContext {
+class MatterEventMetaContext: public chip::IntrusiveListNodeBase {
+public:
     EmberAfEventContext context;
     const char* eventString;
     EmberEventData event;
@@ -92,3 +94,5 @@ struct MatterEventMetaContext {
 };
 
 void MatterRegisterAfEvent(MatterEventMetaContext* newContext);
+
+void MatterUnregisterAllAfEvents();

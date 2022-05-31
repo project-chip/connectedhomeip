@@ -51,3 +51,16 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
 #endif
 #endif
 }
+
+void ShutdownDataModelHandler()
+{
+#ifdef USE_ZAP_CONFIG
+    ChipLogProgress(Zcl, "Shutting down Data Model");
+    emberAfStackDown();
+
+#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
+    EmberStatus status = EMBER_NETWORK_DOWN;
+    emberAfPluginIasZoneServerStackStatusCallback(status);
+#endif /* EMBER_AF_PLUGIN_IAS_ZONE_SERVER */
+#endif /* USE_ZAP_CONFIG */
+}

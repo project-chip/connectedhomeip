@@ -66,18 +66,18 @@ void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 EMBER_AF_GENERATED_EVENT_CODE
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
+static IntrusiveList<MatterEventMetaContext> eventMetaContexts;
 
 void MatterRegisterAfEvent(MatterEventMetaContext* newContext)
 {
-    if (metaContextListHead == nullptr) {
-        metaContextListHead = newContext;
-    } else {
-        auto metaContextPointer = metaContextListHead;
-        while (metaContextPointer->nextContext != nullptr)
-        {
-            metaContextPointer = metaContextPointer->nextContext;
-        }
-        metaContextPointer->nextContext = newContext;
+    eventMetaContexts.PushBack(newContext);
+}
+
+void MatterUnregisterAllAfEvents()
+{
+    while (eventMetaContexts.begin() != eventMetaContexts.end())
+    {
+        eventMetaContexts.Remove(&(*eventMetaContexts.begin()));
     }
 }
 
@@ -94,13 +94,12 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
             return;
         }
 
-        for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
-        {
-            const EmberEventData & event = metaContext->event;
+        for (auto metaContext : eventMetaContexts) {
+            const EmberEventData & event = metaContext.event;
             if (event.control != control)
                 continue;
             control->status = EMBER_EVENT_INACTIVE;
-            event.handler((uint8_t) metaContext->context.endpoint);
+            event.handler((uint8_t)metaContext.context.endpoint);
             break;
         }
     }
@@ -122,11 +121,9 @@ const char * emberAfGetEventString(uint8_t index)
     }
 
     uint8_t iteratorCounter = 0;
-    for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
-    {
-        if (iteratorCounter == index)
-        {
-            return metaContext->eventString;
+    for (auto& metaContext : eventMetaContexts) {
+        if (iteratorCounter == index) {
+            return metaContext.eventString;
         }
         iteratorCounter++;
     }
@@ -136,12 +133,11 @@ const char * emberAfGetEventString(uint8_t index)
 
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
-    for (auto metaContext = metaContextListHead; metaContext != nullptr; metaContext = metaContext->nextContext)
-    {
-        auto & context = metaContext->context;
+    for (auto& metaContext : eventMetaContexts) {
+        auto context = metaContext.context;
         if (context.endpoint == endpoint && context.clusterId == clusterId && context.isClient == isClient)
         {
-            return &context;
+            return &metaContext.context;
         }
     }
     return nullptr;

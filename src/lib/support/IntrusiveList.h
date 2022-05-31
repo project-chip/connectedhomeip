@@ -29,7 +29,7 @@ class IntrusiveListNodeBase
 {
 public:
     IntrusiveListNodeBase() : mPrev(nullptr), mNext(nullptr) {}
-    ~IntrusiveListNodeBase() { VerifyOrDie(!IsInList()); }
+    ~IntrusiveListNodeBase() {}
 
     bool IsInList() const { return (mPrev != nullptr && mNext != nullptr); }
 

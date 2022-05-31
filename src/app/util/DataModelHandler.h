@@ -33,3 +33,9 @@
  *
  */
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr);
+
+/**
+ * Shutdowns and cleans up the data model internal code
+ *
+ */
+void ShutdownDataModelHandler();

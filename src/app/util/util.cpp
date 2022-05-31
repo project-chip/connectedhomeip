@@ -264,8 +264,9 @@ void MatterFanControlPluginServerInitCallback() {}
 // such as after a leave network. This allows zcl utils to clear state
 // that should not be kept when changing networks
 // ****************************************
-void emberAfStackDown(void)
+void emberAfStackDown()
 {
+    MatterUnregisterAllAfEvents();
     emberAfRegistrationAbortCallback();
 }
 
