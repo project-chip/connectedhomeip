@@ -1,5 +1,48 @@
 # CHIP Tizen Lighting Example
 
+## Building binary
+
+Activating environment
+
+```sh
+source ./scripts/activate.sh
+```
+
+Generating tizen-arm-light
+
+```sh
+gn gen --check \
+	--fail-on-unused-args \
+	--export-compile-commands \
+	--root=$PW_PROJECT_ROOT/examples/lighting-app/tizen \
+	"--args=target_os=\"tizen\" target_cpu=\"arm\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" sysroot=\"$TIZEN_SDK_SYSROOT\"" \
+	$PW_PROJECT_ROOT/out/tizen-arm-light
+```
+
+Building tizen-arm-light
+
+```sh
+ninja -C $PW_PROJECT_ROOT/out/tizen-arm-light
+```
+
+## Preparing Tizen SDK certificate
+
+For packaging the Tizen APP, there is a need to generate an author certificate
+and security profile using the commands described below. Change password and
+author data as needed.
+
+```sh
+tizen certificate --alias=CHIP --name=CHIP --email=chip@tizen.org --password=chiptizen
+
+tizen security-profiles add --active --name=CHIP --author=$HOME/tizen-sdk-data/keystore/author/author.p12 --password=chiptizen
+```
+
+## Packaging APP
+
+```sh
+ninja -C $PW_PROJECT_ROOT/out/tizen-arm-light chip-lighting-app:tpk
+```
+
 ## Installing TPK
 
 Upload TPK package to device under test (DUT). Install it with `pkgcmd` as

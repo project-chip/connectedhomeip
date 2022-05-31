@@ -83,15 +83,3 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
-
-USER $USERNAME
-WORKDIR /home/$USERNAME
-
-# Setup tizen studio CLI
-RUN set -x \
-    # Generate authr certificate
-    && $TIZEN_SDK_ROOT/tools/ide/bin/tizen certificate --alias=CHIP --name=CHIP --email=chip@tizen.org --password=chiptizen \
-    # Add new security profile
-    && $TIZEN_SDK_ROOT/tools/ide/bin/tizen security-profiles add --active --name=CHIP --author=$HOME/tizen-sdk-data/keystore/author/author.p12 --password=chiptizen \
-    # Cleanup
-    && : # last line
