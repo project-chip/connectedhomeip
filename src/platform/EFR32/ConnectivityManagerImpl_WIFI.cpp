@@ -133,6 +133,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         }
     }
 }
+
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -230,7 +231,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // Ensure that the WFX is started.
         if ((serr = wfx_wifi_start()) != SL_STATUS_OK)
         {
-            ChipLogError(DeviceLayer, "WFX_wifi_start: FAIL: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %s", chip::ErrorStr(err));
             return;
         }
         // Ensure that station mode is enabled in the WFX WiFi layer.
@@ -308,7 +309,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
                     if ((serr = wfx_connect_to_ap()) != SL_STATUS_OK)
                     {
-                        ChipLogError(DeviceLayer, "wfx_connect_to_ap failed");
+                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
                     }
                     SuccessOrExit(serr);
 
@@ -362,6 +363,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
 
     UpdateInternetConnectivityState();
 }
+
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveStationState();
