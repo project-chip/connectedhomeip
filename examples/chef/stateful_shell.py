@@ -16,11 +16,13 @@ import os
 import shlex
 import subprocess
 import sys
-import tempfile
 from typing import Dict, Optional
 
 import constants
 
+_ENV_FILENAME = ".shell_env"
+_OUTPUT_FILENAME = ".shell_output"
+_HERE = os.path.dirname(os.path.abspath(__file__))
 
 TermColors = constants.TermColors
 
@@ -42,8 +44,8 @@ class StatefulShell:
 
         # This file holds the env after running a command. This is a better approach
         # than writing to stdout because commands could redirect the stdout.
-        self.envfile_path: str = os.path.join(tempfile.gettempdir(), "envfile")
-        self.cmd_output_path: str = os.path.join(tempfile.gettempdir(), "cmd_output")
+        self.envfile_path: str = os.path.join(_HERE, _ENV_FILENAME)
+        self.cmd_output_path: str = os.path.join(_HERE, _OUTPUT_FILENAME)
 
     def print_env(self) -> None:
         """Print environment variables in commandline friendly format for export.
@@ -57,7 +59,11 @@ class StatefulShell:
             if env_var:
                 print(f"export {env_var}={quoted_value}")
 
-    def run_cmd(self, cmd: str, *, raise_on_returncode=False, return_cmd_output=True) -> Optional[str]:
+    def run_cmd(
+        self, cmd: str, *,
+        raise_on_returncode=False,
+        return_cmd_output=False,
+    ) -> Optional[str]:
         """Runs a command and updates environment.
 
         Args:
