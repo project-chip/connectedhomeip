@@ -73,12 +73,9 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
-    Clock::Microseconds64 curTimeUs;
-    CHIP_ERROR err = GetClock_RealTime(curTimeUs);
-    if (err == CHIP_NO_ERROR)
-    {
-        aCurTime = std::chrono::duration_cast<Clock::Milliseconds64>(curTimeUs);
-    }
+    Microseconds64 curTimeUs;
+    auto err = GetClock_RealTime(curTimeUs);
+    aCurTime = std::chrono::duration_cast<Milliseconds64>(curTimeUs);
     return err;
 }
 
