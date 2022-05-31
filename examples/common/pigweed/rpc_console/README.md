@@ -37,9 +37,9 @@ $ ninja -C out/debug
 ```
 
 After building the output directory also contains a folder
-(chip_rpc_console_wheels), with all the wheels required for the tool. These
-can be used to install the console without needing the sdk. Simply install
-all the wheels in the folder:
+(chip_rpc_console_wheels), with all the wheels required for the tool. These can
+be used to install the console without needing the sdk. Simply install all the
+wheels in the folder:
 
 ```
 $ cd <project_root>/examples/common/pigweed/rpc_console/out/debug
