@@ -46,60 +46,6 @@
 using namespace chip;
 using namespace chip::AppPlatform;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-class MyUserPrompter : public UserPrompter
-{
-    // tv should override this with a dialog prompt
-    inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        /*
-         *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
-         * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
-         *
-         * If user responds with OK then implementor should call CommissionerRespondOk();
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         *
-         */
-        GetCommissionerDiscoveryController()->Ok();
-
-        /**
-         * For Demo: Launch Prime Video App
-         */
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        /*
-         *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
-         * commissioned. For example "Please enter pin displayed in casting app."
-         *
-         * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         */
-
-        GetCommissionerDiscoveryController()->CommissionWithPincode(20202021); // dummy pin code
-
-        /**
-         * For Demo: Launch Prime Video App
-         */
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
-};
-
-MyUserPrompter gMyUserPrompter;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 class MyPincodeService : public PincodeService
 {
@@ -456,7 +402,7 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-CHIP_ERROR InitVideoPlayerPlatform()
+CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
@@ -465,10 +411,10 @@ CHIP_ERROR InitVideoPlayerPlatform()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-    if (cdc != nullptr)
+    if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPincodeService(&gMyPincodeService);
-        cdc->SetUserPrompter(&gMyUserPrompter);
+        cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }
 
