@@ -43,27 +43,27 @@ size_t gCurLineBufferSize = 0;
 
 void PrettyPrintIMBlankLine()
 {
-       if (gCurLineBufferSize)
-        {
-            // Don't need to explicitly NULL-terminate the string because
-            // snprintf takes care of that.
-            ChipLogDetail(DataManagement, "%s", gLineBuffer);
-            gCurLineBufferSize = 0;
-        }
+    if (gCurLineBufferSize)
+    {
+        // Don't need to explicitly NULL-terminate the string because
+        // snprintf takes care of that.
+        ChipLogDetail(DataManagement, "%s", gLineBuffer);
+        gCurLineBufferSize = 0;
+    }
 
-        for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
+    for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
+    {
+        if (sizeof(gLineBuffer) > gCurLineBufferSize)
         {
-            if (sizeof(gLineBuffer) > gCurLineBufferSize)
+            size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            if (ret > 0)
             {
-                size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
-                if (ret > 0)
-                {
-                    gCurLineBufferSize += std::min(ret, sizeLeft);
-                }
+                gCurLineBufferSize += std::min(ret, sizeLeft);
             }
         }
- }
+    }
+}
 
 void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {

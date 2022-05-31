@@ -44,10 +44,10 @@ void PrettyPrintIMBlankLine();
 void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...) ENFORCE_FORMAT(2, 3);
 void IncreaseDepth();
 void DecreaseDepth();
-#define PRETTY_PRINT_BLANK_LINE()                                                                                                     \
+#define PRETTY_PRINT_BLANK_LINE()                                                                                                  \
     do                                                                                                                             \
     {                                                                                                                              \
-        PrettyPrintIMBlankLine();                                                                                   \
+        PrettyPrintIMBlankLine();                                                                                                  \
     } while (0)
 #define PRETTY_PRINT(fmt, ...)                                                                                                     \
     do                                                                                                                             \
