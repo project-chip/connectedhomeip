@@ -97,25 +97,36 @@ def check_python_version() -> None:
         exit(1)
 
 
-def check_zap_master() -> str:
-    """Produces hash of ZAP submodule in branch master
-    This will need to be replaced with stateful shell once it supports output
-    The branch should be taken as a parameter
-    Old code to show intent:
-    # git_cmd = ["git", "ls-tree", "master", "third_party/zap/repo"]
-    # zap_commit = str(subprocess.check_output(git_cmd, cwd=_REPO_BASE_PATH))
-    # zap_commit = zap_commit.split(" ")[2]
-    # zap_commit = zap_commit[:zap_commit.index("\\")]
+def check_zap(master=False) -> str:
+    """Produces hash of ZAP submodule
+
+    Args:
+      master: check branch master instead of current branch
+    Returns:
+      SHA of zap submodule
     """
-    # TODO
-    zap_commit = 'TEMP DISABLED'
+    shell.run_cmd(f"cd {_REPO_BASE_PATH}")
+    if master:
+        flush_print("Fetching master")
+        command = "git fetch origin master --depth=1 --recurse-submodules"
+        shell.run_cmd(command)
+        branch = "origin/master"
+    else:
+        branch = shell.run_cmd("git rev-parse --abbrev-ref HEAD",
+                               return_cmd_output=True).replace("\n", "")
+    command = f"git ls-tree {branch} third_party/zap/repo"
+    zap_commit = shell.run_cmd(command, return_cmd_output=True)
+    flush_print(f"Raw zap commit {zap_commit}")
+    zap_commit = zap_commit.split(" ")[2]
+    zap_commit = zap_commit[:zap_commit.index("\t")]
     flush_print(f"zap commit: {zap_commit}")
     return zap_commit
 
 
 def generate_device_manifest(
         include_zap_submod: bool = False,
-        write_manifest_file: bool = False) -> Dict[str, Any]:
+        write_manifest_file: bool = False,
+        zap_check_master: bool = False) -> Dict[str, Any]:
     """Produces dictionary containing md5 of device dir zap files.
 
     Args:
@@ -128,20 +139,21 @@ def generate_device_manifest(
     devices_manifest = ci_manifest["devices"]
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
+        file_md5 = hashlib.md5()
         with open(device_file_path, "rb") as device_file:
-            file_md5 = hashlib.md5()
             while data := device_file.read(128 * 32):
                 file_md5.update(data)
-            device_file_md5 = file_md5.hexdigest()
-            devices_manifest[device_name] = device_file_md5
-            flush_print(f"Current digest for {device_name} : {device_file_md5}")
+        device_file_md5 = file_md5.hexdigest()
+        devices_manifest[device_name] = device_file_md5
+        flush_print(f"Current digest for {device_name} : {device_file_md5}")
         if write_manifest_file:
-            device_zzz_dir_root = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-            device_zzz_md5_file = os.path.join(device_zzz_dir_root, _CI_DEVICE_MANIFEST_NAME)
+            device_zzz_md5_file = os.path.join(_CHEF_ZZZ_ROOT,
+                                               device_name,
+                                               _CI_DEVICE_MANIFEST_NAME)
             with open(device_zzz_md5_file, "w+", encoding="utf-8") as md5file:
                 md5file.write(device_file_md5)
     if include_zap_submod:
-        ci_manifest["zap_commit"] = check_zap_master()
+        ci_manifest["zap_commit"] = check_zap(master=zap_check_master)
     if write_manifest_file:
         with open(_CI_MANIFEST_FILE_NAME, "w+", encoding="utf-8") as ci_manifest_file:
             ci_manifest_file.write(json.dumps(ci_manifest, indent=4)+"\n")
@@ -274,7 +286,7 @@ def main(argv: Sequence[str]) -> None:
     if options.validate_zzz:
         flush_print(f"Validating\n{_CI_MANIFEST_FILE_NAME}\n{_CHEF_ZZZ_ROOT}\n",
                     with_border=True)
-        fix_instructions = f"""
+        fix_instructions = textwrap.dedent(f"""
 
         Cached files out of date!
         Please:
@@ -286,8 +298,9 @@ def main(argv: Sequence[str]) -> None:
           ./examples/chef/chef.py --generate_zzz
           git add {_CHEF_ZZZ_ROOT}
           git add {_CI_MANIFEST_FILE_NAME}
-        Ensure you are running with the latest version of ZAP from master!"""
-        ci_manifest = generate_device_manifest()
+        Ensure you are running with the latest version of ZAP from master!""")
+        ci_manifest = generate_device_manifest(include_zap_submod=True,
+                                               zap_check_master=True)
         with open(_CI_MANIFEST_FILE_NAME, "r", encoding="utf-8") as ci_manifest_file:
             cached_manifest = json.loads(ci_manifest_file.read())
         cached_device_manifest = cached_manifest["devices"]
@@ -308,13 +321,12 @@ def main(argv: Sequence[str]) -> None:
                 if output_cached_md5 != device_md5:
                     flush_print(f"OUTPUT MISMATCH {device}: {fix_instrucitons}")
                     exit(1)
-        if False:
-            # TODO
-            # Disabled; should check:
-            #   Current branch when writing manifest
-            #   Master in CI
-            flush_print("BAD ZAP VERSION:  "+fix_instructions)
-            # should only warn in output and not stop builds
+        current_zap = ci_manifest["zap_commit"]
+        cached_zap = cached_manifest["zap_commit"]
+        flush_print(f"currnt zap commit {current_zap}")
+        flush_print(f"cached zap commit {cached_zap}")
+        if current_zap != cached_zap:
+            flush_print(f"BAD ZAP VERSION: {fix_instructions}")
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
