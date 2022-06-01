@@ -91,8 +91,8 @@ _TEST_EVENT_TRIGGERS_CLIENT_COMMAND = {
         "code": 0,
         "mfgCode": None,
         "source": "client",
-        "incoming": 0,
-        "outgoing": 1
+        "incoming": 1,
+        "outgoing": 0
     },
     "clusterCode": 51,
     "clusterParamKey": "commands",
