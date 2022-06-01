@@ -56,14 +56,13 @@ public:
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
-    void HandleGeneralFault(uint32_t EventId);
-    void HandleSoftwareFault(uint32_t EventId);
-
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
+    void _HandleSoftwareFault(uint32_t eventId);
+    void _HandleGeneralFault(uint32_t eventId);
 
     // ===== Members for internal use by the following friends.
 

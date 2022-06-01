@@ -59,29 +59,6 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
-void SignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    switch (signum)
-    {
-    case SIGUSR1:
-        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
-        break;
-    case SIGUSR2:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
-        break;
-    case SIGHUP:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
-        break;
-    case SIGTTIN:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
-        break;
-    default:
-        break;
-    }
-}
-
 #if CHIP_WITH_GIO
 void GDBus_Thread()
 {
@@ -175,16 +152,6 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-    struct sigaction action;
-
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = SignalHandler;
-    sigaction(SIGHUP, &action, nullptr);
-    sigaction(SIGTTIN, &action, nullptr);
-    sigaction(SIGUSR1, &action, nullptr);
-    sigaction(SIGUSR2, &action, nullptr);
-    sigaction(SIGTSTP, &action, nullptr);
-
 #if CHIP_WITH_GIO
     GError * error = nullptr;
 
@@ -238,7 +205,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
-void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
+void PlatformManagerImpl::_HandleGeneralFault(uint32_t EventId)
 {
     GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
@@ -304,7 +271,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
     }
 }
 
-void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
+void PlatformManagerImpl::_HandleSoftwareFault(uint32_t EventId)
 {
     SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
 
