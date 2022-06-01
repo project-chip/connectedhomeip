@@ -224,9 +224,6 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
 
 void DefaultOTARequestorDriver::UpdateDownloaded()
 {
-    // Download complete so reset provider retry counter
-    mProviderRetryCount = 0;
-
     VerifyOrDie(mRequestor != nullptr);
     mRequestor->ApplyUpdate();
 }
