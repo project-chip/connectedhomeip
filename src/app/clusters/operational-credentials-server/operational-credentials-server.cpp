@@ -680,7 +680,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 nonDefaultStatus = Status::UnsupportedAccess);
+                 nonDefaultStatus = Status::FailsafeRequired);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
@@ -806,7 +806,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
                  nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 nonDefaultStatus = Status::UnsupportedAccess);
+                 nonDefaultStatus = Status::FailsafeRequired);
 
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
@@ -1005,7 +1005,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     auto & CSRNonce = commandData.CSRNonce;
     VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
 
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::UnsupportedAccess);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
 
     // Prepare NOCSRElements structure
@@ -1120,7 +1120,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     VerifyOrExit(rootCertificate.size() <= Credentials::kMaxCHIPCertLength, finalStatus = Status::InvalidCommand);
 
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::UnsupportedAccess);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
 
     // Can only add a single trusted root cert per fail-safe
     VerifyOrExit(!failSafeContext.AddTrustedRootCertHasBeenInvoked(), finalStatus = Status::ConstraintError);

@@ -70,7 +70,7 @@ tests:
                 value: "00000000"
 
       response:
-          error: UNSUPPORTED_ACCESS
+          error: FAILSAFE_REQUIRED
 
     - label: "Invoke AddNOC without fail-safe"
       command: "AddNOC"
@@ -86,7 +86,7 @@ tests:
               - name: AdminVendorId
                 value: 65521
       response:
-          error: UNSUPPORTED_ACCESS
+          error: FAILSAFE_REQUIRED
 
     - label: "Invoke UpdateNOC without fail-safe"
       command: "UpdateNOC"
@@ -96,7 +96,7 @@ tests:
               - name: NOCValue
                 value: "00112233"
       response:
-          error: UNSUPPORTED_ACCESS
+          error: FAILSAFE_REQUIRED
 
     - label: "Invoke CSRRequest without fail-safe"
       command: "CSRRequest"
@@ -106,4 +106,4 @@ tests:
               - name: CSRNonce
                 value: "\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07"
       response:
-          error: UNSUPPORTED_ACCESS
+          error: FAILSAFE_REQUIRED
