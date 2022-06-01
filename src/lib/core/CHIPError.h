@@ -2421,7 +2421,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_MISSING_URI_SEPARATOR                      CHIP_CORE_ERROR(0xe0)
 
-
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation

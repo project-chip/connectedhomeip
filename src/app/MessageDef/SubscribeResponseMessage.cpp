@@ -93,7 +93,8 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
     {
         const uint16_t requiredFields = (1 << to_underlying(Tag::kSubscriptionId)) |
             (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
+                                                                   : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
