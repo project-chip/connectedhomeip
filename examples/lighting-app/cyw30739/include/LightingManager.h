@@ -55,10 +55,10 @@ public:
     typedef void (*Callback_fn_initiated)(Actor_t, Action_t, uint8_t);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    void WriteClusterLevel(uint8_t value);
 
 private:
     void WriteClusterState(uint8_t value);
-    void WriteClusterLevel(uint8_t value);
 
     friend LightingManager & LightMgr(void);
     State_t mState;

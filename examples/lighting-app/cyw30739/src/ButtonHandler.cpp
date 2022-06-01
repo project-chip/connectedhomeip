@@ -20,10 +20,14 @@
 
 #include <ButtonHandler.h>
 #include <LightingManager.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <stdio.h>
 #include <wiced.h>
 #include <wiced_button_manager.h>
 #include <wiced_platform.h>
+
+using namespace chip::app::Clusters;
 
 /******************************************************
  *                      Macros
@@ -56,7 +60,7 @@ wiced_result_t app_button_init(void)
     memset(app_buttons, 0, (sizeof(button_manager_button_t) * APP_MAX_BUTTON_DEF));
 
     app_button_configurations[ON_OFF_BUTTON].button            = PLATFORM_BUTTON_1;
-    app_button_configurations[ON_OFF_BUTTON].button_event_mask = BUTTON_CLICK_EVENT;
+    app_button_configurations[ON_OFF_BUTTON].button_event_mask = BUTTON_CLICK_EVENT | BUTTON_HOLDING_EVENT;
     app_buttons[ON_OFF_BUTTON].configuration                   = &app_button_configurations[ON_OFF_BUTTON];
 
     result = wiced_button_manager_init(&app_button_manager, &app_button_manager_configuration, app_buttons, 1);
@@ -71,7 +75,7 @@ wiced_result_t app_button_init(void)
 void app_button_event_handler(const button_manager_button_t * button_mgr, button_manager_event_t event,
                               button_manager_button_state_t state)
 {
-
+    uint8_t attributeValue;
     if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
     {
         if (LightMgr().IsLightOn())
@@ -84,5 +88,12 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
             printf("Button Toggle:OFF -> ON\n");
             LightMgr().InitiateAction(LightingManager::ACTOR_BUTTON, LightingManager::ON_ACTION, 0);
         }
+    }
+    else if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_HOLDING_EVENT)
+    {
+        // update the current occupancy here for hardcoded endpoint 1
+        OccupancySensing::Attributes::Occupancy::Get(1, &attributeValue);
+        printf("Button Holding Toggle: %d -> %d\n", attributeValue, !attributeValue);
+        OccupancySensing::Attributes::Occupancy::Set(1, !attributeValue);
     }
 }

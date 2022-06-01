@@ -44,11 +44,29 @@ public:
 
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
+    CHIP_ERROR EraseAll(void);
+
 private:
-    static constexpr uint8_t mMaxEntryCount = 1 + /* For the global message counter */
-        1 +                                       /* For the admin key count */
-        CHIP_CONFIG_MAX_FABRICS + 1               /* For the session key count */
-        ;
+    static constexpr uint8_t mMaxEntryCount = 1 +                   /* global event id counter */
+        1 +                                                         /* FabricIndexInfo */
+        CHIP_CONFIG_MAX_FABRICS +                                   /* FabricNOC */
+        CHIP_CONFIG_MAX_FABRICS +                                   /* FabricICAC */
+        CHIP_CONFIG_MAX_FABRICS +                                   /* FabricRCAC */
+        CHIP_CONFIG_MAX_FABRICS +                                   /* FabricMetadata */
+        CHIP_CONFIG_MAX_FABRICS +                                   /* FabricOpKey */
+        1 +                                                         /* AccessControlList */
+        CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC + /* AccessControlEntry */
+        1 +                                                         /* GroupDataCounter */
+        1 +                                                         /* GroupControlCounter */
+        1 +                                                         /* FabricTable */
+        4 +                                                         /* FabricGroups */
+        CHIP_CONFIG_MAX_FABRICS * 3 +                               /* FabricKeyset */
+        1 +                                                         /* OTADefaultProviders */
+        1 +                                                         /* OTACurrentProvider */
+        1 +                                                         /* OTAUpdateToken */
+        1 +                                                         /* OTACurrentUpdateState */
+        1 +                                                         /* OTATargetVersion */
+        16;                                                         /* AttributeValue */
 
     struct KeyEntry
     {

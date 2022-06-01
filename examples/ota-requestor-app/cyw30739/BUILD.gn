@@ -20,6 +20,7 @@ import("${cyw30739_sdk_build_root}/cyw30739_executable.gni")
 import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
 
 cyw30739_project_dir = "${chip_root}/examples/ota-requestor-app/cyw30739"
+examples_plat_dir = "${chip_root}/examples/platform/cyw30739"
 
 declare_args() {
   setupPinCode = 20202021
@@ -29,7 +30,10 @@ declare_args() {
 cyw30739_sdk("sdk") {
   sources = [ "${cyw30739_project_dir}/include/CHIPProjectConfig.h" ]
 
-  include_dirs = [ "${cyw30739_project_dir}/include" ]
+  include_dirs = [
+    "${cyw30739_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
 
   defines = [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
@@ -50,6 +54,13 @@ cyw30739_executable("ota_requestor_app") {
   ]
 
   include_dirs = [ "include" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "${examples_plat_dir}/OTAConfig.cpp",
+      "${examples_plat_dir}/OTAConfig.h",
+    ]
+  }
 }
 
 group("cyw30739") {

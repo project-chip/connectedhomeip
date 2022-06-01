@@ -18,8 +18,8 @@
  *    limitations under the License.
  */
 
-#include <BoltLockManager.h>
 #include <ButtonHandler.h>
+#include <LockManager.h>
 #include <stdio.h>
 #include <wiced.h>
 #include <wiced_button_manager.h>
@@ -73,18 +73,34 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
 {
     // printf("app_button_event_handler. button=%d, event=%d, state=%d\n", button_mgr[ON_OFF_BUTTON].configuration->button, event,
     // state);
-
+    bool initiated = false;
+    LockManager::Action_t action;
+    int32_t actor;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
     {
-        if (BoltLockMgr().IsUnlocked())
+        if (LockMgr().NextState() == true)
         {
-            printf("Button Toggle:Lock\n");
-            BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_BUTTON, BoltLockManager::LOCK_ACTION);
+            action = LockManager::LOCK_ACTION;
         }
         else
         {
-            printf("Button Toggle:Unlock\n");
-            BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_BUTTON, BoltLockManager::UNLOCK_ACTION);
+            action = LockManager::UNLOCK_ACTION;
+        }
+        actor = AppEvent::kEventType_Button;
+    }
+    else
+    {
+        err = CHIP_ERROR_UNEXPECTED_EVENT;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        initiated = LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, action);
+
+        if (!initiated)
+        {
+            printf("Action is already in progress or active.");
         }
     }
 }

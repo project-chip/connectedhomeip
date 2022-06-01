@@ -1,7 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2018 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +17,36 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *    Platform-specific configuration overrides for CHIP.
- */
-
 #pragma once
 
-#define CHIP_CONFIG_MAX_FABRICS 5
-#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 10
-#define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 1
-#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 1
+#include <stdint.h>
+
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Lock,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
+    };
+};

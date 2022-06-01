@@ -42,7 +42,7 @@ extern "C" {
 
 void wiced_firmware_upgrade_bootloader(void);
 bool wiced_firmware_upgrade_prepare(void);
-uint32_t wiced_firmware_upgrade_process_block(uint32_t offset, uint8_t * data, uint32_t len);
+uint32_t wiced_firmware_upgrade_process_block(uint32_t offset, const uint8_t * data, uint32_t len);
 bool wiced_firmware_upgrade_finalize(void);
 bool wiced_firmware_upgrade_apply(void);
 void wiced_firmware_upgrade_abort(void);
