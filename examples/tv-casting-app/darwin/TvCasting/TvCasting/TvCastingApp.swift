@@ -15,15 +15,13 @@
  *    limitations under the License.
  */
 
-#import "AppDelegate.h"
-#import <UIKit/UIKit.h>
+import SwiftUI
 
-int main(int argc, char * argv[])
-{
-    NSString * appDelegateClassName;
-    @autoreleasepool {
-        // Setup code that might create autoreleased objects goes here.
-        appDelegateClassName = NSStringFromClass([AppDelegate class]);
+@main
+struct TvCastingApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
     }
-    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 }

@@ -15,18 +15,8 @@
  *    limitations under the License.
  */
 
-#import "ViewController.h"
+//
+//  TvCasting's Public headers exposed to Swift
+//
 
-@interface ViewController ()
-
-@end
-
-@implementation ViewController
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
-}
-
-@end
+#import "CastingServerBridge.h"

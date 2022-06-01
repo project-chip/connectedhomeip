@@ -15,8 +15,13 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import "CastingServerBridge.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@implementation CastingServerBridge
+
+- (int)add:(int)a secondNum:(int)b
+{
+    return a + b;
+}
 
 @end

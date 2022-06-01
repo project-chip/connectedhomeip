@@ -15,8 +15,15 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+#ifndef CastingServerBridge_h
+#define CastingServerBridge_h
+
+@interface CastingServerBridge : NSObject
+
+- (int)add:(int)a secondNum:(int)b;
 
 @end
+
+#endif /* CastingServerBridge_h */
