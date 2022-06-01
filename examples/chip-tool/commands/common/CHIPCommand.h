@@ -94,9 +94,23 @@ protected:
     // Get the wait duration, in seconds, before the command times out.
     virtual chip::System::Clock::Timeout GetWaitDuration() const = 0;
 
-    // Shut down the command, in case any work needs to be done after the event
-    // loop has been stopped.
+    // Shut down the command.  After a Shutdown call the command object is ready
+    // to be used for another command invocation.
     virtual void Shutdown() {}
+
+    // Clean up any resources allocated by the command.  Some commands may hold
+    // on to resources after Shutdown(), but Cleanup() will guarantee those are
+    // cleaned up.
+    virtual void Cleanup() {}
+
+    // If true, skip calling Cleanup() when in interactive mode, so the command
+    // can keep doing work as needed.  Cleanup() will be called when quitting
+    // interactive mode.  This method will be called before Shutdown, so it can
+    // use member values that Shutdown will normally reset.
+    virtual bool DeferInteractiveCleanup() { return false; }
+
+    // Execute any deferred cleanups.  Used when exiting interactive mode.
+    void ExecuteDeferredCleanups();
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
@@ -122,6 +136,8 @@ private:
     CHIP_ERROR ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    static std::set<CHIPCommand *> sDeferredCleanups;
+
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<uint16_t> mBleAdapterId;

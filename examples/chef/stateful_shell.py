@@ -17,7 +17,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
-from typing import Dict
+from typing import Dict, Optional
 
 import constants
 
@@ -43,6 +43,7 @@ class StatefulShell:
         # This file holds the env after running a command. This is a better approach
         # than writing to stdout because commands could redirect the stdout.
         self.envfile_path: str = os.path.join(tempfile.gettempdir(), "envfile")
+        self.cmd_output_path: str = os.path.join(tempfile.gettempdir(), "cmd_output")
 
     def print_env(self) -> None:
         """Print environment variables in commandline friendly format for export.
@@ -56,21 +57,37 @@ class StatefulShell:
             if env_var:
                 print(f"export {env_var}={quoted_value}")
 
-    def run_cmd(self, cmd: str, *, raise_on_returncode=False) -> None:
+    def run_cmd(self, cmd: str, *, raise_on_returncode=False, return_cmd_output=True) -> Optional[str]:
         """Runs a command and updates environment.
 
         Args:
           cmd: Command to execute.
+            This does not support commands that run in the background e.g. `<cmd> &`
           raise_on_returncode: Whether to raise an error if the return code is nonzero.
+          return_cmd_output: Whether to return the command output.
+            If enabled, the text piped to screen won't be colorized due to output
+            being passed through `tee`.
 
         Raises:
           RuntimeError: If raise_on_returncode is set and nonzero return code is given.
+
+        Returns:
+          Output of command if return_cmd_output set to True.
         """
         env_dict = {}
-
         # Set OLDPWD at beginning because opening the shell clears this. This handles 'cd -'.
         # env -0 prints the env variables separated by null characters for easy parsing.
-        command_with_state = f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd}; env -0 > {self.envfile_path}"
+
+        if return_cmd_output:
+            # Piping won't work here because piping will affect how environment variables
+            # are propagated. This solution uses tee without piping to preserve env variables.
+            redirect = f" > >(tee \"{self.cmd_output_path}\") 2>&1 "  # include stderr
+        else:
+            redirect = ""
+
+        command_with_state = (
+            f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect};"
+            f" env -0 > {self.envfile_path}")
         with subprocess.Popen(
             [command_with_state],
             env=self.env, cwd=self.cwd,
@@ -92,3 +109,8 @@ class StatefulShell:
         if raise_on_returncode and returncode != 0:
             raise RuntimeError(
                 f"Error. Return code is not 0. It is: {returncode}")
+
+        if return_cmd_output:
+            with open(self.cmd_output_path) as f:
+                output = f.read()
+            return output

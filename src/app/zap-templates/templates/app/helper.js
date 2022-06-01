@@ -30,11 +30,11 @@ const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 const TestHelper      = require('../../common/ClusterTestGeneration.js');
 
-zclHelper['isEvent'] = function(db, event_name, packageId) {
-    return queryEvents
-      .selectAllEvents(db, packageId)
-      .then(events => events.find(event => event.name == event_name))
-      .then(events => events ? 'event' : dbEnum.zclType.unknown);
+zclHelper['isEvent'] = function (db, event_name, packageId) {
+  return queryEvents
+    .selectAllEvents(db, packageId)
+    .then(events => events.find(event => event.name == event_name))
+    .then(events => events ? 'event' : dbEnum.zclType.unknown);
 }
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the
@@ -80,11 +80,13 @@ var endpointClusterWithAttributeChanged = [
 var endpointClusterWithPreAttribute = [
   'IAS Zone',
   'Door Lock',
+  'Pump Configuration and Control',
   'Thermostat User Interface Configuration',
   'Time Format Localization',
   'Localization Configuration',
   'Mode Select',
   'Fan Control',
+  'Thermostat',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 

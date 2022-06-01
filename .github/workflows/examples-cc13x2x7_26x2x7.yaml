@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ti:0.5.61
+            image: connectedhomeip/chip-build-ti:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -105,6 +105,13 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x2_26x2 LP_CC2652R7 all-clusters-app \
                     out/artifacts/cc13x2x7_26x2x7-all-clusters/chip-LP_CC2652R7-all-clusters-example.out \
+                    /tmp/bloat_reports/
+            - name: Get All Clusters Minimal App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x2_26x2 LP_CC2652R7 all-clusters-minimal-app \
+                    out/artifacts/cc13x2x7_26x2x7-all-clusters-minimal/chip-LP_CC2652R7-all-clusters-minimal-example.out \
                     /tmp/bloat_reports/
             - name: Get Shell App size stats
               timeout-minutes: 5

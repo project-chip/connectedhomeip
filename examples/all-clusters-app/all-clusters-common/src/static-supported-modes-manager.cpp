@@ -6,22 +6,32 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using storage_value_type   = const ModeOptionStructType;
+using SemanticTag          = Structs::SemanticTag::Type;
+template <typename T>
+using List               = app::DataModel::List<T>;
+using storage_value_type = const ModeOptionStructType;
 namespace {
-Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, uint32_t semanticTag)
+Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode,
+                                                      const List<const SemanticTag> & semanticTags)
 {
     Structs::ModeOptionStruct::Type option;
-    option.label       = CharSpan::fromCharString(label);
-    option.mode        = mode;
-    option.semanticTag = semanticTag;
+    option.label        = CharSpan::fromCharString(label);
+    option.mode         = mode;
+    option.semanticTags = semanticTags;
     return option;
 }
 } // namespace
 
+constexpr SemanticTag semanticTagsBlack[]     = { { .value = 0 } };
+constexpr SemanticTag semanticTagsCappucino[] = { { .value = 0 } };
+constexpr SemanticTag semanticTagsEspresso[]  = { { .value = 0 } };
+
 // TODO: Configure your options for each endpoint
-storage_value_type StaticSupportedModesManager::coffeeOptions[] = { buildModeOptionStruct("Black", 0, 0),
-                                                                    buildModeOptionStruct("Cappuccino", 4, 0),
-                                                                    buildModeOptionStruct("Espresso", 7, 0) };
+storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
+    buildModeOptionStruct("Black", 0, List<const SemanticTag>(semanticTagsBlack)),
+    buildModeOptionStruct("Cappuccino", 4, List<const SemanticTag>(semanticTagsCappucino)),
+    buildModeOptionStruct("Espresso", 7, List<const SemanticTag>(semanticTagsEspresso))
+};
 const StaticSupportedModesManager::EndpointSpanPair
     StaticSupportedModesManager::supportedOptionsByEndpoints[EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointSpanPair(1, Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions)) // Options for Endpoint 1

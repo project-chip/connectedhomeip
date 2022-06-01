@@ -162,6 +162,8 @@ oids = [
      4,       [joint_iso_ccitt(2), ds(5), 29, 14]),
     ("Extension",      "AuthorityKeyIdentifier",
      5,       [joint_iso_ccitt(2), ds(5), 29, 35]),
+    ("Extension",      "CSRRequest",
+     6,       [iso(1), member_body(2), us(840), rsadsi(113549), pkcs(1), 9, 14]),
 
     # Key Purposes
     ("KeyPurpose",     "ServerAuth",              1,       [iso(1), organization(

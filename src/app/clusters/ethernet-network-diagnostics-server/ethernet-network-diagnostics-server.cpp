@@ -177,29 +177,9 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHan
                                                                  const app::ConcreteCommandPath & commandPath,
                                                                  const Commands::ResetCounts::DecodableType & commandData)
 {
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts();
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
 
-    VerifyOrExit(DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
-
-    status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketTxCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::TxErrCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset TxErrCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::CollisionCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset CollisionCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
-
-exit:
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,7 +44,18 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
-    /* None currently defined */
+    kPlatformWebOSEvent = kRange_InternalPlatformSpecific,
+    kPlatformWebOSBLECentralConnected,
+    kPlatformWebOSBLECentralConnectFailed,
+    kPlatformWebOSBLEWriteComplete,
+    kPlatformWebOSBLESubscribeOpComplete,
+    kPlatformWebOSBLEIndicationReceived,
+    kPlatformWebOSBLEC1WriteEvent,
+    kPlatformWebOSBLEOutOfBuffersEvent,
+    kPlatformWebOSBLEPeripheralRegisterAppComplete,
+    kPlatformWebOSBLEPeripheralAdvConfiguredComplete,
+    kPlatformWebOSBLEPeripheralAdvStartComplete,
+    kPlatformWebOSBLEPeripheralAdvStopComplete
 };
 
 } // namespace DeviceEventType
@@ -56,7 +67,48 @@ struct ChipDevicePlatformEvent
 {
     union
     {
-        /* None currently defined */
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLECentralConnected;
+        struct
+        {
+            CHIP_ERROR mError;
+        } BLECentralConnectFailed;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLEWriteComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            bool mIsSubscribed;
+        } BLESubscribeOpComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            chip::System::PacketBuffer * mData;
+        } BLEIndicationReceived;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralRegisterAppComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvConfiguredComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStartComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStopComplete;
     };
 };
 

@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-infineon:0.5.73
+            image: connectedhomeip/chip-build-infineon:0.5.75
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
@@ -89,6 +89,19 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                       p6 default all-clusters-app \
                       out/infineon-p6-all-clusters/chip-p6-clusters-example.out
+            - name: Build all-clusters-minimal-app example
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                    "scripts/build/build_examples.py \
+                        --enable-flashbundle --no-log-timestamps \
+                        --target infineon-p6-all-clusters-minimal \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                    "
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                      p6 default all-clusters-minimal-app \
+                      out/infineon-p6-all-clusters-minimal/chip-p6-clusters-minimal-example.out
             - name: Build lighting-app example
               timeout-minutes: 10
               run: |
@@ -110,4 +123,5 @@ jobs:
                   path: |
                       out/infineon-p6-lock/p6-default-lock-app-sizes.json
                       out/infineon-p6-all-clusters/p6-default-all-clusters-app-sizes.json
+                      out/infineon-p6-all-clusters-minimal/p6-default-all-clusters-minimal-app-sizes.json
                       out/infineon-p6-light/p6-default-light-app-sizes.json

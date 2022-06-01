@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.73
+            image: connectedhomeip/chip-build:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -95,6 +95,14 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-app \
                     out/all_clusters_debug/chip-all-clusters-app \
+                    /tmp/bloat_reports/
+            - name: Build example Standalone All Clusters Mininal Server
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/gn_build_example.sh examples/all-clusters-minimal-app/linux out/all_clusters_minimal_debug
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug all-clusters-minimal-app \
+                    out/all_clusters_minimal_debug/chip-all-clusters-minimal-app \
                     /tmp/bloat_reports/
             - name: Build example TV app
               timeout-minutes: 10

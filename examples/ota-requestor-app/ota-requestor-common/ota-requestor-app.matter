@@ -68,6 +68,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -87,6 +88,7 @@ server cluster AdministratorCommissioning = 60 {
   readonly attribute int8u windowStatus = 0;
   readonly attribute fabric_idx adminFabricIndex = 1;
   readonly attribute int16u adminVendorId = 2;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenCommissioningWindowRequest {
@@ -146,11 +148,13 @@ server cluster Basic = 40 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -215,6 +219,7 @@ server cluster GeneralCommissioning = 48 {
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 0;
   readonly attribute CHAR_STRING supportedLocales[] = 1;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -473,6 +478,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -494,6 +500,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -521,6 +528,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
@@ -539,7 +547,7 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -619,11 +627,13 @@ server cluster TimeFormatLocalization = 44 {
   attribute HourFormat hourFormat = 0;
   attribute CalendarType activeCalendarType = 1;
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster UserLabel = 65 {
   attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -638,6 +648,7 @@ endpoint 0 {
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 3;
     callback attribute attributeList;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -662,6 +673,7 @@ endpoint 0 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -670,12 +682,14 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
     ram      attribute updateStateProgress;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -683,6 +697,7 @@ endpoint 0 {
     persist  attribute hourFormat;
     persist  attribute activeCalendarType;
     callback attribute supportedCalendarTypes;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -713,6 +728,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -723,16 +739,19 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 }

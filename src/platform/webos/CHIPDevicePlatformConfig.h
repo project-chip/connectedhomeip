@@ -45,7 +45,7 @@
 
 // ========== Platform-specific Configuration =========
 
-// These are configuration options that are unique to webOs platforms.
+// These are configuration options that are unique to webOS platforms.
 // These can be overridden by the application as needed.
 
 /**

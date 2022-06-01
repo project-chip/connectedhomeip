@@ -154,6 +154,12 @@ enum class OnOffFeature : uint32_t
 {
     kLighting = 0x1,
 };
+
+// Bitmap for SceneFeatures
+enum class SceneFeatures : uint32_t
+{
+    kSceneNames = 0x1,
+};
 } // namespace OnOff
 
 namespace OnOffSwitchConfiguration {
@@ -919,6 +925,7 @@ enum class OperationalCertStatus : uint8_t
     kInvalidNOC            = 0x03,
     kMissingCsr            = 0x04,
     kTableFull             = 0x05,
+    kInvalidAdminSubject   = 0x06,
     kInsufficientPrivilege = 0x08,
     kFabricConflict        = 0x09,
     kLabelConflict         = 0x0A,

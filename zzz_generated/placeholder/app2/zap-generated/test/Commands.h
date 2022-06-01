@@ -21,6 +21,8 @@
 
 #include "TestCommand.h"
 
+#include <lib/support/CHIPListUtils.h>
+
 class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
@@ -77,11 +79,13 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
             return WaitForCommissioning(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Log OnOff Test Startup");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
             return Log(kIdentityAlpha, value);
@@ -219,6 +223,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
             return WaitForCommissioning(kIdentityAlpha, value);
         }
@@ -228,13 +233,13 @@ private:
         }
         case 2: {
             LogStep(2, "Wait for Add Wifi Network Command");
-            VerifyOrdo(!ShouldSkip("WIFI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WIFI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id,
                                NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id);
         }
         case 3: {
             LogStep(3, "Wait for Update Thread Network Command");
-            VerifyOrdo(!ShouldSkip("THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id,
                                NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id);
         }
@@ -244,7 +249,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait for Remove Network Command");
-            VerifyOrdo(!ShouldSkip("WIFI | THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WIFI | THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id, NetworkCommissioning::Commands::RemoveNetwork::Id);
         }
         }
@@ -344,6 +349,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);

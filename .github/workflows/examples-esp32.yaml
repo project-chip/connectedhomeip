@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.73
+            image: connectedhomeip/chip-build-esp32:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -66,12 +66,12 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build some M5Stack variations
-              timeout-minutes: 30
+              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob '*-m5stack-{all-clusters,all-clusters-rpc-ipv6only}' \
+                        --target-glob '*-m5stack-{all-clusters,all-clusters-minimal,all-clusters-rpc-ipv6only}' \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
@@ -118,7 +118,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.73
+            image: connectedhomeip/chip-build-esp32:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

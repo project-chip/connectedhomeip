@@ -25,7 +25,6 @@ from enum import Enum, auto
 from random import randrange
 
 TEST_NODE_ID = '0x12344321'
-DEVELOPMENT_PAA_LIST = './credentials/development/paa-root-certs'
 
 
 class App:
@@ -264,16 +263,10 @@ class TestDefinition:
             app = apps_register.get('default')
             app.start()
             pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
-            if sys.platform != 'darwin':
-                pairing_cmd.append('--paa-trust-store-path')
-                pairing_cmd.append(DEVELOPMENT_PAA_LIST)
             runner.RunSubprocess(pairing_cmd,
                                  name='PAIR', dependencies=[apps_register])
 
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
-            if sys.platform != 'darwin':
-                test_cmd.append('--paa-trust-store-path')
-                test_cmd.append(DEVELOPMENT_PAA_LIST)
             runner.RunSubprocess(
                 test_cmd,
                 name='TEST', dependencies=[apps_register])

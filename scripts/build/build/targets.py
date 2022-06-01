@@ -233,18 +233,16 @@ def HostTargets():
     app_targets.append(
         target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
-        target_native.Extend('tv-app', app=HostApp.TV_APP))
-    app_targets.append(
-        target_native.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
-    app_targets.append(
         target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
         app_targets.append(target.Extend(
             'all-clusters', app=HostApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend(
+            'all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL))
         if (HostBoard.NATIVE.PlatformName() == 'darwin'):
             app_targets.append(target.Extend(
-                'chip-tool-darwin', app=HostApp.CHIP_TOOL_DARWIN))
+                'darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
@@ -256,13 +254,16 @@ def HostTargets():
         app_targets.append(target.Extend(
             'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
         app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
+        app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
+        app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
+        app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
     builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool', '-chip-tool-darwin']), separate_event_loop=False),
+        ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
         ['-chip-tool']), interactive_mode=False),
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
@@ -321,10 +322,22 @@ def Esp32Targets():
 
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
+    yield esp32_target.Extend('m5stack-all-clusters-minimal', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL)
+    yield esp32_target.Extend('m5stack-all-clusters-minimal-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
+                              enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-minimal-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
+                              enable_rpcs=True)
+    yield esp32_target.Extend('m5stack-all-clusters-minimal-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
+                              enable_rpcs=True, enable_ipv4=False)
+
+    yield esp32_target.Extend('c3devkit-all-clusters-minimal', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS_MINIMAL)
+
     devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
     yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield devkitc.Extend('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL)
+    yield devkitc.Extend('all-clusters-minimal-ipv6only', app=Esp32App.ALL_CLUSTERS_MINIMAL, enable_ipv4=False)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
     yield devkitc.Extend('light', app=Esp32App.LIGHT)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
@@ -393,10 +406,12 @@ def NrfTargets():
 
     # Enable nrf52840dongle for all-clusters and lighting app only
     yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
+    yield target.Extend('nrf52840dongle-all-clusters-minimal', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
         yield target.Extend('all-clusters', app=NrfApp.ALL_CLUSTERS)
+        yield target.Extend('all-clusters-minimal', app=NrfApp.ALL_CLUSTERS_MINIMAL)
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
         yield target.Extend('shell', app=NrfApp.SHELL)
@@ -447,6 +462,8 @@ def MbedTargets():
         app_targets.append(target.Extend('light', app=MbedApp.LIGHT))
         app_targets.append(target.Extend(
             'all-clusters', app=MbedApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend(
+            'all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL))
         app_targets.append(target.Extend('pigweed', app=MbedApp.PIGWEED))
         app_targets.append(target.Extend('shell', app=MbedApp.SHELL))
 
@@ -465,6 +482,7 @@ def InfineonTargets():
 
     yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
     yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
+    yield target.Extend('p6-all-clusters-minimal', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
 
 
@@ -472,6 +490,7 @@ def AmebaTargets():
     ameba_target = Target('ameba', AmebaBuilder)
 
     yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
+    yield ameba_target.Extend('amebad-all-clusters-minimal', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS_MINIMAL)
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
     yield ameba_target.Extend('amebad-pigweed', board=AmebaBoard.AMEBAD, app=AmebaApp.PIGWEED)
 
@@ -495,6 +514,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
     yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
+    yield target.Extend('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
 
 
@@ -549,11 +569,13 @@ def IMXTargets():
     yield target.Extend('lighting-app', app=IMXApp.LIGHT)
     yield target.Extend('thermostat', app=IMXApp.THERMOSTAT)
     yield target.Extend('all-clusters-app', app=IMXApp.ALL_CLUSTERS)
+    yield target.Extend('all-clusters-minimal-app', app=IMXApp.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('ota-provider-app', app=IMXApp.OTA_PROVIDER)
     yield target.Extend('chip-tool-release', app=IMXApp.CHIP_TOOL, release=True)
     yield target.Extend('lighting-app-release', app=IMXApp.LIGHT, release=True)
     yield target.Extend('thermostat-release', app=IMXApp.THERMOSTAT, release=True)
     yield target.Extend('all-clusters-app-release', app=IMXApp.ALL_CLUSTERS, release=True)
+    yield target.Extend('all-clusters-minimal-app-release', app=IMXApp.ALL_CLUSTERS_MINIMAL, release=True)
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
 

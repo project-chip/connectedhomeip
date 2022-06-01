@@ -1098,15 +1098,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
             {
                 ThreadNetworkDiagnostics::Structs::NeighborTable::Type neighborTable;
+                app::DataModel::Nullable<int8_t> averageRssi;
+                app::DataModel::Nullable<int8_t> lastRssi;
 
+                averageRssi.SetNonNull(neighInfo.mAverageRssi);
+                lastRssi.SetNonNull(neighInfo.mLastRssi);
+
+                neighborTable.averageRssi      = averageRssi;
+                neighborTable.lastRssi         = lastRssi;
                 neighborTable.extAddress       = Encoding::BigEndian::Get64(neighInfo.mExtAddress.m8);
                 neighborTable.age              = neighInfo.mAge;
                 neighborTable.rloc16           = neighInfo.mRloc16;
                 neighborTable.linkFrameCounter = neighInfo.mLinkFrameCounter;
                 neighborTable.mleFrameCounter  = neighInfo.mMleFrameCounter;
                 neighborTable.lqi              = neighInfo.mLinkQualityIn;
-                neighborTable.averageRssi      = neighInfo.mAverageRssi;
-                neighborTable.lastRssi         = neighInfo.mLastRssi;
                 neighborTable.frameErrorRate   = neighInfo.mFrameErrorRate;
                 neighborTable.messageErrorRate = neighInfo.mMessageErrorRate;
                 neighborTable.rxOnWhenIdle     = neighInfo.mRxOnWhenIdle;
@@ -1518,10 +1523,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             securityPolicy.rotationTime = policyAsInts[0];
             securityPolicy.flags        = policyAsInts[1];
 
-            err = encoder.EncodeList([securityPolicy](const auto & aEncoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(aEncoder.Encode(securityPolicy));
-                return CHIP_NO_ERROR;
-            });
+            err = encoder.Encode(securityPolicy);
         }
     }
     break;
@@ -1571,10 +1573,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             OpDatasetComponents.securityPolicyPresent   = activeDataset.mComponents.mIsSecurityPolicyPresent;
             OpDatasetComponents.channelMaskPresent      = activeDataset.mComponents.mIsChannelMaskPresent;
 
-            err = encoder.EncodeList([OpDatasetComponents](const auto & aEncoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(aEncoder.Encode(OpDatasetComponents));
-                return CHIP_NO_ERROR;
-            });
+            err = encoder.Encode(OpDatasetComponents);
         }
     }
     break;
@@ -2386,8 +2385,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr_t context)
 {
-    auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), Span<Inet::IPAddress>(),
+    auto * dnsResult            = reinterpret_cast<DnsResult *>(context);
+    Inet::IPAddress * ipAddress = &(dnsResult->mMdnsService.mAddress.Value());
+    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), Span<Inet::IPAddress>(ipAddress, 1),
                                              dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }

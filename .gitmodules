@@ -17,7 +17,7 @@
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
-	branch  = mbedtls-2.25.0
+	branch = mbedtls-2.28
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git

@@ -91,6 +91,14 @@ limitations under the License.
     <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveHardwareFaults</attribute>
     <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveRadioFaults</attribute>
     <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="BOOLEAN" writable="false" optional="false">TestEventTriggersEnabled</attribute>
+
+    <command source="client" code="0x00" name="TestEventTrigger" optional="false">
+      <description>Provide a means for certification tests to trigger some test-plan-specific events</description>
+      <arg name="EnableKey" type="OCTET_STRING" length="16"/>
+      <arg name="EventTrigger" type="INT64U"/>
+    </command>
+
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
       <field id="0" name="Current" type="HardwareFaultType" array="true"/>

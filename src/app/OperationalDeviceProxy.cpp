@@ -70,16 +70,16 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
     ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricInfo->GetFabricIndex());
     auto sessionHandle =
         mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
-    if (sessionHandle.HasValue())
-    {
-        ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
-                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
-        mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
-        mSecureSession.Grab(sessionHandle.Value());
-        return true;
-    }
+    if (!sessionHandle.HasValue())
+        return false;
 
-    return false;
+    ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
+                    ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+    mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
+    if (!mSecureSession.Grab(sessionHandle.Value()))
+        return false;
+
+    return true;
 }
 
 void OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
@@ -305,7 +305,9 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
     VerifyOrReturn(mState != State::Uninitialized,
                    ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
 
-    mSecureSession.Grab(session);
+    if (!mSecureSession.Grab(session))
+        return; // Got an invalid session, do not change any state
+
     MoveToState(State::SecureConnected);
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 
@@ -336,6 +338,16 @@ void OperationalDeviceProxy::CleanupCASEClient()
 void OperationalDeviceProxy::OnSessionReleased()
 {
     MoveToState(State::HasAddress);
+}
+
+void OperationalDeviceProxy::OnFirstMessageDeliveryFailed()
+{
+    LookupPeerAddress();
+}
+
+void OperationalDeviceProxy::OnSessionHang()
+{
+    // TODO: establish a new session
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()

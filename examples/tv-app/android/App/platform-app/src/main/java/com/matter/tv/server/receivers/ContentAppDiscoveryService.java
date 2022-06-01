@@ -11,25 +11,38 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import com.matter.tv.app.api.MatterIntentConstants;
+import com.matter.tv.app.api.SupportedCluster;
+import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.utils.ResourceUtils;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ContentAppDiscoveryService extends BroadcastReceiver {
   private static final String TAG = "ContentAppDiscoveryService";
-  static final String CLUSTERS_RESOURCE_METADATA_KEY = "com.matter.app_agent_api.clusters";
+  static final String CLUSTERS_RESOURCE_METADATA_KEY = "com.matter.tv.app.api.clusters";
+  static final String MATTER_VENDOR_NAME_METADATA_KEY = "com.matter.tv.app.api.vendor_name";
+  static final String MATTER_VENDOR_ID_METADATA_KEY = "com.matter.tv.app.api.vendor_id";
+  static final String MATTER_PRODUCT_ID_METADATA_KEY = "com.matter.tv.app.api.product_id";
+
   private static final String ANDROID_PACKAGE_REMOVED_ACTION =
       "android.intent.action.PACKAGE_REMOVED";
   private static final String ANDROID_PACKAGE_ADDED_ACTION = "android.intent.action.PACKAGE_ADDED";
+  private static final String ANDROID_PACKAGE_REPLACED_ACTION =
+      "android.intent.action.PACKAGE_REPLACED";
 
   private static ResourceUtils resourceUtils = ResourceUtils.getInstance();
 
   private static final ContentAppDiscoveryService instance = new ContentAppDiscoveryService();
 
-  public ContentAppDiscoveryService() {}
+  private ContentAppDiscoveryService() {}
 
   private volatile boolean registered = false;
+
+  private Map<String, ContentApp> applications = new HashMap<>();
 
   @Override
   public void onReceive(Context context, Intent intent) {
@@ -41,10 +54,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
     }
 
     switch (intentAction) {
-      case Intent.ACTION_BOOT_COMPLETED:
-        //                discoveryAgent.init();
-        break;
       case ANDROID_PACKAGE_ADDED_ACTION:
+      case ANDROID_PACKAGE_REPLACED_ACTION:
         handlePackageAdded(intent, context);
         break;
       case ANDROID_PACKAGE_REMOVED_ACTION:
@@ -62,8 +73,6 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
   private void handlePackageAdded(final Intent intent, final Context context) {
     String pkg = intent.getData().getSchemeSpecificPart();
-    Log.i(TAG, pkg + " Added. MATTERSERVER");
-
     handlePackageAdded(context, pkg);
   }
 
@@ -72,24 +81,35 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
     try {
       ApplicationInfo appInfo = pm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
       if (appInfo.metaData == null) {
-        Log.i(TAG, pkg + " has no metadata.");
         return;
       }
 
       int resId = appInfo.metaData.getInt(CLUSTERS_RESOURCE_METADATA_KEY, 0);
+      int vendorId = appInfo.metaData.getInt(MATTER_VENDOR_ID_METADATA_KEY, -1);
+      int productId = appInfo.metaData.getInt(MATTER_PRODUCT_ID_METADATA_KEY, -1);
+      String vendorName = appInfo.metaData.getString(MATTER_VENDOR_NAME_METADATA_KEY, "");
+
+      if (vendorId == -1 || productId == -1) {
+        return;
+      }
+
+      Set<SupportedCluster> supportedClusters;
       Log.d(TAG, "got static capability for package " + pkg + ", resourceId: " + resId);
       if (resId != 0) {
         Resources res = pm.getResourcesForApplication(appInfo);
-        String rawJson = resourceUtils.getRawTextResource(res, resId);
-        Log.d(TAG, "Got capabilities resource:\n" + rawJson);
-
-        Intent in = new Intent("com.matter.tv.server.appagent.add");
-        Bundle extras = new Bundle();
-        extras.putString("com.matter.tv.server.appagent.add.pkg", pkg);
-        extras.putString("com.matter.tv.server.appagent.add.clusters", rawJson);
-        in.putExtras(extras);
-        context.sendBroadcast(in);
+        supportedClusters = resourceUtils.getSupportedClusters(res, resId);
+      } else {
+        supportedClusters = new HashSet<>();
       }
+
+      ContentApp app = new ContentApp(pkg, vendorName, vendorId, productId, supportedClusters);
+      applications.put(pkg, app);
+
+      Intent in = new Intent("com.matter.tv.server.appagent.add");
+      Bundle extras = new Bundle();
+      extras.putString("com.matter.tv.server.appagent.add.pkg", pkg);
+      in.putExtras(extras);
+      context.sendBroadcast(in);
     } catch (PackageManager.NameNotFoundException e) {
       Log.e(TAG, "Could not find package " + pkg, e);
     }
@@ -97,7 +117,10 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
   private void handlePackageRemoved(final Intent intent, final Context context) {
     String pkg = intent.getData().getSchemeSpecificPart();
-    Log.i(TAG, pkg + " Removed. MATTERSERVER");
+    Log.i(TAG, pkg + " Removed.");
+
+    applications.remove(pkg);
+
     Intent in = new Intent("com.matter.tv.server.appagent.remove");
     Bundle extras = new Bundle();
     extras.putString("com.matter.tv.server.appagent.add.pkg", pkg);
@@ -106,25 +129,26 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   }
 
   public void registerSelf(Context context) {
-    Log.i(TAG, "Starting the registration of the matter package update receiver");
     if (registered) {
       Log.i(TAG, "Package update receiver for matter already registered");
       return;
     } else {
       registered = true;
     }
-
-    Log.i(TAG, "Trying to register the matter package update receiver");
-    IntentFilter pckAdded = new IntentFilter(ANDROID_PACKAGE_ADDED_ACTION);
-    pckAdded.addDataScheme("package");
-    context.registerReceiver(this, pckAdded);
-    IntentFilter pckRemoved = new IntentFilter(ANDROID_PACKAGE_REMOVED_ACTION);
-    pckRemoved.addDataScheme("package");
-    context.registerReceiver(this, pckRemoved);
-    Log.i(TAG, "Registered the matter package update receiver");
+    registerPackageAction(context, ANDROID_PACKAGE_ADDED_ACTION);
+    registerPackageAction(context, ANDROID_PACKAGE_REMOVED_ACTION);
+    registerPackageAction(context, ANDROID_PACKAGE_REPLACED_ACTION);
+    initializeMatterApps(context);
+    Log.i(TAG, "Registered the matter package updates receiver");
   }
 
-  public void initializeMatterApps(Context context) {
+  private void registerPackageAction(final Context context, final String action) {
+    IntentFilter intent = new IntentFilter(action);
+    intent.addDataScheme("package");
+    context.registerReceiver(this, intent);
+  }
+
+  private void initializeMatterApps(Context context) {
     Set<String> matterApps = getMatterApps(context);
     for (String matterApp : matterApps) {
       handlePackageAdded(context, matterApp);
@@ -155,5 +179,13 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   // TODO : Introduce dependency injection
   public static ContentAppDiscoveryService getReceiverInstance() {
     return instance;
+  }
+
+  public Map<String, ContentApp> getDiscoveredContentApps() {
+    return Collections.unmodifiableMap(applications);
+  }
+
+  public ContentApp getDiscoveredContentApp(String appName) {
+    return applications.get(appName);
   }
 }

@@ -102,7 +102,7 @@ static bool __IsChipThingDevice(bt_adapter_le_device_scan_result_info_s * info,
     if (!info)
         return false;
 
-    ChipLogError(DeviceLayer, "Is [%s] ChipThingDevice ?: Check now", info->remote_address);
+    ChipLogProgress(DeviceLayer, "Is [%s] ChipThingDevice ?: Check now", info->remote_address);
 
     if (bt_adapter_le_get_scan_result_service_data_list(info, BT_ADAPTER_LE_PACKET_ADVERTISING, &dataList, &count) == BT_ERROR_NONE)
     {
@@ -239,7 +239,10 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     ret = bt_adapter_le_stop_scan();
-    ChipLogError(DeviceLayer, "bt_adapter_le_stop_scan() ret: %d", ret);
+    if (ret != BT_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "bt_adapter_le_stop_scan() failed. ret: %d", ret);
+    }
 
     g_main_loop_quit(mAsyncLoop);
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");

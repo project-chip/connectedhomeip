@@ -97,8 +97,13 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
 {
     VerifyOrReturnError(mState == ConnectionState::Connecting, CHIP_ERROR_INCORRECT_STATE);
+    if (!mSecureSession.Grab(session))
+    {
+        mState = ConnectionState::NotConnected;
+        return CHIP_ERROR_INTERNAL;
+    }
+
     mState = ConnectionState::SecureConnected;
-    mSecureSession.Grab(session);
     return CHIP_NO_ERROR;
 }
 

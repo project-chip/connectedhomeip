@@ -38,9 +38,6 @@
 namespace chip {
 namespace Messaging {
 
-class ExchangeContext;
-using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
-
 enum class SendMessageFlags : uint16_t;
 class ReliableMessageContext;
 

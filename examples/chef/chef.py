@@ -56,6 +56,7 @@ def load_config() -> None:
     config = dict()
     config["nrfconnect"] = dict()
     config["esp32"] = dict()
+    config["silabs-thread"] = dict()
 
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
@@ -71,6 +72,10 @@ def load_config() -> None:
         config["nrfconnect"]["TTY"] = None
         config["esp32"]["IDF_PATH"] = os.environ.get('IDF_PATH')
         config["esp32"]["TTY"] = None
+        config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
+        config["silabs-thread"]["TTY"] = None
+        config["silabs-thread"]["CU"] = None
+
         print(yaml.dump(config))
         yaml.dump(config, configStream)
         configStream.close()
@@ -110,6 +115,7 @@ def main(argv: Sequence[str]) -> None:
             nrfconnect
             esp32
             linux
+            silabs-thread
 
         Device Types:
             {deviceTypes}
@@ -146,7 +152,7 @@ def main(argv: Sequence[str]) -> None:
                       action='store',
                       dest="build_target",
                       help="specifies target platform. Default is esp32. See info below for currently supported target platforms",
-                      choices=['nrfconnect', 'esp32', 'linux', ],
+                      choices=['nrfconnect', 'esp32', 'linux', 'silabs-thread'],
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
@@ -188,6 +194,8 @@ def main(argv: Sequence[str]) -> None:
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
     elif options.build_target == "linux":
         pass
+    elif options.build_target == "silabs-thread":
+        print('Path to gecko sdk is configured within Matter.')
     else:
         print(f"Target {options.build_target} not supported")
 
@@ -204,6 +212,8 @@ def main(argv: Sequence[str]) -> None:
             print("Updating toolchain")
             shell.run_cmd(
                 f"cd {_REPO_BASE_PATH} && python3 scripts/setup/nrfconnect/update_ncs.py --update")
+        elif options.build_target == "silabs-thread":
+            print("Silabs-thread toolchain not supported. Skipping")
         elif options.build_target == "linux":
             print("Linux toolchain update not supported. Skipping")
 
@@ -256,6 +266,8 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             shell.run_cmd("west build -t menuconfig")
+        elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
+            print("Menuconfig not available on Silabs-thread target. Skipping")
         elif options.build_target == "linux":
             print("Menuconfig not available on Linux target. Skipping")
 
@@ -267,12 +279,18 @@ def main(argv: Sequence[str]) -> None:
         print("Building...")
         if options.do_rpc:
             print("RPC PW enabled")
-            shell.run_cmd(
-                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
+            if options.build_target == "esp32":
+                shell.run_cmd(
+                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
+            else:
+                print(f"RPC PW on {options.build_target} not supported")
+
         else:
             print("RPC PW disabled")
+        if (options.build_target == "esp32"):
             shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
+
         print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -301,12 +319,21 @@ def main(argv: Sequence[str]) -> None:
             if options.do_rpc:
                 nrf_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
             shell.run_cmd(" ".join(nrf_build_cmds))
+
+        elif options.build_target == "silabs-thread":
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
+            if options.do_clean:
+                shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
+            shell.run_cmd(
+                f"""{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh ./ out/{options.sample_device_type_name} BRD4186A \'sample_name=\"{options.sample_device_type_name}\"\' enable_openthread_cli=true chip_build_libshell=true \'{'import("//with_pw_rpc.gni")' if options.do_rpc else ""}\'""")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
-                        import("\\${{chip_root}}/config/standalone/args.gni")
+                        import("${{chip_root}}/config/standalone/args.gni")
                         chip_shell_cmd_server = false
                         target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
                         """))
@@ -317,7 +344,10 @@ def main(argv: Sequence[str]) -> None:
                         """))
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out")
-            shell.run_cmd("gn gen out")
+            if options.do_rpc:
+                shell.run_cmd("gn gen out --args='import(\"//with_pw_rpc.gni\")'")
+            else:
+                shell.run_cmd("gn gen out --args=''")
             shell.run_cmd("ninja -C out")
 
     #
@@ -345,6 +375,11 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd("west flash --erase")
             else:
                 shell.run_cmd("west flash")
+        elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
+            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/BRD4186A/chip-efr32-chef-example.flash.py")
+
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
     #
     # Terminal interaction
@@ -364,6 +399,13 @@ def main(argv: Sequence[str]) -> None:
                 exit(1)
             shell.run_cmd("killall screen")
             shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
+        elif (options.build_target == "silabs-thread"):
+            if config['silabs-thread']['TTY'] is None:
+                print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                exit(1)
+
+            shell.run_cmd("killall screen")
+            shell.run_cmd(f"screen {config['silabs-thread']['TTY']} 115200 8-N-1")
         elif options.build_target == "linux":
             print(
                 f"{_CHEF_SCRIPT_PATH}/linux/out/{options.sample_device_type_name}")
@@ -374,8 +416,20 @@ def main(argv: Sequence[str]) -> None:
     # RPC Console
     #
     if options.do_rpc_console:
-        shell.run_cmd(
-            f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
+        if options.build_target == "esp32":
+            shell.run_cmd(
+                f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
+        elif (options.build_target == "silabs-thread"):
+            if (sys.platform == "linux") or (sys.platform == "linux2"):
+                if(config['silabs-thread']['TTY'] is None):
+                    print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                    exit(1)
+                shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
+            elif sys.platform == "darwin":
+                if(config['silabs-thread']['CU'] is None):
+                    print('The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
+                    exit(1)
+                shell.run_cmd(f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
 
     print("Done")
 

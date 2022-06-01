@@ -1630,7 +1630,6 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Identify                                                          |   0x00 |
-| * IdentifyQuery                                                     |   0x01 |
 | * TriggerEffect                                                     |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -1673,35 +1672,6 @@ public:
 
 private:
     chip::app::Clusters::Identify::Commands::Identify::Type mRequest;
-};
-
-/*
- * Command IdentifyQuery
- */
-class IdentifyIdentifyQuery : public ClusterCommand
-{
-public:
-    IdentifyIdentifyQuery(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("identify-query", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000003, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Identify::Commands::IdentifyQuery::Type mRequest;
 };
 
 /*
@@ -2031,7 +2001,7 @@ public:
 
 private:
     chip::app::Clusters::Scenes::Commands::AddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>>
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
@@ -2254,7 +2224,7 @@ public:
 
 private:
     chip::app::Clusters::Scenes::Commands::EnhancedAddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>>
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
@@ -6021,6 +5991,7 @@ private:
 | Cluster GeneralDiagnostics                                          | 0x0033 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * TestEventTrigger                                                  |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NetworkInterfaces                                                 | 0x0000 |
@@ -6031,6 +6002,7 @@ private:
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
+| * TestEventTriggersEnabled                                          | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6043,6 +6015,38 @@ private:
 | * NetworkFaultChange                                                | 0x0002 |
 | * BootReason                                                        | 0x0003 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command TestEventTrigger
+ */
+class GeneralDiagnosticsTestEventTrigger : public ClusterCommand
+{
+public:
+    GeneralDiagnosticsTestEventTrigger(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-event-trigger", credsIssuerConfig)
+    {
+        AddArgument("EnableKey", &mRequest.enableKey);
+        AddArgument("EventTrigger", 0, UINT64_MAX, &mRequest.eventTrigger);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000033, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000033, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster SoftwareDiagnostics                                         | 0x0034 |
@@ -6672,7 +6676,7 @@ public:
         AddArgument("NOCValue", &mRequest.NOCValue);
         AddArgument("ICACValue", &mRequest.ICACValue);
         AddArgument("IPKValue", &mRequest.IPKValue);
-        AddArgument("CaseAdminNode", 0, UINT64_MAX, &mRequest.caseAdminNode);
+        AddArgument("CaseAdminSubject", 0, UINT64_MAX, &mRequest.caseAdminSubject);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId);
         ClusterCommand::AddArguments();
     }
@@ -9712,7 +9716,6 @@ private:
 | * LifetimeEnergyConsumed                                            | 0x0017 |
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
-| * AlarmMask                                                         | 0x0022 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9855,7 +9858,6 @@ private:
 | * SetWeeklySchedule                                                 |   0x01 |
 | * GetWeeklySchedule                                                 |   0x02 |
 | * ClearWeeklySchedule                                               |   0x03 |
-| * GetRelayStatusLog                                                 |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
@@ -9865,9 +9867,9 @@ private:
 | * AbsMaxHeatSetpointLimit                                           | 0x0004 |
 | * AbsMinCoolSetpointLimit                                           | 0x0005 |
 | * AbsMaxCoolSetpointLimit                                           | 0x0006 |
-| * PiCoolingDemand                                                   | 0x0007 |
-| * PiHeatingDemand                                                   | 0x0008 |
-| * HvacSystemTypeConfiguration                                       | 0x0009 |
+| * PICoolingDemand                                                   | 0x0007 |
+| * PIHeatingDemand                                                   | 0x0008 |
+| * HVACSystemTypeConfiguration                                       | 0x0009 |
 | * LocalTemperatureCalibration                                       | 0x0010 |
 | * OccupiedCoolingSetpoint                                           | 0x0011 |
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
@@ -9881,7 +9883,6 @@ private:
 | * RemoteSensing                                                     | 0x001A |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
-| * AlarmMask                                                         | 0x001D |
 | * ThermostatRunningMode                                             | 0x001E |
 | * StartOfWeek                                                       | 0x0020 |
 | * NumberOfWeeklyTransitions                                         | 0x0021 |
@@ -9893,14 +9894,21 @@ private:
 | * SetpointChangeSource                                              | 0x0030 |
 | * SetpointChangeAmount                                              | 0x0031 |
 | * SetpointChangeSourceTimestamp                                     | 0x0032 |
-| * AcType                                                            | 0x0040 |
-| * AcCapacity                                                        | 0x0041 |
-| * AcRefrigerantType                                                 | 0x0042 |
-| * AcCompressorType                                                  | 0x0043 |
-| * AcErrorCode                                                       | 0x0044 |
-| * AcLouverPosition                                                  | 0x0045 |
-| * AcCoilTemperature                                                 | 0x0046 |
-| * AcCapacityFormat                                                  | 0x0047 |
+| * OccupiedSetback                                                   | 0x0034 |
+| * OccupiedSetbackMin                                                | 0x0035 |
+| * OccupiedSetbackMax                                                | 0x0036 |
+| * UnoccupiedSetback                                                 | 0x0037 |
+| * UnoccupiedSetbackMin                                              | 0x0038 |
+| * UnoccupiedSetbackMax                                              | 0x0039 |
+| * EmergencyHeatDelta                                                | 0x003A |
+| * ACType                                                            | 0x0040 |
+| * ACCapacity                                                        | 0x0041 |
+| * ACRefrigerantType                                                 | 0x0042 |
+| * ACCompressorType                                                  | 0x0043 |
+| * ACErrorCode                                                       | 0x0044 |
+| * ACLouverPosition                                                  | 0x0045 |
+| * ACCoilTemperature                                                 | 0x0046 |
+| * ACCapacityformat                                                  | 0x0047 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9949,12 +9957,12 @@ class ThermostatSetWeeklySchedule : public ClusterCommand
 {
 public:
     ThermostatSetWeeklySchedule(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-weekly-schedule", credsIssuerConfig), mComplex_Payload(&mRequest.payload)
+        ClusterCommand("set-weekly-schedule", credsIssuerConfig), mComplex_Transitions(&mRequest.transitions)
     {
         AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence);
         AddArgument("DayOfWeekForSequence", 0, UINT8_MAX, &mRequest.dayOfWeekForSequence);
         AddArgument("ModeForSequence", 0, UINT8_MAX, &mRequest.modeForSequence);
-        AddArgument("Payload", &mComplex_Payload);
+        AddArgument("Transitions", &mComplex_Transitions);
         ClusterCommand::AddArguments();
     }
 
@@ -9974,7 +9982,9 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Payload;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type>>
+        mComplex_Transitions;
 };
 
 /*
@@ -10039,48 +10049,18 @@ private:
     chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type mRequest;
 };
 
-/*
- * Command GetRelayStatusLog
- */
-class ThermostatGetRelayStatusLog : public ClusterCommand
+class WriteThermostatHVACSystemTypeConfiguration : public WriteAttribute
 {
 public:
-    ThermostatGetRelayStatusLog(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-relay-status-log", credsIssuerConfig)
+    WriteThermostatHVACSystemTypeConfiguration(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("HVACSystemTypeConfiguration", credsIssuerConfig)
     {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type mRequest;
-};
-
-class WriteThermostatHvacSystemTypeConfiguration : public WriteAttribute
-{
-public:
-    WriteThermostatHvacSystemTypeConfiguration(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("HvacSystemTypeConfiguration", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "hvac-system-type-configuration");
+        AddArgument("attr-name", "hvacsystem-type-configuration");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatHvacSystemTypeConfiguration() {}
+    ~WriteThermostatHVACSystemTypeConfiguration() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10496,7 +10476,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::DataModel::Nullable<uint16_t> mValue;
 };
 
 class WriteThermostatThermostatProgrammingOperationMode : public WriteAttribute
@@ -10526,17 +10506,98 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcType : public WriteAttribute
+class WriteThermostatOccupiedSetback : public WriteAttribute
 {
 public:
-    WriteThermostatAcType(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcType", credsIssuerConfig)
+    WriteThermostatOccupiedSetback(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("OccupiedSetback", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-type");
+        AddArgument("attr-name", "occupied-setback");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcType() {}
+    ~WriteThermostatOccupiedSetback() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000034, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000034, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
+class WriteThermostatUnoccupiedSetback : public WriteAttribute
+{
+public:
+    WriteThermostatUnoccupiedSetback(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("UnoccupiedSetback", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "unoccupied-setback");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteThermostatUnoccupiedSetback() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000037, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000037, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
+class WriteThermostatEmergencyHeatDelta : public WriteAttribute
+{
+public:
+    WriteThermostatEmergencyHeatDelta(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("EmergencyHeatDelta", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "emergency-heat-delta");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteThermostatEmergencyHeatDelta() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000003A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x0000003A, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteThermostatACType : public WriteAttribute
+{
+public:
+    WriteThermostatACType(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("ACType", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "actype");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteThermostatACType() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10552,17 +10613,17 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCapacity : public WriteAttribute
+class WriteThermostatACCapacity : public WriteAttribute
 {
 public:
-    WriteThermostatAcCapacity(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcCapacity", credsIssuerConfig)
+    WriteThermostatACCapacity(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("ACCapacity", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-capacity");
+        AddArgument("attr-name", "accapacity");
         AddArgument("attr-value", 0, UINT16_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCapacity() {}
+    ~WriteThermostatACCapacity() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10578,18 +10639,18 @@ private:
     uint16_t mValue;
 };
 
-class WriteThermostatAcRefrigerantType : public WriteAttribute
+class WriteThermostatACRefrigerantType : public WriteAttribute
 {
 public:
-    WriteThermostatAcRefrigerantType(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("AcRefrigerantType", credsIssuerConfig)
+    WriteThermostatACRefrigerantType(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ACRefrigerantType", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-refrigerant-type");
+        AddArgument("attr-name", "acrefrigerant-type");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcRefrigerantType() {}
+    ~WriteThermostatACRefrigerantType() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10605,18 +10666,18 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCompressorType : public WriteAttribute
+class WriteThermostatACCompressorType : public WriteAttribute
 {
 public:
-    WriteThermostatAcCompressorType(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("AcCompressorType", credsIssuerConfig)
+    WriteThermostatACCompressorType(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ACCompressorType", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-compressor-type");
+        AddArgument("attr-name", "accompressor-type");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCompressorType() {}
+    ~WriteThermostatACCompressorType() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10632,17 +10693,17 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcErrorCode : public WriteAttribute
+class WriteThermostatACErrorCode : public WriteAttribute
 {
 public:
-    WriteThermostatAcErrorCode(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AcErrorCode", credsIssuerConfig)
+    WriteThermostatACErrorCode(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("ACErrorCode", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-error-code");
+        AddArgument("attr-name", "acerror-code");
         AddArgument("attr-value", 0, UINT32_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcErrorCode() {}
+    ~WriteThermostatACErrorCode() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10658,18 +10719,18 @@ private:
     uint32_t mValue;
 };
 
-class WriteThermostatAcLouverPosition : public WriteAttribute
+class WriteThermostatACLouverPosition : public WriteAttribute
 {
 public:
-    WriteThermostatAcLouverPosition(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("AcLouverPosition", credsIssuerConfig)
+    WriteThermostatACLouverPosition(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ACLouverPosition", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-louver-position");
+        AddArgument("attr-name", "aclouver-position");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcLouverPosition() {}
+    ~WriteThermostatACLouverPosition() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -10685,18 +10746,18 @@ private:
     uint8_t mValue;
 };
 
-class WriteThermostatAcCapacityFormat : public WriteAttribute
+class WriteThermostatACCapacityformat : public WriteAttribute
 {
 public:
-    WriteThermostatAcCapacityFormat(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("AcCapacityFormat", credsIssuerConfig)
+    WriteThermostatACCapacityformat(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ACCapacityformat", credsIssuerConfig)
     {
-        AddArgument("attr-name", "ac-capacity-format");
+        AddArgument("attr-name", "accapacityformat");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAcCapacityFormat() {}
+    ~WriteThermostatACCapacityformat() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -11214,7 +11275,7 @@ private:
 | * CompensationText                                                  | 0x0006 |
 | * ColorTemperature                                                  | 0x0007 |
 | * ColorMode                                                         | 0x0008 |
-| * ColorControlOptions                                               | 0x000F |
+| * Options                                                           | 0x000F |
 | * NumberOfPrimaries                                                 | 0x0010 |
 | * Primary1X                                                         | 0x0011 |
 | * Primary1Y                                                         | 0x0012 |
@@ -11253,8 +11314,8 @@ private:
 | * ColorLoopStartEnhancedHue                                         | 0x4005 |
 | * ColorLoopStoredEnhancedHue                                        | 0x4006 |
 | * ColorCapabilities                                                 | 0x400A |
-| * ColorTempPhysicalMin                                              | 0x400B |
-| * ColorTempPhysicalMax                                              | 0x400C |
+| * ColorTempPhysicalMinMireds                                        | 0x400B |
+| * ColorTempPhysicalMaxMireds                                        | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -11855,8 +11916,8 @@ public:
     {
         AddArgument("MoveMode", 0, UINT8_MAX, &mRequest.moveMode);
         AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
+        AddArgument("ColorTemperatureMinimumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMinimumMireds);
+        AddArgument("ColorTemperatureMaximumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMaximumMireds);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
@@ -11892,8 +11953,8 @@ public:
         AddArgument("StepMode", 0, UINT8_MAX, &mRequest.stepMode);
         AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
+        AddArgument("ColorTemperatureMinimumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMinimumMireds);
+        AddArgument("ColorTemperatureMaximumMireds", 0, UINT16_MAX, &mRequest.colorTemperatureMaximumMireds);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
         ClusterCommand::AddArguments();
@@ -11917,18 +11978,17 @@ private:
     chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type mRequest;
 };
 
-class WriteColorControlColorControlOptions : public WriteAttribute
+class WriteColorControlOptions : public WriteAttribute
 {
 public:
-    WriteColorControlColorControlOptions(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ColorControlOptions", credsIssuerConfig)
+    WriteColorControlOptions(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Options", credsIssuerConfig)
     {
-        AddArgument("attr-name", "color-control-options");
+        AddArgument("attr-name", "options");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteColorControlColorControlOptions() {}
+    ~WriteColorControlOptions() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
@@ -12072,7 +12132,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlColorPointGX : public WriteAttribute
@@ -12151,7 +12211,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlColorPointBX : public WriteAttribute
@@ -12230,7 +12290,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteColorControlStartUpColorTemperatureMireds : public WriteAttribute
@@ -19482,7 +19542,6 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),    //
         make_unique<IdentifyIdentify>(credsIssuerConfig),      //
-        make_unique<IdentifyIdentifyQuery>(credsIssuerConfig), //
         make_unique<IdentifyTriggerEffect>(credsIssuerConfig), //
         //
         // Attributes
@@ -20976,19 +21035,22 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<GeneralDiagnosticsTestEventTrigger>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                     //
-        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -21004,11 +21066,13 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         //
         // Events
         //
@@ -22485,7 +22549,6 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<ReadAttribute>(Id, "lifetime-energy-consumed", Attributes::LifetimeEnergyConsumed::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
@@ -22522,7 +22585,6 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22587,7 +22649,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),   //
         make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),   //
         make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig), //
-        make_unique<ThermostatGetRelayStatusLog>(credsIssuerConfig),   //
         //
         // Attributes
         //
@@ -22602,10 +22663,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "abs-min-cool-setpoint-limit", Attributes::AbsMinCoolSetpointLimit::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "abs-max-cool-setpoint-limit", Attributes::AbsMaxCoolSetpointLimit::Id,
-                                   credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "pi-cooling-demand", Attributes::PiCoolingDemand::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "pi-heating-demand", Attributes::PiHeatingDemand::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "hvac-system-type-configuration", Attributes::HvacSystemTypeConfiguration::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "picooling-demand", Attributes::PICoolingDemand::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "piheating-demand", Attributes::PIHeatingDemand::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "hvacsystem-type-configuration", Attributes::HVACSystemTypeConfiguration::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "local-temperature-calibration", Attributes::LocalTemperatureCalibration::Id,
                                    credsIssuerConfig),                                                                           //
@@ -22624,7 +22685,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "control-sequence-of-operation", Attributes::ControlSequenceOfOperation::Id,
                                    credsIssuerConfig),                                                                       //
         make_unique<ReadAttribute>(Id, "system-mode", Attributes::SystemMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "thermostat-running-mode", Attributes::ThermostatRunningMode::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "start-of-week", Attributes::StartOfWeek::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "number-of-weekly-transitions", Attributes::NumberOfWeeklyTransitions::Id,
@@ -22641,21 +22701,28 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "setpoint-change-amount", Attributes::SetpointChangeAmount::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "setpoint-change-source-timestamp", Attributes::SetpointChangeSourceTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "ac-capacity-format", Attributes::AcCapacityFormat::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "occupied-setback", Attributes::OccupiedSetback::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "occupied-setback-min", Attributes::OccupiedSetbackMin::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "occupied-setback-max", Attributes::OccupiedSetbackMax::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "unoccupied-setback", Attributes::UnoccupiedSetback::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "unoccupied-setback-min", Attributes::UnoccupiedSetbackMin::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "unoccupied-setback-max", Attributes::UnoccupiedSetbackMax::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "emergency-heat-delta", Attributes::EmergencyHeatDelta::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "actype", Attributes::ACType::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "accapacity", Attributes::ACCapacity::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "acrefrigerant-type", Attributes::ACRefrigerantType::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "accompressor-type", Attributes::ACCompressorType::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "acerror-code", Attributes::ACErrorCode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "aclouver-position", Attributes::ACLouverPosition::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "accoil-temperature", Attributes::ACCoilTemperature::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "accapacityformat", Attributes::ACCapacityformat::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<WriteThermostatHvacSystemTypeConfiguration>(credsIssuerConfig),                                        //
+        make_unique<WriteThermostatHVACSystemTypeConfiguration>(credsIssuerConfig),                                        //
         make_unique<WriteThermostatLocalTemperatureCalibration>(credsIssuerConfig),                                        //
         make_unique<WriteThermostatOccupiedCoolingSetpoint>(credsIssuerConfig),                                            //
         make_unique<WriteThermostatOccupiedHeatingSetpoint>(credsIssuerConfig),                                            //
@@ -22672,13 +22739,16 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteThermostatTemperatureSetpointHold>(credsIssuerConfig),                                            //
         make_unique<WriteThermostatTemperatureSetpointHoldDuration>(credsIssuerConfig),                                    //
         make_unique<WriteThermostatThermostatProgrammingOperationMode>(credsIssuerConfig),                                 //
-        make_unique<WriteThermostatAcType>(credsIssuerConfig),                                                             //
-        make_unique<WriteThermostatAcCapacity>(credsIssuerConfig),                                                         //
-        make_unique<WriteThermostatAcRefrigerantType>(credsIssuerConfig),                                                  //
-        make_unique<WriteThermostatAcCompressorType>(credsIssuerConfig),                                                   //
-        make_unique<WriteThermostatAcErrorCode>(credsIssuerConfig),                                                        //
-        make_unique<WriteThermostatAcLouverPosition>(credsIssuerConfig),                                                   //
-        make_unique<WriteThermostatAcCapacityFormat>(credsIssuerConfig),                                                   //
+        make_unique<WriteThermostatOccupiedSetback>(credsIssuerConfig),                                                    //
+        make_unique<WriteThermostatUnoccupiedSetback>(credsIssuerConfig),                                                  //
+        make_unique<WriteThermostatEmergencyHeatDelta>(credsIssuerConfig),                                                 //
+        make_unique<WriteThermostatACType>(credsIssuerConfig),                                                             //
+        make_unique<WriteThermostatACCapacity>(credsIssuerConfig),                                                         //
+        make_unique<WriteThermostatACRefrigerantType>(credsIssuerConfig),                                                  //
+        make_unique<WriteThermostatACCompressorType>(credsIssuerConfig),                                                   //
+        make_unique<WriteThermostatACErrorCode>(credsIssuerConfig),                                                        //
+        make_unique<WriteThermostatACLouverPosition>(credsIssuerConfig),                                                   //
+        make_unique<WriteThermostatACCapacityformat>(credsIssuerConfig),                                                   //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "local-temperature", Attributes::LocalTemperature::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "outdoor-temperature", Attributes::OutdoorTemperature::Id, credsIssuerConfig), //
@@ -22690,10 +22760,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "abs-min-cool-setpoint-limit", Attributes::AbsMinCoolSetpointLimit::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "abs-max-cool-setpoint-limit", Attributes::AbsMaxCoolSetpointLimit::Id,
-                                        credsIssuerConfig),                                                           //
-        make_unique<SubscribeAttribute>(Id, "pi-cooling-demand", Attributes::PiCoolingDemand::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "pi-heating-demand", Attributes::PiHeatingDemand::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "hvac-system-type-configuration", Attributes::HvacSystemTypeConfiguration::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "picooling-demand", Attributes::PICoolingDemand::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "piheating-demand", Attributes::PIHeatingDemand::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "hvacsystem-type-configuration", Attributes::HVACSystemTypeConfiguration::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "local-temperature-calibration", Attributes::LocalTemperatureCalibration::Id,
                                         credsIssuerConfig), //
@@ -22714,7 +22784,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "control-sequence-of-operation", Attributes::ControlSequenceOfOperation::Id,
                                         credsIssuerConfig),                                                                       //
         make_unique<SubscribeAttribute>(Id, "system-mode", Attributes::SystemMode::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "thermostat-running-mode", Attributes::ThermostatRunningMode::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "start-of-week", Attributes::StartOfWeek::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "number-of-weekly-transitions", Attributes::NumberOfWeeklyTransitions::Id,
@@ -22733,14 +22802,21 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "setpoint-change-amount", Attributes::SetpointChangeAmount::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "setpoint-change-source-timestamp", Attributes::SetpointChangeSourceTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "ac-type", Attributes::AcType::Id, credsIssuerConfig),                              //
-        make_unique<SubscribeAttribute>(Id, "ac-capacity", Attributes::AcCapacity::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "ac-refrigerant-type", Attributes::AcRefrigerantType::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "ac-compressor-type", Attributes::AcCompressorType::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "ac-error-code", Attributes::AcErrorCode::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "ac-louver-position", Attributes::AcLouverPosition::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "ac-coil-temperature", Attributes::AcCoilTemperature::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "ac-capacity-format", Attributes::AcCapacityFormat::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "occupied-setback", Attributes::OccupiedSetback::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "occupied-setback-min", Attributes::OccupiedSetbackMin::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "occupied-setback-max", Attributes::OccupiedSetbackMax::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "unoccupied-setback", Attributes::UnoccupiedSetback::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "unoccupied-setback-min", Attributes::UnoccupiedSetbackMin::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "unoccupied-setback-max", Attributes::UnoccupiedSetbackMax::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "emergency-heat-delta", Attributes::EmergencyHeatDelta::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "actype", Attributes::ACType::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "accapacity", Attributes::ACCapacity::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "acrefrigerant-type", Attributes::ACRefrigerantType::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "accompressor-type", Attributes::ACCompressorType::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "acerror-code", Attributes::ACErrorCode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "aclouver-position", Attributes::ACLouverPosition::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "accoil-temperature", Attributes::ACCoilTemperature::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "accapacityformat", Attributes::ACCapacityformat::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22976,7 +23052,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "color-control-options", Attributes::ColorControlOptions::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                         //
@@ -23015,10 +23091,12 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "color-loop-start-enhanced-hue", Attributes::ColorLoopStartEnhancedHue::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "color-loop-stored-enhanced-hue", Attributes::ColorLoopStoredEnhancedHue::Id,
-                                   credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "color-temp-physical-min", Attributes::ColorTempPhysicalMin::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "color-temp-physical-max", Attributes::ColorTempPhysicalMax::Id, credsIssuerConfig), //
+                                   credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "color-temp-physical-min-mireds", Attributes::ColorTempPhysicalMinMireds::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "color-temp-physical-max-mireds", Attributes::ColorTempPhysicalMaxMireds::Id,
+                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "couple-color-temp-to-level-min-mireds", Attributes::CoupleColorTempToLevelMinMireds::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,
@@ -23029,7 +23107,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<WriteColorControlColorControlOptions>(credsIssuerConfig),                                                   //
+        make_unique<WriteColorControlOptions>(credsIssuerConfig),                                                               //
         make_unique<WriteColorControlWhitePointX>(credsIssuerConfig),                                                           //
         make_unique<WriteColorControlWhitePointY>(credsIssuerConfig),                                                           //
         make_unique<WriteColorControlColorPointRX>(credsIssuerConfig),                                                          //
@@ -23052,7 +23130,7 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "color-control-options", Attributes::ColorControlOptions::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                         //
@@ -23091,10 +23169,12 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "color-loop-start-enhanced-hue", Attributes::ColorLoopStartEnhancedHue::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "color-loop-stored-enhanced-hue", Attributes::ColorLoopStoredEnhancedHue::Id,
-                                        credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "color-temp-physical-min", Attributes::ColorTempPhysicalMin::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "color-temp-physical-max", Attributes::ColorTempPhysicalMax::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                              //
+        make_unique<SubscribeAttribute>(Id, "color-capabilities", Attributes::ColorCapabilities::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "color-temp-physical-min-mireds", Attributes::ColorTempPhysicalMinMireds::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "color-temp-physical-max-mireds", Attributes::ColorTempPhysicalMaxMireds::Id,
+                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "couple-color-temp-to-level-min-mireds",
                                         Attributes::CoupleColorTempToLevelMinMireds::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,

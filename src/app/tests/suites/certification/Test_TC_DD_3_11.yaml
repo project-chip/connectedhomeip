@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.3.11. [TC-DD-3.11] Commissioning Flow - QR Code [DUT - Commissioner]
+name:
+    3.3.11. [TC-DD-3.11] Commissioning Flow = 0 (Standard Flow) - QR Code [DUT -
+    Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -22,223 +24,126 @@ config:
 
 tests:
     - label:
-          "Version: Use a QR code from a commissionee that has their QR code
-          Version bit string set to 000"
+          "If (PICS_DT_BLE), Standard Commissioning Flow: Use a Commissionee
+          with a QR code that has the Custom Flow field set to 0 and supports
+          BLE for its Discovery Capability. Ensure the Version bit string
+          follows the current Matter spec. documentation."
       verification: |
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 2 -dv 3840 -ps 20202021
-          2022-02-25 23:28:06 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-25 23:28:06 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J042C00KA0648G00]
-      disabled: true
-
-    - label:
-          "Scan the QR code from the previous step using the DUT. Follow any
-          manufacturer-specific steps needed for the Commissioner/Commissionee
-          to complete the commissioning process."
-      verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
-
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2
           ...
-
-          [1645836234938] [9239:26087760] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1645836234938] [9239:26087760] CHIP: [CTL] Received CommissioningComplete response
-          [1645836234938] [9239:26087760] CHIP: [CTL] Rendezvous cleanup
-          [1645836234938] [9239:26087760] CHIP: [TOO] Device commissioning completed with success
-
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-
-          [1645836235.102593][8174:8174] CHIP:EM: Piggybacking Ack for MessageCounter:9602810 on exchange: 9753r
-          [1645836235.102654][8174:8174] CHIP:IN: Prepared secure message 0xaaaae5bbed98 to 0x000000000001B669 (1)  of type 0x9 and protocolId (0, 1) on exchange 9753r with MessageCounter:12855769.
-          [1645836235.102698][8174:8174] CHIP:IN: Sending encrypted msg 0xaaaae5bbed98 with MessageCounter:12855769 to 0x000000000001B669 (1) at monotonic time: 25637371 msec
-          [1645836235.102836][8174:8174] CHIP:DMG: ICR moving to [CommandSen]
-          [1645836235.102863][8174:8174] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1645836235.102906][8174:8174] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1645836235.102932][8174:8174] CHIP:SVR: Commissioning completed successfully
+          [1651101335.714230][22353:22353] CHIP:DL: Device Configuration:
+          [1651101335.722064][22353:22353] CHIP:DL:   Serial Number: TEST_SN
+          [1651101335.722638][22353:22353] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651101335.723167][22353:22353] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651101335.723712][22353:22353] CHIP:DL:   Hardware Version: 0
+          [1651101335.724228][22353:22353] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651101335.724756][22353:22353] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651101335.725226][22353:22353] CHIP:DL:   Manufacturing Date: (not set)
+          [1651101335.725721][22353:22353] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651101335.733693][22353:22353] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651101335.734598][22353:22353] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1651101335.735182][22353:22353] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1651101335.735618][22353:22353] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Standard Commissioning Flow: Use a QR code from
-          a commissionee that has their Custom Flow bit set to 0 and supports
-          BLE for its Discovery Capability."
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 2 -dv 3840 -ps 20202021
-          2022-02-25 23:28:06 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-25 23:28:06 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J042C00KA0648G00]
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Scan the QR code from the previous step using
-          the DUT. Follow any steps needed for the Commissioner/Commissionee to
-          complete the commissioning process using BLE"
-      verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
-
-          ...
-
-          [1645836234938] [9239:26087760] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1645836234938] [9239:26087760] CHIP: [CTL] Received CommissioningComplete response
-          [1645836234938] [9239:26087760] CHIP: [CTL] Rendezvous cleanup
-          [1645836234938] [9239:26087760] CHIP: [TOO] Device commissioning completed with success
-
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-
-          [1645836235.102593][8174:8174] CHIP:EM: Piggybacking Ack for MessageCounter:9602810 on exchange: 9753r
-          [1645836235.102654][8174:8174] CHIP:IN: Prepared secure message 0xaaaae5bbed98 to 0x000000000001B669 (1)  of type 0x9 and protocolId (0, 1) on exchange 9753r with MessageCounter:12855769.
-          [1645836235.102698][8174:8174] CHIP:IN: Sending encrypted msg 0xaaaae5bbed98 with MessageCounter:12855769 to 0x000000000001B669 (1) at monotonic time: 25637371 msec
-          [1645836235.102836][8174:8174] CHIP:DMG: ICR moving to [CommandSen]
-          [1645836235.102863][8174:8174] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1645836235.102906][8174:8174] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1645836235.102932][8174:8174] CHIP:SVR: Commissioning completed successfully
-      disabled: true
-
-    - label:
-          "Standard Commissioning Flow: Use a QR code from a commissionee that
-          has their Custom Flow bit set to 0 and supports IP Network for its
-          Discovery Capability."
-      verification: |
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 0 -dc 4 -dv 3840 -ps 20202021
-          2022-02-26 03:07:29 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:07:29 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J0AFN00KA0648G00]
-      disabled: true
-
-    - label:
-          "Scan the QR code from the previous step using the DUT. Follow any
-          steps needed for the Commissioner/Commissionee to complete the
-          commissioning process using IP Network"
-      verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
-
-          ...
-
-          [1646261423084] [53218:29382487] CHIP: [CTL] Received CommissioningComplete response
-          [1646261423084] [53218:29382487] CHIP: [CTL] Rendezvous cleanup
-          [1646261423084] [53218:29382487] CHIP: [TOO] Device commissioning completed with success
-
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-
-          [1646261423.249620][28366:28366] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646261423.249687][28366:28366] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646261423.249738][28366:28366] CHIP:SVR: Commissioning completed successfully
-      disabled: true
-
-    - label:
-          "User-Intent Commissioning Flow: Use a QR code from a commissionee
-          that has their Custom Flow bit set to 1 and supports BLE for its
-          Discovery Capability. Place the commissionee into commissioning mode
-          according to the devices specified instructions in its pairing hint."
-      verification: |
-          BLOCKED
-
-          chip-all-clusters-app does not currently support User-Intent commissioning flow
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 1 -dc 2 -dv 3840 -ps 20202021
-          2022-02-26 03:17:50 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:17:50 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J00ID00KA0648G00]
-      disabled: true
-
-    - label:
-          "Scan the QR code from the previous step using the DUT. Follow any
+          "If (PICS_DT_BLE), Using the DUT, parse the THs QR code and follow any
           steps needed for the Commissioner/Commissionee to complete the
           commissioning process using BLE"
       verification: |
-          BLOCKED
+          TH Commissionee:
 
-          chip-all-clusters-app does not currently support User-Intent commissioning flow
+          [1651101510.975272][22353:22353] CHIP:SVR: Commissioning completed successfully
+          [1651101510.975318][22353:22353] CHIP:DIS: Updating services using commissioning mode 0
+
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J042C00KA0648G00
+
+          [1651101510810] [94338:65557180] CHIP: [CTL] Received CommissioningComplete response
+          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "User-Intent Commissioning Flow: Use a QR code from a commissionee
-          that has their Custom Flow bit set to 1 and supports IP Network for
-          its Discovery Capability. Place the commissionee into Commissioning
-          Mode according to the devices specified instructions in its pairing
-          hint."
+          "If (PICS_DT_IP), Standard Commissioning Flow: Use a Commissionee with
+          a QR code that has the Custom Flow field set to 0, supports IP Network
+          for its Discovery Capability and is already on the same IP network as
+          the DUT commissioner. Ensure the Version bit string follows the
+          current Matter spec. documentation."
       verification: |
-          BLOCKED
+          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 0 --capabilities 4
 
-          chip-all-clusters-app does not currently support User-Intent commissioning flow
+          [1651105420.610637][27312:27312] CHIP:DL: Device Configuration:
+          [1651105420.610695][27312:27312] CHIP:DL:   Serial Number: TEST_SN
+          [1651105420.610727][27312:27312] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651105420.610761][27312:27312] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651105420.610792][27312:27312] CHIP:DL:   Hardware Version: 0
+          [1651105420.610815][27312:27312] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651105420.610836][27312:27312] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651105420.610864][27312:27312] CHIP:DL:   Manufacturing Date: (not set)
+          [1651105420.610886][27312:27312] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651105420.610907][27312:27312] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651105420.610962][27312:27312] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
     - label:
-          "Scan the QR code from the previous step using the DUT. Follow any
-          manufacturer-specific steps needed for the Commissioner/Commissionee
-          to complete the commissioning process using IP Network"
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app does not currently support User-Intent commissioning flow
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 1 -dc 4 -dv 3840 -ps 20202021
-          2022-02-26 03:19:10 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [34970112332]
-          2022-02-26 03:19:10 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J06VO00KA0648G00]
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Custom Commissioning Flow: Use a QR code from a
-          commissionee that has their Custom Flow bit set to 2 and supports BLE
-          for its Discovery Capability. Place the commissionee into
-          commissioning mode according to the devices specified instructions in
-          the given URL."
+          "If (PICS_DT_IP), Using the DUT, parse the THs QR code and follow any
+          steps needed for the Commissioner/Commissionee to complete the
+          commissioning process using IP Network"
       verification: |
-          BLOCKED
+          TH Commissionee:
 
-          chip-all-clusters-app does not currently support Custom Commissioning Flow
+          [1651105530.973166][27371:27371] CHIP:SVR: Commissioning completed successfully
+          [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
 
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
 
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 2 -dc 2 -dv 3840 -ps 20202021
-          2022-02-26 03:20:27 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [749701123365521327694]
-          2022-02-26 03:20:27 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Scan the QR code from the previous step using
-          the DUT. Follow any manufacturer-specific steps needed for the
-          Commissioner/Commissionee to complete the commissioning process using
-          BLE"
+          "If (PICS_DT_SOFTAP), Standard Commissioning Flow: Use a Commissionee
+          with a QR code that has the Custom Flow field set to 0 and supports
+          SoftAP for its Discovery Capability. Ensure the Version bit string
+          follows the current Matter spec. documentation."
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app does not currently support Custom Commissioning Flow
+          BLOCKED: SoftAP commissioning not currently supported
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Custom Commissioning Flow: Use a QR code from a
-          commissionee that has their Custom Flow bit set to 2 and supports IP
-          Network for its Discovery Capability. Place the commissionee into
-          commissioning mode according to the devices specified instructions in
-          the given URL."
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app does not currently support Custom Commissioning Flow
-
-
-
-          chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769 -cf 2 -dc 4 -dv 3840 -ps 20202021
-          2022-02-26 03:22:27 matter-te-6 chip.SPL[22108] INFO Manual pairing code: [749701123365521327694]
-          2022-02-26 03:22:27 matter-te-6 chip.SPL[22108] INFO SetupQRCode: [MT:-24J029Q00KA0648G00]
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_THREAD), Scan the QR code from the previous step using
-          the DUT. Follow any manufacturer-specific steps needed for the
-          Commissioner/Commissionee to complete the commissioning process using
-          IP Network"
+          "If (PICS_DT_SOFTAP), Using the DUT, parse the THs QR code and follow
+          any steps needed for the Commissioner/Commissionee to complete the
+          commissioning process using SoftAP"
       verification: |
-          BLOCKED
-
-          chip-all-clusters-app does not currently support Custom Commissioning Flow
+          BLOCKED: SoftAP commissioning not currently supported
       disabled: true

@@ -637,7 +637,7 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
-            VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_NODE_ID);
             lCertType = kCertType_Node;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
@@ -791,7 +791,7 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             ReturnErrorOnFailure(reader.Get(chipAttr));
             if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
             {
-                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_WRONG_NODE_ID);
             }
             else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
             {
@@ -946,7 +946,7 @@ CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
 
                         if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
                         {
-                            VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+                            VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_NODE_ID);
                         }
                         else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
                         {

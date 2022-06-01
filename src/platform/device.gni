@@ -48,7 +48,8 @@ declare_args() {
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
       chip_device_platform == "cc13x2_26x2" ||
-      chip_device_platform == "k32w0" || chip_device_platform == "tizen"
+      chip_device_platform == "k32w0" || chip_device_platform == "tizen" ||
+      chip_device_platform == "webos"
 }
 
 declare_args() {

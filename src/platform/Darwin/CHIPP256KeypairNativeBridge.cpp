@@ -36,13 +36,14 @@ CHIP_ERROR CHIPP256KeypairNativeBridge::Deserialize(P256SerializedKeypair & inpu
     return mKeypairBase.Deserialize(input);
 }
 
-CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
+                                                       P256ECDSASignature & out_signature) const
 {
     return mKeypairBase.ECDSA_sign_msg(msg, msg_length, out_signature);
 }
 
 CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length,
-                                                        P256ECDSASignature & out_signature)
+                                                        P256ECDSASignature & out_signature) const
 {
     return mKeypairBase.ECDSA_sign_hash(hash, hash_length, out_signature);
 }
@@ -53,7 +54,7 @@ CHIP_ERROR CHIPP256KeypairNativeBridge::ECDH_derive_secret(const P256PublicKey &
     return mKeypairBase.ECDH_derive_secret(remote_public_key, out_secret);
 }
 
-CHIP_ERROR CHIPP256KeypairNativeBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length)
+CHIP_ERROR CHIPP256KeypairNativeBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
     return mKeypairBase.NewCertificateSigningRequest(csr, csr_length);
 }

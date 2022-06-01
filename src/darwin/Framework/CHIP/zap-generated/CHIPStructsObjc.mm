@@ -21,16 +21,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation CHIPScenesClusterSceneExtensionFieldSet
+@implementation CHIPScenesClusterAttributeValuePair
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeId = nil;
+
+        _attributeValue = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterExtensionFieldSet
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _clusterId = @(0);
 
-        _length = @(0);
-
-        _value = @(0);
+        _attributeValueList = [NSArray array];
     }
     return self;
 }
@@ -635,9 +646,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _lqi = @(0);
 
-        _averageRssi = @(0);
+        _averageRssi = nil;
 
-        _lastRssi = @(0);
+        _lastRssi = nil;
 
         _frameErrorRate = @(0);
 
@@ -1027,6 +1038,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPModeSelectClusterSemanticTag
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = @(0);
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
@@ -1036,20 +1060,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _semanticTag = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPModeSelectClusterSemanticTag
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mfgCode = @(0);
-
-        _value = @(0);
+        _semanticTags = [NSArray array];
     }
     return self;
 }
@@ -1305,6 +1316,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPThermostatClusterThermostatScheduleTransition
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _transitionTime = @(0);
+
+        _heatSetpoint = nil;
+
+        _coolSetpoint = nil;
     }
     return self;
 }

@@ -26,14 +26,14 @@
       auto iter_{{depth}} = {{actual}}.begin();
       {{#each expected}}
         VerifyOrReturn(CheckNextListItemDecodes<decltype({{../actual}})>("{{../label}}", iter_{{../depth}}, {{@index}}));
-        {{>valueEquals label=(concat ../label "[" @index "]") actual=(concat "iter_" ../depth ".GetValue()") expected=this isArray=false type=../type chipType=../chipType depth=(incrementDepth depth) parent=../parent}}
+        {{>valueEquals label=(concat ../label "[" @index "]") actual=(concat "iter_" ../depth ".GetValue()") expected=this isArray=false type=../type chipType=../chipType depth=(incrementDepth ../depth) parent=../parent}}
       {{/each}}
       VerifyOrReturn(CheckNoMoreListItems<decltype({{actual}})>("{{label}}", iter_{{depth}}, {{expected.length}}));
     }
 {{else if isEvent}}
     {{#zcl_events_fields_by_event_name type}}
       {{#if (hasProperty ../expected label)}}
-        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) depth=(incrementDepth depth)}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) depth=(incrementDepth ../depth)}}
       {{/if}}
     {{/zcl_events_fields_by_event_name}}
 {{else}}
@@ -43,7 +43,7 @@
         call. }}
     {{#zcl_struct_items_by_struct_name type}}
       {{#if (hasProperty ../expected label)}}
-        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) depth=(incrementDepth depth)}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) depth=(incrementDepth ../depth)}}
       {{/if}}
     {{/zcl_struct_items_by_struct_name}}
     {{! Maybe we should add a check for properties in the expected object (other

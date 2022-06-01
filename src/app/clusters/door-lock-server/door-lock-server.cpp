@@ -72,13 +72,22 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
     emberAfDoorLockClusterPrintln("Door Lock cluster initialized at endpoint #%u", endpointId);
 
-    SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kUnspecified);
+    auto status = Attributes::LockState::SetNull(endpointId);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "[InitDoorLockServer] Unable to set the Lock State attribute to null [status=%d]", status);
+    }
     SetActuatorEnabled(endpointId, true);
+}
+
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
+{
+    return SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource)
 {
-    bool success = SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
+    bool success = SetLockState(endpointId, newLockState);
 
     // Remote operations are handled separately as they use more data unavailable here
     VerifyOrReturnError(DlOperationSource::kRemote != opSource, success);
@@ -195,6 +204,12 @@ bool DoorLockServer::GetNumberOfCredentialsSupportedPerUser(chip::EndpointId end
 {
     return GetAttribute(endpointId, Attributes::NumberOfCredentialsSupportedPerUser::Id,
                         Attributes::NumberOfCredentialsSupportedPerUser::Get, numberOfCredentialsSupportedPerUser);
+}
+
+bool DoorLockServer::GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules)
+{
+    return GetAttribute(endpointId, Attributes::NumberOfHolidaySchedulesSupported::Id,
+                        Attributes::NumberOfHolidaySchedulesSupported::Get, numberOfHolidaySchedules);
 }
 
 void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
@@ -2275,13 +2290,13 @@ DlStatus DoorLockServer::clearYearDaySchedule(chip::EndpointId endpointId, uint1
 
 DlStatus DoorLockServer::clearYearDaySchedules(chip::EndpointId endpointId, uint16_t userIndex)
 {
-    uint8_t weekDaySchedulesPerUser = 0;
-    if (!GetNumberOfYearDaySchedulesPerUserSupported(endpointId, weekDaySchedulesPerUser))
+    uint8_t yearDaySchedulesPerUser = 0;
+    if (!GetNumberOfYearDaySchedulesPerUserSupported(endpointId, yearDaySchedulesPerUser))
     {
         return DlStatus::kFailure;
     }
 
-    for (uint8_t i = 1; i <= weekDaySchedulesPerUser; ++i)
+    for (uint8_t i = 1; i <= yearDaySchedulesPerUser; ++i)
     {
         auto status = clearYearDaySchedule(endpointId, userIndex, i);
         if (DlStatus::kSuccess != status)
@@ -2309,6 +2324,72 @@ void DoorLockServer::sendGetYearDayScheduleResponse(chip::app::CommandHandler * 
         response.localEndTime   = Optional<uint32_t>(localEndTime);
     }
 
+    commandObj->AddResponse(commandPath, response);
+}
+
+bool DoorLockServer::holidayIndexValid(chip::EndpointId endpointId, uint8_t holidayIndex)
+{
+    uint8_t holidaysSupported;
+    if (!GetNumberOfHolidaySchedulesSupported(endpointId, holidaysSupported))
+    {
+        return false;
+    }
+
+    // appclusters, 5.2.4.22-25: year day index changes from 1 to maxNumberOfHolidaySchedules
+    if (0 == holidayIndex || holidayIndex > holidaysSupported)
+    {
+        return false;
+    }
+    return true;
+}
+
+DlStatus DoorLockServer::clearHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex)
+{
+    auto status =
+        emberAfPluginDoorLockSetSchedule(endpointId, holidayIndex, DlScheduleStatus::kAvailable, 0, 0, DlOperatingMode::kNormal);
+    if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
+    {
+        ChipLogError(
+            Zcl, "[ClearHolidaySchedule] Unable to clear the schedule - internal error [endpointId=%d,scheduleIndex=%d,status=%u]",
+            endpointId, holidayIndex, to_underlying(status));
+        return status;
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockServer::clearHolidaySchedules(chip::EndpointId endpointId)
+{
+    uint8_t totalHolidaySchedules = 0;
+    if (!GetNumberOfHolidaySchedulesSupported(endpointId, totalHolidaySchedules))
+    {
+        return DlStatus::kFailure;
+    }
+
+    for (uint8_t i = 1; i <= totalHolidaySchedules; ++i)
+    {
+        auto status = clearHolidaySchedule(endpointId, i);
+        if (DlStatus::kSuccess != status)
+        {
+            return status;
+        }
+    }
+    return DlStatus::kSuccess;
+}
+
+void DoorLockServer::sendHolidayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                                 const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex,
+                                                 DlStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                                                 DlOperatingMode operatingMode)
+{
+    VerifyOrDie(nullptr != commandObj);
+
+    auto response = Commands::GetHolidayScheduleResponse::Type{ holidayIndex, status };
+    if (DlStatus::kSuccess == status)
+    {
+        response.localStartTime = Optional<uint32_t>(localStartTime);
+        response.localEndTime   = Optional<uint32_t>(localEndTime);
+        response.operatingMode  = Optional<DlOperatingMode>(operatingMode);
+    }
     commandObj->AddResponse(commandPath, response);
 }
 
@@ -2632,6 +2713,149 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     }
 
     return DlLockDataType::kUnspecified;
+}
+
+void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                        uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime,
+                                        DlOperatingMode operatingMode)
+{
+    VerifyOrDie(nullptr != commandObj);
+
+    auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    emberAfDoorLockClusterPrintln("[SetHolidaySchedule] incoming command [endpointId=%d]", endpointId);
+
+    if (!holidayIndexValid(endpointId, holidayIndex))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetHolidaySchedule] Unable to add schedule - index out of range [endpointId=%d,scheduleIndex=%d]", endpointId,
+            holidayIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    if (localEndTime <= localStartTime)
+    {
+        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - schedule ends earlier than starts"
+                                      "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32 "]",
+                                      endpointId, holidayIndex, localStartTime, localEndTime);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    if (operatingMode > DlOperatingMode::kPassage)
+    {
+        emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - operating mode is out of range"
+                                      "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
+                                      ", operatingMode=%d]",
+                                      endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return;
+    }
+
+    auto status = emberAfPluginDoorLockSetSchedule(endpointId, holidayIndex, DlScheduleStatus::kOccupied, localStartTime,
+                                                   localEndTime, operatingMode);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl, "[SetHolidaySchedule] Unable to add schedule - internal error [endpointId=%d,scheduleIndex=%d,status=%u]",
+                     endpointId, holidayIndex, to_underlying(status));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Successfully created new schedule "
+                                  "[endpointId=%d,scheduleIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32
+                                  ",operatingMode=%d]",
+                                  endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DoorLockServer::getHolidaySchedule(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                        uint8_t holidayIndex)
+{
+    auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[GetHolidaySchedule] Ignore command (not supported) [endpointId=%d,scheduleIndex=%d]",
+                                      endpointId, holidayIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+    emberAfDoorLockClusterPrintln("[GetHolidaySchedule] incoming command [endpointId=%d,scheduleIndex=%d]", endpointId,
+                                  holidayIndex);
+
+    if (!holidayIndexValid(endpointId, holidayIndex))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[GetYearDaySchedule] Unable to get schedule - index out of range [endpointId=%d,scheduleIndex=%d]", endpointId,
+            holidayIndex);
+        sendHolidayScheduleResponse(commandObj, commandPath, holidayIndex, DlStatus::kInvalidField);
+        return;
+    }
+
+    EmberAfPluginDoorLockHolidaySchedule scheduleInfo{};
+    auto status = emberAfPluginDoorLockGetSchedule(endpointId, holidayIndex, scheduleInfo);
+    if (DlStatus::kSuccess != status)
+    {
+        sendHolidayScheduleResponse(commandObj, commandPath, holidayIndex, status);
+        return;
+    }
+    sendHolidayScheduleResponse(commandObj, commandPath, holidayIndex, DlStatus::kSuccess, scheduleInfo.localStartTime,
+                                scheduleInfo.localEndTime, scheduleInfo.operatingMode);
+}
+
+void DoorLockServer::clearHolidaySchedule(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex)
+{
+    auto endpointId = commandPath.mEndpointId;
+    if (!SupportsSchedules(endpointId))
+    {
+        emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+    emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] incoming command [endpointId=%d,scheduleIndex=%d]", endpointId,
+                                  holidayIndex);
+
+    if (!holidayIndexValid(endpointId, holidayIndex) && 0xFE != holidayIndex)
+    {
+        emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Holiday index is out of range [endpointId=%d,scheduleIndex=%d]",
+                                      endpointId, holidayIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    DlStatus clearStatus = DlStatus::kSuccess;
+    if (0xFE == holidayIndex)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearHolidaySchedule] Clearing all holiday schedules for a single user [endpointId=%d,scheduleIndex=%d]", endpointId,
+            holidayIndex);
+        clearStatus = clearHolidaySchedules(endpointId);
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Clearing a single schedule [endpointId=%d,scheduleIndex=%d]",
+                                      endpointId, holidayIndex);
+        clearStatus = clearHolidaySchedule(endpointId, holidayIndex);
+    }
+
+    if (DlStatus::kSuccess != clearStatus)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[ClearHolidaySchedule] Unable to clear the user schedules - app error [endpointId=%d,scheduleIndex=%d,status=%u]",
+            endpointId, holidayIndex, to_underlying(clearStatus));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
@@ -2976,10 +3200,8 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("SetHolidaySchedule: command not implemented");
-
-    // TODO: Implement setting holiday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().setHolidaySchedule(commandObj, commandPath, commandData.holidayIndex, commandData.localStartTime,
+                                                  commandData.localEndTime, commandData.operatingMode);
     return true;
 }
 
@@ -2987,10 +3209,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("GetHolidaySchedule: command not implemented");
-
-    // TODO: Implement getting holiday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().getHolidaySchedule(commandObj, commandPath, commandData.holidayIndex);
     return true;
 }
 
@@ -2998,10 +3217,7 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("ClearHolidaySchedule: command not implemented");
-
-    // TODO: Implement clearing holiday schedule
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().clearHolidaySchedule(commandObj, commandPath, commandData.holidayIndex);
     return true;
 }
 
@@ -3251,6 +3467,12 @@ DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId
 }
 
 DlStatus __attribute__((weak))
+emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+{
+    return DlStatus::kFailure;
+}
+
+DlStatus __attribute__((weak))
 emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
                                  DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
@@ -3260,6 +3482,13 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayInd
 DlStatus __attribute__((weak))
 emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
                                  uint32_t localStartTime, uint32_t localEndTime)
+{
+    return DlStatus::kFailure;
+}
+
+DlStatus __attribute__((weak))
+emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
+                                 uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
     return DlStatus::kFailure;
 }

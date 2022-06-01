@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-imx:0.5.73
+            image: connectedhomeip/chip-build-imx:0.5.75
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
@@ -68,6 +68,13 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                          --target imx-all-clusters-app build \
+                     "
+            - name: Build all-cluster-minimal
+              timeout-minutes: 30
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                         --target imx-all-clusters-minimal-app build \
                      "
             - name: Build ota-provider-app
               timeout-minutes: 30

@@ -32,10 +32,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        ModelCommand::AddArguments();
+        AddArguments();
     }
 
     WriteAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
@@ -43,18 +40,7 @@ public:
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        ModelCommand::AddArguments();
-    }
-
-    WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig)
-    {
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
+        AddArguments();
     }
 
     ~WriteAttribute() {}
@@ -110,6 +96,22 @@ public:
         ChipLogDetail(chipTool, "Sending Write Attribute to Group %u, on Fabric %x, for cluster %u with attributeId %u", groupId,
                       fabricIndex, clusterId, attributeId);
         return InteractionModelWriter::WriteGroupAttribute(groupId, fabricIndex, clusterId, attributeId, value, mDataVersion);
+    }
+
+protected:
+    WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig)
+    {
+        // Subclasses are responsible for calling AddArguments.
+    }
+
+    void AddArguments()
+    {
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
+                    "If provided, do a timed write with the given timed interaction timeout.");
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
+        ModelCommand::AddArguments();
     }
 
 private:

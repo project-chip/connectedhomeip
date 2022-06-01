@@ -51,11 +51,10 @@ tests:
           constraints:
               type: string
 
-    #Issue disabled below steps due to #13758
     - label:
           "Test Harness Client reads WiredAssessedInputVoltage attribue from
           Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
       response:
@@ -65,7 +64,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedInputFrequency attribute from
           Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
       response:
@@ -74,7 +73,7 @@ tests:
 
     - label:
           "Test Harness Client reads WiredCurrentType attribute from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredCurrentType"
       response:
@@ -86,7 +85,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedCurrent attribute from Server
           DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
       response:
@@ -94,7 +93,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredNominalVoltage"
       response:
@@ -102,7 +101,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
       response:
@@ -110,20 +109,47 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredPresent from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "WiredMaximumCurrent"
+      attribute: "WiredPresent"
       response:
           constraints:
               type: bool
 
     - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "ActiveWiredFaults"
       response:
           constraints:
               type: list
+              maxlength: 8
+
+    - label: "Test Harness Client reads BatVoltage from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BatteryVoltage"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BatteryPercentRemaining"
+      response:
+          constraints:
+              type: uint8
+              minvalue: 0
+              maxvalue: 200
+
+    - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BatteryTimeRemaining"
+      response:
+          constraints:
+              type: uint32
 
     - label: "Test Harness Client reads BatChargeLevel from Server DUT"
       command: "readAttribute"
@@ -135,17 +161,17 @@ tests:
               maxValue: 2
 
     - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatReplacementNeeded"
+      attribute: "BatteryReplacementNeeded"
       response:
           constraints:
               type: bool
 
     - label: "Test Harness Client reads BatReplaceability from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatReplaceability"
+      attribute: "BatteryReplaceability"
       response:
           constraints:
               type: enum8
@@ -153,27 +179,36 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads BatPresent from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatPresent"
+      attribute: "BatteryPresent"
       response:
           constraints:
               type: bool
 
+    - label: "Test Harness Client readsActiveBatFaults from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "ActiveBatteryFaults"
+      response:
+          constraints:
+              type: list
+              maxlength: 8
+
     - label:
           "Test Harness Client reads BatReplacementDescription from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatReplacementDescription"
+      attribute: "BatteryReplacementDescription"
       response:
           constraints:
               type: string
               maxLength: 60
 
     - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatCommonDesignation"
+      attribute: "BatteryCommonDesignation"
       response:
           constraints:
               type: uint32
@@ -181,27 +216,27 @@ tests:
               maxValue: 80
 
     - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatANSIDesignation"
+      attribute: "BatteryANSIDesignation"
       response:
           constraints:
               type: string
               maxLength: 20
 
     - label: "Test Harness Client reads BatIECDesignation from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatIECDesignation"
+      attribute: "BatteryIECDesignation"
       response:
           constraints:
               type: string
               maxLength: 20
 
     - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatApprovedChemistry"
+      attribute: "BatteryApprovedChemistry"
       response:
           constraints:
               type: uint32
@@ -209,50 +244,60 @@ tests:
               maxValue: 32
 
     - label: "Test Harness Client reads BatCapacity from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatCapacity"
+      attribute: "BatteryCapacity"
       response:
           constraints:
               type: uint32
 
     - label: "Test Harness Client reads BatQuantity from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatQuantity"
+      attribute: "BatteryQuantity"
       response:
           constraints:
               type: uint8
 
-    - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
-      disabled: true
+    - label: "Test Harness Client reads BatChargeState from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatTimeToFullCharge"
+      attribute: "BatteryChargeState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BatteryTimeToFullCharge"
       response:
           constraints:
               type: uint32
 
     - label:
           "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatFunctionalWhileCharging"
+      attribute: "BatteryFunctionalWhileCharging"
       response:
           constraints:
               type: bool
 
     - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "BatChargingCurrent"
+      attribute: "BatteryChargingCurrent"
       response:
           constraints:
               type: uint32
 
     - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "ActiveBatChargeFaults"
+      attribute: "ActiveBatteryChargeFaults"
       response:
           constraints:
               type: list

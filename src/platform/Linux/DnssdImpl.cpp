@@ -328,6 +328,11 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
 
+    if (Shutdown() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Shutdown() failed, continue anyway...");
+    }
+
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mClient == nullptr && mGroup == nullptr, error = CHIP_ERROR_INCORRECT_STATE);
@@ -729,7 +734,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     case AVAHI_RESOLVER_FOUND:
         DnssdService result = {};
 
-        result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
@@ -753,6 +757,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         }
 
         CHIP_ERROR result_err = CHIP_ERROR_INVALID_ADDRESS;
+        chip::Inet::IPAddress ipAddress; // Will be set of result_err is set to CHIP_NO_ERROR
         if (address)
         {
             switch (address->proto)
@@ -762,7 +767,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
-                result.mAddress.SetValue(chip::Inet::IPAddress(addr4));
+                ipAddress  = chip::Inet::IPAddress(addr4);
                 result_err = CHIP_NO_ERROR;
 #else
                 ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
@@ -772,7 +777,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
-                result.mAddress.SetValue(chip::Inet::IPAddress(addr6));
+                ipAddress  = chip::Inet::IPAddress(addr6);
                 result_err = CHIP_NO_ERROR;
                 break;
             default:
@@ -802,7 +807,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(), CHIP_NO_ERROR);
+            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
         }
         else
         {

@@ -70,6 +70,7 @@ static_library("crypto") {
 
   public_deps = [
     ":crypto_buildconfig",
+    "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${nlassert_root}:nlassert",
   ]

@@ -46,52 +46,52 @@ tests:
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 15
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 30
               - name: "startHue"
                 value: 160
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
-      attribute: "color loop active"
+      attribute: "ColorLoopActive"
       PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop direction"
+      attribute: "ColorLoopDirection"
       PICS: A_COLORLOOPDIRECTION
       response:
           value: 0
 
     - label: "Read ColorLoopTime attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop time"
+      attribute: "ColorLoopTime"
       PICS: A_COLORLOOPTIME
       response:
           value: 30
 
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop start enhanced hue"
+      attribute: "ColorLoopStartEnhancedHue"
       PICS: A_COLORLOOPSTARTENHANCEDHUE
       response:
           value: 160
 
     - label: "Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           saveAs: EnhancedCurrentHueValue
@@ -103,31 +103,31 @@ tests:
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 1
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop active"
+      attribute: "ColorLoopActive"
       PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop stored enhanced hue"
+      attribute: "ColorLoopStoredEnhancedHue"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: EnhancedCurrentHueValue
@@ -137,7 +137,7 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
@@ -147,7 +147,7 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
@@ -157,24 +157,24 @@ tests:
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 2
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 1
-              - name: "time"
+              - name: "Time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT."
       command: "readAttribute"
-      attribute: "color loop direction"
+      attribute: "ColorLoopDirection"
       PICS: A_COLORLOOPDIRECTION
       response:
           value: 1
@@ -184,7 +184,7 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
@@ -194,7 +194,7 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
@@ -204,24 +204,24 @@ tests:
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "UpdateFlags"
                 value: 1
-              - name: "action"
+              - name: "Action"
                 value: 0
-              - name: "direction"
+              - name: "Direction"
                 value: 0
-              - name: "time"
+              - name: "Time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
-      attribute: "color loop active"
+      attribute: "ColorLoopActive"
       PICS: A_COLORLOOPACTIVE
       response:
           value: 0
@@ -229,7 +229,7 @@ tests:
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       PICS: A_COLORLOOPSTOREDENHANCEDHUE
-      attribute: "color loop stored enhanced hue"
+      attribute: "ColorLoopStoredEnhancedHue"
       response:
           saveAs: ColorLoopStoredEnhancedHueValue
           constraints:
@@ -237,7 +237,7 @@ tests:
 
     - label: "Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
           value: ColorLoopStoredEnhancedHueValue

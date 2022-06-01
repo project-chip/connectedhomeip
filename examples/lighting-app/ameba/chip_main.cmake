@@ -19,6 +19,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
 
@@ -59,6 +60,7 @@ target_include_directories(
     ${chip_dir}/examples/lighting-app/lighting-common
     ${chip_dir}/examples/lighting-app/lighting-common/include
     ${chip_dir}/examples/lighting-app/ameba/main/include
+    ${chip_dir}/examples/platform/ameba
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
@@ -83,14 +85,6 @@ list(
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DMATTER_LIGHTING_APP=1
 )
-
-if (matter_enable_ota_requestor)
-list(
-    APPEND chip_main_flags
-
-    -DCONFIG_ENABLE_OTA_REQUESTOR=1
-)
-endif (matter_enable_ota_requestor)
 
 list(
     APPEND chip_main_cpp_flags

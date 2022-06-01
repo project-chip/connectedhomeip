@@ -158,6 +158,9 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
     readHandler.OnInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

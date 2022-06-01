@@ -321,7 +321,7 @@ exit:
     return RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
 }
 
-size_t GetExtraIPsSize(mdns_ip_addr_t * addr)
+size_t GetAddressCount(mdns_ip_addr_t * addr)
 {
     size_t ret = 0;
     while (addr)
@@ -334,9 +334,8 @@ size_t GetExtraIPsSize(mdns_ip_addr_t * addr)
 
 CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
 {
-    CHIP_ERROR error           = CHIP_NO_ERROR;
-    mdns_ip_addr_t * extraAddr = nullptr;
-    size_t extraIPIndex        = 0;
+    CHIP_ERROR error    = CHIP_NO_ERROR;
+    size_t addressIndex = 0;
 
     VerifyOrExit(ctx && ctx->mResolveCb, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ctx->mService == nullptr && ctx->mResolveState == ResolveContext::ResolveState::QuerySrv,
@@ -359,33 +358,30 @@ CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
 
         if (ctx->mResult->addr)
         {
-            Inet::IPAddress IPAddr;
-            GetIPAddress(IPAddr, ctx->mResult->addr);
-            ctx->mService->mAddress.SetValue(IPAddr);
-            extraAddr         = ctx->mResult->addr->next;
-            ctx->mExtraIPSize = GetExtraIPsSize(extraAddr);
-            if (ctx->mExtraIPSize > 0)
+            ctx->mAddressCount = GetAddressCount(ctx->mResult->addr);
+            if (ctx->mAddressCount > 0)
             {
-                ctx->mExtraIPs =
-                    static_cast<Inet::IPAddress *>(chip::Platform::MemoryCalloc(ctx->mExtraIPSize, sizeof(Inet::IPAddress)));
-                if (ctx->mExtraIPs == nullptr)
+                ctx->mAddresses =
+                    static_cast<Inet::IPAddress *>(chip::Platform::MemoryCalloc(ctx->mAddressCount, sizeof(Inet::IPAddress)));
+                if (ctx->mAddresses == nullptr)
                 {
-                    ChipLogError(DeviceLayer, "Failed to alloc memory for ExtraIPs");
-                    error             = CHIP_ERROR_NO_MEMORY;
-                    ctx->mExtraIPSize = 0;
+                    ChipLogError(DeviceLayer, "Failed to alloc memory for addresses");
+                    error              = CHIP_ERROR_NO_MEMORY;
+                    ctx->mAddressCount = 0;
                     ExitNow();
                 }
-                while (extraAddr)
+                auto * addr = ctx->mResult->addr;
+                while (addr)
                 {
-                    GetIPAddress(ctx->mExtraIPs[extraIPIndex], extraAddr);
-                    extraIPIndex++;
-                    extraAddr = extraAddr->next;
+                    GetIPAddress(ctx->mAddresses[addressIndex], addr);
+                    addressIndex++;
+                    addr = addr->next;
                 }
             }
             else
             {
-                ctx->mExtraIPs    = nullptr;
-                ctx->mExtraIPSize = 0;
+                ctx->mAddresses    = nullptr;
+                ctx->mAddressCount = 0;
             }
         }
     }
@@ -429,7 +425,7 @@ exit:
     }
     else
     {
-        ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mExtraIPs, ctx->mExtraIPSize), error);
+        ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mAddresses, ctx->mAddressCount), error);
     }
     RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
     return error;

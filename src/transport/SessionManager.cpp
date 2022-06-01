@@ -95,8 +95,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
     ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
 
-    ScheduleExpiryTimer();
-
     mTransportMgr->SetSessionManager(this);
 
     return CHIP_NO_ERROR;
@@ -104,10 +102,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
-    CancelExpiryTimer();
-
-    mSessionRecoveryDelegates.ReleaseAll();
-
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
@@ -337,7 +331,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
 void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
 {
-    mSecureSessions.ReleaseSession(sessionHandle->AsSecureSession());
+    sessionHandle->AsSecureSession()->MarkForRemoval();
 }
 
 void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
@@ -345,7 +339,7 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
@@ -354,11 +348,12 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
 void SessionManager::ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
-        if ((session->GetPeer() == node) && (session->GetSecureSessionType() == SecureSession::Type::kCASE))
+        if ((session->GetPeer() == node) && session->IsActiveSession() &&
+            (session->GetSecureSessionType() == SecureSession::Type::kCASE))
         {
             ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId,
                           static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
@@ -370,7 +365,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetFabricIndex() == fabric)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
@@ -382,15 +377,15 @@ void SessionManager::ExpireAllPASEPairings()
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
-            mSecureSessions.ReleaseSession(session);
+            session->MarkForRemoval();
         }
         return Loop::Continue;
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession()
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType)
 {
-    return mSecureSessions.CreateNewSecureSession();
+    return mSecureSessions.CreateNewSecureSession(secureSessionType);
 }
 
 CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
@@ -412,22 +407,6 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
-}
-
-void SessionManager::ScheduleExpiryTimer()
-{
-    CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
-                                              SessionManager::ExpiryTimerCallback, this);
-
-    VerifyOrDie(err == CHIP_NO_ERROR);
-}
-
-void SessionManager::CancelExpiryTimer()
-{
-    if (mSystemLayer != nullptr)
-    {
-        mSystemLayer->CancelTimer(SessionManager::ExpiryTimerCallback, this);
-    }
 }
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
@@ -452,38 +431,6 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     {
         UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
-}
-
-void SessionManager::RegisterRecoveryDelegate(SessionRecoveryDelegate & cb)
-{
-#ifndef NDEBUG
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
-        VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-        return Loop::Continue;
-    });
-#endif
-    std::reference_wrapper<SessionRecoveryDelegate> * slot = mSessionRecoveryDelegates.CreateObject(cb);
-    VerifyOrDie(slot != nullptr);
-}
-
-void SessionManager::UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb)
-{
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
-        if (std::addressof(cb) == std::addressof(i->get()))
-        {
-            mSessionRecoveryDelegates.ReleaseObject(i);
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-}
-
-void SessionManager::RefreshSessionOperationalData(const SessionHandle & sessionHandle)
-{
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * cb) {
-        cb->get().OnFirstMessageDeliveryFailed(sessionHandle);
-        return Loop::Continue;
-    });
 }
 
 void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
@@ -773,24 +720,13 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     }
 }
 
-void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
-{
-    SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
-#if CHIP_CONFIG_SESSION_REKEYING
-    // TODO(#14217): session expiration is currently disabled until rekeying is supported
-    // the #ifdef should be removed after that.
-    mgr->mSecureSessions.ExpireInactiveSessions(System::SystemClock().GetMonotonicTimestamp(),
-                                                System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS));
-#endif
-    mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
-}
-
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,
                                                                  const Optional<Transport::SecureSession::Type> & type)
 {
     SecureSession * found = nullptr;
     mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
-        if (session->GetPeer() == peerNodeId && (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
+            (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             found = session;
             return Loop::Break;

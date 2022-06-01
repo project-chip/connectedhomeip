@@ -12296,17 +12296,6 @@ bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandO
                                             const chip::app::ConcreteCommandPath & commandPath,
                                             const chip::app::Clusters::Identify::Commands::Identify::DecodableType & commandData);
 /**
- * @brief Identify Cluster IdentifyQueryResponse Command callback (from server)
- */
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint16_t timeout);
-/**
- * @brief Identify Cluster IdentifyQuery Command callback (from client)
- */
-bool emberAfIdentifyClusterIdentifyQueryCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Identify::Commands::IdentifyQuery::DecodableType & commandData);
-/**
  * @brief Identify Cluster TriggerEffect Command callback (from client)
  */
 bool emberAfIdentifyClusterTriggerEffectCallback(
@@ -12378,8 +12367,8 @@ bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj
 /**
  * @brief Scenes Cluster AddSceneResponse Command callback (from server)
  */
-bool emberAfScenesClusterAddSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                  uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterAddSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                  chip::GroupId GroupId, uint8_t SceneId);
 /**
  * @brief Scenes Cluster ViewScene Command callback (from client)
  */
@@ -12389,10 +12378,10 @@ bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandOb
 /**
  * @brief Scenes Cluster ViewSceneResponse Command callback (from server)
  */
-bool emberAfScenesClusterViewSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                                   chip::CharSpan sceneName,
-                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+bool emberAfScenesClusterViewSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                   chip::GroupId GroupId, uint8_t SceneId, uint16_t TransitionTime,
+                                                   chip::CharSpan SceneName,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * ExtensionFieldSets);
 /**
  * @brief Scenes Cluster RemoveScene Command callback (from client)
  */
@@ -12403,7 +12392,7 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * command
  * @brief Scenes Cluster RemoveSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterRemoveSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                     uint8_t status, uint16_t groupId, uint8_t sceneId);
+                                                     uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
 /**
  * @brief Scenes Cluster RemoveAllScenes Command callback (from client)
  */
@@ -12414,7 +12403,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(
  * @brief Scenes Cluster RemoveAllScenesResponse Command callback (from server)
  */
 bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status, uint16_t groupId);
+                                                         uint8_t Status, chip::GroupId GroupId);
 /**
  * @brief Scenes Cluster StoreScene Command callback (from client)
  */
@@ -12425,7 +12414,7 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandO
  * @brief Scenes Cluster StoreSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterStoreSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                    uint8_t status, uint16_t groupId, uint8_t sceneId);
+                                                    uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
 /**
  * @brief Scenes Cluster RecallScene Command callback (from client)
  */
@@ -12442,8 +12431,8 @@ bool emberAfScenesClusterGetSceneMembershipCallback(
  * @brief Scenes Cluster GetSceneMembershipResponse Command callback (from server)
  */
 bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+                                                            uint8_t Status, uint8_t Capacity, chip::GroupId GroupId,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * SceneList);
 /**
  * @brief Scenes Cluster EnhancedAddScene Command callback (from client)
  */
@@ -12454,7 +12443,7 @@ bool emberAfScenesClusterEnhancedAddSceneCallback(
  * @brief Scenes Cluster EnhancedAddSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          uint8_t status, uint16_t groupId, uint8_t sceneId);
+                                                          uint8_t Status, chip::GroupId GroupId, uint8_t SceneId);
 /**
  * @brief Scenes Cluster EnhancedViewScene Command callback (from client)
  */
@@ -12465,8 +12454,8 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(
  * @brief Scenes Cluster EnhancedViewSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId, uint8_t sceneId,
-    uint16_t transitionTime, chip::CharSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status, chip::GroupId GroupId, uint8_t SceneId,
+    uint16_t TransitionTime, chip::CharSpan SceneName, /* TYPE WARNING: array array defaults to */ uint8_t * ExtensionFieldSets);
 /**
  * @brief Scenes Cluster CopyScene Command callback (from client)
  */
@@ -12476,8 +12465,8 @@ bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandOb
 /**
  * @brief Scenes Cluster CopySceneResponse Command callback (from server)
  */
-bool emberAfScenesClusterCopySceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupIdFrom, uint8_t sceneIdFrom);
+bool emberAfScenesClusterCopySceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                   chip::GroupId GroupIdFrom, uint8_t SceneIdFrom);
 /**
  * @brief On/Off Cluster Off Command callback (from client)
  */
@@ -13014,6 +13003,12 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::EndpointId e
                                                               uint8_t status, chip::ByteSpan content, uint32_t timeStamp,
                                                               uint32_t timeSinceBoot);
 /**
+ * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
+ */
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
+/**
  * @brief Software Diagnostics Cluster ResetWatermarks Command callback (from client)
  */
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(
@@ -13506,22 +13501,15 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(
  * @brief Thermostat Cluster GetWeeklyScheduleResponse Command callback (from server)
  */
 bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                               uint8_t modeForSequence,
-                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+                                                               uint8_t NumberOfTransitionsForSequence, uint8_t DayOfWeekForSequence,
+                                                               uint8_t ModeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * Transitions);
 /**
  * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
  */
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster GetRelayStatusLogResponse Command callback (from server)
- */
-bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
-                                                               uint8_t humidityInPercentage, int16_t setpoint,
-                                                               uint16_t unreadEntries);
 /**
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */
@@ -13534,12 +13522,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster GetRelayStatusLog Command callback (from client)
- */
-bool emberAfThermostatClusterGetRelayStatusLogCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */

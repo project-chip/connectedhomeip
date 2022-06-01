@@ -485,16 +485,6 @@ limitations under the License.
     <item name="indicator" type="INT8U"/>
     <item name="indicies" type="INT16U" array="true"/>
   </struct>
-  <struct name="SceneExtensionAttributeInfo">
-    <item name="attributeType" type="INT8U"/>
-    <item name="attributeLocation" type="NO_DATA"/>
-  </struct>
-  <struct name="SceneExtensionFieldSet">
-    <cluster code="0x0005"/>
-    <item name="clusterId" type="CLUSTER_ID"/>
-    <item name="length" type="INT8U"/>
-    <item name="value" type="INT8U"/>
-  </struct>
   <struct name="Notification">
     <item name="contentId" type="INT16U"/>
     <item name="statusFeedback" type="ENUM8"/>

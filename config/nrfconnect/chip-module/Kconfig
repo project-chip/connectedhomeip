@@ -61,6 +61,10 @@ config CHIP_OTA_IMAGE_BUILD
 	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES
 
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
 config CHIP_DEBUG_SYMBOLS
 	bool "Generate debug symbols"
 	default y

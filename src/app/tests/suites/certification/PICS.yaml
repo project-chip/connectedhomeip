@@ -180,6 +180,17 @@ PICS:
           "Does the device implement receiving the SetpointRaiseLower command?"
       id: CR_SetpointRaiseLower
 
+    - label:
+          "Does the device implement the UnoccupiedCoolingSetpoint attribute?"
+      id: A_UNOCCUPIEDCOOLINGSETPOINT
+
+    - label:
+          "Does the device implement the UnoccupiedHeatingSetpoint attribute?"
+      id: A_UNOCCUPIEDHEATINGSETPOINT
+
+    - label: "Does the device implement the MinSetpointDeadBand attribute?"
+      id: A_MINSETPOINTDEADBAND
+
       # Occupency sensing cluster
     - label: "Does the device implement the Occupancy attribute?"
       id: A_OCCUPANCY
@@ -310,6 +321,7 @@ PICS:
           "The optional key PI MAY provide additional information for pairing."
       id: PI_KEY
 
+    #Prompt
     - label: "Prompts user for input. Unable to run in CI"
       id: PICS_USER_PROMPT
 
@@ -318,3 +330,9 @@ PICS:
 
     - label: "Level Control for Lighting"
       id: OO_LT
+
+    #Flow measurement
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: MANUAL_FLOW_CHANGE

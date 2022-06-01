@@ -17,7 +17,6 @@
  */
 
 #include "TvCastingApp-JNI.h"
-#include "CallbackHelper.h"
 #include "CastingServer.h"
 #include "JNIDACProvider.h"
 
@@ -38,41 +37,6 @@ using namespace chip;
 
 TvCastingAppJNI TvCastingAppJNI::sInstance;
 
-void TvCastingAppJNI::InitializeWithObjects(jobject app)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for TvCastingAppJNI"));
-
-    mTvCastingAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mTvCastingAppObject != nullptr, ChipLogError(AppServer, "Failed to NewGlobalRef TvCastingAppJNI"));
-
-    jclass managerClass = env->GetObjectClass(mTvCastingAppObject);
-    VerifyOrReturn(managerClass != nullptr, ChipLogError(AppServer, "Failed to get TvCastingAppJNI Java class"));
-
-    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(II)V");
-    if (mPostClusterInitMethod == nullptr)
-    {
-        ChipLogError(AppServer, "Failed to access ChannelManager 'postClusterInit' method");
-        env->ExceptionClear();
-    }
-}
-
-void TvCastingAppJNI::PostClusterInit(chip::ClusterId clusterId, chip::EndpointId endpoint)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr,
-                   ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for TvCastingAppJNI::PostClusterInit"));
-    VerifyOrReturn(mTvCastingAppObject != nullptr, ChipLogError(AppServer, "TvCastingAppJNI::mTvCastingAppObject null"));
-    VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(AppServer, "TvCastingAppJNI::mPostClusterInitMethod null"));
-
-    env->CallVoidMethod(mTvCastingAppObject, mPostClusterInitMethod, static_cast<jint>(clusterId), static_cast<jint>(endpoint));
-    if (env->ExceptionCheck())
-    {
-        ChipLogError(AppServer, "Failed to call TvCastingAppJNI 'postClusterInit' method");
-        env->ExceptionClear();
-    }
-}
-
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     return AndroidAppServerJNI_OnLoad(jvm, reserved);
@@ -81,11 +45,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 void JNI_OnUnload(JavaVM * jvm, void * reserved)
 {
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
-}
-
-JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app)
-{
-    TvCastingAppJNIMgr().InitializeWithObjects(app);
 }
 
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
@@ -97,14 +56,23 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
     }
 }
 
-JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint duration)
+JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv * env, jobject, jint duration, jobject jCommissioningCompleteHandler)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
+    chip::DeviceLayer::StackLock lock;
 
-    CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow();
+    ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
+    CHIP_ERROR err = TvCastingAppJNIMgr().getCommissioningCompleteHandler().SetUp(env, jCommissioningCompleteHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
+        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getCommissioningCompleteHandler().Handle(err); });
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -128,7 +96,7 @@ JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject
     CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(peerAddress);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::SendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "TVCastingApp-JNI::sendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     return true;
@@ -140,37 +108,44 @@ JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
     CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::DiscoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "TVCastingApp-JNI::discoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
     return true;
 }
 
-JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCompleteHandler)
+JNI_METHOD(void, init)(JNIEnv *, jobject)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD initServer called");
-    CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
-    if (err == CHIP_NO_ERROR)
-    {
-        CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
-        return true;
-    }
-    else
-    {
-        ChipLogError(AppServer, "initServer error: %s", err.AsString());
-        return false;
-    }
+    ChipLogProgress(AppServer, "JNI_METHOD init called");
+    CastingServer::GetInstance()->Init();
 }
 
-JNI_METHOD(void, contentLauncherLaunchURL)(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr)
+JNI_METHOD(jboolean, contentLauncherLaunchURL)
+(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr, jobject jLaunchURLResponseHandler)
 {
     ChipLogProgress(AppServer, "JNI_METHOD contentLauncherLaunchURL called");
     const char * nativeContentUrl        = env->GetStringUTFChars(contentUrl, 0);
     const char * nativeContentDisplayStr = env->GetStringUTFChars(contentDisplayStr, 0);
 
-    CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr);
+    CHIP_ERROR err = TvCastingAppJNIMgr().getLaunchURLResponseHandler().SetUp(env, jLaunchURLResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr, [](CHIP_ERROR err) {
+        TvCastingAppJNIMgr().getLaunchURLResponseHandler().Handle(err);
+    });
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer::ContentLauncherLaunchURL failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->ReleaseStringUTFChars(contentUrl, nativeContentUrl);
     env->ReleaseStringUTFChars(contentDisplayStr, nativeContentDisplayStr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
 }

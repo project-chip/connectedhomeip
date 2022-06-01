@@ -28,7 +28,7 @@ if ({{source}}.IsNull()) {
 {{else}}
   {{#if_is_struct type}}
     {{#zcl_struct_items_by_struct_name type}}
-      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth depth) omitDeclaration=false earlyReturn=../earlyReturn}}
+      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) omitDeclaration=false earlyReturn=../earlyReturn}}
     {{/zcl_struct_items_by_struct_name}}
 
     jclass {{asLowerCamelCase type}}StructClass;

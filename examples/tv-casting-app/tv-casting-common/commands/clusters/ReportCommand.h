@@ -99,7 +99,7 @@ public:
         mError = error;
     }
 
-    void OnDone() override
+    void OnDone(chip::app::ReadClient *) override
     {
         mReadClient.reset();
         SetCommandExitStatus(mError);

@@ -282,13 +282,10 @@ def resolve_device(devCtrl, nodeId):
     """
     ret = None
     try:
-        err = devCtrl.ResolveNode(int(nodeId))
-        if err == 0:
-            ret = devCtrl.GetAddressAndPort(int(nodeId))
-            if ret == None:
-                log.error("Get address and port failed")
-        else:
-            log.error("Resolve node failed [{}]".format(err))
+        devCtrl.ResolveNode(int(nodeId))
+        ret = devCtrl.GetAddressAndPort(int(nodeId))
+        if ret == None:
+            log.error("Get address and port failed")
     except exceptions.ChipStackException as ex:
         log.error("Resolve node failed {}".format(str(ex)))
 

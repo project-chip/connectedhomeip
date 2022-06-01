@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.73
+            image: connectedhomeip/chip-build-nrf-platform:0.5.75
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -180,6 +180,14 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+            - name: Build example nRF Connect SDK All Clusters Minimal App on nRF52840 DK
+              timeout-minutes: 15
+              run: |
+                  scripts/examples/nrfconnect_example.sh all-clusters-minimal-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nrfconnect nrf52840dk_nrf52840 all-clusters-minimal-app \
+                    examples/all-clusters-minimal-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true'

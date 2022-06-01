@@ -520,6 +520,11 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
+    if (level > EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL)
+    {
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+    }
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionMask, optionOverride))
     {
         return EMBER_ZCL_STATUS_SUCCESS;

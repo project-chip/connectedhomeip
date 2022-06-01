@@ -27,10 +27,8 @@ class ReportCommand : public InteractionModelReports, public ModelCommand, publi
 {
 public:
     ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
-        InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig)
+        InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig, /* supportsMultipleEndpoints = */ true)
     {}
-
-    virtual void OnSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
@@ -96,13 +94,14 @@ public:
         mError = error;
     }
 
-    void OnDone() override
+    void Shutdown() override
     {
-        InteractionModelReports::Shutdown();
-        SetCommandExitStatus(mError);
+        // We don't shut down InteractionModelReports here; we leave it for
+        // Cleanup to handle.
+        ModelCommand::Shutdown();
     }
 
-    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override { OnSubscription(); }
+    void Cleanup() override { InteractionModelReports::Shutdown(); }
 
 protected:
     // Use a 3x-longer-than-default timeout because wildcard reads can take a
@@ -115,119 +114,179 @@ protected:
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
-class ReadAttribute : public ReportCommand
+class ReadCommand : public ReportCommand
+{
+protected:
+    ReadCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand(commandName, credsIssuerConfig)
+    {}
+
+    void OnDone(chip::app::ReadClient * aReadClient) override
+    {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+        SetCommandExitStatus(mError);
+    }
+};
+
+class SubscribeCommand : public ReportCommand
+{
+protected:
+    SubscribeCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand(commandName, credsIssuerConfig)
+    {}
+
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override
+    {
+        mSubscriptionEstablished = true;
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
+
+    void OnDone(chip::app::ReadClient * aReadClient) override
+    {
+        if (!mSubscriptionEstablished)
+        {
+            InteractionModelReports::CleanupReadClient(aReadClient);
+            SetCommandExitStatus(mError);
+        }
+
+        // else we must be getting here from Cleanup(), which means we have
+        // already done our exit status thing, and have done the ReadClient
+        // cleanup.
+    }
+
+    void Shutdown() override
+    {
+        mSubscriptionEstablished = false;
+        ReportCommand::Shutdown();
+    }
+
+    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
+
+private:
+    bool mSubscriptionEstablished = false;
+};
+
+class ReadAttribute : public ReadCommand
 {
 public:
-    ReadAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("read-by-id", credsIssuerConfig)
+    ReadAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-by-id", credsIssuerConfig)
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        ReportCommand::AddArguments();
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to read from (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF to "
+                    "indicate a wildcard cluster.");
+        AddAttributeIdArgument();
+        AddCommonArguments();
+        ReadCommand::AddArguments();
     }
 
     ReadAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("read-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
+        ReadCommand("read-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        ReportCommand::AddArguments();
+        AddAttributeIdArgument();
+        AddCommonArguments();
+        ReadCommand::AddArguments();
     }
 
     ReadAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
                   CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("read", credsIssuerConfig),
+        ReadCommand("read", credsIssuerConfig),
         mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {
         AddArgument("attr-name", attributeName);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        ReportCommand::AddArguments();
+        AddCommonArguments();
+        ReadCommand::AddArguments();
     }
 
     ~ReadAttribute() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::ReadAttribute(device, endpointIds, mClusterIds, mAttributeIds, mFabricFiltered, mDataVersion);
+        return ReadCommand::ReadAttribute(device, endpointIds, mClusterIds, mAttributeIds, mFabricFiltered, mDataVersion);
     }
 
 private:
+    void AddAttributeIdArgument()
+    {
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to read (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+    }
+
+    void AddCommonArguments()
+    {
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+                    "Comma-separated list of data versions for the clusters being read.");
+    }
+
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
     chip::Optional<bool> mFabricFiltered;
     chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
 };
 
-class SubscribeAttribute : public ReportCommand
+class SubscribeAttribute : public SubscribeCommand
 {
 public:
-    SubscribeAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("subscribe-by-id", credsIssuerConfig)
+    SubscribeAttribute(CredentialIssuerCommands * credsIssuerConfig) : SubscribeCommand("subscribe-by-id", credsIssuerConfig)
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ReportCommand::AddArguments();
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to subscribe to (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF "
+                    "to indicate a wildcard cluster.");
+        AddAttributeIdArgument();
+        AddCommonArguments();
+        SubscribeCommand::AddArguments();
     }
 
     SubscribeAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("subscribe-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
+        SubscribeCommand("subscribe-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ReportCommand::AddArguments();
+        AddAttributeIdArgument();
+        AddCommonArguments();
+        SubscribeCommand::AddArguments();
     }
 
     SubscribeAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
                        CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("subscribe", credsIssuerConfig),
+        SubscribeCommand("subscribe", credsIssuerConfig),
         mClusterIds(1, clusterId), mAttributeIds(1, attributeId)
     {
         AddArgument("attr-name", attributeName);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ReportCommand::AddArguments();
+        AddCommonArguments();
+        SubscribeCommand::AddArguments();
     }
 
     ~SubscribeAttribute() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds, mMinInterval, mMaxInterval,
-                                                 mFabricFiltered, mDataVersion, mKeepSubscriptions);
-    }
-
-    void OnSubscription() override
-    {
-        // The ReadClient instance can not be released directly into the OnSubscription
-        // callback since it happens to be called by ReadClient itself which is doing additional
-        // work after that.
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t arg) {
-                auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
-                if (!command->IsInteractive())
-                {
-                    command->InteractionModelReports::Shutdown();
-                }
-                command->SetCommandExitStatus(CHIP_NO_ERROR);
-            },
-            reinterpret_cast<intptr_t>(this));
+        return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds, mMinInterval, mMaxInterval,
+                                                    mFabricFiltered, mDataVersion, mKeepSubscriptions);
     }
 
 private:
+    void AddAttributeIdArgument()
+    {
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to subscribe to (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+    }
+
+    void AddCommonArguments()
+    {
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
+                    "Server should not send a new report if less than this number of seconds has elapsed since the last report.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
+                    "Server must send a report if this number of seconds has elapsed since the last report.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered subscription. Defaults to true.");
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+                    "Comma-separated list of data versions for the clusters being subscribed to.");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "Boolean indicating whether to keep existing subscriptions when creating the new one. Defaults to false.");
+    }
+
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
 
@@ -238,43 +297,43 @@ private:
     chip::Optional<bool> mKeepSubscriptions;
 };
 
-class ReadEvent : public ReportCommand
+class ReadEvent : public ReadCommand
 {
 public:
-    ReadEvent(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("read-event-by-id", credsIssuerConfig)
+    ReadEvent(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-event-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        ReportCommand::AddArguments();
+        ReadCommand::AddArguments();
     }
 
     ReadEvent(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("read-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
+        ReadCommand("read-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        ReportCommand::AddArguments();
+        ReadCommand::AddArguments();
     }
 
     ReadEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId,
               CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("read-event", credsIssuerConfig),
+        ReadCommand("read-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        ReportCommand::AddArguments();
+        ReadCommand::AddArguments();
     }
 
     ~ReadEvent() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds, mFabricFiltered, mEventNumber);
+        return ReadCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds, mFabricFiltered, mEventNumber);
     }
 
 private:
@@ -284,10 +343,10 @@ private:
     chip::Optional<chip::EventNumber> mEventNumber;
 };
 
-class SubscribeEvent : public ReportCommand
+class SubscribeEvent : public SubscribeCommand
 {
 public:
-    SubscribeEvent(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("subscribe-event-by-id", credsIssuerConfig)
+    SubscribeEvent(CredentialIssuerCommands * credsIssuerConfig) : SubscribeCommand("subscribe-event-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
@@ -296,11 +355,11 @@ public:
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ReportCommand::AddArguments();
+        SubscribeCommand::AddArguments();
     }
 
     SubscribeEvent(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("subscribe-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
+        SubscribeCommand("subscribe-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -308,12 +367,12 @@ public:
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        ReportCommand::AddArguments();
+        SubscribeCommand::AddArguments();
     }
 
     SubscribeEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId,
                    CredentialIssuerCommands * credsIssuerConfig) :
-        ReportCommand("subscribe-event", credsIssuerConfig),
+        SubscribeCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName, "Event name.");
@@ -325,32 +384,15 @@ public:
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
-        ReportCommand::AddArguments();
+        SubscribeCommand::AddArguments();
     }
 
     ~SubscribeEvent() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReportCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
-                                             mFabricFiltered, mEventNumber, mKeepSubscriptions);
-    }
-
-    void OnSubscription() override
-    {
-        // The ReadClient instance can not be released directly into the OnEventSubscription
-        // callback since it happens to be called by ReadClient itself which is doing additional
-        // work after that.
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t arg) {
-                auto * command = reinterpret_cast<SubscribeEvent *>(arg);
-                if (!command->IsInteractive())
-                {
-                    command->InteractionModelReports::Shutdown();
-                }
-                command->SetCommandExitStatus(CHIP_NO_ERROR);
-            },
-            reinterpret_cast<intptr_t>(this));
+        return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
+                                                mFabricFiltered, mEventNumber, mKeepSubscriptions);
     }
 
 private:
