@@ -64,7 +64,8 @@ constexpr EndpointId kTestEndpointId3 = 3;
 constexpr EndpointId kTestEndpointId4    = 4;
 constexpr EndpointId kTestEndpointId5    = 5;
 constexpr AttributeId kTestListAttribute = 6;
-constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
+constexpr AttributeId kTestBadAttribute =
+    7; // Reading this attribute will return CHIP_ERROR_NO_MEMORY but nothing is actually encoded.
 
 class TestCommandInteraction
 {
@@ -274,7 +275,7 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
         });
     case kTestBadAttribute:
         // The "BadAttribute" is implemented by encoding a very large octet string, then the encode will always return
-        // CHIP_NO_MEMORY.
+        // CHIP_ERROR_NO_MEMORY.
         return aEncoder.EncodeList([](const auto & encoder) {
             return encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, sizeof(sAnStringThatCanNeverFitIntoTheMTU)));
         });

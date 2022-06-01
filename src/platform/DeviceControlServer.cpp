@@ -40,9 +40,9 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricI
 
     ChipDeviceEvent event;
 
-    event.Type                                  = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerNodeId      = peerNodeId;
-    event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
+    event.Type                              = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.nodeId      = peerNodeId;
+    event.CommissioningComplete.fabricIndex = accessingFabricIndex;
 
     return PlatformMgr().PostEvent(&event);
 }

@@ -54730,7 +54730,7 @@ private:
 class TestArmFailSafeSuite : public TestCommand
 {
 public:
-    TestArmFailSafeSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestArmFailSafe", 5, credsIssuerConfig)
+    TestArmFailSafeSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestArmFailSafe", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -54801,6 +54801,18 @@ private:
                 VerifyOrReturn(CheckValueAsString("nodeLabel", value, chip::CharSpan("", 0)));
             }
             break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILSAFE_REQUIRED));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILSAFE_REQUIRED));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILSAFE_REQUIRED));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILSAFE_REQUIRED));
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -54849,6 +54861,55 @@ private:
             LogStep(4, "Reads NodeLabel mandatory attribute of target device");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, true,
                                  chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Invoke AddTrustedRootCertificate without fail-safe");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type value;
+            value.rootCertificate = chip::ByteSpan(chip::Uint8::from_const_char("00000000garbage: not in length on purpose"), 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::AddTrustedRootCertificate::Id, value, chip::NullOptional
+
+            );
+        }
+        case 6: {
+            LogStep(6, "Invoke AddNOC without fail-safe");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type value;
+            value.NOCValue = chip::ByteSpan(chip::Uint8::from_const_char("00112233garbage: not in length on purpose"), 8);
+            value.IPKValue = chip::ByteSpan(
+                chip::Uint8::from_const_char(
+                    "\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
+                16);
+            value.caseAdminSubject = 1234ULL;
+            value.adminVendorId    = static_cast<chip::VendorId>(65521);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::AddNOC::Id, value, chip::NullOptional
+
+            );
+        }
+        case 7: {
+            LogStep(7, "Invoke UpdateNOC without fail-safe");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type value;
+            value.NOCValue = chip::ByteSpan(chip::Uint8::from_const_char("00112233garbage: not in length on purpose"), 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::UpdateNOC::Id, value, chip::NullOptional
+
+            );
+        }
+        case 8: {
+            LogStep(8, "Invoke CSRRequest without fail-safe");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type value;
+            value.CSRNonce = chip::ByteSpan(
+                chip::Uint8::from_const_char("\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007\000\001\002\003\004"
+                                             "\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
+                32);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::CSRRequest::Id, value, chip::NullOptional
+
+            );
         }
         }
         return CHIP_NO_ERROR;

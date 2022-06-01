@@ -470,15 +470,15 @@ struct ChipDeviceEvent final
 
         struct
         {
-            uint64_t PeerNodeId;
-            FabricIndex PeerFabricIndex;
+            uint64_t nodeId;
+            FabricIndex fabricIndex;
         } CommissioningComplete;
 
         struct
         {
-            FabricIndex PeerFabricIndex;
-            bool AddNocCommandHasBeenInvoked;
-            bool UpdateNocCommandHasBeenInvoked;
+            FabricIndex fabricIndex;
+            bool addNocCommandHasBeenInvoked;
+            bool updateNocCommandHasBeenInvoked;
         } FailSafeTimerExpired;
 
         struct

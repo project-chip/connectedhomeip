@@ -43,6 +43,10 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
 }
 
 namespace {
+
+static_assert(kMinValidFabricIndex <= CHIP_CONFIG_MAX_FABRICS, "Must support some fabrics.");
+static_assert(CHIP_CONFIG_MAX_FABRICS <= kMaxValidFabricIndex, "Max fabric count out of range.");
+
 // Tags for our metadata storage.
 constexpr TLV::Tag kVendorIdTag    = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);

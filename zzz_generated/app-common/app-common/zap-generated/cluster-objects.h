@@ -15294,11 +15294,6 @@ struct Type;
 struct DecodableType;
 } // namespace AddTrustedRootCertificate
 
-namespace RemoveTrustedRootCertificate {
-struct Type;
-struct DecodableType;
-} // namespace RemoveTrustedRootCertificate
-
 } // namespace Commands
 
 namespace Commands {
@@ -15713,38 +15708,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
-namespace RemoveTrustedRootCertificate {
-enum class Fields
-{
-    kTrustedRootIdentifier = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RemoveTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-
-    chip::ByteSpan trustedRootIdentifier;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::RemoveTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-
-    chip::ByteSpan trustedRootIdentifier;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace RemoveTrustedRootCertificate
 } // namespace Commands
 
 namespace Attributes {
