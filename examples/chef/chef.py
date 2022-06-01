@@ -325,6 +325,7 @@ def main(argv: Sequence[str]) -> None:
         flush_print(f"cached zap commit {cached_zap}")
         if current_zap != cached_zap:
             flush_print(f"BAD ZAP VERSION: {fix_instructions}")
+            exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
