@@ -48,7 +48,7 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
     return G_SOURCE_REMOVE;
 }
 
-void MainLoop::ThreadMainHandler(LoopData * loopData)
+void MainLoop::ThreadMainHandler(std::shared_ptr<LoopData> loopData)
 {
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[PUSH] main context %p", loopData->mMainContext);
@@ -65,7 +65,7 @@ void MainLoop::ThreadMainHandler(LoopData * loopData)
     loopData->mMainContext = nullptr;
 }
 
-void MainLoop::ThreadAsyncHandler(LoopData * loopData)
+void MainLoop::ThreadAsyncHandler(std::shared_ptr<LoopData> loopData)
 {
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[PUSH] async context %p", loopData->mMainContext);
@@ -80,16 +80,14 @@ void MainLoop::ThreadAsyncHandler(LoopData * loopData)
     ChipLogProgress(DeviceLayer, "[POP] async context %p", loopData->mMainContext);
     g_main_context_unref(loopData->mMainContext);
     loopData->mMainContext = nullptr;
-
-    chip::Platform::Delete(loopData);
 }
 
 bool MainLoop::Init(initFn_t initFn, gpointer userData)
 {
-    bool result;
-    LoopData * loopData = chip::Platform::New<LoopData>();
+    auto loopData = std::make_shared<LoopData>();
+    bool result   = false;
 
-    VerifyOrReturnError(loopData != nullptr, false);
+    VerifyOrReturnError(loopData, false);
 
     loopData->mMainContext = g_main_context_new();
     loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);
@@ -110,35 +108,26 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     return true;
 }
 
-void MainLoop::DeleteData(LoopData * loopData)
-{
-    if (loopData->mMainLoop)
-    {
-        g_main_loop_quit(loopData->mMainLoop);
-        loopData->mThread.join();
-    }
-
-    chip::Platform::Delete(loopData);
-}
-
 void MainLoop::Deinit(void)
 {
-    std::vector<LoopData *>::const_iterator iter = mLoopData.cbegin();
-    while (iter != mLoopData.cend())
+    for (auto & loopData : mLoopData)
     {
-        DeleteData(*iter);
-        mLoopData.erase(iter);
-        iter++;
+        if (loopData->mMainLoop)
+        {
+            g_main_loop_quit(loopData->mMainLoop);
+        }
+        loopData->mThread.join();
     }
+    mLoopData.clear();
 }
 
 bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint timeoutInterval, timeoutFn_t timeoutFn,
                             gpointer timeoutUserData)
 {
-    bool result         = false;
-    LoopData * loopData = chip::Platform::New<LoopData>();
+    auto loopData = std::make_shared<LoopData>();
+    bool result   = false;
 
-    VerifyOrReturnError(loopData != nullptr, false);
+    VerifyOrReturnError(loopData, false);
 
     loopData->mMainContext     = g_main_context_new();
     loopData->mMainLoop        = g_main_loop_new(loopData->mMainContext, FALSE);
@@ -161,7 +150,7 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint tim
     if (timeoutInterval)
     {
         GSource * source = g_timeout_source_new_seconds(timeoutInterval);
-        g_source_set_callback(source, ThreadTimeout, loopData, nullptr);
+        g_source_set_callback(source, ThreadTimeout, loopData.get(), nullptr);
         g_source_attach(source, loopData->mMainContext);
         g_source_unref(source);
     }

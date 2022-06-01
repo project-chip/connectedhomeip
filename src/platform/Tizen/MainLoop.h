@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <thread>
 
 #include <lib/core/CHIPError.h>
@@ -55,12 +56,11 @@ public:
 private:
     MainLoop() = default;
 
-    void DeleteData(LoopData * loopData);
     static gboolean ThreadTimeout(gpointer userData);
-    static void ThreadMainHandler(LoopData * loopData);
-    static void ThreadAsyncHandler(LoopData * loopData);
+    static void ThreadMainHandler(std::shared_ptr<LoopData> loopData);
+    static void ThreadAsyncHandler(std::shared_ptr<LoopData> loopData);
 
-    std::vector<LoopData *> mLoopData;
+    std::vector<std::shared_ptr<LoopData>> mLoopData;
 };
 
 } // namespace Internal
