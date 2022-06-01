@@ -38,7 +38,7 @@ tests:
               maxValue: 9999
 
     - label: "Reads constraints of attribute: MaxMeasuredValue"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "max measured value"
       response:
@@ -52,15 +52,22 @@ tests:
       attribute: "measured value"
       PICS: A_RELATIVEHUMIDITY
       response:
+          saveAs: ValueBeforeChange
           constraints:
               type: int16
               minValue: 0
               maxValue: 10000
 
-    #Disabled as UI prompts required for user action
     - label: "Operate on device to change the relative humidity significantly"
-      disabled: true
       PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Operate on device to change the relative humidity
+                    significantly"
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
@@ -69,3 +76,4 @@ tests:
       response:
           constraints:
               type: uint16
+              notValue: ValueBeforeChange

@@ -680,16 +680,16 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     {
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
-    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
-    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
         err = encoder.EncodeEmptyList();
         break;
-    }
-    default: {
+    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
+    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
+        err = encoder.EncodeNull();
+        break;
+    default:
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         break;
-    }
     }
 
     return err;

@@ -74,7 +74,30 @@ public:
 
     void InitServer(chip::EndpointId endpointId);
 
+    /**
+     * Updates the LockState attribute with new value and sends LockOperation event.
+     *
+     * @note Does not send an event of opSource is kRemote.
+     *
+     * @param endpointId ID of the endpoint to the lock state
+     * @param newLockState new lock state
+     * @param opSource source of the operation (will be used in the event).
+     *
+     * @return true on success, false on failure.
+     */
     bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource);
+
+    /**
+     * Updates the LockState attribute with new value.
+     *
+     * @note Does not generate Lock Operation event
+     *
+     * @param endpointId ID of the endpoint to the lock state
+     * @param newLockState new lock state
+     *
+     * @return true on success, false on failure.
+     */
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState);
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
     bool SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState);
 
@@ -112,9 +135,6 @@ public:
 
     void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
-
-    void LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                      DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode);
 
     void SetWeekDayScheduleCommandHandler(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

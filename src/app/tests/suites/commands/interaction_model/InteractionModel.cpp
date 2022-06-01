@@ -300,7 +300,16 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                                mBufferedReadAdapter, interactionType);
-    ReturnErrorOnFailure(client->SendRequest(params));
+    if (interactionType == ReadClient::InteractionType::Read)
+    {
+        ReturnErrorOnFailure(client->SendRequest(params));
+    }
+    else
+    {
+        // We want to allow certain kinds of spec-invalid subscriptions so we
+        // can test how the server reacts to them.
+        ReturnErrorOnFailure(client->SendSubscribeRequestWithoutValidation(params));
+    }
     mReadClients.push_back(std::move(client));
     return CHIP_NO_ERROR;
 }

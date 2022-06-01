@@ -28,21 +28,21 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="true">AcceptHeader</attribute>
     <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="BITMAP32" default="0"                       writable="true"  optional="true">SupportedStreamingProtocols</attribute>
 
-    <command source="client" code="0x00" name="LaunchContent" response="LaunchResponse" optional="false">
+    <command source="client" code="0x00" name="LaunchContent" response="LaunchResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
       <arg name="search" type="ContentSearch"/>
       <arg name="autoPlay" type="BOOLEAN"/>
       <arg name="data" type="CHAR_STRING" optional="true"/>
     </command>
 
-    <command source="client" code="0x01" name="LaunchURL" response="LaunchResponse" optional="false">
+    <command source="client" code="0x01" name="LaunchURL" response="LaunchResponse" optional="true">
       <description>Upon receipt, this SHALL launch content from the specified URL.</description>
       <arg name="contentURL" type="CHAR_STRING"/>
       <arg name="displayString" type="CHAR_STRING" optional="true"/>
       <arg name="brandingInformation" type="BrandingInformation" optional="true"/>
     </command>
 
-    <command source="server" code="0x02" name="LaunchResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x02" name="LaunchResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchContent command.</description>
       <arg name="status" type="ContentLaunchStatusEnum"/>
       <arg name="data" type="CHAR_STRING" optional="true"/>

@@ -16,6 +16,7 @@ include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.ameba)
@@ -121,6 +122,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
 
@@ -178,6 +180,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
+    ${chip_dir}/examples/platform/ameba
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
@@ -239,14 +242,6 @@ list(
     -DCONFIG_ENABLE_PW_RPC=1
 )
 endif (matter_enable_rpc)
-
-if (matter_enable_ota_requestor)
-list(
-    APPEND chip_main_flags
-
-    -DCONFIG_ENABLE_OTA_REQUESTOR=1
-)
-endif (matter_enable_ota_requestor)
 
 list(
     APPEND chip_main_cpp_flags

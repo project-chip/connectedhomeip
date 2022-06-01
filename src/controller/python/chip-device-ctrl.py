@@ -672,12 +672,14 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             if len(args) == 1:
-                err = self.devCtrl.ResolveNode(int(args[0]))
-                if err == 0:
+                try:
+                    self.devCtrl.ResolveNode(int(args[0]))
                     address = self.devCtrl.GetAddressAndPort(int(args[0]))
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
+                except exceptions.ChipStackException as ex:
+                    print(str(ex))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:

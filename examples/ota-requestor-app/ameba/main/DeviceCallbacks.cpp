@@ -36,6 +36,9 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <ota/OTAInitializer.h>
+#endif
 
 #include "Globals.h"
 #include "LEDWidget.h"
@@ -50,7 +53,15 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::Logging;
 
 uint32_t identifyTimerCount;
-constexpr uint32_t kIdentifyTimerDelayMS = 250;
+constexpr uint32_t kIdentifyTimerDelayMS     = 250;
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    OTAInitializer::Instance().InitOTARequestor();
+}
+#endif
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -97,6 +108,9 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static bool isOTAInitialized = false;
+#endif
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ChipLogProgress(DeviceLayer, "IPv4 Server ready...");
@@ -110,6 +124,15 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        // Init OTA requestor only when we have gotten IPv6 address
+        if (!isOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
+        }
+#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

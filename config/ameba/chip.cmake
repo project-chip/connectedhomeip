@@ -114,6 +114,7 @@ string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/
 string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/ameba/pw_sys_io:pw_sys_io_ameba\"\n")
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert:impl\", \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log:impl\"]\n")
+string(APPEND CHIP_GN_ARGS "pw_rpc_CONFIG = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
 endif (matter_enable_rpc)
 
 # Build ota-requestor

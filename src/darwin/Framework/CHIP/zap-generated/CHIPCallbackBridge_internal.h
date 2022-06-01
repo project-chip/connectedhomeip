@@ -149,8 +149,6 @@ typedef void (*CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseCallba
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
 typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
-typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -1123,14 +1121,13 @@ typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         data);
-typedef void (*ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & data);
-typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & data);
+typedef void (*ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &);
+typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> &);
 typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
 typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
@@ -8867,28 +8864,28 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>
+class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>
 {
 public:
-    CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
+                            const chip::app::DataModel::Nullable<
                                 chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
 };
 
-class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge
+class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
 {
 public:
-    CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge(
+    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8898,31 +8895,31 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>
+class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>
 {
 public:
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
+    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          CHIPActionBlock action,
+                                                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn, keepAlive){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<
+                const chip::app::DataModel::Nullable<
                     chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
 };
 
-class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge
+class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
 {
 public:
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge(
+    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10410,19 +10407,6 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
-};
-
-class CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
-{
-public:
-    CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge

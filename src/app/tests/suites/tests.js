@@ -76,17 +76,10 @@ function getManualTests() {
   ];
 
   const BulkDataExchangeProtocol = [
-    'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
-    'Test_TC_BDX_1_3',
     'Test_TC_BDX_1_4',
-    'Test_TC_BDX_1_5',
-    'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
     'Test_TC_BDX_2_2',
-    'Test_TC_BDX_2_3',
-    'Test_TC_BDX_2_4',
-    'Test_TC_BDX_2_5',
   ];
 
   const bridge = [
@@ -109,6 +102,7 @@ function getManualTests() {
     'Test_TC_DM_1_2',
     'Test_TC_DM_1_4',
     'Test_TC_DM_2_1',
+    'Test_TC_DM_2_2',
     'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
     'Test_TC_DM_3_4',
@@ -136,13 +130,16 @@ function getManualTests() {
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_Diag_Log_2_1',
-    'Test_TC_Diag_Log_2_2',
-    'Test_TC_Diag_Log_2_3',
+    'Test_TC_DIAGLOG_1_1',
+    'Test_TC_DIAGLOG_2_1',
+    'Test_TC_DIAGLOG_2_2',
+    'Test_TC_DIAGLOG_3_1',
   ];
 
   const Descriptor = [
     'Test_TC_DESC_1_1',
+    'Test_TC_DESC_2_1',
+    'Test_TC_DESC_2_2',
   ];
 
   const EthernetNetworkDiagnostics = [
@@ -293,6 +290,7 @@ function getManualTests() {
   ];
 
   const FlowMeasurement = [
+    'Test_TC_FLW_2_2',
     'Test_TC_FLW_3_1',
   ];
 
@@ -351,6 +349,8 @@ function getManualTests() {
 
   const LocalizationConfiguration = [
     'Test_TC_LO_1_1',
+    'Test_TC_LO_2_1',
+    'Test_TC_LO_3_1',
   ];
 
   const LevelControl = [
@@ -363,15 +363,18 @@ function getManualTests() {
   ];
 
   const RelativeHumidityMeasurement = [
+    'Test_TC_RH_2_2',
     'Test_TC_RH_3_1',
   ];
 
   const Switch = [
     'Test_TC_SWTCH_1_1',
+    'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
   ];
 
   const TemperatureMeasurement = [
+    'Test_TC_TM_2_2',
     'Test_TC_TM_3_1',
   ];
 
@@ -512,7 +515,6 @@ function getTests() {
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
-    'Test_TC_DM_2_2',
   ];
 
   const ElectricalMeasurement = [
@@ -527,7 +529,6 @@ function getTests() {
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
-    'Test_TC_FLW_2_2',
   ];
 
   const GeneralCommissioning = [
@@ -652,7 +653,6 @@ function getTests() {
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
-    'Test_TC_RH_2_2',
   ];
 
   const SecureChannel = [
@@ -661,13 +661,11 @@ function getTests() {
 
   const Switch = [
     'Test_TC_SWTCH_2_1',
-    'Test_TC_SWTCH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
-    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [

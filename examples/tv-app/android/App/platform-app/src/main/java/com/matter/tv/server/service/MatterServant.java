@@ -17,6 +17,7 @@
  */
 package com.matter.tv.server.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -28,12 +29,14 @@ import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import com.matter.tv.server.MatterCommissioningPrompter;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.DACProviderStub;
+import com.tcl.chip.tvapp.DeviceEventProvider;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LevelManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
@@ -65,6 +68,7 @@ public class MatterServant {
   }
 
   private Context context;
+  private Activity activity;
 
   public void init(@NonNull Context context) {
 
@@ -112,7 +116,15 @@ public class MatterServant {
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());
+    mTvApp.setUserPrompter(new MatterCommissioningPrompter(activity));
 
+    mTvApp.setChipDeviceEventProvider(
+        new DeviceEventProvider() {
+          @Override
+          public void onCommissioningComplete() {
+            Log.d("lz", "onCommissioningComplete: ");
+          }
+        });
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
@@ -142,6 +154,10 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
+  }
+
+  public void setActivity(Activity activity) {
+    this.activity = activity;
   }
 
   public void sendCustomCommand(String customCommand) {

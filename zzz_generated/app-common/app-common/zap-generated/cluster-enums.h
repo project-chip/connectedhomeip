@@ -925,6 +925,7 @@ enum class OperationalCertStatus : uint8_t
     kInvalidNOC            = 0x03,
     kMissingCsr            = 0x04,
     kTableFull             = 0x05,
+    kInvalidAdminSubject   = 0x06,
     kInsufficientPrivilege = 0x08,
     kFabricConflict        = 0x09,
     kLabelConflict         = 0x0A,

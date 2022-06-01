@@ -10514,35 +10514,24 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscription
     }
 }
 
-void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
+void CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
+        value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-            newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-            newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
+    CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+        objCValue.rotationTime = [NSNumber numberWithUnsignedShort:value.Value().rotationTime];
+        objCValue.flags = [NSNumber numberWithUnsignedShort:value.Value().flags];
     }
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10556,47 +10545,36 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscription
     }
 }
 
-void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
+void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-            newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
-            newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
-            newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
-            newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
-            newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
-            newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
-            newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
-            newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
-            newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
-            newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
-            newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
-            newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
+    CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+        objCValue.activeTimestampPresent = [NSNumber numberWithBool:value.Value().activeTimestampPresent];
+        objCValue.pendingTimestampPresent = [NSNumber numberWithBool:value.Value().pendingTimestampPresent];
+        objCValue.masterKeyPresent = [NSNumber numberWithBool:value.Value().masterKeyPresent];
+        objCValue.networkNamePresent = [NSNumber numberWithBool:value.Value().networkNamePresent];
+        objCValue.extendedPanIdPresent = [NSNumber numberWithBool:value.Value().extendedPanIdPresent];
+        objCValue.meshLocalPrefixPresent = [NSNumber numberWithBool:value.Value().meshLocalPrefixPresent];
+        objCValue.delayPresent = [NSNumber numberWithBool:value.Value().delayPresent];
+        objCValue.panIdPresent = [NSNumber numberWithBool:value.Value().panIdPresent];
+        objCValue.channelPresent = [NSNumber numberWithBool:value.Value().channelPresent];
+        objCValue.pskcPresent = [NSNumber numberWithBool:value.Value().pskcPresent];
+        objCValue.securityPolicyPresent = [NSNumber numberWithBool:value.Value().securityPolicyPresent];
+        objCValue.channelMaskPresent = [NSNumber numberWithBool:value.Value().channelMaskPresent];
     }
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -13521,31 +13499,6 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
             }
             response.transitions = array_0;
         }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
-{
-    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
-    {
-        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
-    }
-    {
-        response.relayStatus = [NSNumber numberWithUnsignedChar:data.relayStatus];
-    }
-    {
-        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
-    }
-    {
-        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
-    }
-    {
-        response.setpoint = [NSNumber numberWithShort:data.setpoint];
-    }
-    {
-        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
     }
     DispatchSuccess(context, response);
 };

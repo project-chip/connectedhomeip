@@ -6383,50 +6383,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGetRelayStatusLogResponseCallback
-      implements ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        Integer TimeOfDay,
-        Integer RelayStatus,
-        Integer LocalTemperature,
-        Integer HumidityInPercentage,
-        Integer Setpoint,
-        Integer UnreadEntries) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo TimeOfDayResponseValue = new CommandResponseInfo("TimeOfDay", "Integer");
-      responseValues.put(TimeOfDayResponseValue, TimeOfDay);
-      CommandResponseInfo RelayStatusResponseValue =
-          new CommandResponseInfo("RelayStatus", "Integer");
-      responseValues.put(RelayStatusResponseValue, RelayStatus);
-      CommandResponseInfo LocalTemperatureResponseValue =
-          new CommandResponseInfo("LocalTemperature", "Integer");
-      responseValues.put(LocalTemperatureResponseValue, LocalTemperature);
-      CommandResponseInfo HumidityInPercentageResponseValue =
-          new CommandResponseInfo("HumidityInPercentage", "Integer");
-      responseValues.put(HumidityInPercentageResponseValue, HumidityInPercentage);
-      CommandResponseInfo SetpointResponseValue = new CommandResponseInfo("Setpoint", "Integer");
-      responseValues.put(SetpointResponseValue, Setpoint);
-      CommandResponseInfo UnreadEntriesResponseValue =
-          new CommandResponseInfo("UnreadEntries", "Integer");
-      responseValues.put(UnreadEntriesResponseValue, UnreadEntries);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
   public static class DelegatedGetWeeklyScheduleResponseCallback
       implements ChipClusters.ThermostatCluster.GetWeeklyScheduleResponseCallback,
           DelegatedClusterCallback {
@@ -6610,63 +6566,6 @@ public class ClusterInfoMapping {
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
               "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTable>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.SecurityPolicyAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static
-  class DelegatedThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster
-              .OperationalDatasetComponentsAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList",
-              "List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9772,6 +9671,31 @@ public class ClusterInfoMapping {
     commandMap.put("generalCommissioning", generalCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> generalDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> generalDiagnosticstestEventTriggerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo =
+        new CommandParameterInfo("enableKey", byte[].class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "enableKey", generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo);
+
+    CommandParameterInfo generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo =
+        new CommandParameterInfo("eventTrigger", Long.class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "eventTrigger", generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo);
+
+    InteractionInfo generalDiagnosticstestEventTriggerInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .testEventTrigger(
+                      (DefaultClusterCallback) callback,
+                      (byte[]) commandArguments.get("enableKey"),
+                      (Long) commandArguments.get("eventTrigger"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalDiagnosticstestEventTriggerCommandParams);
+    generalDiagnosticsClusterInteractionInfoMap.put(
+        "testEventTrigger", generalDiagnosticstestEventTriggerInteractionInfo);
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();
@@ -10976,10 +10900,10 @@ public class ClusterInfoMapping {
     operationalCredentialsaddNOCCommandParams.put(
         "IPKValue", operationalCredentialsaddNOCIPKValueCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo =
-        new CommandParameterInfo("caseAdminNode", Long.class);
+    CommandParameterInfo operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo =
+        new CommandParameterInfo("caseAdminSubject", Long.class);
     operationalCredentialsaddNOCCommandParams.put(
-        "caseAdminNode", operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo);
+        "caseAdminSubject", operationalCredentialsaddNOCcaseAdminSubjectCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialsaddNOCadminVendorIdCommandParameterInfo =
         new CommandParameterInfo("adminVendorId", Integer.class);
@@ -10995,7 +10919,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("NOCValue"),
                       (Optional<byte[]>) commandArguments.get("ICACValue"),
                       (byte[]) commandArguments.get("IPKValue"),
-                      (Long) commandArguments.get("caseAdminNode"),
+                      (Long) commandArguments.get("caseAdminSubject"),
                       (Integer) commandArguments.get("adminVendorId"));
             },
             () -> new DelegatedNOCResponseCallback(),
@@ -11730,19 +11654,6 @@ public class ClusterInfoMapping {
             thermostatclearWeeklyScheduleCommandParams);
     thermostatClusterInteractionInfoMap.put(
         "clearWeeklySchedule", thermostatclearWeeklyScheduleInteractionInfo);
-    Map<String, CommandParameterInfo> thermostatgetRelayStatusLogCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatgetRelayStatusLogInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.ThermostatCluster) cluster)
-                  .getRelayStatusLog(
-                      (ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback) callback);
-            },
-            () -> new DelegatedGetRelayStatusLogResponseCallback(),
-            thermostatgetRelayStatusLogCommandParams);
-    thermostatClusterInteractionInfoMap.put(
-        "getRelayStatusLog", thermostatgetRelayStatusLogInteractionInfo);
     Map<String, CommandParameterInfo> thermostatgetWeeklyScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatgetWeeklyScheduledaysToReturnCommandParameterInfo =

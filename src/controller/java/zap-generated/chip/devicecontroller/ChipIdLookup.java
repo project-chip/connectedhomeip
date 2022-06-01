@@ -1282,6 +1282,9 @@ public final class ChipIdLookup {
       if (attributeId == 7L) {
         return "ActiveNetworkFaults";
       }
+      if (attributeId == 8L) {
+        return "TestEventTriggersEnabled";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
