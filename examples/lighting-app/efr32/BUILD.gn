@@ -217,7 +217,7 @@ efr32_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-if (chip_disable_wifi_ipv4) {
+  if (chip_disable_wifi_ipv4) {
     defines += [ "WIFI_IPV4_DISABLED" ]
   }
 
