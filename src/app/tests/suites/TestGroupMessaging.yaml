@@ -493,7 +493,8 @@ tests:
 
     # Test Pair 4 : Validates previous group command with a unicast to read
     - label:
-          "Check on/off attribute value is true after on command for endpoint 1 for gamma"
+          "Check on/off attribute value is true after on command for endpoint 1
+          for gamma"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
