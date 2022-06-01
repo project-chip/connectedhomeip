@@ -35,7 +35,7 @@ namespace app {
 namespace CommandDataIB {
 enum class Tag : uint8_t
 {
-    kPath = 0,
+    kPath   = 0,
     kFields = 1,
 };
 
