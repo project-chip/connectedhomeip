@@ -34,7 +34,6 @@
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/ESP32/ESP32Utils.h>
 #if CONFIG_ENABLE_OTA_REQUESTOR
 #include <ota/OTAHelper.h>
 #endif
@@ -59,14 +58,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
         OnSessionEstablished(event);
         break;
 
-    case DeviceEventType::kFailSafeTimerExpired: {
-        CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
-        }
-    }
-    break;
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         ESP_LOGI(TAG, "CHIPoBLE connection established");
         break;
