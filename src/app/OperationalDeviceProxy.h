@@ -219,7 +219,7 @@ private:
         HasAddress,        // Have an address, CASE handshake not started yet.
         Connecting,        // CASE handshake in progress.
         Recovering,        // CASE session hang, trying to establish a new one, the old session is hanging but left untouched.
-        RecoveringBackoff, // CASE session hang, unable to connection a new one, backoff
+        RecoveryBackoff, // CASE session hang, unable to connection a new one, backoff
         SecureConnected,   // CASE session established.
     };
 
@@ -247,7 +247,7 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
-    CHIP_ERROR EstablishConnection(bool isRecovering);
+    CHIP_ERROR EstablishConnection();
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
@@ -281,10 +281,10 @@ private:
     void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 
     static void HandleBackoffTimer(System::Layer * aSystemLayer, void * aAppState);
-    void TryRecoverSession();
-    void RecoveringBackoff();
+    void TrySessionRecovery();
+    void RecoveryBackoff();
 
-    System::Clock::Timeout mRecoveringBackoffTimeout =
+    System::Clock::Timeout mRecoveryBackoffTimeout =
         System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_INITIAL_MS);
 };
 
