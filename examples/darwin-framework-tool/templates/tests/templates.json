@@ -38,6 +38,10 @@
         {
             "name": "check_test_value",
             "path": "partials/check_test_value.zapt"
+        },
+        {
+            "name": "maybeCheckExpectedConstraints",
+            "path": "partials/checks/maybeCheckExpectedConstraints.zapt"
         }
     ],
     "templates": [
