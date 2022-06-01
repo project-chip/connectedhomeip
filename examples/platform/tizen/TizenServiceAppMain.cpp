@@ -84,13 +84,16 @@ void TizenServiceAppMain::AppTerminated()
 void TizenServiceAppMain::AppControl(app_control_h app_control)
 {
     ChipLogProgress(NotSpecified, "Tizen app control");
-
-    mLinuxArgs.Parse(mArgc > 0 ? mArgv[0] : nullptr, app_control);
-    if (ChipLinuxAppInit(mLinuxArgs.argc(), const_cast<char **>(mLinuxArgs.argv())) != 0)
+    if (!initialized)
     {
-        service_app_exit();
-        return;
-    }
+        mLinuxArgs.Parse(mArgc > 0 ? mArgv[0] : nullptr, app_control);
+        if (ChipLinuxAppInit(mLinuxArgs.argc(), const_cast<char **>(mLinuxArgs.argv())) != 0)
+        {
+            service_app_exit();
+            return;
+        }
 
-    mLinuxThread = std::thread(ChipLinuxAppMainLoop);
+        mLinuxThread = std::thread(ChipLinuxAppMainLoop);
+        initialized  = true;
+    }
 }
