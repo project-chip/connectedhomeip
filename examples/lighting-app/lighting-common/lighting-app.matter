@@ -642,8 +642,16 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster GroupKeyManagement = 63 {
@@ -1772,6 +1780,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute testEventTriggersEnabled;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
