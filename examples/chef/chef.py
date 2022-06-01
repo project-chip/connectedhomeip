@@ -294,8 +294,8 @@ def main(argv: Sequence[str]) -> None:
           npm install
           cd ../../..
           ./examples/chef/chef.py --generate_zzz
-          git add {_CHEF_ZZZ_ROOT}
-          git add {_CI_MANIFEST_FILE_NAME}
+          git add examples/chef/ci_manifest.json
+          git add examples/chef/zzz_generated
         Ensure you are running with the latest version of ZAP from master!""")
         ci_manifest = generate_device_manifest(include_zap_submod=True,
                                                zap_check_master=True)
@@ -518,7 +518,7 @@ def main(argv: Sequence[str]) -> None:
                                    options.sample_device_type_name,
                                    "zap-generated")
             if not os.path.exists(zzz_dir):
-                flush_print(f"""
+                flush_print(textwrap.dedent(f"""
                 You have specified --use_zzz
                 for device {options.sample_device_type_name}
                 which does not exist in the cached ZAP output.
@@ -526,7 +526,7 @@ def main(argv: Sequence[str]) -> None:
                 ensure {options.sample_device_type_name}.zap
                 is placed in {_DEVICE_FOLDER}
                 run chef with the option --generate_zzz
-                """)
+                """))
                 exit(1)
             shutil.rmtree(gen_dir, ignore_errors=True)
             shutil.copytree(zzz_dir, gen_dir)

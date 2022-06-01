@@ -60,7 +60,6 @@ class StatefulShell:
             if env_var:
                 print(f"export {env_var}={quoted_value}")
 
-
     def run_cmd(
         self, cmd: str, *,
         raise_on_returncode=True,
