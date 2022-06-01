@@ -222,7 +222,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
 
     jobject value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, just skip it.
-    VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(attributePathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));

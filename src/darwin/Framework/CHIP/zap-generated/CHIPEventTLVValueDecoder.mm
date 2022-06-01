@@ -207,7 +207,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -217,7 +217,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -227,7 +227,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -237,7 +237,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -247,7 +247,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -257,7 +257,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -267,7 +267,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -337,7 +337,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -347,7 +347,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -357,7 +357,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -385,7 +385,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -456,7 +456,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -526,7 +526,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -536,7 +536,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -546,7 +546,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -556,7 +556,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -566,7 +566,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -576,7 +576,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -853,7 +853,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -863,7 +863,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -873,7 +873,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -883,7 +883,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -893,7 +893,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -903,7 +903,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -913,7 +913,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1102,7 +1102,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1112,7 +1112,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1122,7 +1122,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1132,7 +1132,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1142,7 +1142,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1152,7 +1152,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1162,7 +1162,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1172,7 +1172,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1182,7 +1182,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1192,7 +1192,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1202,7 +1202,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1212,7 +1212,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1222,7 +1222,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1232,7 +1232,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1346,7 +1346,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1356,7 +1356,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1366,7 +1366,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1376,7 +1376,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1386,7 +1386,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1396,7 +1396,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1406,7 +1406,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1416,7 +1416,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1646,7 +1646,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1656,7 +1656,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1666,7 +1666,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1700,7 +1700,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1846,7 +1846,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1856,7 +1856,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1866,7 +1866,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1987,7 +1987,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -1997,7 +1997,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2007,7 +2007,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2036,7 +2036,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2046,7 +2046,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2056,7 +2056,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2066,7 +2066,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2076,7 +2076,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2147,7 +2147,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         }
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
@@ -2157,13 +2157,13 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         switch (aPath.mEventId) {
 
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
         }
         break;
     }
     default: {
-        *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+        *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
         break;
     }
     }

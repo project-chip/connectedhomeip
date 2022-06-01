@@ -182,7 +182,7 @@ EventDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
 CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventDataIB =");
@@ -202,8 +202,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kPath):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
                 EventPathIB::Parser path;
                 ReturnErrorOnFailure(path.Init(reader));
@@ -215,8 +215,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEventNumber):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventNumber))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventNumber));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventNumber))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventNumber));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -229,8 +229,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kPriority):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPriority))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPriority));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPriority))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kPriority));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -243,8 +243,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEpochTimestamp):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEpochTimestamp));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEpochTimestamp));
 
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
@@ -259,8 +259,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 
         case to_underlying(Tag::kSystemTimestamp):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kSystemTimestamp));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kSystemTimestamp));
 
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
@@ -274,8 +274,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kDeltaEpochTimestamp):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kDeltaEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kDeltaEpochTimestamp));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDeltaEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kDeltaEpochTimestamp));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -288,8 +288,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kDeltaSystemTimestamp):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kDeltaSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kDeltaSystemTimestamp));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDeltaSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kDeltaSystemTimestamp));
 
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
@@ -303,8 +303,8 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kData):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kData));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kData));
 
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(ParseData(reader, 0));
@@ -322,17 +322,9 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const int RequiredFields =
+        const int requiredFields =
             (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kPriority)) | (1 << to_underlying(Tag::kData));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
@@ -386,13 +378,13 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventPath(EventPathIB::Parser & aEventPat
 {
     // The ReportData must contain a concrete event path
     CHIP_ERROR err = aEventPath.GetEndpoint(&(aConcreteEventPath.mEndpointId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
 
     err = aEventPath.GetCluster(&(aConcreteEventPath.mClusterId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
 
     err = aEventPath.GetEvent(&(aConcreteEventPath.mEventId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
 
     return CHIP_NO_ERROR;
 }

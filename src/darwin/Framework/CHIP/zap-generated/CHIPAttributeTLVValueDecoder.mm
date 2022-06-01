@@ -283,7 +283,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -392,7 +392,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -534,7 +534,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -750,7 +750,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -910,7 +910,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1061,7 +1061,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1280,7 +1280,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1611,7 +1611,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1819,7 +1819,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1975,7 +1975,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2095,7 +2095,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2296,7 +2296,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2570,7 +2570,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2799,7 +2799,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -3520,7 +3520,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -3668,7 +3668,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -3883,7 +3883,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -3992,7 +3992,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -4615,7 +4615,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6132,7 +6132,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6352,7 +6352,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6590,7 +6590,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6731,7 +6731,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6896,7 +6896,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7061,7 +7061,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7380,7 +7380,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7591,7 +7591,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7711,7 +7711,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7842,7 +7842,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8022,7 +8022,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8131,7 +8131,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8414,7 +8414,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8562,7 +8562,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8671,7 +8671,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8825,7 +8825,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9037,7 +9037,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9261,7 +9261,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9487,7 +9487,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9596,7 +9596,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9771,7 +9771,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10012,7 +10012,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10180,7 +10180,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10311,7 +10311,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10547,7 +10547,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11042,7 +11042,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11177,7 +11177,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11409,7 +11409,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11843,7 +11843,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12008,7 +12008,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12187,7 +12187,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12362,7 +12362,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12504,7 +12504,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12654,7 +12654,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12819,7 +12819,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -14293,7 +14293,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -14985,7 +14985,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -15127,7 +15127,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16090,7 +16090,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16247,7 +16247,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16367,7 +16367,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16508,7 +16508,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16628,7 +16628,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16900,7 +16900,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -17283,13 +17283,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
     }
     default: {
-        *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+        *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
         break;
     }
     }

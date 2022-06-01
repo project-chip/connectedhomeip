@@ -31,7 +31,7 @@ namespace app {
 CHIP_ERROR EventStatusIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventStatusIB =");
@@ -51,8 +51,8 @@ CHIP_ERROR EventStatusIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kPath):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
                 EventPathIB::Parser path;
                 ReturnErrorOnFailure(path.Init(reader));
@@ -64,8 +64,8 @@ CHIP_ERROR EventStatusIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kErrorStatus):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kErrorStatus))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kErrorStatus));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kErrorStatus))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kErrorStatus));
             {
                 StatusIB::Parser errorStatus;
                 ReturnErrorOnFailure(errorStatus.Init(reader));
@@ -86,16 +86,8 @@ CHIP_ERROR EventStatusIB::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kErrorStatus));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB;
-        }
+        const int requiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kErrorStatus));
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB;
     }
 
     ReturnErrorOnFailure(err);
