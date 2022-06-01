@@ -347,11 +347,11 @@
               ZAP_EMPTY_DEFAULT() }, /* PendingTimestamp */                                                                        \
             { 0x0000003A, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* delay */                                                                                   \
-            { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003B, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */                                                                          \
             { 0x0000003C, ZAP_TYPE(OCTET_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),          \
               ZAP_EMPTY_DEFAULT() }, /* ChannelMask */                                                                             \
-            { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003D, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() },                                              /* ActiveNetworkFaultsList */                    \
@@ -636,32 +636,31 @@
   0x00000009 /* UpdateFabricLabel */, \
   0x0000000A /* RemoveFabric */, \
   0x0000000B /* AddTrustedRootCertificate */, \
-  0x0000000C /* RemoveTrustedRootCertificate */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=41)*/ \
+  /*   GeneratedCommandList (index=40)*/ \
   0x00000001 /* AttestationResponse */, \
   0x00000003 /* CertificateChainResponse */, \
   0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 0, Cluster: Group Key Management (server) */\
-  /*   AcceptedCommandList (index=46) */ \
+  /*   AcceptedCommandList (index=45) */ \
   0x00000000 /* KeySetWrite */, \
   0x00000001 /* KeySetRead */, \
   0x00000003 /* KeySetRemove */, \
   0x00000004 /* KeySetReadAllIndices */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=51)*/ \
+  /*   GeneratedCommandList (index=50)*/ \
   0x00000002 /* KeySetReadResponse */, \
   0x00000005 /* KeySetReadAllIndicesResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Identify (server) */\
-  /*   AcceptedCommandList (index=54) */ \
+  /*   AcceptedCommandList (index=53) */ \
   0x00000000 /* Identify */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=57) */ \
+  /*   AcceptedCommandList (index=56) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -669,14 +668,14 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=64)*/ \
+  /*   GeneratedCommandList (index=63)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Window Covering (server) */\
-  /*   AcceptedCommandList (index=69) */ \
+  /*   AcceptedCommandList (index=68) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -686,7 +685,7 @@
   0x00000008 /* GoToTiltPercentage */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=77) */ \
+  /*   AcceptedCommandList (index=76) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -694,14 +693,14 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=84)*/ \
+  /*   GeneratedCommandList (index=83)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Window Covering (server) */\
-  /*   AcceptedCommandList (index=89) */ \
+  /*   AcceptedCommandList (index=88) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -915,7 +914,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 31 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 41 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 40 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Group Key Management (server) */ \
@@ -925,8 +924,8 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 46 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 51 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 45 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 50 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -958,7 +957,7 @@
       .clusterSize = 9, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 53 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -969,8 +968,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 57 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 64 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Scenes (client) */ \
@@ -1002,7 +1001,7 @@
       .clusterSize = 35, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 69 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 68 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1013,8 +1012,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 77 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 84 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 76 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Scenes (client) */ \
@@ -1046,7 +1045,7 @@
       .clusterSize = 35, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 89 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
       .generatedCommandList = nullptr ,\
     },\
 }

@@ -329,11 +329,11 @@
               ZAP_EMPTY_DEFAULT() }, /* PendingTimestamp */                                                                        \
             { 0x0000003A, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* delay */                                                                                   \
-            { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003B, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */                                                                          \
             { 0x0000003C, ZAP_TYPE(OCTET_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),          \
               ZAP_EMPTY_DEFAULT() }, /* ChannelMask */                                                                             \
-            { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003D, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() },                                          /* ActiveNetworkFaultsList */                        \
@@ -545,22 +545,21 @@
   0x00000009 /* UpdateFabricLabel */, \
   0x0000000A /* RemoveFabric */, \
   0x0000000B /* AddTrustedRootCertificate */, \
-  0x0000000C /* RemoveTrustedRootCertificate */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=39)*/ \
+  /*   GeneratedCommandList (index=38)*/ \
   0x00000001 /* AttestationResponse */, \
   0x00000003 /* CertificateChainResponse */, \
   0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=44) */ \
+  /*   AcceptedCommandList (index=43) */ \
   0x00000000 /* Off */, \
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Level Control (server) */\
-  /*   AcceptedCommandList (index=48) */ \
+  /*   AcceptedCommandList (index=47) */ \
   0x00000000 /* MoveToLevel */, \
   0x00000001 /* Move */, \
   0x00000002 /* Step */, \
@@ -764,7 +763,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 29 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 39 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 38 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -796,7 +795,7 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 44 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -807,7 +806,7 @@
       .clusterSize = 27, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 47 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \

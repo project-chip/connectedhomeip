@@ -1449,9 +1449,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePendingTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDelayWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSecurityPolicyWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSecurityPolicyWithValue:(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)value
+                            completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeChannelMaskWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeOperationalDatasetComponentsWithValue:(NSArray * _Nullable)value
+- (void)writeAttributeOperationalDatasetComponentsWithValue:
+            (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;

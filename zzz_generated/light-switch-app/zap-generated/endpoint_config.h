@@ -327,11 +327,11 @@
               ZAP_EMPTY_DEFAULT() }, /* PendingTimestamp */                                                                        \
             { 0x0000003A, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* delay */                                                                                   \
-            { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003B, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */                                                                          \
             { 0x0000003C, ZAP_TYPE(OCTET_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),          \
               ZAP_EMPTY_DEFAULT() }, /* ChannelMask */                                                                             \
-            { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003D, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() },                                              /* ActiveNetworkFaultsList */                    \
@@ -549,32 +549,31 @@
   0x00000009 /* UpdateFabricLabel */, \
   0x0000000A /* RemoveFabric */, \
   0x0000000B /* AddTrustedRootCertificate */, \
-  0x0000000C /* RemoveTrustedRootCertificate */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=47)*/ \
+  /*   GeneratedCommandList (index=46)*/ \
   0x00000001 /* AttestationResponse */, \
   0x00000003 /* CertificateChainResponse */, \
   0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 0, Cluster: Group Key Management (server) */\
-  /*   AcceptedCommandList (index=52) */ \
+  /*   AcceptedCommandList (index=51) */ \
   0x00000000 /* KeySetWrite */, \
   0x00000001 /* KeySetRead */, \
   0x00000003 /* KeySetRemove */, \
   0x00000004 /* KeySetReadAllIndices */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=57)*/ \
+  /*   GeneratedCommandList (index=56)*/ \
   0x00000002 /* KeySetReadResponse */, \
   0x00000005 /* KeySetReadAllIndicesResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Identify (server) */\
-  /*   AcceptedCommandList (index=60) */ \
+  /*   AcceptedCommandList (index=59) */ \
   0x00000000 /* Identify */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=63) */ \
+  /*   AcceptedCommandList (index=62) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -582,7 +581,7 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=70)*/ \
+  /*   GeneratedCommandList (index=69)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
@@ -804,7 +803,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 37 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 47 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 46 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Group Key Management (server) */ \
@@ -814,8 +813,8 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 57 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 51 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -858,7 +857,7 @@
       .clusterSize = 9, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 59 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -869,8 +868,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 62 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 69 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Scenes (client) */ \

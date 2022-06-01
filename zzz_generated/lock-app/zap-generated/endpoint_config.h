@@ -384,11 +384,11 @@
               ZAP_EMPTY_DEFAULT() }, /* PendingTimestamp */                                                                        \
             { 0x0000003A, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* delay */                                                                                   \
-            { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003B, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */                                                                          \
             { 0x0000003C, ZAP_TYPE(OCTET_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),          \
               ZAP_EMPTY_DEFAULT() }, /* ChannelMask */                                                                             \
-            { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
+            { 0x0000003D, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() },                                              /* ActiveNetworkFaultsList */                    \
@@ -651,20 +651,19 @@
   0x00000009 /* UpdateFabricLabel */, \
   0x0000000A /* RemoveFabric */, \
   0x0000000B /* AddTrustedRootCertificate */, \
-  0x0000000C /* RemoveTrustedRootCertificate */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=47)*/ \
+  /*   GeneratedCommandList (index=46)*/ \
   0x00000001 /* AttestationResponse */, \
   0x00000003 /* CertificateChainResponse */, \
   0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Identify (server) */\
-  /*   AcceptedCommandList (index=52) */ \
+  /*   AcceptedCommandList (index=51) */ \
   0x00000000 /* Identify */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=54) */ \
+  /*   AcceptedCommandList (index=53) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -672,20 +671,20 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=61)*/ \
+  /*   GeneratedCommandList (index=60)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=66) */ \
+  /*   AcceptedCommandList (index=65) */ \
   0x00000000 /* Off */, \
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Door Lock (server) */\
-  /*   AcceptedCommandList (index=70) */ \
+  /*   AcceptedCommandList (index=69) */ \
   0x00000000 /* LockDoor */, \
   0x00000001 /* UnlockDoor */, \
   0x00000003 /* UnlockWithTimeout */, \
@@ -705,7 +704,7 @@
   0x00000024 /* GetCredentialStatus */, \
   0x00000026 /* ClearCredential */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=89)*/ \
+  /*   GeneratedCommandList (index=88)*/ \
   0x0000000C /* GetWeekDayScheduleResponse */, \
   0x0000000F /* GetYearDayScheduleResponse */, \
   0x00000012 /* GetHolidayScheduleResponse */, \
@@ -929,7 +928,7 @@
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 37 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 47 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 46 ) ,\
     },\
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
@@ -961,7 +960,7 @@
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 51 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -972,8 +971,8 @@
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 54 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 61 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 53 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
@@ -983,7 +982,7 @@
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 66 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 65 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1016,8 +1015,8 @@
       .clusterSize = 42, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayDoorLockServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 70 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 89 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 69 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
     },\
 }
 

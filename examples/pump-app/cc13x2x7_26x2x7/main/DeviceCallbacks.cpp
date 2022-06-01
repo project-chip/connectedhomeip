@@ -73,8 +73,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kCommissioningComplete:
-        PLAT_LOG("Commissioning complete (%x,%d)", event->CommissioningComplete.PeerNodeId,
-                 event->CommissioningComplete.PeerFabricIndex);
+        PLAT_LOG("Commissioning complete for fabric 0x%x", event->CommissioningComplete.fabricIndex);
         break;
 
     case DeviceEventType::kOperationalNetworkEnabled:

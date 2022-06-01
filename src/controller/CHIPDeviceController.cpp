@@ -736,19 +736,6 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
-{
-    Optional<SessionHandle> secureSessionHandle;
-
-    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    secureSessionHandle = mDeviceBeingCommissioned->GetSecureSession();
-    VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
-    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);

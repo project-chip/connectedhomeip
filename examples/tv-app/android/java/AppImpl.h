@@ -42,6 +42,7 @@
 #include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MyUserPrompter-JNI.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -51,7 +52,7 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
-CHIP_ERROR InitVideoPlayerPlatform();
+CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter);
 CHIP_ERROR PreServerInit();
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager);

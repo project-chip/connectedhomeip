@@ -16,6 +16,7 @@ include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.ameba)
@@ -99,4 +100,3 @@ add_custom_command(
     POST_BUILD
     COMMAND cp lib${chip_main}.a ${CMAKE_CURRENT_SOURCE_DIR}/lib/application
 )
-

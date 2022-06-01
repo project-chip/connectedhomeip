@@ -18,7 +18,8 @@
 #pragma once
 
 #include <cstdint>
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pwm.h>
 
 class PWMDevice
 {
@@ -40,21 +41,21 @@ public:
 
     using PWMCallback = void (*)(Action_t, int32_t);
 
-    int Init(const device * aPWMDevice, uint32_t aPWMChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
+    int Init(const pwm_dt_spec * aPWMDevice, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
     uint8_t GetMinLevel() const { return mMinLevel; }
     uint8_t GetMaxLevel() const { return mMaxLevel; }
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * aValue);
     void SetCallbacks(PWMCallback aActionInitiatedClb, PWMCallback aActionCompletedClb);
-    const device * GetDevice() { return mPwmDevice; }
+    const device * GetDevice() { return mPwmDevice->dev; }
 
 private:
     State_t mState;
     uint8_t mMinLevel;
     uint8_t mMaxLevel;
     uint8_t mLevel;
-    const device * mPwmDevice;
+    const pwm_dt_spec * mPwmDevice;
     uint32_t mPwmChannel;
 
     PWMCallback mActionInitiatedClb;

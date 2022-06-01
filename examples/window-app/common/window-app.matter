@@ -893,10 +893,6 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING rootCertificate = 0;
   }
 
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
-  }
-
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
@@ -925,7 +921,6 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {
@@ -1223,7 +1218,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable RoutingRole routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
@@ -1281,9 +1276,9 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable int64u activeTimestamp = 56;
   readonly attribute nullable int64u pendingTimestamp = 57;
   readonly attribute nullable int32u delay = 58;
-  readonly attribute nullable SecurityPolicy securityPolicy[] = 59;
+  readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelMask = 60;
-  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
