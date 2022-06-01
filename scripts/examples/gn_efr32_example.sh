@@ -19,12 +19,21 @@
 # Build script for GN EFT32 examples GitHub workflow.
 
 set -e
-source "$(dirname "$0")/../../scripts/activate.sh"
+
+if [[ -z "${MATTER_ROOT}" ]]; then
+    echo "Using default path for Matter root"
+    CHIP_ROOT="$(dirname "$0")/../.."
+else
+    echo "Using ENV path for Matter root"
+    CHIP_ROOT="$MATTER_ROOT"
+fi
+
+source "$CHIP_ROOT/scripts/activate.sh"
 
 set -x
 env
 USE_WIFI=false
-CHIP_ROOT="$(dirname "$0")/../.."
+
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then

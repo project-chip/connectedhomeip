@@ -27,6 +27,7 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
@@ -78,6 +79,9 @@ void event_cb_wifi_event(input_event_t * event, void * private_data)
     case CODE_WIFI_ON_SCAN_DONE: {
         log_info("[APP] [EVT] SCAN Done %lld, SCAN Result: %s\r\n", aos_now_ms(),
                  WIFI_SCAN_DONE_EVENT_OK == event->value ? "OK" : "Busy now");
+
+        // wifi_mgmr_cli_scanlist();
+        NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
     break;
     case CODE_WIFI_ON_CONNECTING: {

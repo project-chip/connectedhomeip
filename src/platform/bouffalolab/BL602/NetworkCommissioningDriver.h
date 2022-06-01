@@ -17,6 +17,7 @@
 
 #pragma once
 #include <platform/NetworkCommissioning.h>
+#include <wifi_mgmr.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,7 +32,7 @@ constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 class BLScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    // BLScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
+    BLScanResponseIterator(const size_t size, const wifi_mgmr_ap_item_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
     size_t Count() override { return mSize; }
     bool Next(WiFiScanResponse & item) override
     {
@@ -40,16 +41,15 @@ public:
             return false;
         }
 
-#if 0
-        item.security.SetRaw(mpScanResults[mIternum].authmode);
-        item.ssidLen =
-            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        item.channel  = mpScanResults[mIternum].primary;
+        item.security.SetRaw(mpScanResults[mIternum].auth);
+        item.ssidLen = mpScanResults[mIternum].ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+            ? mpScanResults[mIternum].ssid_len
+            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;
         memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
-#endif
 
         mIternum++;
         return true;
@@ -58,7 +58,7 @@ public:
 
 private:
     const size_t mSize;
-    // const wifi_ap_record_t * mpScanResults;
+    const wifi_mgmr_ap_item_t * mpScanResults;
     size_t mIternum = 0;
 };
 

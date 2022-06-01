@@ -22,11 +22,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <tcpip.h>
+#include <wifi_mgmr_api.h>
 #include <wifi_mgmr_ext.h>
 
 #include <limits>
 #include <stdint.h>
 #include <string>
+#include <utils_log.h>
 
 using namespace ::chip;
 //#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -220,36 +222,33 @@ exit:
     }
 }
 
-#if 0
-CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
+CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    esp_err_t err = ESP_OK;
-    if (ssid.data())
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (!ssid.empty())
     {
-        wifi_scan_config_t scan_config = { 0 };
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        scan_config.ssid = WiFiSSIDStr;
-        err              = esp_wifi_scan_start(&scan_config, false);
+        err = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
     }
     else
     {
-        err = esp_wifi_scan_start(NULL, false);
+        err = (CHIP_ERROR) wifi_mgmr_scan(NULL, NULL);
     }
-    if (err != ESP_OK)
+    if (err != CHIP_NO_ERROR)
     {
-        return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+        return CHIP_ERROR_INTERNAL;
     }
     return CHIP_NO_ERROR;
 }
-#endif
 
-#if 0
-void ESPWiFiDriver::OnScanWiFiNetworkDone()
+void BLWiFiDriver::OnScanWiFiNetworkDone()
 {
-    uint16_t ap_number;
-    esp_wifi_scan_get_ap_num(&ap_number);
-    if (!ap_number)
+    int ap_num;
+
+    ap_num = wifi_mgmr_get_scan_ap_num();
+    if (!ap_num)
     {
         ChipLogProgress(DeviceLayer, "No AP found");
         if (mpScanCallback != nullptr)
@@ -259,23 +258,14 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         }
         return;
     }
-    std::unique_ptr<wifi_ap_record_t[]> ap_buffer_ptr(new wifi_ap_record_t[ap_number]);
-    if (ap_buffer_ptr == NULL)
+
+    wifi_mgmr_ap_item_t * ScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
+    wifi_mgmr_get_scan_result(ScanResult, ap_num);
+
+    if (ScanResult)
     {
-        ChipLogError(DeviceLayer, "can't malloc memory for ap_list_buffer");
-        if (mpScanCallback)
-        {
-            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
-        }
-        return;
-    }
-    wifi_ap_record_t * ap_list_buffer = ap_buffer_ptr.get();
-    if (esp_wifi_scan_get_ap_records(&ap_number, ap_list_buffer) == ESP_OK)
-    {
-        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number, ap_list_buffer]() {
-                std::unique_ptr<wifi_ap_record_t[]> auto_free(ap_list_buffer);
-                ESPScanResponseIterator iter(ap_number, ap_list_buffer);
+        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_num, ScanResult]() {
+                BLScanResponseIterator iter(ap_num, ScanResult);
                 if (GetInstance().mpScanCallback)
                 {
                     GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
@@ -287,7 +277,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
                 }
             }))
         {
-            ap_buffer_ptr.release();
+            ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
         }
     }
     else
@@ -300,11 +290,9 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         }
     }
 }
-#endif
 
 void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-#if 0
     if (callback != nullptr)
     {
         mpScanCallback = callback;
@@ -314,26 +302,11 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
     }
-#endif
 }
 
 #if 0
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err != ESP_OK)
-    {
-        return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
-    }
-    uint8_t length = strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    if (length > sizeof(network.networkID))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-    memcpy(network.networkID, ap_info.ssid, length);
-    network.networkIDLen = length;
     return CHIP_NO_ERROR;
 }
 #endif

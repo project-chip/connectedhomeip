@@ -16,6 +16,7 @@ import os
 import shlex
 import subprocess
 import sys
+import tempfile
 from typing import Dict, Optional
 
 import constants
@@ -58,6 +59,7 @@ class StatefulShell:
             quoted_value = shlex.quote(self.env[env_var])
             if env_var:
                 print(f"export {env_var}={quoted_value}")
+
 
     def run_cmd(
         self, cmd: str, *,
