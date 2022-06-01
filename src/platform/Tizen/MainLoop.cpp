@@ -33,51 +33,37 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
 
     VerifyOrReturnError(loopData != nullptr, G_SOURCE_REMOVE);
 
+    ChipLogDetail(DeviceLayer, "[TIMEOUT] glib main loop [%p]", loopData->mMainLoop);
+
     if (loopData->mTimeoutFn)
     {
-        ChipLogProgress(DeviceLayer, "[Timeout] thread timeout function");
+        ChipLogDetail(DeviceLayer, "Running thread timeout function");
         loopData->mTimeoutFn(loopData->mTimeoutUserData);
     }
 
     if (loopData->mMainLoop)
     {
-        ChipLogProgress(DeviceLayer, "[Timeout] main loop %p", loopData->mMainLoop);
         g_main_loop_quit(loopData->mMainLoop);
     }
 
     return G_SOURCE_REMOVE;
 }
 
-void MainLoop::ThreadMainHandler(std::shared_ptr<LoopData> loopData)
+void MainLoop::ThreadHandler(std::shared_ptr<LoopData> loopData)
 {
     g_main_context_push_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[PUSH] main context %p", loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[PUSH] thread default context [%p]", loopData->mMainContext);
 
-    ChipLogProgress(DeviceLayer, "[RUN] main loop %p", loopData->mMainLoop);
+    ChipLogDetail(DeviceLayer, "[RUN] glib main loop [%p]", loopData->mMainLoop);
     g_main_loop_run(loopData->mMainLoop);
-    ChipLogProgress(DeviceLayer, "[QUIT] main loop %p", loopData->mMainLoop);
+    ChipLogDetail(DeviceLayer, "[QUIT] glib main loop [%p]", loopData->mMainLoop);
+
+    g_main_context_pop_thread_default(loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[POP] thread default context [%p]", loopData->mMainContext);
+
     g_main_loop_unref(loopData->mMainLoop);
     loopData->mMainLoop = nullptr;
 
-    g_main_context_pop_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[POP] main context %p", loopData->mMainContext);
-    g_main_context_unref(loopData->mMainContext);
-    loopData->mMainContext = nullptr;
-}
-
-void MainLoop::ThreadAsyncHandler(std::shared_ptr<LoopData> loopData)
-{
-    g_main_context_push_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[PUSH] async context %p", loopData->mMainContext);
-
-    ChipLogProgress(DeviceLayer, "[RUN] async loop %p", loopData->mMainLoop);
-    g_main_loop_run(loopData->mMainLoop);
-    ChipLogProgress(DeviceLayer, "[QUIT] async loop %p", loopData->mMainLoop);
-    g_main_loop_unref(loopData->mMainLoop);
-    loopData->mMainLoop = nullptr;
-
-    g_main_context_pop_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[POP] async context %p", loopData->mMainContext);
     g_main_context_unref(loopData->mMainContext);
     loopData->mMainContext = nullptr;
 }
@@ -93,16 +79,16 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);
 
     g_main_context_push_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[PUSH] main context %p", loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[PUSH] thread default context [%p]", loopData->mMainContext);
 
     result = initFn(userData);
 
     g_main_context_pop_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[POP] main context %p", loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[POP] thread default context [%p]", loopData->mMainContext);
 
     VerifyOrReturnError(result, false);
 
-    loopData->mThread = std::thread(ThreadMainHandler, loopData);
+    loopData->mThread = std::thread(ThreadHandler, loopData);
     mLoopData.push_back(loopData);
 
     return true;
@@ -135,16 +121,16 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint tim
     loopData->mTimeoutUserData = timeoutUserData;
 
     g_main_context_push_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[PUSH] async context %p", loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[PUSH] thread default context [%p]", loopData->mMainContext);
 
     result = asyncFn(loopData->mMainLoop, asyncUserData);
 
     g_main_context_pop_thread_default(loopData->mMainContext);
-    ChipLogProgress(DeviceLayer, "[POP] async context %p", loopData->mMainContext);
+    ChipLogDetail(DeviceLayer, "[POP] thread default context [%p]", loopData->mMainContext);
 
     VerifyOrReturnError(result, false);
 
-    loopData->mThread = std::thread(ThreadAsyncHandler, loopData);
+    loopData->mThread = std::thread(ThreadHandler, loopData);
     loopData->mThread.detach();
 
     if (timeoutInterval)

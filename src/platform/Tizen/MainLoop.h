@@ -57,8 +57,7 @@ private:
     MainLoop() = default;
 
     static gboolean ThreadTimeout(gpointer userData);
-    static void ThreadMainHandler(std::shared_ptr<LoopData> loopData);
-    static void ThreadAsyncHandler(std::shared_ptr<LoopData> loopData);
+    static void ThreadHandler(std::shared_ptr<LoopData> loopData);
 
     std::vector<std::shared_ptr<LoopData>> mLoopData;
 };
