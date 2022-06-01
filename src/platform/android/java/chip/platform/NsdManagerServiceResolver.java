@@ -33,7 +33,6 @@ import java.util.Map;
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
   private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
-  private static final long RESOLVE_SERVICE_FOUND = 3000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
