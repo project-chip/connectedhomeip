@@ -139,11 +139,9 @@ def generate_device_manifest(
     devices_manifest = ci_manifest["devices"]
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
-        file_md5 = hashlib.md5()
         with open(device_file_path, "rb") as device_file:
-            while data := device_file.read(128 * 32):
-                file_md5.update(data)
-        device_file_md5 = file_md5.hexdigest()
+            device_file_data = device_file.read()
+        device_file_md5 = hashlib.md5(device_file_data).hexdigest()
         devices_manifest[device_name] = device_file_md5
         flush_print(f"Current digest for {device_name} : {device_file_md5}")
         if write_manifest_file:
@@ -323,7 +321,7 @@ def main(argv: Sequence[str]) -> None:
                     exit(1)
         current_zap = ci_manifest["zap_commit"]
         cached_zap = cached_manifest["zap_commit"]
-        flush_print(f"currnt zap commit {current_zap}")
+        flush_print(f"current zap commit {current_zap}")
         flush_print(f"cached zap commit {cached_zap}")
         if current_zap != cached_zap:
             flush_print(f"BAD ZAP VERSION: {fix_instructions}")
