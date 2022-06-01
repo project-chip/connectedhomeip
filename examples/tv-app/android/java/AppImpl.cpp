@@ -447,7 +447,7 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
         ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
     return gFactory.AddContentApp(app);
-#endif //CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return 0;
 }
 
@@ -455,5 +455,5 @@ void SendTestMessage(EndpointId epID, const char * message)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     gFactory.SendTestMessage(epID, message);
-#endif //CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
