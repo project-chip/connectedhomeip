@@ -59,7 +59,7 @@ $ TERM=linux minicom -D /dev/ttyUSB1 -b 115200
 Prepare MW320 download firmware image:
 ```
 $ ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
-$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F000100
+$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
 $ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 ```
 
