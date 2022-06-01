@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <thread>
+
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -31,11 +33,14 @@ typedef void (*timeoutFn_t)(gpointer userData);
 
 struct LoopData
 {
+    // Thread which governs glib main event loop
+    std::thread mThread;
+    // Objects for running glib main event loop
     GMainContext * mMainContext = nullptr;
     GMainLoop * mMainLoop       = nullptr;
-    GThread * mThread           = nullptr;
-    timeoutFn_t mTimeoutFn      = nullptr;
-    gpointer mTimeoutUserData   = nullptr;
+    // Optional timeout function
+    timeoutFn_t mTimeoutFn    = nullptr;
+    gpointer mTimeoutUserData = nullptr;
 };
 
 class MainLoop
@@ -43,8 +48,8 @@ class MainLoop
 public:
     bool Init(initFn_t initFn, gpointer userData = nullptr);
     void Deinit(void);
-    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr, guint interval = 0, timeoutFn_t timeoutFn = nullptr,
-                      gpointer timeoutUserData = nullptr);
+    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr, guint timeoutInterval = 0,
+                      timeoutFn_t timeoutFn = nullptr, gpointer timeoutUserData = nullptr);
     static MainLoop & Instance(void);
 
 private:
@@ -52,9 +57,8 @@ private:
 
     void DeleteData(LoopData * loopData);
     static gboolean ThreadTimeout(gpointer userData);
-    void SetThreadTimeout(LoopData * loopData, guint interval);
-    static gpointer ThreadMainHandler(gpointer data);
-    static gpointer ThreadAsyncHandler(gpointer data);
+    static void ThreadMainHandler(LoopData * loopData);
+    static void ThreadAsyncHandler(LoopData * loopData);
 
     std::vector<LoopData *> mLoopData;
 };

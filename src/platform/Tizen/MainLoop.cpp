@@ -48,20 +48,8 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
     return G_SOURCE_REMOVE;
 }
 
-void MainLoop::SetThreadTimeout(LoopData * loopData, guint interval)
+void MainLoop::ThreadMainHandler(LoopData * loopData)
 {
-    VerifyOrReturn(loopData != nullptr);
-
-    GSource * source = g_timeout_source_new_seconds(interval);
-    g_source_set_callback(source, ThreadTimeout, reinterpret_cast<gpointer>(loopData), nullptr);
-    g_source_attach(source, loopData->mMainContext);
-    g_source_unref(source);
-}
-
-gpointer MainLoop::ThreadMainHandler(gpointer data)
-{
-    LoopData * loopData = reinterpret_cast<LoopData *>(data);
-
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[PUSH] main context %p", loopData->mMainContext);
 
@@ -75,14 +63,10 @@ gpointer MainLoop::ThreadMainHandler(gpointer data)
     ChipLogProgress(DeviceLayer, "[POP] main context %p", loopData->mMainContext);
     g_main_context_unref(loopData->mMainContext);
     loopData->mMainContext = nullptr;
-
-    return nullptr;
 }
 
-gpointer MainLoop::ThreadAsyncHandler(gpointer data)
+void MainLoop::ThreadAsyncHandler(LoopData * loopData)
 {
-    LoopData * loopData = reinterpret_cast<LoopData *>(data);
-
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[PUSH] async context %p", loopData->mMainContext);
 
@@ -98,8 +82,6 @@ gpointer MainLoop::ThreadAsyncHandler(gpointer data)
     loopData->mMainContext = nullptr;
 
     chip::Platform::Delete(loopData);
-
-    return nullptr;
 }
 
 bool MainLoop::Init(initFn_t initFn, gpointer userData)
@@ -120,13 +102,12 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     g_main_context_pop_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[POP] main context %p", loopData->mMainContext);
 
-    if (result != false)
-    {
-        loopData->mThread = g_thread_new("ThreadMainHandler", ThreadMainHandler, reinterpret_cast<gpointer>(loopData));
-        mLoopData.push_back(loopData);
-    }
+    VerifyOrReturnError(result, false);
 
-    return result;
+    loopData->mThread = std::thread(ThreadMainHandler, loopData);
+    mLoopData.push_back(loopData);
+
+    return true;
 }
 
 void MainLoop::DeleteData(LoopData * loopData)
@@ -134,7 +115,7 @@ void MainLoop::DeleteData(LoopData * loopData)
     if (loopData->mMainLoop)
     {
         g_main_loop_quit(loopData->mMainLoop);
-        g_thread_join(loopData->mThread);
+        loopData->mThread.join();
     }
 
     chip::Platform::Delete(loopData);
@@ -151,7 +132,7 @@ void MainLoop::Deinit(void)
     }
 }
 
-bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint interval, timeoutFn_t timeoutFn,
+bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint timeoutInterval, timeoutFn_t timeoutFn,
                             gpointer timeoutUserData)
 {
     bool result         = false;
@@ -159,8 +140,10 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint int
 
     VerifyOrReturnError(loopData != nullptr, false);
 
-    loopData->mMainContext = g_main_context_new();
-    loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);
+    loopData->mMainContext     = g_main_context_new();
+    loopData->mMainLoop        = g_main_loop_new(loopData->mMainContext, FALSE);
+    loopData->mTimeoutFn       = timeoutFn;
+    loopData->mTimeoutUserData = timeoutUserData;
 
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[PUSH] async context %p", loopData->mMainContext);
@@ -170,19 +153,20 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint int
     g_main_context_pop_thread_default(loopData->mMainContext);
     ChipLogProgress(DeviceLayer, "[POP] async context %p", loopData->mMainContext);
 
-    if (result != false)
-    {
-        loopData->mThread = g_thread_new("ThreadAsyncHandler", ThreadAsyncHandler, reinterpret_cast<gpointer>(loopData));
+    VerifyOrReturnError(result, false);
 
-        if (interval)
-        {
-            loopData->mTimeoutFn       = timeoutFn;
-            loopData->mTimeoutUserData = timeoutUserData;
-            SetThreadTimeout(loopData, interval);
-        }
+    loopData->mThread = std::thread(ThreadAsyncHandler, loopData);
+    loopData->mThread.detach();
+
+    if (timeoutInterval)
+    {
+        GSource * source = g_timeout_source_new_seconds(timeoutInterval);
+        g_source_set_callback(source, ThreadTimeout, loopData, nullptr);
+        g_source_attach(source, loopData->mMainContext);
+        g_source_unref(source);
     }
 
-    return result;
+    return true;
 }
 
 MainLoop & MainLoop::Instance(void)
