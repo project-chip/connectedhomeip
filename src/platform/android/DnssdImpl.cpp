@@ -38,14 +38,14 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject         = nullptr;
-jobject sMdnsCallbackObject     = nullptr;
-jmethodID sResolveMethod        = nullptr;
+jobject sResolverObject           = nullptr;
+jobject sMdnsCallbackObject       = nullptr;
+jmethodID sResolveMethod          = nullptr;
 jmethodID sGetAttributeKeysMethod = nullptr;
 jmethodID sGetAttributeDataMethod = nullptr;
 jclass sMdnsCallbackClass         = nullptr;
-jmethodID sPublishMethod        = nullptr;
-jmethodID sRemoveServicesMethod = nullptr;
+jmethodID sPublishMethod          = nullptr;
+jmethodID sRemoveServicesMethod   = nullptr;
 } // namespace
 
 // Implementation of functions declared in lib/dnssd/platform/Dnssd.h
@@ -234,6 +234,24 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
     }
 }
 
+/**
+ * Helper function which returns the jstring key as a null-terminated char string for the purpose
+ * of constructing the TextEntry list
+ */
+const char * getTxtInfoKey(JNIEnv * env, jstring key)
+{
+    const char * keyList[] = { "D", "VP", "AP", "CM", "DT", "DN", "RI", "PI", "PH", "CRI", "CRA", "T" };
+    JniUtfString jniKey(env, key);
+    for (auto & info : keyList)
+    {
+        if (strcmp(info, jniKey.c_str()) == 0)
+        {
+            return info;
+        }
+    }
+    return "";
+}
+
 void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject attributes, jlong callbackHandle,
                    jlong contextHandle)
 {
@@ -323,20 +341,6 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
         }
         delete[] service.mTextEntries;
     }
-}
-
-const char * getTxtInfoKey(JNIEnv * env, jstring key)
-{
-    const char * keyList[] = { "D", "VP", "AP", "CM", "DT", "DN", "RI", "PI", "PH", "CRI", "CRA", "T" };
-    JniUtfString jniKey(env, key);
-    for (auto & info : keyList)
-    {
-        if (strcmp(info, jniKey.c_str()) == 0)
-        {
-            return info;
-        }
-    }
-    return "";
 }
 
 } // namespace Dnssd

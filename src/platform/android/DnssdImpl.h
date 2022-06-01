@@ -35,6 +35,5 @@ void InitializeWithObjects(jobject resolverObject, jobject chipMdnsCallbackObjec
 void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject attributes, jlong callbackHandle,
                    jlong contextHandle);
 
-const char * getTxtInfoKey(JNIEnv * env, jstring key);
 } // namespace Dnssd
 } // namespace chip

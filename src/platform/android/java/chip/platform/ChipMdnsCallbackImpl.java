@@ -32,8 +32,8 @@ public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
   public String[] getAttributeKeys(Map<String, byte[]> attributes) {
     return attributes.keySet().toArray(new String[attributes.size()]);
   }
-   
+
   public byte[] getAttributeData(Map<String, byte[]> attributes, String key) {
     return attributes.get(key);
-  } 
+  }
 }
