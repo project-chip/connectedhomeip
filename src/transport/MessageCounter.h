@@ -33,8 +33,7 @@ namespace chip {
  * of message counter
  *
  * 1. Global unencrypted message counter
- * 2. Global encrypted message counter
- * 3. Session message counter
+ * 2. Secure session message counter
  *
  * There will be separate implementations for each type
  */
@@ -51,6 +50,7 @@ public:
     virtual ~MessageCounter() = default;
 
     virtual Type GetType() const   = 0;
+    virtual bool IsValid() const   = 0;
     virtual uint32_t Value() const = 0; /** Get current value */
     virtual CHIP_ERROR Advance()   = 0; /** Advance the counter */
 };
@@ -63,6 +63,7 @@ public:
     void Init();
 
     Type GetType() const override { return GlobalUnencrypted; }
+    bool IsValid() const override { return true; }
     uint32_t Value() const override { return mValue; }
     CHIP_ERROR Advance() override
     {
@@ -77,7 +78,8 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialSyncValue             = 0;          ///< Used for initializing peer counter
+    static constexpr uint32_t kInvalidMessageCounter        = 0;
+    static constexpr uint32_t kMaxMessageCounter            = 0xFFFFFFFF;
     static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
 
     /**
@@ -88,9 +90,21 @@ public:
     LocalSessionMessageCounter() { mValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1; }
 
     Type GetType() const override { return Session; }
+    bool IsValid() const override { return mValue != kInvalidMessageCounter; }
     uint32_t Value() const override { return mValue; }
     CHIP_ERROR Advance() override
     {
+        if (mValue == kInvalidMessageCounter)
+        {
+            return CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED;
+        }
+
+        if (mValue == kMaxMessageCounter)
+        {
+            mValue = kInvalidMessageCounter;
+            return CHIP_NO_ERROR;
+        }
+
         ++mValue;
         return CHIP_NO_ERROR;
     }

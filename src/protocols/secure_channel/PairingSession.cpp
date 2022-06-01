@@ -44,7 +44,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
     uint16_t peerSessionId = GetPeerSessionId();
     secureSession->SetPeerAddress(peerAddress);
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
 
     // Call Activate last, otherwise errors on anything after would lead to
     // a partially valid session.

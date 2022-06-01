@@ -2410,6 +2410,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
 
+/**
+ * @def CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED
+ *
+ * @brief
+ *   The message counter of the session is exhausted, the session should be closed.
+ */
+#define CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED                 CHIP_CORE_ERROR(0xe2)
+
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
