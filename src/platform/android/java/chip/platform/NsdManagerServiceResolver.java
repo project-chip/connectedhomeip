@@ -77,31 +77,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
 
-      // TODO: remove this hack before merge
-      Runnable hack =
-        new Runnable() {
-          @Override
-          public void run() {
-
-            Map<String, byte[]> attributes = new HashMap<String, byte[]>();
-            attributes.put("VP", "65521+123".getBytes());
-            attributes.put("RI", new byte[] { (byte)0xe0, (byte)0x4f, (byte)0xd0,
-              0x20, (byte)0xea, 0x3a, 0x69, 0x10, (byte)0xa2, (byte)0xd8, 0x08, 0x00, 0x2b,
-              0x30, 0x30, (byte)0x9d});
-            attributes.put("DN", "Chris iPhone".getBytes());
-
-            Log.d(TAG, "resolve: Hacking service resolution for '" + instanceName + "' type '"+serviceType+"'");
-            chipMdnsCallback.handleServiceResolve(
-              instanceName,
-              serviceType,
-              "10.0.2.2",
-              5540,
-              attributes,
-              callbackHandle,
-              contextHandle);
-          }
-        };
-
     this.nsdManager.resolveService(
         serviceInfo,
         new NsdManager.ResolveListener() {
@@ -144,8 +119,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
-
-    mainThreadHandler.postDelayed(hack, RESOLVE_SERVICE_FOUND);
   }
 
   @Override
