@@ -26,11 +26,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
   private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
+  private static final long RESOLVE_SERVICE_FOUND = 3000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
@@ -58,7 +61,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
-    Log.d(TAG, "Starting service resolution for '" + instanceName + "'");
+    Log.d(TAG, "resolve: Starting service resolution for '" + instanceName + "' type '"+serviceType+"'");
 
     Runnable timeoutRunnable =
         new Runnable() {
@@ -67,9 +70,35 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             // Ensure we always release the multicast lock. It's possible that we release the
             // multicast lock here before ResolveListener returns, but since NsdManager has no API
             // to cancel service resolution, there's not much we can do here.
+            Log.d(TAG, "resolve: Timing out");
             if (multicastLock.isHeld()) {
               multicastLock.release();
             }
+          }
+        };
+
+      // TODO: remove this hack before merge
+      Runnable hack =
+        new Runnable() {
+          @Override
+          public void run() {
+
+            Map<String, byte[]> attributes = new HashMap<String, byte[]>();
+            attributes.put("VP", "65521+123".getBytes());
+            attributes.put("RI", new byte[] { (byte)0xe0, (byte)0x4f, (byte)0xd0,
+              0x20, (byte)0xea, 0x3a, 0x69, 0x10, (byte)0xa2, (byte)0xd8, 0x08, 0x00, 0x2b,
+              0x30, 0x30, (byte)0x9d});
+            attributes.put("DN", "Chris iPhone".getBytes());
+
+            Log.d(TAG, "resolve: Hacking service resolution for '" + instanceName + "' type '"+serviceType+"'");
+            chipMdnsCallback.handleServiceResolve(
+              instanceName,
+              serviceType,
+              "10.0.2.2",
+              5540,
+              attributes,
+              callbackHandle,
+              contextHandle);
           }
         };
 
@@ -82,7 +111,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
             chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+                instanceName, serviceType, null, 0, null, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -91,7 +120,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
 
           @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {        
             Log.i(
                 TAG,
                 "Resolved service '"
@@ -104,6 +133,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 serviceType,
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
+                serviceInfo.getAttributes(),
                 callbackHandle,
                 contextHandle);
 
@@ -114,6 +144,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
+
+    mainThreadHandler.postDelayed(hack, RESOLVE_SERVICE_FOUND);
   }
 
   @Override
