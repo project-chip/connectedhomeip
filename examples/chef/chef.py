@@ -97,7 +97,7 @@ def check_python_version() -> None:
         exit(1)
 
 
-def check_zap(master=False) -> str:
+def check_zap(master: bool = False) -> str:
     """Produces hash of ZAP submodule
 
     Args:
