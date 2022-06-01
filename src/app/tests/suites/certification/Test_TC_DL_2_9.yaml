@@ -80,7 +80,6 @@ tests:
               - name: "UserIndex"
                 constraints:
                     minValue: 1
-                    maxValue: NumberOfTotalUsersSupported
 
     - label: "TH sends Set Credential Command to DUT"
       command: "SetCredential"
