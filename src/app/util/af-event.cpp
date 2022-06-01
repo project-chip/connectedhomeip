@@ -70,7 +70,14 @@ static IntrusiveList<MatterEventMetaContext> eventMetaContexts;
 
 void MatterRegisterAfEvent(MatterEventMetaContext * newContext)
 {
-    eventMetaContexts.PushBack(newContext);
+    if (eventMetaContexts.Contains(newContext))
+    {
+        ChipLogError(Zcl, "Trying to register previously registered cluster event context");
+    }
+    else
+    {
+        eventMetaContexts.PushBack(newContext);
+    }
 }
 
 void MatterUnregisterAllAfEvents()
