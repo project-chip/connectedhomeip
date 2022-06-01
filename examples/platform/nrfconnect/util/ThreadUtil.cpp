@@ -23,7 +23,7 @@
 #include <app/server/Dnssd.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
-#include <zephyr.h>
+#include <zephyr/zephyr.h>
 
 #include <cstring>
 

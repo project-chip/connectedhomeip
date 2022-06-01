@@ -31,6 +31,7 @@
 #include <app/util/af.h>
 #include <cstdio>
 #include <inttypes.h>
+#include <jni.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/shell/Commands.h>
@@ -44,60 +45,6 @@
 
 using namespace chip;
 using namespace chip::AppPlatform;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-class MyUserPrompter : public UserPrompter
-{
-    // tv should override this with a dialog prompt
-    inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        /*
-         *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
-         * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
-         *
-         * If user responds with OK then implementor should call CommissionerRespondOk();
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         *
-         */
-        GetCommissionerDiscoveryController()->Ok();
-
-        /**
-         * For Demo: Launch Prime Video App
-         */
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        /*
-         *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
-         * commissioned. For example "Please enter pin displayed in casting app."
-         *
-         * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
-         * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-         */
-
-        GetCommissionerDiscoveryController()->CommissionWithPincode(20202021); // dummy pin code
-
-        /**
-         * For Demo: Launch Prime Video App
-         */
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        return;
-    }
-
-    // tv should override this with a dialog prompt
-    inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
-};
-
-MyUserPrompter gMyUserPrompter;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 class MyPincodeService : public PincodeService
@@ -377,9 +324,9 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);
 
-    for (size_t i = 0; i < ArraySize(mContentApps); ++i)
+    for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        auto & app = mContentApps[i];
+        auto & app = mContentApps.at(i);
 
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
@@ -395,12 +342,67 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl & app)
+{
+    DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+                                                                      Span<const EmberAfDeviceType>(gContentAppDeviceType));
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
+                    app.GetEndpointId());
+    mContentApps.push_back(app);
+    return epId;
+}
+
+/**
+ * @brief Code for testing the message flow path.
+ *
+ */
+class TestCommandHandlerCallback : public app::CommandHandler::Callback
+{
+    void OnDone(app::CommandHandler & apCommandObj) {}
+
+    void DispatchCommand(app::CommandHandler & apCommandObj, const app::ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload)
+    {}
+
+    Protocols::InteractionModel::Status CommandExists(const app::ConcreteCommandPath & aCommandPath)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+};
+
+/**
+ * @brief Code for testing the message flow path.
+ *
+ */
+void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * message)
+{
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage called with message %s & endpointId %d", message, epId);
+    for (size_t i = 0; i < mContentApps.size(); ++i)
+    {
+        ContentAppImpl app = mContentApps.at(i);
+        ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl checking app with endpointId %d", app.ContentApp::GetEndpointId());
+        if (app.GetEndpointId() == epId)
+        {
+            ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage endpoint found");
+            app::ConcreteCommandPath commandPath(epId, app::Clusters::ContentLauncher::Id,
+                                                 app::Clusters::ContentLauncher::Commands::LaunchURL::Id);
+            chip::AppPlatform::TestCommandHandlerCallback callback;
+            app::CommandHandler commandHandler(&callback);
+            CommandResponseHelper<LaunchResponseType> helper(&commandHandler, commandPath);
+            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type branding;
+            app.GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
+                                                              CharSpan::fromCharString("Temp Display"), branding);
+        }
+    }
+}
+
 } // namespace AppPlatform
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-CHIP_ERROR InitVideoPlayerPlatform()
+CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
@@ -409,10 +411,10 @@ CHIP_ERROR InitVideoPlayerPlatform()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-    if (cdc != nullptr)
+    if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPincodeService(&gMyPincodeService);
-        cdc->SetUserPrompter(&gMyUserPrompter);
+        cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }
 
@@ -435,4 +437,18 @@ CHIP_ERROR PreServerInit()
      */
 
     return CHIP_NO_ERROR;
+}
+
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager)
+{
+    ContentAppImpl app =
+        ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
+    ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
+    return gFactory.AddContentApp(app);
+}
+
+void SendTestMessage(EndpointId epID, const char * message)
+{
+    gFactory.SendTestMessage(epID, message);
 }

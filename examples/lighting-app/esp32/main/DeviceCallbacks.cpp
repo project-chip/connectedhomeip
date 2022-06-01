@@ -26,6 +26,8 @@
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
 
+#include <app/util/util.h>
+
 static const char * TAG = "light-app-callbacks";
 
 extern LEDWidget AppLED;

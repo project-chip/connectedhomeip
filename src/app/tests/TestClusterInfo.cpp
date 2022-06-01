@@ -34,6 +34,65 @@ using namespace chip::Test;
 namespace chip {
 namespace app {
 namespace TestPath {
+void TestAttributePathIntersect(nlTestSuite * apSuite, void * apContext)
+{
+    EndpointId endpointIdArray[2]   = { 1, kInvalidEndpointId };
+    ClusterId clusterIdArray[2]     = { 2, kInvalidClusterId };
+    AttributeId attributeIdArray[2] = { 3, kInvalidAttributeId };
+
+    for (auto endpointId1 : endpointIdArray)
+    {
+        for (auto clusterId1 : clusterIdArray)
+        {
+            for (auto attributeId1 : attributeIdArray)
+            {
+                for (auto endpointId2 : endpointIdArray)
+                {
+                    for (auto clusterId2 : clusterIdArray)
+                    {
+                        for (auto attributeId2 : attributeIdArray)
+                        {
+                            AttributePathParams path1;
+                            path1.mEndpointId  = endpointId1;
+                            path1.mClusterId   = clusterId1;
+                            path1.mAttributeId = attributeId1;
+                            AttributePathParams path2;
+                            path2.mEndpointId  = endpointId2;
+                            path2.mClusterId   = clusterId2;
+                            path2.mAttributeId = attributeId2;
+                            NL_TEST_ASSERT(apSuite, path1.Intersects(path2));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mEndpointId = 1;
+        AttributePathParams path2;
+        path2.mEndpointId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mClusterId = 1;
+        AttributePathParams path2;
+        path2.mClusterId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mAttributeId = 1;
+        AttributePathParams path2;
+        path2.mAttributeId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+}
+
 void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContext)
 {
     AttributePathParams clusterInfo1;
@@ -179,6 +238,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TestEventPathDifferentEventId", chip::app::TestPath::TestEventPathDifferentEventId),
     NL_TEST_DEF("TestEventPathDifferentClusterId", chip::app::TestPath::TestEventPathDifferentClusterId),
     NL_TEST_DEF("TestEventPathDifferentEndpointId", chip::app::TestPath::TestEventPathDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIntersect", chip::app::TestPath::TestAttributePathIntersect),
     NL_TEST_SENTINEL()
 };
 }

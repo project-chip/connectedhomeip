@@ -21,6 +21,8 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
+#include <DeviceInfoProviderImpl.h>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -37,8 +39,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -53,9 +55,15 @@ using namespace ::chip::DeviceLayer;
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
-static LEDWidget sStatusLED;
-static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
-static k_timer sFunctionTimer;
+namespace {
+
+LEDWidget sStatusLED;
+UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
+k_timer sFunctionTimer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+} // namespace
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -141,10 +149,12 @@ CHIP_ERROR AppTask::Init()
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
     ConfigurationMgr().LogDeviceConfig();
@@ -364,6 +374,14 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* aArg 
         Instance().mIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         Instance().mIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
         break;
     default:
         break;

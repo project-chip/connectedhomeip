@@ -43,7 +43,7 @@ tests:
           "Check Saturation attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -54,13 +54,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -75,7 +75,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -94,7 +94,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -113,7 +113,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -124,13 +124,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -145,7 +145,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -164,7 +164,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -183,7 +183,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -194,13 +194,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -215,7 +215,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -234,7 +234,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -253,7 +253,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -264,13 +264,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -285,7 +285,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -304,7 +304,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -323,7 +323,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -334,13 +334,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -355,7 +355,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -374,7 +374,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -393,7 +393,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -404,13 +404,13 @@ tests:
       command: "MoveSaturation"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -425,7 +425,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -444,7 +444,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8
@@ -463,7 +463,7 @@ tests:
           "Check current saturation attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
           constraints:
               type: uint8

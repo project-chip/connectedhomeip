@@ -34,14 +34,6 @@ namespace Identify {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Identify
 
-namespace IdentifyQueryResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace IdentifyQueryResponse
-
-namespace IdentifyQuery {
-static constexpr CommandId Id = 0x00000001;
-} // namespace IdentifyQuery
-
 namespace TriggerEffect {
 static constexpr CommandId Id = 0x00000040;
 } // namespace TriggerEffect
@@ -615,6 +607,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+namespace GeneralDiagnostics {
+namespace Commands {
+
+namespace TestEventTrigger {
+static constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+} // namespace GeneralDiagnostics
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 
@@ -723,10 +725,6 @@ static constexpr CommandId Id = 0x0000000A;
 namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
-
-namespace RemoveTrustedRootCertificate {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace RemoveTrustedRootCertificate
 
 } // namespace Commands
 } // namespace OperationalCredentials
@@ -1016,10 +1014,6 @@ namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
 } // namespace GetWeeklySchedule
@@ -1027,10 +1021,6 @@ static constexpr CommandId Id = 0x00000002;
 namespace ClearWeeklySchedule {
 static constexpr CommandId Id = 0x00000003;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 } // namespace Thermostat

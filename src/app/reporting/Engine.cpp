@@ -773,31 +773,32 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
-        // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
-        // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
-        // chunk for read interactions.
-        if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
-        {
-            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
+    bool intersectsInterestPath = false;
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
+        [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+            // We call SetDirty for both read interactions and subscribe interactions, since we may send inconsistent attribute data
+            // between two chunks. SetDirty will be ignored automatically by read handlers which are waiting for a response to the
+            // last message chunk for read interactions.
+            if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
             {
-                if (aAttributePath.IsAttributePathSupersetOf(object->mValue) ||
-                    object->mValue.IsAttributePathSupersetOf(aAttributePath))
+                for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {
-                    handler->SetDirty(aAttributePath);
-                    break;
+                    if (object->mValue.Intersects(aAttributePath))
+                    {
+                        handler->SetDirty(aAttributePath);
+                        intersectsInterestPath = true;
+                        break;
+                    }
                 }
             }
-        }
 
-        return Loop::Continue;
-    });
+            return Loop::Continue;
+        });
 
-    if (!InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aAttributePath))
+    if (!intersectsInterestPath)
     {
         return CHIP_NO_ERROR;
     }
-
     ReturnErrorOnFailure(InsertPathIntoDirtySet(aAttributePath));
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
@@ -827,8 +828,7 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     for (auto object = aReadHandler.GetAttributePathList(); object != nullptr; object = object->mpNext)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if ((path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path)) &&
-                path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
+            if (path->Intersects(object->mValue) && path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
             {
                 intersected = true;
                 return Loop::Break;
@@ -904,6 +904,15 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
 
 CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
+    // If we literally have no read handlers right now that care about any events,
+    // we don't need to call schedule run for event.
+    // If schedule run is called, actually we would not delivery events as well.
+    // Just wanna save one schedule run here
+    if (InteractionModelEngine::GetInstance()->mEventPathPool.Allocated() == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     bool isUrgentEvent = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))

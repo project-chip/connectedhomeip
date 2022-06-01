@@ -70,6 +70,7 @@ client cluster AccessControl = 31 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -77,6 +78,7 @@ client cluster AccountLogin = 1294 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequest {
@@ -116,6 +118,7 @@ client cluster AdministratorCommissioning = 60 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenCommissioningWindowRequest {
@@ -159,6 +162,7 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -188,6 +192,7 @@ client cluster ApplicationLauncher = 1292 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
@@ -238,6 +243,7 @@ client cluster AudioOutput = 1291 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {
@@ -261,6 +267,7 @@ client cluster BarrierControl = 259 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct BarrierControlGoToPercentRequest {
@@ -314,6 +321,7 @@ client cluster Basic = 40 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -324,6 +332,7 @@ client cluster BinaryInputBasic = 15 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -340,6 +349,7 @@ client cluster Binding = 30 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -352,6 +362,7 @@ client cluster BooleanState = 69 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -434,6 +445,7 @@ client cluster BridgedActions = 37 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct InstantActionRequest {
@@ -548,6 +560,7 @@ client cluster BridgedDeviceBasic = 57 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -588,6 +601,7 @@ client cluster Channel = 1284 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {
@@ -692,37 +706,37 @@ client cluster ColorControl = 768 {
   readonly attribute char_string<254> compensationText = 6;
   readonly attribute int16u colorTemperature = 7;
   readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 colorControlOptions = 15;
-  readonly attribute int8u numberOfPrimaries = 16;
+  attribute bitmap8 options = 15;
+  readonly attribute nullable int8u numberOfPrimaries = 16;
   readonly attribute int16u primary1X = 17;
   readonly attribute int16u primary1Y = 18;
-  readonly attribute int8u primary1Intensity = 19;
+  readonly attribute nullable int8u primary1Intensity = 19;
   readonly attribute int16u primary2X = 21;
   readonly attribute int16u primary2Y = 22;
-  readonly attribute int8u primary2Intensity = 23;
+  readonly attribute nullable int8u primary2Intensity = 23;
   readonly attribute int16u primary3X = 25;
   readonly attribute int16u primary3Y = 26;
-  readonly attribute int8u primary3Intensity = 27;
+  readonly attribute nullable int8u primary3Intensity = 27;
   readonly attribute int16u primary4X = 32;
   readonly attribute int16u primary4Y = 33;
-  readonly attribute int8u primary4Intensity = 34;
+  readonly attribute nullable int8u primary4Intensity = 34;
   readonly attribute int16u primary5X = 36;
   readonly attribute int16u primary5Y = 37;
-  readonly attribute int8u primary5Intensity = 38;
+  readonly attribute nullable int8u primary5Intensity = 38;
   readonly attribute int16u primary6X = 40;
   readonly attribute int16u primary6Y = 41;
-  readonly attribute int8u primary6Intensity = 42;
+  readonly attribute nullable int8u primary6Intensity = 42;
   attribute access(write: manage) int16u whitePointX = 48;
   attribute access(write: manage) int16u whitePointY = 49;
   attribute access(write: manage) int16u colorPointRX = 50;
   attribute access(write: manage) int16u colorPointRY = 51;
-  attribute access(write: manage) int8u colorPointRIntensity = 52;
+  attribute access(write: manage) nullable int8u colorPointRIntensity = 52;
   attribute access(write: manage) int16u colorPointGX = 54;
   attribute access(write: manage) int16u colorPointGY = 55;
-  attribute access(write: manage) int8u colorPointGIntensity = 56;
+  attribute access(write: manage) nullable int8u colorPointGIntensity = 56;
   attribute access(write: manage) int16u colorPointBX = 58;
   attribute access(write: manage) int16u colorPointBY = 59;
-  attribute access(write: manage) int8u colorPointBIntensity = 60;
+  attribute access(write: manage) nullable int8u colorPointBIntensity = 60;
   readonly attribute int16u enhancedCurrentHue = 16384;
   readonly attribute enum8 enhancedColorMode = 16385;
   readonly attribute int8u colorLoopActive = 16386;
@@ -731,13 +745,14 @@ client cluster ColorControl = 768 {
   readonly attribute int16u colorLoopStartEnhancedHue = 16389;
   readonly attribute int16u colorLoopStoredEnhancedHue = 16390;
   readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMin = 16395;
-  readonly attribute int16u colorTempPhysicalMax = 16396;
+  readonly attribute int16u colorTempPhysicalMinMireds = 16395;
+  readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
   attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {
@@ -872,8 +887,8 @@ client cluster ColorControl = 768 {
   request struct MoveColorTemperatureRequest {
     HueMoveMode moveMode = 0;
     INT16U rate = 1;
-    INT16U colorTemperatureMinimum = 2;
-    INT16U colorTemperatureMaximum = 3;
+    INT16U colorTemperatureMinimumMireds = 2;
+    INT16U colorTemperatureMaximumMireds = 3;
     BITMAP8 optionsMask = 4;
     BITMAP8 optionsOverride = 5;
   }
@@ -882,8 +897,8 @@ client cluster ColorControl = 768 {
     HueStepMode stepMode = 0;
     INT16U stepSize = 1;
     INT16U transitionTime = 2;
-    INT16U colorTemperatureMinimum = 3;
-    INT16U colorTemperatureMaximum = 4;
+    INT16U colorTemperatureMinimumMireds = 3;
+    INT16U colorTemperatureMaximumMireds = 4;
     BITMAP8 optionsMask = 5;
     BITMAP8 optionsOverride = 6;
   }
@@ -988,6 +1003,7 @@ client cluster ContentLauncher = 1290 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
@@ -1024,6 +1040,7 @@ client cluster Descriptor = 29 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1050,6 +1067,8 @@ client cluster DiagnosticLogs = 50 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
     LogsIntent intent = 0;
@@ -1475,6 +1494,7 @@ client cluster DoorLock = 257 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LockDoorRequest {
@@ -1671,6 +1691,7 @@ client cluster ElectricalMeasurement = 2820 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1772,6 +1793,7 @@ client cluster FixedLabel = 64 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1783,6 +1805,7 @@ client cluster FlowMeasurement = 1028 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1813,6 +1836,7 @@ client cluster GeneralCommissioning = 48 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
@@ -1934,10 +1958,19 @@ client cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 client cluster GroupKeyManagement = 63 {
@@ -1977,6 +2010,7 @@ client cluster GroupKeyManagement = 63 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct KeySetWriteRequest {
@@ -2014,6 +2048,7 @@ client cluster Groups = 4 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
@@ -2095,6 +2130,7 @@ client cluster Identify = 3 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
@@ -2106,12 +2142,7 @@ client cluster Identify = 3 {
     IdentifyEffectVariant effectVariant = 1;
   }
 
-  response struct IdentifyQueryResponse = 0 {
-    INT16U timeout = 0;
-  }
-
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) IdentifyQuery(): IdentifyQueryResponse = 1;
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
@@ -2129,6 +2160,7 @@ client cluster IlluminanceMeasurement = 1024 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2237,6 +2269,7 @@ client cluster KeypadInput = 1289 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
@@ -2345,6 +2378,7 @@ client cluster LocalizationConfiguration = 43 {
   readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2352,6 +2386,7 @@ client cluster LowPower = 1288 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   command Sleep(): DefaultSuccess = 0;
@@ -2389,6 +2424,7 @@ client cluster MediaInput = 1287 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {
@@ -2438,6 +2474,7 @@ client cluster MediaPlayback = 1286 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SkipForwardRequest {
@@ -2663,6 +2700,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
@@ -2764,6 +2802,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -2784,6 +2823,7 @@ client cluster OccupancySensing = 1030 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2815,6 +2855,10 @@ client cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
+  }
+
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -2853,6 +2897,7 @@ client cluster OnOffSwitchConfiguration = 7 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2864,6 +2909,7 @@ client cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -2894,6 +2940,7 @@ client cluster OperationalCredentials = 62 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
@@ -2912,7 +2959,7 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -2931,10 +2978,6 @@ client cluster OperationalCredentials = 62 {
 
   request struct AddTrustedRootCertificateRequest {
     OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   response struct AttestationResponse = 1 {
@@ -2965,7 +3008,6 @@ client cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 client cluster PowerSource = 47 {
@@ -3077,6 +3119,7 @@ client cluster PowerSourceConfiguration = 46 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3095,6 +3138,7 @@ client cluster PressureMeasurement = 1027 {
   readonly attribute int16u scaledTolerance = 19;
   readonly attribute int8s scale = 20;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3216,6 +3260,7 @@ client cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3224,97 +3269,101 @@ client cluster Scenes = 5 {
     kCopyAllScenes = 0x1;
   }
 
-  struct SceneExtensionFieldSet {
+  struct ExtensionFieldSet {
     cluster_id clusterId = 0;
-    int8u length = 1;
-    int8u value = 2;
+    AttributeValuePair attributeValueList[] = 1;
+  }
+
+  struct AttributeValuePair {
+    optional attrib_id attributeId = 0;
+    int8u attributeValue[] = 1;
   }
 
   readonly attribute int8u sceneCount = 0;
   readonly attribute int8u currentScene = 1;
-  readonly attribute int16u currentGroup = 2;
+  readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
-    SceneExtensionFieldSet extensionFieldSets[] = 4;
+    ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct StoreSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RecallSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
-    INT16U transitionTime = 2;
+    optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
-    INT16U transitionTime = 3;
-    CHAR_STRING sceneName = 4;
-    SceneExtensionFieldSet extensionFieldSets[] = 5;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
-    INT8U capacity = 1;
-    INT16U groupId = 2;
-    INT8U sceneCount = 3;
-    INT8U sceneList[] = 4;
+    nullable INT8U capacity = 1;
+    group_id groupId = 2;
+    optional INT8U sceneList[] = 3;
   }
 
   command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
@@ -3410,6 +3459,7 @@ client cluster TargetNavigator = 1285 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequest {
@@ -3431,6 +3481,7 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3631,6 +3682,7 @@ client cluster TestCluster = 1295 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct TestAddArgumentsRequest {
@@ -3802,7 +3854,13 @@ client cluster Thermostat = 513 {
     kAutomode = 0x20;
   }
 
-  readonly attribute int16s localTemperature = 0;
+  struct ThermostatScheduleTransition {
+    int16u transitionTime = 0;
+    nullable int16s heatSetpoint = 1;
+    nullable int16s coolSetpoint = 2;
+  }
+
+  readonly attribute nullable int16s localTemperature = 0;
   readonly attribute int16s absMinHeatSetpointLimit = 3;
   readonly attribute int16s absMaxHeatSetpointLimit = 4;
   readonly attribute int16s absMinCoolSetpointLimit = 5;
@@ -3829,10 +3887,10 @@ client cluster Thermostat = 513 {
   }
 
   request struct SetWeeklyScheduleRequest {
-    ENUM8 numberOfTransitionsForSequence = 0;
+    INT8U numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
-    INT8U payload[] = 3;
+    ThermostatScheduleTransition transitions[] = 3;
   }
 
   request struct GetWeeklyScheduleRequest {
@@ -3841,26 +3899,16 @@ client cluster Thermostat = 513 {
   }
 
   response struct GetWeeklyScheduleResponse = 0 {
-    ENUM8 numberOfTransitionsForSequence = 0;
+    INT8U numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
-    INT8U payload[] = 3;
-  }
-
-  response struct GetRelayStatusLogResponse = 1 {
-    INT16U timeOfDay = 0;
-    BITMAP16 relayStatus = 1;
-    INT16S localTemperature = 2;
-    INT8U humidityInPercentage = 3;
-    INT16S setpoint = 4;
-    INT16U unreadEntries = 5;
+    ThermostatScheduleTransition transitions[] = 3;
   }
 
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
 }
 
 client cluster ThermostatUserInterfaceConfiguration = 516 {
@@ -3870,6 +3918,7 @@ client cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3958,7 +4007,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable RoutingRole routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
@@ -3966,11 +4015,11 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
-  readonly attribute int32u partitionId = 9;
-  readonly attribute int8u weighting = 10;
-  readonly attribute int8u dataVersion = 11;
-  readonly attribute int8u stableDataVersion = 12;
-  readonly attribute int8u leaderRouterId = 13;
+  readonly attribute nullable int32u partitionId = 9;
+  readonly attribute nullable int8u weighting = 10;
+  readonly attribute nullable int8u dataVersion = 11;
+  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute int16u detachedRoleCount = 14;
   readonly attribute int16u childRoleCount = 15;
   readonly attribute int16u routerRoleCount = 16;
@@ -4013,12 +4062,12 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int32u rxErrSecCount = 53;
   readonly attribute int32u rxErrFcsCount = 54;
   readonly attribute int32u rxErrOtherCount = 55;
-  readonly attribute int64u activeTimestamp = 56;
-  readonly attribute int64u pendingTimestamp = 57;
-  readonly attribute int32u delay = 58;
-  readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string<4> channelMask = 60;
-  readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute nullable int64u activeTimestamp = 56;
+  readonly attribute nullable int64u pendingTimestamp = 57;
+  readonly attribute nullable int32u delay = 58;
+  readonly attribute nullable SecurityPolicy securityPolicy = 59;
+  readonly attribute nullable octet_string<4> channelMask = 60;
+  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4055,6 +4104,7 @@ client cluster TimeFormatLocalization = 44 {
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -4079,6 +4129,7 @@ client cluster UserLabel = 65 {
   attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -4087,6 +4138,7 @@ client cluster WakeOnLan = 1283 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 

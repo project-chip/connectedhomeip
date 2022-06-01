@@ -26,7 +26,7 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
-if (chip_mdns != "none") {
+if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -53,8 +53,6 @@ static_library("Linux") {
     "ConnectivityManagerImpl.h",
     "ConnectivityUtils.cpp",
     "ConnectivityUtils.h",
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
@@ -94,7 +92,7 @@ static_library("Linux") {
 
   public_configs = []
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     sources += [
       "DnssdImpl.cpp",
       "DnssdImpl.h",

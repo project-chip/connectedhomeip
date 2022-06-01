@@ -72,6 +72,12 @@ tests:
               - name: "ms"
                 value: fullMotionDuration
 
+    - label: "2c: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          value: 0
+
     ######## DownOrClose Long-Run: Category only for Position Aware DUT #######
     ### Step 3x -> Verify the DUT has reached its fully-open limits
     ### Mandatory Depends on the FeatureMap

@@ -29,18 +29,18 @@ tests:
                 value: nodeId
 
     #Issue 17510
-    - label: "Send RootMenu"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "SendKey"
-      arguments:
-          values:
-              - name: "keyCode"
-                value: 0x09
-
-    - label: "Send SetupMenu"
+    - label: "TH sends CEC Settings Keys(0x0A) to DUT"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x0A
+
+    - label: "TH sends CEC Home Keys(0x09) to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x09

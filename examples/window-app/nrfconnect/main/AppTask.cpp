@@ -21,6 +21,8 @@
 #include "LEDUtil.h"
 #include "WindowCovering.h"
 
+#include <DeviceInfoProviderImpl.h>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -37,8 +39,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -50,9 +52,16 @@
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
-static LEDWidget sStatusLED;
-static UnusedLedsWrapper<1> sUnusedLeds{ { DK_LED4 } };
-static k_timer sFunctionTimer;
+namespace {
+
+LEDWidget sStatusLED;
+UnusedLedsWrapper<1> sUnusedLeds{ { DK_LED4 } };
+k_timer sFunctionTimer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+} // namespace
+
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
 namespace StatusLed {
@@ -138,9 +147,10 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
@@ -474,6 +484,14 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t)
         Instance().mIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         Instance().mIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
         break;
     default:
         break;

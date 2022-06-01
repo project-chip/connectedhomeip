@@ -15,7 +15,7 @@
 
 name:
     3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
-    commissioned to the same fabric [DUT Commissionee, TH2 Commissionee]
+    commissioned to the same fabric [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -23,47 +23,47 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 creates a Fabric"
+    - label: "Commission TH1 to DUTs Fabric"
       verification: |
+          1. Provision the device using 1st controller chip-tool  on the raspi (use above instructions)
 
+
+          " On first controller, using administratorcommissioningg chip tool open commissioning window.
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
       disabled: true
 
-    - label: "Commission DUT to TH1s Fabric"
+    - label: "Commission TH2 to DUTs Fabric"
       verification: |
-          ./chip-tool pairing ble-wifi 1 zigbeehome mater123 20202021 3840  (./chip-tool pairing ble-wifi {NODE ID} {SSID} {PASSWORD} {SETUPPINCODE} {DISCRIMINATOR})
+          Using your DUT Controller connect to the accessory.
+
+          Below is the example when using chip tool as controller
+          ./chip-tool pairing onnetwork 1 20202021
+
+          Verify you got below message
+          Device commissioning completed with success
       disabled: true
 
-    - label: "Commission TH2 to TH1s Fabric"
+    - label: "Send RemoveFabric from DUT to TH1 and comission DUT to TH1 again"
       verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
 
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
+          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
+          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 1
+          [1651571274.155215][10562:10567] CHIP:TOO:    }
       disabled: true
 
-    - label: "Scan for DNS-SD advertising from DUT"
+    - label: "Send RemoveFabric from DUT to TH2 and comission DUT to TH2 again"
       verification: |
-          ./chip-tool operationalcredentials read fabrics 1 1
-      disabled: true
+          ./chip-tool operationalcredentials remove-fabrics 2 2 0
 
-    - label: "Scan for DNS-SD advertising from TH2"
-      verification: |
-          ./chip-tool operationalcredentials read fabrics 2 1
-      disabled: true
-
-    - label: "Remove DUT from TH1s fabric using Remove Fabric method"
-      verification: |
-          ./chip-tool operationalcredentials remove-fabrics 1 0
-      disabled: true
-
-    - label: "Commission DUT to TH1s Fabric again"
-      verification: |
-          ./chip-tool pairing ble-wifi 1 zigbeehome mater123 20202021 3840 (./chip-tool pairing ble-wifi {NODE ID} {SSID} {PASSWORD} {SETUPPINCODE} {DISCRIMINATOR})
-      disabled: true
-
-    - label: "Scan for DNS-SD advertising from DUT"
-      verification: |
-          verify fabric ID value is exactly same as what we got in step 4
-      disabled: true
-
-    - label: "Repeat step 7 to 9 for DUT using Factory Reset Method"
-      verification: |
-          DUT vendor has to provide a way to put the device in factory reset
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
+          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
+          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 2
+          [1651571274.155215][10562:10567] CHIP:TOO:    }
       disabled: true

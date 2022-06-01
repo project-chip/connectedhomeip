@@ -1463,9 +1463,10 @@ CHIP_ERROR CASESession::SetEffectiveTime()
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(
-            SecureChannel,
-            "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.");
+        ChipLogError(SecureChannel,
+                     "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup "
+                     "failures. API error: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         // TODO: Remove use of hardcoded time during CASE setup
         return GetHardcodedTime();
     }

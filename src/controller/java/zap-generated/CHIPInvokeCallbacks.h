@@ -319,21 +319,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPIdentifyClusterIdentifyQueryResponseCallback
-    : public Callback::Callback<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>
-{
-public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallback(jobject javaCallback);
-
-    ~CHIPIdentifyClusterIdentifyQueryResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPKeypadInputClusterSendKeyResponseCallback : public Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>
 {
 public:
@@ -710,21 +695,6 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPThermostatClusterGetRelayStatusLogResponseCallback
-    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
-{
-public:
-    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
-
-    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

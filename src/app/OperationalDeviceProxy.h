@@ -145,11 +145,15 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
 
-    /**
-     *   Called when a connection is closing.
-     *   The object releases all resources associated with the connection.
-     */
+    //////////// SessionDelegate Implementation ///////////////
+
+    // Called when a connection is closing. The object releases all resources associated with the connection.
     void OnSessionReleased() override;
+    // Called when a message is not acked within first retrans timer, try to refresh the peer address
+    void OnFirstMessageDeliveryFailed() override;
+    // Called when a connection is hanging. Try to re-establish another session, and shift to the new session when done, the
+    // original session won't be touched during the period.
+    void OnSessionHang() override;
 
     /**
      *  Mark any open session with the device as expired.

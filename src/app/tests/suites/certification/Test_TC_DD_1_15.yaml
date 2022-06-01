@@ -1,0 +1,87 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.1.15. [TC-DD-1.15] Onboarding Payload Verification - Unique Discriminator
+    and Passcode Values [DUT - Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Using the TH Onboarding payload reader, scan or read the Onboarding
+          payload from DUT1"
+      verification: |
+          1. Parse payload for DUT1
+
+          $  ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+          [1651194471211] [16050:465158] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
+          [1651194471211] [16050:465158] CHIP: [SPL] CommissioningFlow: 0
+          [1651194471211] [16050:465158] CHIP: [SPL] VendorID: 65521
+          [1651194471211] [16050:465158] CHIP: [SPL] Version: 0
+          [1651194471211] [16050:465158] CHIP: [SPL] ProductID: 32769
+          [1651194471211] [16050:465158] CHIP: [SPL] Discriminator: 3840
+          [1651194471211] [16050:465158] CHIP: [SPL] SetUpPINCode: 20202021
+          [1651194471211] [16050:465158] CHIP: [SPL] RendezvousInformation: 4
+      disabled: true
+
+    - label:
+          "Using the TH, parse the Onboarding payload from previous step and
+          verify that the Descriminator and Passcode for DUT1 are present."
+      verification: |
+          DUT1 Descriminator: 3840
+          DUT1 Passcode: 20202021
+      disabled: true
+
+    - label:
+          "Using the TH Onboarding payload reader, scan or read the Onboarding
+          payload from DUT2"
+      verification: |
+          1. Parse payload for DUT2
+
+          $  ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J0IRV01WCCN68G00
+          [1651194577916] [16053:466154] CHIP: [SPL] Parsing base38Representation: MT:-24J0IRV01WCCN68G00
+          [1651194577916] [16053:466154] CHIP: [SPL] CommissioningFlow: 0
+          [1651194577916] [16053:466154] CHIP: [SPL] VendorID: 65521
+          [1651194577916] [16053:466154] CHIP: [SPL] Version: 0
+          [1651194577916] [16053:466154] CHIP: [SPL] ProductID: 32769
+          [1651194577916] [16053:466154] CHIP: [SPL] Discriminator: 3841
+          [1651194577916] [16053:466154] CHIP: [SPL] SetUpPINCode: 20212022
+          [1651194577916] [16053:466154] CHIP: [SPL] RendezvousInformation: 4
+      disabled: true
+
+    - label:
+          "Using the TH, parse the Onboarding payload from previous step and
+          verify that the Descriminator and Passcode for DUT2 are present."
+      verification: |
+          DUT2 Descriminator: 3841
+          DUT2 Passcode: 20212022
+      disabled: true
+
+    - label:
+          "Compare the Descriminator values for DUT1 (Step 1.b) and DUT2 (Step
+          2.b)"
+      verification: |
+          1. Verify DUT1 Descriminator does not equal DUT2 Descriminator
+      disabled: true
+
+    - label:
+          "Compare the Passcode values for DUT1 (Step 1.b) and DUT2 (Step 2.b)"
+      verification: |
+          1. Verify DUT1 Passcode does not equal DUT2 Passcode
+      disabled: true

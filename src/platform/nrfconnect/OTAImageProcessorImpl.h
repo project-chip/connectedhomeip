@@ -19,7 +19,6 @@
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/nrfconnect/OTAImageContentHeader.h>
 
 namespace chip {
 
@@ -27,25 +26,27 @@ class OTADownloader;
 
 namespace DeviceLayer {
 
+class FlashHandler
+{
+public:
+    enum class Action : uint8_t
+    {
+        WAKE_UP,
+        SLEEP
+    };
+    virtual ~FlashHandler() {}
+    virtual void DoAction(Action aAction);
+};
+
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
 
-    enum class ImageType : uint8_t
-    {
-        kAppImage = 0,
-        kNetImage = 1
-    };
+    explicit OTAImageProcessorImpl(FlashHandler * flashHandler = nullptr) : mFlashHandler(flashHandler) {}
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
-
-    struct OTAImage
-    {
-        OTAImageContentHeader::FileInfo * mFileInfo;
-        ImageType mImageType;
-        uint64_t mCurrentOffset;
-    };
+    void TriggerFlashAction(FlashHandler::Action action);
 
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -58,38 +59,11 @@ public:
 private:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
-    CHIP_ERROR SwitchToNextImage(const ByteSpan & aRemainingData);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
-    OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
-    OTAImageContentHeader mContentHeader;
-    OTAImage mCurrentImage;
-};
-
-class ExtFlashHandler
-{
-public:
-    enum class Action : uint8_t
-    {
-        WAKE_UP,
-        SLEEP
-    };
-    virtual ~ExtFlashHandler() {}
-    virtual void DoAction(Action aAction);
-};
-
-class OTAImageProcessorImplPMDevice : public OTAImageProcessorImpl
-{
-public:
-    explicit OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler);
-    CHIP_ERROR PrepareDownload() override;
-    CHIP_ERROR Abort() override;
-    CHIP_ERROR Apply() override;
-
-private:
-    ExtFlashHandler & mHandler;
+    FlashHandler * mFlashHandler;
 };
 
 } // namespace DeviceLayer

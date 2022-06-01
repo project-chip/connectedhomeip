@@ -139,6 +139,18 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
 
+/**
+ * @brief PostAttributeChange is called when an Attribute is modified.
+ *
+ * The method is called by MatterWindowCoveringClusterServerAttributeChangedCallback
+ * to update cluster attributes values. If the application overrides MatterWindowCoveringClusterServerAttributeChangedCallback,
+ * it should call the PostAttributeChange on its own.
+ *
+ * @param[in] endpoint
+ * @param[in] attributeId
+ */
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app

@@ -132,6 +132,10 @@ void ReliableMessageMgr::ExecuteActions()
                          " sendCount: %u max retries: %d",
                          messageCounter, ChipLogValueExchange(&entry->ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
+            // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
+            // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
+            entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
             return Loop::Continue;
@@ -280,7 +284,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
             // After the first failure notify session manager to refresh device data
             if (entry->sendCount == 1)
             {
-                exchangeMgr->GetSessionManager()->RefreshSessionOperationalData(entry->ec->GetSessionHandle());
+                entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnFirstMessageDeliveryFailed);
             }
         }
     }

@@ -89,14 +89,11 @@ protected:
                            const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
                            const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
-    void Shutdown()
-    {
-        mSubscribeClient.reset();
-        mReadClient.reset();
-    }
+    void Shutdown() { mReadClients.clear(); }
 
-    std::unique_ptr<chip::app::ReadClient> mReadClient;
-    std::unique_ptr<chip::app::ReadClient> mSubscribeClient;
+    void CleanupReadClient(chip::app::ReadClient * aReadClient);
+
+    std::vector<std::unique_ptr<chip::app::ReadClient>> mReadClients;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 };
 
@@ -327,7 +324,7 @@ public:
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
-    void OnDone() override;
+    void OnDone(chip::app::ReadClient * aReadClient) override;
     void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
 
     /////////// WriteClient Callback Interface /////////

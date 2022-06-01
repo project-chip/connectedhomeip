@@ -233,13 +233,13 @@ private:
         }
         case 2: {
             LogStep(2, "Wait for Add Wifi Network Command");
-            VerifyOrdo(!ShouldSkip("WIFI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WIFI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id,
                                NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id);
         }
         case 3: {
             LogStep(3, "Wait for Update Thread Network Command");
-            VerifyOrdo(!ShouldSkip("THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id,
                                NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id);
         }
@@ -249,7 +249,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait for Remove Network Command");
-            VerifyOrdo(!ShouldSkip("WIFI | THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WIFI | THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), NetworkCommissioning::Id, NetworkCommissioning::Commands::RemoveNetwork::Id);
         }
         }

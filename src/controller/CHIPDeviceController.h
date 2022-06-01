@@ -136,7 +136,7 @@ struct CommissionerInitParams : public ControllerInitParams
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public AbstractDnssdDiscoveryController
+class DLL_EXPORT DeviceController : public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
@@ -300,9 +300,6 @@ protected:
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
     virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
-
-    //////////// SessionRecoveryDelegate Implementation ///////////////
-    void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
@@ -468,16 +465,6 @@ public:
 
     /**
      * @brief
-     *   This function returns the attestation challenge for the secure session of the device being commissioned.
-     *
-     * @param[out] attestationChallenge The output for the attestationChallenge
-     *
-     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
-     */
-    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
-
-    /**
-     * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
      *   paired device.
      *
@@ -600,7 +587,7 @@ public:
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
     // ClusterStateCache::Callback impl
-    void OnDone() override;
+    void OnDone(app::ReadClient *) override;
 
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;

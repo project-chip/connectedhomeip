@@ -21,14 +21,16 @@
 #error "DFUOverSMP requires MCUMGR module configs enabled"
 #endif
 
-#include <dfu/mcuboot.h>
 #include <img_mgmt/img_mgmt.h>
-#include <mgmt/mcumgr/smp_bt.h>
 #include <os_mgmt/os_mgmt.h>
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/mgmt/mcumgr/smp_bt.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+
+#include "OTAUtil.h"
 
 using namespace ::chip::DeviceLayer;
 
@@ -44,9 +46,13 @@ void DFUOverSMP::Init(DFUOverSMPRestartAdvertisingHandler startAdvertisingCb)
     img_mgmt_set_upload_cb(UploadConfirmHandler, NULL);
 
     memset(&mBleConnCallbacks, 0, sizeof(mBleConnCallbacks));
+    mBleConnCallbacks.connected    = OnBleConnect;
     mBleConnCallbacks.disconnected = OnBleDisconnect;
 
     bt_conn_cb_register(&mBleConnCallbacks);
+
+    k_work_init(&mFlashSleepWork, [](k_work *) { GetFlashHandler().DoAction(FlashHandler::Action::SLEEP); });
+    k_work_init(&mFlashWakeUpWork, [](k_work *) { GetFlashHandler().DoAction(FlashHandler::Action::WAKE_UP); });
 
     restartAdvertisingCallback = startAdvertisingCb;
 
@@ -130,8 +136,21 @@ void DFUOverSMP::StartBLEAdvertising()
     }
 }
 
+void DFUOverSMP::OnBleConnect(bt_conn * conn, uint8_t err)
+{
+    if (GetDFUOverSMP().IsEnabled())
+    {
+        (void) k_work_submit(&sDFUOverSMP.mFlashWakeUpWork);
+    }
+}
+
 void DFUOverSMP::OnBleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
+    if (GetDFUOverSMP().IsEnabled())
+    {
+        (void) k_work_submit(&sDFUOverSMP.mFlashSleepWork);
+    }
+
     PlatformMgr().LockChipStack();
 
     // After BLE disconnect SMP advertising needs to be restarted. Before making it ensure that BLE disconnect was not triggered
@@ -159,7 +178,7 @@ void DFUOverSMP::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg
                 sDFUOverSMP.restartAdvertisingCallback();
         }
         break;
-    case DeviceEventType::kCommissioningComplete:
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
         // Check if after closing CHIPoBLE connection advertising is working, if no start SMP advertising.
         if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
         {

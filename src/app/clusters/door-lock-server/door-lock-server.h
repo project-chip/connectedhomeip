@@ -43,6 +43,7 @@ using chip::app::Clusters::DoorLock::DlDoorState;
 using chip::app::Clusters::DoorLock::DlLockDataType;
 using chip::app::Clusters::DoorLock::DlLockOperationType;
 using chip::app::Clusters::DoorLock::DlLockState;
+using chip::app::Clusters::DoorLock::DlOperatingMode;
 using chip::app::Clusters::DoorLock::DlOperationError;
 using chip::app::Clusters::DoorLock::DlOperationSource;
 using chip::app::Clusters::DoorLock::DlStatus;
@@ -73,7 +74,30 @@ public:
 
     void InitServer(chip::EndpointId endpointId);
 
+    /**
+     * Updates the LockState attribute with new value and sends LockOperation event.
+     *
+     * @note Does not send an event of opSource is kRemote.
+     *
+     * @param endpointId ID of the endpoint to the lock state
+     * @param newLockState new lock state
+     * @param opSource source of the operation (will be used in the event).
+     *
+     * @return true on success, false on failure.
+     */
     bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource);
+
+    /**
+     * Updates the LockState attribute with new value.
+     *
+     * @note Does not generate Lock Operation event
+     *
+     * @param endpointId ID of the endpoint to the lock state
+     * @param newLockState new lock state
+     *
+     * @return true on success, false on failure.
+     */
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState);
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
     bool SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState);
 
@@ -91,6 +115,7 @@ public:
     bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
     bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
     bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
+    bool GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules);
 
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
@@ -110,9 +135,6 @@ public:
 
     void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
-
-    void LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                      DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode);
 
     void SetWeekDayScheduleCommandHandler(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -251,11 +273,29 @@ private:
                                         uint8_t yearDayIndex, uint16_t userIndex, DlStatus status, uint32_t localStartTime = 0,
                                         uint32_t localEndTime = 0);
 
+    bool holidayIndexValid(chip::EndpointId endpointId, uint8_t holidayIndex);
+
+    DlStatus clearHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex);
+    DlStatus clearHolidaySchedules(chip::EndpointId endpointId);
+
+    void sendHolidayScheduleResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                     uint8_t holidayIndex, DlStatus status, uint32_t localStartTime = 0, uint32_t localEndTime = 0,
+                                     DlOperatingMode operatingMode = DlOperatingMode::kNormal);
+
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
                                   chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
                                   uint16_t dataIndex = 0);
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
+
+    void setHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                            uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
+
+    void getHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                            uint8_t holidayIndex);
+
+    void clearHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                              uint8_t holidayIndex);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -354,6 +394,18 @@ private:
 
     friend void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
+    friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterGetHolidayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearHolidayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData);
+
     EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
     static DoorLockServer instance;
@@ -428,6 +480,18 @@ struct EmberAfPluginDoorLockYearDaySchedule
 };
 
 /**
+ * @brief Structure that holds holiday schedule information.
+ */
+struct EmberAfPluginDoorLockHolidaySchedule
+{
+    uint32_t localStartTime; /** The starting time for the Holiday schedule in Epoch Time in Seconds with local time offset based
+                            on the local timezone and DST offset on the day represented by the value. */
+    uint32_t localEndTime;   /** The ending time for the Holiday schedule in Epoch Time in Seconds with local time offset based on
+                              * the local timezone and DST offset on the day represented by the value. */
+    DlOperatingMode operatingMode; /** Operating mode during the schedule. */
+};
+
+/**
  * @brief This callback is called when Door Lock cluster needs to access the Week Day schedule in the schedules database.
  *
  * @param endpointId ID of the endpoint which contains the lock.
@@ -459,6 +523,21 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t w
  */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockYearDaySchedule & schedule);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the Holiday schedule in the schedules database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param holidayIndex Index of the holiday schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     holiday schedule (from 1 up to NumberOfHolidaySchedulesSupported)
+ * @param[out] schedule Resulting holiday schedule.
+ *
+ * @retval DlStatus::kSuccess if schedule was retrieved successfully
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
+                                          EmberAfPluginDoorLockHolidaySchedule & schedule);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to create, modify or clear the week day schedule in schedules
@@ -508,6 +587,29 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
  */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the holiday schedule in schedules
+ * database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param holidayIndex Index of the holiday schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     holiday schedule (from 1 up to NumberOfHolidaySchedulesSupported).
+ * @param status New status of the schedule slot (occupied/available). DlScheduleStatus::kAvailable means that the
+ *               schedules must be deleted.
+ * @param localStartTime The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the
+ *                       local timezone and DST offset on the day represented by the value.
+ * @param localEndTime The ending time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the local
+ *                     timezone and DST offset on the day represented by the value. \p localEndTime is guaranteed to be greater than
+ *                     \p localStartTime.
+ * @param operatingMode The operating mode to use during this Holiday schedule start/end time.
+ *
+ * @retval DlStatus::kSuccess if schedule was successfully modified
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
+                                          uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
 
 // =============================================================================
 // Pre-change callbacks for cluster attributes

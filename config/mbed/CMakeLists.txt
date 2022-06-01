@@ -375,6 +375,10 @@ target_sources(${APP_TARGET} PRIVATE
     ${MBED_COMMON}/util/PigweedLogger.cpp
 )
 
+list(APPEND CHIP_DEFINES
+    PW_RPC_USE_GLOBAL_MUTEX=0
+)
+
 target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_sys_io/public
                     ${PIGWEED_ROOT}/pw_assert/public

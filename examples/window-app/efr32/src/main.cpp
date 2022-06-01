@@ -23,6 +23,8 @@
 #include "init_efrPlatform.h"
 #include "sl_simple_button_instances.h"
 #include "sl_system_kernel.h"
+#include <DeviceInfoProviderImpl.h>
+#include <app/server/Server.h>
 #include <matter_config.h>
 
 #define BLE_DEV_NAME "Silabs-Window"
@@ -31,6 +33,7 @@ using namespace ::chip::DeviceLayer;
 #define UNUSED_PARAMETER(a) (a = a)
 
 volatile int apperror_cnt;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // ================================================================================
 // Main Code
@@ -42,6 +45,9 @@ int main(void)
     init_efrPlatform();
     if (EFR32MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     WindowApp & app = WindowApp::Instance();
 

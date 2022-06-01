@@ -25,7 +25,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <zephyr.h>
+#include <zephyr/zephyr.h>
 
 typedef void (*DFUOverSMPRestartAdvertisingHandler)(void);
 
@@ -42,12 +42,15 @@ private:
     friend DFUOverSMP & GetDFUOverSMP(void);
 
     static int UploadConfirmHandler(uint32_t offset, uint32_t size, void * arg);
+    static void OnBleConnect(bt_conn * conn, uint8_t err);
     static void OnBleDisconnect(bt_conn * conn, uint8_t reason);
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     bool mIsEnabled;
     bool mIsAdvertisingEnabled;
     bt_conn_cb mBleConnCallbacks;
+    k_work mFlashSleepWork;
+    k_work mFlashWakeUpWork;
     DFUOverSMPRestartAdvertisingHandler restartAdvertisingCallback;
 
     static DFUOverSMP sDFUOverSMP;

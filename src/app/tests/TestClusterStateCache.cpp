@@ -280,7 +280,7 @@ public:
     Clusters::TestCluster::Attributes::TypeInfo::DecodableType clusterValue;
 
 private:
-    void OnDone() override {}
+    void OnDone(ReadClient *) override {}
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         ChipLogProgress(DataManagement, "\t\t -- Validating OnAttributeData callback");

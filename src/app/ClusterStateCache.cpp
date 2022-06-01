@@ -209,7 +209,7 @@ void ClusterStateCache::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)
+CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader) const
 {
     CHIP_ERROR err;
     auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
@@ -224,7 +224,7 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
     return reader.Next();
 }
 
-CHIP_ERROR ClusterStateCache::Get(EventNumber eventNumber, TLV::TLVReader & reader)
+CHIP_ERROR ClusterStateCache::Get(EventNumber eventNumber, TLV::TLVReader & reader) const
 {
     CHIP_ERROR err;
 
@@ -240,7 +240,7 @@ CHIP_ERROR ClusterStateCache::Get(EventNumber eventNumber, TLV::TLVReader & read
     return CHIP_NO_ERROR;
 }
 
-ClusterStateCache::EndpointState * ClusterStateCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err)
+const ClusterStateCache::EndpointState * ClusterStateCache::GetEndpointState(EndpointId endpointId, CHIP_ERROR & err) const
 {
     auto endpointIter = mCache.find(endpointId);
     if (endpointIter == mCache.end())
@@ -253,7 +253,8 @@ ClusterStateCache::EndpointState * ClusterStateCache::GetEndpointState(EndpointI
     return &endpointIter->second;
 }
 
-ClusterStateCache::ClusterState * ClusterStateCache::GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err)
+const ClusterStateCache::ClusterState * ClusterStateCache::GetClusterState(EndpointId endpointId, ClusterId clusterId,
+                                                                           CHIP_ERROR & err) const
 {
     auto endpointState = GetEndpointState(endpointId, err);
     if (err != CHIP_NO_ERROR)
@@ -273,7 +274,7 @@ ClusterStateCache::ClusterState * ClusterStateCache::GetClusterState(EndpointId 
 }
 
 const ClusterStateCache::AttributeState * ClusterStateCache::GetAttributeState(EndpointId endpointId, ClusterId clusterId,
-                                                                               AttributeId attributeId, CHIP_ERROR & err)
+                                                                               AttributeId attributeId, CHIP_ERROR & err) const
 {
     auto clusterState = GetClusterState(endpointId, clusterId, err);
     if (err != CHIP_NO_ERROR)
@@ -292,7 +293,7 @@ const ClusterStateCache::AttributeState * ClusterStateCache::GetAttributeState(E
     return &attributeState->second;
 }
 
-const ClusterStateCache::EventData * ClusterStateCache::GetEventData(EventNumber eventNumber, CHIP_ERROR & err)
+const ClusterStateCache::EventData * ClusterStateCache::GetEventData(EventNumber eventNumber, CHIP_ERROR & err) const
 {
     EventData compareKey;
 
@@ -338,7 +339,7 @@ void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath,
     mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
 
-CHIP_ERROR ClusterStateCache::GetVersion(const ConcreteClusterPath & aPath, Optional<DataVersion> & aVersion)
+CHIP_ERROR ClusterStateCache::GetVersion(const ConcreteClusterPath & aPath, Optional<DataVersion> & aVersion) const
 {
     VerifyOrReturnError(aPath.IsValidConcreteClusterPath(), CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err;
@@ -362,7 +363,7 @@ void ClusterStateCache::OnEventData(const EventHeader & aEventHeader, TLV::TLVRe
     mCallback.OnEventData(aEventHeader, apData ? &dataSnapshot : nullptr, apStatus);
 }
 
-CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
+CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status) const
 {
     CHIP_ERROR err;
 
@@ -378,7 +379,7 @@ CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteAttributePath & path, Stat
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteEventPath & path, StatusIB & status)
+CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteEventPath & path, StatusIB & status) const
 {
     auto statusIter = mEventStatusCache.find(path);
     if (statusIter == mEventStatusCache.end())
@@ -390,7 +391,7 @@ CHIP_ERROR ClusterStateCache::GetStatus(const ConcreteEventPath & path, StatusIB
     return CHIP_NO_ERROR;
 }
 
-void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector)
+void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector) const
 {
     for (auto const & endpointIter : mCache)
     {

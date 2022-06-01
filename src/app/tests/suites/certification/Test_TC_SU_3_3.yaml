@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    31.11.1. [TC-SU-3.3] Tests the transfer of Images between the DUT and OTA-R
+name: 3.12.1. [TC-SU-3.3] Tests the transfer of Images between the DUT and OTA-R
 
 config:
     nodeId: 0x12344321
@@ -44,7 +43,7 @@ tests:
           [1645743053319] [97809:20280821] CHIP: [SWU]   metadataForRequestor: 0
           [1645743053319] [97809:20280821] CHIP: [SWU] Update available from 0 to 1 version
 
-          Verifyon the OTA Requestor logs after image downloaded
+          Verify on the OTA Requestor logs after image downloaded
 
           [1645743059327] [97809:20280957] CHIP: [SWU] OTA image downloaded to test.txt
       disabled: true
@@ -63,8 +62,9 @@ tests:
           UserConsentNeeded field set to True."
       verification: |
           Run the OTA Requestor App using command
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
 
-          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} -c
+          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -c
 
           Verify that the DUT does not try to obtain User Consent from the user prior to transfer of software update image.
       disabled: true
@@ -76,9 +76,41 @@ tests:
       verification: |
           Run the OTA Requestor App using command
 
-          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} -c
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
+
+          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
 
           Verify that the DUT tries to obtain User Consent from the user prior to transfer of software update image.
+      disabled: true
+
+    - label:
+          "During the transfer of the image from the DUT, force fail the
+          transfer before it completely transfers the image. Wait for the Idle
+          timeout. Initiate another QueryImage Command from OTA-R/TH to the DUT."
+      verification: |
+          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+
+          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Kill the OTA Requestor App during the transfer of the image to the DUT before it completely transfers the image.
+
+          Verify that the BDX Idle timeout on DUT should be no less than 5 minutes.
+          [1651269360125] [23256:35291938] CHIP: [BDX] Transfer timed out
+
+          Relaunch the OTA Requestor App and initiate another query
+          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+
+          Verify that a new transfer of software image is started from DUT when sending another QueryImage request
+      disabled: true
+
+    - label:
+          "During the transfer of the image from the DUT, force fail the
+          transfer before it completely transfers the image. Initiate another
+          QueryImage Command from OTA-R/TH to the DUT. Set the RC[STARTOFS] bit
+          and associated STARTOFS field in the ReceiveInit Message sent from the
+          TH to indicate the resumption of a transfer previously aborted."
+      verification: |
+          Out of scope for V1.0
       disabled: true
 
     - label:
