@@ -442,13 +442,18 @@ CHIP_ERROR PreServerInit()
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager)
 {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppImpl app =
         ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
     return gFactory.AddContentApp(app);
+#endif //CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    return 0;
 }
 
 void SendTestMessage(EndpointId epID, const char * message)
 {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     gFactory.SendTestMessage(epID, message);
+#endif //CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
