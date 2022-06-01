@@ -40,6 +40,9 @@ patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/Flash
 convert_to_dos "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/MemManager/Interface/MemManager.h
 patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/MemManager/Interface -p1 <"$SOURCE_DIR/MemManager_h.patch"
 
+#internal: THREADIP-3660
+patch -N --binary -d ./third_party/openthread/ot-nxp/src/k32w0/platform -p1 <"$SOURCE_DIR/settings_k32w_c.patch"
+
 SIGN_FILE_PATH="$NXP_K32W061_SDK_ROOT"/tools/imagetool/sign_images.sh
 convert_to_dos "$SIGN_FILE_PATH"
 patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/tools/imagetool/ -p1 <"$SOURCE_DIR/sign_images_sh.patch"

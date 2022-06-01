@@ -36,23 +36,12 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-#define BUFFER_LOG_SIZE 256
-#define CHIP_CONFIG_RAM_BUFFER_SIZE 3072
-
-#ifndef NVM_ID_CHIP_CONFIG_DATA
-#define NVM_ID_CHIP_CONFIG_DATA 0x5000
-#endif
-
-typedef struct
-{
-    uint16_t chipConfigRamBufferLen;
-    uint8_t chipConfigRamBuffer[1];
-} ChipConfigRamStruct_t;
-
-static ChipConfigRamStruct_t * chipConfigRamStruct;
 static ramBufferDescriptor * ramDescr;
 
-#define RAM_DESC_HEADER_SIZE (sizeof(ramDescr->ramBufferLen + ramDescr->ramBufferMaxLen))
+constexpr size_t kRamBufferInitialSize = 3072;
+constexpr size_t kRamBufferReallocSize = 512;
+constexpr size_t kNvmIdChipConfigData  = 0x5000;
+constexpr size_t kRamDescHeaderSize = sizeof(ramDescr->ramBufferLen) + sizeof(ramDescr->ramBufferMaxLen);
 
 static rsError AddToRamStorage(ramBufferDescriptor ** pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
@@ -64,11 +53,11 @@ static rsError AddToRamStorage(ramBufferDescriptor ** pBuffer, uint16_t aKey, co
     {
         while (allocSize < (*pBuffer)->ramBufferLen + aValueLength)
         {
-            /* Need to realocate the memory buffer, increase size by 512B until nvm data fits */
-            allocSize += 512;
+            /* Need to realocate the memory buffer, increase size by kRamBufferReallocSize until NVM data fits */
+            allocSize += kRamBufferReallocSize;
         }
 
-        allocSize += RAM_DESC_HEADER_SIZE;
+        allocSize += kRamDescHeaderSize;
 
         ptr = (ramBufferDescriptor *) realloc((void *) (*pBuffer), allocSize);
         VerifyOrExit((NULL != ptr), err = RS_ERROR_NO_BUFS);
@@ -85,17 +74,16 @@ CHIP_ERROR K32WConfig::Init()
 {
     CHIP_ERROR err;
     int pdmStatus;
-    ;
     uint16_t bytesRead, recordSize;
     bool bLoadDataFromNvm = false;
-    uint32_t allocSize    = CHIP_CONFIG_RAM_BUFFER_SIZE;
+    uint32_t allocSize    = kRamBufferInitialSize;
 
     /* Initialise the Persistent Data Manager */
     pdmStatus = PDM_Init();
     SuccessOrExit(err = MapPdmInitStatus(pdmStatus));
 
     /* Check if dataset is present and get its size */
-    if (PDM_bDoesDataExist((uint16_t) NVM_ID_CHIP_CONFIG_DATA, &recordSize))
+    if (PDM_bDoesDataExist((uint16_t) kNvmIdChipConfigData, &recordSize))
     {
         bLoadDataFromNvm = true;
         while (recordSize > allocSize)
@@ -109,13 +97,12 @@ CHIP_ERROR K32WConfig::Init()
     VerifyOrExit((NULL != ramDescr), err = CHIP_ERROR_NO_MEMORY);
 
     ramDescr->ramBufferLen    = 0;
-    ramDescr->ramBufferMaxLen = allocSize - RAM_DESC_HEADER_SIZE;
+    ramDescr->ramBufferMaxLen = allocSize - kRamDescHeaderSize;
 
     if (bLoadDataFromNvm)
     {
         /* Try to load the dataset in RAM */
-        // PDM_vDeleteDataRecord((uint16_t) NVM_ID_CHIP_CONFIG_DATA);
-        PDM_eReadDataFromRecord((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, recordSize, &bytesRead);
+        PDM_eReadDataFromRecord((uint16_t) kNvmIdChipConfigData, ramDescr, recordSize, &bytesRead);
     }
 
 exit:
@@ -209,7 +196,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
     SuccessOrExit(err = MapRamStorageStatus(status));
 
     pdmStatus =
-        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 exit:
     return err;
@@ -226,7 +213,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
     SuccessOrExit(err = MapRamStorageStatus(status));
 
     pdmStatus =
-        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -244,7 +231,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
     SuccessOrExit(err = MapRamStorageStatus(status));
 
     pdmStatus =
-        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -269,8 +256,8 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
         status = AddToRamStorage(&ramDescr, key, (uint8_t *) str, strLen);
         SuccessOrExit(err = MapRamStorageStatus(status));
 
-        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr,
-                                                  ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr,
+                                                  ramDescr->ramBufferLen + kRamDescHeaderSize);
         SuccessOrExit(err = MapPdmStatus(pdmStatus));
     }
     else
@@ -305,7 +292,7 @@ CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
     SuccessOrExit(err = MapRamStorageStatus(status));
 
     pdmStatus =
-        PDM_eSaveRecordDataInIdleTask((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+        PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -338,7 +325,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
         err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
     }
 
-    pdmStatus = PDM_eSaveRecordData((uint16_t) NVM_ID_CHIP_CONFIG_DATA, ramDescr, ramDescr->ramBufferLen + RAM_DESC_HEADER_SIZE);
+    pdmStatus = PDM_eSaveRecordData((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:

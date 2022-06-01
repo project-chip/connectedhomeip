@@ -48,8 +48,8 @@ static_library("k32w0") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "ble_function_mux.c",
-    "ram_storage.c",
-    "ram_storage.h",
+    "RamStorage.cpp",
+    "RamStorage.h",
   ]
 
   if (chip_enable_ota_requestor) {
