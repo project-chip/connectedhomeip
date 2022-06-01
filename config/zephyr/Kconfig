@@ -242,13 +242,6 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	  This option allows one to pass optional arguments to the ota_image_tool.py
 	  script, used for building OTA image.
 
-config CHIP_OTA_IMAGE_INCLUDE_MCUBOOT
-	bool "Include MCUBoot in OTA image"
-	depends on BOOTLOADER_MCUBOOT
-	help
-	  Include MCUBoot bootloader image in the generated Matter OTA image. This
-	  option can be enabled if the device supports the bootloader update.
-
 endif
 
 config CHIP_EXTENDED_DISCOVERY

@@ -21,10 +21,10 @@
 #error "DFUOverSMP requires MCUMGR module configs enabled"
 #endif
 
-#include <dfu/mcuboot.h>
 #include <img_mgmt/img_mgmt.h>
-#include <mgmt/mcumgr/smp_bt.h>
 #include <os_mgmt/os_mgmt.h>
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/mgmt/mcumgr/smp_bt.h>
 
 #include <platform/CHIPDeviceLayer.h>
 

@@ -23,9 +23,9 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/af.h>
-#include <logging/log.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <zephyr.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
@@ -33,6 +33,8 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
+static const struct pwm_dt_spec sLiftPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+static const struct pwm_dt_spec sTiltPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
 static k_timer sLiftTimer;
 static k_timer sTiltTimer;
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
@@ -42,11 +44,11 @@ WindowCovering::WindowCovering()
     mLiftLED.Init(LIFT_STATE_LED);
     mTiltLED.Init(TILT_STATE_LED);
 
-    if (mLiftIndicator.Init(LIFT_PWM_DEVICE, LIFT_PWM_CHANNEL, 0, 255) != 0)
+    if (mLiftIndicator.Init(&sLiftPwmDevice, 0, 255) != 0)
     {
         LOG_ERR("Cannot initialize the lift indicator");
     }
-    if (mTiltIndicator.Init(TILT_PWM_DEVICE, TILT_PWM_CHANNEL, 0, 255) != 0)
+    if (mTiltIndicator.Init(&sTiltPwmDevice, 0, 255) != 0)
     {
         LOG_ERR("Cannot initialize the tilt indicator");
     }
