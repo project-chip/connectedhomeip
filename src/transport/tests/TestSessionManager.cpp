@@ -805,7 +805,8 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // ==== Set counter value to max ====
-    LocalSessionMessageCounter & counter = static_cast<LocalSessionMessageCounter&>(aliceToBobSession.Get().Value()->AsSecureSession()->GetSessionMessageCounter().GetLocalMessageCounter());
+    LocalSessionMessageCounter & counter = static_cast<LocalSessionMessageCounter &>(
+        aliceToBobSession.Get().Value()->AsSecureSession()->GetSessionMessageCounter().GetLocalMessageCounter());
     counter.TestSetCounter(LocalSessionMessageCounter::kMaxMessageCounter);
 
     // ==== Build a valid message with max counter value ====
