@@ -19,7 +19,7 @@ package com.tcl.chip.tvapp;
 
 public class UserPrompterResolver {
 
-  private static final String TAG = "UserPrompterResolver";
+  protected static final String TAG = "UserPrompterResolver";
 
   public native void OnPinCodeEntered(int pinCode);
 
