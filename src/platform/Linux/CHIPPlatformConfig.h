@@ -41,6 +41,11 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 // ==================== Security Adaptations ====================
 
+// If unspecified, assume crypto is fast on Linux
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 0
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
