@@ -109,6 +109,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    // Test-only function to set the counter value
+    void TestSetCounter(uint32_t value) { mValue = value; }
+
 private:
     uint32_t mValue;
 };
