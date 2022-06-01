@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Access Control
- *    
+ *
  */
 @interface CHIPTestAccessControl : CHIPAccessControl
 
@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Account Login
- *    
+ *
  */
 @interface CHIPTestAccountLogin : CHIPAccountLogin
 
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster AdministratorCommissioning
- *    
+ *
  */
 @interface CHIPTestAdministratorCommissioning : CHIPAdministratorCommissioning
 
@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Basic
- *    
+ *
  */
 @interface CHIPTestApplicationBasic : CHIPApplicationBasic
 
@@ -100,7 +100,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Launcher
- *    
+ *
  */
 @interface CHIPTestApplicationLauncher : CHIPApplicationLauncher
 
@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Audio Output
- *    
+ *
  */
 @interface CHIPTestAudioOutput : CHIPAudioOutput
 
@@ -133,7 +133,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Barrier Control
- *    
+ *
  */
 @interface CHIPTestBarrierControl : CHIPBarrierControl
 
@@ -152,7 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Basic
- *    
+ *
  */
 @interface CHIPTestBasic : CHIPBasic
 
@@ -184,7 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Binary Input (Basic)
- *    
+ *
  */
 @interface CHIPTestBinaryInputBasic : CHIPBinaryInputBasic
 
@@ -202,7 +202,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Binding
- *    
+ *
  */
 @interface CHIPTestBinding : CHIPBinding
 
@@ -217,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Boolean State
- *    
+ *
  */
 @interface CHIPTestBooleanState : CHIPBooleanState
 
@@ -233,7 +233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Bridged Actions
- *    
+ *
  */
 @interface CHIPTestBridgedActions : CHIPBridgedActions
 
@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Bridged Device Basic
- *    
+ *
  */
 @interface CHIPTestBridgedDeviceBasic : CHIPBridgedDeviceBasic
 
@@ -280,7 +280,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Channel
- *    
+ *
  */
 @interface CHIPTestChannel : CHIPChannel
 
@@ -298,7 +298,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Color Control
- *    
+ *
  */
 @interface CHIPTestColorControl : CHIPColorControl
 
@@ -352,7 +352,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Content Launcher
- *    
+ *
  */
 @interface CHIPTestContentLauncher : CHIPContentLauncher
 
@@ -368,7 +368,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Descriptor
- *    
+ *
  */
 @interface CHIPTestDescriptor : CHIPDescriptor
 
@@ -387,7 +387,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Diagnostic Logs
- *    
+ *
  */
 @interface CHIPTestDiagnosticLogs : CHIPDiagnosticLogs
 
@@ -402,7 +402,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Door Lock
- *    
+ *
  */
 @interface CHIPTestDoorLock : CHIPDoorLock
 
@@ -436,7 +436,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Electrical Measurement
- *    
+ *
  */
 @interface CHIPTestElectricalMeasurement : CHIPElectricalMeasurement
 
@@ -571,7 +571,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Ethernet Network Diagnostics
- *    
+ *
  */
 @interface CHIPTestEthernetNetworkDiagnostics : CHIPEthernetNetworkDiagnostics
 
@@ -595,7 +595,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Fan Control
- *    
+ *
  */
 @interface CHIPTestFanControl : CHIPFanControl
 
@@ -615,7 +615,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Fixed Label
- *    
+ *
  */
 @interface CHIPTestFixedLabel : CHIPFixedLabel
 
@@ -631,7 +631,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Flow Measurement
- *    
+ *
  */
 @interface CHIPTestFlowMeasurement : CHIPFlowMeasurement
 
@@ -650,7 +650,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster General Commissioning
- *    
+ *
  */
 @interface CHIPTestGeneralCommissioning : CHIPGeneralCommissioning
 
@@ -669,7 +669,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster General Diagnostics
- *    
+ *
  */
 @interface CHIPTestGeneralDiagnostics : CHIPGeneralDiagnostics
 
@@ -693,7 +693,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Group Key Management
- *    
+ *
  */
 @interface CHIPTestGroupKeyManagement : CHIPGroupKeyManagement
 
@@ -711,7 +711,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Groups
- *    
+ *
  */
 @interface CHIPTestGroups : CHIPGroups
 
@@ -727,7 +727,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Identify
- *    
+ *
  */
 @interface CHIPTestIdentify : CHIPIdentify
 
@@ -743,7 +743,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Illuminance Measurement
- *    
+ *
  */
 @interface CHIPTestIlluminanceMeasurement : CHIPIlluminanceMeasurement
 
@@ -763,7 +763,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Keypad Input
- *    
+ *
  */
 @interface CHIPTestKeypadInput : CHIPKeypadInput
 
@@ -778,7 +778,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Level Control
- *    
+ *
  */
 @interface CHIPTestLevelControl : CHIPLevelControl
 
@@ -800,7 +800,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Localization Configuration
- *    
+ *
  */
 @interface CHIPTestLocalizationConfiguration : CHIPLocalizationConfiguration
 
@@ -816,7 +816,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Low Power
- *    
+ *
  */
 @interface CHIPTestLowPower : CHIPLowPower
 
@@ -831,7 +831,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Input
- *    
+ *
  */
 @interface CHIPTestMediaInput : CHIPMediaInput
 
@@ -848,7 +848,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Playback
- *    
+ *
  */
 @interface CHIPTestMediaPlayback : CHIPMediaPlayback
 
@@ -870,7 +870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Mode Select
- *    
+ *
  */
 @interface CHIPTestModeSelect : CHIPModeSelect
 
@@ -889,7 +889,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Network Commissioning
- *    
+ *
  */
 @interface CHIPTestNetworkCommissioning : CHIPNetworkCommissioning
 
@@ -911,7 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster OTA Software Update Provider
- *    
+ *
  */
 @interface CHIPTestOtaSoftwareUpdateProvider : CHIPOtaSoftwareUpdateProvider
 
@@ -926,7 +926,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster OTA Software Update Requestor
- *    
+ *
  */
 @interface CHIPTestOtaSoftwareUpdateRequestor : CHIPOtaSoftwareUpdateRequestor
 
@@ -944,7 +944,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Occupancy Sensing
- *    
+ *
  */
 @interface CHIPTestOccupancySensing : CHIPOccupancySensing
 
@@ -962,7 +962,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster On/Off
- *    
+ *
  */
 @interface CHIPTestOnOff : CHIPOnOff
 
@@ -979,7 +979,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster On/off Switch Configuration
- *    
+ *
  */
 @interface CHIPTestOnOffSwitchConfiguration : CHIPOnOffSwitchConfiguration
 
@@ -995,7 +995,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Operational Credentials
- *    
+ *
  */
 @interface CHIPTestOperationalCredentials : CHIPOperationalCredentials
 
@@ -1016,7 +1016,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Power Source
- *    
+ *
  */
 @interface CHIPTestPowerSource : CHIPPowerSource
 
@@ -1062,7 +1062,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Power Source Configuration
- *    
+ *
  */
 @interface CHIPTestPowerSourceConfiguration : CHIPPowerSourceConfiguration
 
@@ -1078,7 +1078,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Pressure Measurement
- *    
+ *
  */
 @interface CHIPTestPressureMeasurement : CHIPPressureMeasurement
 
@@ -1102,7 +1102,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Pump Configuration and Control
- *    
+ *
  */
 @interface CHIPTestPumpConfigurationAndControl : CHIPPumpConfigurationAndControl
 
@@ -1136,7 +1136,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Relative Humidity Measurement
- *    
+ *
  */
 @interface CHIPTestRelativeHumidityMeasurement : CHIPRelativeHumidityMeasurement
 
@@ -1155,7 +1155,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Scenes
- *    
+ *
  */
 @interface CHIPTestScenes : CHIPScenes
 
@@ -1176,7 +1176,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Software Diagnostics
- *    
+ *
  */
 @interface CHIPTestSoftwareDiagnostics : CHIPSoftwareDiagnostics
 
@@ -1195,7 +1195,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Switch
- *    
+ *
  */
 @interface CHIPTestSwitch : CHIPSwitch
 
@@ -1213,7 +1213,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Target Navigator
- *    
+ *
  */
 @interface CHIPTestTargetNavigator : CHIPTargetNavigator
 
@@ -1230,7 +1230,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Temperature Measurement
- *    
+ *
  */
 @interface CHIPTestTemperatureMeasurement : CHIPTemperatureMeasurement
 
@@ -1249,7 +1249,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Test Cluster
- *    
+ *
  */
 @interface CHIPTestTestCluster : CHIPTestCluster
 
@@ -1264,7 +1264,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thermostat
- *    
+ *
  */
 @interface CHIPTestThermostat : CHIPThermostat
 
@@ -1301,7 +1301,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thermostat User Interface Configuration
- *    
+ *
  */
 @interface CHIPTestThermostatUserInterfaceConfiguration : CHIPThermostatUserInterfaceConfiguration
 
@@ -1316,7 +1316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thread Network Diagnostics
- *    
+ *
  */
 @interface CHIPTestThreadNetworkDiagnostics : CHIPThreadNetworkDiagnostics
 
@@ -1394,7 +1394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Time Format Localization
- *    
+ *
  */
 @interface CHIPTestTimeFormatLocalization : CHIPTimeFormatLocalization
 
@@ -1410,7 +1410,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Unit Localization
- *    
+ *
  */
 @interface CHIPTestUnitLocalization : CHIPUnitLocalization
 
@@ -1425,7 +1425,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster User Label
- *    
+ *
  */
 @interface CHIPTestUserLabel : CHIPUserLabel
 
@@ -1440,7 +1440,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Wake on LAN
- *    
+ *
  */
 @interface CHIPTestWakeOnLan : CHIPWakeOnLan
 
@@ -1456,7 +1456,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster WiFi Network Diagnostics
- *    
+ *
  */
 @interface CHIPTestWiFiNetworkDiagnostics : CHIPWiFiNetworkDiagnostics
 
@@ -1484,7 +1484,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Window Covering
- *    
+ *
  */
 @interface CHIPTestWindowCovering : CHIPWindowCovering
 
