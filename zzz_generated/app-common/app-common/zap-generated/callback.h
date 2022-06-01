@@ -12549,6 +12549,12 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::DecodableType & commandData);
 /**
+ * @brief Level Control Cluster MoveToClosestFrequency Command callback (from client)
+ */
+bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
+/**
  * @brief Alarms Cluster ResetAlarm Command callback (from client)
  */
 bool emberAfAlarmsClusterResetAlarmCallback(chip::app::CommandHandler * commandObj,

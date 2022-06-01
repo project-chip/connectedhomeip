@@ -2136,6 +2136,7 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterLevelControlCommandMoveWithOnOffID = 0x00000005,
     kMatterClusterLevelControlCommandStepWithOnOffID = 0x00000006,
     kMatterClusterLevelControlCommandStopWithOnOffID = 0x00000007,
+    kMatterClusterLevelControlCommandMoveToClosestFrequencyID = 0x00000008,
 
     // Cluster Alarms commands
     kMatterClusterAlarmsCommandResetAlarmID = 0x00000000,

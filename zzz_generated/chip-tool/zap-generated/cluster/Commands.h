@@ -2633,6 +2633,7 @@ private:
 | * MoveWithOnOff                                                     |   0x05 |
 | * StepWithOnOff                                                     |   0x06 |
 | * StopWithOnOff                                                     |   0x07 |
+| * MoveToClosestFrequency                                            |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentLevel                                                      | 0x0000 |
@@ -2911,6 +2912,37 @@ public:
 
 private:
     chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type mRequest;
+};
+
+/*
+ * Command MoveToClosestFrequency
+ */
+class LevelControlMoveToClosestFrequency : public ClusterCommand
+{
+public:
+    LevelControlMoveToClosestFrequency(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("move-to-closest-frequency", credsIssuerConfig)
+    {
+        AddArgument("Frequency", 0, UINT16_MAX, &mRequest.frequency);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000008, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000008, mRequest);
+    }
+
+private:
+    chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type mRequest;
 };
 
 class WriteLevelControlOptions : public WriteAttribute
@@ -19749,15 +19781,16 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
-        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),          //
-        make_unique<LevelControlMove>(credsIssuerConfig),                 //
-        make_unique<LevelControlStep>(credsIssuerConfig),                 //
-        make_unique<LevelControlStop>(credsIssuerConfig),                 //
-        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig), //
-        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),            //
+        make_unique<LevelControlMove>(credsIssuerConfig),                   //
+        make_unique<LevelControlStep>(credsIssuerConfig),                   //
+        make_unique<LevelControlStop>(credsIssuerConfig),                   //
+        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig),   //
+        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlMoveToClosestFrequency>(credsIssuerConfig), //
         //
         // Attributes
         //
