@@ -65,7 +65,7 @@ namespace System {
 //
 
 PacketBuffer::BufferPoolElement PacketBuffer::sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE]
-    __attribute__((section(".bss.packet_buffer_matter")));
+    __attribute__((section(".bss.buf_pool")));
 
 PacketBuffer * PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
 

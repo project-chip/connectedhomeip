@@ -213,7 +213,7 @@ SECTIONS
 
     .heap_packet_buffer (COPY):
     {
-        *(.bss.packet_buffer_matter)
+        *(.bss.buf_pool)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))
