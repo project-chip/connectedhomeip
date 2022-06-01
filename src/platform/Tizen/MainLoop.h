@@ -32,8 +32,12 @@ typedef gboolean (*initFn_t)(gpointer userData);
 typedef gboolean (*asyncFn_t)(GMainLoop * mainLoop, gpointer userData);
 typedef void (*timeoutFn_t)(gpointer userData);
 
-struct LoopData
+class LoopData
 {
+public:
+    LoopData();
+    ~LoopData();
+
     // Thread which governs glib main event loop
     std::thread mThread;
     // Objects for running glib main event loop

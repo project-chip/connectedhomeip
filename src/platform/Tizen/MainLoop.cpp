@@ -16,16 +16,34 @@
 
 #include "MainLoop.h"
 
-#include <errno.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <pthread.h>
-#include <system/SystemTimer.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+LoopData::LoopData()
+{
+    mMainContext = g_main_context_new();
+    mMainLoop    = g_main_loop_new(mMainContext, FALSE);
+}
+
+LoopData::~LoopData()
+{
+    if (mThread.joinable())
+    {
+        mThread.join();
+    }
+    if (mMainContext != nullptr)
+    {
+        g_main_context_unref(mMainContext);
+    }
+    if (mMainLoop != nullptr)
+    {
+        g_main_loop_unref(mMainLoop);
+    }
+}
 
 gboolean MainLoop::ThreadTimeout(gpointer userData)
 {
@@ -41,10 +59,7 @@ gboolean MainLoop::ThreadTimeout(gpointer userData)
         loopData->mTimeoutFn(loopData->mTimeoutUserData);
     }
 
-    if (loopData->mMainLoop)
-    {
-        g_main_loop_quit(loopData->mMainLoop);
-    }
+    g_main_loop_quit(loopData->mMainLoop);
 
     return G_SOURCE_REMOVE;
 }
@@ -60,12 +75,6 @@ void MainLoop::ThreadHandler(std::shared_ptr<LoopData> loopData)
 
     g_main_context_pop_thread_default(loopData->mMainContext);
     ChipLogDetail(DeviceLayer, "[POP] thread default context [%p]", loopData->mMainContext);
-
-    g_main_loop_unref(loopData->mMainLoop);
-    loopData->mMainLoop = nullptr;
-
-    g_main_context_unref(loopData->mMainContext);
-    loopData->mMainContext = nullptr;
 }
 
 bool MainLoop::Init(initFn_t initFn, gpointer userData)
@@ -74,9 +83,6 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     bool result   = false;
 
     VerifyOrReturnError(loopData, false);
-
-    loopData->mMainContext = g_main_context_new();
-    loopData->mMainLoop    = g_main_loop_new(loopData->mMainContext, FALSE);
 
     g_main_context_push_thread_default(loopData->mMainContext);
     ChipLogDetail(DeviceLayer, "[PUSH] thread default context [%p]", loopData->mMainContext);
@@ -98,11 +104,7 @@ void MainLoop::Deinit(void)
 {
     for (auto & loopData : mLoopData)
     {
-        if (loopData->mMainLoop)
-        {
-            g_main_loop_quit(loopData->mMainLoop);
-        }
-        loopData->mThread.join();
+        g_main_loop_quit(loopData->mMainLoop);
     }
     mLoopData.clear();
 }
@@ -115,8 +117,6 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint tim
 
     VerifyOrReturnError(loopData, false);
 
-    loopData->mMainContext     = g_main_context_new();
-    loopData->mMainLoop        = g_main_loop_new(loopData->mMainContext, FALSE);
     loopData->mTimeoutFn       = timeoutFn;
     loopData->mTimeoutUserData = timeoutUserData;
 
