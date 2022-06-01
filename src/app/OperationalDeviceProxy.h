@@ -151,9 +151,9 @@ public:
     void OnSessionReleased() override;
     // Called when a message is not acked within first retrans timer, try to refresh the peer address
     void OnFirstMessageDeliveryFailed() override;
-    // Called when a connection is hanging. Try to re-establish another session, and shift to the new session when done, the
+    // Triggered by application layer. Try to re-establish another session, and shift to the new session when done, the
     // original session won't be touched during the period.
-    void OnSessionHang() override;
+    void OnRequestRecovery() override;
 
     /**
      *  Mark any open session with the device as expired.
@@ -219,7 +219,6 @@ private:
         HasAddress,        // Have an address, CASE handshake not started yet.
         Connecting,        // CASE handshake in progress.
         Recovering,        // CASE session hang, trying to establish a new one, the old session is hanging but left untouched.
-        RecoveryBackoff, // CASE session hang, unable to connection a new one, backoff
         SecureConnected,   // CASE session established.
     };
 
@@ -280,12 +279,7 @@ private:
      */
     void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 
-    static void HandleBackoffTimer(System::Layer * aSystemLayer, void * aAppState);
     void TrySessionRecovery();
-    void RecoveryBackoff();
-
-    System::Clock::Timeout mRecoveryBackoffTimeout =
-        System::Clock::Milliseconds32(CHIP_CONFIG_SESSION_RECOVERY_BACKOFF_INITIAL_MS);
 };
 
 } // namespace chip

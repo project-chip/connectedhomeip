@@ -72,6 +72,22 @@ public:
      *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
      */
     virtual void OnSessionHang() {}
+
+    /**
+     * @brief
+     *   Called when an application requests to recover a session.
+     *
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     */
+    virtual void OnRequestRecovery() {}
+
+    /**
+     * @brief
+     *   Called when a pairing fails to recover a session.
+     *
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     */
+    virtual void OnRecoveryFailed() {}
 };
 
 } // namespace chip
