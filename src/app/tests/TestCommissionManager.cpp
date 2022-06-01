@@ -36,6 +36,7 @@ using chip::Server;
 
 // Mock function for linking
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
+void ShutdownDataModelHandler() {}
 
 namespace {
 
