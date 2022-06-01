@@ -129,7 +129,7 @@ public:
      *
      */
     template <typename AttributeObjectTypeT>
-    CHIP_ERROR Get(const ConcreteAttributePath & path, typename AttributeObjectTypeT::DecodableType & value)
+    CHIP_ERROR Get(const ConcreteAttributePath & path, typename AttributeObjectTypeT::DecodableType & value) const
     {
         TLV::TLVReader reader;
 
@@ -152,7 +152,7 @@ public:
      *      - If data exists in the cache instead of status, CHIP_ERROR_INVALID_ARGUMENT shall be returned.
      *
      */
-    CHIP_ERROR GetStatus(const ConcreteAttributePath & path, StatusIB & status);
+    CHIP_ERROR GetStatus(const ConcreteAttributePath & path, StatusIB & status) const;
 
     /*
      * Encapsulates a StatusIB and a ConcreteAttributePath pair.
@@ -184,7 +184,8 @@ public:
      *
      */
     template <typename ClusterObjectTypeT>
-    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT & value, std::list<AttributeStatus> & statusList)
+    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT & value,
+                   std::list<AttributeStatus> & statusList) const
     {
         statusList.clear();
 
@@ -228,7 +229,7 @@ public:
      *        shall be returned from this call instead. The actual StatusIB can be retrieved using the GetStatus() API above.
      *
      */
-    CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader);
+    CHIP_ERROR Get(const ConcreteAttributePath & path, TLV::TLVReader & reader) const;
 
     /*
      * Retrieve the data version for the given cluster.  If there is no data for the specified path in the cache,
@@ -236,7 +237,7 @@ public:
      * current data version for the cluster (which may have no value if we don't have a known data version
      * for it, for example because none of our paths were wildcards that covered the whole cluster).
      */
-    CHIP_ERROR GetVersion(const ConcreteClusterPath & path, Optional<DataVersion> & aVersion);
+    CHIP_ERROR GetVersion(const ConcreteClusterPath & path, Optional<DataVersion> & aVersion) const;
 
     /*
      * Get highest received event number.
@@ -271,7 +272,7 @@ public:
      */
 
     template <typename EventObjectTypeT>
-    CHIP_ERROR Get(EventNumber eventNumber, EventObjectTypeT & value)
+    CHIP_ERROR Get(EventNumber eventNumber, EventObjectTypeT & value) const
     {
         TLV::TLVReader reader;
         CHIP_ERROR err;
@@ -297,7 +298,7 @@ public:
      *        shall be returned.
      *
      */
-    CHIP_ERROR Get(EventNumber eventNumber, TLV::TLVReader & reader);
+    CHIP_ERROR Get(EventNumber eventNumber, TLV::TLVReader & reader) const;
 
     /*
      * Retrieve the StatusIB for a specific event from the event status cache (if one exists).
@@ -308,7 +309,7 @@ public:
      * NOTE: Receipt of a StatusIB does not affect any pre-existing or future event data entries in the cache (and vice-versa).
      *
      */
-    CHIP_ERROR GetStatus(const ConcreteEventPath & path, StatusIB & status);
+    CHIP_ERROR GetStatus(const ConcreteEventPath & path, StatusIB & status) const;
 
     /*
      * Execute an iterator function that is called for every attribute
@@ -327,7 +328,7 @@ public:
      *
      */
     template <typename IteratorFunc>
-    CHIP_ERROR ForEachAttribute(EndpointId endpointId, ClusterId clusterId, IteratorFunc func)
+    CHIP_ERROR ForEachAttribute(EndpointId endpointId, ClusterId clusterId, IteratorFunc func) const
     {
         CHIP_ERROR err;
 
@@ -357,7 +358,7 @@ public:
      *
      */
     template <typename IteratorFunc>
-    CHIP_ERROR ForEachAttribute(ClusterId clusterId, IteratorFunc func)
+    CHIP_ERROR ForEachAttribute(ClusterId clusterId, IteratorFunc func) const
     {
         for (auto & endpointIter : mCache)
         {
@@ -390,7 +391,7 @@ public:
      *
      */
     template <typename IteratorFunc>
-    CHIP_ERROR ForEachCluster(EndpointId endpointId, IteratorFunc func)
+    CHIP_ERROR ForEachCluster(EndpointId endpointId, IteratorFunc func) const
     {
         auto endpointIter = mCache.find(endpointId);
         if (endpointIter->first == endpointId)
@@ -426,7 +427,7 @@ public:
      */
     template <typename IteratorFunc>
     CHIP_ERROR ForEachEventData(IteratorFunc func, EventPathParams pathFilter = EventPathParams(),
-                                EventNumber minEventNumberFilter = 0)
+                                EventNumber minEventNumberFilter = 0) const
     {
         for (const auto & item : mEventDataCache)
         {
@@ -453,7 +454,7 @@ public:
      *
      */
     template <typename IteratorFunc>
-    CHIP_ERROR ForEachEventStatus(IteratorFunc func)
+    CHIP_ERROR ForEachEventStatus(IteratorFunc func) const
     {
         for (const auto & item : mEventStatusCache)
         {
@@ -532,11 +533,12 @@ private:
      *        CHIP_ERROR_KEY_NOT_FOUND shall be returned.
      *
      */
-    EndpointState * GetEndpointState(EndpointId endpointId, CHIP_ERROR & err);
-    ClusterState * GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err);
-    const AttributeState * GetAttributeState(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, CHIP_ERROR & err);
+    const EndpointState * GetEndpointState(EndpointId endpointId, CHIP_ERROR & err) const;
+    const ClusterState * GetClusterState(EndpointId endpointId, ClusterId clusterId, CHIP_ERROR & err) const;
+    const AttributeState * GetAttributeState(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                             CHIP_ERROR & err) const;
 
-    const EventData * GetEventData(EventNumber number, CHIP_ERROR & err);
+    const EventData * GetEventData(EventNumber number, CHIP_ERROR & err) const;
 
     /*
      * Updates the state of an attribute in the cache given a reader. If the reader is null, the state is updated
@@ -589,7 +591,7 @@ private:
     // Get our list of data version filters, sorted from larges to smallest by the total size of the TLV
     // payload for the filter's cluster.  Applying filters in this order should maximize space savings
     // on the wire if not all filters can be applied.
-    void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
+    void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector) const;
 
     CHIP_ERROR GetElementTLVSize(TLV::TLVReader * apData, size_t & aSize);
 

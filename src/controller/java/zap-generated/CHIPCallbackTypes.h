@@ -1767,12 +1767,11 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterPendingTimestampAttributeCallb
 typedef void (*CHIPThreadNetworkDiagnosticsClusterDelayAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallbackType)(
-    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo::DecodableType &);
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableType &);
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType &);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(

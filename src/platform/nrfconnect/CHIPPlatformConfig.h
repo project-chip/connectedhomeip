@@ -37,7 +37,7 @@
 // Size of the statically allocated context for SHA256 operations in CryptoPAL
 // determined empirically.
 #ifdef CONFIG_CC3XX_BACKEND
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 240
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 244
 #else
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE 208
 #endif

@@ -8258,14 +8258,6 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
-            },
-            {
-              "name": "RemoveTrustedRootCertificate",
-              "code": 12,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 1
             }
           ],
           "attributes": [

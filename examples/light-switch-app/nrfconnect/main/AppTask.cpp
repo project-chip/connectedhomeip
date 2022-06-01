@@ -39,8 +39,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -156,10 +156,7 @@ CHIP_ERROR AppTask::Init()
     // Initialize DFU
 #ifdef CONFIG_MCUMGR_SMP_BT
     GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
-#ifndef CONFIG_CHIP_OTA_REQUESTOR
-    // When OTA Requestor is enabled, it is responsible for confirming new images.
     GetDFUOverSMP().ConfirmNewImage();
-#endif
 #endif
 
     // Print initial configs
@@ -171,9 +168,6 @@ CHIP_ERROR AppTask::Init()
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
@@ -391,6 +385,14 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg *
         sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
         break;
     default:
         if ((ConnectivityMgr().NumBLEConnections() == 0) && (!sIsThreadProvisioned || !sIsThreadEnabled))

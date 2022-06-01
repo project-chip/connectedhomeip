@@ -568,10 +568,6 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING rootCertificate = 0;
   }
 
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
-  }
-
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
@@ -600,7 +596,6 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster TimeFormatLocalization = 44 {

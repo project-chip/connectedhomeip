@@ -267,15 +267,19 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
     case Transport::Session::SessionType::kGroupOutgoing: {
         auto groupSession = sessionHandle->AsOutgoingGroupSession();
-        multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
-        destination       = &multicastAddress;
+
+        FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        destination      = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
                         " at monotonic time: " ChipLogFormatX64
-                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
+                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric index of %x",
                         "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
                         ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
                         groupSession->GetGroupId(), groupSession->GetFabricIndex());
