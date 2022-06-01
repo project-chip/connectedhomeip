@@ -4085,17 +4085,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::NumberOfLogRecordsSupported::Id: {
-            using TypeInfo = Attributes::NumberOfLogRecordsSupported::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
-            return value;
-        }
         case Attributes::NumberOfTotalUsersSupported::Id: {
             using TypeInfo = Attributes::NumberOfTotalUsersSupported::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4226,17 +4215,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::EnableLogging::Id: {
-            using TypeInfo = Attributes::EnableLogging::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
             return value;
         }
         case Attributes::Language::Id: {
@@ -4424,94 +4402,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedShort:cppValue];
-            return value;
-        }
-        case Attributes::AlarmMask::Id: {
-            using TypeInfo = Attributes::AlarmMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::KeypadOperationEventMask::Id: {
-            using TypeInfo = Attributes::KeypadOperationEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::RemoteOperationEventMask::Id: {
-            using TypeInfo = Attributes::RemoteOperationEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::ManualOperationEventMask::Id: {
-            using TypeInfo = Attributes::ManualOperationEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::RFIDOperationEventMask::Id: {
-            using TypeInfo = Attributes::RFIDOperationEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::KeypadProgrammingEventMask::Id: {
-            using TypeInfo = Attributes::KeypadProgrammingEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::RemoteProgrammingEventMask::Id: {
-            using TypeInfo = Attributes::RemoteProgrammingEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
-            return value;
-        }
-        case Attributes::RFIDProgrammingEventMask::Id: {
-            using TypeInfo = Attributes::RFIDProgrammingEventMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
