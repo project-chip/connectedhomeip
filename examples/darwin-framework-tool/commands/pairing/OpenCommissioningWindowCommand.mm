@@ -25,10 +25,10 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
     NSError * error;
     __block NSString * pairingCode;
     if (mCommissioningWindowOption == 0) {
-        [controller openPairingWindow:mNodeId duration:mCommissioningWindowTimeout error:&error];
+        [controller openPairingWindow:mNodeId duration:mCommissioningWindowTimeoutMs error:&error];
     } else {
         pairingCode = [controller openPairingWindowWithPIN:mNodeId
-                                                  duration:mCommissioningWindowTimeout
+                                                  duration:mCommissioningWindowTimeoutMs
                                              discriminator:mDiscriminator
                                                   setupPIN:arc4random()
                                                      error:&error];

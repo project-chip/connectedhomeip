@@ -27,7 +27,7 @@ public:
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId, "Node to open a commissionging window on.");
         AddArgument("option", 0, 1, &mCommissioningWindowOption,
                     "1 to use Enhanced Commissioning Method.\n  0 to use Basic Commissioning Method.");
-        AddArgument("window-timeout", 0, UINT16_MAX, &mCommissioningWindowTimeout,
+        AddArgument("window-timeout", 0, UINT16_MAX, &mCommissioningWindowTimeoutMs,
                     "Time, in seconds, before the commissioning window closes.");
         AddArgument("iteration", chip::kSpake2p_Min_PBKDF_Iterations, chip::kSpake2p_Max_PBKDF_Iterations, &mIteration,
                     "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
@@ -44,7 +44,7 @@ protected:
 
     chip::NodeId mNodeId;
     uint8_t mCommissioningWindowOption;
-    uint16_t mCommissioningWindowTimeout;
+    uint16_t mCommissioningWindowTimeoutMs;
     uint32_t mIteration;
     uint16_t mDiscriminator;
 
