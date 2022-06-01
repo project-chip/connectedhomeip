@@ -11030,29 +11030,6 @@ public class ClusterInfoMapping {
             operationalCredentialsremoveFabricCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "removeFabric", operationalCredentialsremoveFabricInteractionInfo);
-    Map<String, CommandParameterInfo>
-        operationalCredentialsremoveTrustedRootCertificateCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo
-        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo =
-            new CommandParameterInfo("trustedRootIdentifier", byte[].class);
-    operationalCredentialsremoveTrustedRootCertificateCommandParams.put(
-        "trustedRootIdentifier",
-        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo);
-
-    InteractionInfo operationalCredentialsremoveTrustedRootCertificateInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalCredentialsCluster) cluster)
-                  .removeTrustedRootCertificate(
-                      (DefaultClusterCallback) callback,
-                      (byte[]) commandArguments.get("trustedRootIdentifier"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            operationalCredentialsremoveTrustedRootCertificateCommandParams);
-    operationalCredentialsClusterInteractionInfoMap.put(
-        "removeTrustedRootCertificate",
-        operationalCredentialsremoveTrustedRootCertificateInteractionInfo);
     Map<String, CommandParameterInfo> operationalCredentialsupdateFabricLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo operationalCredentialsupdateFabricLabellabelCommandParameterInfo =

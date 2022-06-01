@@ -4405,13 +4405,6 @@ class ChipClusters:
                         "fabricIndex": "int",
                     },
                 },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "RemoveTrustedRootCertificate",
-                    "args": {
-                        "trustedRootIdentifier": "bytes",
-                    },
-                },
             0x00000009: {
                     "commandId": 0x00000009,
                     "commandName": "UpdateFabricLabel",

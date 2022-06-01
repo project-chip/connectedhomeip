@@ -22,24 +22,23 @@
 
 #include <lib/support/CodeUtils.h>
 
-#include <drivers/pwm.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/drivers/pwm.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
-int PWMDevice::Init(const device * aPWMDevice, uint32_t aPWMChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel)
+int PWMDevice::Init(const pwm_dt_spec * aPWMDevice, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel)
 {
-    mState      = kState_On;
-    mMinLevel   = aMinLevel;
-    mMaxLevel   = aMaxLevel;
-    mLevel      = aDefaultLevel;
-    mPwmDevice  = aPWMDevice;
-    mPwmChannel = aPWMChannel;
+    mState     = kState_On;
+    mMinLevel  = aMinLevel;
+    mMaxLevel  = aMaxLevel;
+    mLevel     = aDefaultLevel;
+    mPwmDevice = aPWMDevice;
 
-    if (!device_is_ready(mPwmDevice))
+    if (!device_is_ready(mPwmDevice->dev))
     {
-        LOG_ERR("PWM device %s is not ready", mPwmDevice->name);
+        LOG_ERR("PWM device %s is not ready", mPwmDevice->dev->name);
         return -ENODEV;
     }
 
@@ -124,9 +123,9 @@ void PWMDevice::Set(bool aOn)
 
 void PWMDevice::UpdateLight()
 {
-    constexpr uint32_t kPwmWidthUs  = 20000u;
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
 
-    pwm_pin_set_usec(mPwmDevice, mPwmChannel, kPwmWidthUs, kPwmWidthUs * effectiveLevel / maxEffectiveLevel, 0);
+    pwm_set_pulse_dt(mPwmDevice,
+                     static_cast<uint32_t>(static_cast<const uint64_t>(mPwmDevice->period) * effectiveLevel / maxEffectiveLevel));
 }

@@ -15,15 +15,17 @@
  *    limitations under the License.
  */
 
-#import "AppDelegate.h"
-#import <UIKit/UIKit.h>
+import SwiftUI
 
-int main(int argc, char * argv[])
-{
-    NSString * appDelegateClassName;
-    @autoreleasepool {
-        // Setup code that might create autoreleased objects goes here.
-        appDelegateClassName = NSStringFromClass([AppDelegate class]);
+struct ContentView: View {
+    var body: some View {
+        Text("Hello Objective-C from Swift! " + String(CastingServerBridge().add(5, secondNum: 6)))
+            .padding()
     }
-    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

@@ -233,7 +233,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         CHIP_ERROR err = CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
-            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex);
+            event->CommissioningComplete.nodeId, event->CommissioningComplete.fabricIndex);
 
         CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
     }

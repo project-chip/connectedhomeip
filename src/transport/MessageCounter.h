@@ -77,8 +77,8 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialSyncValue             = 0;         ///< Used for initializing peer counter
-    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFF; ///< 28-bit mask
+    static constexpr uint32_t kInitialSyncValue             = 0;          ///< Used for initializing peer counter
+    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
 
     /**
      * Initialize a local message counter with random value between [1, 2^28]. This increases the difficulty of traffic analysis

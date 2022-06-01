@@ -60,3 +60,50 @@ tests:
       attribute: "NodeLabel"
       response:
           value: ""
+
+    - label: "Invoke AddTrustedRootCertificate without fail-safe"
+      command: "AddTrustedRootCertificate"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: RootCertificate
+                value: "00000000"
+
+      response:
+          error: FAILSAFE_REQUIRED
+
+    - label: "Invoke AddNOC without fail-safe"
+      command: "AddNOC"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: NOCValue
+                value: "00112233"
+              - name: IPKValue
+                value: "\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07"
+              - name: CaseAdminSubject
+                value: 1234
+              - name: AdminVendorId
+                value: 65521
+      response:
+          error: FAILSAFE_REQUIRED
+
+    - label: "Invoke UpdateNOC without fail-safe"
+      command: "UpdateNOC"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: NOCValue
+                value: "00112233"
+      response:
+          error: FAILSAFE_REQUIRED
+
+    - label: "Invoke CSRRequest without fail-safe"
+      command: "CSRRequest"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: CSRNonce
+                value: "\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07"
+      response:
+          error: FAILSAFE_REQUIRED

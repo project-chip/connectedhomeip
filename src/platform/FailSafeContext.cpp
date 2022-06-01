@@ -65,16 +65,15 @@ void FailSafeContext::FailSafeTimerExpired()
 
 void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
 {
-    mFailSafeArmed                  = false;
-    mAddNocCommandHasBeenInvoked    = false;
-    mUpdateNocCommandHasBeenInvoked = false;
-    mFailSafeBusy                   = true;
+    ResetState();
+
+    mFailSafeBusy = true;
 
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-    event.FailSafeTimerExpired.PeerFabricIndex                = fabricIndex;
-    event.FailSafeTimerExpired.AddNocCommandHasBeenInvoked    = addNocCommandInvoked;
-    event.FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked = updateNocCommandInvoked;
+    event.FailSafeTimerExpired.fabricIndex                    = fabricIndex;
+    event.FailSafeTimerExpired.addNocCommandHasBeenInvoked    = addNocCommandInvoked;
+    event.FailSafeTimerExpired.updateNocCommandHasBeenInvoked = updateNocCommandInvoked;
     CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
@@ -99,9 +98,7 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
 CHIP_ERROR FailSafeContext::DisarmFailSafe()
 {
-    mFailSafeArmed                  = false;
-    mAddNocCommandHasBeenInvoked    = false;
-    mUpdateNocCommandHasBeenInvoked = false;
+    ResetState();
 
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
 
@@ -140,6 +137,8 @@ CHIP_ERROR FailSafeContext::CommitToStorage()
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
     ReturnErrorOnFailure(writer.Put(kFabricIndexTag, mFabricIndex));
+
+    // TODO: Stop storing this, and just make the fail-safe context volatile and sweep-up stale data next boot on partial commits
     ReturnErrorOnFailure(writer.Put(kAddNocCommandTag, mAddNocCommandHasBeenInvoked));
     ReturnErrorOnFailure(writer.Put(kUpdateNocCommandTag, mUpdateNocCommandHasBeenInvoked));
     ReturnErrorOnFailure(writer.EndContainer(outerType));

@@ -12807,8 +12807,6 @@ NS_ASSUME_NONNULL_BEGIN
                                    NSError * _Nullable error))completionHandler;
 - (void)addTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                           completionHandler:(StatusCompletion)completionHandler;
-- (void)removeTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams *)params
-                             completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeNOCsWithParams:(CHIPReadParams * _Nullable)params
                   completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;

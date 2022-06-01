@@ -33,7 +33,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
 #include <ChipShellCollection.h>
