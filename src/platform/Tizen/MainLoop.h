@@ -29,29 +29,27 @@ typedef gboolean (*initFn_t)(gpointer userData);
 typedef gboolean (*asyncFn_t)(GMainLoop * mainLoop, gpointer userData);
 typedef void (*timeoutFn_t)(gpointer userData);
 
-class LoopData
+struct LoopData
 {
-public:
-    LoopData() : mMainContext(NULL), mMainLoop(NULL), mThread(NULL), mTimeoutFn(NULL), mTimeoutUserData(NULL) {}
-
-    GMainContext * mMainContext;
-    GMainLoop * mMainLoop;
-    GThread * mThread;
-    timeoutFn_t mTimeoutFn;
-    gpointer mTimeoutUserData;
+    GMainContext * mMainContext = nullptr;
+    GMainLoop * mMainLoop       = nullptr;
+    GThread * mThread           = nullptr;
+    timeoutFn_t mTimeoutFn      = nullptr;
+    gpointer mTimeoutUserData   = nullptr;
 };
 
 class MainLoop
 {
 public:
-    bool Init(initFn_t initFn, gpointer userData = NULL);
+    bool Init(initFn_t initFn, gpointer userData = nullptr);
     void Deinit(void);
-    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = NULL, guint interval = 0, timeoutFn_t timeoutFn = NULL,
-                      gpointer timeoutUserData = NULL);
+    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr, guint interval = 0, timeoutFn_t timeoutFn = nullptr,
+                      gpointer timeoutUserData = nullptr);
     static MainLoop & Instance(void);
 
 private:
-    MainLoop() {}
+    MainLoop() = default;
+
     void DeleteData(LoopData * loopData);
     static gboolean ThreadTimeout(gpointer userData);
     void SetThreadTimeout(LoopData * loopData, guint interval);
