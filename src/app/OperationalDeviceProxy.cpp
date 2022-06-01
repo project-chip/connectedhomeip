@@ -322,7 +322,7 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
     VerifyOrReturn(mState == State::Connecting || mState == State::Recovering,
                    ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
 
-    bool report               = (mState == State::Connecting);
+    bool report = (mState == State::Connecting);
 
     if (!mSecureSession.Grab(session))
         return; // Got an invalid session, do not change any state

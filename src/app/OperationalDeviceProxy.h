@@ -213,13 +213,13 @@ public:
 private:
     enum class State
     {
-        Uninitialized,     // Error state: OperationalDeviceProxy is useless
-        NeedsAddress,      // No address known, lookup not started yet.
-        ResolvingAddress,  // Address lookup in progress.
-        HasAddress,        // Have an address, CASE handshake not started yet.
-        Connecting,        // CASE handshake in progress.
-        Recovering,        // CASE session hang, trying to establish a new one, the old session is hanging but left untouched.
-        SecureConnected,   // CASE session established.
+        Uninitialized,    // Error state: OperationalDeviceProxy is useless
+        NeedsAddress,     // No address known, lookup not started yet.
+        ResolvingAddress, // Address lookup in progress.
+        HasAddress,       // Have an address, CASE handshake not started yet.
+        Connecting,       // CASE handshake in progress.
+        Recovering,       // CASE session hang, trying to establish a new one, the old session is hanging but left untouched.
+        SecureConnected,  // CASE session established.
     };
 
     DeviceProxyInitParams mInitParams;
