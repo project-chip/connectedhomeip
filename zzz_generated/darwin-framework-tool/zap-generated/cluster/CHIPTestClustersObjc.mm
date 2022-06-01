@@ -9795,6 +9795,25 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeTestEventTriggersEnabledWithValue:(NSNumber * _Nonnull)value
+                                      completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GeneralDiagnostics::Attributes::TestEventTriggersEnabled::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -18656,7 +18675,7 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.unsignedCharValue;
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -19834,7 +19853,8 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeSecurityPolicyWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeSecurityPolicyWithValue:(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)value
+                            completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -19849,29 +19869,8 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                {
-                    using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
-                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                    if (value.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(value.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_1);
-                        for (size_t i_1 = 0; i_1 < value.count; ++i_1) {
-                            if (![value[i_1] isKindOfClass:[CHIPThreadNetworkDiagnosticsClusterSecurityPolicy class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (CHIPThreadNetworkDiagnosticsClusterSecurityPolicy *) value[i_1];
-                            listHolder_1->mList[i_1].rotationTime = element_1.rotationTime.unsignedShortValue;
-                            listHolder_1->mList[i_1].flags = element_1.flags.unsignedShortValue;
-                        }
-                        nonNullValue_0 = ListType_1(listHolder_1->mList, value.count);
-                    } else {
-                        nonNullValue_0 = ListType_1();
-                    }
-                }
+                nonNullValue_0.rotationTime = value.rotationTime.unsignedShortValue;
+                nonNullValue_0.flags = value.flags.unsignedShortValue;
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -19902,7 +19901,8 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeOperationalDatasetComponentsWithValue:(NSArray * _Nullable)value
+- (void)writeAttributeOperationalDatasetComponentsWithValue:
+            (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -19918,40 +19918,18 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                {
-                    using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
-                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                    if (value.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(value.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_1);
-                        for (size_t i_1 = 0; i_1 < value.count; ++i_1) {
-                            if (![value[i_1]
-                                    isKindOfClass:[CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents *) value[i_1];
-                            listHolder_1->mList[i_1].activeTimestampPresent = element_1.activeTimestampPresent.boolValue;
-                            listHolder_1->mList[i_1].pendingTimestampPresent = element_1.pendingTimestampPresent.boolValue;
-                            listHolder_1->mList[i_1].masterKeyPresent = element_1.masterKeyPresent.boolValue;
-                            listHolder_1->mList[i_1].networkNamePresent = element_1.networkNamePresent.boolValue;
-                            listHolder_1->mList[i_1].extendedPanIdPresent = element_1.extendedPanIdPresent.boolValue;
-                            listHolder_1->mList[i_1].meshLocalPrefixPresent = element_1.meshLocalPrefixPresent.boolValue;
-                            listHolder_1->mList[i_1].delayPresent = element_1.delayPresent.boolValue;
-                            listHolder_1->mList[i_1].panIdPresent = element_1.panIdPresent.boolValue;
-                            listHolder_1->mList[i_1].channelPresent = element_1.channelPresent.boolValue;
-                            listHolder_1->mList[i_1].pskcPresent = element_1.pskcPresent.boolValue;
-                            listHolder_1->mList[i_1].securityPolicyPresent = element_1.securityPolicyPresent.boolValue;
-                            listHolder_1->mList[i_1].channelMaskPresent = element_1.channelMaskPresent.boolValue;
-                        }
-                        nonNullValue_0 = ListType_1(listHolder_1->mList, value.count);
-                    } else {
-                        nonNullValue_0 = ListType_1();
-                    }
-                }
+                nonNullValue_0.activeTimestampPresent = value.activeTimestampPresent.boolValue;
+                nonNullValue_0.pendingTimestampPresent = value.pendingTimestampPresent.boolValue;
+                nonNullValue_0.masterKeyPresent = value.masterKeyPresent.boolValue;
+                nonNullValue_0.networkNamePresent = value.networkNamePresent.boolValue;
+                nonNullValue_0.extendedPanIdPresent = value.extendedPanIdPresent.boolValue;
+                nonNullValue_0.meshLocalPrefixPresent = value.meshLocalPrefixPresent.boolValue;
+                nonNullValue_0.delayPresent = value.delayPresent.boolValue;
+                nonNullValue_0.panIdPresent = value.panIdPresent.boolValue;
+                nonNullValue_0.channelPresent = value.channelPresent.boolValue;
+                nonNullValue_0.pskcPresent = value.pskcPresent.boolValue;
+                nonNullValue_0.securityPolicyPresent = value.securityPolicyPresent.boolValue;
+                nonNullValue_0.channelMaskPresent = value.channelMaskPresent.boolValue;
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);

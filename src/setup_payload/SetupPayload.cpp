@@ -128,8 +128,8 @@ bool PayloadContents::CheckPayloadCommonConstraints() const
         return false;
     }
 
-    // VendorID after TestVendor4 are reserved.
-    if (vendorID > VendorId::TestVendor4)
+    // VendorID must be unspecified (0) or in valid range expected.
+    if (!IsVendorIdValidOperationally(vendorID) && (vendorID != VendorId::Unspecified))
     {
         return false;
     }
@@ -138,7 +138,7 @@ bool PayloadContents::CheckPayloadCommonConstraints() const
     //  * To announce an anonymized Product ID as part of device discovery
     //  * To indicate an OTA software update file applies to multiple Product IDs equally.
     //  * To avoid confusion when presenting the Onboarding Payload for ECM with multiple nodes
-    if (productID == 0 && vendorID != 0)
+    if (productID == 0 && vendorID != VendorId::Unspecified)
     {
         return false;
     }

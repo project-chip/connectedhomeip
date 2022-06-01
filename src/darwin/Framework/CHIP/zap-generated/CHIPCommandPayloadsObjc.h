@@ -2878,6 +2878,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
+@interface CHIPGeneralDiagnosticsClusterTestEventTriggerParams : NSObject
+
+@property (strong, nonatomic) NSData * _Nonnull enableKey;
+
+@property (strong, nonatomic) NSNumber * _Nonnull eventTrigger;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
 @interface CHIPSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3275,27 +3298,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject
 
 @property (strong, nonatomic) NSData * _Nonnull rootCertificate;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams : NSObject
-
-@property (strong, nonatomic) NSData * _Nonnull trustedRootIdentifier;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

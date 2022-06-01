@@ -10244,6 +10244,7 @@ class GeneralDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="activeHardwareFaults", Tag=0x00000005, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="activeRadioFaults", Tag=0x00000006, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaults", Tag=0x00000007, Type=typing.Optional[typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="testEventTriggersEnabled", Tag=0x00000008, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -10259,6 +10260,7 @@ class GeneralDiagnostics(Cluster):
     activeHardwareFaults: 'typing.Optional[typing.List[uint]]' = None
     activeRadioFaults: 'typing.Optional[typing.List[uint]]' = None
     activeNetworkFaults: 'typing.Optional[typing.List[uint]]' = None
+    testEventTriggersEnabled: 'bool' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -10338,6 +10340,24 @@ class GeneralDiagnostics(Cluster):
             type: 'GeneralDiagnostics.Enums.InterfaceType' = 0
 
 
+
+    class Commands:
+        @dataclass
+        class TestEventTrigger(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0033
+            command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="enableKey", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="eventTrigger", Tag=1, Type=uint),
+                    ])
+
+            enableKey: 'bytes' = b""
+            eventTrigger: 'uint' = 0
 
 
     class Attributes:
@@ -10468,6 +10488,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
 
             value: 'typing.Optional[typing.List[uint]]' = None
+
+        @dataclass
+        class TestEventTriggersEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0033
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: 'bool' = False
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -10892,7 +10928,7 @@ class ThreadNetworkDiagnostics(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]),
                 ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=typing.Union[Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
@@ -10950,9 +10986,9 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="activeTimestamp", Tag=0x00000038, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="pendingTimestamp", Tag=0x00000039, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="delay", Tag=0x0000003A, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="securityPolicy", Tag=0x0000003B, Type=typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]]),
+                ClusterObjectFieldDescriptor(Label="securityPolicy", Tag=0x0000003B, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]),
                 ClusterObjectFieldDescriptor(Label="channelMask", Tag=0x0000003C, Type=typing.Union[Nullable, bytes]),
-                ClusterObjectFieldDescriptor(Label="operationalDatasetComponents", Tag=0x0000003D, Type=typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]]),
+                ClusterObjectFieldDescriptor(Label="operationalDatasetComponents", Tag=0x0000003D, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaultsList", Tag=0x0000003E, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -10962,7 +10998,7 @@ class ThreadNetworkDiagnostics(Cluster):
             ])
 
     channel: 'typing.Union[Nullable, uint]' = None
-    routingRole: 'typing.Union[Nullable, uint]' = None
+    routingRole: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]' = None
     networkName: 'typing.Union[Nullable, str]' = None
     panId: 'typing.Union[Nullable, uint]' = None
     extendedPanId: 'typing.Union[Nullable, uint]' = None
@@ -11020,9 +11056,9 @@ class ThreadNetworkDiagnostics(Cluster):
     activeTimestamp: 'typing.Union[None, Nullable, uint]' = None
     pendingTimestamp: 'typing.Union[None, Nullable, uint]' = None
     delay: 'typing.Union[None, Nullable, uint]' = None
-    securityPolicy: 'typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]]' = None
+    securityPolicy: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = None
     channelMask: 'typing.Union[Nullable, bytes]' = None
-    operationalDatasetComponents: 'typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]]' = None
+    operationalDatasetComponents: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = None
     activeNetworkFaultsList: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -11210,9 +11246,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole])
 
-            value: 'typing.Union[Nullable, uint]' = NullValue
+            value: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]' = NullValue
 
         @dataclass
         class NetworkName(ClusterAttributeDescriptor):
@@ -12138,9 +12174,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy])
 
-            value: 'typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]]' = NullValue
+            value: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = NullValue
 
         @dataclass
         class ChannelMask(ClusterAttributeDescriptor):
@@ -12170,9 +12206,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents])
 
-            value: 'typing.Union[Nullable, typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]]' = NullValue
+            value: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = NullValue
 
         @dataclass
         class ActiveNetworkFaultsList(ClusterAttributeDescriptor):
@@ -14407,21 +14443,6 @@ class OperationalCredentials(Cluster):
                     ])
 
             rootCertificate: 'bytes' = b""
-
-        @dataclass
-        class RemoveTrustedRootCertificate(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x003E
-            command_id: typing.ClassVar[int] = 0x000C
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="trustedRootIdentifier", Tag=0, Type=bytes),
-                    ])
-
-            trustedRootIdentifier: 'bytes' = b""
 
 
     class Attributes:

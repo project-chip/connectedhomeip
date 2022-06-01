@@ -77,3 +77,9 @@ RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.10-hardknott/
 
 # Add access to openocd for VSCode debugging
 RUN chown -R $USERNAME:$USERNAME /opt/openocd
+
+# Fix Tizen SDK paths for new user
+RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
+    && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
+    && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
+    && : # last line

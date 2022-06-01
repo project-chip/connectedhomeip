@@ -689,6 +689,17 @@
 #endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
 
 /**
+ *  @def CHIP_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code
@@ -1051,17 +1062,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
 #error                                                                                                                             \
     "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
- *
- * @brief Defines the max number of SessionRecoveryDelegate
- *
- * // TODO: Explain what this is for.
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
 #endif
 
 /**

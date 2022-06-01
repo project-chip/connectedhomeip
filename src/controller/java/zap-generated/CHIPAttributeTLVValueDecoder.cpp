@@ -6940,6 +6940,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::TestEventTriggersEnabled::Id: {
+            using TypeInfo = Attributes::TestEventTriggersEnabled::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(valueClassName.c_str(), valueCtorSignature.c_str(), cppValue,
+                                                                       value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -16137,7 +16152,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              cppValue.Value(), value);
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
             }
             return value;
         }
@@ -17306,47 +17321,36 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                chip::JniReferences::GetInstance().CreateArrayList(value);
+                jobject value_rotationTime;
+                std::string value_rotationTimeClassName     = "java/lang/Integer";
+                std::string value_rotationTimeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(value_rotationTimeClassName.c_str(),
+                                                                               value_rotationTimeCtorSignature.c_str(),
+                                                                               cppValue.Value().rotationTime, value_rotationTime);
+                jobject value_flags;
+                std::string value_flagsClassName     = "java/lang/Integer";
+                std::string value_flagsCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                    value_flagsClassName.c_str(), value_flagsCtorSignature.c_str(), cppValue.Value().flags, value_flags);
 
-                auto iter_value_1 = cppValue.Value().begin();
-                while (iter_value_1.Next())
+                jclass securityPolicyStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy",
+                    securityPolicyStructClass);
+                if (err != CHIP_NO_ERROR)
                 {
-                    auto & entry_1 = iter_value_1.GetValue();
-                    jobject newElement_1;
-                    jobject newElement_1_rotationTime;
-                    std::string newElement_1_rotationTimeClassName     = "java/lang/Integer";
-                    std::string newElement_1_rotationTimeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_rotationTimeClassName.c_str(),
-                                                                                   newElement_1_rotationTimeCtorSignature.c_str(),
-                                                                                   entry_1.rotationTime, newElement_1_rotationTime);
-                    jobject newElement_1_flags;
-                    std::string newElement_1_flagsClassName     = "java/lang/Integer";
-                    std::string newElement_1_flagsCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_flagsClassName.c_str(),
-                                                                                   newElement_1_flagsCtorSignature.c_str(),
-                                                                                   entry_1.flags, newElement_1_flags);
-
-                    jclass securityPolicyStructClass;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy",
-                        securityPolicyStructClass);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy");
-                        return nullptr;
-                    }
-                    jmethodID securityPolicyStructCtor =
-                        env->GetMethodID(securityPolicyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                    if (securityPolicyStructCtor == nullptr)
-                    {
-                        ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy constructor");
-                        return nullptr;
-                    }
-
-                    newElement_1 = env->NewObject(securityPolicyStructClass, securityPolicyStructCtor, newElement_1_rotationTime,
-                                                  newElement_1_flags);
-                    chip::JniReferences::GetInstance().AddToList(value, newElement_1);
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy");
+                    return nullptr;
                 }
+                jmethodID securityPolicyStructCtor =
+                    env->GetMethodID(securityPolicyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                if (securityPolicyStructCtor == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy constructor");
+                    return nullptr;
+                }
+
+                value = env->NewObject(securityPolicyStructClass, securityPolicyStructCtor, value_rotationTime, value_flags);
             }
             return value;
         }
@@ -17387,121 +17391,106 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                chip::JniReferences::GetInstance().CreateArrayList(value);
+                jobject value_activeTimestampPresent;
+                std::string value_activeTimestampPresentClassName     = "java/lang/Boolean";
+                std::string value_activeTimestampPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_activeTimestampPresentClassName.c_str(), value_activeTimestampPresentCtorSignature.c_str(),
+                    cppValue.Value().activeTimestampPresent, value_activeTimestampPresent);
+                jobject value_pendingTimestampPresent;
+                std::string value_pendingTimestampPresentClassName     = "java/lang/Boolean";
+                std::string value_pendingTimestampPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_pendingTimestampPresentClassName.c_str(), value_pendingTimestampPresentCtorSignature.c_str(),
+                    cppValue.Value().pendingTimestampPresent, value_pendingTimestampPresent);
+                jobject value_masterKeyPresent;
+                std::string value_masterKeyPresentClassName     = "java/lang/Boolean";
+                std::string value_masterKeyPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_masterKeyPresentClassName.c_str(), value_masterKeyPresentCtorSignature.c_str(),
+                    cppValue.Value().masterKeyPresent, value_masterKeyPresent);
+                jobject value_networkNamePresent;
+                std::string value_networkNamePresentClassName     = "java/lang/Boolean";
+                std::string value_networkNamePresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_networkNamePresentClassName.c_str(), value_networkNamePresentCtorSignature.c_str(),
+                    cppValue.Value().networkNamePresent, value_networkNamePresent);
+                jobject value_extendedPanIdPresent;
+                std::string value_extendedPanIdPresentClassName     = "java/lang/Boolean";
+                std::string value_extendedPanIdPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_extendedPanIdPresentClassName.c_str(), value_extendedPanIdPresentCtorSignature.c_str(),
+                    cppValue.Value().extendedPanIdPresent, value_extendedPanIdPresent);
+                jobject value_meshLocalPrefixPresent;
+                std::string value_meshLocalPrefixPresentClassName     = "java/lang/Boolean";
+                std::string value_meshLocalPrefixPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_meshLocalPrefixPresentClassName.c_str(), value_meshLocalPrefixPresentCtorSignature.c_str(),
+                    cppValue.Value().meshLocalPrefixPresent, value_meshLocalPrefixPresent);
+                jobject value_delayPresent;
+                std::string value_delayPresentClassName     = "java/lang/Boolean";
+                std::string value_delayPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(value_delayPresentClassName.c_str(),
+                                                                           value_delayPresentCtorSignature.c_str(),
+                                                                           cppValue.Value().delayPresent, value_delayPresent);
+                jobject value_panIdPresent;
+                std::string value_panIdPresentClassName     = "java/lang/Boolean";
+                std::string value_panIdPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(value_panIdPresentClassName.c_str(),
+                                                                           value_panIdPresentCtorSignature.c_str(),
+                                                                           cppValue.Value().panIdPresent, value_panIdPresent);
+                jobject value_channelPresent;
+                std::string value_channelPresentClassName     = "java/lang/Boolean";
+                std::string value_channelPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(value_channelPresentClassName.c_str(),
+                                                                           value_channelPresentCtorSignature.c_str(),
+                                                                           cppValue.Value().channelPresent, value_channelPresent);
+                jobject value_pskcPresent;
+                std::string value_pskcPresentClassName     = "java/lang/Boolean";
+                std::string value_pskcPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(value_pskcPresentClassName.c_str(),
+                                                                           value_pskcPresentCtorSignature.c_str(),
+                                                                           cppValue.Value().pskcPresent, value_pskcPresent);
+                jobject value_securityPolicyPresent;
+                std::string value_securityPolicyPresentClassName     = "java/lang/Boolean";
+                std::string value_securityPolicyPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_securityPolicyPresentClassName.c_str(), value_securityPolicyPresentCtorSignature.c_str(),
+                    cppValue.Value().securityPolicyPresent, value_securityPolicyPresent);
+                jobject value_channelMaskPresent;
+                std::string value_channelMaskPresentClassName     = "java/lang/Boolean";
+                std::string value_channelMaskPresentCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    value_channelMaskPresentClassName.c_str(), value_channelMaskPresentCtorSignature.c_str(),
+                    cppValue.Value().channelMaskPresent, value_channelMaskPresent);
 
-                auto iter_value_1 = cppValue.Value().begin();
-                while (iter_value_1.Next())
+                jclass operationalDatasetComponentsStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents",
+                    operationalDatasetComponentsStructClass);
+                if (err != CHIP_NO_ERROR)
                 {
-                    auto & entry_1 = iter_value_1.GetValue();
-                    jobject newElement_1;
-                    jobject newElement_1_activeTimestampPresent;
-                    std::string newElement_1_activeTimestampPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_activeTimestampPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_activeTimestampPresentClassName.c_str(),
-                        newElement_1_activeTimestampPresentCtorSignature.c_str(), entry_1.activeTimestampPresent,
-                        newElement_1_activeTimestampPresent);
-                    jobject newElement_1_pendingTimestampPresent;
-                    std::string newElement_1_pendingTimestampPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_pendingTimestampPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_pendingTimestampPresentClassName.c_str(),
-                        newElement_1_pendingTimestampPresentCtorSignature.c_str(), entry_1.pendingTimestampPresent,
-                        newElement_1_pendingTimestampPresent);
-                    jobject newElement_1_masterKeyPresent;
-                    std::string newElement_1_masterKeyPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_masterKeyPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_masterKeyPresentClassName.c_str(), newElement_1_masterKeyPresentCtorSignature.c_str(),
-                        entry_1.masterKeyPresent, newElement_1_masterKeyPresent);
-                    jobject newElement_1_networkNamePresent;
-                    std::string newElement_1_networkNamePresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_networkNamePresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_networkNamePresentClassName.c_str(), newElement_1_networkNamePresentCtorSignature.c_str(),
-                        entry_1.networkNamePresent, newElement_1_networkNamePresent);
-                    jobject newElement_1_extendedPanIdPresent;
-                    std::string newElement_1_extendedPanIdPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_extendedPanIdPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_extendedPanIdPresentClassName.c_str(), newElement_1_extendedPanIdPresentCtorSignature.c_str(),
-                        entry_1.extendedPanIdPresent, newElement_1_extendedPanIdPresent);
-                    jobject newElement_1_meshLocalPrefixPresent;
-                    std::string newElement_1_meshLocalPrefixPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_meshLocalPrefixPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_meshLocalPrefixPresentClassName.c_str(),
-                        newElement_1_meshLocalPrefixPresentCtorSignature.c_str(), entry_1.meshLocalPrefixPresent,
-                        newElement_1_meshLocalPrefixPresent);
-                    jobject newElement_1_delayPresent;
-                    std::string newElement_1_delayPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_delayPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_1_delayPresentClassName.c_str(),
-                                                                               newElement_1_delayPresentCtorSignature.c_str(),
-                                                                               entry_1.delayPresent, newElement_1_delayPresent);
-                    jobject newElement_1_panIdPresent;
-                    std::string newElement_1_panIdPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_panIdPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_1_panIdPresentClassName.c_str(),
-                                                                               newElement_1_panIdPresentCtorSignature.c_str(),
-                                                                               entry_1.panIdPresent, newElement_1_panIdPresent);
-                    jobject newElement_1_channelPresent;
-                    std::string newElement_1_channelPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_channelPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_1_channelPresentClassName.c_str(),
-                                                                               newElement_1_channelPresentCtorSignature.c_str(),
-                                                                               entry_1.channelPresent, newElement_1_channelPresent);
-                    jobject newElement_1_pskcPresent;
-                    std::string newElement_1_pskcPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_pskcPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_1_pskcPresentClassName.c_str(),
-                                                                               newElement_1_pskcPresentCtorSignature.c_str(),
-                                                                               entry_1.pskcPresent, newElement_1_pskcPresent);
-                    jobject newElement_1_securityPolicyPresent;
-                    std::string newElement_1_securityPolicyPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_securityPolicyPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_securityPolicyPresentClassName.c_str(),
-                        newElement_1_securityPolicyPresentCtorSignature.c_str(), entry_1.securityPolicyPresent,
-                        newElement_1_securityPolicyPresent);
-                    jobject newElement_1_channelMaskPresent;
-                    std::string newElement_1_channelMaskPresentClassName     = "java/lang/Boolean";
-                    std::string newElement_1_channelMaskPresentCtorSignature = "(Z)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                        newElement_1_channelMaskPresentClassName.c_str(), newElement_1_channelMaskPresentCtorSignature.c_str(),
-                        entry_1.channelMaskPresent, newElement_1_channelMaskPresent);
-
-                    jclass operationalDatasetComponentsStructClass;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents",
-                        operationalDatasetComponentsStructClass);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(
-                            Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents");
-                        return nullptr;
-                    }
-                    jmethodID operationalDatasetComponentsStructCtor =
-                        env->GetMethodID(operationalDatasetComponentsStructClass, "<init>",
-                                         "(Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
-                                         "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
-                                         "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-                    if (operationalDatasetComponentsStructCtor == nullptr)
-                    {
-                        ChipLogError(
-                            Zcl,
-                            "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents constructor");
-                        return nullptr;
-                    }
-
-                    newElement_1 = env->NewObject(
-                        operationalDatasetComponentsStructClass, operationalDatasetComponentsStructCtor,
-                        newElement_1_activeTimestampPresent, newElement_1_pendingTimestampPresent, newElement_1_masterKeyPresent,
-                        newElement_1_networkNamePresent, newElement_1_extendedPanIdPresent, newElement_1_meshLocalPrefixPresent,
-                        newElement_1_delayPresent, newElement_1_panIdPresent, newElement_1_channelPresent, newElement_1_pskcPresent,
-                        newElement_1_securityPolicyPresent, newElement_1_channelMaskPresent);
-                    chip::JniReferences::GetInstance().AddToList(value, newElement_1);
+                    ChipLogError(Zcl,
+                                 "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents");
+                    return nullptr;
                 }
+                jmethodID operationalDatasetComponentsStructCtor =
+                    env->GetMethodID(operationalDatasetComponentsStructClass, "<init>",
+                                     "(Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
+                                     "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/"
+                                     "lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
+                if (operationalDatasetComponentsStructCtor == nullptr)
+                {
+                    ChipLogError(
+                        Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents constructor");
+                    return nullptr;
+                }
+
+                value = env->NewObject(operationalDatasetComponentsStructClass, operationalDatasetComponentsStructCtor,
+                                       value_activeTimestampPresent, value_pendingTimestampPresent, value_masterKeyPresent,
+                                       value_networkNamePresent, value_extendedPanIdPresent, value_meshLocalPrefixPresent,
+                                       value_delayPresent, value_panIdPresent, value_channelPresent, value_pskcPresent,
+                                       value_securityPolicyPresent, value_channelMaskPresent);
             }
             return value;
         }

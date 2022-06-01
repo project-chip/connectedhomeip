@@ -7268,6 +7268,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::TestEventTriggersEnabled::Id: {
+            using TypeInfo = Attributes::TestEventTriggersEnabled::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -15150,7 +15161,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
             }
             return value;
         }
@@ -15900,28 +15911,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nullable value;
+            CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                { // Scope for our temporary variables
-                    auto * array_1 = [NSMutableArray new];
-                    auto iter_1 = cppValue.Value().begin();
-                    while (iter_1.Next()) {
-                        auto & entry_1 = iter_1.GetValue();
-                        CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_1;
-                        newElement_1 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-                        newElement_1.rotationTime = [NSNumber numberWithUnsignedShort:entry_1.rotationTime];
-                        newElement_1.flags = [NSNumber numberWithUnsignedShort:entry_1.flags];
-                        [array_1 addObject:newElement_1];
-                    }
-                    CHIP_ERROR err = iter_1.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
-                    }
-                    value = array_1;
-                }
+                value = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+                value.rotationTime = [NSNumber numberWithUnsignedShort:cppValue.Value().rotationTime];
+                value.flags = [NSNumber numberWithUnsignedShort:cppValue.Value().flags];
             }
             return value;
         }
@@ -15947,38 +15943,23 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nullable value;
+            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                { // Scope for our temporary variables
-                    auto * array_1 = [NSMutableArray new];
-                    auto iter_1 = cppValue.Value().begin();
-                    while (iter_1.Next()) {
-                        auto & entry_1 = iter_1.GetValue();
-                        CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_1;
-                        newElement_1 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-                        newElement_1.activeTimestampPresent = [NSNumber numberWithBool:entry_1.activeTimestampPresent];
-                        newElement_1.pendingTimestampPresent = [NSNumber numberWithBool:entry_1.pendingTimestampPresent];
-                        newElement_1.masterKeyPresent = [NSNumber numberWithBool:entry_1.masterKeyPresent];
-                        newElement_1.networkNamePresent = [NSNumber numberWithBool:entry_1.networkNamePresent];
-                        newElement_1.extendedPanIdPresent = [NSNumber numberWithBool:entry_1.extendedPanIdPresent];
-                        newElement_1.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_1.meshLocalPrefixPresent];
-                        newElement_1.delayPresent = [NSNumber numberWithBool:entry_1.delayPresent];
-                        newElement_1.panIdPresent = [NSNumber numberWithBool:entry_1.panIdPresent];
-                        newElement_1.channelPresent = [NSNumber numberWithBool:entry_1.channelPresent];
-                        newElement_1.pskcPresent = [NSNumber numberWithBool:entry_1.pskcPresent];
-                        newElement_1.securityPolicyPresent = [NSNumber numberWithBool:entry_1.securityPolicyPresent];
-                        newElement_1.channelMaskPresent = [NSNumber numberWithBool:entry_1.channelMaskPresent];
-                        [array_1 addObject:newElement_1];
-                    }
-                    CHIP_ERROR err = iter_1.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
-                    }
-                    value = array_1;
-                }
+                value = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+                value.activeTimestampPresent = [NSNumber numberWithBool:cppValue.Value().activeTimestampPresent];
+                value.pendingTimestampPresent = [NSNumber numberWithBool:cppValue.Value().pendingTimestampPresent];
+                value.masterKeyPresent = [NSNumber numberWithBool:cppValue.Value().masterKeyPresent];
+                value.networkNamePresent = [NSNumber numberWithBool:cppValue.Value().networkNamePresent];
+                value.extendedPanIdPresent = [NSNumber numberWithBool:cppValue.Value().extendedPanIdPresent];
+                value.meshLocalPrefixPresent = [NSNumber numberWithBool:cppValue.Value().meshLocalPrefixPresent];
+                value.delayPresent = [NSNumber numberWithBool:cppValue.Value().delayPresent];
+                value.panIdPresent = [NSNumber numberWithBool:cppValue.Value().panIdPresent];
+                value.channelPresent = [NSNumber numberWithBool:cppValue.Value().channelPresent];
+                value.pskcPresent = [NSNumber numberWithBool:cppValue.Value().pskcPresent];
+                value.securityPolicyPresent = [NSNumber numberWithBool:cppValue.Value().securityPolicyPresent];
+                value.channelMaskPresent = [NSNumber numberWithBool:cppValue.Value().channelMaskPresent];
             }
             return value;
         }

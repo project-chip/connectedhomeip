@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 namespace PigweedLogger {
 

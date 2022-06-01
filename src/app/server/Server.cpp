@@ -145,6 +145,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
 
+    mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
     {
@@ -172,7 +174,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     );
 
-    err = mListener.Init(&mTransports);
+    err = mListener.Init(this);
     SuccessOrExit(err);
     mGroupsProvider->SetListener(&mListener);
 
@@ -307,7 +309,7 @@ void Server::RejoinExistingMulticastGroups()
             while (iterator->Next(groupInfo))
             {
                 err = mTransports.MulticastGroupJoinLeave(
-                    Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
+                    Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id), true);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "Error when trying to join Group %u of fabric index %u : %" CHIP_ERROR_FORMAT,

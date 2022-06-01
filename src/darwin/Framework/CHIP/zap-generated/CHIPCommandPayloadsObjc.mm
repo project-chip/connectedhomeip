@@ -1664,6 +1664,19 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
+@implementation CHIPGeneralDiagnosticsClusterTestEventTriggerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _enableKey = [NSData data];
+
+        _eventTrigger = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+@end
 @implementation CHIPSoftwareDiagnosticsClusterResetWatermarksParams
 - (instancetype)init
 {
@@ -1884,17 +1897,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _rootCertificate = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _trustedRootIdentifier = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;

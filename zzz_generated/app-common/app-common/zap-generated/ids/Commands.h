@@ -607,6 +607,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+namespace GeneralDiagnostics {
+namespace Commands {
+
+namespace TestEventTrigger {
+static constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+} // namespace GeneralDiagnostics
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 
@@ -715,10 +725,6 @@ static constexpr CommandId Id = 0x0000000A;
 namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
-
-namespace RemoveTrustedRootCertificate {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace RemoveTrustedRootCertificate
 
 } // namespace Commands
 } // namespace OperationalCredentials

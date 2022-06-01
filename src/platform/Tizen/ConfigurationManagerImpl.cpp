@@ -31,6 +31,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Tizen/PosixConfig.h>
+#include <platform/Tizen/WiFiManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 namespace chip {
@@ -91,7 +92,12 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    constexpr size_t kExpectedBufSize = ConfigurationManager::kPrimaryMACAddressLength;
+    return WiFiMgr().GetDeviceMACAddress(buf, kExpectedBufSize);
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset(void)

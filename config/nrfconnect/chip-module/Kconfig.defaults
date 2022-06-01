@@ -190,6 +190,15 @@ config CHIP_EXTENDED_DISCOVERY
     bool
     default y
 
+config NVS_LOOKUP_CACHE
+    bool
+    default y
+
+# Increase the default RX stack size
+config IEEE802154_NRF5_RX_STACK_SIZE
+    int
+    default 1024
+
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD
@@ -202,9 +211,9 @@ choice OPENTHREAD_SECURITY
 	default OPENTHREAD_NRF_SECURITY_CHOICE
 endchoice
 
-config CC3XX_BACKEND
-    bool
-    default n
+config PSA_CRYPTO_DRIVER_CC3XX
+	bool
+	default n
 
 config OBERON_BACKEND
     bool
@@ -346,6 +355,10 @@ config BT_CTLR_DATA_LENGTH_MAX
 endif # SOC_SERIES_NRF52X
 
 if SOC_SERIES_NRF53X
+
+config UPDATEABLE_IMAGE_NUMBER
+    int
+    default 2
 
 # Generate random numbers using Xoroshiro algorithm instead of direct calls
 # to the cryptocell library to workaround firmware hangs.

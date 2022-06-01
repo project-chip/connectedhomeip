@@ -185,6 +185,9 @@
 #define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 #define ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID (0x01)
 
+// Commands for cluster: General Diagnostics
+#define ZCL_TEST_EVENT_TRIGGER_COMMAND_ID (0x00)
+
 // Commands for cluster: Software Diagnostics
 #define ZCL_RESET_WATERMARKS_COMMAND_ID (0x00)
 
@@ -215,7 +218,6 @@
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0B)
-#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0C)
 
 // Commands for cluster: Group Key Management
 #define ZCL_KEY_SET_WRITE_COMMAND_ID (0x00)

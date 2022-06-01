@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -35,8 +36,36 @@ using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+bool IsTestEventTriggerEnabled()
+{
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+    if (triggerDelegate == nullptr)
+    {
+        return false;
+    }
+    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
+    if (triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
+{
+    for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
+    {
+        if (*it != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
 {
@@ -161,6 +190,10 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     }
     case BootReasons::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
+    }
+    case TestEventTriggersEnabled::Id: {
+        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
+        return aEncoder.Encode(isTestEventTriggersEnabled);
     }
     default: {
         break;
@@ -289,6 +322,44 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
+
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+{
+
+    if (commandData.enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    if (IsByteSpanAllZeros(commandData.enableKey))
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
+        return true;
+    }
+
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
+    Status returnStatus                 = StatusIB(handleEventTriggerResult).mStatus;
+
+    // When HandleEventTrigger returns INVALID_ARGUMENT we convert that into InvalidCommand to be spec
+    // compliant.
+    if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        returnStatus = Status::InvalidCommand;
+    }
+
+    commandObj->AddStatus(commandPath, returnStatus);
+    return true;
+}
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {

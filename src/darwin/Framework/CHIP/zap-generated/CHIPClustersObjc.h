@@ -9240,6 +9240,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
+- (void)testEventTriggerWithParams:(CHIPGeneralDiagnosticsClusterTestEventTriggerParams *)params
+                 completionHandler:(StatusCompletion)completionHandler;
+
 - (void)readAttributeNetworkInterfacesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 /**
@@ -9381,6 +9384,25 @@ NS_ASSUME_NONNULL_BEGIN
                                                      queue:(dispatch_queue_t)queue
                                          completionHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTestEventTriggersEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeTestEventTriggersEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))reportHandler;
++ (void)readAttributeTestEventTriggersEnabledWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -12785,8 +12807,6 @@ NS_ASSUME_NONNULL_BEGIN
                                    NSError * _Nullable error))completionHandler;
 - (void)addTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                           completionHandler:(StatusCompletion)completionHandler;
-- (void)removeTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams *)params
-                             completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeNOCsWithParams:(CHIPReadParams * _Nullable)params
                   completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -19856,8 +19876,8 @@ NS_ASSUME_NONNULL_BEGIN
                                        queue:(dispatch_queue_t)queue
                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSecurityPolicyWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                             NSError * _Nullable error))completionHandler;
+- (void)readAttributeSecurityPolicyWithCompletionHandler:
+    (void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
@@ -19867,12 +19887,13 @@ NS_ASSUME_NONNULL_BEGIN
                                                  params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
-                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+                                              (void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
+                                                  NSError * _Nullable error))reportHandler;
 + (void)readAttributeSecurityPolicyWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
-                                    completionHandler:
-                                        (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+                                    completionHandler:(void (^)(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
+                                                          NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -19890,24 +19911,31 @@ NS_ASSUME_NONNULL_BEGIN
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                           NSError * _Nullable error))completionHandler;
+- (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:
+    (void (^)(CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+        NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * CHIPSubscribeParams.
  */
-- (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                               params:(CHIPSubscribeParams * _Nullable)params
-                                              subscriptionEstablished:
-                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                        reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                          NSError * _Nullable error))reportHandler;
-+ (void)readAttributeOperationalDatasetComponentsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                           endpoint:(NSNumber *)endpoint
-                                                              queue:(dispatch_queue_t)queue
-                                                  completionHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))completionHandler;
+- (void)
+    subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:
+                                                        (void (^)(
+                                                            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler;
++ (void)
+    readAttributeOperationalDatasetComponentsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:
+                                                  (void (^)(
+                                                      CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
+                                                      NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;

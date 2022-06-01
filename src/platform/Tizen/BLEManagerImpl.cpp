@@ -79,7 +79,7 @@ void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, co
 
     if (result != BT_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, connected ? "Connection req failed" : "Disconnection req failed");
+        ChipLogError(DeviceLayer, "%s", connected ? "Connection req failed" : "Disconnection req failed");
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
     }

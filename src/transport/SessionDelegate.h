@@ -41,27 +41,29 @@ public:
      */
     virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 
+    using Event = void (SessionDelegate::*)();
+
     /**
      * @brief
      *   Called when a session is releasing
      */
     virtual void OnSessionReleased() = 0;
-};
-
-class DLL_EXPORT SessionRecoveryDelegate
-{
-public:
-    virtual ~SessionRecoveryDelegate() {}
 
     /**
      * @brief
-     *   Called when the first message delivery in a session failed,
-     *   so actions aiming to recover connection can be performed.
+     *   Called when the first message delivery in an exchange fails, so actions aiming to recover connection can be performed.
      *
-     * @param session   The handle to the session.  This may be any session type
-     *                  that supports MRP.
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
      */
-    virtual void OnFirstMessageDeliveryFailed(const SessionHandle & session) = 0;
+    virtual void OnFirstMessageDeliveryFailed() {}
+
+    /**
+     * @brief
+     *   Called when a session is unresponsive for a while (detected by MRP)
+     *
+     *   Note: the implementation must not do anything that will destroy the session or change the SessionHolder.
+     */
+    virtual void OnSessionHang() {}
 };
 
 } // namespace chip

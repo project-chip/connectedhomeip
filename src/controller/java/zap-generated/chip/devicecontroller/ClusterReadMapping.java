@@ -4478,6 +4478,20 @@ public class ClusterReadMapping {
     readGeneralDiagnosticsInteractionInfo.put(
         "readActiveNetworkFaultsAttribute",
         readGeneralDiagnosticsActiveNetworkFaultsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralDiagnosticsTestEventTriggersEnabledCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralDiagnosticsTestEventTriggersEnabledAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .readTestEventTriggersEnabledAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readGeneralDiagnosticsTestEventTriggersEnabledCommandParams);
+    readGeneralDiagnosticsInteractionInfo.put(
+        "readTestEventTriggersEnabledAttribute",
+        readGeneralDiagnosticsTestEventTriggersEnabledAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralDiagnosticsGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralDiagnosticsGeneratedCommandListAttributeInteractionInfo =
@@ -11041,23 +11055,6 @@ public class ClusterReadMapping {
             readThreadNetworkDiagnosticsDelayCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readDelayAttribute", readThreadNetworkDiagnosticsDelayAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsSecurityPolicyCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readThreadNetworkDiagnosticsSecurityPolicyAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readSecurityPolicyAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.SecurityPolicyAttributeCallback)
-                          callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallback(),
-            readThreadNetworkDiagnosticsSecurityPolicyCommandParams);
-    readThreadNetworkDiagnosticsInteractionInfo.put(
-        "readSecurityPolicyAttribute",
-        readThreadNetworkDiagnosticsSecurityPolicyAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsChannelMaskCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readThreadNetworkDiagnosticsChannelMaskAttributeInteractionInfo =
@@ -11073,26 +11070,6 @@ public class ClusterReadMapping {
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readChannelMaskAttribute",
         readThreadNetworkDiagnosticsChannelMaskAttributeInteractionInfo);
-    Map<String, CommandParameterInfo>
-        readThreadNetworkDiagnosticsOperationalDatasetComponentsCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo
-        readThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeInteractionInfo =
-            new InteractionInfo(
-                (cluster, callback, commandArguments) -> {
-                  ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                      .readOperationalDatasetComponentsAttribute(
-                          (ChipClusters.ThreadNetworkDiagnosticsCluster
-                                  .OperationalDatasetComponentsAttributeCallback)
-                              callback);
-                },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallback(),
-                readThreadNetworkDiagnosticsOperationalDatasetComponentsCommandParams);
-    readThreadNetworkDiagnosticsInteractionInfo.put(
-        "readOperationalDatasetComponentsAttribute",
-        readThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
         readThreadNetworkDiagnosticsActiveNetworkFaultsListCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();

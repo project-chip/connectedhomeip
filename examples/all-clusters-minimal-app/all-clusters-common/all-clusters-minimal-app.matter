@@ -1223,11 +1223,19 @@ server cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster GroupKeyManagement = 63 {
@@ -2029,6 +2037,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -2075,7 +2084,7 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -2094,10 +2103,6 @@ server cluster OperationalCredentials = 62 {
 
   request struct AddTrustedRootCertificateRequest {
     OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   response struct AttestationResponse = 1 {
@@ -2128,7 +2133,6 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {
@@ -2994,21 +2998,21 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable RoutingRole routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
-  readonly attribute int32u partitionId = 9;
-  readonly attribute int8u weighting = 10;
-  readonly attribute int8u dataVersion = 11;
-  readonly attribute int8u stableDataVersion = 12;
-  readonly attribute int8u leaderRouterId = 13;
-  readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string<4> channelMask = 60;
-  readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute nullable int32u partitionId = 9;
+  readonly attribute nullable int8u weighting = 10;
+  readonly attribute nullable int8u dataVersion = 11;
+  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int8u leaderRouterId = 13;
+  readonly attribute nullable SecurityPolicy securityPolicy = 59;
+  readonly attribute nullable octet_string<4> channelMask = 60;
+  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -3357,6 +3361,7 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
+    callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3370,21 +3375,21 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    ram      attribute channel;
-    ram      attribute routingRole;
-    ram      attribute networkName;
-    ram      attribute panId;
-    ram      attribute extendedPanId;
-    ram      attribute meshLocalPrefix;
+    callback attribute channel;
+    callback attribute routingRole;
+    callback attribute networkName;
+    callback attribute panId;
+    callback attribute extendedPanId;
+    callback attribute meshLocalPrefix;
     callback attribute neighborTableList;
     callback attribute routeTableList;
-    ram      attribute partitionId;
-    ram      attribute weighting;
-    ram      attribute dataVersion;
-    ram      attribute stableDataVersion;
-    ram      attribute leaderRouterId;
+    callback attribute partitionId;
+    callback attribute weighting;
+    callback attribute dataVersion;
+    callback attribute stableDataVersion;
+    callback attribute leaderRouterId;
     callback attribute securityPolicy;
-    ram      attribute channelMask;
+    callback attribute channelMask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap;

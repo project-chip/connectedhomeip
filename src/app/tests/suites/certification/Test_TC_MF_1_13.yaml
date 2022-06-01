@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    22.1.13. [TC-MF-1.13] Open commissioning window on DUT twice using ECM then
+    3.1.13. [TC-MF-1.13] Open commissioning window on DUT twice using ECM then
     BCM [DUT - Commissionee]
 
 config:
@@ -25,12 +25,14 @@ config:
 tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       verification: |
-          1. Provision the device using 1st controller chip tool on the raspi (use above instructions) ,
+          "1. Provision the device using 1st controller chip tool on the raspi (use above instructions) ,
+          "
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using ECM and TH_CR3
-          Commissions with DUT_CE"
+          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR3 Commissions
+          with DUT_CE"
       verification: |
           On the 1st controller using chip tool, open commissioning window using ECM
 
@@ -51,12 +53,34 @@ tests:
 
           1. On 3rd controller using chip tool connect using manual code
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing manualcode 1 35484132896
+
+          Verify you got below message
+          Device commissioning completed with success
+      disabled: true
+
+    - label: "DNS-SD records shows DUT_CE advertising"
+      verification: |
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          = wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using ECM and TH_CR2
-          Commissions with DUT_CE"
+          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR2 Commissions
+          with DUT_CE"
       verification: |
           On the 1st controller using chip tool, open commissioning window using ECM
 
@@ -77,7 +101,10 @@ tests:
 
           1. On 2nd controller using chip tool connect using manual code
 
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool pairing manualcode 1 35484132896
+
+          Verify you got below message
+          Device commissioning completed with success
       disabled: true
 
     - label:
@@ -102,87 +129,86 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR1 opens a 2nd
-          commissioning window on DUT_CE using a commissioning timeout of
-          PIXIT_COMM_WIN seconds using ECM"
+          "Before the expiration of PIXIT_COMM_WIN seconds which was set in step
+          5, TH_CR1 opens a 2nd commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT_COMM_WIN seconds using ECM"
       verification: |
           Before the timer expiry, on the 1st controller using chip tool, open commissioning window using ECM. Verify the General code return error 1
 
 
           ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650527291.952055][8566:8571] CHIP:DMG: {
+          [1650527291.952074][8566:8571] CHIP:DMG: 	suppressResponse = false,
+          [1650527291.952091][8566:8571] CHIP:DMG: 	InvokeResponseIBs =
+          [1650527291.952116][8566:8571] CHIP:DMG: 	[
+          [1650527291.952134][8566:8571] CHIP:DMG: 		InvokeResponseIB =
+          [1650527291.952172][8566:8571] CHIP:DMG: 		{
+          [1650527291.952195][8566:8571] CHIP:DMG: 			CommandStatusIB =
+          [1650527291.952220][8566:8571] CHIP:DMG: 			{
+          [1650527291.952245][8566:8571] CHIP:DMG: 				CommandPathIB =
+          [1650527291.952276][8566:8571] CHIP:DMG: 				{
+          [1650527291.952303][8566:8571] CHIP:DMG: 					EndpointId = 0x0,
+          [1650527291.952334][8566:8571] CHIP:DMG: 					ClusterId = 0x3c,
+          [1650527291.952369][8566:8571] CHIP:DMG: 					CommandId = 0x0,
+          [1650527291.952394][8566:8571] CHIP:DMG: 				},
+          [1650527291.952431][8566:8571] CHIP:DMG:
+          [1650527291.952458][8566:8571] CHIP:DMG: 				StatusIB =
+          [1650527291.952488][8566:8571] CHIP:DMG: 				{
+          [1650527291.952519][8566:8571] CHIP:DMG: 					status = 0x01 (FAILURE),
+          [1650527291.952555][8566:8571] CHIP:DMG: 					cluster-status = 0x1,
+          [1650527291.952578][8566:8571] CHIP:DMG: 				},
+          [1650527291.952612][8566:8571] CHIP:DMG:
+          [1650527291.952634][8566:8571] CHIP:DMG: 			},
+          [1650527291.952671][8566:8571] CHIP:DMG:
+          [1650527291.952694][8566:8571] CHIP:DMG: 		},
+          [1650527291.952731][8566:8571] CHIP:DMG:
+          [1650527291.952751][8566:8571] CHIP:DMG: 	],
+          [1650527291.952781][8566:8571] CHIP:DMG:
+          [1650527291.952795][8566:8571] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650527291.952807][8566:8571] CHIP:DMG: },
+          [1650527291.952886][8566:8571] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x1
+          [1650527291.952931][8566:8571] CHIP:CTL: Failed to open pairing window on the device. Status IM Error 0x00000601: Cluster-specific error: 0x01
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       verification: |
           On 1st controller using chip tool, read fabrics list
 
-          ./chip-tool operationalcredentials read fabrics-list 1 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
-          [1635874880.498519][4577:4582] CHIP:DMG: ReportData =
-          [1635874880.498558][4577:4582] CHIP:DMG: {
-          [1635874880.498587][4577:4582] CHIP:DMG:         AttributeDataList =
-          [1635874880.498622][4577:4582] CHIP:DMG:         [
-          [1635874880.498654][4577:4582] CHIP:DMG:                 AttributeDataElement =
-          [1635874880.498695][4577:4582] CHIP:DMG:                 {
-          [1635874880.498734][4577:4582] CHIP:DMG:                         AttributePath =
-          [1635874880.498783][4577:4582] CHIP:DMG:                         {
-          [1635874880.498827][4577:4582] CHIP:DMG:                                 NodeId = 0x1,
-          [1635874880.498874][4577:4582] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635874880.498923][4577:4582] CHIP:DMG:                                 ClusterId = 0x3e,
-          [1635874880.498995][4577:4582] CHIP:DMG:                                 FieldTag = 0x0000_0001,
-          [1635874880.499070][4577:4582] CHIP:DMG:                         }
-          [1635874880.499148][4577:4582] CHIP:DMG:
-          [1635874880.499200][4577:4582] CHIP:DMG:                         Data = [
-          [1635874880.499252][4577:4582] CHIP:DMG:
-          [1635874880.499305][4577:4582] CHIP:DMG:                                 {
-          [1635874880.499369][4577:4582] CHIP:DMG:                                         0x0 = 1,
-          [1635874880.499429][4577:4582] CHIP:DMG:                                         0x1 = [
-          [1635874880.499514][4577:4582] CHIP:DMG:                                                 0x4, 0x9e, 0x26, 0x54, 0x2, 0x45, 0x18, 0xca, 0x68, 0x9c, 0xa0, 0x77, 0xef, 0xb4, 0x37, 0x0, 0xce, 0xb7, 0x15, 0x8d, 0x4a, 0xc7, 0x6a, 0x67, 0x31, 0xf2, 0xba, 0x52, 0x8f, 0xb9, 0xfd, 0x93, 0xed, 0xc0, 0xdc, 0xce, 0xf7, 0x9d, 0x3, 0x3b, 0xc8, 0x63, 0
-          [1635874880.499583][4577:4582] CHIP:DMG:                                         ]
-          [1635874880.499656][4577:4582] CHIP:DMG:                                         0x2 = 30024,
-          [1635874880.499726][4577:4582] CHIP:DMG:                                         0x3 = 0,
-          [1635874880.499798][4577:4582] CHIP:DMG:                                         0x4 = 1,
-          [1635874880.499854][4577:4582] CHIP:DMG:                                         0x5 = "",
-          [1635874880.499912][4577:4582] CHIP:DMG:                                 },
-          [1635874880.499967][4577:4582] CHIP:DMG:                                 {
-          [1635874880.500024][4577:4582] CHIP:DMG:                                         0x0 = 2,
-          [1635874880.500082][4577:4582] CHIP:DMG:                                         0x1 = [
-          [1635874880.500165][4577:4582] CHIP:DMG:                                                 0x4, 0x5b, 0x93, 0x38, 0xab, 0x50, 0x6, 0x85, 0xc0, 0x50, 0xfe, 0x7d, 0x6c, 0xeb, 0x9d, 0xbd, 0x55, 0x90, 0x5e, 0x4f, 0x54, 0xed, 0x94, 0x21, 0xc0, 0x8d, 0x9d, 0x4f, 0x60, 0x48, 0xdb, 0x38, 0x4a, 0xf4, 0xe2, 0xa3, 0xf9, 0xd0, 0x55, 0xd5, 0x63, 0xd0,
-          [1635874880.500243][4577:4582] CHIP:DMG:                                         ]
-          [1635874880.500315][4577:4582] CHIP:DMG:                                         0x2 = 45896,
-          [1635874880.500384][4577:4582] CHIP:DMG:                                         0x3 = 0,
-          [1635874880.500450][4577:4582] CHIP:DMG:                                         0x4 = 2,
-          [1635874880.500504][4577:4582] CHIP:DMG:                                         0x5 = "",
-          [1635874880.500562][4577:4582] CHIP:DMG:                                 },
-          [1635874880.500619][4577:4582] CHIP:DMG:                         ],
-          [1635874880.500671][4577:4582] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635874880.500722][4577:4582] CHIP:DMG:                 },
-          [1635874880.500794][4577:4582] CHIP:DMG:
-          [1635874880.500838][4577:4582] CHIP:DMG:         ],
-          [1635874880.500902][4577:4582] CHIP:DMG:
-          [1635874880.500945][4577:4582] CHIP:DMG: }
-          [1635874880.501124][4577:4582] CHIP:ZCL: ReadAttributesResponse:
-          [1635874880.501165][4577:4582] CHIP:ZCL:   ClusterId: 0x0000_003E
-          [1635874880.501209][4577:4582] CHIP:ZCL:   attributeId: 0x0000_0001
-          [1635874880.501250][4577:4582] CHIP:ZCL:   status: Success                (0x0000)
-          [1635874880.501285][4577:4582] CHIP:ZCL:   attribute TLV Type: 0x16
-          [1635874880.501348][4577:4582] CHIP:TOO: OnOperationalCredentialsFabricsListListAttributeResponse: 2 entries
-          [1635874880.501510][4577:4582] CHIP:TOO: FabricDescriptor[1]:
-          [1635874880.501556][4577:4582] CHIP:TOO:   fabricIndex: 1
-          [1635874880.501594][4577:4582] CHIP:ZCL:   RootPublicKey: 65
-          [1635874880.501632][4577:4582] CHIP:TOO:   vendorId: 30024
-          [1635874880.501666][4577:4582] CHIP:TOO:   fabricId: 0
-          [1635874880.501703][4577:4582] CHIP:TOO:   nodeId: 1
-          [1635874880.501739][4577:4582] CHIP:ZCL:   Label:
-          [1635874880.501792][4577:4582] CHIP:TOO: FabricDescriptor[2]:
-          [1635874880.501832][4577:4582] CHIP:TOO:   fabricIndex: 2
-          [1635874880.501865][4577:4582] CHIP:ZCL:   RootPublicKey: 65
-          [1635874880.501902][4577:4582] CHIP:TOO:   vendorId: 45896
-          [1635874880.501943][4577:4582] CHIP:TOO:   fabricId: 0
-          [1635874880.501980][4577:4582] CHIP:TOO:   nodeId: 2
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
+          [1650527361.425870][15792:15797] CHIP:TOO:   Fabrics: 3 entries
+          [1650527361.426777][15792:15797] CHIP:TOO:     [1]: {
+          [1650527361.426859][15792:15797] CHIP:TOO:       RootPublicKey: 0429A71383F336D80918C9EC655112513E428C073AF7FB44820EC793535302C6E3825C56EE6DD1A683EAA7B59E3F261B46FFA24A6D911E8D88839F4C1B3C84BA01
+          [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
+          [1650527361.427376][15792:15797] CHIP:TOO:      }
+          [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
+          [1650527361.427532][15792:15797] CHIP:TOO:       RootPublicKey: 04781BCEE70118049ED61DD5B4E401CF1A09D2F78AE7F5770BE5506AD24238E5E0777277DABAFD062659651C95CC2CA7DEAACE40DB579A946CC07CADB141BE05D7
+          [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
+          [1650527361.427868][15792:15797] CHIP:TOO:      }
+          [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
+          [1650527361.428008][15792:15797] CHIP:TOO:       RootPublicKey: 0403EDB5B461030A34EF7EA2F9DB0D46A36185E4755C365AF9344C4959F049EF21D55EAB903A2C7FBFC305EEFA42989250D7517A73E6156062390A60C0D4C41EBD
+          [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
+          [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
+          [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label:
+          "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
+          step 6"
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
@@ -193,20 +219,99 @@ tests:
       verification: |
           On the 1st controller using chip tool, open commissioning window using BCM
 
-          ./chip-tool  administratorcommissioning open-basic-commissioning-window 500 1 0
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650278416.248379][11064:11069] CHIP:DMG: {
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
+          [1650278416.248570][11064:11069] CHIP:DMG:         [
+          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
+          [1650278416.248718][11064:11069] CHIP:DMG:                 {
+          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
+          [1650278416.248860][11064:11069] CHIP:DMG:                         {
+          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
+          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249889][11064:11069] CHIP:DMG:                         },
+          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.250035][11064:11069] CHIP:DMG:                 },
+          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250169][11064:11069] CHIP:DMG:         ],
+          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
+          [1650278416.250355][11064:11069] CHIP:DMG: },
+          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label: "DNS-SD records shows DUT_CE advertising"
+      verification: |
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+          =   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR3 opens a 2nd
-          commissioning window on DUT_CE using a commissioning timeout of
-          PIXIT_COMM_WIN seconds using BCM"
+          "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
+          9, TH_CR3 opens a 2nd commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
       verification: |
           On the 3rd controller using chip tool, open commissioning window using BCM before the timer expiry of the above step
 
-          ./chip-tool pairing administratorcommissioning open-basic-commissioning-window 500 1 0
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 3 0 --timedInteractionTimeoutMs 1000
+
+           CHIP:DMG: InvokeResponseMessage =
+          [1650527565.990404][24618:24623] CHIP:DMG: {
+          [1650527565.990476][24618:24623] CHIP:DMG:         suppressResponse = false,
+          [1650527565.990528][24618:24623] CHIP:DMG:         InvokeResponseIBs =
+          [1650527565.990615][24618:24623] CHIP:DMG:         [
+          [1650527565.990667][24618:24623] CHIP:DMG:                 InvokeResponseIB =
+          [1650527565.990755][24618:24623] CHIP:DMG:                 {
+          [1650527565.990816][24618:24623] CHIP:DMG:                         CommandStatusIB =
+          [1650527565.990900][24618:24623] CHIP:DMG:                         {
+          [1650527565.990967][24618:24623] CHIP:DMG:                                 CommandPathIB =
+          [1650527565.991042][24618:24623] CHIP:DMG:                                 {
+          [1650527565.991112][24618:24623] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650527565.991186][24618:24623] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650527565.991257][24618:24623] CHIP:DMG:                                         CommandId = 0x1,
+          [1650527565.991332][24618:24623] CHIP:DMG:                                 },
+          [1650527565.991441][24618:24623] CHIP:DMG:
+          [1650527565.991505][24618:24623] CHIP:DMG:                                 StatusIB =
+          [1650527565.991574][24618:24623] CHIP:DMG:                                 {
+          [1650527565.991645][24618:24623] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527565.991743][24618:24623] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527565.991830][24618:24623] CHIP:DMG:                                 },
+          [1650527565.991918][24618:24623] CHIP:DMG:
+          [1650527565.991976][24618:24623] CHIP:DMG:                         },
+          [1650527565.992061][24618:24623] CHIP:DMG:
+          [1650527565.992116][24618:24623] CHIP:DMG:                 },
+          [1650527565.992202][24618:24623] CHIP:DMG:
+          [1650527565.992253][24618:24623] CHIP:DMG:         ],
+          [1650527565.992316][24618:24623] CHIP:DMG:
+          [1650527565.992365][24618:24623] CHIP:DMG:         InteractionModelRevision = 1
+          [1650527565.992414][24618:24623] CHIP:DMG: },
+          [1650527565.992535][24618:24623] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
+          [1650527565.992601][24618:24623] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
       disabled: true
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label:
+          "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
+          step 11"
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
@@ -215,70 +320,34 @@ tests:
       verification: |
           On 1st controller using chip tool, read fabrics list
 
-          ./chip-tool operationalcredentials read fabrics-list 1 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
-          [1635875084.555953][4590:4595] CHIP:DMG: ReportData =
-          [1635875084.555986][4590:4595] CHIP:DMG: {
-          [1635875084.556021][4590:4595] CHIP:DMG:         AttributeDataList =
-          [1635875084.556059][4590:4595] CHIP:DMG:         [
-          [1635875084.556105][4590:4595] CHIP:DMG:                 AttributeDataElement =
-          [1635875084.556141][4590:4595] CHIP:DMG:                 {
-          [1635875084.556179][4590:4595] CHIP:DMG:                         AttributePath =
-          [1635875084.556216][4590:4595] CHIP:DMG:                         {
-          [1635875084.556263][4590:4595] CHIP:DMG:                                 NodeId = 0x1,
-          [1635875084.556304][4590:4595] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635875084.556359][4590:4595] CHIP:DMG:                                 ClusterId = 0x3e,
-          [1635875084.556408][4590:4595] CHIP:DMG:                                 FieldTag = 0x0000_0001,
-          [1635875084.556457][4590:4595] CHIP:DMG:                         }
-          [1635875084.556509][4590:4595] CHIP:DMG:
-          [1635875084.556553][4590:4595] CHIP:DMG:                         Data = [
-          [1635875084.556597][4590:4595] CHIP:DMG:
-          [1635875084.556642][4590:4595] CHIP:DMG:                                 {
-          [1635875084.556698][4590:4595] CHIP:DMG:                                         0x0 = 1,
-          [1635875084.556752][4590:4595] CHIP:DMG:                                         0x1 = [
-          [1635875084.556819][4590:4595] CHIP:DMG:                                                 0x4, 0x9e, 0x26, 0x54, 0x2, 0x45, 0x18, 0xca, 0x68, 0x9c, 0xa0, 0x77, 0xef, 0xb4, 0x37, 0x0, 0xce, 0xb7, 0x15, 0x8d, 0x4a, 0xc7, 0x6a, 0x67, 0x31, 0xf2, 0xba, 0x52, 0x8f, 0xb9, 0xfd, 0x93, 0xed, 0xc0, 0xdc, 0xce, 0xf7, 0x9d, 0x3, 0x3b, 0xc8, 0x63, 0
-          [1635875084.556875][4590:4595] CHIP:DMG:                                         ]
-          [1635875084.556933][4590:4595] CHIP:DMG:                                         0x2 = 30024,
-          [1635875084.556975][4590:4595] CHIP:DMG:                                         0x3 = 0,
-          [1635875084.557022][4590:4595] CHIP:DMG:                                         0x4 = 1,
-          [1635875084.557070][4590:4595] CHIP:DMG:                                         0x5 = "",
-          [1635875084.557116][4590:4595] CHIP:DMG:                                 },
-          [1635875084.557168][4590:4595] CHIP:DMG:                                 {
-          [1635875084.557237][4590:4595] CHIP:DMG:                                         0x0 = 2,
-          [1635875084.557295][4590:4595] CHIP:DMG:                                         0x1 = [
-          [1635875084.557371][4590:4595] CHIP:DMG:                                                 0x4, 0x5b, 0x93, 0x38, 0xab, 0x50, 0x6, 0x85, 0xc0, 0x50, 0xfe, 0x7d, 0x6c, 0xeb, 0x9d, 0xbd, 0x55, 0x90, 0x5e, 0x4f, 0x54, 0xed, 0x94, 0x21, 0xc0, 0x8d, 0x9d, 0x4f, 0x60, 0x48, 0xdb, 0x38, 0x4a, 0xf4, 0xe2, 0xa3, 0xf9, 0xd0, 0x55, 0xd5, 0x63, 0xd0,
-          [1635875084.557477][4590:4595] CHIP:DMG:                                         ]
-          [1635875084.557555][4590:4595] CHIP:DMG:                                         0x2 = 45896,
-          [1635875084.557629][4590:4595] CHIP:DMG:                                         0x3 = 0,
-          [1635875084.557701][4590:4595] CHIP:DMG:                                         0x4 = 2,
-          [1635875084.557757][4590:4595] CHIP:DMG:                                         0x5 = "",
-          [1635875084.557828][4590:4595] CHIP:DMG:                                 },
-          [1635875084.557888][4590:4595] CHIP:DMG:                         ],
-          [1635875084.557948][4590:4595] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635875084.558002][4590:4595] CHIP:DMG:                 },
-          [1635875084.558070][4590:4595] CHIP:DMG:
-          [1635875084.558115][4590:4595] CHIP:DMG:         ],
-          [1635875084.558179][4590:4595] CHIP:DMG:
-          [1635875084.558222][4590:4595] CHIP:DMG: }
-          [1635875084.558385][4590:4595] CHIP:ZCL: ReadAttributesResponse:
-          [1635875084.558426][4590:4595] CHIP:ZCL:   ClusterId: 0x0000_003E
-          [1635875084.558469][4590:4595] CHIP:ZCL:   attributeId: 0x0000_0001
-          [1635875084.558508][4590:4595] CHIP:ZCL:   status: Success                (0x0000)
-          [1635875084.558543][4590:4595] CHIP:ZCL:   attribute TLV Type: 0x16
-          [1635875084.558609][4590:4595] CHIP:TOO: OnOperationalCredentialsFabricsListListAttributeResponse: 2 entries
-          [1635875084.558730][4590:4595] CHIP:TOO: FabricDescriptor[1]:
-          [1635875084.558772][4590:4595] CHIP:TOO:   fabricIndex: 1
-          [1635875084.558808][4590:4595] CHIP:ZCL:   RootPublicKey: 65
-          [1635875084.558844][4590:4595] CHIP:TOO:   vendorId: 30024
-          [1635875084.558887][4590:4595] CHIP:TOO:   fabricId: 0
-          [1635875084.558923][4590:4595] CHIP:TOO:   nodeId: 1
-          [1635875084.558954][4590:4595] CHIP:ZCL:   Label:
-          [1635875084.559004][4590:4595] CHIP:TOO: FabricDescriptor[2]:
-          [1635875084.559044][4590:4595] CHIP:TOO:   fabricIndex: 2
-          [1635875084.559076][4590:4595] CHIP:ZCL:   RootPublicKey: 65
-          [1635875084.559111][4590:4595] CHIP:TOO:   vendorId: 45896
-          [1635875084.559143][4590:4595] CHIP:TOO:   fabricId: 0
-          [1635875084.559178][4590:4595] CHIP:TOO:   nodeId: 2
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
+          [1650527361.425870][15792:15797] CHIP:TOO:   Fabrics: 3 entries
+          [1650527361.426777][15792:15797] CHIP:TOO:     [1]: {
+          [1650527361.426859][15792:15797] CHIP:TOO:       RootPublicKey: 0429A71383F336D80918C9EC655112513E428C073AF7FB44820EC793535302C6E3825C56EE6DD1A683EAA7B59E3F261B46FFA24A6D911E8D88839F4C1B3C84BA01
+          [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
+          [1650527361.427376][15792:15797] CHIP:TOO:      }
+          [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
+          [1650527361.427532][15792:15797] CHIP:TOO:       RootPublicKey: 04781BCEE70118049ED61DD5B4E401CF1A09D2F78AE7F5770BE5506AD24238E5E0777277DABAFD062659651C95CC2CA7DEAACE40DB579A946CC07CADB141BE05D7
+          [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
+          [1650527361.427868][15792:15797] CHIP:TOO:      }
+          [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
+          [1650527361.428008][15792:15797] CHIP:TOO:       RootPublicKey: 0403EDB5B461030A34EF7EA2F9DB0D46A36185E4755C365AF9344C4959F049EF21D55EAB903A2C7FBFC305EEFA42989250D7517A73E6156062390A60C0D4C41EBD
+          [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
+          [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
+          [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -288,42 +357,81 @@ tests:
           On the 1st controller using chip tool, open commissioning window using BCM
 
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
 
-          [1635922853.458816][9456:9461] CHIP:DMG: InvokeCommand =
-          [1635922853.458865][9456:9461] CHIP:DMG: {
-          [1635922853.458903][9456:9461] CHIP:DMG:         CommandList =
-          [1635922853.458951][9456:9461] CHIP:DMG:         [
-          [1635922853.459031][9456:9461] CHIP:DMG:                 CommandDataIB =
-          [1635922853.459086][9456:9461] CHIP:DMG:                 {
-          [1635922853.459130][9456:9461] CHIP:DMG:                         CommandPathIB =
-          [1635922853.459184][9456:9461] CHIP:DMG:                         {
-          [1635922853.459235][9456:9461] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635922853.459291][9456:9461] CHIP:DMG:                                 ClusterId = 0x3c,
-          [1635922853.459348][9456:9461] CHIP:DMG:                                 CommandId = 0x1,
-          [1635922853.459400][9456:9461] CHIP:DMG:                         },
-          [1635922853.459458][9456:9461] CHIP:DMG:
-          [1635922853.459507][9456:9461] CHIP:DMG:                         StatusIB =
-          [1635922853.459560][9456:9461] CHIP:DMG:                         {
-          [1635922853.459612][9456:9461] CHIP:DMG:                                 status = 0x0,
-          [1635922853.459664][9456:9461] CHIP:DMG:                         },
-          [1635922853.459718][9456:9461] CHIP:DMG:
-          [1635922853.459766][9456:9461] CHIP:DMG:                 },
-          [1635922853.459831][9456:9461] CHIP:DMG:
-          [1635922853.459889][9456:9461] CHIP:DMG:         ],
-          [1635922853.459951][9456:9461] CHIP:DMG:
-          [1635922853.460004][9456:9461] CHIP:DMG: }
-          [1635922853.460101][9456:9461] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1635922853.460166][9456:9461] CHIP:TOO: Default Success Response
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650278416.248379][11064:11069] CHIP:DMG: {
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
+          [1650278416.248570][11064:11069] CHIP:DMG:         [
+          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
+          [1650278416.248718][11064:11069] CHIP:DMG:                 {
+          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
+          [1650278416.248860][11064:11069] CHIP:DMG:                         {
+          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
+          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249889][11064:11069] CHIP:DMG:                         },
+          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.250035][11064:11069] CHIP:DMG:                 },
+          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250169][11064:11069] CHIP:DMG:         ],
+          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
+          [1650278416.250355][11064:11069] CHIP:DMG: },
+          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR2 opens a
-          second commissioning window on DUT_CE using a commissioning timeout of
-          PIXIT_COMM_WIN seconds using BCM"
+          "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
+          14, TH_CR2 opens a second commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
       verification: |
           On the 2nd controller using chip tool, open commissioning window using BCM before timer expiry from above step
 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 100 1 0
+          CHIP:DMG: InvokeResponseMessage =
+          [1650527622.373450][15824:15829] CHIP:DMG: {
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
+          [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
+          [1650527622.373734][15824:15829] CHIP:DMG:         [
+          [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
+          [1650527622.373913][15824:15829] CHIP:DMG:                 {
+          [1650527622.374001][15824:15829] CHIP:DMG:                         CommandStatusIB =
+          [1650527622.374087][15824:15829] CHIP:DMG:                         {
+          [1650527622.374182][15824:15829] CHIP:DMG:                                 CommandPathIB =
+          [1650527622.374296][15824:15829] CHIP:DMG:                                 {
+          [1650527622.374382][15824:15829] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
+          [1650527622.374682][15824:15829] CHIP:DMG:                                 },
+          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
+          [1650527622.374979][15824:15829] CHIP:DMG:                                 {
+          [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527622.375320][15824:15829] CHIP:DMG:                                 },
+          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375527][15824:15829] CHIP:DMG:                         },
+          [1650527622.375616][15824:15829] CHIP:DMG:
+          [1650527622.375704][15824:15829] CHIP:DMG:                 },
+          [1650527622.375786][15824:15829] CHIP:DMG:
+          [1650527622.375864][15824:15829] CHIP:DMG:         ],
+          [1650527622.375940][15824:15829] CHIP:DMG:
+          [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
+          [1650527622.376058][15824:15829] CHIP:DMG: },
+          [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
+          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
       disabled: true

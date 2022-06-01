@@ -730,6 +730,8 @@ typedef void (*CHIPGeneralDiagnosticsClusterActiveRadioFaultsAttributeCallbackTy
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterActiveNetworkFaultsAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralDiagnosticsClusterTestEventTriggersEnabledAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterAcceptedCommandListAttributeCallbackType)(
@@ -1765,12 +1767,11 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterPendingTimestampAttributeCallb
 typedef void (*CHIPThreadNetworkDiagnosticsClusterDelayAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallbackType)(
-    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo::DecodableType &);
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType)(
-    void *,
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableType &);
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType &);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterGeneratedCommandListAttributeCallbackType)(

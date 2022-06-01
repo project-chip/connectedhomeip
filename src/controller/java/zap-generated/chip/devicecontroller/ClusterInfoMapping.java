@@ -6576,65 +6576,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.SecurityPolicyAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        @Nullable List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static
-  class DelegatedThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster
-              .OperationalDatasetComponentsAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        @Nullable
-            List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>
-                valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList",
-              "List<ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static
   class DelegatedThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster
@@ -9730,6 +9671,31 @@ public class ClusterInfoMapping {
     commandMap.put("generalCommissioning", generalCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> generalDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> generalDiagnosticstestEventTriggerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo =
+        new CommandParameterInfo("enableKey", byte[].class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "enableKey", generalDiagnosticstestEventTriggerenableKeyCommandParameterInfo);
+
+    CommandParameterInfo generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo =
+        new CommandParameterInfo("eventTrigger", Long.class);
+    generalDiagnosticstestEventTriggerCommandParams.put(
+        "eventTrigger", generalDiagnosticstestEventTriggereventTriggerCommandParameterInfo);
+
+    InteractionInfo generalDiagnosticstestEventTriggerInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .testEventTrigger(
+                      (DefaultClusterCallback) callback,
+                      (byte[]) commandArguments.get("enableKey"),
+                      (Long) commandArguments.get("eventTrigger"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalDiagnosticstestEventTriggerCommandParams);
+    generalDiagnosticsClusterInteractionInfoMap.put(
+        "testEventTrigger", generalDiagnosticstestEventTriggerInteractionInfo);
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();
@@ -11064,29 +11030,6 @@ public class ClusterInfoMapping {
             operationalCredentialsremoveFabricCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "removeFabric", operationalCredentialsremoveFabricInteractionInfo);
-    Map<String, CommandParameterInfo>
-        operationalCredentialsremoveTrustedRootCertificateCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo
-        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo =
-            new CommandParameterInfo("trustedRootIdentifier", byte[].class);
-    operationalCredentialsremoveTrustedRootCertificateCommandParams.put(
-        "trustedRootIdentifier",
-        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo);
-
-    InteractionInfo operationalCredentialsremoveTrustedRootCertificateInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalCredentialsCluster) cluster)
-                  .removeTrustedRootCertificate(
-                      (DefaultClusterCallback) callback,
-                      (byte[]) commandArguments.get("trustedRootIdentifier"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            operationalCredentialsremoveTrustedRootCertificateCommandParams);
-    operationalCredentialsClusterInteractionInfoMap.put(
-        "removeTrustedRootCertificate",
-        operationalCredentialsremoveTrustedRootCertificateInteractionInfo);
     Map<String, CommandParameterInfo> operationalCredentialsupdateFabricLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo operationalCredentialsupdateFabricLabellabelCommandParameterInfo =

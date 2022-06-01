@@ -264,7 +264,7 @@ private:
         CHIP_ERROR err = EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
         if (err != CHIP_NO_ERROR)
         {
-            // For list chunking, ReportEngine should not rollback the buffer when CHIP_NO_MEMORY or similar error occurred.
+            // For list chunking, ReportEngine should not rollback the buffer when CHIP_ERROR_NO_MEMORY or similar error occurred.
             // However, the error might be raised in the middle of encoding procedure, then the buffer may contain partial data,
             // unclosed containers etc. This line clears all possible partial data and makes EncodeListItem is atomic.
             mAttributeReportIBsBuilder.Rollback(backup);
