@@ -394,7 +394,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -506,7 +506,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -663,7 +663,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -920,7 +920,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1138,7 +1138,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1318,7 +1318,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1490,7 +1490,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -1893,7 +1893,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2050,7 +2050,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2271,7 +2271,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2398,7 +2398,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2666,7 +2666,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -2970,7 +2970,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -3334,7 +3334,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -4293,7 +4293,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -4441,7 +4441,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -4675,7 +4675,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -4787,7 +4787,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -5285,7 +5285,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -5562,7 +5562,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -5830,7 +5830,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6121,7 +6121,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6276,7 +6276,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6469,7 +6469,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -6678,7 +6678,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7058,7 +7058,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7337,7 +7337,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7464,7 +7464,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7606,7 +7606,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7821,7 +7821,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -7933,7 +7933,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8290,7 +8290,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8411,7 +8411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8523,7 +8523,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8707,7 +8707,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -8992,7 +8992,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9284,7 +9284,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9547,7 +9547,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9611,7 +9611,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9785,7 +9785,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -9942,7 +9942,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10136,7 +10136,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10278,7 +10278,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -10594,7 +10594,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11186,7 +11186,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11322,7 +11322,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -11563,7 +11563,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12146,7 +12146,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12339,7 +12339,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12526,7 +12526,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12748,7 +12748,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -12905,7 +12905,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -13079,7 +13079,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -13224,7 +13224,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -15620,7 +15620,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -15946,7 +15946,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -16103,7 +16103,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -17621,7 +17621,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -17763,7 +17763,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -17842,7 +17842,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -17973,7 +17973,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -18097,7 +18097,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -18439,7 +18439,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
@@ -18877,13 +18877,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             return value;
         }
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
         }
         break;
     }
     default:
-        *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+        *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
         break;
     }
     return nullptr;

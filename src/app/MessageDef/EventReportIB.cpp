@@ -32,7 +32,7 @@ namespace app {
 CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventReportIB =");
@@ -52,8 +52,8 @@ CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kEventStatus):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventStatus))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventStatus));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventStatus))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventStatus));
             {
                 EventStatusIB::Parser eventStatus;
                 ReturnErrorOnFailure(eventStatus.Init(reader));
@@ -65,8 +65,8 @@ CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEventData):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventData));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventData))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventData));
             {
                 EventDataIB::Parser eventData;
                 ReturnErrorOnFailure(eventData.Init(reader));
@@ -91,12 +91,12 @@ CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
         const int CheckDataField   = 1 << to_underlying(Tag::kEventData);
         const int CheckStatusField = (1 << to_underlying(Tag::kEventStatus));
 
-        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusField) == CheckStatusField)
+        if ((tagPresenceMask & CheckDataField) == CheckDataField && (tagPresenceMask & CheckStatusField) == CheckStatusField)
         {
             // kEventData and kEventStatus both exist
             err = CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB;
         }
-        else if ((TagPresenceMask & CheckDataField) != CheckDataField && (TagPresenceMask & CheckStatusField) != CheckStatusField)
+        else if ((tagPresenceMask & CheckDataField) != CheckDataField && (tagPresenceMask & CheckStatusField) != CheckStatusField)
         {
             // kEventData and kErrorStatus not exist
             err = CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB;

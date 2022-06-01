@@ -68,7 +68,7 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("StatusIB =");
@@ -82,9 +82,9 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
         {
             continue;
         }
-        if (!(TagPresenceMask & (1 << to_underlying(Tag::kStatus))))
+        if (!(tagPresenceMask & (1 << to_underlying(Tag::kStatus))))
         {
-            TagPresenceMask |= (1 << to_underlying(Tag::kStatus));
+            tagPresenceMask |= (1 << to_underlying(Tag::kStatus));
 
 #if CHIP_DETAIL_LOGGING
             {
@@ -94,9 +94,9 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
         }
-        else if (!(TagPresenceMask & (1 << to_underlying(Tag::kClusterStatus))))
+        else if (!(tagPresenceMask & (1 << to_underlying(Tag::kClusterStatus))))
         {
-            TagPresenceMask |= (1 << to_underlying(Tag::kClusterStatus));
+            tagPresenceMask |= (1 << to_underlying(Tag::kClusterStatus));
 
 #if CHIP_DETAIL_LOGGING
             {
@@ -118,16 +118,8 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const int RequiredFields = (1 << to_underlying(Tag::kStatus));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_STATUS_CODE;
-        }
+        const int requiredFields = (1 << to_underlying(Tag::kStatus));
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_STATUS_IB;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

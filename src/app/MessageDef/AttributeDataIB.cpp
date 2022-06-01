@@ -187,7 +187,7 @@ AttributeDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
 CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeDataIB =");
@@ -207,8 +207,8 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kDataVersion):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kDataVersion))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kDataVersion));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDataVersion))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kDataVersion));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -221,8 +221,8 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kPath):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
                 AttributePathIB::Parser path;
                 ReturnErrorOnFailure(path.Init(reader));
@@ -234,8 +234,8 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kData):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kData));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kData));
 
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(ParseData(reader, 0));
@@ -253,16 +253,9 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const int RequiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kData));
+        const int requiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kData));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_IB;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

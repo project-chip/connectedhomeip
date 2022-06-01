@@ -537,7 +537,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
 
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
     err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
 void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext)
@@ -564,7 +564,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
     err = readClient.ProcessReportData(std::move(buf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
 void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext)

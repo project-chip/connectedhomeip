@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeResponseIB =");
@@ -49,8 +49,8 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kCommand):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kCommand))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kCommand));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kCommand))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kCommand));
             {
                 CommandDataIB::Parser command;
                 ReturnErrorOnFailure(command.Init(reader));
@@ -62,8 +62,8 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kStatus):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kStatus))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kStatus));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kStatus))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kStatus));
             {
                 CommandStatusIB::Parser status;
                 ReturnErrorOnFailure(status.Init(reader));
@@ -89,13 +89,13 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
         const int CheckCommandField = 1 << to_underlying(Tag::kCommand);
         const int CheckStatusField  = (1 << to_underlying(Tag::kStatus));
 
-        if ((TagPresenceMask & CheckCommandField) == CheckCommandField && (TagPresenceMask & CheckStatusField) == CheckStatusField)
+        if ((tagPresenceMask & CheckCommandField) == CheckCommandField && (tagPresenceMask & CheckStatusField) == CheckStatusField)
         {
             // kPath and kErrorStatus both exist
             err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB;
         }
-        else if ((TagPresenceMask & CheckCommandField) != CheckCommandField &&
-                 (TagPresenceMask & CheckStatusField) != CheckStatusField)
+        else if ((tagPresenceMask & CheckCommandField) != CheckCommandField &&
+                 (tagPresenceMask & CheckStatusField) != CheckStatusField)
         {
             // kPath and kErrorStatus not exist
             err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB;

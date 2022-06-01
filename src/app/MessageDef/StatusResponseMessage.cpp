@@ -69,15 +69,7 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         const int requiredFields = (1 << to_underlying(Tag::kStatus));
-
-        if ((tagPresenceMask & requiredFields) == requiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

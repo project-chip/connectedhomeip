@@ -203,7 +203,7 @@ exit:
 CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("CommandDataIB =");
@@ -224,8 +224,8 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kPath):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
                 CommandPathIB::Parser path;
                 ReturnErrorOnFailure(path.Init(reader));
@@ -237,8 +237,8 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kFields):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kFields))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kFields));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kFields))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kFields));
             ReturnErrorOnFailure(ParseFields(reader, 0));
             break;
         default:
@@ -252,16 +252,8 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = 1 << to_underlying(Tag::kPath);
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-        }
+        const int requiredFields = 1 << to_underlying(Tag::kPath);
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
     }
 
     ReturnErrorOnFailure(err);
