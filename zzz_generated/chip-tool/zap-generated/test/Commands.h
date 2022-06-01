@@ -63617,7 +63617,6 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value.credentialExists", "", "boolean"));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
-                VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
             }
             break;
         case 4:
