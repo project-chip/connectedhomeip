@@ -157,17 +157,11 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kKeepSubscriptions)) |
+        const int requiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kKeepSubscriptions)) |
             (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
 
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
+                                                                   : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE;
     }
 
     ReturnErrorOnFailure(err);

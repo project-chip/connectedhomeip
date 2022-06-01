@@ -35,7 +35,7 @@ namespace app {
 CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventFilterIB =");
@@ -55,8 +55,8 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kNode):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kNode))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kNode));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kNode))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kNode));
 #if CHIP_DETAIL_LOGGING
             {
                 NodeId node;
@@ -67,8 +67,8 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kEventMin):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventMin))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventMin));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventMin))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventMin));
 #if CHIP_DETAIL_LOGGING
             {
                 uint64_t eventMin;
@@ -88,16 +88,8 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kEventMin));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB;
-        }
+        const int requiredFields = (1 << to_underlying(Tag::kEventMin));
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB;
     }
 
     ReturnErrorOnFailure(err);

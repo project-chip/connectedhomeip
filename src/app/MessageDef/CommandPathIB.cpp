@@ -35,7 +35,7 @@ namespace app {
 CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
     PRETTY_PRINT("CommandPathIB =");
     PRETTY_PRINT("{");
@@ -54,8 +54,8 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kEndpointId):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEndpointId))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEndpointId));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEndpointId))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEndpointId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -68,8 +68,8 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kClusterId):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kClusterId))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kClusterId));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kClusterId))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kClusterId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -81,8 +81,8 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kCommandId):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kCommandId))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kCommandId));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kCommandId))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kCommandId));
             VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -103,17 +103,10 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields =
+        const uint16_t requiredFields =
             (1 << to_underlying(Tag::kEndpointId)) | (1 << to_underlying(Tag::kCommandId)) | (1 << to_underlying(Tag::kClusterId));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

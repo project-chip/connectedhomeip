@@ -99,17 +99,9 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
+        const int requiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
             (1 << to_underlying(Tag::kInvokeRequests));
-
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE;
     }
 
     ReturnErrorOnFailure(err);
