@@ -48,10 +48,6 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
-#if defined(RS911X_WIFI)
-#define CHIP_DEVICE_CONFIG_ENABLE_IPV6 1
-#endif
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the EFR32 platform.
