@@ -254,6 +254,16 @@ public:
      */
     void DispatchShutDownAndStopEventLoop();
 
+    /**
+     * This function generate the SoftwareFault Event when a software fault takes place on the Node.
+     */
+    void DispatchSoftwareFaultEvent(uint32_t eventId);
+
+    /**
+     * This function generate the GeneralFault Event when a general fault takes place on the Node.
+     */
+    void DispatchGeneralFaultEvent(uint32_t eventId);
+
     void Shutdown();
 
     void ScheduleFactoryReset();

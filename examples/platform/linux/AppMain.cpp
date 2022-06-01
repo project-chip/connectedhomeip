@@ -128,21 +128,39 @@ void OnSignalHandler(int signum)
     {
     case SIGVTALRM:
         bootReason = BootReasonType::kPowerOnReboot;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGALRM:
         bootReason = BootReasonType::kBrownOutReset;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGILL:
         bootReason = BootReasonType::kSoftwareWatchdogReset;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGTRAP:
         bootReason = BootReasonType::kHardwareWatchdogReset;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGIO:
         bootReason = BootReasonType::kSoftwareUpdateCompleted;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGINT:
         bootReason = BootReasonType::kSoftwareReset;
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        break;
+    case SIGUSR1:
+        Server::GetInstance().DispatchSoftwareFaultEvent(SoftwareDiagnostics::Events::SoftwareFault::Id);
+        break;
+    case SIGUSR2:
+        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::HardwareFaultChange::Id);
+        break;
+    case SIGHUP:
+        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::RadioFaultChange::Id);
+        break;
+    case SIGTTIN:
+        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -150,8 +168,6 @@ void OnSignalHandler(int signum)
         chipDie();
         break;
     }
-
-    Server::GetInstance().DispatchShutDownAndStopEventLoop();
 }
 
 void SetupSignalHandlers()
@@ -165,6 +181,11 @@ void SetupSignalHandlers()
     signal(SIGTERM, OnSignalHandler);
     signal(SIGIO, OnSignalHandler);
     signal(SIGINT, OnSignalHandler);
+
+    signal(SIGUSR1, OnSignalHandler);
+    signal(SIGUSR2, OnSignalHandler);
+    signal(SIGHUP, OnSignalHandler);
+    signal(SIGTTIN, OnSignalHandler);
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 
