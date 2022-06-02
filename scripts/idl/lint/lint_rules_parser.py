@@ -75,7 +75,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             # <attribute ...><description>myName</description><access .../>...</attribute>
             attr_name = attr.text
             if attr.find('description') is not None:
-                attr_name=attr.find('description').text
+                attr_name = attr.find('description').text
 
             required_attributes.append(
                 RequiredAttribute(
