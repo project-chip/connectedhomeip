@@ -31,6 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: identifyTime:%@; >", NSStringFromClass([self class]), _identifyTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIdentifyClusterTriggerEffectParams
 - (instancetype)init
@@ -44,6 +52,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >",
+                                             NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterAddGroupParams
 - (instancetype)init
@@ -57,6 +73,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterAddGroupResponseParams
 - (instancetype)init
@@ -70,6 +94,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterViewGroupParams
 - (instancetype)init
@@ -81,6 +113,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterViewGroupResponseParams
 - (instancetype)init
@@ -96,6 +135,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; groupName:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupId, _groupName];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterGetGroupMembershipParams
 - (instancetype)init
@@ -107,6 +154,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupList:%@; >", NSStringFromClass([self class]), _groupList];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterGetGroupMembershipResponseParams
 - (instancetype)init
@@ -120,6 +174,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: capacity:%@; groupList:%@; >", NSStringFromClass([self class]), _capacity, _groupList];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterRemoveGroupParams
 - (instancetype)init
@@ -131,6 +193,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterRemoveGroupResponseParams
 - (instancetype)init
@@ -144,6 +213,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterRemoveAllGroupsParams
 - (instancetype)init
@@ -153,6 +230,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupsClusterAddGroupIfIdentifyingParams
 - (instancetype)init
@@ -166,6 +250,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterAddSceneParams
 - (instancetype)init
@@ -185,6 +277,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterAddSceneResponseParams
 - (instancetype)init
@@ -200,6 +301,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterViewSceneParams
 - (instancetype)init
@@ -213,6 +322,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterViewSceneResponseParams
 - (instancetype)init
@@ -234,6 +351,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterRemoveSceneParams
 - (instancetype)init
@@ -247,6 +373,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterRemoveSceneResponseParams
 - (instancetype)init
@@ -262,6 +396,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterRemoveAllScenesParams
 - (instancetype)init
@@ -273,6 +415,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
@@ -286,6 +435,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterStoreSceneParams
 - (instancetype)init
@@ -299,6 +456,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterStoreSceneResponseParams
 - (instancetype)init
@@ -314,6 +479,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterRecallSceneParams
 - (instancetype)init
@@ -329,6 +502,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; >",
+                                             NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterGetSceneMembershipParams
 - (instancetype)init
@@ -340,6 +521,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
@@ -357,6 +545,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupId:%@; sceneList:%@; >",
+                                             NSStringFromClass([self class]), _status, _capacity, _groupId, _sceneList];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterEnhancedAddSceneParams
 - (instancetype)init
@@ -376,6 +572,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
@@ -391,6 +596,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterEnhancedViewSceneParams
 - (instancetype)init
@@ -404,6 +617,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
@@ -425,6 +646,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterCopySceneParams
 - (instancetype)init
@@ -444,6 +674,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: mode:%@; groupIdFrom:%@; sceneIdFrom:%@; groupIdTo:%@; sceneIdTo:%@; >",
+                  NSStringFromClass([self class]), _mode, _groupIdFrom, _sceneIdFrom, _groupIdTo, _sceneIdTo];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPScenesClusterCopySceneResponseParams
 - (instancetype)init
@@ -459,6 +698,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdFrom:%@; sceneIdFrom:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupIdFrom, _sceneIdFrom];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterOffParams
 - (instancetype)init
@@ -468,6 +715,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterOnParams
 - (instancetype)init
@@ -477,6 +731,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterToggleParams
 - (instancetype)init
@@ -486,6 +747,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterOffWithEffectParams
 - (instancetype)init
@@ -499,6 +767,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: effectId:%@; effectVariant:%@; >", NSStringFromClass([self class]), _effectId, _effectVariant];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterOnWithRecallGlobalSceneParams
 - (instancetype)init
@@ -508,6 +784,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOnOffClusterOnWithTimedOffParams
 - (instancetype)init
@@ -523,6 +806,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: onOffControl:%@; onTime:%@; offWaitTime:%@; >",
+                                             NSStringFromClass([self class]), _onOffControl, _onTime, _offWaitTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterMoveToLevelParams
 - (instancetype)init
@@ -540,6 +831,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
+                  NSStringFromClass([self class]), _level, _transitionTime, _optionMask, _optionOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterMoveParams
 - (instancetype)init
@@ -557,6 +857,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionMask:%@; optionOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionMask, _optionOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterStepParams
 - (instancetype)init
@@ -576,6 +884,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionMask:%@; optionOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionMask, _optionOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterStopParams
 - (instancetype)init
@@ -589,6 +906,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionMask:%@; optionOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionMask, _optionOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterMoveToLevelWithOnOffParams
 - (instancetype)init
@@ -602,6 +927,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: level:%@; transitionTime:%@; >", NSStringFromClass([self class]), _level, _transitionTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterMoveWithOnOffParams
 - (instancetype)init
@@ -615,6 +948,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; >", NSStringFromClass([self class]), _moveMode, _rate];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterStepWithOnOffParams
 - (instancetype)init
@@ -630,6 +971,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; >",
+                                             NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLevelControlClusterStopWithOnOffParams
 - (instancetype)init
@@ -639,6 +988,31 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPLevelControlClusterMoveToClosestFrequencyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _frequency = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: frequency:%@; >", NSStringFromClass([self class]), _frequency];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterResetAlarmParams
 - (instancetype)init
@@ -652,6 +1026,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmCode:%@; clusterId:%@; >", NSStringFromClass([self class]), _alarmCode, _clusterId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterAlarmParams
 - (instancetype)init
@@ -665,6 +1047,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarmCode:%@; clusterId:%@; >", NSStringFromClass([self class]), _alarmCode, _clusterId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterResetAllAlarmsParams
 - (instancetype)init
@@ -674,6 +1064,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterGetAlarmResponseParams
 - (instancetype)init
@@ -691,6 +1088,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; alarmCode:%@; clusterId:%@; timeStamp:%@; >",
+                                             NSStringFromClass([self class]), _status, _alarmCode, _clusterId, _timeStamp];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterGetAlarmParams
 - (instancetype)init
@@ -700,6 +1105,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAlarmsClusterResetAlarmLogParams
 - (instancetype)init
@@ -709,6 +1121,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileRequestParams
 - (instancetype)init
@@ -720,6 +1139,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; >", NSStringFromClass([self class]), _powerProfileId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileNotificationParams
 - (instancetype)init
@@ -737,6 +1164,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: totalProfileNum:%@; powerProfileId:%@; numOfTransferredPhases:%@; transferredPhases:%@; >",
+        NSStringFromClass([self class]), _totalProfileNum, _powerProfileId, _numOfTransferredPhases, _transferredPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileStateRequestParams
 - (instancetype)init
@@ -746,6 +1182,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileResponseParams
 - (instancetype)init
@@ -763,6 +1206,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: totalProfileNum:%@; powerProfileId:%@; numOfTransferredPhases:%@; transferredPhases:%@; >",
+        NSStringFromClass([self class]), _totalProfileNum, _powerProfileId, _numOfTransferredPhases, _transferredPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceResponseParams
 - (instancetype)init
@@ -780,6 +1232,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; currency:%@; price:%@; priceTrailingDigit:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _currency, _price, _priceTrailingDigit];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileStateResponseParams
 - (instancetype)init
@@ -793,6 +1254,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerProfileCount:%@; powerProfileRecords:%@; >",
+                                             NSStringFromClass([self class]), _powerProfileCount, _powerProfileRecords];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponseParams
 - (instancetype)init
@@ -808,6 +1277,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currency:%@; price:%@; priceTrailingDigit:%@; >",
+                                             NSStringFromClass([self class]), _currency, _price, _priceTrailingDigit];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceParams
 - (instancetype)init
@@ -819,6 +1296,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; >", NSStringFromClass([self class]), _powerProfileId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationParams
 - (instancetype)init
@@ -834,6 +1319,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; numOfScheduledPhases:%@; scheduledPhases:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _numOfScheduledPhases, _scheduledPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfilesStateNotificationParams
 - (instancetype)init
@@ -847,6 +1341,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerProfileCount:%@; powerProfileRecords:%@; >",
+                                             NSStringFromClass([self class]), _powerProfileCount, _powerProfileRecords];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponseParams
 - (instancetype)init
@@ -862,6 +1364,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; numOfScheduledPhases:%@; scheduledPhases:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _numOfScheduledPhases, _scheduledPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetOverallSchedulePriceParams
 - (instancetype)init
@@ -871,6 +1382,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestParams
 - (instancetype)init
@@ -882,6 +1400,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; >", NSStringFromClass([self class]), _powerProfileId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestParams
 - (instancetype)init
@@ -893,6 +1419,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; >", NSStringFromClass([self class]), _powerProfileId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestParams
 - (instancetype)init
@@ -904,6 +1438,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; >", NSStringFromClass([self class]), _powerProfileId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponseParams
 - (instancetype)init
@@ -919,6 +1461,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; numOfScheduledPhases:%@; scheduledPhases:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _numOfScheduledPhases, _scheduledPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponseParams
 - (instancetype)init
@@ -936,6 +1487,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; currency:%@; price:%@; priceTrailingDigit:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _currency, _price, _priceTrailingDigit];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationParams
 - (instancetype)init
@@ -951,6 +1511,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: powerProfileId:%@; numOfScheduledPhases:%@; scheduledPhases:%@; >",
+                  NSStringFromClass([self class]), _powerProfileId, _numOfScheduledPhases, _scheduledPhases];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationParams
 - (instancetype)init
@@ -966,6 +1535,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerProfileId:%@; startAfter:%@; stopBefore:%@; >",
+                                             NSStringFromClass([self class]), _powerProfileId, _startAfter, _stopBefore];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponseParams
 - (instancetype)init
@@ -981,6 +1558,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerProfileId:%@; startAfter:%@; stopBefore:%@; >",
+                                             NSStringFromClass([self class]), _powerProfileId, _startAfter, _stopBefore];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedParams
 - (instancetype)init
@@ -996,6 +1581,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: options:%@; powerProfileId:%@; powerProfileStartTime:%@; >",
+                                             NSStringFromClass([self class]), _options, _powerProfileId, _powerProfileStartTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterExecutionOfACommandParams
 - (instancetype)init
@@ -1007,6 +1600,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: commandId:%@; >", NSStringFromClass([self class]), _commandId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterSignalStateResponseParams
 - (instancetype)init
@@ -1022,6 +1622,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: applianceStatus:%@; remoteEnableFlagsAndDeviceStatus2:%@; applianceStatus2:%@; >",
+                  NSStringFromClass([self class]), _applianceStatus, _remoteEnableFlagsAndDeviceStatus2, _applianceStatus2];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterSignalStateParams
 - (instancetype)init
@@ -1031,6 +1640,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterSignalStateNotificationParams
 - (instancetype)init
@@ -1046,6 +1662,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: applianceStatus:%@; remoteEnableFlagsAndDeviceStatus2:%@; applianceStatus2:%@; >",
+                  NSStringFromClass([self class]), _applianceStatus, _remoteEnableFlagsAndDeviceStatus2, _applianceStatus2];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterWriteFunctionsParams
 - (instancetype)init
@@ -1061,6 +1686,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: functionId:%@; functionDataType:%@; functionData:%@; >",
+                                             NSStringFromClass([self class]), _functionId, _functionDataType, _functionData];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterOverloadPauseResumeParams
 - (instancetype)init
@@ -1070,6 +1703,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterOverloadPauseParams
 - (instancetype)init
@@ -1079,6 +1719,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceControlClusterOverloadWarningParams
 - (instancetype)init
@@ -1090,6 +1737,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: warningEvent:%@; >", NSStringFromClass([self class]), _warningEvent];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPollControlClusterCheckInParams
 - (instancetype)init
@@ -1099,6 +1754,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
@@ -1112,6 +1774,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startFastPolling:%@; fastPollTimeout:%@; >",
+                                             NSStringFromClass([self class]), _startFastPolling, _fastPollTimeout];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPollControlClusterFastPollStopParams
 - (instancetype)init
@@ -1121,6 +1791,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPollControlClusterSetLongPollIntervalParams
 - (instancetype)init
@@ -1132,6 +1809,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: newLongPollInterval:%@; >", NSStringFromClass([self class]), _newLongPollInterval];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPPollControlClusterSetShortPollIntervalParams
 - (instancetype)init
@@ -1143,6 +1828,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: newShortPollInterval:%@; >", NSStringFromClass([self class]), _newShortPollInterval];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterInstantActionParams
 - (instancetype)init
@@ -1156,6 +1849,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterInstantActionWithTransitionParams
 - (instancetype)init
@@ -1171,6 +1872,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; transitionTime:%@; >",
+                                             NSStringFromClass([self class]), _actionID, _invokeID, _transitionTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterStartActionParams
 - (instancetype)init
@@ -1184,6 +1893,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterStartActionWithDurationParams
 - (instancetype)init
@@ -1199,6 +1916,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
+                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterStopActionParams
 - (instancetype)init
@@ -1212,6 +1937,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterPauseActionParams
 - (instancetype)init
@@ -1225,6 +1958,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterPauseActionWithDurationParams
 - (instancetype)init
@@ -1240,6 +1981,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
+                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterResumeActionParams
 - (instancetype)init
@@ -1253,6 +2002,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterEnableActionParams
 - (instancetype)init
@@ -1266,6 +2023,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterEnableActionWithDurationParams
 - (instancetype)init
@@ -1281,6 +2046,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
+                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterDisableActionParams
 - (instancetype)init
@@ -1294,6 +2067,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBridgedActionsClusterDisableActionWithDurationParams
 - (instancetype)init
@@ -1309,6 +2090,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
+                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBasicClusterMfgSpecificPingParams
 - (instancetype)init
@@ -1318,6 +2107,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
@@ -1343,6 +2139,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: vendorId:%@; productId:%@; softwareVersion:%@; protocolsSupported:%@; "
+                                   @"hardwareVersion:%@; location:%@; requestorCanConsent:%@; metadataForProvider:%@; >",
+                  NSStringFromClass([self class]), _vendorId, _productId, _softwareVersion, _protocolsSupported, _hardwareVersion,
+                  _location, _requestorCanConsent, [_metadataForProvider base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
@@ -1368,6 +2175,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; delayedActionTime:%@; imageURI:%@; softwareVersion:%@; "
+                                   @"softwareVersionString:%@; updateToken:%@; userConsentNeeded:%@; metadataForRequestor:%@; >",
+                  NSStringFromClass([self class]), _status, _delayedActionTime, _imageURI, _softwareVersion, _softwareVersionString,
+                  [_updateToken base64EncodedStringWithOptions:0], _userConsentNeeded,
+                  [_metadataForRequestor base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
@@ -1381,6 +2200,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: updateToken:%@; newVersion:%@; >", NSStringFromClass([self class]),
+                  [_updateToken base64EncodedStringWithOptions:0], _newVersion];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
@@ -1394,6 +2222,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: action:%@; delayedActionTime:%@; >", NSStringFromClass([self class]), _action, _delayedActionTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
@@ -1407,6 +2243,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: updateToken:%@; softwareVersion:%@; >", NSStringFromClass([self class]),
+                  [_updateToken base64EncodedStringWithOptions:0], _softwareVersion];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
@@ -1426,6 +2271,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: providerNodeId:%@; vendorId:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
+        NSStringFromClass([self class]), _providerNodeId, _vendorId, _announcementReason,
+        [_metadataForNode base64EncodedStringWithOptions:0], _endpoint];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init
@@ -1439,6 +2294,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: expiryLengthSeconds:%@; breadcrumb:%@; >",
+                                             NSStringFromClass([self class]), _expiryLengthSeconds, _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterArmFailSafeResponseParams
 - (instancetype)init
@@ -1452,6 +2315,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigParams
 - (instancetype)init
@@ -1467,6 +2338,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newRegulatoryConfig:%@; countryCode:%@; breadcrumb:%@; >",
+                                             NSStringFromClass([self class]), _newRegulatoryConfig, _countryCode, _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams
 - (instancetype)init
@@ -1480,6 +2359,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterCommissioningCompleteParams
 - (instancetype)init
@@ -1489,6 +2376,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams
 - (instancetype)init
@@ -1502,6 +2396,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterScanNetworksParams
 - (instancetype)init
@@ -1515,6 +2417,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                                             [_ssid base64EncodedStringWithOptions:0], _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterScanNetworksResponseParams
 - (instancetype)init
@@ -1532,6 +2442,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; wiFiScanResults:%@; threadScanResults:%@; >",
+                  NSStringFromClass([self class]), _networkingStatus, _debugText, _wiFiScanResults, _threadScanResults];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
 - (instancetype)init
@@ -1547,6 +2466,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: ssid:%@; credentials:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                  [_ssid base64EncodedStringWithOptions:0], [_credentials base64EncodedStringWithOptions:0], _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams
 - (instancetype)init
@@ -1560,6 +2488,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: operationalDataset:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                  [_operationalDataset base64EncodedStringWithOptions:0], _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterRemoveNetworkParams
 - (instancetype)init
@@ -1573,6 +2510,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                  [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterNetworkConfigResponseParams
 - (instancetype)init
@@ -1588,6 +2534,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; >",
+                                             NSStringFromClass([self class]), _networkingStatus, _debugText, _networkIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterConnectNetworkParams
 - (instancetype)init
@@ -1601,6 +2555,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                  [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterConnectNetworkResponseParams
 - (instancetype)init
@@ -1616,6 +2579,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; errorValue:%@; >",
+                                             NSStringFromClass([self class]), _networkingStatus, _debugText, _errorValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPNetworkCommissioningClusterReorderNetworkParams
 - (instancetype)init
@@ -1631,6 +2602,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: networkID:%@; networkIndex:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
+                  [_networkID base64EncodedStringWithOptions:0], _networkIndex, _breadcrumb];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestParams
 - (instancetype)init
@@ -1646,6 +2626,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >",
+                                             NSStringFromClass([self class]), _intent, _requestedProtocol,
+                                             [_transferFileDesignator base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDiagnosticLogsClusterRetrieveLogsResponseParams
 - (instancetype)init
@@ -1663,6 +2652,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; content:%@; timeStamp:%@; timeSinceBoot:%@; >",
+                                             NSStringFromClass([self class]), _status, [_content base64EncodedStringWithOptions:0],
+                                             _timeStamp, _timeSinceBoot];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGeneralDiagnosticsClusterTestEventTriggerParams
 - (instancetype)init
@@ -1676,6 +2674,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: enableKey:%@; eventTrigger:%@; >", NSStringFromClass([self class]),
+                  [_enableKey base64EncodedStringWithOptions:0], _eventTrigger];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPSoftwareDiagnosticsClusterResetWatermarksParams
 - (instancetype)init
@@ -1685,6 +2692,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThreadNetworkDiagnosticsClusterResetCountsParams
 - (instancetype)init
@@ -1694,6 +2708,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWiFiNetworkDiagnosticsClusterResetCountsParams
 - (instancetype)init
@@ -1703,6 +2724,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPEthernetNetworkDiagnosticsClusterResetCountsParams
 - (instancetype)init
@@ -1712,6 +2740,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams
 - (instancetype)init
@@ -1731,6 +2766,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; pakeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
+                  NSStringFromClass([self class]), _commissioningTimeout, [_pakeVerifier base64EncodedStringWithOptions:0],
+                  _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init
@@ -1742,6 +2787,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; >", NSStringFromClass([self class]), _commissioningTimeout];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAdministratorCommissioningClusterRevokeCommissioningParams
 - (instancetype)init
@@ -1751,6 +2804,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterAttestationRequestParams
 - (instancetype)init
@@ -1762,6 +2822,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attestationNonce:%@; >", NSStringFromClass([self class]),
+                                             [_attestationNonce base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterAttestationResponseParams
 - (instancetype)init
@@ -1775,6 +2843,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: attestationElements:%@; signature:%@; >", NSStringFromClass([self class]),
+                  [_attestationElements base64EncodedStringWithOptions:0], [_signature base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
@@ -1786,6 +2863,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterCertificateChainResponseParams
 - (instancetype)init
@@ -1797,6 +2882,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]),
+                                             [_certificate base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
@@ -1808,6 +2901,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: csrNonce:%@; >", NSStringFromClass([self class]), [_csrNonce base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterCSRResponseParams
 - (instancetype)init
@@ -1821,6 +2922,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: nocsrElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
+                  [_nocsrElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterAddNOCParams
 - (instancetype)init
@@ -1840,6 +2950,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; ipkValue:%@; caseAdminSubject:%@; adminVendorId:%@; >",
+                  NSStringFromClass([self class]), [_nocValue base64EncodedStringWithOptions:0],
+                  [_icacValue base64EncodedStringWithOptions:0], [_ipkValue base64EncodedStringWithOptions:0], _caseAdminSubject,
+                  _adminVendorId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterUpdateNOCParams
 - (instancetype)init
@@ -1853,6 +2974,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; >", NSStringFromClass([self class]),
+                  [_nocValue base64EncodedStringWithOptions:0], [_icacValue base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterNOCResponseParams
 - (instancetype)init
@@ -1868,6 +2998,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; fabricIndex:%@; debugText:%@; >",
+                                             NSStringFromClass([self class]), _statusCode, _fabricIndex, _debugText];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterUpdateFabricLabelParams
 - (instancetype)init
@@ -1879,6 +3017,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; >", NSStringFromClass([self class]), _label];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterRemoveFabricParams
 - (instancetype)init
@@ -1890,6 +3035,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams
 - (instancetype)init
@@ -1901,17 +3054,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
-@end
-@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
-- (instancetype)init
-{
-    if (self = [super init]) {
 
-        _trustedRootIdentifier = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCertificate:%@; >", NSStringFromClass([self class]),
+                                             [_rootCertificate base64EncodedStringWithOptions:0]];
+    return descriptionString;
 }
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init
@@ -1923,6 +3073,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetReadParams
 - (instancetype)init
@@ -1934,6 +3092,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetReadResponseParams
 - (instancetype)init
@@ -1945,6 +3111,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetRemoveParams
 - (instancetype)init
@@ -1956,6 +3130,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
 - (instancetype)init
@@ -1967,6 +3149,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
 - (instancetype)init
@@ -1978,6 +3168,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
@@ -1989,6 +3187,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterLockDoorParams
 - (instancetype)init
@@ -2000,6 +3205,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterUnlockDoorParams
 - (instancetype)init
@@ -2011,6 +3224,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterUnlockWithTimeoutParams
 - (instancetype)init
@@ -2024,142 +3245,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
-@end
-@implementation CHIPDoorLockClusterGetLogRecordParams
-- (instancetype)init
+
+- (NSString *)description
 {
-    if (self = [super init]) {
-
-        _logIndex = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeout:%@; pinCode:%@; >", NSStringFromClass([self class]),
+                                             _timeout, [_pinCode base64EncodedStringWithOptions:0]];
+    return descriptionString;
 }
-@end
-@implementation CHIPDoorLockClusterGetLogRecordResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
 
-        _logEntryId = @(0);
-
-        _timestamp = @(0);
-
-        _eventType = @(0);
-
-        _source = @(0);
-
-        _eventIdOrAlarmCode = @(0);
-
-        _userId = @(0);
-
-        _pin = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterSetPINCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = nil;
-
-        _userType = nil;
-
-        _pin = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetPINCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetPINCodeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = nil;
-
-        _userType = nil;
-
-        _pin = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterClearPINCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _pinSlotIndex = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterClearAllPINCodesParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterSetUserStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetUserStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetUserStatusResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
 @end
 @implementation CHIPDoorLockClusterSetWeekDayScheduleParams
 - (instancetype)init
@@ -2183,6 +3276,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: weekDayIndex:%@; userIndex:%@; daysMask:%@; startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >",
+        NSStringFromClass([self class]), _weekDayIndex, _userIndex, _daysMask, _startHour, _startMinute, _endHour, _endMinute];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetWeekDayScheduleParams
 - (instancetype)init
@@ -2196,6 +3299,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetWeekDayScheduleResponseParams
 - (instancetype)init
@@ -2221,6 +3332,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; status:%@; daysMask:%@; "
+                                                              @"startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >",
+                                             NSStringFromClass([self class]), _weekDayIndex, _userIndex, _status, _daysMask,
+                                             _startHour, _startMinute, _endHour, _endMinute];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterClearWeekDayScheduleParams
 - (instancetype)init
@@ -2234,6 +3355,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterSetYearDayScheduleParams
 - (instancetype)init
@@ -2251,6 +3380,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; localStartTime:%@; localEndTime:%@; >",
+                  NSStringFromClass([self class]), _yearDayIndex, _userIndex, _localStartTime, _localEndTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetYearDayScheduleParams
 - (instancetype)init
@@ -2264,6 +3402,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetYearDayScheduleResponseParams
 - (instancetype)init
@@ -2283,6 +3429,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; >",
+                  NSStringFromClass([self class]), _yearDayIndex, _userIndex, _status, _localStartTime, _localEndTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterClearYearDayScheduleParams
 - (instancetype)init
@@ -2296,6 +3451,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterSetHolidayScheduleParams
 - (instancetype)init
@@ -2313,6 +3476,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: holidayIndex:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >",
+                  NSStringFromClass([self class]), _holidayIndex, _localStartTime, _localEndTime, _operatingMode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetHolidayScheduleParams
 - (instancetype)init
@@ -2324,6 +3496,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetHolidayScheduleResponseParams
 - (instancetype)init
@@ -2343,6 +3523,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: holidayIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >",
+                  NSStringFromClass([self class]), _holidayIndex, _status, _localStartTime, _localEndTime, _operatingMode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterClearHolidayScheduleParams
 - (instancetype)init
@@ -2354,108 +3543,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
-@end
-@implementation CHIPDoorLockClusterSetUserTypeParams
-- (instancetype)init
+
+- (NSString *)description
 {
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userType = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
+    return descriptionString;
 }
-@end
-@implementation CHIPDoorLockClusterGetUserTypeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
 
-        _userId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetUserTypeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userType = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterSetRFIDCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = nil;
-
-        _userType = nil;
-
-        _rfidCode = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetRFIDCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterGetRFIDCodeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _userId = @(0);
-
-        _userStatus = nil;
-
-        _userType = nil;
-
-        _rfidCode = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterClearRFIDCodeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _rfidSlotIndex = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-@end
-@implementation CHIPDoorLockClusterClearAllRFIDCodesParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
 @end
 @implementation CHIPDoorLockClusterSetUserParams
 - (instancetype)init
@@ -2479,6 +3574,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
+        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueId, _userStatus, _userType,
+        _credentialRule];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetUserParams
 - (instancetype)init
@@ -2490,6 +3596,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userIndex:%@; >", NSStringFromClass([self class]), _userIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetUserResponseParams
 - (instancetype)init
@@ -2519,6 +3632,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; "
+                         @"credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >",
+        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueId, _userStatus, _userType, _credentialRule,
+        _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterClearUserParams
 - (instancetype)init
@@ -2530,52 +3654,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
-@end
-@implementation CHIPDoorLockClusterOperatingEventNotificationParams
-- (instancetype)init
+
+- (NSString *)description
 {
-    if (self = [super init]) {
-
-        _operationEventSource = @(0);
-
-        _operationEventCode = @(0);
-
-        _userId = @(0);
-
-        _pin = [NSData data];
-
-        _localTime = @(0);
-
-        _data = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userIndex:%@; >", NSStringFromClass([self class]), _userIndex];
+    return descriptionString;
 }
-@end
-@implementation CHIPDoorLockClusterProgrammingEventNotificationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
 
-        _programEventSource = @(0);
-
-        _programEventCode = @(0);
-
-        _userId = @(0);
-
-        _pin = [NSData data];
-
-        _userType = @(0);
-
-        _userStatus = @(0);
-
-        _localTime = @(0);
-
-        _data = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
 @end
 @implementation CHIPDoorLockClusterSetCredentialParams
 - (instancetype)init
@@ -2597,6 +3682,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: operationType:%@; credential:%@; credentialData:%@; userIndex:%@; userStatus:%@; userType:%@; >",
+        NSStringFromClass([self class]), _operationType, _credential, [_credentialData base64EncodedStringWithOptions:0],
+        _userIndex, _userStatus, _userType];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterSetCredentialResponseParams
 - (instancetype)init
@@ -2612,6 +3707,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; userIndex:%@; nextCredentialIndex:%@; >",
+                                             NSStringFromClass([self class]), _status, _userIndex, _nextCredentialIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetCredentialStatusParams
 - (instancetype)init
@@ -2623,6 +3726,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterGetCredentialStatusResponseParams
 - (instancetype)init
@@ -2642,6 +3753,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; >",
+        NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex,
+        _nextCredentialIndex];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPDoorLockClusterClearCredentialParams
 - (instancetype)init
@@ -2653,6 +3775,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterUpOrOpenParams
 - (instancetype)init
@@ -2662,6 +3792,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterDownOrCloseParams
 - (instancetype)init
@@ -2671,6 +3808,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterStopMotionParams
 - (instancetype)init
@@ -2680,6 +3824,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterGoToLiftValueParams
 - (instancetype)init
@@ -2691,6 +3842,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: liftValue:%@; >", NSStringFromClass([self class]), _liftValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterGoToLiftPercentageParams
 - (instancetype)init
@@ -2702,6 +3860,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: liftPercent100thsValue:%@; >", NSStringFromClass([self class]), _liftPercent100thsValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterGoToTiltValueParams
 - (instancetype)init
@@ -2713,6 +3879,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tiltValue:%@; >", NSStringFromClass([self class]), _tiltValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPWindowCoveringClusterGoToTiltPercentageParams
 - (instancetype)init
@@ -2724,6 +3897,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: tiltPercent100thsValue:%@; >", NSStringFromClass([self class]), _tiltPercent100thsValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBarrierControlClusterBarrierControlGoToPercentParams
 - (instancetype)init
@@ -2735,6 +3916,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: percentOpen:%@; >", NSStringFromClass([self class]), _percentOpen];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPBarrierControlClusterBarrierControlStopParams
 - (instancetype)init
@@ -2744,6 +3933,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThermostatClusterSetpointRaiseLowerParams
 - (instancetype)init
@@ -2757,6 +3953,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: mode:%@; amount:%@; >", NSStringFromClass([self class]), _mode, _amount];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
@@ -2774,6 +3978,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >",
+        NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThermostatClusterSetWeeklyScheduleParams
 - (instancetype)init
@@ -2791,6 +4004,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >",
+        NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThermostatClusterGetWeeklyScheduleParams
 - (instancetype)init
@@ -2804,6 +4026,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; modeToReturn:%@; >",
+                                             NSStringFromClass([self class]), _daysToReturn, _modeToReturn];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPThermostatClusterClearWeeklyScheduleParams
 - (instancetype)init
@@ -2813,6 +4043,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveToHueParams
 - (instancetype)init
@@ -2832,6 +4069,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: hue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _hue, _direction, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveHueParams
 - (instancetype)init
@@ -2849,6 +4095,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterStepHueParams
 - (instancetype)init
@@ -2868,6 +4122,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveToSaturationParams
 - (instancetype)init
@@ -2885,6 +4148,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveSaturationParams
 - (instancetype)init
@@ -2902,6 +4174,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterStepSaturationParams
 - (instancetype)init
@@ -2921,6 +4201,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveToHueAndSaturationParams
 - (instancetype)init
@@ -2940,6 +4229,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: hue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _hue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveToColorParams
 - (instancetype)init
@@ -2959,6 +4257,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: colorX:%@; colorY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _colorX, _colorY, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveColorParams
 - (instancetype)init
@@ -2976,6 +4283,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rateX:%@; rateY:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _rateX, _rateY, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterStepColorParams
 - (instancetype)init
@@ -2995,6 +4310,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepX:%@; stepY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepX, _stepY, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveToColorTemperatureParams
 - (instancetype)init
@@ -3012,6 +4336,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: colorTemperature:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _colorTemperature, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterEnhancedMoveToHueParams
 - (instancetype)init
@@ -3031,6 +4364,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: enhancedHue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _enhancedHue, _direction, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterEnhancedMoveHueParams
 - (instancetype)init
@@ -3048,6 +4390,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterEnhancedStepHueParams
 - (instancetype)init
@@ -3067,6 +4417,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams
 - (instancetype)init
@@ -3086,6 +4445,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: enhancedHue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _enhancedHue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterColorLoopSetParams
 - (instancetype)init
@@ -3109,6 +4477,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: updateFlags:%@; action:%@; direction:%@; time:%@; startHue:%@; optionsMask:%@; optionsOverride:%@; >",
+        NSStringFromClass([self class]), _updateFlags, _action, _direction, _time, _startHue, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterStopMoveStepParams
 - (instancetype)init
@@ -3122,6 +4500,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
+                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterMoveColorTemperatureParams
 - (instancetype)init
@@ -3143,6 +4529,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; colorTemperatureMinimumMireds:%@; "
+                                   @"colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _moveMode, _rate, _colorTemperatureMinimumMireds, _colorTemperatureMaximumMireds,
+                  _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPColorControlClusterStepColorTemperatureParams
 - (instancetype)init
@@ -3166,6 +4563,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; colorTemperatureMinimumMireds:%@; "
+                                   @"colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _colorTemperatureMinimumMireds,
+                  _colorTemperatureMaximumMireds, _optionsMask, _optionsOverride];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterZoneEnrollResponseParams
 - (instancetype)init
@@ -3179,6 +4587,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enrollResponseCode:%@; zoneId:%@; >",
+                                             NSStringFromClass([self class]), _enrollResponseCode, _zoneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterZoneStatusChangeNotificationParams
 - (instancetype)init
@@ -3196,6 +4612,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneStatus:%@; extendedStatus:%@; zoneId:%@; delay:%@; >",
+                                             NSStringFromClass([self class]), _zoneStatus, _extendedStatus, _zoneId, _delay];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterInitiateNormalOperationModeParams
 - (instancetype)init
@@ -3205,6 +4629,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterZoneEnrollRequestParams
 - (instancetype)init
@@ -3218,6 +4649,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneType:%@; manufacturerCode:%@; >",
+                                             NSStringFromClass([self class]), _zoneType, _manufacturerCode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterInitiateTestModeParams
 - (instancetype)init
@@ -3231,6 +4670,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: testModeDuration:%@; currentZoneSensitivityLevel:%@; >",
+                                             NSStringFromClass([self class]), _testModeDuration, _currentZoneSensitivityLevel];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterInitiateNormalOperationModeResponseParams
 - (instancetype)init
@@ -3240,6 +4687,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasZoneClusterInitiateTestModeResponseParams
 - (instancetype)init
@@ -3249,6 +4703,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterArmParams
 - (instancetype)init
@@ -3264,6 +4725,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: armMode:%@; armDisarmCode:%@; zoneId:%@; >",
+                                             NSStringFromClass([self class]), _armMode, _armDisarmCode, _zoneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterArmResponseParams
 - (instancetype)init
@@ -3275,6 +4744,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: armNotification:%@; >", NSStringFromClass([self class]), _armNotification];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterBypassParams
 - (instancetype)init
@@ -3290,6 +4767,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfZones:%@; zoneIds:%@; armDisarmCode:%@; >",
+                                             NSStringFromClass([self class]), _numberOfZones, _zoneIds, _armDisarmCode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneIdMapResponseParams
 - (instancetype)init
@@ -3331,6 +4816,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: section0:%@; section1:%@; section2:%@; section3:%@; section4:%@; section5:%@; section6:%@; section7:%@; "
+            @"section8:%@; section9:%@; section10:%@; section11:%@; section12:%@; section13:%@; section14:%@; section15:%@; >",
+        NSStringFromClass([self class]), _section0, _section1, _section2, _section3, _section4, _section5, _section6, _section7,
+        _section8, _section9, _section10, _section11, _section12, _section13, _section14, _section15];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterEmergencyParams
 - (instancetype)init
@@ -3340,6 +4837,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneInformationResponseParams
 - (instancetype)init
@@ -3357,6 +4861,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneId:%@; zoneType:%@; ieeeAddress:%@; zoneLabel:%@; >",
+                                             NSStringFromClass([self class]), _zoneId, _zoneType, _ieeeAddress, _zoneLabel];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterFireParams
 - (instancetype)init
@@ -3366,6 +4878,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterZoneStatusChangedParams
 - (instancetype)init
@@ -3383,6 +4902,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: zoneId:%@; zoneStatus:%@; audibleNotification:%@; zoneLabel:%@; >",
+                  NSStringFromClass([self class]), _zoneId, _zoneStatus, _audibleNotification, _zoneLabel];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterPanicParams
 - (instancetype)init
@@ -3392,6 +4920,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterPanelStatusChangedParams
 - (instancetype)init
@@ -3409,6 +4944,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: panelStatus:%@; secondsRemaining:%@; audibleNotification:%@; alarmStatus:%@; >",
+                  NSStringFromClass([self class]), _panelStatus, _secondsRemaining, _audibleNotification, _alarmStatus];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneIdMapParams
 - (instancetype)init
@@ -3418,6 +4962,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetPanelStatusResponseParams
 - (instancetype)init
@@ -3435,6 +4986,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: panelStatus:%@; secondsRemaining:%@; audibleNotification:%@; alarmStatus:%@; >",
+                  NSStringFromClass([self class]), _panelStatus, _secondsRemaining, _audibleNotification, _alarmStatus];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneInformationParams
 - (instancetype)init
@@ -3446,6 +5006,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneId:%@; >", NSStringFromClass([self class]), _zoneId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterSetBypassedZoneListParams
 - (instancetype)init
@@ -3459,6 +5026,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: numberOfZones:%@; zoneIds:%@; >", NSStringFromClass([self class]), _numberOfZones, _zoneIds];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetPanelStatusParams
 - (instancetype)init
@@ -3468,6 +5043,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterBypassResponseParams
 - (instancetype)init
@@ -3481,6 +5063,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfZones:%@; bypassResult:%@; >",
+                                             NSStringFromClass([self class]), _numberOfZones, _bypassResult];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetBypassedZoneListParams
 - (instancetype)init
@@ -3490,6 +5080,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneStatusResponseParams
 - (instancetype)init
@@ -3505,6 +5102,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: zoneStatusComplete:%@; numberOfZones:%@; zoneStatusResult:%@; >",
+                  NSStringFromClass([self class]), _zoneStatusComplete, _numberOfZones, _zoneStatusResult];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasAceClusterGetZoneStatusParams
 - (instancetype)init
@@ -3522,6 +5128,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: startingZoneId:%@; maxNumberOfZoneIds:%@; zoneStatusMaskFlag:%@; zoneStatusMask:%@; >",
+                  NSStringFromClass([self class]), _startingZoneId, _maxNumberOfZoneIds, _zoneStatusMaskFlag, _zoneStatusMask];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasWdClusterStartWarningParams
 - (instancetype)init
@@ -3539,6 +5154,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: warningInfo:%@; warningDuration:%@; strobeDutyCycle:%@; strobeLevel:%@; >",
+                  NSStringFromClass([self class]), _warningInfo, _warningDuration, _strobeDutyCycle, _strobeLevel];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPIasWdClusterSquawkParams
 - (instancetype)init
@@ -3550,6 +5174,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: squawkInfo:%@; >", NSStringFromClass([self class]), _squawkInfo];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
@@ -3561,6 +5193,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: match:%@; >", NSStringFromClass([self class]), _match];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
@@ -3574,6 +5213,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPChannelClusterChangeChannelByNumberParams
 - (instancetype)init
@@ -3587,6 +5234,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: majorNumber:%@; minorNumber:%@; >", NSStringFromClass([self class]), _majorNumber, _minorNumber];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPChannelClusterSkipChannelParams
 - (instancetype)init
@@ -3598,6 +5253,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: count:%@; >", NSStringFromClass([self class]), _count];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTargetNavigatorClusterNavigateTargetParams
 - (instancetype)init
@@ -3611,6 +5273,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: target:%@; data:%@; >", NSStringFromClass([self class]), _target, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTargetNavigatorClusterNavigateTargetResponseParams
 - (instancetype)init
@@ -3624,6 +5294,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterPlayParams
 - (instancetype)init
@@ -3633,6 +5311,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterPauseParams
 - (instancetype)init
@@ -3642,6 +5327,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterStopPlaybackParams
 - (instancetype)init
@@ -3651,6 +5343,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterStartOverParams
 - (instancetype)init
@@ -3660,6 +5359,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterPreviousParams
 - (instancetype)init
@@ -3669,6 +5375,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterNextParams
 - (instancetype)init
@@ -3678,6 +5391,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterRewindParams
 - (instancetype)init
@@ -3687,6 +5407,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterFastForwardParams
 - (instancetype)init
@@ -3696,6 +5423,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterSkipForwardParams
 - (instancetype)init
@@ -3707,6 +5441,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterSkipBackwardParams
 - (instancetype)init
@@ -3718,6 +5460,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterPlaybackResponseParams
 - (instancetype)init
@@ -3731,6 +5481,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaPlaybackClusterSeekParams
 - (instancetype)init
@@ -3742,6 +5500,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; >", NSStringFromClass([self class]), _position];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaInputClusterSelectInputParams
 - (instancetype)init
@@ -3753,6 +5518,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; >", NSStringFromClass([self class]), _index];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaInputClusterShowInputStatusParams
 - (instancetype)init
@@ -3762,6 +5534,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaInputClusterHideInputStatusParams
 - (instancetype)init
@@ -3771,6 +5550,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMediaInputClusterRenameInputParams
 - (instancetype)init
@@ -3784,6 +5570,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPLowPowerClusterSleepParams
 - (instancetype)init
@@ -3793,6 +5587,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPKeypadInputClusterSendKeyParams
 - (instancetype)init
@@ -3804,6 +5605,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: keyCode:%@; >", NSStringFromClass([self class]), _keyCode];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPKeypadInputClusterSendKeyResponseParams
 - (instancetype)init
@@ -3815,6 +5623,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; >", NSStringFromClass([self class]), _status];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPContentLauncherClusterLaunchContentParams
 - (instancetype)init
@@ -3830,6 +5645,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPContentLauncherClusterLaunchURLParams
 - (instancetype)init
@@ -3845,6 +5668,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >",
+                                             NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPContentLauncherClusterLaunchResponseParams
 - (instancetype)init
@@ -3858,6 +5689,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAudioOutputClusterSelectOutputParams
 - (instancetype)init
@@ -3869,6 +5708,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; >", NSStringFromClass([self class]), _index];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAudioOutputClusterRenameOutputParams
 - (instancetype)init
@@ -3882,6 +5728,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplicationLauncherClusterLaunchAppParams
 - (instancetype)init
@@ -3895,6 +5749,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; data:%@; >", NSStringFromClass([self class]),
+                                             _application, [_data base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplicationLauncherClusterStopAppParams
 - (instancetype)init
@@ -3906,6 +5768,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplicationLauncherClusterHideAppParams
 - (instancetype)init
@@ -3917,6 +5787,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplicationLauncherClusterLauncherResponseParams
 - (instancetype)init
@@ -3930,6 +5808,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]),
+                                             _status, [_data base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAccountLoginClusterGetSetupPINParams
 - (instancetype)init
@@ -3941,6 +5827,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; >", NSStringFromClass([self class]), _tempAccountIdentifier];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAccountLoginClusterGetSetupPINResponseParams
 - (instancetype)init
@@ -3952,6 +5846,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: setupPIN:%@; >", NSStringFromClass([self class]), _setupPIN];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAccountLoginClusterLoginParams
 - (instancetype)init
@@ -3965,6 +5866,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; setupPIN:%@; >",
+                                             NSStringFromClass([self class]), _tempAccountIdentifier, _setupPIN];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPAccountLoginClusterLogoutParams
 - (instancetype)init
@@ -3974,6 +5883,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestParams
 - (instancetype)init
@@ -3983,6 +5899,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestSpecificResponseParams
 - (instancetype)init
@@ -3994,6 +5917,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestNotHandledParams
 - (instancetype)init
@@ -4003,6 +5934,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestAddArgumentsResponseParams
 - (instancetype)init
@@ -4014,6 +5952,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestSpecificParams
 - (instancetype)init
@@ -4023,6 +5969,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestSimpleArgumentResponseParams
 - (instancetype)init
@@ -4034,6 +5987,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestUnknownCommandParams
 - (instancetype)init
@@ -4043,6 +6004,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
@@ -4064,6 +6032,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
+                                             NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestAddArgumentsParams
 - (instancetype)init
@@ -4077,6 +6053,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestListInt8UReverseResponseParams
 - (instancetype)init
@@ -4088,6 +6072,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestSimpleArgumentRequestParams
 - (instancetype)init
@@ -4099,6 +6090,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEnumsResponseParams
 - (instancetype)init
@@ -4112,6 +6110,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
@@ -4133,6 +6139,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
+                                             NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestNullableOptionalResponseParams
 - (instancetype)init
@@ -4150,6 +6164,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wasPresent:%@; wasNull:%@; value:%@; originalValue:%@; >",
+                                             NSStringFromClass([self class]), _wasPresent, _wasNull, _value, _originalValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestStructArgumentRequestParams
 - (instancetype)init
@@ -4161,6 +6183,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
@@ -4226,6 +6255,28 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: nullableIntWasNull:%@; nullableIntValue:%@; optionalIntWasPresent:%@; optionalIntValue:%@; "
+                         @"nullableOptionalIntWasPresent:%@; nullableOptionalIntWasNull:%@; nullableOptionalIntValue:%@; "
+                         @"nullableStringWasNull:%@; nullableStringValue:%@; optionalStringWasPresent:%@; optionalStringValue:%@; "
+                         @"nullableOptionalStringWasPresent:%@; nullableOptionalStringWasNull:%@; nullableOptionalStringValue:%@; "
+                         @"nullableStructWasNull:%@; nullableStructValue:%@; optionalStructWasPresent:%@; optionalStructValue:%@; "
+                         @"nullableOptionalStructWasPresent:%@; nullableOptionalStructWasNull:%@; nullableOptionalStructValue:%@; "
+                         @"nullableListWasNull:%@; nullableListValue:%@; optionalListWasPresent:%@; optionalListValue:%@; "
+                         @"nullableOptionalListWasPresent:%@; nullableOptionalListWasNull:%@; nullableOptionalListValue:%@; >",
+        NSStringFromClass([self class]), _nullableIntWasNull, _nullableIntValue, _optionalIntWasPresent, _optionalIntValue,
+        _nullableOptionalIntWasPresent, _nullableOptionalIntWasNull, _nullableOptionalIntValue, _nullableStringWasNull,
+        _nullableStringValue, _optionalStringWasPresent, _optionalStringValue, _nullableOptionalStringWasPresent,
+        _nullableOptionalStringWasNull, _nullableOptionalStringValue, _nullableStructWasNull, _nullableStructValue,
+        _optionalStructWasPresent, _optionalStructValue, _nullableOptionalStructWasPresent, _nullableOptionalStructWasNull,
+        _nullableOptionalStructValue, _nullableListWasNull, _nullableListValue, _optionalListWasPresent, _optionalListValue,
+        _nullableOptionalListWasPresent, _nullableOptionalListWasNull, _nullableOptionalListValue];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
@@ -4237,6 +6288,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterBooleanResponseParams
 - (instancetype)init
@@ -4248,6 +6306,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: value:%@; >", NSStringFromClass([self class]), _value];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestListStructArgumentRequestParams
 - (instancetype)init
@@ -4259,6 +6324,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterSimpleStructResponseParams
 - (instancetype)init
@@ -4270,6 +6342,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
@@ -4281,6 +6360,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEmitTestEventResponseParams
 - (instancetype)init
@@ -4292,6 +6378,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: value:%@; >", NSStringFromClass([self class]), _value];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
@@ -4303,6 +6396,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
@@ -4314,6 +6414,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: value:%@; >", NSStringFromClass([self class]), _value];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
@@ -4325,6 +6432,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestListInt8UReverseRequestParams
 - (instancetype)init
@@ -4336,6 +6450,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEnumsRequestParams
 - (instancetype)init
@@ -4349,6 +6470,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestNullableOptionalRequestParams
 - (instancetype)init
@@ -4360,6 +6489,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
@@ -4393,6 +6529,19 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: nullableInt:%@; optionalInt:%@; nullableOptionalInt:%@; nullableString:%@; "
+                                   @"optionalString:%@; nullableOptionalString:%@; nullableStruct:%@; optionalStruct:%@; "
+                                   @"nullableOptionalStruct:%@; nullableList:%@; optionalList:%@; nullableOptionalList:%@; >",
+                  NSStringFromClass([self class]), _nullableInt, _optionalInt, _nullableOptionalInt, _nullableString,
+                  _optionalString, _nullableOptionalString, _nullableStruct, _optionalStruct, _nullableOptionalStruct,
+                  _nullableList, _optionalList, _nullableOptionalList];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterSimpleStructEchoRequestParams
 - (instancetype)init
@@ -4404,6 +6553,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTimedInvokeRequestParams
 - (instancetype)init
@@ -4413,6 +6569,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
@@ -4424,6 +6587,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEmitTestEventRequestParams
 - (instancetype)init
@@ -4439,6 +6609,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; >", NSStringFromClass([self class]), _arg1, _arg2, _arg3];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
@@ -4450,6 +6628,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterDisplayMessageParams
 - (instancetype)init
@@ -4471,6 +6656,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
+                                   @"optionalExtendedMessageControl:%@; >",
+                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
+                  _optionalExtendedMessageControl];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterGetLastMessageParams
 - (instancetype)init
@@ -4480,6 +6676,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterCancelMessageParams
 - (instancetype)init
@@ -4493,6 +6696,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: messageId:%@; messageControl:%@; >", NSStringFromClass([self class]), _messageId, _messageControl];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterMessageConfirmationParams
 - (instancetype)init
@@ -4510,6 +6721,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; confirmationTime:%@; messageConfirmationControl:%@; messageResponse:%@; >",
+                  NSStringFromClass([self class]), _messageId, _confirmationTime, _messageConfirmationControl,
+                  [_messageResponse base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterDisplayProtectedMessageParams
 - (instancetype)init
@@ -4531,6 +6752,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
+                                   @"optionalExtendedMessageControl:%@; >",
+                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
+                  _optionalExtendedMessageControl];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterGetMessageCancellationParams
 - (instancetype)init
@@ -4542,6 +6774,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: earliestImplementationTime:%@; >", NSStringFromClass([self class]), _earliestImplementationTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPMessagingClusterCancelAllMessagesParams
 - (instancetype)init
@@ -4553,6 +6793,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: implementationDateTime:%@; >", NSStringFromClass([self class]), _implementationDateTime];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceEventsAndAlertClusterGetAlertsParams
 - (instancetype)init
@@ -4562,6 +6810,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
 - (instancetype)init
@@ -4575,6 +6830,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
+                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
 - (instancetype)init
@@ -4588,6 +6851,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
+                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
 - (instancetype)init
@@ -4601,6 +6872,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: eventHeader:%@; eventId:%@; >", NSStringFromClass([self class]), _eventHeader, _eventId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterLogNotificationParams
 - (instancetype)init
@@ -4618,6 +6897,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
+                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterLogRequestParams
 - (instancetype)init
@@ -4629,6 +6916,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: logId:%@; >", NSStringFromClass([self class]), _logId];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterLogResponseParams
 - (instancetype)init
@@ -4646,6 +6940,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
+                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterLogQueueRequestParams
 - (instancetype)init
@@ -4655,6 +6957,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
 - (instancetype)init
@@ -4668,6 +6977,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
 - (instancetype)init
@@ -4681,6 +6998,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
 - (instancetype)init
@@ -4698,6 +7023,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >",
+        NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPElectricalMeasurementClusterGetProfileInfoCommandParams
 - (instancetype)init
@@ -4707,6 +7041,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
 - (instancetype)init
@@ -4728,6 +7069,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; "
+                                                              @"numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >",
+                                             NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod,
+                                             _numberOfIntervalsDelivered, _attributeId, _intervals];
+    return descriptionString;
+}
+
 @end
 @implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
 - (instancetype)init
@@ -4743,6 +7094,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
+                                             NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
+    return descriptionString;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

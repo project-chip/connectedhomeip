@@ -388,16 +388,6 @@ server cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -962,8 +952,16 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster Groups = 4 {
@@ -1455,10 +1453,6 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING rootCertificate = 0;
   }
 
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
-  }
-
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
@@ -1487,7 +1481,6 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster PowerSource = 47 {
@@ -1972,6 +1965,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute testEventTriggersEnabled;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

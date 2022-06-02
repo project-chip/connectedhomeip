@@ -78,6 +78,12 @@ public:
     virtual System::Clock::Timestamp GetMRPBaseTimeout()               = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
 
+    // Returns a suggested timeout value based on the round-trip time it takes for the peer at the other end of the session to
+    // receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy
+    // characteristics of the target and a caller-provided value for the time it takes to process a message at the upper layer on
+    // the target For group sessions, this function will always return 0.
+    System::Clock::Timeout ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout);
+
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     SecureSession * AsSecureSession();

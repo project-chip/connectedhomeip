@@ -26,6 +26,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <system/SystemMutex.h>
 
 #include <atomic>
 #include <stdlib.h>
@@ -36,31 +37,51 @@ namespace Platform {
 extern CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize);
 extern void MemoryAllocatorShutdown();
 
-static std::atomic_int memoryInitializationCount{ 0 };
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+static chip::System::Mutex gMemoryLock;
+#endif
+static int memoryInitializationCount{ 0 };
 
 CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 {
-    if (memoryInitializationCount++ > 0)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    gMemoryLock.Lock();
+#endif
+    do
     {
-        return CHIP_NO_ERROR;
-    }
-    // Initialize the allocator.
-    CHIP_ERROR err = MemoryAllocatorInit(buf, bufSize);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    // Here we do things like mbedtls_platform_set_calloc_free(), depending on configuration.
+        if (memoryInitializationCount++ > 0)
+        {
+            // Already initialized
+            break;
+        }
+        // Initialize the allocator.
+        err = MemoryAllocatorInit(buf, bufSize);
+        if (err != CHIP_NO_ERROR)
+        {
+            break;
+        }
+        // Here we do things like mbedtls_platform_set_calloc_free(), depending on configuration.
+    } while (0);
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    gMemoryLock.Unlock();
+#endif
     return err;
 }
 
 void MemoryShutdown()
 {
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    gMemoryLock.Lock();
+#endif
     if ((memoryInitializationCount > 0) && (--memoryInitializationCount == 0))
     {
         // Here we undo things like mbedtls_platform_set_calloc_free()
         MemoryAllocatorShutdown();
     }
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    gMemoryLock.Unlock();
+#endif
 }
 
 } // namespace Platform

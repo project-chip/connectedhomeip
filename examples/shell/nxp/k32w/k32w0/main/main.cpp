@@ -50,7 +50,7 @@ extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
-uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
+uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
 extern "C" unsigned int sleep(unsigned int seconds)
 {

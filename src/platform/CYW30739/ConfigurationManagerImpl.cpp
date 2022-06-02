@@ -46,6 +46,21 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount;
+    if (CYW30739Config::ConfigValueExists(CYW30739Config::kConfigKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<CYW30739Config>::Init();
@@ -53,6 +68,16 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(CYW30739Config::kConfigKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(CYW30739Config::kConfigKey_RebootCount, rebootCount);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset(void)
@@ -159,6 +184,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
+    }
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");

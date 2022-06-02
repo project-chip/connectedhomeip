@@ -46,6 +46,8 @@ executable("darwin-framework-tool") {
     "commands/common/CHIPCommandStorageDelegate.mm",
     "commands/common/CHIPToolKeypair.mm",
     "commands/pairing/Commands.h",
+    "commands/pairing/OpenCommissioningWindowCommand.h",
+    "commands/pairing/OpenCommissioningWindowCommand.mm",
     "commands/pairing/PairingCommandBridge.mm",
     "commands/pairing/PairingDelegateBridge.mm",
     "commands/storage/Commands.h",

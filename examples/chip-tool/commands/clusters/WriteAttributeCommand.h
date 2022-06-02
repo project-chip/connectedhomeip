@@ -86,7 +86,7 @@ public:
         ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %u",
                         ChipLogValueMEI(clusterId), endpointId);
         return InteractionModelWriter::WriteAttribute(device, endpointId, clusterId, attributeId, value, mTimedInteractionTimeoutMs,
-                                                      mSuppressResponse, mDataVersion);
+                                                      mSuppressResponse, mDataVersion, mRepeatCount, mRepeatDelayInMs);
     }
 
     template <class T>
@@ -111,6 +111,8 @@ protected:
                     "If provided, do a timed write with the given timed interaction timeout.");
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
+        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
+        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
         ModelCommand::AddArguments();
     }
 
@@ -122,4 +124,6 @@ private:
     chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
     chip::Optional<bool> mSuppressResponse;
     CustomArgument mAttributeValue;
+    chip::Optional<uint16_t> mRepeatCount;
+    chip::Optional<uint16_t> mRepeatDelayInMs;
 };

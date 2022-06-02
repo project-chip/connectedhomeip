@@ -56,14 +56,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 {{/chip_server_cluster_attributes}}
                 default:
-                    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+                    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
                     break;
             }
             break;
         }
         {{/chip_client_clusters}}
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
     } 
     return nullptr;

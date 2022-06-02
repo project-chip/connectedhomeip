@@ -131,18 +131,6 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
-        case to_underlying(Tag::kIsProxy):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsProxy))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kIsProxy));
-            VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                bool isProxy;
-                ReturnErrorOnFailure(reader.Get(isProxy));
-                PRETTY_PRINT("\tIsProxy = %s, ", isProxy ? "true" : "false");
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
         case to_underlying(Tag::kIsFabricFiltered):
             // check if this tag has appeared before
             VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
@@ -165,21 +153,15 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) |
+        const int requiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kKeepSubscriptions)) |
             (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
 
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
+                                                                   : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE;
     }
 
     ReturnErrorOnFailure(err);
@@ -228,11 +210,6 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilterIBs::Pars
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
     return apEventFilters->Init(reader);
-}
-
-CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) const
-{
-    return GetSimpleValue(to_underlying(Tag::kIsProxy), TLV::kTLVType_Boolean, apIsProxy);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
@@ -304,15 +281,6 @@ EventFilterIBs::Builder & SubscribeRequestMessage::Builder::CreateEventFilters()
         mError = mEventFilters.Init(mpWriter, to_underlying(Tag::kEventFilters));
     }
     return mEventFilters;
-}
-
-SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsProxy(const bool aIsProxy)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsProxy)), aIsProxy);
-    }
-    return *this;
 }
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)

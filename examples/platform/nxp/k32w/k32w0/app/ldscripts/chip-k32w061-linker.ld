@@ -211,9 +211,9 @@ SECTIONS
 
     _etext = .;
 
-    .heap_controller (COPY):
+    .heap_packet_buffer (COPY):
     {
-        *(.ll_exchange_mem)
+        *(.bss._ZN4chip6System12PacketBuffer11sBufferPoolE)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))

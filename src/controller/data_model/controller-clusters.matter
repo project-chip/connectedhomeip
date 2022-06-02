@@ -1276,16 +1276,6 @@ client cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1622,11 +1612,6 @@ client cluster DoorLock = 257 {
     optional epoch_s localStartTime = 2;
     optional epoch_s localEndTime = 3;
     optional DlOperatingMode operatingMode = 4;
-  }
-
-  response struct GetUserTypeResponse = 21 {
-    INT16U userId = 0;
-    DlUserType userType = 1;
   }
 
   response struct GetUserResponse = 28 {
@@ -2980,10 +2965,6 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING rootCertificate = 0;
   }
 
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
-  }
-
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
@@ -3012,7 +2993,6 @@ client cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 client cluster PowerSource = 47 {

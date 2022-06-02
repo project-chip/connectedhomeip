@@ -38,7 +38,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 /* TODO: adjust these values */
-constexpr size_t kMaxNumberOfKeys  = 30;
+constexpr size_t kMaxNumberOfKeys  = 125;
 constexpr size_t kMaxKeyValueBytes = 255;
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;

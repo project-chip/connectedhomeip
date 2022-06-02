@@ -17,12 +17,17 @@
  */
 #include "CommonDeviceCallbacks.h"
 
+#if CONFIG_BT_ENABLED
 #include "esp_bt.h"
+#if CONFIG_BT_NIMBLE_ENABLED
+#include "esp_nimble_hci.h"
+#include "nimble/nimble_port.h"
+#endif // CONFIG_BT_NIMBLE_ENABLED
+#endif // CONFIG_BT_ENABLED
+
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "esp_nimble_hci.h"
-#include "nimble/nimble_port.h"
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>

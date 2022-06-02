@@ -73,7 +73,9 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
         case Attributes::CurrentPositionTiltPercent100ths::Id:
             WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
             break;
+        default:
+            WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+            break;
         };
     }
-    WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }
