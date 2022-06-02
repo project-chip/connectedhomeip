@@ -1540,7 +1540,7 @@ using CHIP_ERROR = ::chip::ChipError;
  * @def CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB
  *
  * @brief
- *   The Event Status IB is malformed: itf does not contain
+ *   The Event Status IB is malformed: it does not contain
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB             CHIP_CORE_ERROR(0x7b)

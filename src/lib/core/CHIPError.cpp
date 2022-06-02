@@ -222,7 +222,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Malformed Interacton Model Command Data IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB.AsInteger():
-        desc = "Malformed Interacton Model Status IB";
+        desc = "Malformed Interacton Model Event Status IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
         desc = "Malformed Interacton Model Status Response IB";
@@ -528,7 +528,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Too many shared session end nodes";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_IB.AsInteger():
-        desc = "Malformed Interaction Model Attribute DataElement";
+        desc = "Malformed Interaction Model Attribute Data IB";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE.AsInteger():
         desc = "Wrong certificate type";
@@ -612,10 +612,10 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Malformed Interacton Model Attribute Status IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB.AsInteger():
-        desc = "Malformed Interacton Model Event DataElement";
+        desc = "Malformed Interacton Model Event Data IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_STATUS_IB.AsInteger():
-        desc = "Malformed Interacton Model Status Code";
+        desc = "Malformed Interacton Model Status IB";
         break;
     case CHIP_ERROR_PEER_NODE_NOT_FOUND.AsInteger():
         desc = "Unable to find the peer node";
@@ -666,10 +666,10 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Malformed Interaction Model Command Status IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB.AsInteger():
-        desc = "Malformed Interaction Model Invoke Response code IB";
+        desc = "Malformed Interaction Model Invoke Response IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Invoke Response Message";
+        desc = "Malformed Interaction Model Invoke Request Message";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Invoke Response Message";
