@@ -117,6 +117,8 @@
 {{#user_endpoints}}
 
 endpoint {{endpointId}} {
+  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}};
+
   {{#user_clusters}}
     {{#if enabled}}
       {{#unless (isServer side)}}

@@ -446,6 +446,17 @@ async function chip_endpoint_clusters(options)
   return templateUtil.collectBlocks(clusters, options, this);
 }
 
+function chip_friendly_endpoint_type_name(options)
+{
+  var name = this.endpointTypeName;
+  if (name.startsWith("MA-")) {
+    // prefix likely for "Matter" and is redundant
+    name = name.substring(3);
+  }
+
+  return name;
+}
+
 /**
  * Helper checks if the type for the bitmap is BitFlags. This generally includes
  * all bitmaps apart from
@@ -665,6 +676,7 @@ exports.chip_server_has_reportable_attributes                = chip_server_has_r
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
+exports.chip_friendly_endpoint_type_name                     = chip_friendly_endpoint_type_name;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_chip_complex                                      = if_chip_complex;
 exports.if_basic_global_response                             = if_basic_global_response;
