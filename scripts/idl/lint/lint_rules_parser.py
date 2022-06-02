@@ -12,12 +12,12 @@ import stringcase
 import traceback
 
 try:
-    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement
+    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
 except:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
-    from idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement
+    from idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
 
 
 def parseNumberString(n):
@@ -34,10 +34,17 @@ class RequiredAttribute:
 
 
 @dataclass
+class RequiredCommand:
+    name: str
+    code: int
+
+
+@dataclass
 class DecodedCluster:
     name: str
     code: int
     required_attributes: List[RequiredAttribute]
+    required_commands: List[RequiredCommand]
 
 
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
@@ -53,6 +60,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     try:
         name = element.find('name').text.replace(' ', '')
         required_attributes = []
+        required_commands = []
 
         for attr in element.findall('attribute'):
             if attr.attrib['side'] != 'server':
@@ -67,10 +75,20 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
                     code=parseNumberString(attr.attrib['code'])
                 ))
 
+        for cmd in element.findall('command'):
+            if cmd.attrib['source'] != 'client':
+                continue
+
+            if 'optional' in cmd.attrib and cmd.attrib['optional'] == 'true':
+                continue
+
+            required_commands.append(RequiredCommand(name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
+
         return DecodedCluster(
             name=name,
             code=parseNumberString(element.find('code').text),
             required_attributes=required_attributes,
+            required_commands=required_commands
         )
     except Exception as e:
         logging.exception("Failed to decode cluster %r" % element)
@@ -81,7 +99,7 @@ def ClustersInXmlFile(path: str):
     logging.info("Loading XML from %s" % path)
 
     # root is expected to be just a "configurator" object
-    configurator = xml.etree.ElementTree.parse(path).getroot()
+    configurator=xml.etree.ElementTree.parse(path).getroot()
     for child in configurator:
         if child.tag != 'cluster':
             continue
@@ -98,16 +116,17 @@ class LintRulesContext:
     """
 
     def __init__(self):
-        self._linter_rule = RequiredAttributesRule("Rules file")
+        self._required_attributes_rule=RequiredAttributesRule("Required attributes")
+        self._required_commands_rule=RequiredCommandsRule("Required commands")
 
         # Map cluster names to the underlying code
-        self._cluster_codes: Mapping[str, int] = {}
+        self._cluster_codes: Mapping[str, int]={}
 
     def GetLinterRules(self):
-        return [self._linter_rule]
+        return [self._required_attributes_rule, self._required_commands_rule]
 
     def RequireAttribute(self, r: AttributeRequirement):
-        self._linter_rule.RequireAttribute(r)
+        self._required_attributes_rule.RequireAttribute(r)
 
     def RequireClusterInEndpoint(self, name: str, code: int):
         """Mark that a specific cluster is always required in the given endpoint
@@ -117,41 +136,48 @@ class LintRulesContext:
             logging.error("Known names: %s" % (",".join(self._cluster_codes.keys()), ))
             return
 
-        self._linter_rule.RequireClusterInEndpoint(ClusterRequirement(
+        self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
-            cluster_id=self._cluster_codes[name],
+            cluster_code=self._cluster_codes[name],
             cluster_name=name,
         ))
 
     def LoadXml(self, path: str):
-        """Load XML data from the given path and add it to 
+        """Load XML data from the given path and add it to
            internal processing. Adds attribute requirement rules
            as needed.
         """
         for cluster in ClustersInXmlFile(path):
-            decoded = DecodeClusterFromXml(cluster)
+            decoded=DecodeClusterFromXml(cluster)
 
             if not decoded:
                 continue
 
-            self._cluster_codes[decoded.name] = decoded.code
+            self._cluster_codes[decoded.name]=decoded.code
 
             for attr in decoded.required_attributes:
-                self._linter_rule.RequireAttribute(AttributeRequirement(
+                self._required_attributes_rule.RequireAttribute(AttributeRequirement(
                     code=attr.code, name=attr.name, filter_cluster=decoded.code))
 
-            # TODO: add cluster ID to internal registry
+            for cmd in decoded.required_commands:
+                self._required_commands_rule.RequireCommand(
+                    ClusterCommandRequirement(
+                        cluster_code=decoded.code,
+                        command_code=cmd.code,
+                        command_name=cmd.name
+                    ))
+
 
 
 class LintRulesTransformer(Transformer):
     """
-    A transformer capable to transform data parsed by Lark according to 
+    A transformer capable to transform data parsed by Lark according to
     lint_rules_grammar.lark.
     """
 
     def __init__(self, file_name: str):
-        self.context = LintRulesContext()
-        self.file_name = file_name
+        self.context=LintRulesContext()
+        self.file_name=file_name
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -161,11 +187,11 @@ class LintRulesTransformer(Transformer):
 
         return parseNumberString(tokens[0].value)
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def negative_integer(self, value):
         return -value
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def integer(self, value):
         return value
 
@@ -194,35 +220,35 @@ class LintRulesTransformer(Transformer):
 
         return Discard
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def load_xml(self, path):
         if not os.path.isabs(path):
-            path = os.path.abspath(os.path.join(os.path.dirname(self.file_name), path))
+            path=os.path.abspath(os.path.join(os.path.dirname(self.file_name), path))
 
         self.context.LoadXml(path)
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def required_global_attribute(self, name, code):
         return AttributeRequirement(code=code, name=name)
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def specific_endpoint_rule(self, code, *names):
         for name in names:
             self.context.RequireClusterInEndpoint(name, code)
         return Discard
 
-    @v_args(inline=True)
+    @ v_args(inline=True)
     def required_server_cluster(self, id):
         return id
 
 
 class Parser:
     def __init__(self, parser, file_name: str):
-        self.parser = parser
-        self.file_name = file_name
+        self.parser=parser
+        self.file_name=file_name
 
     def parse(self):
-        data = LintRulesTransformer(self.file_name).transform(self.parser.parse(open(self.file_name, "rt").read()))
+        data=LintRulesTransformer(self.file_name).transform(self.parser.parse(open(self.file_name, "rt").read()))
         return data
 
 
@@ -241,26 +267,26 @@ if __name__ == '__main__':
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
-    __LOG_LEVELS__ = {
+    __LOG_LEVELS__={
         'debug': logging.DEBUG,
         'info': logging.INFO,
         'warn': logging.WARN,
         'fatal': logging.FATAL,
     }
 
-    @click.command()
-    @click.option(
+    @ click.command()
+    @ click.option(
         '--log-level',
         default='INFO',
         type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
         help='Determines the verbosity of script output.')
-    @click.argument('filename')
+    @ click.argument('filename')
     def main(log_level, filename=None):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
         logging.info("Starting to parse ...")
-        data = CreateParser(filename).parse()
+        data=CreateParser(filename).parse()
         logging.info("Parse completed")
 
         logging.info("Data:")
