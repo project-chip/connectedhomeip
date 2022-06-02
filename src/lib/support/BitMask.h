@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <assert.h>
-
-#include <limits>
-
 #include <lib/support/BitFlags.h>
 
 namespace chip {
