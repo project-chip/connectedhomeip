@@ -1,0 +1,250 @@
+/*
+ *
+ *    Copyright (c) 2021-2022 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ * @brief Defines a table of fabrics that have provisioned the device.
+ */
+
+#include "LastKnownGoodTime.h"
+
+#include <lib/support/BufferWriter.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <platform/ConfigurationManager.h>
+//#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/SafeInt.h>
+
+namespace chip {
+
+namespace {
+// Tags for Last Known Good Time.
+constexpr TLV::Tag kLastKnownGoodChipEpochSecondsTag         = TLV::ContextTag(0);
+constexpr TLV::Tag kFailSafeLastKnownGoodChipEpochSecondsTag = TLV::ContextTag(1);
+} // anonymous namespace
+
+const char * LastKnownGoodTime::FormatChipEpochTime(System::Clock::Seconds32 chipEpochTime)
+{
+    static char buf[strlen("2000-00-00T00:00:00") + 1] = { 0 };
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    ChipEpochToCalendarTime(chipEpochTime.count(), year, month, day, hour, minute, second);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+    snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
+#pragma GCC diagnostic pop
+    return &buf[0];
+}
+
+CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
+                                                             Optional<System::Clock::Seconds32> & failSafeBackup) const
+{
+    TLV::ContiguousBufferTLVReader reader;
+    uint8_t buf[LastKnownGoodTimeTLVMaxSize()];
+    uint16_t size = sizeof(buf);
+    uint32_t seconds;
+    reader.Init(buf, size);
+    DefaultStorageKeyAllocator keyAlloc;
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(keyAlloc.LastKnownGoodTimeKey(), buf, size));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kLastKnownGoodChipEpochSecondsTag));
+    ReturnErrorOnFailure(reader.Get(seconds));
+    lastKnownGoodChipEpochTime = System::Clock::Seconds32(seconds);
+    CHIP_ERROR err             = reader.Next();
+    if (err == CHIP_END_OF_TLV)
+    {
+        failSafeBackup = NullOptional;
+        return CHIP_NO_ERROR; // not an error; this tag is optional
+    }
+    VerifyOrReturnError(reader.GetTag() == kFailSafeLastKnownGoodChipEpochSecondsTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Get(seconds));
+    failSafeBackup.Emplace(seconds);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const
+{
+    Optional<System::Clock::Seconds32> failSafeBackup;
+    return LoadLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, failSafeBackup);
+}
+
+CHIP_ERROR LastKnownGoodTime::StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
+                                                              Optional<System::Clock::Seconds32> failSafeBackup) const
+{
+    uint8_t buf[LastKnownGoodTimeTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(buf);
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.Put(kLastKnownGoodChipEpochSecondsTag, lastKnownGoodChipEpochTime.count()));
+    if (failSafeBackup.HasValue())
+    {
+        ReturnErrorOnFailure(writer.Put(kFailSafeLastKnownGoodChipEpochSecondsTag, failSafeBackup.Value().count()));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+    const auto length = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(length), CHIP_ERROR_BUFFER_TOO_SMALL);
+    DefaultStorageKeyAllocator keyAlloc;
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(keyAlloc.LastKnownGoodTimeKey(), buf, static_cast<uint16_t>(length)));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LastKnownGoodTime::StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime) const
+{
+    return StoreLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, NullOptional);
+}
+
+CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
+{
+    mStorage = storage;
+    // 3.5.6.1 Last Known Good UTC Time:
+    //
+    // "A Node’s initial out-of-box Last Known Good UTC time SHALL be the
+    // compile-time of the firmware."
+    //
+    // Read build time from the configuration manager to get our initial Last
+    // Known Good Time.  Note 'SHALL' above: it is impermissible for a platform
+    // not to know this.  Hence return an error to the caller if build time is
+    // not available.  Callers should consider this fatal.
+    System::Clock::Seconds32 buildTime;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime));
+    System::Clock::Seconds32 kvstoreLastKnownGoodChipEpochTime;
+    CHIP_ERROR err = LoadLastKnownGoodChipEpochTime(kvstoreLastKnownGoodChipEpochTime);
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+    ChipLogProgress(Discovery, "Last Known Good Time: %s",
+                    err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? "[unknown]"
+                                                                        : FormatChipEpochTime(kvstoreLastKnownGoodChipEpochTime));
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || buildTime > kvstoreLastKnownGoodChipEpochTime)
+    {
+        // If we have no value in persistence, or the firmware build time is
+        // later than the value in persistence, set last known good time to the
+        // firmware build time and write back.
+        ChipLogProgress(Discovery, "Setting Last Known Good Time to firmware build time %s", FormatChipEpochTime(buildTime));
+        mLastKnownGoodChipEpochTime.SetValue(buildTime);
+        return StoreLastKnownGoodChipEpochTime(buildTime);
+    }
+    else
+    {
+        mLastKnownGoodChipEpochTime.SetValue(kvstoreLastKnownGoodChipEpochTime);
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR LastKnownGoodTime::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
+                                                            System::Clock::Seconds32 notBefore)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Discovery, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+    ChipLogProgress(Discovery, "new proposed Last Known Good Time: %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+
+    // Verify that the passed value is not earlier than the firmware build time.
+    System::Clock::Seconds32 buildTime;
+    SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime));
+    VerifyOrExit(lastKnownGoodChipEpochTime >= buildTime, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // Verify that the passed value is not earlier than the passed NotBefore time.
+    VerifyOrExit(lastKnownGoodChipEpochTime >= notBefore, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Passed value is valid.  Capture it and write back to persistence.
+    //
+    // Note that we are purposefully overwriting any previous last known
+    // good time that may have been stored as part of a fail-safe context.
+    // This is intentional: we don't promise not to change last known good
+    // time during the fail-safe timer.  For instance, if the platform has a
+    // new, better time source, it is legal to capture it.  If we do, we should
+    // both overwrite last known good time and discard the previous value stored
+    // for fail safe recovery, as together these comprise a transaction.  By
+    // overwriting both, we are fully superseding that transaction with our
+    // own, which does not to have a revert feature.
+    SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime));
+    mLastKnownGoodChipEpochTime.SetValue(lastKnownGoodChipEpochTime);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "updating Last Known Good Time to %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+    }
+    return err;
+}
+
+CHIP_ERROR LastKnownGoodTime::UpdateLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Discovery, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+    ChipLogProgress(Discovery, "new proposed Last Known Good Time: %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+    if (lastKnownGoodChipEpochTime > mLastKnownGoodChipEpochTime.Value())
+    {
+        ChipLogProgress(Discovery, "updating Last Known Good Time to %s, retaining current value in fail-safe context",
+                        FormatChipEpochTime(lastKnownGoodChipEpochTime));
+        // We have a later timestamp.  Advance last known good time and store
+        // the failsafe value.
+        SuccessOrExit(
+            err = StoreLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, MakeOptional(mLastKnownGoodChipEpochTime.Value())));
+        mLastKnownGoodChipEpochTime.SetValue(lastKnownGoodChipEpochTime);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "retaining current Last Known Good Time");
+        // Our timestamp is not later.  Retain the existing last known good time
+        // and discard any fail-safe value in persistence.
+        SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "failed to persist Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+
+CHIP_ERROR LastKnownGoodTime::RevertLastKnownGoodChipEpochTime()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::Clock::Seconds32 lastKnownGoodChipEpochTime;
+    Optional<System::Clock::Seconds32> failSafeBackup;
+    VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Discovery, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+    SuccessOrExit(err = LoadLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, failSafeBackup));
+    ChipLogProgress(Discovery, "fail safe Last Known Good Time: %s",
+                    failSafeBackup.HasValue() ? FormatChipEpochTime(failSafeBackup.Value()) : "[N/A]");
+    if (!failSafeBackup.HasValue())
+    {
+        return CHIP_NO_ERROR; // if there's no value to revert to, we are done
+    }
+    SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(failSafeBackup.Value()));
+    mLastKnownGoodChipEpochTime.SetValue(failSafeBackup.Value());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "failed to persist Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogError(Discovery, "reverted Last Known Good Time to fail safe value");
+    }
+    return err;
+}
+
+} // namespace chip

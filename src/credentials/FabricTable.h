@@ -26,6 +26,7 @@
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
+#include <credentials/LastKnownGoodTime.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM
@@ -405,13 +406,6 @@ public:
     CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
     void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
-    uint8_t FabricCount() const { return mFabricCount; }
-
-    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
-    ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
-    ConstFabricIterator begin() const { return cbegin(); }
-    ConstFabricIterator end() const { return cend(); }
-
     /**
      * Get the current Last Known Good Time.
      *
@@ -420,9 +414,7 @@ public:
      */
     CHIP_ERROR GetLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const
     {
-        VerifyOrReturnError(mLastKnownGoodChipEpochTime.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-        lastKnownGoodChipEpochTime = mLastKnownGoodChipEpochTime.Value();
-        return CHIP_NO_ERROR;
+        return mLastKnownGoodTime.GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
     }
 
     /**
@@ -441,6 +433,7 @@ public:
      *      • The not-before timestamp of any of its operational certificates
      *
      * @param lastKnownGoodChipEpochTime Last Known Good Time in seconds since CHIP epoch
+     * @param notBefore the latest NotBefore time of all installed certificates
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
     CHIP_ERROR SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
@@ -451,7 +444,14 @@ public:
      *
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
-    CHIP_ERROR RevertLastKnownGoodChipEpochTime();
+    CHIP_ERROR RevertLastKnownGoodChipEpochTime() { return mLastKnownGoodTime.RevertLastKnownGoodChipEpochTime(); }
+
+    uint8_t FabricCount() const { return mFabricCount; }
+
+    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
+    ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
+    ConstFabricIterator begin() const { return cbegin(); }
+    ConstFabricIterator end() const { return cend(); }
 
 private:
     static constexpr size_t IndexInfoTLVMaxSize()
@@ -478,90 +478,6 @@ private:
      */
     CHIP_ERROR StoreFabricIndexInfo() const;
 
-    static constexpr size_t LastKnownGoodTimeTLVMaxSize()
-    {
-        // We have Last Known Good Time and, optionally, a previous Last known
-        // good time for fail safe cleanup.
-        return TLV::EstimateStructOverhead(sizeof(uint32_t), sizeof(uint32_t));
-    }
-
-    /**
-     * Initialize Last Known Good Time to the later of firmware build time or
-     * last known good time persisted in storage.  Persist the selected value
-     * if this differs from the value in storage or no value is yet persisted.
-     *
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR InitLastKnownGoodChipEpochTime();
-
-    /**
-     * Update the Last Known Good Time to the later of the current value and
-     * the passed value and persist to storage.  If the value is changed, also
-     * store the current value for fail-safe recovery.
-     *
-     * We can only support storage of a single fail-safe recovery value.  But by
-     * by being private and only calling from AddNewFabric, we ensure that on
-     * nodes and fabric additions where fail-safe recovery is required, we will
-     * be called from within a fail-safe context.
-     *
-     * @param lastKnownGoodChipEpochTime Last Known Good Time in seconds since CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
-     */
-    CHIP_ERROR UpdateLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
-
-    /**
-     * Load the Last Known Good Time from storage and, optionally, a fail-safe
-     * value to fall back to if any exists.
-     *
-     * @param lastKnownGoodChipEpochTime (out) Last Known Good Time as seconds from CHIP epoch
-     * @param failSafeBackup (out) an optional Fail Safe context last known good time value to fall back to, also in seconds from
-     * CHIP epoch from CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
-                                              Optional<System::Clock::Seconds32> & failSafeBackup) const;
-
-    /**
-     * Load the Last Known Good Time from storage.
-     *
-     * @param lastKnownGoodChipEpochTime (out) Last Known Good Time as seconds from CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const;
-
-    /**
-     * Store the Last Known Good Time to storage, and optionally, a fail-safe
-     * value to fall back to if the fail safe timer expires.
-     *
-     * @param lastKnownGoodChipEpochTime Last Known Good Time as seconds from CHIP epoch
-     * @param failSafeBackup fail safe backup of the previous Last Known Good Time
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
-                                               Optional<System::Clock::Seconds32> failSafeBackup) const;
-
-    /**
-     * Store the Last Known Good Time to storage.  This overload also clears
-     * the fail safe Last Known Good Time from storage.
-     *
-     * @param lastKnownGoodChipEpochTime Last Known Good Time as seconds from CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime) const;
-
-    /**
-     * Format print a CHIP epoch time as a null-terminated ISO 8601 string to a
-     * static internal buffer and return a pointer to this.
-     *
-     * This is provided here as a logging convenience for local code, which
-     * must frequently print Last Known Good Time.  Callers do not own the
-     * return buffer and should not try to use it later.
-     *
-     * @param chipEpochTime time in seconds from the CHIP epoch
-     * @return null-terminted ISO8601 string
-     */
-    static const char * FormatChipEpochTime(System::Clock::Seconds32 chipEpochTime);
-
     /**
      * Read our fabric index info from the given TLV reader and set up the
      * fabric table accordingly.
@@ -581,7 +497,7 @@ private:
     // it can go and is full.
     Optional<FabricIndex> mNextAvailableFabricIndex;
     uint8_t mFabricCount = 0;
-    Optional<System::Clock::Seconds32> mLastKnownGoodChipEpochTime;
+    LastKnownGoodTime mLastKnownGoodTime;
 };
 
 } // namespace chip
