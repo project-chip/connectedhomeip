@@ -163,10 +163,6 @@ jobs:
               timeout-minutes: 15
               run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
 
-            - name: Build example IPv6 Only App
-              timeout-minutes: 15
-              run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
-
             - name: Build example OTA Requestor App
               run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
               timeout-minutes: 15
