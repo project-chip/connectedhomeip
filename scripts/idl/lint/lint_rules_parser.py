@@ -186,11 +186,11 @@ class LintRulesTransformer(Transformer):
 
         return parseNumberString(tokens[0].value)
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def negative_integer(self, value):
         return -value
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def integer(self, value):
         return value
 
@@ -219,24 +219,24 @@ class LintRulesTransformer(Transformer):
 
         return Discard
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def load_xml(self, path):
         if not os.path.isabs(path):
             path = os.path.abspath(os.path.join(os.path.dirname(self.file_name), path))
 
         self.context.LoadXml(path)
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def required_global_attribute(self, name, code):
         return AttributeRequirement(code=code, name=name)
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def specific_endpoint_rule(self, code, *names):
         for name in names:
             self.context.RequireClusterInEndpoint(name, code)
         return Discard
 
-    @ v_args(inline=True)
+    @v_args(inline=True)
     def required_server_cluster(self, id):
         return id
 
@@ -273,13 +273,13 @@ if __name__ == '__main__':
         'fatal': logging.FATAL,
     }
 
-    @ click.command()
-    @ click.option(
+    @click.command()
+    @click.option(
         '--log-level',
         default='INFO',
         type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
         help='Determines the verbosity of script output.')
-    @ click.argument('filename')
+    @click.argument('filename')
     def main(log_level, filename=None):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
