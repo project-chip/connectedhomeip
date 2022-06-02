@@ -109,6 +109,14 @@ private:
     }
 
     /**
+     * Log the message, appending the passed CHIP epoch time in ISO8601 format.
+     *
+     * @param msg message to log with ISO8601 time appended
+     * @param chipEpochTiwme time in seconds from the CHIP epoch
+     */
+    void LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime);
+
+    /**
      * Load the Last Known Good Time from storage and, optionally, a fail-safe
      * value to fall back to if any exists.
      *
@@ -147,19 +155,6 @@ private:
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
      */
     CHIP_ERROR StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime) const;
-
-    /**
-     * Format print a CHIP epoch time as a null-terminated ISO 8601 string to a
-     * static internal buffer and return a pointer to this.
-     *
-     * This is provided here as a logging convenience for local code, which
-     * must frequently print Last Known Good Time.  Callers do not own the
-     * return buffer and should not try to use it later.
-     *
-     * @param chipEpochTime time in seconds from the CHIP epoch
-     * @return null-terminted ISO8601 string
-     */
-    static const char * FormatChipEpochTime(System::Clock::Seconds32 chipEpochTime);
 
     PersistentStorageDelegate * mStorage = nullptr;
     Optional<System::Clock::Seconds32> mLastKnownGoodChipEpochTime;

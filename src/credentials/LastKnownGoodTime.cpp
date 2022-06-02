@@ -35,9 +35,9 @@ constexpr TLV::Tag kLastKnownGoodChipEpochSecondsTag         = TLV::ContextTag(0
 constexpr TLV::Tag kFailSafeLastKnownGoodChipEpochSecondsTag = TLV::ContextTag(1);
 } // anonymous namespace
 
-const char * LastKnownGoodTime::FormatChipEpochTime(System::Clock::Seconds32 chipEpochTime)
+void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime)
 {
-    static char buf[strlen("2000-00-00T00:00:00") + 1] = { 0 };
+    char buf[20] = { 0 }; // strlen("0000-00-00T00:00:00") == 19
     uint16_t year;
     uint8_t month;
     uint8_t day;
@@ -45,11 +45,8 @@ const char * LastKnownGoodTime::FormatChipEpochTime(System::Clock::Seconds32 chi
     uint8_t minute;
     uint8_t second;
     ChipEpochToCalendarTime(chipEpochTime.count(), year, month, day, hour, minute, second);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-truncation"
-    snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
-#pragma GCC diagnostic pop
-    return &buf[0];
+    int len = snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
+    ChipLogProgress(TimeService, "%s%s", msg, len == sizeof(buf) - 1 ? buf : "[time formatting failed]");
 }
 
 CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
@@ -129,15 +126,20 @@ CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
     System::Clock::Seconds32 storedLastKnownGoodChipEpochTime;
     CHIP_ERROR err = LoadLastKnownGoodChipEpochTime(storedLastKnownGoodChipEpochTime);
     VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
-    ChipLogProgress(TimeService, "Last Known Good Time: %s",
-                    err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? "[unknown]"
-                                                                        : FormatChipEpochTime(storedLastKnownGoodChipEpochTime));
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogProgress(TimeService, "Last Known Good Time: [unknown]");
+    }
+    else
+    {
+        LogTime("Last Known Good Time: ", storedLastKnownGoodChipEpochTime);
+    }
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || buildTime > storedLastKnownGoodChipEpochTime)
     {
         // If we have no value in persistence, or the firmware build time is
         // later than the value in persistence, set last known good time to the
         // firmware build time and write back.
-        ChipLogProgress(TimeService, "Setting Last Known Good Time to firmware build time %s", FormatChipEpochTime(buildTime));
+        LogTime("Setting Last Known Good Time to firmware build time ", buildTime);
         mLastKnownGoodChipEpochTime.SetValue(buildTime);
         return StoreLastKnownGoodChipEpochTime(buildTime);
     }
@@ -153,8 +155,8 @@ CHIP_ERROR LastKnownGoodTime::SetLastKnownGoodChipEpochTime(System::Clock::Secon
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(TimeService, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
-    ChipLogProgress(TimeService, "New proposed Last Known Good Time: %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+    LogTime("Last Known Good Time: ", mLastKnownGoodChipEpochTime.Value());
+    LogTime("New proposed Last Known Good Time: ", lastKnownGoodChipEpochTime);
 
     // Verify that the passed value is not earlier than the firmware build time.
     System::Clock::Seconds32 buildTime;
@@ -183,7 +185,7 @@ exit:
     }
     else
     {
-        ChipLogProgress(TimeService, "Updating Last Known Good Time to %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+        LogTime("Updating Last Known Good Time to ", lastKnownGoodChipEpochTime);
     }
     return err;
 }
@@ -192,12 +194,11 @@ CHIP_ERROR LastKnownGoodTime::UpdateLastKnownGoodChipEpochTime(System::Clock::Se
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(TimeService, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
-    ChipLogProgress(TimeService, "New proposed Last Known Good Time: %s", FormatChipEpochTime(lastKnownGoodChipEpochTime));
+    LogTime("Last Known Good Time: ", mLastKnownGoodChipEpochTime.Value());
+    LogTime("New proposed Last Known Good Time: ", lastKnownGoodChipEpochTime);
     if (lastKnownGoodChipEpochTime > mLastKnownGoodChipEpochTime.Value())
     {
-        ChipLogProgress(TimeService, "Updating Last Known Good Time to %s, retaining current value in fail-safe context",
-                        FormatChipEpochTime(lastKnownGoodChipEpochTime));
+        LogTime("Current Last Known Good time retained in fail-safe context, updating to ", lastKnownGoodChipEpochTime);
         // We have a later timestamp.  Advance last known good time and store
         // the failsafe value.
         SuccessOrExit(
@@ -225,14 +226,14 @@ CHIP_ERROR LastKnownGoodTime::RevertLastKnownGoodChipEpochTime()
     System::Clock::Seconds32 lastKnownGoodChipEpochTime;
     Optional<System::Clock::Seconds32> failSafeBackup;
     VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(TimeService, "Last Known Good Time: %s", FormatChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+    LogTime("Last Known Good Time: ", mLastKnownGoodChipEpochTime.Value());
     SuccessOrExit(err = LoadLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, failSafeBackup));
-    ChipLogProgress(TimeService, "Fail safe Last Known Good Time: %s",
-                    failSafeBackup.HasValue() ? FormatChipEpochTime(failSafeBackup.Value()) : "[N/A]");
     if (!failSafeBackup.HasValue())
     {
+        ChipLogProgress(TimeService, "No fail safe Last Known Good Time to revert to");
         return CHIP_NO_ERROR; // if there's no value to revert to, we are done
     }
+    LogTime("Fail safe Last Known Good Time: ", failSafeBackup.Value());
     SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(failSafeBackup.Value()));
     mLastKnownGoodChipEpochTime.SetValue(failSafeBackup.Value());
 exit:
