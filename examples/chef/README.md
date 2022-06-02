@@ -63,7 +63,7 @@ Run `chef.py -h` to see the available commands
 
 ### zzz_generated
 
-To eliminate a dependnecy on ZAP in CI jobs, all chef examples found in
+To eliminate a dependency on ZAP in CI jobs, all chef examples found in
 `examples/chef/devices` must have their output from the ZAP tool cached in
 `examples/chef/zzz_generated`.
 
