@@ -98,7 +98,7 @@ public:
      * Gets an underlying field that is contained within a bit subset of the integer.
      * Examples:
      *    GetField(0x70) == GetField(0b01110000) == ((n & 0x70) >> 4) == ((n >> 4) 0x07)
-     *    GetField(0xB0) == GetField(0b11000000) == ((n & 0xB0) >> 6) == ((n >> 6) 0x03)
+     *    GetField(0xC0) == GetField(0b11000000) == ((n & 0xC0) >> 6) == ((n >> 6) 0x03)
      *
      * @param mask The bit mask to be used, assumed to be a contigous bit mask
      */
