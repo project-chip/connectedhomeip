@@ -69,6 +69,71 @@ using DecodableType = Type;
 } // namespace Structs
 } // namespace detail
 
+namespace Globals {
+namespace Attributes {
+namespace GeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::CommandId>;
+    using DecodableType    = DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::CommandId>;
+    using DecodableType    = DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::AttributeId>;
+    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AttributeList
+
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Globals
+
 namespace PowerConfiguration {
 
 namespace Attributes {
@@ -761,63 +826,33 @@ struct TypeInfo
 };
 } // namespace Battery3AlarmState
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -1010,63 +1045,33 @@ struct TypeInfo
 };
 } // namespace HighTempDwellTripPoint
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -1210,63 +1215,33 @@ struct TypeInfo
 };
 } // namespace IdentifyType
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -1701,63 +1676,33 @@ struct TypeInfo
 };
 } // namespace NameSupport
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -2755,63 +2700,33 @@ struct TypeInfo
 };
 } // namespace LastConfiguredBy
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -3126,63 +3041,33 @@ struct TypeInfo
 };
 } // namespace StartUpOnOff
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -3237,63 +3122,33 @@ struct TypeInfo
 };
 } // namespace SwitchActions
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -3834,63 +3689,33 @@ struct TypeInfo
 };
 } // namespace StartUpCurrentLevel
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -4175,63 +4000,33 @@ struct TypeInfo
 };
 } // namespace AlarmCount
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -4378,63 +4173,33 @@ struct TypeInfo
 };
 } // namespace ValidUntilTime
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -4581,63 +4346,33 @@ struct TypeInfo
 };
 } // namespace ApplicationType
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -5682,63 +5417,33 @@ struct TypeInfo
 };
 } // namespace ScheduleMode
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -6119,63 +5824,33 @@ struct TypeInfo
 };
 } // namespace RemainingTime
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -6204,63 +5879,33 @@ namespace PulseWidthModulation {
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -6360,63 +6005,33 @@ struct TypeInfo
 };
 } // namespace PartsList
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -6498,63 +6113,33 @@ struct TypeInfo
 };
 } // namespace Binding
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -6754,63 +6339,33 @@ struct TypeInfo
 };
 } // namespace AccessControlEntriesPerFabric
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -7209,63 +6764,33 @@ struct TypeInfo
 };
 } // namespace FastPollTimeoutMax
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -7911,63 +7436,33 @@ struct TypeInfo
 };
 } // namespace SetupUrl
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -8397,63 +7892,33 @@ struct TypeInfo
 };
 } // namespace CapabilityMinima
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -8867,63 +8332,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -9091,63 +8526,33 @@ struct TypeInfo
 };
 } // namespace UpdateStateProgress
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -9325,63 +8730,33 @@ struct TypeInfo
 };
 } // namespace SupportedLocales
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -9445,63 +8820,33 @@ struct TypeInfo
 };
 } // namespace SupportedCalendarTypes
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -9544,63 +8889,33 @@ struct TypeInfo
 };
 } // namespace TemperatureUnit
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -9640,63 +8955,33 @@ struct TypeInfo
 };
 } // namespace Sources
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -10191,63 +9476,33 @@ struct TypeInfo
 };
 } // namespace ActiveBatteryChargeFaults
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -10631,63 +9886,33 @@ struct TypeInfo
 };
 } // namespace SupportsConcurrentConnection
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -11297,63 +10522,33 @@ struct TypeInfo
 };
 } // namespace LastConnectErrorValue
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -11484,63 +10679,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -11774,63 +10939,33 @@ struct TypeInfo
 };
 } // namespace TestEventTriggersEnabled
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -12155,63 +11290,33 @@ struct TypeInfo
 };
 } // namespace CurrentHeapHighWatermark
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -13240,63 +12345,33 @@ struct TypeInfo
 };
 } // namespace ActiveNetworkFaultsList
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -13619,63 +12694,33 @@ struct TypeInfo
 };
 } // namespace OverrunCount
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -13967,63 +13012,33 @@ struct TypeInfo
 };
 } // namespace TimeSinceReset
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -14058,63 +13073,33 @@ namespace TimeSynchronization {
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -14331,63 +13316,33 @@ struct TypeInfo
 };
 } // namespace UniqueID
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -14588,63 +13543,33 @@ struct TypeInfo
 };
 } // namespace MultiPressMax
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -15075,63 +14000,33 @@ struct TypeInfo
 };
 } // namespace AdminVendorId
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -15789,63 +14684,33 @@ struct TypeInfo
 };
 } // namespace CurrentFabricIndex
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16277,63 +15142,33 @@ struct TypeInfo
 };
 } // namespace MaxGroupKeysPerFabric
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16379,63 +15214,33 @@ struct TypeInfo
 };
 } // namespace LabelList
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16478,63 +15283,33 @@ struct TypeInfo
 };
 } // namespace LabelList
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16561,63 +15336,33 @@ namespace ProxyConfiguration {
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16643,63 +15388,33 @@ namespace ProxyDiscovery {
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16725,63 +15440,33 @@ namespace ProxyValid {
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -16819,63 +15504,33 @@ struct TypeInfo
 };
 } // namespace StateValue
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -17115,63 +15770,33 @@ struct TypeInfo
 };
 } // namespace OnMode
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -17263,63 +15888,33 @@ struct TypeInfo
 };
 } // namespace Mode
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -19832,63 +18427,33 @@ struct TypeInfo
 };
 } // namespace RFIDProgrammingEventMask
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -20714,63 +19279,33 @@ struct TypeInfo
 };
 } // namespace SafetyStatus
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -21018,63 +19553,33 @@ struct TypeInfo
 };
 } // namespace BarrierPosition
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -21386,63 +19891,33 @@ struct TypeInfo
 };
 } // namespace ControlMode
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -22802,63 +21277,33 @@ struct TypeInfo
 };
 } // namespace ACCapacityformat
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -23067,63 +21512,33 @@ struct TypeInfo
 };
 } // namespace WindSetting
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -23257,63 +21672,33 @@ struct TypeInfo
 };
 } // namespace RelativeHumidityDisplay
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -23383,63 +21768,33 @@ struct TypeInfo
 };
 } // namespace ScheduleProgrammingVisibility
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25020,63 +23375,33 @@ struct TypeInfo
 };
 } // namespace StartUpColorTemperatureMireds
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25349,63 +23674,33 @@ struct TypeInfo
 };
 } // namespace LampBurnHoursTripPoint
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25507,63 +23802,33 @@ struct TypeInfo
 };
 } // namespace LightSensorType
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25642,63 +23907,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25836,63 +24071,33 @@ struct TypeInfo
 };
 } // namespace Scale
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -25975,63 +24180,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26109,63 +24284,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26339,63 +24484,33 @@ struct TypeInfo
 };
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26488,63 +24603,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26622,63 +24707,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26756,63 +24811,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -26890,63 +24915,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27024,63 +25019,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27158,63 +25123,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27292,63 +25227,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27426,63 +25331,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27560,63 +25435,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27694,63 +25539,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27828,63 +25643,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -27962,63 +25747,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28096,63 +25851,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28230,63 +25955,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28364,63 +26059,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28498,63 +26163,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28632,63 +26267,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28766,63 +26371,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -28900,63 +26475,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29034,63 +26579,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29168,63 +26683,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29302,63 +26787,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29436,63 +26891,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29570,63 +26995,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29704,63 +27099,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29838,63 +27203,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -29972,63 +27307,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -30106,63 +27411,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -30240,63 +27515,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -30374,63 +27619,33 @@ struct TypeInfo
 };
 } // namespace Tolerance
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -30817,63 +28032,33 @@ struct TypeInfo
 };
 } // namespace CurrentZoneSensitivityLevel
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -31733,63 +28918,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -31918,63 +29073,33 @@ struct TypeInfo
 };
 } // namespace MaxDuration
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -32014,63 +29139,33 @@ struct TypeInfo
 };
 } // namespace MACAddress
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -32356,63 +29451,33 @@ struct TypeInfo
 };
 } // namespace CurrentChannel
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -32580,63 +29645,33 @@ struct TypeInfo
 };
 } // namespace CurrentTarget
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -33198,63 +30233,33 @@ struct TypeInfo
 };
 } // namespace SeekRangeStart
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -33493,63 +30498,33 @@ struct TypeInfo
 };
 } // namespace CurrentInput
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -33618,63 +30593,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -33782,63 +30727,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -34188,63 +31103,33 @@ struct TypeInfo
 };
 } // namespace SupportedStreamingProtocols
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -34409,63 +31294,33 @@ struct TypeInfo
 };
 } // namespace CurrentOutput
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -34729,63 +31584,33 @@ struct TypeInfo
 };
 } // namespace CurrentApp
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -34937,63 +31762,33 @@ struct TypeInfo
 };
 } // namespace AllowedVendorList
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -35183,63 +31978,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -37945,63 +34710,33 @@ struct TypeInfo
 };
 } // namespace NullableRangeRestrictedInt16s
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -38506,63 +35241,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -38739,63 +35444,33 @@ struct TypeInfo
 };
 } // namespace CecedSpecificationVersion
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -38985,63 +35660,33 @@ struct TypeInfo
 };
 } // namespace PowerThreshold
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -39240,63 +35885,33 @@ public:
 namespace Attributes {
 
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -39596,63 +36211,33 @@ struct TypeInfo
 };
 } // namespace LogQueueMaxSize
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
@@ -41398,63 +37983,33 @@ struct TypeInfo
 };
 } // namespace RmsVoltageSwellPeriodPhaseC
 namespace GeneratedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GeneratedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::CommandId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptedCommandList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
-struct TypeInfo
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 
