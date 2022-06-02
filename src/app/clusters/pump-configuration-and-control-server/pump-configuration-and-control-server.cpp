@@ -24,9 +24,9 @@
 //#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
-#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -51,7 +51,7 @@ private:
 
 PumpConfigurationAndControlAttrAccess gAttrAccess;
 bool isControlModeAvailable = true;
-bool isPumpStatusAvailable = true;
+bool isPumpStatusAvailable  = true;
 
 // Enum for RemoteSensorType
 enum class RemoteSensorType : uint8_t
@@ -75,7 +75,7 @@ static void updateAttributeLinks(EndpointId endpoint)
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
     BitFlags<PumpStatus> pumpStatus;
-    
+
     // Get the current control- and operation modes
     Attributes::OperationMode::Get(endpoint, &operationMode);
 
@@ -87,15 +87,14 @@ static void updateAttributeLinks(EndpointId endpoint)
     {
         // If controlMode attribute is not available, then use the default value
         // of the effectiveControlMode attriute as the effectiveControlMode
-        // if this is not suitable, the application should override this value in 
+        // if this is not suitable, the application should override this value in
         // the post attribute change callback for the operation mode attribute
         const EmberAfAttributeMetadata * effectiveControlModeMetaData;
-        effectiveControlModeMetaData = GetAttributeMetadata(app::ConcreteAttributePath(endpoint, 
-                                                                                       PumpConfigurationAndControl::Id, 
-                                                                                       Attributes::EffectiveControlMode::Id));
+        effectiveControlModeMetaData = GetAttributeMetadata(
+            app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
         controlMode = static_cast<PumpControlMode>(effectiveControlModeMetaData->defaultValue.defaultValue);
     }
-    
+
     if (isPumpStatusAvailable)
     {
         Attributes::PumpStatus::Get(endpoint, &pumpStatus);
