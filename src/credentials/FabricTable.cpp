@@ -945,7 +945,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
     }
     // Pass this to the LastKnownGoodTime object so it can make determination
     // of the legality of our new proposed time.
-    SuccessOrExit(mLastKnownGoodTime.SetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, latestNotBefore));
+    SuccessOrExit(err = mLastKnownGoodTime.SetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, latestNotBefore));
 exit:
     if (err != CHIP_NO_ERROR)
     {
