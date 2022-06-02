@@ -38,8 +38,8 @@ _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
-_CI_MANIFEST_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "ci_manifest.json")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
+_CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
 _CI_ALLOW_LIST = ["lighting-app"]
 
@@ -98,12 +98,12 @@ def check_python_version() -> None:
 
 
 def check_zap(master: bool = False) -> str:
-    """Produces hash of ZAP submodule
+    """Produces hash of ZAP submodule.
 
     Args:
-      master: check branch master instead of current branch
+      master: Check branch master instead of current branch.
     Returns:
-      SHA of zap submodule
+      SHA of zap submodule.
     """
     shell.run_cmd(f"cd {_REPO_BASE_PATH}")
     if master:
@@ -116,27 +116,27 @@ def check_zap(master: bool = False) -> str:
                                return_cmd_output=True).replace("\n", "")
     command = f"git ls-tree {branch} third_party/zap/repo"
     zap_commit = shell.run_cmd(command, return_cmd_output=True)
-    flush_print(f"Raw zap commit {zap_commit}")
     zap_commit = zap_commit.split(" ")[2]
     zap_commit = zap_commit[:zap_commit.index("\t")]
-    flush_print(f"zap commit: {zap_commit}")
+    flush_print(f"found zap commit: {zap_commit}")
     return zap_commit
 
 
 def generate_device_manifest(
-        include_zap_submod: bool = False,
         write_manifest_file: bool = False,
         zap_check_master: bool = False) -> Dict[str, Any]:
     """Produces dictionary containing md5 of device dir zap files.
 
     Args:
-        include_zap_submod: Include ZAP commit in manifest
-        write_manifest_file: Serialize manifest in file and tree
+        write_manifest_file: Serialize manifest in file and tree.
+        zap_check_master: Check master instead of HEAD for zap.
     Returns:
         Dict containing MD5 of device dir zap files.
     """
     ci_manifest = {"devices": {}}
     devices_manifest = ci_manifest["devices"]
+    zap_sha = check_zap(master=zap_check_master)
+    ci_manifest["zap_commit"] = zap_sha
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
         with open(device_file_path, "rb") as device_file:
@@ -145,16 +145,13 @@ def generate_device_manifest(
         devices_manifest[device_name] = device_file_md5
         flush_print(f"Current digest for {device_name} : {device_file_md5}")
         if write_manifest_file:
-            device_zzz_md5_file = os.path.join(_CHEF_ZZZ_ROOT,
-                                               device_name,
-                                               _CI_DEVICE_MANIFEST_NAME)
-            with open(device_zzz_md5_file, "w+", encoding="utf-8") as md5file:
-                md5file.write(device_file_md5)
-    if include_zap_submod:
-        ci_manifest["zap_commit"] = check_zap(master=zap_check_master)
-    if write_manifest_file:
-        with open(_CI_MANIFEST_FILE_NAME, "w+", encoding="utf-8") as ci_manifest_file:
-            ci_manifest_file.write(json.dumps(ci_manifest, indent=4)+"\n")
+            device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
+            device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
+            with open(device_zzz_md5_file, "w+", encoding="utf-8") as md5_file:
+                md5_file.write(device_file_md5)
+            device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
+            with open(device_zzz_zap_sha_file, "w+", encoding="utf-8") as zap_sha_file:
+                zap_sha_file.write(zap_sha)
     return ci_manifest
 
 
@@ -173,13 +170,11 @@ def load_cicd_config() -> Dict[str, Any]:
 def flush_print(
         to_print: str,
         with_border: bool = False) -> None:
-    """Prints and flushes stdout buffer
+    """Prints and flushes stdout buffer.
 
     Args:
-        to_print: The string to print
-        with_border: Add boarder above and below to_print
-    Returns:
-        None
+        to_print: The string to print.
+        with_border: Add boarder above and below to_print.
     """
     if with_border:
         border = ('-' * 64) + '\n'
@@ -282,10 +277,9 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.validate_zzz:
-        flush_print(f"Validating\n{_CI_MANIFEST_FILE_NAME}\n{_CHEF_ZZZ_ROOT}\n",
+        flush_print(f"Validating\n{_CHEF_ZZZ_ROOT}\n",
                     with_border=True)
-        fix_instructions = textwrap.dedent(f"""
-
+        fix_instructions = textwrap.dedent(f""" \
         Cached files out of date!
         Please:
           ./scripts/bootstrap.sh
@@ -294,38 +288,33 @@ def main(argv: Sequence[str]) -> None:
           npm install
           cd ../../..
           ./examples/chef/chef.py --generate_zzz
-          git add examples/chef/ci_manifest.json
           git add examples/chef/zzz_generated
         Ensure you are running with the latest version of ZAP from master!""")
-        ci_manifest = generate_device_manifest(include_zap_submod=True,
-                                               zap_check_master=True)
-        with open(_CI_MANIFEST_FILE_NAME, "r", encoding="utf-8") as ci_manifest_file:
-            cached_manifest = json.loads(ci_manifest_file.read())
-        cached_device_manifest = cached_manifest["devices"]
+        ci_manifest = generate_device_manifest()
+        current_zap = ci_manifest["zap_commit"]
         for device, device_md5 in ci_manifest["devices"].items():
             zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
+            device_zap_sha_file = os.path.join(zzz_dir, _CI_ZAP_MANIFEST_NAME)
             device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            if device not in cached_device_manifest:
-                flush_print(f"MANIFEST MISSING {device}: {fix_instructions}")
-            elif cached_device_manifest[device] != device_md5:
-                flush_print(f"MANIFEST MISMATCH {device}: {fix_instructions}")
+            help_msg = f"{device}: {fix_instructions}"
+            if not os.path.exists(device_zap_sha_file):
+                flush_print(f"ZAP VERSION MISSING {help_msg}")
                 exit(1)
-            elif not os.path.exists(device_md5_file):
-                flush_print(f"OUTPUT MISSING {device}: {fix_instructions}")
+            else:
+                with open(device_zap_sha_file, "r", encoding="utf-8") as zap_file:
+                    output_cached_zap_sha = zap_file.read()
+                if output_cached_zap_sha != current_zap:
+                    flush_print(f"ZAP VERSION MISMATCH {help_msg}")
+                    exit(1)
+            if not os.path.exists(device_md5_file):
+                flush_print(f"INPUT MD5 MISSING {help_msg}")
                 exit(1)
             else:
                 with open(device_md5_file, "r", encoding="utf-8") as md5_file:
                     output_cached_md5 = md5_file.read()
                 if output_cached_md5 != device_md5:
-                    flush_print(f"OUTPUT MISMATCH {device}: {fix_instrucitons}")
+                    flush_print(f"INPUT MD5 MISMATCH {help_msg}")
                     exit(1)
-        current_zap = ci_manifest["zap_commit"]
-        cached_zap = cached_manifest["zap_commit"]
-        flush_print(f"current zap commit {current_zap}")
-        flush_print(f"cached zap commit {cached_zap}")
-        if current_zap != cached_zap:
-            flush_print(f"BAD ZAP VERSION: {fix_instructions}")
-            exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
@@ -375,8 +364,7 @@ def main(argv: Sequence[str]) -> None:
             {_REPO_BASE_PATH}/scripts/tools/zap/generate.py \
             {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""))
             shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
-        generate_device_manifest(include_zap_submod=True,
-                                 write_manifest_file=True)
+        generate_device_manifest(write_manifest_file=True)
         exit(0)
 
     #
@@ -399,7 +387,6 @@ def main(argv: Sequence[str]) -> None:
 
     if options.build_all:
         # TODO
-        # Needs testing after refactor
         # Needs to call per-platform bundle function
         flush_print("Build all disabled")
         exit(1)
