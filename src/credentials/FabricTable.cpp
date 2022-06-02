@@ -922,7 +922,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Discovery, "Failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }
