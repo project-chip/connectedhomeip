@@ -307,7 +307,7 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(inline=True)
     def endpoint(self, number, device_name, device_code, *transforms):
-        endpoint = Endpoint(number=number, device_type = DeviceType(name=device_name, code=device_code))
+        endpoint = Endpoint(number=number, device_type=DeviceType(name=device_name, code=device_code))
 
         for t in transforms:
             t.apply(endpoint)

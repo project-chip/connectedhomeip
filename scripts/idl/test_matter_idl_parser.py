@@ -433,10 +433,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(endpoints=[
-            Endpoint(number=1, device_type=DeviceType(name="first",code=1)),
-            Endpoint(number=2, device_type=DeviceType(name="second",code=123)),
-            Endpoint(number=10, device_type=DeviceType(name="ten",code=22)),
-            Endpoint(number=100, device_type=DeviceType(name="test",code=33)),
+            Endpoint(number=1, device_type=DeviceType(name="first", code=1)),
+            Endpoint(number=2, device_type=DeviceType(name="second", code=123)),
+            Endpoint(number=10, device_type=DeviceType(name="ten", code=22)),
+            Endpoint(number=100, device_type=DeviceType(name="test", code=33)),
         ])
         self.assertEqual(actual, expected)
 
