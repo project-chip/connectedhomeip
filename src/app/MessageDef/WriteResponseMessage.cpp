@@ -71,16 +71,7 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kWriteResponses));
-
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE;
-        }
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);

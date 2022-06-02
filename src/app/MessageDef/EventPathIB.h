@@ -124,7 +124,7 @@ public:
      *  @param [in] apPath    A pointer to the path to fill in.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH if the path from the reader is not a valid concrere event path.
+     *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB if the path from the reader is not a valid concrere event path.
      */
     CHIP_ERROR GetEventPath(ConcreteEventPath * const apPath) const;
 };
