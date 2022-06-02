@@ -254,6 +254,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
       defines -=
           [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
+    } else if (chip_device_platform == "openiotsdk") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK=1",
+        "CHIP_DEVICE_LAYER_TARGET=openiotsdk",
+      ]
     }
   }
 } else if (chip_device_platform == "none") {
@@ -406,6 +411,8 @@ if (chip_device_platform != "none") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {
       _platform_target = "CYW30739"
+    } else if (chip_device_platform == "openiotsdk") {
+      _platform_target = "openiotsdk"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
