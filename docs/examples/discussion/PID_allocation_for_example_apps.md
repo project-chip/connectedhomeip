@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # PID allocation for example apps
 
 Unless specifically overridden by the platform, example apps in this SDK use the

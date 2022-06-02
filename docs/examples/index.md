@@ -11,6 +11,15 @@ The Matter SDK provides examples of Matter devices for different development pla
 all-clusters-app/**/README
 ```
 
+## All clusters minimal example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+all-clusters-minimal-app/**/README
+```
+
 ## Bridge example
 
 ```{toctree}
@@ -26,6 +35,7 @@ bridge-app/**/README
 :glob:
 :maxdepth: 1
 
+chef/README*
 chef/**/README
 ```
 
@@ -44,16 +54,7 @@ chip-tool/README
 :glob:
 :maxdepth: 1
 
-chip-tool-darwin/README
-```
-
-## IPv6 Only example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-ipv6only-app/**/README
+darwin-framework-tool/README
 ```
 
 ## Lighting example
@@ -63,6 +64,7 @@ ipv6only-app/**/README
 :maxdepth: 1
 
 lighting-app/**/README
+lighting-app/qpg/APPLICATION
 ```
 
 ## Light switch example
@@ -71,7 +73,7 @@ lighting-app/**/README
 :glob:
 :maxdepth: 1
 
-lighting-app/**/README
+light-switch-app/**/README
 ```
 
 ## Lock example
@@ -81,6 +83,7 @@ lighting-app/**/README
 :maxdepth: 1
 
 lock-app/**/README
+lock-app/qpg/APPLICATION
 ```
 
 ## Log source example
@@ -126,6 +129,7 @@ ota-requestor-app/**/README
 :maxdepth: 1
 
 persistent-storage/**/README
+persistent-storage/**/APPLICATION
 ```
 
 ## Pigweed example
@@ -144,6 +148,7 @@ pigweed-app/**/README
 :maxdepth: 1
 
 pump-app/**/README
+pump-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Pump controller example
@@ -153,6 +158,7 @@ pump-app/**/README
 :maxdepth: 1
 
 pump-controller-app/**/README
+pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Shell example
@@ -161,6 +167,7 @@ pump-controller-app/**/README
 :glob:
 :maxdepth: 1
 
+shell/README*
 shell/**/README
 ```
 

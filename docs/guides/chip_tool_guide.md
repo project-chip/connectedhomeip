@@ -8,14 +8,12 @@ the setup payload or performing discovery actions.
 
 <hr>
 
--   [Source files](#source)
--   [Building and running the CHIP Tool](#building)
--   [Using the CHIP Tool for Matter device testing](#using)
--   [Supported commands and options](#commands)
+-   [Source files](#source-files)
+-   [Building and running the CHIP Tool](#building-and-running-the-chip-tool)
+-   [Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+-   [Supported commands and options](#supported-commands-and-options)
 
 <hr>
-
-<a name="source"></a>
 
 ## Source files
 
@@ -27,8 +25,6 @@ directory.
 > `/tmp` directory can sometimes resolve issues related to stale configuration.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building and running the CHIP Tool
 
@@ -69,11 +65,9 @@ _clusters_ in this context, but not all listed commands correspond to the
 _clusters_ in the Data Model (for example, pairing or discover commands). Each
 listed command can however become the root of the new more complex command by
 appending it with sub-commands. Examples of specific commands and their use
-cases are described in the [Supported commands and options](#commands) section.
+cases are described in the [Supported commands and options](#supported-commands-and-options) section.
 
 <hr>
-
-<a name="using"></a>
 
 ## Using CHIP Tool for Matter device testing
 
@@ -384,8 +378,6 @@ $ ./chip-tool basic
 ```
 
 <hr>
-
-<a name="commands"></a>
 
 ## Supported commands and options
 
@@ -770,7 +762,7 @@ The `pairing` command supports different means regarding Matter device
 commissioning procedure.
 
 Thread and Wi-Fi commissioning use cases are described in the
-[Using the CHIP Tool for Matter device testing](#using) section.
+[Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing) section.
 
 To list all `pairing` sub-commands, run the following command:
 
@@ -780,7 +772,7 @@ $ ./chip-tool pairing
 
 ### Interacting with Data Model clusters
 
-As mentioned in the [Using the CHIP Tool for Matter device testing](#using)
+As mentioned in the [Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
 section, executing the `chip-tool` command with a particular cluster name lists
 all operations supported for this cluster, as in the following command pattern:
 

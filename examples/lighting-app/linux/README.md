@@ -13,14 +13,12 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
-    -   [Commandline Arguments](#command-line-args)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Commandline Arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
     -   [Running RPC console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -49,8 +47,6 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-<a name="command-line-args"></a>
-
 ## Commandline arguments
 
 -   `--wifi`
@@ -69,8 +65,6 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
     `interface id`: the number after `hci` when listing BLE interfaces by
     `hciconfig` command, for example, `--ble-device 1` means using `hci1`
     interface. Default: `0`.
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 

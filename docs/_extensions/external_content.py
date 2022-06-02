@@ -14,16 +14,19 @@ build. Note that the copy is *smart*, that is, only updated files are actually
 copied. Therefore, incremental builds detect changes correctly and behave as
 expected.
 
-Paths for external content ingluded via e.g. figure, literalinclude, etc.
-are adjusted as needed.
+Links to external content not included in the generated documentation are
+transformed to external links as needed.
 
 Configuration options
 =====================
 
 - ``external_content_contents``: A list of external contents. Each entry is
   a tuple with two fields: the external base directory and a file glob pattern.
-- ``external_content_directives``: A list of directives that should be analyzed
-  and their paths adjusted if necessary. Defaults to ``DEFAULT_DIRECTIVES``.
+- ``external_content_link_repositories``: A list of base directories out of scope.
+  All links to content within these directories are made external.
+- ``external_content_link_extensions``: A list of file extensions in scope of
+  the documentation. All links to content without these file extensions are
+  made external.
 - ``external_content_keep``: A list of file globs (relative to the destination
   directory) that should be kept even if they do not exist in the source
   directory. This option can be useful for auto-generated files in the
@@ -40,19 +43,19 @@ from typing import Dict, Any, List, Optional
 
 from sphinx.application import Sphinx
 
-
 __version__ = "0.1.0"
 
-
-DEFAULT_DIRECTIVES = ("figure", "image", "include", "literalinclude")
-"""Default directives for included content."""
+EXTERNAL_LINK_URL_PREFIX = (
+    "https://github.com/project-chip/connectedhomeip/blob/master/"
+)
 
 
 def adjust_includes(
     fname: Path,
     basepath: Path,
-    directives: List[str],
     encoding: str,
+    link_folders: List[str],
+    extensions: List[str],
     dstpath: Optional[Path] = None,
 ) -> None:
     """Adjust included content paths.
@@ -60,35 +63,77 @@ def adjust_includes(
     Args:
         fname: File to be processed.
         basepath: Base path to be used to resolve content location.
-        directives: Directives to be parsed and adjusted.
         encoding: Sources encoding.
+        link_folders: Folders links to which are made external.
+        extensions: Filename extensions links to which are not made external.
         dstpath: Destination path for fname if its path is not the actual destination.
     """
 
-    if fname.suffix != ".rst":
+    if fname.suffix != ".md":
         return
 
     dstpath = dstpath or fname.parent
 
-    def _adjust(m):
-        directive, fpath = m.groups()
+    def _adjust_links(m):
+        displayed, fpath = m.groups()
 
-        # ignore absolute paths
-        if fpath.startswith("/"):
+        # ignore absolute paths, section links, hyperlinks and same folder
+        if fpath.startswith(("/", "#", "http", "www")) or not "/" in fpath:
             fpath_adj = fpath
         else:
             fpath_adj = Path(os.path.relpath(basepath / fpath, dstpath)).as_posix()
 
-        return f".. {directive}:: {fpath_adj}"
+        return f"[{displayed}]({fpath_adj})"
+
+    def _adjust_external(m):
+        displayed, folder, target = m.groups()
+        return f"[{displayed}]({EXTERNAL_LINK_URL_PREFIX}{folder}/{target})"
+
+    def _adjust_filetype(m):
+        displayed, target, extension = m.groups()
+        if extension.lower() in extensions or target.startswith("http"):
+            return m.group(0)
+
+        return f"[{displayed}]({EXTERNAL_LINK_URL_PREFIX}{target})"
+
+    def _remove_section_links(m):
+        (file_link,) = m.groups()
+        return file_link + ")"
+
+    rules = [
+        # Find any links and adjust the path
+        (r"\[([^\[\]]*)\]\s*\((.*)\)", _adjust_links),
+
+        # Find links that lead to an external folder and transform it
+        # into an external link.
+        (
+            r"\[([^\[\]]*)\]\s*\((?:\.\./)*(" + "|".join(link_folders) + r")/(.*)\)",
+            _adjust_external,
+        ),
+
+        # Find links that lead to a section within another file and
+        # remove the section part of the link.
+        (r"(\[[^\[\]]*\]\s*\([^)]*\.md)#.*\)", _remove_section_links),
+
+        # Find links that lead to a non-presentable filetype and transform
+        # it into an external link.
+        (
+            r"\[([^\[\]]*)\]\s*\((?:\.\./)*((?:[^()]+?/)*[^.()]+?(\.[^)/]+))\)",
+            _adjust_filetype,
+        ),
+    ]
 
     with open(fname, "r+", encoding=encoding) as f:
         content = f.read()
-        content_adj, modified = re.subn(
-            r"\.\. (" + "|".join(directives) + r")::\s*([^`\n]+)", _adjust, content
-        )
+        modified = False
+
+        for pattern, sub_func in rules:
+            content, changes_made = re.subn(pattern, sub_func, content)
+            modified = modified or changes_made
+
         if modified:
             f.seek(0)
-            f.write(content_adj)
+            f.write(content)
             f.truncate()
 
 
@@ -135,8 +180,9 @@ def sync_contents(app: Sphinx) -> None:
             adjust_includes(
                 dst,
                 src.parent,
-                app.config.external_content_directives,
                 app.config.source_encoding,
+                app.config.external_content_link_repositories,
+                app.config.external_content_link_extensions,
             )
         # if origin file is modified only copy if different
         elif src.stat().st_mtime > dst.stat().st_mtime:
@@ -147,8 +193,9 @@ def sync_contents(app: Sphinx) -> None:
                 adjust_includes(
                     src_adjusted,
                     src.parent,
-                    app.config.external_content_directives,
                     app.config.source_encoding,
+                    app.config.external_content_link_repositories,
+                    app.config.external_content_link_extensions,
                     dstpath=dst.parent,
                 )
 
@@ -164,8 +211,9 @@ def sync_contents(app: Sphinx) -> None:
 
 def setup(app: Sphinx) -> Dict[str, Any]:
     app.add_config_value("external_content_contents", [], "env")
-    app.add_config_value("external_content_directives", DEFAULT_DIRECTIVES, "env")
     app.add_config_value("external_content_keep", [], "")
+    app.add_config_value("external_content_link_repositories", [], "env")
+    app.add_config_value("external_content_link_extensions", [], "env")
 
     app.connect("builder-inited", sync_contents)
 

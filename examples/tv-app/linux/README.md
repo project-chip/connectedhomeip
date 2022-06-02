@@ -16,8 +16,6 @@ Desktop 20.10 (aarch64)**
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
 -   Install tool chain
@@ -36,8 +34,6 @@ Desktop 20.10 (aarch64)**
 
           $ cd ~/connectedhomeip/examples/tv-app/linux
           $ rm -rf out/
-
-<a name="running-complete-example"></a>
 
 ## Exercising Commissioning
 

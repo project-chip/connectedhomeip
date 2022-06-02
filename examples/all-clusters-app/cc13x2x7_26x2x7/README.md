@@ -19,14 +19,13 @@ Instruments CC13XX_26XX family of Wireless MCUs.
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
             -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
 
 ## Introduction
 
-![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
+![CC1352R1_LAUNCHXL](../../pump-app/cc13x2x7_26x2x7/doc/images/cc1352r1_launchxl.jpg)
 
 The CC13XX_26XX all clusters example application provides the basis to query and
 run commands for all currently implemented Matter clusters. This uses the
@@ -212,10 +211,10 @@ fully provisioned, BLE advertising will stop.
 #### Bluetooth LE Rendezvous
 
 Pairing this application with `ble-thread` can be done with any of the enabled
-[CHIP Controller](../../../src/controller/README.md) applications. Use the
-information printed on the console to aide in pairing the device. The controller
-application can also be used to control the example app with the cluster
-commands.
+[CHIP Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/README.md)
+applications. Use the information printed on the console to aide in pairing the
+device. The controller application can also be used to control the example app
+with the cluster commands.
 
 ## TI Support
 

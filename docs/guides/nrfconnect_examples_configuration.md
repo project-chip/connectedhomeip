@@ -103,8 +103,6 @@ target name of the kit, for example _nrf52840dk_nrf52840_:
 
 <hr>
 
-<a name="configuration-structure-overview"></a>
-
 ## Configuration structure overview
 
 Zephyr RTOS and related software components, like drivers and libraries, provide

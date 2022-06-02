@@ -12,8 +12,6 @@ An example testing and demonstrating the key value storage API.
 
 <hr>
 
-<a name="intro"></a>
-
 ## Introduction
 
 This example serves to both test the key value storage implementation and API as
@@ -23,14 +21,10 @@ to use the API.
 In the future this example can be moved into a unit test when available on all
 platforms.
 
-<a name="Linux"></a>
-
 ## Linux
 
 The Linux platform KVS is fully implemented, the KVS is enabled and configured
 by providing a file during the init call.
-
-<a name="building"></a>
 
 ### Building
 
@@ -45,8 +39,6 @@ by providing a file during the init call.
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
           $ ninja -C out/debug
-
-<a name="running"></a>
 
 ### Running
 

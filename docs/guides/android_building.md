@@ -15,14 +15,14 @@ There are following Apps on Android
 
 <hr>
 
--   [Source files](#source)
--   [Requirements for building](#requirements)
-    -   [ABIs and TARGET_CPU](#abi)
-    -   [Gradle & JDK Version](#jdk)
--   [Preparing for build](#preparing)
--   [Building Android CHIPTool from scripts](#building-scripts)
--   [Building Android CHIPTool from Android Studio](#building-studio)
--   [Building Android CHIPTest from scripts](#building-chiptest-scripts)
+-   [Source files](#source-files)
+-   [Requirements for building](#requirements-for-building)
+    -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+    -   [Gradle & JDK Version](#gradle--jdk-version)
+-   [Preparing for build](#preparing-for-build)
+-   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+-   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+-   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
@@ -167,7 +167,7 @@ or
 ## Building Android CHIPTest from scripts
 
 Currently, the CHIPTest can only be built from scripts. The steps are similar to
-[building CHIPTool from scripts](#building-scripts).
+[building CHIPTool from scripts](#building-android-chiptool-from-scripts).
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build

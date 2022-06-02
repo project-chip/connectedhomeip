@@ -1,10 +1,10 @@
-# CHIP P6 All Clusters Example
+# CHIP PSoC6 All Clusters Example
 
 An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
 
 <hr>
 
--   [Matter PSoC6 All Clusters Example](#chip-p6-all-clusters-example)
+-   [Matter PSoC6 All Clusters Example](#chip-psoc6-all-clusters-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)

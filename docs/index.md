@@ -4,13 +4,14 @@
 :maxdepth: 2
 :caption: Contents
 
-quick_start
-project_flow
-vscode_development
+QUICK_START
+PROJECT_FLOW
+VSCODE_DEVELOPMENT
 api/index
 discussion/index
 guides/index
 style/index
 examples/index
 breathe
+BUG_REPORT
 ```

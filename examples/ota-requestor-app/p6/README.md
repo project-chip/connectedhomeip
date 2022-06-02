@@ -14,8 +14,6 @@ CY8CKIT-062S2-43012 board.
 
 <hr>
 
-<a name="introduction"></a>
-
 ## Introduction
 
 The P6 OTA Requestor example provides a baseline demonstration of a OTA
@@ -26,8 +24,6 @@ The P6 device can be commissioned over Bluetooth Low Energy where the device and
 the Matter controller will exchange security information with the Rendezvous
 procedure. Wi-Fi Network credentials are then provided to the P6 device which
 will then join the network.
-
-<a name="building"></a>
 
 ## Building
 
@@ -73,8 +69,6 @@ will then join the network.
 
           $ ./third_party/p6/p6_sdk/ota/matter-psoc6-mcuboot-bootloader.hex
 
-<a name="flashing-the-application"></a>
-
 ## Flashing the Application
 
 -   Flash the bootloader by first putting the CY8CKIT-062S2-43012 board into
@@ -91,8 +85,6 @@ will then join the network.
 
           $ cd ~/connectedhomeip
           $ python3 out/ota_requestor_debug/chip-p6-ota-requestor-example.flash.py
-
-<a name="running-ota-update-process"></a>
 
 ### Running OTA Update Process
 
@@ -125,8 +117,6 @@ will then join the network.
 -   Using a serial emulator reading from the CY8CKIT-062S2-43012, you should
     observe the updated application being transferred to the board, written to
     flash, and, when completed, booted into.
-
-<a name="notes"></a>
 
 #### Notes
 

@@ -16,14 +16,14 @@ network.
 
 <hr>
 
--   [CHIP K32W0 Lock Example Application](#chip-k32w-lock-example-application) -
+-   [CHIP K32W0 Lock Example Application](#chip-k32w061-lock-example-application) -
 -   [Introduction](#introduction)
     -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
--   [Flashing and debugging](#flashdebug)
--   [Known Issues](#knownissues)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Known Issues](#known-issues)
 -   [Testing the example](#testing-the-example)
 -   [Pigweed Tokenizer](#tokenizer)
     -   [Detokenizer script](#detokenizer)
@@ -34,8 +34,6 @@ network.
     -   [Building steps](#tinycrypt-building-steps)
 
     </hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -165,8 +163,6 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-<a name="building"></a>
-
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
@@ -218,8 +214,6 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
-<a name="flashdebug"></a>
-
 ## Flashing and debugging
 
 Program the firmware using the official
@@ -228,8 +222,6 @@ Program the firmware using the official
 All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w0x-lock-example.bin_ if DK6Programmer is
 used or with _out/debug/chip-k32w0x-lock-example_ if MCUXpresso is used.
-
-<a name="knownissues"></a>
 
 ## Low power
 
@@ -272,7 +264,7 @@ professional tools must be used if exact power consumption needs to be known.
 
 The app can be deployed against any generic OpenThread Border Router. See the
 guide
-[Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
+[Commissioning NXP K32W using Android CHIPTool](../../../../../docs/guides/nxp_k32w_android_commissioning.md)
 for step-by-step instructions.
 
 ## Video demo

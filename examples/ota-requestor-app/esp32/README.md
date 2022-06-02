@@ -38,7 +38,7 @@ application of OTA image.
 
 ### ESP32 OTA Requestor with Linux OTA Provider
 
--   Build the [Linux OTA Provider](../../ota-provider-app/linux)
+-   Build the [Linux OTA Provider](../../ota-provider-app/linux/README.md)
 -   Run the Linux OTA Provider with OTA image.
 
 ```

@@ -102,7 +102,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=shell -b=<board name
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
-[Supported devices](#supported_devices) paragraph.
+[Supported devices](#supported-devices) paragraph.
 
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit

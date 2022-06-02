@@ -12,8 +12,6 @@ An example testing and demonstrating the key value storage API.
 
 <hr>
 
-<a name="intro"></a>
-
 ## Introduction
 
 This example serves to both test the key value storage implementation and API as
@@ -30,8 +28,6 @@ platforms.
 The Infineon PSoC6 platform KVS is fully implemented, the KVS is enabled and
 configured by providing a file during the init call.
 
-<a name="building"></a>
-
 ### Building
 
 -   Build the example application:
@@ -39,8 +35,6 @@ configured by providing a file during the init call.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ ./scripts/examples/gn_psoc6_example.sh examples/persistent-storage/infineon/psoc6 out/persistent_storage_app_psoc6
-
-<a name="flashing"></a>
 
 ### Flashing the Application
 

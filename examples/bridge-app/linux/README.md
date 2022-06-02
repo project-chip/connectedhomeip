@@ -9,13 +9,11 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 <hr>
 
 -   [CHIP Linux Bridge Example](#chip-linux-bridge-example)
-    -   [Theory of Operation](#operation)
+    -   [Theory of Operation](#theory-of-operation)
     -   [Building](#building)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
-
-<a name="operation"></a>
 
 ## Theory of Operation
 
@@ -106,8 +104,6 @@ the `Bridged Device Basic` cluster, the `reachable` attribute is simulated. In
 the `Fixed Label` cluster, the `LabelList` attribute is simulated with the
 value/label pair `"room"`/`[light name]`.
 
-<a name="building"></a>
-
 ## Building
 
 -   Install tool chain
@@ -132,8 +128,6 @@ value/label pair `"room"`/`[light name]`.
           $ cd ~/connectedhomeip/examples/bridge-app/linux
           $ rm -rf out/
           ```
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 

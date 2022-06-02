@@ -5,7 +5,7 @@ An example application that uses Matter to send messages to a Matter server.
 ---
 
 -   [Building the Example Application](#building-the-example-application)
--   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
+-   [Using the Client to Commission a Device](#using-the-client-to-commission-a-device)
 
 ---
 

@@ -20,7 +20,13 @@ version = "1.0.0"
 # -- General configuration ---------------------------------------------------
 
 extensions = ["myst_parser", "external_content", "doxyrunner", "breathe"]
-exclude_patterns = ["_build"]
+exclude_patterns = [
+    "_build",
+    "**/nxp/linux-imx/imx8m/README.md",
+    "examples/ota-requestor-app/efr32/README.md",
+    "**/android/App/app/libs*",
+    "examples/providers/README.md",
+]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -38,12 +44,24 @@ html_theme_options = {
     "path_to_docs": "docs",
 }
 
+# -- Options for MyST --------------------------------------------------------
+
+myst_heading_anchors = 6
+suppress_warnings = ["myst.header"]
+myst_enable_extensions = ["html_image"]
+
+
 # -- Options for external_content --------------------------------------------
 
 external_content_contents = [
     (MATTER_BASE / "docs", "[!_]*"),
     (MATTER_BASE, "examples/**/*.md"),
+    (MATTER_BASE, "examples/**/*.png"),
+    (MATTER_BASE, "examples/**/*.jpg"),
+    (MATTER_BASE, "examples/**/*.JPG"),
 ]
+external_content_link_repositories = ["src", r"\.vscode"]
+external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
 
 # -- Options for zephyr.doxyrunner plugin ------------------------------------
 
@@ -51,10 +69,7 @@ doxyrunner_doxygen = os.environ.get("DOXYGEN_EXECUTABLE", "doxygen")
 doxyrunner_doxyfile = MATTER_BASE / "docs" / "matter.doxyfile.in"
 doxyrunner_outdir = MATTER_BASE / "docs" / "_build" / "doxygen"
 doxyrunner_fmt = True
-doxyrunner_fmt_vars = {
-    "MATTER_BASE": str(MATTER_BASE),
-    "MATTER_VERSION": version
-}
+doxyrunner_fmt_vars = {"MATTER_BASE": str(MATTER_BASE), "MATTER_VERSION": version}
 
 # -- Options for Breathe plugin -------------------------------------------
 

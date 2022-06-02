@@ -21,9 +21,9 @@ following features are available:
 
 ---
 
--   [CHIP EFR32 Pigweed Example Application](#chip-EFR32-pigweed-example-application)
+-   [CHIP EFR32 Pigweed Example Application](#chip-efr32-pigweed-example-application)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
+        -   [Flashing the Application](#flashing-the-application)
     -   [Testing the Example Application](#testing-the-example-application)
 
 ---

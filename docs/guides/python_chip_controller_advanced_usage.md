@@ -7,12 +7,10 @@ tool or Matter accessories on Linux.
 
 <hr>
 
--   [Bluetooth LE virtualization on Linux](#virtualization)
--   [Debugging with gdb](#gdb)
+-   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+-   [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
-
-<a name="virtualization"></a>
 
 ## Bluetooth LE virtualization on Linux
 
@@ -75,8 +73,6 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     ```
 
 <hr>
-
-<a name="gdb"></a>
 
 ## Debugging with gdb
 
