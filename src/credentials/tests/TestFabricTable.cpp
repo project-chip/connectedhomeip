@@ -77,45 +77,6 @@ void TestGetCompressedFabricID(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, compressedId.GetNodeId() == 0xdeed);
 }
 
-void TestGetNotBeforeTime(nlTestSuite * inSuite, void * inContext)
-{
-    // Test certs all have this NotBefore: Oct 15 14:23:43 2020 GMT
-    const ASN1::ASN1UniversalTime asn1Expected = { 2020, 10, 15, 14, 23, 43 };
-    uint32_t expectedChipEpochSeconds;
-    NL_TEST_ASSERT(inSuite, Credentials::ASN1ToChipEpochTime(asn1Expected, expectedChipEpochSeconds) == CHIP_NO_ERROR);
-    System::Clock::Seconds32 expectedChipEpochTime(expectedChipEpochSeconds);
-
-    // Test without an intermediate.
-    {
-        FabricInfo fabricInfo;
-        NL_TEST_ASSERT(inSuite,
-                       fabricInfo.SetRootCert(ByteSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len)) ==
-                           CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite,
-                       fabricInfo.SetNOCCert(ByteSpan(TestCerts::sTestCert_Node01_01_Chip,
-                                                      TestCerts::sTestCert_Node01_01_Chip_Len)) == CHIP_NO_ERROR);
-        System::Clock::Seconds32 notBeforeTime;
-        NL_TEST_ASSERT(inSuite, fabricInfo.GetNotBeforeChipEpochTime(notBeforeTime) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, notBeforeTime == expectedChipEpochTime);
-    }
-    // Test with an intermediate.
-    {
-        FabricInfo fabricInfo;
-        NL_TEST_ASSERT(inSuite,
-                       fabricInfo.SetRootCert(ByteSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len)) ==
-                           CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite,
-                       fabricInfo.SetICACert(ByteSpan(TestCerts::sTestCert_ICA01_Chip, TestCerts::sTestCert_ICA01_Chip_Len)) ==
-                           CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite,
-                       fabricInfo.SetNOCCert(ByteSpan(TestCerts::sTestCert_Node01_01_Chip,
-                                                      TestCerts::sTestCert_Node01_01_Chip_Len)) == CHIP_NO_ERROR);
-        System::Clock::Seconds32 notBeforeTime;
-        NL_TEST_ASSERT(inSuite, fabricInfo.GetNotBeforeChipEpochTime(notBeforeTime) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, notBeforeTime == expectedChipEpochTime);
-    }
-}
-
 void TestLastKnownGoodTimeInit(nlTestSuite * inSuite, void * inContext)
 {
     // Fabric table init should init Last Known Good Time to the firmware build time.
@@ -411,7 +372,6 @@ void TestSetLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("Get Compressed Fabric ID",    TestGetCompressedFabricID),
-    NL_TEST_DEF("Get NotBefore Time",    TestGetNotBeforeTime),
     NL_TEST_DEF("Last Known Good Time Init",    TestLastKnownGoodTimeInit),
     NL_TEST_DEF("Update Last Known Good Time",    TestUpdateLastKnownGoodTime),
     NL_TEST_DEF("Set Last Known Good Time",    TestSetLastKnownGoodTime),

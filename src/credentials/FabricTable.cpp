@@ -298,28 +298,6 @@ CHIP_ERROR FabricInfo::GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::GetNotBeforeChipEpochTime(chip::System::Clock::Seconds32 & certChainNotBefore) const
-{
-    certChainNotBefore = chip::System::Clock::Seconds32(0);
-    {
-        chip::System::Clock::Seconds32 rcacNotBefore;
-        ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(mRootCert, rcacNotBefore));
-        certChainNotBefore = rcacNotBefore > certChainNotBefore ? rcacNotBefore : certChainNotBefore;
-    }
-    if (!mICACert.empty())
-    {
-        chip::System::Clock::Seconds32 icacNotBefore;
-        ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(mICACert, icacNotBefore));
-        certChainNotBefore = icacNotBefore > certChainNotBefore ? icacNotBefore : certChainNotBefore;
-    }
-    {
-        chip::System::Clock::Seconds32 nocNotBefore;
-        ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(mNOCCert, nocNotBefore));
-        certChainNotBefore = nocNotBefore > certChainNotBefore ? nocNotBefore : certChainNotBefore;
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex)
 {
     DefaultStorageKeyAllocator keyAlloc;
@@ -604,13 +582,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
+CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric, Credentials::CertificateValidityPolicy * policy)
 {
     P256PublicKey pubkey;
     ValidationContext validContext;
     validContext.Reset();
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    validContext.mValidityPolicy = policy;
 
     // Make sure to not modify any of our state until VerifyCredentials passes.
     PeerId operationalId;
@@ -696,7 +675,33 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return AddNewFabricInner(newFabric, outputIndex);
 }
 
-CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
+/**
+ * A dummy validation policy we can pass into VerifyCredentials to extract the
+ * latest NotBefore time in the certificate chain without having to load the
+ * certificates into memory twice.
+ *
+ * Note that we don't inject current time into this validation path anyway
+ * because certificates themselves can change our notion of time AND our test
+ * for working certificates is that subsequent CASE rendezvous succeeds.
+ */
+class NotBeforeCollector : public Credentials::CertificateValidityPolicy
+{
+public:
+    NotBeforeCollector() : mLatestNotBefore(0) {}
+    CHIP_ERROR ApplyCertificateValidityPolicy(const ChipCertificateData * cert, uint8_t depth,
+                                              CertificateValidityResult result) override
+    {
+        if (cert->mNotBeforeTime > mLatestNotBefore.count())
+        {
+            mLatestNotBefore = System::Clock::Seconds32(cert->mNotBeforeTime);
+        }
+        return CHIP_NO_ERROR;
+    }
+    System::Clock::Seconds32 mLatestNotBefore;
+};
+
+CHIP_ERROR
+FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
 {
     if (!mNextAvailableFabricIndex.HasValue())
     {
@@ -709,12 +714,11 @@ CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * 
     {
         if (!fabric.IsInitialized())
         {
-            System::Clock::Seconds32 notBefore;
+            NotBeforeCollector notBeforeCollector;
             FabricIndex newFabricIndex = mNextAvailableFabricIndex.Value();
             fabric.mFabricIndex        = newFabricIndex;
             CHIP_ERROR err;
-            if ((err = fabric.SetFabricInfo(newFabric)) != CHIP_NO_ERROR ||
-                (err = fabric.GetNotBeforeChipEpochTime(notBefore)) != CHIP_NO_ERROR)
+            if ((err = fabric.SetFabricInfo(newFabric, &notBeforeCollector)) != CHIP_NO_ERROR)
             {
                 fabric.Reset();
                 return err;
@@ -730,7 +734,7 @@ CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * 
 
             UpdateNextAvailableFabricIndex();
             if ((err = StoreFabricIndexInfo()) != CHIP_NO_ERROR ||
-                (err = mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBefore)) != CHIP_NO_ERROR)
+                (err = mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore)) != CHIP_NO_ERROR)
             {
                 // Roll everything back.
                 mNextAvailableFabricIndex.SetValue(newFabricIndex);

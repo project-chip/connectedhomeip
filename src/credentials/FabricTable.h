@@ -26,6 +26,7 @@
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/LastKnownGoodTime.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -176,19 +177,6 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
-    /**
-     * Get the effective NotBefore time for a certificate chain, which is
-     * the latest NotBefore time in the chain.  Note that chip TLV certificate
-     * format stores the  X.509/RFC5280 special time 99991231235959Z 'no
-     * well-defined expiration date' as 0.  In this context, we can interpret
-     * that as either NotBefore == CHIP epoch or NotBefore == Don't care, and
-     * this will evaluate the same in both cases.
-     *
-     * @param certChainNotBefore (out) effective NotBefore time for the certiticate chain in seconds from CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR GetNotBeforeChipEpochTime(chip::System::Clock::Seconds32 & certChainNotBefore) const;
-
     // Verifies credentials, using this fabric info's root certificate.
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
                                  PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
@@ -217,7 +205,24 @@ public:
         mFabricIndex = kUndefinedFabricIndex;
     }
 
-    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
+    /**
+     * Verify the validity of the passed fabric info, and then emplace into
+     * this.  If a policy is passed, enact this for the fabric info validation.
+     *
+     * @param fabric fabric to emplace into this
+     * @param policy validation policy to apply, or nulllptr for none
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric, Credentials::CertificateValidityPolicy * policy);
+
+    /**
+     * Verify the validity of the passed fabric info, and then emplace into
+     * this.
+     *
+     * @param fabric fabric to emplace into this
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric) { return SetFabricInfo(fabric, nullptr); }
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
