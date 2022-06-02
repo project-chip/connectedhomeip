@@ -152,7 +152,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    ChipLogProgress(Inet, "Loading from storage for fabric index 0x%x", static_cast<unsigned>(mFabricIndex));
+    ChipLogProgress(FabricProvisioning, "Loading from storage for fabric index 0x%x", static_cast<unsigned>(mFabricIndex));
 
     // Scopes for "size" so we don't forget to re-initialize it between gets,
     // since each get modifies it.
@@ -343,7 +343,8 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     }
     if (prevDeleteErr != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex, prevDeleteErr.Format());
+        ChipLogDetail(FabricProvisioning, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex,
+                      prevDeleteErr.Format());
     }
     return prevDeleteErr;
 }
@@ -571,7 +572,7 @@ CHIP_ERROR FabricTable::Store(FabricIndex fabricIndex)
 exit:
     if (err == CHIP_NO_ERROR && mDelegateListRoot != nullptr)
     {
-        ChipLogProgress(Discovery, "Fabric (0x%x) persisted to storage. Calling OnFabricPersistedToStorage",
+        ChipLogProgress(FabricProvisioning, "Fabric (0x%x) persisted to storage. Calling OnFabricPersistedToStorage",
                         static_cast<unsigned>(fabricIndex));
         FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
@@ -594,7 +595,8 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
         FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
-            ChipLogProgress(Discovery, "Fabric (0x%x) loaded from storage", static_cast<unsigned>(fabric->GetFabricIndex()));
+            ChipLogProgress(FabricProvisioning, "Fabric (0x%x) loaded from storage",
+                            static_cast<unsigned>(fabric->GetFabricIndex()));
             delegate->OnFabricRetrievedFromStorage(*this, fabric->GetFabricIndex());
             delegate = delegate->next;
         }
@@ -613,7 +615,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     // Make sure to not modify any of our state until VerifyCredentials passes.
     PeerId operationalId;
     FabricId fabricId;
-    ChipLogProgress(Discovery, "Verifying the received credentials");
+    ChipLogProgress(FabricProvisioning, "Verifying the received credentials");
     CHIP_ERROR err = VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
                                        fabricId, pubkey);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WRONG_NODE_ID)
@@ -649,9 +651,9 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     SetNOCCert(newFabric.mNOCCert);
     SetVendorId(newFabric.GetVendorId());
     SetFabricLabel(newFabric.GetFabricLabel());
-    ChipLogProgress(Discovery, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()),
+    ChipLogProgress(FabricProvisioning, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()),
                     IsInitialized());
-    ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
+    ChipLogProgress(FabricProvisioning, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
 }
@@ -785,12 +787,12 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     {
         if (mFabricCount == 0)
         {
-            ChipLogError(Discovery, "Trying to delete a fabric, but the current fabric count is already 0");
+            ChipLogError(FabricProvisioning, "Trying to delete a fabric, but the current fabric count is already 0");
         }
         else
         {
             mFabricCount--;
-            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
+            ChipLogProgress(FabricProvisioning, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
                             static_cast<unsigned>(fabricIndex));
         }
 
@@ -819,7 +821,7 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorage = storage;
-    ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
+    ChipLogDetail(FabricProvisioning, "Init fabric pairing table with server storage");
 
     // Load the current fabrics from the storage. This is done here, since ConstFabricIterator
     // iterator doesn't have mechanism to load fabric info from storage on demand.
@@ -922,7 +924,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(TimeService, "Failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(FabricProvisioning, "Failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }
