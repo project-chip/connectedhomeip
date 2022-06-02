@@ -69,9 +69,17 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
                 continue
 
+            # when introducing access controls, the content of attributes may either be:
+            # <attribute ...>myName</attribute>
+            # or
+            # <attribute ...><description>myName</description><access .../>...</attribute>
+            attr_name = attr.text
+            if attr.find('description') is not None:
+                attr_name=attr.find('description').text
+
             required_attributes.append(
                 RequiredAttribute(
-                    name=attr.text,
+                    name=attr_name,
                     code=parseNumberString(attr.attrib['code'])
                 ))
 
