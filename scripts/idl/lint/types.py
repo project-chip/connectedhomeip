@@ -71,16 +71,45 @@ class AttributeRequirement:
 @dataclass
 class ClusterRequirement:
     endpoint_id: int
-    cluster_id: int
+    cluster_code: int
     cluster_name: str
 
 
-class RequiredAttributesRule(LintRule):
+class ErrorAccumulatingRule(LintRule):
+    """Contains a lint error list and helps helpers to add to such a list of rules."""
+
     def __init__(self, name):
-        super(RequiredAttributesRule, self).__init__(name)
+        super(ErrorAccumulatingRule, self).__init__(name)
         self._lint_errors = []
         self._idl = None
 
+    def _AddLintError(self, text, location):
+        self._lint_errors.append(LintError("%s: %s" % (self.name, text), location))
+
+    def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
+        """Create a location in the current file that is being parsed. """
+        if not meta or not self._idl.parse_file_name:
+            return None
+        return LocationInFile(self._idl.parse_file_name, meta)
+
+    def LintIdl(self, idl: Idl) -> List[LintError]:
+        self._idl = idl
+        self._lint_errors = []
+        self._LintImpl()
+        return self._lint_errors
+
+    @abstractmethod
+    def _LintImpl(self):
+        """Implements actual linting of the IDL.
+
+        Uses the underlying _idl for validation.
+        """
+        pass
+
+
+class RequiredAttributesRule(ErrorAccumulatingRule):
+    def __init__(self, name):
+        super(RequiredAttributesRule, self).__init__(name)
         # Map attribute code to name
         self._mandatory_attributes: List[AttributeRequirement] = []
         self._mandatory_clusters: List[ClusterRequirement] = []
@@ -93,6 +122,11 @@ class RequiredAttributesRule(LintRule):
             for attr in self._mandatory_attributes:
                 result += "    - %r\n" % attr
 
+        if self._mandatory_clusters:
+            result += "  mandatory_clusters:\n"
+            for cluster in self._mandatory_clusters:
+                result += "    - %r\n" % cluster
+
         result += "}"
         return result
 
@@ -102,15 +136,6 @@ class RequiredAttributesRule(LintRule):
 
     def RequireClusterInEndpoint(self, requirement: ClusterRequirement):
         self._mandatory_clusters.append(requirement)
-
-    def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
-        """Create a location in the current file that is being parsed. """
-        if not meta or not self._idl.parse_file_name:
-            return None
-        return LocationInFile(self._idl.parse_file_name, meta)
-
-    def _AddLintError(self, text, location):
-        self._lint_errors.append(LintError("%s: %s" % (self.name, text), location))
 
     def _ServerClusterDefinition(self, name: str, location: Optional[LocationInFile]):
         """Finds the server cluster definition with the given name.
@@ -173,12 +198,62 @@ class RequiredAttributesRule(LintRule):
                 if requirement.endpoint_id != endpoint.number:
                     continue
 
-                if requirement.cluster_id not in cluster_codes:
+                if requirement.cluster_code not in cluster_codes:
                     self._AddLintError("Endpoint %d does not expose cluster %s (%d)" %
-                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_id), location=None)
+                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
 
-    def LintIdl(self, idl: Idl) -> List[LintError]:
-        self._idl = idl
-        self._lint_errors = []
-        self._LintImpl()
-        return self._lint_errors
+
+@dataclass
+class ClusterCommandRequirement:
+    cluster_code: int
+    command_code: int
+    command_name: str
+
+
+class RequiredCommandsRule(ErrorAccumulatingRule):
+    def __init__(self, name):
+        super(RequiredCommandsRule, self).__init__(name)
+
+        # Maps cluster id to mandatory cluster requirement
+        self._mandatory_commands: Maping[int, List[ClusterCommandRequirement]] = {}
+
+    def __repr__(self):
+        result = "RequiredCommandsRule{\n"
+
+        if self._mandatory_commands:
+            result += "  mandatory_commands:\n"
+            for key, value in self._mandatory_commands.items():
+                result += "    - cluster %d:\n" % key
+                for requirement in value:
+                    result += "        - %r\n" % requirement
+
+        result += "}"
+        return result
+
+    def RequireCommand(self, cmd: ClusterCommandRequirement):
+        """Mark a command required"""
+
+        if cmd.cluster_code in self._mandatory_commands:
+            self._mandatory_commands[cmd.cluster_code].append(cmd)
+        else:
+            self._mandatory_commands[cmd.cluster_code] = [cmd]
+
+    def _LintImpl(self):
+        for cluster in self._idl.clusters:
+            if cluster.side != ClusterSide.SERVER:
+                continue  # only validate server-side:
+
+            if cluster.code not in self._mandatory_commands:
+                continue  # no known mandatory commands
+
+            defined_commands = set([c.code for c in cluster.commands])
+
+            for requirement in self._mandatory_commands[cluster.code]:
+                if requirement.command_code in defined_commands:
+                    continue  # command exists
+
+                self._AddLintError(
+                    "Cluster %s does not define mandatory command %s(%d)" % (
+                        cluster.name, requirement.command_name, requirement.command_code),
+                    self._ParseLocation(cluster.parse_meta)
+                )

@@ -12,12 +12,12 @@ import stringcase
 import traceback
 
 try:
-    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement
+    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
 except:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
-    from idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement
+    from idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
 
 
 def parseNumberString(n):
@@ -34,10 +34,17 @@ class RequiredAttribute:
 
 
 @dataclass
+class RequiredCommand:
+    name: str
+    code: int
+
+
+@dataclass
 class DecodedCluster:
     name: str
     code: int
     required_attributes: List[RequiredAttribute]
+    required_commands: List[RequiredCommand]
 
 
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
@@ -53,6 +60,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     try:
         name = element.find('name').text.replace(' ', '')
         required_attributes = []
+        required_commands = []
 
         for attr in element.findall('attribute'):
             if attr.attrib['side'] != 'server':
@@ -61,16 +69,34 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             if 'optional' in attr.attrib and attr.attrib['optional'] == 'true':
                 continue
 
+            # when introducing access controls, the content of attributes may either be:
+            # <attribute ...>myName</attribute>
+            # or
+            # <attribute ...><description>myName</description><access .../>...</attribute>
+            attr_name = attr.text
+            if attr.find('description') is not None:
+                attr_name = attr.find('description').text
+
             required_attributes.append(
                 RequiredAttribute(
-                    name=attr.text,
+                    name=attr_name,
                     code=parseNumberString(attr.attrib['code'])
                 ))
+
+        for cmd in element.findall('command'):
+            if cmd.attrib['source'] != 'client':
+                continue
+
+            if 'optional' in cmd.attrib and cmd.attrib['optional'] == 'true':
+                continue
+
+            required_commands.append(RequiredCommand(name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
 
         return DecodedCluster(
             name=name,
             code=parseNumberString(element.find('code').text),
             required_attributes=required_attributes,
+            required_commands=required_commands
         )
     except Exception as e:
         logging.exception("Failed to decode cluster %r" % element)
@@ -98,16 +124,17 @@ class LintRulesContext:
     """
 
     def __init__(self):
-        self._linter_rule = RequiredAttributesRule("Rules file")
+        self._required_attributes_rule = RequiredAttributesRule("Required attributes")
+        self._required_commands_rule = RequiredCommandsRule("Required commands")
 
         # Map cluster names to the underlying code
         self._cluster_codes: Mapping[str, int] = {}
 
     def GetLinterRules(self):
-        return [self._linter_rule]
+        return [self._required_attributes_rule, self._required_commands_rule]
 
     def RequireAttribute(self, r: AttributeRequirement):
-        self._linter_rule.RequireAttribute(r)
+        self._required_attributes_rule.RequireAttribute(r)
 
     def RequireClusterInEndpoint(self, name: str, code: int):
         """Mark that a specific cluster is always required in the given endpoint
@@ -117,14 +144,14 @@ class LintRulesContext:
             logging.error("Known names: %s" % (",".join(self._cluster_codes.keys()), ))
             return
 
-        self._linter_rule.RequireClusterInEndpoint(ClusterRequirement(
+        self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
-            cluster_id=self._cluster_codes[name],
+            cluster_code=self._cluster_codes[name],
             cluster_name=name,
         ))
 
     def LoadXml(self, path: str):
-        """Load XML data from the given path and add it to 
+        """Load XML data from the given path and add it to
            internal processing. Adds attribute requirement rules
            as needed.
         """
@@ -137,15 +164,21 @@ class LintRulesContext:
             self._cluster_codes[decoded.name] = decoded.code
 
             for attr in decoded.required_attributes:
-                self._linter_rule.RequireAttribute(AttributeRequirement(
+                self._required_attributes_rule.RequireAttribute(AttributeRequirement(
                     code=attr.code, name=attr.name, filter_cluster=decoded.code))
 
-            # TODO: add cluster ID to internal registry
+            for cmd in decoded.required_commands:
+                self._required_commands_rule.RequireCommand(
+                    ClusterCommandRequirement(
+                        cluster_code=decoded.code,
+                        command_code=cmd.code,
+                        command_name=cmd.name
+                    ))
 
 
 class LintRulesTransformer(Transformer):
     """
-    A transformer capable to transform data parsed by Lark according to 
+    A transformer capable to transform data parsed by Lark according to
     lint_rules_grammar.lark.
     """
 
