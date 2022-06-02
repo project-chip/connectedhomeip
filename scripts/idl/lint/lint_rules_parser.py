@@ -47,7 +47,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
 
     # cluster elements contain among other children
     #  - name (general name for this cluster)
-    #  - copde (unique identifier, may be hex or numeric)
+    #  - code (unique identifier, may be hex or numeric)
     #  - attribute with side, code and optional attributes
 
     try:
