@@ -914,9 +914,30 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
         {
             continue;
         }
-        System::Clock::Seconds32 notBefore;
-        SuccessOrExit(err = fabric.GetNotBeforeChipEpochTime(notBefore));
-        latestNotBefore = notBefore > latestNotBefore ? notBefore : latestNotBefore;
+        {
+            ByteSpan rcac;
+            SuccessOrExit(err = fabric.GetRootCert(rcac));
+            chip::System::Clock::Seconds32 rcacNotBefore;
+            SuccessOrExit(err = Credentials::ExtractNotBeforeFromChipCert(rcac, rcacNotBefore));
+            latestNotBefore = rcacNotBefore > latestNotBefore ? rcacNotBefore : latestNotBefore;
+        }
+        {
+            ByteSpan icac;
+            SuccessOrExit(err = fabric.GetICACert(icac));
+            if (!icac.empty())
+            {
+                chip::System::Clock::Seconds32 icacNotBefore;
+                ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(icac, icacNotBefore));
+                latestNotBefore = icacNotBefore > latestNotBefore ? icacNotBefore : latestNotBefore;
+            }
+        }
+        {
+            ByteSpan noc;
+            SuccessOrExit(err = fabric.GetNOCCert(noc));
+            chip::System::Clock::Seconds32 nocNotBefore;
+            ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(noc, nocNotBefore));
+            latestNotBefore = nocNotBefore > latestNotBefore ? nocNotBefore : latestNotBefore;
+        }
     }
     // Pass this to the LastKnownGoodTime object so it can make determination
     // of the legality of our new proposed time.
