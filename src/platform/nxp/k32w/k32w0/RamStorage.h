@@ -25,7 +25,6 @@ typedef enum
     RS_ERROR_NO_BUFS
 } rsError;
 
-
 /* the structure used for keeping the records has the same structure both in RAM and in NVM:
  * ramBufferLen | ramBufferMaxLen | settingsBlock | .... | settingsBlock
  *

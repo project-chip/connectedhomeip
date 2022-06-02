@@ -41,7 +41,7 @@ static ramBufferDescriptor * ramDescr;
 constexpr size_t kRamBufferInitialSize = 3072;
 constexpr size_t kRamBufferReallocSize = 512;
 constexpr size_t kNvmIdChipConfigData  = 0x5000;
-constexpr size_t kRamDescHeaderSize = sizeof(ramDescr->ramBufferLen) + sizeof(ramDescr->ramBufferMaxLen);
+constexpr size_t kRamDescHeaderSize    = sizeof(ramDescr->ramBufferLen) + sizeof(ramDescr->ramBufferMaxLen);
 
 static rsError AddToRamStorage(ramBufferDescriptor ** pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
@@ -256,8 +256,8 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
         status = AddToRamStorage(&ramDescr, key, (uint8_t *) str, strLen);
         SuccessOrExit(err = MapRamStorageStatus(status));
 
-        pdmStatus = PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr,
-                                                  ramDescr->ramBufferLen + kRamDescHeaderSize);
+        pdmStatus =
+            PDM_eSaveRecordDataInIdleTask((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
         SuccessOrExit(err = MapPdmStatus(pdmStatus));
     }
     else
