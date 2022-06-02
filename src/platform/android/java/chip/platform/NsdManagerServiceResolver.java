@@ -26,9 +26,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -60,7 +58,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
-    Log.d(TAG, "resolve: Starting service resolution for '" + instanceName + "' type '"+serviceType+"'");
+    Log.d(
+        TAG,
+        "resolve: Starting service resolution for '"
+            + instanceName
+            + "' type '"
+            + serviceType
+            + "'");
 
     Runnable timeoutRunnable =
         new Runnable() {
@@ -94,7 +98,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
 
           @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {        
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {
             Log.i(
                 TAG,
                 "Resolved service '"
