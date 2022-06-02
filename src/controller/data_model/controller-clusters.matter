@@ -1276,16 +1276,6 @@ client cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1622,11 +1612,6 @@ client cluster DoorLock = 257 {
     optional epoch_s localStartTime = 2;
     optional epoch_s localEndTime = 3;
     optional DlOperatingMode operatingMode = 4;
-  }
-
-  response struct GetUserTypeResponse = 21 {
-    INT16U userId = 0;
-    DlUserType userType = 1;
   }
 
   response struct GetUserResponse = 28 {

@@ -2804,10 +2804,6 @@ namespace OpenPeriod {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace OpenPeriod
 
-namespace NumberOfLogRecordsSupported {
-static constexpr AttributeId Id = 0x00000010;
-} // namespace NumberOfLogRecordsSupported
-
 namespace NumberOfTotalUsersSupported {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace NumberOfTotalUsersSupported
@@ -2855,10 +2851,6 @@ static constexpr AttributeId Id = 0x0000001B;
 namespace NumberOfCredentialsSupportedPerUser {
 static constexpr AttributeId Id = 0x0000001C;
 } // namespace NumberOfCredentialsSupportedPerUser
-
-namespace EnableLogging {
-static constexpr AttributeId Id = 0x00000020;
-} // namespace EnableLogging
 
 namespace Language {
 static constexpr AttributeId Id = 0x00000021;
@@ -2927,38 +2919,6 @@ static constexpr AttributeId Id = 0x00000033;
 namespace ExpiringUserTimeout {
 static constexpr AttributeId Id = 0x00000035;
 } // namespace ExpiringUserTimeout
-
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x00000040;
-} // namespace AlarmMask
-
-namespace KeypadOperationEventMask {
-static constexpr AttributeId Id = 0x00000041;
-} // namespace KeypadOperationEventMask
-
-namespace RemoteOperationEventMask {
-static constexpr AttributeId Id = 0x00000042;
-} // namespace RemoteOperationEventMask
-
-namespace ManualOperationEventMask {
-static constexpr AttributeId Id = 0x00000043;
-} // namespace ManualOperationEventMask
-
-namespace RFIDOperationEventMask {
-static constexpr AttributeId Id = 0x00000044;
-} // namespace RFIDOperationEventMask
-
-namespace KeypadProgrammingEventMask {
-static constexpr AttributeId Id = 0x00000045;
-} // namespace KeypadProgrammingEventMask
-
-namespace RemoteProgrammingEventMask {
-static constexpr AttributeId Id = 0x00000046;
-} // namespace RemoteProgrammingEventMask
-
-namespace RFIDProgrammingEventMask {
-static constexpr AttributeId Id = 0x00000047;
-} // namespace RFIDProgrammingEventMask
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
