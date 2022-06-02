@@ -234,26 +234,6 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
     }
 }
 
-/**
- * Returns a static `const char *` string that is equivalent to the passed in jstring key
- * so that the jstring can be released while the key value remains valid.
- *
- * Only supports known Matter DNSSD TXT key values, returns empty string otherwise.
- */
-const char * getTxtInfoKey(JNIEnv * env, jstring key)
-{
-    const char * keyList[] = { "D", "VP", "AP", "CM", "DT", "DN", "RI", "PI", "PH", "CRI", "CRA", "T" };
-    JniUtfString jniKey(env, key);
-    for (auto & info : keyList)
-    {
-        if (strcmp(info, jniKey.c_str()) == 0)
-        {
-            return info;
-        }
-    }
-    return "";
-}
-
 void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject textEntries, jlong callbackHandle,
                    jlong contextHandle)
 {
@@ -304,7 +284,8 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
         for (size_t i = 0; i < size; i++)
         {
             jstring jniKeyObject = (jstring) env->GetObjectArrayElement(keys, i);
-            entries[i].mKey      = getTxtInfoKey(env, jniKeyObject);
+            JniUtfString key(env, jniKeyObject);
+            entries[i].mKey = strdup(key.c_str());
 
             jbyteArray datas =
                 (jbyteArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryDataMethod, textEntries, jniKeyObject);
@@ -348,6 +329,7 @@ exit:
         size_t size = service.mTextEntrySize;
         for (size_t i = 0; i < size; i++)
         {
+            delete[] service.mTextEntries[i].mKey;
             if (service.mTextEntries[i].mData != nullptr)
             {
                 delete[] service.mTextEntries[i].mData;
