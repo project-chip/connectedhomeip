@@ -1223,8 +1223,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-endpoint 0 of type pump = 22 {
-
+endpoint 0 {
+  device type pump = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1391,8 +1391,8 @@ endpoint 0 of type pump = 22 {
     ram      attribute clusterRevision default = 1;
   }
 }
-endpoint 1 of type pump = 771 {
-
+endpoint 1 {
+  device type pump = 771;
   binding cluster OccupancySensing;
 
   server cluster Identify {

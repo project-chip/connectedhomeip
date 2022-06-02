@@ -399,8 +399,7 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
-endpoint 0 of type anonymousEndpointType =  {
-
+endpoint 0 {
   binding cluster DiagnosticLogs;
 
   server cluster AccessControl {
