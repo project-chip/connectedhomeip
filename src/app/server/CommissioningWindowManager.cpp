@@ -359,6 +359,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         // us from opening a commissioning window and advertising over IP.
         if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
+            ChipLogProgress(AppServer, "BLE networking available but BLE advertising is not supported");
             err = CHIP_NO_ERROR;
         }
         ReturnErrorOnFailure(err);
@@ -415,7 +416,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         // Ignore errors from SetBLEAdvertisingEnabled (which could be due to
         // BLE advertising not being supported at all).  Our commissioning
         // window is now closed and we need to notify our delegate of that.
-        chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        (void) chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
