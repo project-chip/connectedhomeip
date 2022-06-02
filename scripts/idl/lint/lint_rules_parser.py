@@ -99,7 +99,7 @@ def ClustersInXmlFile(path: str):
     logging.info("Loading XML from %s" % path)
 
     # root is expected to be just a "configurator" object
-    configurator=xml.etree.ElementTree.parse(path).getroot()
+    configurator = xml.etree.ElementTree.parse(path).getroot()
     for child in configurator:
         if child.tag != 'cluster':
             continue
@@ -116,11 +116,11 @@ class LintRulesContext:
     """
 
     def __init__(self):
-        self._required_attributes_rule=RequiredAttributesRule("Required attributes")
-        self._required_commands_rule=RequiredCommandsRule("Required commands")
+        self._required_attributes_rule = RequiredAttributesRule("Required attributes")
+        self._required_commands_rule = RequiredCommandsRule("Required commands")
 
         # Map cluster names to the underlying code
-        self._cluster_codes: Mapping[str, int]={}
+        self._cluster_codes: Mapping[str, int] = {}
 
     def GetLinterRules(self):
         return [self._required_attributes_rule, self._required_commands_rule]
@@ -148,12 +148,12 @@ class LintRulesContext:
            as needed.
         """
         for cluster in ClustersInXmlFile(path):
-            decoded=DecodeClusterFromXml(cluster)
+            decoded = DecodeClusterFromXml(cluster)
 
             if not decoded:
                 continue
 
-            self._cluster_codes[decoded.name]=decoded.code
+            self._cluster_codes[decoded.name] = decoded.code
 
             for attr in decoded.required_attributes:
                 self._required_attributes_rule.RequireAttribute(AttributeRequirement(
@@ -168,7 +168,6 @@ class LintRulesContext:
                     ))
 
 
-
 class LintRulesTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to
@@ -176,8 +175,8 @@ class LintRulesTransformer(Transformer):
     """
 
     def __init__(self, file_name: str):
-        self.context=LintRulesContext()
-        self.file_name=file_name
+        self.context = LintRulesContext()
+        self.file_name = file_name
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -223,7 +222,7 @@ class LintRulesTransformer(Transformer):
     @ v_args(inline=True)
     def load_xml(self, path):
         if not os.path.isabs(path):
-            path=os.path.abspath(os.path.join(os.path.dirname(self.file_name), path))
+            path = os.path.abspath(os.path.join(os.path.dirname(self.file_name), path))
 
         self.context.LoadXml(path)
 
@@ -244,11 +243,11 @@ class LintRulesTransformer(Transformer):
 
 class Parser:
     def __init__(self, parser, file_name: str):
-        self.parser=parser
-        self.file_name=file_name
+        self.parser = parser
+        self.file_name = file_name
 
     def parse(self):
-        data=LintRulesTransformer(self.file_name).transform(self.parser.parse(open(self.file_name, "rt").read()))
+        data = LintRulesTransformer(self.file_name).transform(self.parser.parse(open(self.file_name, "rt").read()))
         return data
 
 
@@ -267,7 +266,7 @@ if __name__ == '__main__':
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
-    __LOG_LEVELS__={
+    __LOG_LEVELS__ = {
         'debug': logging.DEBUG,
         'info': logging.INFO,
         'warn': logging.WARN,
@@ -286,7 +285,7 @@ if __name__ == '__main__':
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
         logging.info("Starting to parse ...")
-        data=CreateParser(filename).parse()
+        data = CreateParser(filename).parse()
         logging.info("Parse completed")
 
         logging.info("Data:")

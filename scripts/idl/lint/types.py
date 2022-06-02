@@ -222,7 +222,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
 
         if self._mandatory_commands:
             result += "  mandatory_commands:\n"
-            for key,value in self._mandatory_commands.items():
+            for key, value in self._mandatory_commands.items():
                 result += "    - cluster %d:\n" % key
                 for requirement in value:
                     result += "        - %r\n" % requirement
@@ -253,6 +253,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
                     continue  # command exists
 
                 self._AddLintError(
-                    "Cluster %s does not define mandatory command %s(%d)" % (cluster.name, requirement.command_name, requirement.command_code),
+                    "Cluster %s does not define mandatory command %s(%d)" % (
+                        cluster.name, requirement.command_name, requirement.command_code),
                     self._ParseLocation(cluster.parse_meta)
                 )
