@@ -31,8 +31,8 @@ config("openthread_k32w0_config") {
 
 source_set("openthread_core_config_k32w0") {
   sources = [
+    "${chip_root}/examples/platform/nxp/k32w/k32w0/app/project_include/OpenThreadConfig.h",
     "${openthread_nxp_root}/src/k32w0/k32w061/openthread-core-k32w061-config-check.h",
-    "${openthread_nxp_root}/src/k32w0/k32w061/openthread-core-k32w061-config.h",
   ]
 
   public_configs = [ ":openthread_k32w0_config" ]
