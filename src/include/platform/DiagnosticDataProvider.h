@@ -63,40 +63,6 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 };
 
 /**
- * Defines the General Diagnostics Delegate class to notify platform events.
- */
-class GeneralDiagnosticsDelegate
-{
-public:
-    virtual ~GeneralDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called after the current device is rebooted.
-     */
-    virtual void OnDeviceRebooted(BootReasonType bootReason) {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a hardware fault has been raised.
-     */
-    virtual void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
-    {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a radio fault has been raised.
-     */
-    virtual void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a network fault has been raised.
-     */
-    virtual void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) {}
-};
-
-/**
  * Defines the Software Diagnostics Delegate class to notify software events.
  */
 class SoftwareDiagnosticsDelegate
@@ -146,9 +112,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
-    GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
-
     void SetSoftwareDiagnosticsDelegate(SoftwareDiagnosticsDelegate * delegate) { mSoftwareDiagnosticsDelegate = delegate; }
     SoftwareDiagnosticsDelegate * GetSoftwareDiagnosticsDelegate() const { return mSoftwareDiagnosticsDelegate; }
 
@@ -228,7 +191,6 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    GeneralDiagnosticsDelegate * mGeneralDiagnosticsDelegate   = nullptr;
     SoftwareDiagnosticsDelegate * mSoftwareDiagnosticsDelegate = nullptr;
     WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate         = nullptr;
 
