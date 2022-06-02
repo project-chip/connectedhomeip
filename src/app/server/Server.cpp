@@ -345,9 +345,13 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
+
+    chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    mMessageCounterManager.Shutdown();
     CHIP_ERROR err = mExchangeMgr.Shutdown();
     if (err != CHIP_NO_ERROR)
     {
@@ -355,11 +359,10 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
-
+    mAccessControl.Finish();
+    Credentials::SetGroupDataProvider(nullptr);
     mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
-    mCASESessionManager.Shutdown();
-
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

@@ -146,7 +146,7 @@ chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext,
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
         reader.Next();
-        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), reader));
+        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), reader));
     }
 
     SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)

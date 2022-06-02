@@ -28,6 +28,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <inet/EndPointStateOpenThread.h>
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -69,6 +71,16 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -76,6 +88,11 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
@@ -434,3 +451,5 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         K32W_LOG("Event received with no handler. Dropping event.");
     }
 }
+
+extern "C" void OTAIdleActivities(void) {}

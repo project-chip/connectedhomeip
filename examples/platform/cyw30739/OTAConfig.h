@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Google LLC.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,24 +16,10 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the Chip
- *          Addressing and Routing Module (WARM) on K32W platforms
- *          using the NXP SDK.
- *
- */
-
 #pragma once
 
-// ==================== Platform Adaptations ====================
+namespace OTAConfig {
 
-#define WARM_CONFIG_SUPPORT_THREAD 1
-#define WARM_CONFIG_SUPPORT_THREAD_ROUTING 0
-#define WARM_CONFIG_SUPPORT_LEGACY6LOWPAN_NETWORK 0
-#define WARM_CONFIG_SUPPORT_WIFI 0
-#define WARM_CONFIG_SUPPORT_CELLULAR 0
+void Init();
 
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
+} // namespace OTAConfig

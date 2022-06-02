@@ -24,8 +24,7 @@ CHIP_ERROR ArrayParser::Init(const TLV::TLVReader & aReader)
 {
     mReader.Init(aReader);
     VerifyOrReturnError(TLV::kTLVType_Array == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return mReader.EnterContainer(mOuterContainerType);
 }
 } // namespace app
 } // namespace chip
