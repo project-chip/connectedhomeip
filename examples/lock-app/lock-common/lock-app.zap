@@ -2797,7 +2797,16 @@
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
+          "commands": [
+            {
+              "name": "TestEventTrigger",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "NetworkInterfaces",
@@ -2922,6 +2931,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "TestEventTriggersEnabled",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "false",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

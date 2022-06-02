@@ -126,11 +126,15 @@ void CustomOTARequestorDriver::UpdateDownloaded()
 {
     if (gAutoApplyImage)
     {
-        // Let the default driver take further action to apply the image
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
         DefaultOTARequestorDriver::UpdateDownloaded();
     }
     else
     {
+        // Download complete but we're not going to apply image, so reset provider retry counter.
+        mProviderRetryCount = 0;
+
         // Reset to put the state back to idle to allow the next OTA update to occur
         gRequestorCore.Reset();
     }

@@ -689,6 +689,17 @@
 #endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
 
 /**
+ *  @def CHIP_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

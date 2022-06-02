@@ -64,28 +64,27 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, mask, type,
-                                        size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
+                                        value);
     }
 }
 
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           uint8_t mask, uint8_t type, uint16_t size,
-                                                                           uint8_t * value)
+                                                                           uint8_t type, uint16_t size, uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        return cb->PreAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, mask,
-                                              type, size, value);
+        return cb->PreAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type,
+                                              size, value);
     }
 
     return chip::Protocols::InteractionModel::Status::Success;

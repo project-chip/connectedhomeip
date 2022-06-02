@@ -67,16 +67,7 @@ public:
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
      */
-    virtual CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge)
-    {
-        Optional<SessionHandle> secureSessionHandle;
-
-        secureSessionHandle = GetSecureSession();
-        VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
-        attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-        return CHIP_NO_ERROR;
-    }
+    virtual CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
 
 protected:
     virtual bool IsSecureConnected() const = 0;

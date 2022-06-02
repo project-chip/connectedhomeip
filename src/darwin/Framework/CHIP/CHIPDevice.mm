@@ -1423,7 +1423,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     } else {
         CHIP_ERROR err;
         value = CHIPDecodeEventPayload(aEventHeader.mPath, *apData, &err);
-        if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH) {
+        if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB) {
             // We don't know this event; just skip it.
             return;
         }
@@ -1465,7 +1465,7 @@ void SubscriptionCallback::OnAttributeData(
     } else {
         CHIP_ERROR err;
         value = CHIPDecodeAttributeValue(aPath, *apData, &err);
-        if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
+        if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
             // We don't know this attribute; just skip it.
             return;
         }
