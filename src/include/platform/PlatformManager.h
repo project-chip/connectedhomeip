@@ -127,16 +127,6 @@ public:
     void HandleServerShuttingDown();
 
     /**
-     * Should be called when a software fault takes place on the Node.
-     */
-    void HandleSoftwareFault(uint32_t eventId);
-
-    /**
-     * Should be called when a general fault takes place on the Node.
-     */
-    void HandleGeneralFault(uint32_t eventId);
-
-    /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
@@ -360,16 +350,6 @@ inline void PlatformManager::HandleServerStarted()
 inline void PlatformManager::HandleServerShuttingDown()
 {
     static_cast<ImplClass *>(this)->_HandleServerShuttingDown();
-}
-
-inline void PlatformManager::HandleSoftwareFault(uint32_t eventId)
-{
-    static_cast<ImplClass *>(this)->_HandleSoftwareFault(eventId);
-}
-
-inline void PlatformManager::HandleGeneralFault(uint32_t eventId)
-{
-    static_cast<ImplClass *>(this)->_HandleGeneralFault(eventId);
 }
 
 inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)

@@ -333,26 +333,6 @@ void Server::DispatchShutDownAndStopEventLoop()
     PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
-void Server::DispatchSoftwareFaultEvent(uint32_t eventId)
-{
-    PlatformMgr().ScheduleWork(
-        [](intptr_t context) {
-            uint32_t event = static_cast<uint32_t>(context);
-            PlatformMgr().HandleSoftwareFault(event);
-        },
-        static_cast<intptr_t>(eventId));
-}
-
-void Server::DispatchGeneralFaultEvent(uint32_t eventId)
-{
-    PlatformMgr().ScheduleWork(
-        [](intptr_t context) {
-            uint32_t event = static_cast<uint32_t>(context);
-            PlatformMgr().HandleGeneralFault(event);
-        },
-        static_cast<intptr_t>(eventId));
-}
-
 void Server::ScheduleFactoryReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {

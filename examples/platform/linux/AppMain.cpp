@@ -113,10 +113,28 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+/**
+ * Should be called when a software fault takes place on the Node.
+ */
+void HandleSoftwareFault(intptr_t arg)
+{
+
+}
+
+/**
+ * Should be called when a general fault takes place on the Node.
+ */
+void HandleGeneralFault(intptr_t arg)
+{
+    uint32_t eventId = static_cast<uint32_t>(arg);
+}
+
 // when the shell is enabled, don't intercept signals since it prevents the user from
 // using expected commands like CTRL-C to quit the application. (see issue #17845)
+// We should stop using signals for those faults, and move to a different notification
+// means, like a pipe. (see issue #19114)
 #if !defined(ENABLE_CHIP_SHELL)
-void OnSignalHandler(int signum)
+void OnRebootSignalHandler(int signum)
 {
     ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
 
@@ -128,39 +146,21 @@ void OnSignalHandler(int signum)
     {
     case SIGVTALRM:
         bootReason = BootReasonType::kPowerOnReboot;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGALRM:
         bootReason = BootReasonType::kBrownOutReset;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGILL:
         bootReason = BootReasonType::kSoftwareWatchdogReset;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGTRAP:
         bootReason = BootReasonType::kHardwareWatchdogReset;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGIO:
         bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
         break;
     case SIGINT:
         bootReason = BootReasonType::kSoftwareReset;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
-        break;
-    case SIGUSR1:
-        Server::GetInstance().DispatchSoftwareFaultEvent(SoftwareDiagnostics::Events::SoftwareFault::Id);
-        break;
-    case SIGUSR2:
-        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::HardwareFaultChange::Id);
-        break;
-    case SIGHUP:
-        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::RadioFaultChange::Id);
-        break;
-    case SIGTTIN:
-        Server::GetInstance().DispatchGeneralFaultEvent(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -168,24 +168,58 @@ void OnSignalHandler(int signum)
         chipDie();
         break;
     }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void OnSoftwareFaultSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    VerifyOrDie(signum == SIGUSR1);
+    PlatformMgr().ScheduleWork(HandleSoftwareFault);
+}
+
+void OnGeneralFaultSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    uint32_t eventId;
+    switch (signum)
+    {
+    case SIGUSR2:
+        eventId = GeneralDiagnostics::Events::HardwareFaultChange::Id;
+        break;
+    case SIGHUP:
+        eventId = GeneralDiagnostics::Events::RadioFaultChange::Id;
+        break;
+    case SIGTTIN:
+        eventId = GeneralDiagnostics::Events::NetworkFaultChange::Id;
+        break;
+    default:
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    PlatformMgr().ScheduleWork(HandleGeneralFault, static_cast<intptr_t>(eventId));
 }
 
 void SetupSignalHandlers()
 {
     // sigaction is not used here because Tsan interceptors seems to
     // never dispatch the signals on darwin.
-    signal(SIGALRM, OnSignalHandler);
-    signal(SIGVTALRM, OnSignalHandler);
-    signal(SIGILL, OnSignalHandler);
-    signal(SIGTRAP, OnSignalHandler);
-    signal(SIGTERM, OnSignalHandler);
-    signal(SIGIO, OnSignalHandler);
-    signal(SIGINT, OnSignalHandler);
-
-    signal(SIGUSR1, OnSignalHandler);
-    signal(SIGUSR2, OnSignalHandler);
-    signal(SIGHUP, OnSignalHandler);
-    signal(SIGTTIN, OnSignalHandler);
+    signal(SIGALRM, OnRebootSignalHandler);
+    signal(SIGVTALRM, OnRebootSignalHandler);
+    signal(SIGILL, OnRebootSignalHandler);
+    signal(SIGTRAP, OnRebootSignalHandler);
+    signal(SIGTERM, OnRebootSignalHandler);
+    signal(SIGIO, OnRebootSignalHandler);
+    signal(SIGINT, OnRebootSignalHandler);
+    signal(SIGUSR1, OnFaultSignalHandler);
+    signal(SIGUSR2, OnGeneralFaultSignalHandler);
+    signal(SIGHUP, OnGeneralFaultSignalHandler);
+    signal(SIGTTIN, OnGeneralFaultSignalHandler);
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 
