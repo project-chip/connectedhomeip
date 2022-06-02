@@ -263,10 +263,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=Zephyr",
       ]
     }
+    else if (chip_device_platform == "openiotsdk") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK=1",
+        "CHIP_DEVICE_LAYER_TARGET=openiotsdk",
+      ]
+    }
 
     if (chip_device_config_device_software_version_string != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
-    }
+    } 
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {
@@ -431,6 +437,8 @@ if (chip_device_platform != "none") {
       _platform_target = "nxp/mw320"
     } else if (chip_device_platform == "zephyr") {
       _platform_target = "Zephyr"
+    } else if (chip_device_platform == "openiotsdk") {
+      _platform_target = "openiotsdk"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
