@@ -10268,6 +10268,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopWithOnOffWithParams:(CHIPLevelControlClusterStopWithOnOffParams * _Nullable)params
               completionHandler:(StatusCompletion)completionHandler;
 - (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)moveToClosestFrequencyWithParams:(CHIPLevelControlClusterMoveToClosestFrequencyParams *)params
+                       completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeCurrentLevelWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;

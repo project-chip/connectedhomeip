@@ -3187,6 +3187,21 @@ class LevelControl(Cluster):
                     ])
 
 
+        @dataclass
+        class MoveToClosestFrequency(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0008
+            command_id: typing.ClassVar[int] = 0x0008
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="frequency", Tag=0, Type=uint),
+                    ])
+
+            frequency: 'uint' = 0
+
 
     class Attributes:
         @dataclass

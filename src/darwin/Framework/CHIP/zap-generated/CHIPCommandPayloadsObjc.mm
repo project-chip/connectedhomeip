@@ -640,6 +640,17 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 @end
+@implementation CHIPLevelControlClusterMoveToClosestFrequencyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _frequency = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+@end
 @implementation CHIPAlarmsClusterResetAlarmParams
 - (instancetype)init
 {

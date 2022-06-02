@@ -3361,6 +3361,11 @@ struct Type;
 struct DecodableType;
 } // namespace StopWithOnOff
 
+namespace MoveToClosestFrequency {
+struct Type;
+struct DecodableType;
+} // namespace MoveToClosestFrequency
+
 } // namespace Commands
 
 namespace Commands {
@@ -3661,6 +3666,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopWithOnOff
+namespace MoveToClosestFrequency {
+enum class Fields
+{
+    kFrequency = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::MoveToClosestFrequency::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+
+    uint16_t frequency = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::MoveToClosestFrequency::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+
+    uint16_t frequency = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToClosestFrequency
 } // namespace Commands
 
 namespace Attributes {
