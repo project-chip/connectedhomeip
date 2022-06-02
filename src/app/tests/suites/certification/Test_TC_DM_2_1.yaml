@@ -80,8 +80,7 @@ tests:
       response:
           constraints:
               type: string
-              maxLength: 2
-              format: "ISO 3166-1 alpha-2" # Step 6 11.2.3.1-6 Verify it follows ISO 3166-1 alpha-2 code / or it is empty, since it is user-defined
+              maxLength: 16
 
     - label: "Query HardwareVersion"
       command: "readAttribute"
@@ -99,34 +98,45 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "Query SoftwareVersion"
-      command: "readAttribute"
-      attribute: "SoftwareVersion"
-      response:
-          constraints:
-              type: uint32
+    - label:
+          "TH reads SoftwareVersionString from the DUT and Verify it is of type
+          string and verify the format"
+      verification: |
+          ./chip-tool basic read  software-version 1 0
 
-    - label: "Query SoftwareVersionString"
-      command: "readAttribute"
-      attribute: "SoftwareVersionString"
-      response:
-          constraints:
-              type: string
-              minLength: 1
-              maxLength: 64
-              format: "ASCII" # Step 10 11.2.3.1-10 Verify it uses 7-bit ASCII alphanumeric and punctuation characters
+          [1654069233.033848][11164:11169] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0009 DataVersion: 2079473958
+          [1654069233.033880][11164:11169] CHIP:TOO:   SoftwareVersion: 1
+          [1654069233.033902][11164:11169] CHIP:EM: Sending Standalone Ack for MessageCounter:3270959 on exchange 29106i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Query ManufacturingDate"
-      command: "readAttribute"
-      attribute: "ManufacturingDate"
-      PICS: MANF_DATE
-      optional: true
-      response:
-          constraints:
-              type: string
-              minLength: 8
-              maxLength: 16
-              format: "ISO 8601" # Step 11  11.2.3.1-11 Verify if the first 8 characters specify date according to ISO 8601, i.e, YYYYMMDD
+    - label:
+          "TH reads ManufacturingDate from the DUT and Verify it is of type
+          string and verify the format"
+      verification: |
+          ./chip-tool basic read manufacturing-date 1 0
+
+
+          [1640336849.202099][14335:14340] CHIP:DMG:
+          [1640336849.202186][14335:14340] CHIP:DMG:      SuppressResponse = true,
+          [1640336849.202239][14335:14340] CHIP:DMG: }
+          [1640336849.202479][14335:14340] CHIP:TOO: Basic.ManufacturingDate response: 20210614123456ZZ
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Query PartNumber"
       command: "readAttribute"
@@ -138,15 +148,26 @@ tests:
               type: string
               maxLength: 32
 
-    - label: "Query ProductURL"
-      command: "readAttribute"
-      attribute: "ProductURL"
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 256
-              format: "RFC3986" # Step 13 11.2.3.1-13 Verify that it follows the syntax rules specified in RFC 3986
+    - label:
+          "TH reads ProductURL from the DUT and Verify it is of type string and
+          verify the format"
+      verification: |
+          ./chip-tool basic read product-url 1 0
+
+
+          [1640337847.187590][14399:14404] CHIP:DMG:  
+          [1640337847.187633][14399:14404] CHIP:DMG:      SuppressResponse = true,
+          [1640337847.187676][14399:14404] CHIP:DMG: }
+          [1640337847.187868][14399:14404] CHIP:TOO: Basic.ProductURL response:
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Query ProductLabel"
       command: "readAttribute"
