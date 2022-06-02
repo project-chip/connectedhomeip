@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
-#include <app-common/zap-generated/ids/Attributes.h>
 
 namespace chip {
 namespace app {
@@ -62,7 +62,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
-    static constexpr AttributeId GetAttributeId() { return AttributeList::Id ; }
+    static constexpr AttributeId GetAttributeId() { return AttributeList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttributeList
@@ -91,8 +91,8 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 
-}
-}
-} // namespace DataModel
+} // namespace Attributes
+} // namespace Globals
+} // namespace Clusters
 } // namespace app
 } // namespace chip
