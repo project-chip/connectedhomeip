@@ -1664,8 +1664,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+endpoint 0 of type rootdevice = 22 {
 
-endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1939,8 +1939,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+endpoint 1 of type dimmablelight = 257 {
 
-endpoint 1 {
 
   server cluster Identify {
     ram      attribute identifyTime;

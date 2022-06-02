@@ -587,8 +587,8 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+endpoint 0 of type rootdevice = 22 {
 
-endpoint 0 {
   binding cluster AccessControl;
 
   server cluster AccessControl {

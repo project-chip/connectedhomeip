@@ -1682,8 +1682,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+endpoint 0 of type rootdevice = 22 {
 
-endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1957,8 +1957,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+endpoint 1 of type onofflightswitch = 259 {
 
-endpoint 1 {
   binding cluster Identify;
   binding cluster Scenes;
   binding cluster OnOff;
