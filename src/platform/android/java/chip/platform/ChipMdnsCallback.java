@@ -26,7 +26,7 @@ public interface ChipMdnsCallback {
       String serviceType,
       String address,
       int port,
-      Map<String, byte[]> attributes,
+      Map<String, byte[]> textEntries,
       long callbackHandle,
       long contextHandle);
 }

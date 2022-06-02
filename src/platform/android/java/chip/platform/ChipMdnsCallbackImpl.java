@@ -25,15 +25,15 @@ public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
       String serviceType,
       String address,
       int port,
-      Map<String, byte[]> attributes,
+      Map<String, byte[]> textEntries,
       long callbackHandle,
       long contextHandle);
 
-  public String[] getAttributeKeys(Map<String, byte[]> attributes) {
-    return attributes.keySet().toArray(new String[attributes.size()]);
+  public String[] getTextEntryKeys(Map<String, byte[]> textEntries) {
+    return textEntries.keySet().toArray(new String[textEntries.size()]);
   }
 
-  public byte[] getAttributeData(Map<String, byte[]> attributes, String key) {
-    return attributes.get(key);
+  public byte[] getTextEntryData(Map<String, byte[]> textEntries, String key) {
+    return textEntries.get(key);
   }
 }

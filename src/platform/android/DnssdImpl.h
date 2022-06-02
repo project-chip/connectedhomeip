@@ -32,7 +32,7 @@ void InitializeWithObjects(jobject resolverObject, jobject chipMdnsCallbackObjec
 /**
  * Pass results of the service resolution to the CHIP stack.
  */
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject attributes, jlong callbackHandle,
+void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject textEntries, jlong callbackHandle,
                    jlong contextHandle);
 
 } // namespace Dnssd
