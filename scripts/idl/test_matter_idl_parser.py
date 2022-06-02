@@ -385,8 +385,8 @@ server cluster A = 1 { /* Test comment */ }
 
         expected = Idl(endpoints=[Endpoint(number=12,
                                            device_types=[
-                                             DeviceType(name="foo", code=123),
-                                             DeviceType(name="bar", code=0xFF),
+                                               DeviceType(name="foo", code=123),
+                                               DeviceType(name="bar", code=0xFF),
                                            ],
                                            server_clusters=[
                                                ServerClusterInstantiation(name="Foo"),
