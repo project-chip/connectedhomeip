@@ -29,7 +29,7 @@ import unittest
 
 
 def parseText(txt):
-    return CreateParser().parse(txt)
+    return CreateParser(skip_meta=True).parse(txt)
 
 
 class TestParser(unittest.TestCase):
@@ -340,6 +340,20 @@ class TestParser(unittest.TestCase):
                         Event(priority=EventPriority.DEBUG, readacl=AccessPrivilege.ADMINISTER,
                               name="AdminEvent", code=3, fields=[]),
                     ])])
+        self.assertEqual(actual, expected)
+
+    def test_parsing_metadata_for_cluster(self):
+        actual = CreateParser(skip_meta=False).parse("""
+server cluster A = 1 { /* Test comment */ }
+
+// some empty lines and then indented
+   client cluster B = 2 { }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(parse_meta=ParseMetaData(line=2, column=1), side=ClusterSide.SERVER, name="A", code=1),
+            Cluster(parse_meta=ParseMetaData(line=5, column=4), side=ClusterSide.CLIENT, name="B", code=2),
+        ])
         self.assertEqual(actual, expected)
 
     def test_multiple_clusters(self):
