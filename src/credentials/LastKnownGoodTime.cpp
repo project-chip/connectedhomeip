@@ -126,13 +126,13 @@ CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
     // not available.  Callers should consider this fatal.
     System::Clock::Seconds32 buildTime;
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime));
-    System::Clock::Seconds32 kvstoreLastKnownGoodChipEpochTime;
-    CHIP_ERROR err = LoadLastKnownGoodChipEpochTime(kvstoreLastKnownGoodChipEpochTime);
+    System::Clock::Seconds32 storedLastKnownGoodChipEpochTime;
+    CHIP_ERROR err = LoadLastKnownGoodChipEpochTime(storedLastKnownGoodChipEpochTime);
     VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
     ChipLogProgress(TimeService, "Last Known Good Time: %s",
                     err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? "[unknown]"
-                                                                        : FormatChipEpochTime(kvstoreLastKnownGoodChipEpochTime));
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || buildTime > kvstoreLastKnownGoodChipEpochTime)
+                                                                        : FormatChipEpochTime(storedLastKnownGoodChipEpochTime));
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || buildTime > storedLastKnownGoodChipEpochTime)
     {
         // If we have no value in persistence, or the firmware build time is
         // later than the value in persistence, set last known good time to the
@@ -143,7 +143,7 @@ CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
     }
     else
     {
-        mLastKnownGoodChipEpochTime.SetValue(kvstoreLastKnownGoodChipEpochTime);
+        mLastKnownGoodChipEpochTime.SetValue(storedLastKnownGoodChipEpochTime);
         return CHIP_NO_ERROR;
     }
 }
