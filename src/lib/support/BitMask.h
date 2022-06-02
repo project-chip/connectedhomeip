@@ -68,18 +68,24 @@ public:
     }
 
     /**
-     * GetField to value via a mask shifting.
+     * Set a field within the bit mask integer.
      *
-     * @param mask      Typed flag(s) to used as mask, flag(s) must be contiguous. Any flags not in @a v are unaffected.
-     * @returns         Value from the underlying field/mask
+     * Fields are assumed to be contiguous bits within the underlying integer, for example:
+     * A mask of 0x70 == 0b01110000 means that a 3 bit value is encoded at bits [4;6].
+     *
+     * Calling SetField(0x70, n) is equivalent to "((value & ~0x70) | (n << 4)"
+     *
+     * @param mask  The mask, code assumes a continous bit mask
+     * @param value The value, NOT shifted, MUST fit within the number of bits of the mask
      */
     constexpr BitMask & SetField(FlagsEnum mask, IntegerType value)
     {
         IntegerType bitMask = static_cast<IntegerType>(mask);
         IntegerType shift   = GetShiftToFirstSetBit(bitMask);
 
-        // Value should be fully contained within the shift mask.
-        assert((value & (mask >> shift)) == value);
+        // NOTE: value should be fully contained within the shift mask.
+        //
+        // assert((value & (mask >> shift)) == value);
 
         // Clear bits overlayed by the mask
         IntegerType updated = static_cast<IntegerType>(BitFlags<FlagsEnum, StorageType>::Raw() & ~bitMask);
@@ -92,20 +98,20 @@ public:
     }
 
     /**
-     * GetField to value via a mask shifting.
+     * Gets an underlying field that is contained within a bit subset of the integer.
+     * Examples:
+     *    GetField(0x70) == GetField(0b01110000) == ((n & 0x70) >> 4) == ((n >> 4) 0x07)
+     *    GetField(0xB0) == GetField(0b11000000) == ((n & 0xB0) >> 6) == ((n >> 6) 0x03)
      *
-     * @param mask      Typed flag(s) to used as mask, flag(s) must be contiguous. Any flags not in @a v are unaffected.
-     * @returns         Value from the underlying field/mask
+     * @param mask The bit mask to be used, assumed to be a contigous bit mask
      */
     IntegerType GetField(FlagsEnum mask) const
     {
-        {
-            IntegerType bitMask = static_cast<IntegerType>(mask);
-            IntegerType shift   = GetShiftToFirstSetBit(bitMask);
+        IntegerType bitMask = static_cast<IntegerType>(mask);
+        IntegerType shift   = GetShiftToFirstSetBit(bitMask);
 
-            // Forward the right bits
-            return static_cast<IntegerType>(((BitFlags<FlagsEnum, StorageType>::Raw() & bitMask) >> shift));
-        }
+        // Forward the right bits
+        return static_cast<IntegerType>(((BitFlags<FlagsEnum, StorageType>::Raw() & bitMask) >> shift));
     }
 
 protected:
@@ -122,9 +128,16 @@ protected:
     static constexpr IntegerType GetShiftToFirstSetBit(IntegerType bitMask)
     {
         IntegerType count = 0;
-        while (!(bitMask & 0x1) && (count < std::numeric_limits<IntegerType>::max()))
+        IntegerType mask  = 0x01;
+
+        if (bitMask == 0)
         {
-            bitMask = static_cast<IntegerType>(bitMask >> 1);
+            return sizeof(bitMask); // generally invalid value
+        }
+
+        while ((mask & bitMask) == 0)
+        {
+            mask = static_cast<IntegerType>(mask << 1);
             count++;
         }
         return count;
