@@ -37,6 +37,6 @@ artifacts:
         paths: ["/workspace/artifacts/*.tar.gz"]
 # Using higher CPU machines generally speeds up builds, except bootstrap is always
 # slow.
-# options:
-#    machineType: "E2_HIGHCPU_32"
-#    diskSizeGb: 200
+options:
+    machineType: "E2_HIGHCPU_32"
+    diskSizeGb: 200

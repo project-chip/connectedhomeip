@@ -97,45 +97,36 @@ def check_python_version() -> None:
         exit(1)
 
 
-def check_zap(master: bool = False) -> str:
-    """Produces hash of ZAP submodule.
+def check_zap() -> str:
+    """Produces SHA of ZAP submodule for current HEAD.
 
-    Args:
-      master: Check branch master instead of current branch.
     Returns:
       SHA of zap submodule.
     """
     shell.run_cmd(f"cd {_REPO_BASE_PATH}")
-    if master:
-        flush_print("Fetching master")
-        command = "git fetch origin master --depth=1 --recurse-submodules"
-        shell.run_cmd(command)
-        branch = "origin/master"
-    else:
-        branch = shell.run_cmd("git rev-parse --abbrev-ref HEAD",
-                               return_cmd_output=True).replace("\n", "")
+    branch = shell.run_cmd("git rev-parse --abbrev-ref HEAD",
+                           return_cmd_output=True)
+    branch = branch.replace("\n", "")
     command = f"git ls-tree {branch} third_party/zap/repo"
     zap_commit = shell.run_cmd(command, return_cmd_output=True)
     zap_commit = zap_commit.split(" ")[2]
     zap_commit = zap_commit[:zap_commit.index("\t")]
-    flush_print(f"found zap commit: {zap_commit}")
+    flush_print(f"Found zap commit: {zap_commit}")
     return zap_commit
 
 
 def generate_device_manifest(
-        write_manifest_file: bool = False,
-        zap_check_master: bool = False) -> Dict[str, Any]:
+        write_manifest_file: bool = False) -> Dict[str, Any]:
     """Produces dictionary containing md5 of device dir zap files.
 
     Args:
-        write_manifest_file: Serialize manifest in file and tree.
-        zap_check_master: Check master instead of HEAD for zap.
+        write_manifest_file: Serialize manifest in tree.
     Returns:
         Dict containing MD5 of device dir zap files.
     """
     ci_manifest = {"devices": {}}
     devices_manifest = ci_manifest["devices"]
-    zap_sha = check_zap(master=zap_check_master)
+    zap_sha = check_zap()
     ci_manifest["zap_commit"] = zap_sha
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
@@ -147,23 +138,23 @@ def generate_device_manifest(
         if write_manifest_file:
             device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
             device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            with open(device_zzz_md5_file, "w+", encoding="utf-8") as md5_file:
+            with open(device_zzz_md5_file, "w+") as md5_file:
                 md5_file.write(device_file_md5)
             device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            with open(device_zzz_zap_sha_file, "w+", encoding="utf-8") as zap_sha_file:
+            with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
                 zap_sha_file.write(zap_sha)
     return ci_manifest
 
 
 def load_cicd_config() -> Dict[str, Any]:
-    with open(_CICD_CONFIG_FILE_NAME, "r", encoding="utf-8") as config_file:
+    with open(_CICD_CONFIG_FILE_NAME) as config_file:
         config = json.loads(config_file.read())
-        for platform_name, platform_config in config.items():
-            has_build_dir = "build_dir" in platform_config
-            has_plat_label = "platform_label" in platform_config
-            if not has_build_dir or not has_plat_label:
-                flush_print(f"{platform_name} CICD config missing build_dir or platform_label")
-                exit(1)
+    for platform_name, platform_config in config.items():
+        has_build_dir = "build_dir" in platform_config
+        has_plat_label = "platform_label" in platform_config
+        if not has_build_dir or not has_plat_label:
+            flush_print(f"{platform_name} CICD config missing build_dir or platform_label")
+            exit(1)
     return config
 
 
@@ -301,7 +292,7 @@ def main(argv: Sequence[str]) -> None:
                 flush_print(f"ZAP VERSION MISSING {help_msg}")
                 exit(1)
             else:
-                with open(device_zap_sha_file, "r", encoding="utf-8") as zap_file:
+                with open(device_zap_sha_file) as zap_file:
                     output_cached_zap_sha = zap_file.read()
                 if output_cached_zap_sha != current_zap:
                     flush_print(f"ZAP VERSION MISMATCH {help_msg}")
@@ -310,7 +301,7 @@ def main(argv: Sequence[str]) -> None:
                 flush_print(f"INPUT MD5 MISSING {help_msg}")
                 exit(1)
             else:
-                with open(device_md5_file, "r", encoding="utf-8") as md5_file:
+                with open(device_md5_file) as md5_file:
                     output_cached_md5 = md5_file.read()
                 if output_cached_md5 != device_md5:
                     flush_print(f"INPUT MD5 MISMATCH {help_msg}")
@@ -379,6 +370,7 @@ def main(argv: Sequence[str]) -> None:
             command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
+            # TODO call per-platform bundle function for extra validation
         exit(0)
 
     #
@@ -386,10 +378,6 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
-        # TODO
-        # Needs to call per-platform bundle function
-        flush_print("Build all disabled")
-        exit(1)
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
@@ -404,7 +392,8 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
                 shell.run_cmd(command)
-                archive_name = f"{label}-chef-{device_name}-wifi-rpc"
+                # TODO Needs to call per-platform bundle function
+                archive_name = f"{label}-{device_name}"
                 archive_full_name = archive_prefix + archive_name + archive_suffix
                 flush_print(f"Adding build output to archive {archive_full_name}")
                 with tarfile.open(archive_full_name, "w:gz") as tar:
