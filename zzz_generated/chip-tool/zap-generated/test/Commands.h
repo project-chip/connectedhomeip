@@ -65028,7 +65028,7 @@ private:
             );
         }
         case 2: {
-            LogStep(2, "View Group 1 (not found)");
+            LogStep(2, "View First Group (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -65038,7 +65038,7 @@ private:
             );
         }
         case 3: {
-            LogStep(3, "Add Group 1 (new)");
+            LogStep(3, "Add First Group (new)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 1U;
@@ -65048,7 +65048,7 @@ private:
             );
         }
         case 4: {
-            LogStep(4, "View Group 1 (new)");
+            LogStep(4, "View First Group (new)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -65058,7 +65058,7 @@ private:
             );
         }
         case 5: {
-            LogStep(5, "View Group 2 (not found)");
+            LogStep(5, "View Second Group (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
@@ -65089,7 +65089,7 @@ private:
             );
         }
         case 8: {
-            LogStep(8, "View Group 1 (existing)");
+            LogStep(8, "View First Group (existing)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -65119,7 +65119,7 @@ private:
             );
         }
         case 11: {
-            LogStep(11, "View Group 1 (not removed)");
+            LogStep(11, "View First Group (not removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -65129,7 +65129,7 @@ private:
             );
         }
         case 12: {
-            LogStep(12, "View Group 2 (removed)");
+            LogStep(12, "View Second Group (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
@@ -65167,7 +65167,7 @@ private:
             );
         }
         case 15: {
-            LogStep(15, "View Group 1 (removed)");
+            LogStep(15, "View First Group (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
@@ -65177,7 +65177,7 @@ private:
             );
         }
         case 16: {
-            LogStep(16, "View Group 2 (still removed)");
+            LogStep(16, "View Second Group (still removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
