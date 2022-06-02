@@ -69,7 +69,7 @@ public:
      * Fields are assumed to be contiguous bits within the underlying integer, for example:
      * A mask of 0x70 == 0b01110000 means that a 3 bit value is encoded at bits [4;6].
      *
-     * Calling SetField(0x70, n) is equivalent to "((value & ~0x70) | (n << 4)"
+     * Calling SetField(0x70, n) is equivalent to "(value & ~0x70) | (n << 4)"
      *
      * @param mask  The mask, code assumes a continous bit mask
      * @param value The value, NOT shifted, MUST fit within the number of bits of the mask
@@ -85,6 +85,7 @@ public:
 
         // Clear bits overlayed by the mask
         IntegerType updated = static_cast<IntegerType>(BitFlags<FlagsEnum, StorageType>::Raw() & ~bitMask);
+
         // Set the right bits
         updated |= static_cast<IntegerType>(bitMask & (value << shift));
 
