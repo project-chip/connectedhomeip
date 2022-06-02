@@ -155,7 +155,7 @@ tests:
           ./chip-tool basic read product-url 1 0
 
 
-          [1640337847.187590][14399:14404] CHIP:DMG:  
+          [1640337847.187590][14399:14404] CHIP:DMG:
           [1640337847.187633][14399:14404] CHIP:DMG:      SuppressResponse = true,
           [1640337847.187676][14399:14404] CHIP:DMG: }
           [1640337847.187868][14399:14404] CHIP:TOO: Basic.ProductURL response:
