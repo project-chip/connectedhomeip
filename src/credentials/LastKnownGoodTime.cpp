@@ -37,7 +37,7 @@ constexpr TLV::Tag kFailSafeLastKnownGoodChipEpochSecondsTag = TLV::ContextTag(1
 
 void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime)
 {
-    char buf[20] = { 0 }; // strlen("0000-00-00T00:00:00") == 19
+    char buf[26] = { 0 }; // strlen("00000-000-000T000:000:000") == 25
     uint16_t year;
     uint8_t month;
     uint8_t day;
@@ -45,8 +45,8 @@ void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipE
     uint8_t minute;
     uint8_t second;
     ChipEpochToCalendarTime(chipEpochTime.count(), year, month, day, hour, minute, second);
-    int len = snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
-    ChipLogProgress(TimeService, "%s%s", msg, len == sizeof(buf) - 1 ? buf : "[time formatting failed]");
+    snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
+    ChipLogProgress(TimeService, "%s%s", msg, buf);
 }
 
 CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
