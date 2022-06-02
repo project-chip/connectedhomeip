@@ -226,7 +226,7 @@ private:
     CHIP_ERROR RecoverInitiatorIpk();
     // On success, sets locally maching mFabricInfo in internal state to the entry matched by
     // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
-    CHIP_ERROR FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
