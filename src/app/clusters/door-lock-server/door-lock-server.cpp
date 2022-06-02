@@ -53,7 +53,7 @@ static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / (2
 
 DoorLockServer DoorLockServer::instance;
 
-class DoorLockCLusterFabricDelegate : public chip::FabricTable::Delegate
+class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
@@ -74,7 +74,7 @@ class DoorLockCLusterFabricDelegate : public chip::FabricTable::Delegate
     // Intentionally left blank
     void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override {}
 };
-static DoorLockCLusterFabricDelegate gFabricDelegate;
+static DoorLockClusterFabricDelegate gFabricDelegate;
 
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
@@ -1242,6 +1242,7 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
     {
         ChipLogError(Zcl, "[OnFabricRemoved] Unable to cleanup fabric from users - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
+        return false;
     }
 
     // Iterate over all the credentials and clean up the fabrics
@@ -1250,6 +1251,7 @@ bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIn
         ChipLogError(Zcl,
                      "[OnFabricRemoved] Unable to cleanup fabric from credentials - internal error [endpointId=%d,fabricIndex=%d]",
                      endpointId, fabricIndex);
+        return false;
     }
 
     return true;
@@ -2818,7 +2820,15 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, DlC
         return false;
     }
 
-    for (uint16_t credentialIndex = 1; credentialIndex < maxNumberOfCredentials; ++credentialIndex)
+    uint16_t startIndex = 1;
+    // Programming PIN is a special case -- it is unique and its index assumed to be 0.
+    if (DlCredentialType::kProgrammingPIN == credentialType)
+    {
+        startIndex = 0;
+        maxNumberOfCredentials--;
+    }
+
+    for (uint16_t credentialIndex = startIndex; credentialIndex <= maxNumberOfCredentials; ++credentialIndex)
     {
         EmberAfPluginDoorLockCredentialInfo credential;
         if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
@@ -2856,7 +2866,7 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, DlC
                          "[clearFabricFromCredentials] Unable to clear fabric from credential - internal error "
                          "[endpointId=%d,credentialType=%u,credentialIndex=%d,fabricIdToRemove=%d]",
                          endpointId, to_underlying(credentialType), credentialIndex, fabricToRemove);
-            continue;
+            return false;
         }
     }
 

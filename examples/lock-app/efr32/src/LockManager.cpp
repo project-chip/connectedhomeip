@@ -322,6 +322,8 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = credentialInStorage.credentialData;
+    credential.createdBy      = credentialInStorage.createdBy;
+    credential.lastModifiedBy = credentialInStorage.lastModifiedBy;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     credential.creationSource     = DlAssetSource::kMatterIM;
@@ -333,13 +335,14 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     return true;
 }
 
-bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
+                                chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                const chip::ByteSpan & credentialData)
 {
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
-                    "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u]",
-                    to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size());
+                    "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
+                    to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
     auto & credentialInStorage = mLockCredentials;
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
@@ -352,6 +355,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     }
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
+    credentialInStorage.createdBy      = creator;
+    credentialInStorage.lastModifiedBy = modifier;
 
     memcpy(mCredentialData, credentialData.data(), credentialData.size());
     mCredentialData[credentialData.size()] = 0;
