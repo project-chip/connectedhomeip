@@ -96,4 +96,3 @@ struct TypeInfo
 } // namespace DataModel
 } // namespace app
 } // namespace chip
-
