@@ -94,7 +94,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
 
           @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {        
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {
             Log.i(
                 TAG,
                 "Resolved service '"
