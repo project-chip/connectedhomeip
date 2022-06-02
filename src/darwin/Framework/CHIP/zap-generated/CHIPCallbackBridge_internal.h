@@ -41,22 +41,12 @@ typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserStatusResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
@@ -763,21 +753,6 @@ typedef void (*DoorLockDefaultConfigurationRegisterAttributeCallback)(
     void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>);
 typedef void (*DoorLockLocalProgrammingFeaturesAttributeCallback)(
     void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>);
-typedef void (*DoorLockAlarmMaskAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>);
-typedef void (*DoorLockKeypadOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
-typedef void (*DoorLockRemoteOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>);
-typedef void (*DoorLockManualOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>);
-typedef void (*DoorLockRFIDOperationEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>);
-typedef void (*DoorLockKeypadProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>);
-typedef void (*DoorLockRemoteProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>);
-typedef void (*DoorLockRFIDProgrammingEventMaskAttributeCallback)(
-    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
@@ -4076,228 +4051,6 @@ public:
                                                                             CHIPActionBlock action,
                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockAlarmMaskAttributeCallbackBridge : public CHIPCallbackBridge<DoorLockAlarmMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                 bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value);
-};
-
-class CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge : public CHIPDoorLockAlarmMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockAlarmMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockKeypadOperationEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockKeypadOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
-};
-
-class CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockRemoteOperationEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockRemoteOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value);
-};
-
-class CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockManualOperationEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockManualOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value);
-};
-
-class CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockRFIDOperationEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockRFIDOperationEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value);
-};
-
-class CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockKeypadProgrammingEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockKeypadProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
-};
-
-class CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockRemoteProgrammingEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockRemoteProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value);
-};
-
-class CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockRFIDProgrammingEventMaskAttributeCallback>
-{
-public:
-    CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockRFIDProgrammingEventMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value);
-};
-
-class CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -9734,42 +9487,6 @@ public:
                             const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetPINCodeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetPINCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetUserStatusResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserStatusResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetUserStatusResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType & data);
-};
-
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
@@ -9807,30 +9524,6 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data);
 };
 
 class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>

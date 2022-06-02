@@ -407,8 +407,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLockTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActuatorEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDoorStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeNumberOfLogRecordsSupportedWithValue:(NSNumber * _Nonnull)value
-                                         completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfTotalUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfPINUsersSupportedWithValue:(NSNumber * _Nonnull)value
