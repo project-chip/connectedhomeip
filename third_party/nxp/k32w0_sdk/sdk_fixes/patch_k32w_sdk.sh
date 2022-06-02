@@ -45,5 +45,21 @@ convert_to_dos "$SIGN_FILE_PATH"
 patch -N --binary -d "$NXP_K32W061_SDK_ROOT"/tools/imagetool/ -p1 <"$SOURCE_DIR/sign_images_sh.patch"
 sed -i 's/\r$//' "$SIGN_FILE_PATH"
 
+echo "Downloading PDM and BLE libraries from NXP server..."
+
+rm -rf patch_for_K32W061_SDK_2_6_4.zip patch_for_K32W061_SDK_2_6_4
+wget https://www.nxp.com/downloads/en/libraries/patch_for_K32W061_SDK_2_6_4.zip
+exitCode=$?
+if [ "$exitCode" -ne 0 ]; then
+    echo "Download error"
+    exit
+fi
+
+unzip patch_for_K32W061_SDK_2_6_4.zip
+cp patch_for_K32W061_SDK_2_6_4/controller_config.c "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/config/
+cp patch_for_K32W061_SDK_2_6_4/controller_interface.h "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/interface/
+cp patch_for_K32W061_SDK_2_6_4/lib_ble_controller.a "$NXP_K32W061_SDK_ROOT"/middleware/wireless/ble_controller/lib/
+cp patch_for_K32W061_SDK_2_6_4/libPDM_extFlash.a "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/PDM/Library/
+
 echo "K32W SDK MR3 QP1 was patched!"
 exit 0
