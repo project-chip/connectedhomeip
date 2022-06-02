@@ -477,7 +477,7 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildDate(const char ** date)
 {
     VerifyOrReturnError(date != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    static_assert(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE));
+    static_assert(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), "Cannot parse firmware build date");
     *date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
     return CHIP_NO_ERROR;
 }
@@ -486,7 +486,7 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildTimeOfDay(const char ** time)
 {
     VerifyOrReturnError(time != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    static_assert(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME));
+    static_assert(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), "Cannot parse firmware build time");
     *time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
     return CHIP_NO_ERROR;
 }
