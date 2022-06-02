@@ -154,7 +154,7 @@ class RequiredAttributesRule(LintRule):
                 # For all the instantiated attributes, figure out their code
                 for attr in cluster.attributes:
                     if attr.name not in name_to_code_map:
-                        self._AddLintError("Multiple cluster definitions found for %s" %
+                        self._AddLintError("Cluster definition not found for %s" %
                                            cluster.name, self._ParseLocation(cluster.parse_meta))
                         continue
 
