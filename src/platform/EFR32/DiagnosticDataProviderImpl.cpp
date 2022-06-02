@@ -31,6 +31,7 @@
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
+#include "heap_4_silabs.h"
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -77,6 +78,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // Something went wrong, this should not happen
     VerifyOrReturnError(HighestHeapUsageRecorded >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
     currentHeapHighWatermark = static_cast<uint64_t>(HighestHeapUsageRecorded);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+    xPortResetHeapMinimumEverFreeHeapSize();
 
     return CHIP_NO_ERROR;
 }

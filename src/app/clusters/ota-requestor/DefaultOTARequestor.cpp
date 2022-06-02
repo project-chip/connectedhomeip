@@ -621,7 +621,6 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
-
         break;
     default:
         break;

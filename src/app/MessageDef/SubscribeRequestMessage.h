@@ -41,7 +41,6 @@ enum class Tag : uint8_t
     kAttributeRequests         = 3,
     kEventRequests             = 4,
     kEventFilters              = 5,
-    kIsProxy                   = 6,
     kIsFabricFiltered          = 7,
     kDataVersionFilters        = 8,
 };
@@ -119,13 +118,6 @@ public:
     CHIP_ERROR GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const;
 
     /**
-     *  @brief Get GetIsProxy boolean .
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetIsProxy(bool * const apIsProxy) const;
-
-    /**
      *  @brief Get IsFabricFiltered boolean
      *
      *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
@@ -150,13 +142,6 @@ public:
     DataVersionFilterIBs::Builder & CreateDataVersionFilters();
     EventPathIBs::Builder & CreateEventRequests();
     EventFilterIBs::Builder & CreateEventFilters();
-
-    /**
-     *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This
-     *  confers it special privileges on the publisher that might result in evictions of other non-proxy subscriptions
-     *  to make way for the proxy.
-     */
-    SubscribeRequestMessage::Builder & IsProxy(const bool aIsProxy);
 
     /**
      *  @brief  limits the data written within fabric-scoped lists to the accessing fabric

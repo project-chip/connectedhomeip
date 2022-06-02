@@ -34,8 +34,8 @@
 
 #define APP_BUTTON_PUSH 1
 
-#define SYSTEM_STATE_LED LED1
-#define LIGHT_STATE_LED LED2
+#define SYSTEM_STATE_LED LED2
+#define LIGHT_STATE_LED LED1
 
 // Time it takes for the light to switch on/off
 #define ACTUATOR_MOVEMENT_PERIOS_MS 50

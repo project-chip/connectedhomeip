@@ -16,7 +16,6 @@ import os
 import shlex
 import subprocess
 import sys
-import tempfile
 from typing import Dict, Optional
 
 import constants

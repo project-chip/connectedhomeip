@@ -24,9 +24,8 @@ namespace chip {
 namespace app {
 CHIP_ERROR MessageBuilder::EncodeInteractionModelRevision()
 {
-    ReturnErrorOnFailure(mpWriter->Put(TLV::ContextTag(kInteractionModelRevisionTag),
-                                       static_cast<InteractionModelRevision>(CHIP_DEVICE_INTERACTION_MODEL_REVISION)));
-    return CHIP_NO_ERROR;
+    return mpWriter->Put(TLV::ContextTag(kInteractionModelRevisionTag),
+                         static_cast<InteractionModelRevision>(CHIP_DEVICE_INTERACTION_MODEL_REVISION));
 }
 } // namespace app
 } // namespace chip
