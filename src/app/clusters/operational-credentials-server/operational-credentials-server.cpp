@@ -856,6 +856,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     app::DnssdServer::Instance().StartServer();
 
 exit:
+    gFabricBeingCommissioned.Reset();
     // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {
