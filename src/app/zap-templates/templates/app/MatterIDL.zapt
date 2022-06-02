@@ -115,9 +115,7 @@
 
 {{/all_user_clusters}}
 {{#user_endpoints}}
-
-endpoint {{endpointId}} {
-  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}};
+endpoint {{endpointId}} of type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}} {
 
   {{#user_clusters}}
     {{#if enabled}}

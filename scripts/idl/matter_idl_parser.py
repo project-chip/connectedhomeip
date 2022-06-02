@@ -306,8 +306,8 @@ class MatterIdlTransformer(Transformer):
         return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
-    def endpoint(self, number, *transforms):
-        endpoint = Endpoint(number=number)
+    def endpoint(self, number, device_name, device_code, *transforms):
+        endpoint = Endpoint(number=number, device_type = DeviceType(name=device_name, code=device_code))
 
         for t in transforms:
             t.apply(endpoint)

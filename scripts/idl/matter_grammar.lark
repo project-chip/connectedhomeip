@@ -49,7 +49,7 @@ cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|
 ?cluster_side: "server"i -> server_cluster
              | "client"i -> client_cluster
 
-endpoint: "endpoint"i positive_integer "{" endpoint_cluster* "}"
+endpoint: "endpoint"i positive_integer "of" "type" id "=" positive_integer "{" endpoint_cluster* "}"
 ?endpoint_cluster: endpoint_cluster_binding | endpoint_server_cluster
 
 endpoint_cluster_binding: "binding"i "cluster"i id ";"

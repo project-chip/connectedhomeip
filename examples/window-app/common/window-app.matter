@@ -1907,7 +1907,8 @@ endpoint 1 {
   }
 }
 
-endpoint 2 {
+endpoint 2 of type windowcovering = 412 {
+
   binding cluster Scenes;
 
   server cluster Groups {

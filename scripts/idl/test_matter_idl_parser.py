@@ -372,7 +372,7 @@ server cluster A = 1 { /* Test comment */ }
 
     def test_endpoints(self):
         actual = parseText("""
-            endpoint 12 {
+            endpoint 12 of type abc = 11 {
                 server cluster Foo { }
                 server cluster Bar { }
                 binding cluster Bar;
@@ -381,6 +381,7 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(endpoints=[Endpoint(number=12,
+                                           device_type=DeviceType(name="abc", code=11),
                                            server_clusters=[
                                                ServerClusterInstantiation(name="Foo"),
                                                ServerClusterInstantiation(name="Bar"),
@@ -391,7 +392,7 @@ server cluster A = 1 { /* Test comment */ }
 
     def test_cluster_instantiation(self):
         actual = parseText("""
-            endpoint 3 {
+            endpoint 3 of type example = 0xFF {
                 server cluster Example {
                     ram attribute inRamZero;
                     ram attribute inRamWithDefault default=123;
@@ -404,6 +405,7 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(endpoints=[Endpoint(number=3,
+                                           device_type=DeviceType(name="example", code=0xFF),
                                            server_clusters=[
                                                ServerClusterInstantiation(name="Example", attributes=[
                                                    AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
@@ -424,17 +426,17 @@ server cluster A = 1 { /* Test comment */ }
 
     def test_multi_endpoints(self):
         actual = parseText("""
-            endpoint 1 {}
-            endpoint 2 {}
-            endpoint 0xa {}
-            endpoint 100 {}
+            endpoint 1 of type first = 1 {}
+            endpoint 2 of type second = 123 {}
+            endpoint 0xa of type ten = 22 {}
+            endpoint 100 of type test = 33 {}
         """)
 
         expected = Idl(endpoints=[
-            Endpoint(number=1),
-            Endpoint(number=2),
-            Endpoint(number=10),
-            Endpoint(number=100),
+            Endpoint(number=1, device_type=DeviceType(name="first",code=1)),
+            Endpoint(number=2, device_type=DeviceType(name="second",code=123)),
+            Endpoint(number=10, device_type=DeviceType(name="ten",code=22)),
+            Endpoint(number=100, device_type=DeviceType(name="test",code=33)),
         ])
         self.assertEqual(actual, expected)
 

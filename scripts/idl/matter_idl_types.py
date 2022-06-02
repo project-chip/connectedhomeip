@@ -208,8 +208,15 @@ class ServerClusterInstantiation:
 
 
 @dataclass
+class DeviceType:
+    name: str
+    code: int
+
+
+@dataclass
 class Endpoint:
     number: int
+    device_type: DeviceType
     server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
