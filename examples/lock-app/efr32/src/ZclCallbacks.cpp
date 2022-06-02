@@ -94,7 +94,7 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    return LockMgr().SetCredential(endpointId, credentialIndex,  creator, modifier, credentialStatus, credentialType,
+    return LockMgr().SetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
                                    credentialData);
 }
 
