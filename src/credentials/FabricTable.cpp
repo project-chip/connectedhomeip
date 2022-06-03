@@ -676,7 +676,7 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
 }
 
 /**
- * A dummy validation policy we can pass into VerifyCredentials to extract the
+ * A placeholder validation policy we can pass into VerifyCredentials to extract the
  * latest NotBefore time in the certificate chain without having to load the
  * certificates into memory twice.
  *
