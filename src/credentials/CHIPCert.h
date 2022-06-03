@@ -738,12 +738,22 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 
 /**
  * Extract Not Before Time from a chip certificate in ByteSpan TLV-encoded form.
+ * Output format is seconds referenced from the CHIP epoch.
+ *
+ * Special value 0 corresponds to the X.509/RFC5280 defined special time value
+ * 99991231235959Z meaning 'no well-defined expiration date'.  However, as a
+ * NotBefore time, this does not require special handling when comparing to
+ * a CHIP epoch time source, as 0 (the epoch) is also the earliest representable
+ * uint32 time.
+
  * This does not perform any sort of validation on the certificate structure
  * other than parsing it.
  *
- * Can return any error that can be returned from parsing the cert.
+ * @param chipCert CHIP certficiate in TLV-encoded form
+ * @param notBeforeChipEpochTime (out) certificate NotBefore time as seconds from the CHIP epoch
+ * @return CHIP_NO_ERROR if certificate parsing was successful, else an appropriate CHIP_ERROR
  */
-CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeTime);
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime);
 
 /**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.

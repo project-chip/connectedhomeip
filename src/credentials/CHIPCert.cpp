@@ -1341,7 +1341,7 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeTime)
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime)
 {
     ChipCertificateSet certSet;
     ChipCertificateData certData;
@@ -1350,7 +1350,7 @@ CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System:
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    notBeforeTime = chip::System::Clock::Seconds32(certData.mNotBeforeTime);
+    notBeforeChipEpochTime = chip::System::Clock::Seconds32(certData.mNotBeforeTime);
 
     return CHIP_NO_ERROR;
 }
