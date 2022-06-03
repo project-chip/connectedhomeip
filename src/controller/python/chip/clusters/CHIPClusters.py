@@ -4389,6 +4389,7 @@ class ChipClusters:
                     "commandName": "CSRRequest",
                     "args": {
                         "CSRNonce": "bytes",
+                        "isForUpdateNOC": "bool",
                     },
                 },
             0x00000002: {
