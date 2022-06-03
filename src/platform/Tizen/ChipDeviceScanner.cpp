@@ -127,7 +127,7 @@ static bool __IsChipThingDevice(bt_adapter_le_device_scan_result_info_s * info,
 
 void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
 
     if (!info)
@@ -148,7 +148,7 @@ void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_res
 
 gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
     ChipLogProgress(DeviceLayer, "Scan Timer expired!!");
     self->StopChipScan();
     return G_SOURCE_REMOVE;
@@ -156,8 +156,8 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
 
 gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
-    int ret                  = BT_ERROR_NONE;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
+    int ret   = BT_ERROR_NONE;
     GSource * idleSource;
 
     self->mAsyncLoop = mainLoop;

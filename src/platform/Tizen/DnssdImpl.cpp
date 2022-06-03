@@ -117,8 +117,8 @@ CHIP_ERROR UpdateTXTRecord(dnssd_service_h service, TextEntry * textEntries, siz
 void OnRegister(dnssd_error_e error, dnssd_service_h service, void * data)
 {
     ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
-    RegisterContext * rCtx = reinterpret_cast<RegisterContext *>(data);
-    GMainLoop * loop       = (GMainLoop *) rCtx->context;
+    auto rCtx = reinterpret_cast<RegisterContext *>(data);
+    auto loop = reinterpret_cast<GMainLoop *>(rCtx->context);
 
     g_main_loop_quit(loop);
 
@@ -132,8 +132,8 @@ gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    RegisterContext * rCtx = reinterpret_cast<RegisterContext *>(userData);
-    rCtx->context          = mainLoop;
+    auto rCtx     = reinterpret_cast<RegisterContext *>(userData);
+    rCtx->context = mainLoop;
 
     int ret = dnssd_register_local_service(rCtx->service, OnRegister, rCtx);
     VerifyOrReturnError(CheckForSuccess(rCtx, ret, __func__), false);
@@ -255,8 +255,8 @@ void StopBrowse(BrowseContext * context)
 void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
 {
     ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
-    BrowseContext * bCtx = reinterpret_cast<BrowseContext *>(data);
-    GMainLoop * loop     = (GMainLoop *) bCtx->context;
+    auto bCtx = reinterpret_cast<BrowseContext *>(data);
+    auto loop = reinterpret_cast<GMainLoop *>(bCtx->context);
 
     // Always stop browsing
     g_main_loop_quit(loop);
@@ -406,8 +406,8 @@ void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<T
 void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 {
     ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
-    ResolveContext * rCtx = reinterpret_cast<ResolveContext *>(data);
-    GMainLoop * loop      = (GMainLoop *) rCtx->context;
+    auto rCtx = reinterpret_cast<ResolveContext *>(data);
+    auto loop = reinterpret_cast<GMainLoop *>(rCtx->context);
 
     g_main_loop_quit(loop);
 
@@ -434,7 +434,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     ret = dnssd_service_get_port(service, &port);
     VerifyOrExit(CheckForSuccess(rCtx, ret, __func__, true), );
 
-    ret = dnssd_service_get_all_txt_record(service, &txtLen, (void **) &txtRecord);
+    ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
     ConvertTxtRecords(txtLen, txtRecord, textEntries);
     g_free(txtRecord);
 

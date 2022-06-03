@@ -170,7 +170,7 @@ void WiFiManager::_IPConflictCb(char * mac, wifi_manager_ip_conflict_state_e ipC
 
 void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
@@ -186,7 +186,7 @@ void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
 
 void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
@@ -202,7 +202,7 @@ void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
 
 void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop          = (GMainLoop *) userData;
+    auto loop                 = reinterpret_cast<GMainLoop *>(userData);
     wifi_manager_ap_h foundAp = nullptr;
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
@@ -225,11 +225,11 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 
 bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
 {
-    bool cbRet                   = true;
-    int wifiErr                  = WIFI_MANAGER_ERROR_NONE;
-    char * essid                 = nullptr;
-    bool isPassphraseRequired    = false;
-    wifi_manager_ap_h * clonedAp = (wifi_manager_ap_h *) userData;
+    bool cbRet                = true;
+    int wifiErr               = WIFI_MANAGER_ERROR_NONE;
+    char * essid              = nullptr;
+    bool isPassphraseRequired = false;
+    auto clonedAp             = reinterpret_cast<wifi_manager_ap_h *>(userData);
 
     wifiErr = wifi_manager_ap_get_essid(ap, &essid);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
@@ -262,7 +262,7 @@ exit:
 
 void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {

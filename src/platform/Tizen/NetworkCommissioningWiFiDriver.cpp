@@ -143,7 +143,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s", (char *) mStagingNetwork.ssid);
 
-    err = WiFiMgr().Connect((const char *) mStagingNetwork.ssid, (const char *) mStagingNetwork.credentials, callback);
+    err = WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid), reinterpret_cast<char *>(mStagingNetwork.credentials),
+                            callback);
 
 exit:
     if (err != CHIP_NO_ERROR)
