@@ -391,8 +391,8 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpScanCallback = callback;
-    CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
-                                                         0,          /* default value `kScanDurationDefault` = 300 ms. */
+    CHIP_ERROR err = MapOpenThreadError(otThreadDiscover(mOTInst, 0, /* all channels */
+                                                         OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
                                                          _OnNetworkScanFinished, this));
     if (err != CHIP_NO_ERROR)
     {
