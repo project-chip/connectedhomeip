@@ -44,6 +44,7 @@ ALL_PLATFORMS = set([
     'tizen',
     'webos',
     'mw320',
+    'openiotsdk',
 ])
 
 Module = namedtuple('Module', 'name path platforms')

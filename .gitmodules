@@ -269,9 +269,13 @@
 [submodule "editline"]
 	path = third_party/editline/repo
 	url = https://github.com/troglobit/editline.git
-[submodule "third_party/open-iot-sdk/sdk"]
+[submodule "open-iot-sdk"]
 	path = third_party/open-iot-sdk/sdk
 	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
-[submodule "third_party/open-iot-sdk/storage"]
+	branch = main
+	platforms = openiotsdk
+[submodule "open-iot-sdk-storage"]
 	path = third_party/open-iot-sdk/storage
 	url = https://git.gitlab.arm.com/iot/open-iot-sdk/storage.git
+	branch = main
+    platforms = openiotsdk
