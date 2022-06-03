@@ -1,0 +1,230 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 45.2.1. [TC-DGETH-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Ethernet Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read PHYRate attribute constraints"
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Read FullDuplex attribute constraints"
+      command: "readAttribute"
+      attribute: "FullDuplex"
+      response:
+          constraints:
+              type: bool
+
+    #issue #13648
+    - label: "Read PacketRxCount attribute constraints"
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read PacketRxCount value from DUT and verify the number of packets
+          received on ethernet network interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
+          Verify the value of PacketRxCount is in range uint64
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 3872576452
+          [1649663623.009973][8103:8108] CHIP:TOO:   PacketRxCount: 3322
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read PacketTxCount attribute constraints"
+      command: "readAttribute"
+      attribute: "PacketTxCount"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read PacketTxCount value from DUT and verify the number of packets
+          received on ethernet network interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
+          Verify the value of PacketTxCount is in range uint64
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 3872576452
+          [1649663793.192934][8117:8122] CHIP:TOO:   PacketTxCount: 3220
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read TxErrCount attribute constraints"
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read TxErrCount value from DUT and verify value indicates the number
+          of failed packet transmission on ethernet network interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 1
+          Verify the value of TxErrCount is in range uint64
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
+          [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read CollisionCount attribute constraints"
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read CollisionCount value from DUT and verify value indicates the
+          number of collision occurred while transmitting packets on ethernet
+          network interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read collision-count 1 1
+          Verify the value of  CollisionCount is in range uint64
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0005 DataVersion: 3872576452
+          [1649663870.221742][8133:8138] CHIP:TOO:   CollisionCount: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read OverrunCount attribute constraints"
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read OverrunCount value from DUT and verify value indicates the
+          number of packets dropped due to lack of buffer memory on ethernet
+          network interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 1
+
+           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
+          [1649663948.738274][8142:8147] CHIP:TOO:   OverrunCount: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read CarrierDetect attribute constraints"
+      command: "readAttribute"
+      attribute: "CarrierDetect"
+      response:
+          constraints:
+              type: bool
+
+    - label:
+          "Read CarrierDetect value from DUT and verify value indicates the
+          presence of carrier detect control signal on ethernet network
+          interface"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 1
+          Verify the value of CarrierDetect is either bool or null
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 3872576452
+          [1649663972.829304][8149:8154] CHIP:TOO:   CarrierDetect: null
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read TimeSinceReset attribute constraints"
+      command: "readAttribute"
+      attribute: "TimeSinceReset"
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Read TimeSinceReset value from DUT and verify the value indicates the
+          duration of time, in minutes"
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 1
+          Verify the value of TimeSinceReset is in range uint64
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 3872576452
+          [1649664046.010810][8158:8163] CHIP:TOO:   TimeSinceReset: 5219
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
