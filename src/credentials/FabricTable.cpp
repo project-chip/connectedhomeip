@@ -609,6 +609,11 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     VerifyOrReturnError(memcmp(operationalKey->Pubkey().ConstBytes(), pubkey.Bytes(), pubkey.Length()) == 0,
                         CHIP_ERROR_INVALID_PUBLIC_KEY);
 
+    if (mFabricId != kUndefinedFabricId)
+    {
+        VerifyOrReturnError(mFabricId == fabricId, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    }
+
     if (newFabric.mHasExternallyOwnedOperationalKey)
     {
         ReturnErrorOnFailure(SetExternallyOwnedOperationalKeypair(operationalKey));
