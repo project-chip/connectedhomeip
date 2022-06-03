@@ -122,13 +122,10 @@ exit:
     return false;
 }
 
-static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, int * type)
+static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, bt_gatt_type_e * type)
 {
-    int ret;
-
-    ret = bt_gatt_get_type(gattHandle, (bt_gatt_type_e *) type);
+    int ret = bt_gatt_get_type(gattHandle, type);
     VerifyOrReturnError(ret == BT_ERROR_NONE, ret);
-
     return bt_gatt_get_uuid(gattHandle, uuid);
 }
 
@@ -150,11 +147,14 @@ static const char * __ConvertAttTypeToStr(int type)
 static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                    int offset, void * userData)
 {
-    int ret, len = 0, type = 0;
-    char *value = nullptr, *uuid = nullptr;
+    int ret, len = 0;
+    bt_gatt_type_e type;
+    char * uuid  = nullptr;
+    char * value = nullptr;
 
-    __GetAttInfo(gattHandle, &uuid, &type);
-    ChipLogProgress(DeviceLayer, "Read Requested on %s(%s)", __ConvertAttTypeToStr(type), uuid);
+    VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
+                   ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
+    ChipLogProgress(DeviceLayer, "Read Requested on %s: %s", __ConvertAttTypeToStr(type), uuid);
     g_free(uuid);
 
     ret = bt_gatt_get_value(gattHandle, &value, &len);
@@ -170,9 +170,10 @@ static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt
 void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                            bool responseNeeded, int offset, const char * value, int len, void * userData)
 {
-    int ret, type = 0;
+    int ret;
     char * uuid          = nullptr;
     BLEConnection * conn = nullptr;
+    bt_gatt_type_e type;
 
     conn = static_cast<BLEConnection *>(g_hash_table_lookup(sInstance.mConnectionMap, remoteAddress));
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
@@ -195,9 +196,9 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
 
 void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData)
 {
-    int type             = 0;
     char * uuid          = nullptr;
     BLEConnection * conn = nullptr;
+    bt_gatt_type_e type;
     GHashTableIter iter;
     gpointer key, value;
 
@@ -678,50 +679,54 @@ void BLEManagerImpl::InitConnectionData(void)
 
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
 {
-    int type;
+    bt_gatt_type_e type;
     char * uuid = nullptr;
     auto conn   = static_cast<BLEConnection *>(data);
 
-    if (__GetAttInfo(charHandle, &uuid, &type) == BT_ERROR_NONE)
+    VerifyOrExit(__GetAttInfo(charHandle, &uuid, &type) == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle"));
+
+    if (strcasecmp(uuid, chip_ble_char_c1_tx_uuid) == 0)
     {
-        if (strcasecmp(uuid, chip_ble_char_c1_tx_uuid) == 0)
-        {
-            ChipLogProgress(DeviceLayer, "CHIP Char C1 TX Found [%s]", uuid);
-            conn->gattCharC1Handle = charHandle;
-        }
-        else if (strcasecmp(uuid, chip_ble_char_c2_rx_uuid) == 0)
-        {
-            ChipLogProgress(DeviceLayer, "CHIP Char C2 RX Found [%s]", uuid);
-            conn->gattCharC2Handle = charHandle;
-        }
-        g_free(uuid);
+        ChipLogProgress(DeviceLayer, "CHIP Char C1 TX Found [%s]", uuid);
+        conn->gattCharC1Handle = charHandle;
     }
+    else if (strcasecmp(uuid, chip_ble_char_c2_rx_uuid) == 0)
+    {
+        ChipLogProgress(DeviceLayer, "CHIP Char C2 RX Found [%s]", uuid);
+        conn->gattCharC2Handle = charHandle;
+    }
+    g_free(uuid);
+
+exit:
     /* Try next Char UUID */
     return true;
 }
 
 static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHandle, void * data)
 {
-    int type;
+    bt_gatt_type_e type;
     char * uuid = nullptr;
     auto conn   = static_cast<BLEConnection *>(data);
     ChipLogProgress(DeviceLayer, "__GattClientForeachServiceCb");
 
-    if (__GetAttInfo(svcHandle, &uuid, &type) == BT_ERROR_NONE)
+    VerifyOrExit(__GetAttInfo(svcHandle, &uuid, &type) == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle"));
+
+    if (strcasecmp(uuid, chip_ble_service_uuid) == 0)
     {
-        if (strcasecmp(uuid, chip_ble_service_uuid) == 0)
-        {
-            ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", uuid);
+        ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", uuid);
 
-            if (bt_gatt_service_foreach_characteristics(svcHandle, __GattClientForeachCharCb, conn) == BT_ERROR_NONE)
-                conn->isChipDevice = true;
+        if (bt_gatt_service_foreach_characteristics(svcHandle, __GattClientForeachCharCb, conn) == BT_ERROR_NONE)
+            conn->isChipDevice = true;
 
-            /* Got CHIP Device, no need to process further service */
-            g_free(uuid);
-            return false;
-        }
+        /* Got CHIP Device, no need to process further service */
         g_free(uuid);
+        return false;
     }
+    g_free(uuid);
+
+exit:
     /* Try next Service UUID */
     return true;
 }
