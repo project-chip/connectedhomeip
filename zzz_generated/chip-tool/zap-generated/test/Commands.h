@@ -56230,8 +56230,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 2:
@@ -56282,8 +56281,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 7:
@@ -56321,8 +56319,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 10:
@@ -56358,8 +56355,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 12:
@@ -56395,8 +56391,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 14:
@@ -56432,8 +56427,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 16:
@@ -56469,8 +56463,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 18:
@@ -56506,8 +56499,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 20:
@@ -56543,8 +56535,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 22:
@@ -56615,7 +56606,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
             }
             break;
         case 28:
@@ -56651,7 +56642,7 @@ private:
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
             }
             break;
         case 30:
@@ -56686,8 +56677,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 34:
@@ -56739,8 +56729,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 37:
@@ -56799,8 +56788,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 41:
@@ -56819,8 +56807,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 42:
@@ -56877,8 +56864,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 48:
@@ -56933,8 +56919,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 50:
@@ -56953,8 +56938,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 51:
@@ -57195,7 +57179,7 @@ private:
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
             }
             break;
         case 67:
@@ -57257,7 +57241,7 @@ private:
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
             }
             break;
         case 69:
@@ -57277,7 +57261,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 6U));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
             }
             break;
         case 71:
@@ -57323,7 +57307,7 @@ private:
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
             }
             break;
         case 72:
@@ -57343,7 +57327,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 6U));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 4U));
             }
             break;
         case 74:
@@ -57369,8 +57353,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 75:
@@ -57404,7 +57387,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 5U));
             }
             break;
         case 78:
@@ -57421,7 +57404,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 5U));
             }
             break;
         case 79:
@@ -57438,7 +57421,7 @@ private:
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 6U));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 5U));
             }
             break;
         case 80:
@@ -57477,8 +57460,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 81:
@@ -57504,8 +57486,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 82:
@@ -57566,8 +57547,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 87:
@@ -57583,8 +57563,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 88:
@@ -57600,8 +57579,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 7U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 89:
@@ -57627,8 +57605,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 90:
@@ -57654,8 +57631,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 91:
@@ -57681,8 +57657,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 4U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 92:
@@ -57708,8 +57683,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 5U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 93:
@@ -57773,8 +57747,7 @@ private:
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
                 VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 96:
@@ -57852,8 +57825,7 @@ private:
 
                 VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
 
-                VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
-                VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 106:
