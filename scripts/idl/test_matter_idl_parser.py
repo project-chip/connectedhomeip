@@ -373,6 +373,9 @@ server cluster A = 1 { /* Test comment */ }
     def test_endpoints(self):
         actual = parseText("""
             endpoint 12 {
+                device type foo = 123;
+                device type bar = 0xFF;
+
                 server cluster Foo { }
                 server cluster Bar { }
                 binding cluster Bar;
@@ -381,6 +384,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(endpoints=[Endpoint(number=12,
+                                           device_types=[
+                                               DeviceType(name="foo", code=123),
+                                               DeviceType(name="bar", code=0xFF),
+                                           ],
                                            server_clusters=[
                                                ServerClusterInstantiation(name="Foo"),
                                                ServerClusterInstantiation(name="Bar"),

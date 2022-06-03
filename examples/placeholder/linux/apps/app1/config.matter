@@ -2572,8 +2572,8 @@ server cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-
 endpoint 0 {
+  device type anonymousEndpointType = 65280;
   binding cluster OnOff;
   binding cluster GeneralCommissioning;
   binding cluster Switch;
@@ -2990,8 +2990,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type anonymousEndpointType = 258;
   binding cluster OnOff;
 
   server cluster Identify {
