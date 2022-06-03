@@ -16,14 +16,15 @@
  */
 
 #include <app/util/af.h>
+#include <app/util/util.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
-//#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
@@ -72,11 +73,35 @@ static void updateAttributeLinks(EndpointId endpoint)
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
     BitMask<PumpStatus> pumpStatus;
+    bool isControlModeAvailable = true;
+    bool isPumpStatusAvailable  = true;
+
+    isControlModeAvailable = emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::ControlMode::Id);
+    isPumpStatusAvailable  = emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::PumpStatus::Id);
 
     // Get the current control- and operation modes
-    Attributes::ControlMode::Get(endpoint, &controlMode);
     Attributes::OperationMode::Get(endpoint, &operationMode);
-    Attributes::PumpStatus::Get(endpoint, &pumpStatus);
+
+    if (isControlModeAvailable)
+    {
+        Attributes::ControlMode::Get(endpoint, &controlMode);
+    }
+    else
+    {
+        // If controlMode attribute is not available, then use the default value
+        // of the effectiveControlMode attribute as the effectiveControlMode
+        // if this is not suitable, the application should override this value in
+        // the post attribute change callback for the operation mode attribute
+        const EmberAfAttributeMetadata * effectiveControlModeMetaData;
+        effectiveControlModeMetaData = GetAttributeMetadata(
+            app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
+        controlMode = static_cast<PumpControlMode>(effectiveControlModeMetaData->defaultValue.defaultValue);
+    }
+
+    if (isPumpStatusAvailable)
+    {
+        Attributes::PumpStatus::Get(endpoint, &pumpStatus);
+    }
 
     switch (operationMode)
     {
@@ -93,21 +118,30 @@ static void updateAttributeLinks(EndpointId endpoint)
         {
         case RemoteSensorType::kFlowSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
-            pumpStatus.Set(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            if (isPumpStatusAvailable)
+            {
+                pumpStatus.Set(PumpStatus::kRemoteFlow);
+                pumpStatus.Clear(PumpStatus::kRemotePressure);
+                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            }
             break;
         case RemoteSensorType::kPressureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Set(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            if (isPumpStatusAvailable)
+            {
+                pumpStatus.Clear(PumpStatus::kRemoteFlow);
+                pumpStatus.Set(PumpStatus::kRemotePressure);
+                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            }
             break;
         case RemoteSensorType::kTemperatureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Set(PumpStatus::kRemoteTemperature);
+            if (isPumpStatusAvailable)
+            {
+                pumpStatus.Clear(PumpStatus::kRemoteFlow);
+                pumpStatus.Clear(PumpStatus::kRemotePressure);
+                pumpStatus.Set(PumpStatus::kRemoteTemperature);
+            }
             break;
         case RemoteSensorType::kNoSensor:
             // The pump is controlled by a setpoint, as defined by
@@ -119,23 +153,11 @@ static void updateAttributeLinks(EndpointId endpoint)
             // which would be the EffectiveControlMode is dependant on the actual
             // physical pump application running "on-top" of this cluster server.
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
-            switch (controlMode)
+            if (isPumpStatusAvailable)
             {
-            case PumpControlMode::kConstantFlow:
-                pumpStatus.Set(PumpStatus::kRemoteFlow);
-                break;
-            case PumpControlMode::kConstantPressure:
-                pumpStatus.Set(PumpStatus::kRemotePressure);
-                break;
-            case PumpControlMode::kConstantTemperature:
-                pumpStatus.Set(PumpStatus::kRemoteTemperature);
-                break;
-            default:
-                // Intentionally left out
-                break;
+                pumpStatus.Clear(PumpStatus::kRemoteFlow);
+                pumpStatus.Clear(PumpStatus::kRemotePressure);
+                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
             }
             break;
         }
@@ -157,9 +179,12 @@ static void updateAttributeLinks(EndpointId endpoint)
         LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
         LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
 #endif
-        pumpStatus.Clear(PumpStatus::kRemoteFlow);
-        pumpStatus.Clear(PumpStatus::kRemotePressure);
-        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        if (isPumpStatusAvailable)
+        {
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        }
     }
     break;
 
@@ -178,9 +203,12 @@ static void updateAttributeLinks(EndpointId endpoint)
         }
         LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
 #endif
-        pumpStatus.Clear(PumpStatus::kRemoteFlow);
-        pumpStatus.Clear(PumpStatus::kRemotePressure);
-        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        if (isPumpStatusAvailable)
+        {
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        }
     }
     break;
 
@@ -193,13 +221,20 @@ static void updateAttributeLinks(EndpointId endpoint)
         // Set the current ControlMode for now. Perhaps the application will set the EffectiveControlMode to something else.
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
         // Clear out the remote sensors from the PumpStatus flags.
-        pumpStatus.Clear(PumpStatus::kRemoteFlow);
-        pumpStatus.Clear(PumpStatus::kRemotePressure);
-        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        if (isPumpStatusAvailable)
+        {
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+        }
     }
     break;
     }
-    Attributes::PumpStatus::Set(endpoint, pumpStatus);
+
+    if (isPumpStatusAvailable)
+    {
+        Attributes::PumpStatus::Set(endpoint, pumpStatus);
+    }
 }
 
 CHIP_ERROR PumpConfigurationAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -287,14 +322,24 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     emberAfDebugPrintln(
         "Constant Pressure %s",
         FeatureSupportedDebugString(endpoint, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get));
-    emberAfDebugPrintln("Constant Proportional Pressure %s",
+    emberAfDebugPrintln("PCC Server: Constant Proportional Pressure %s",
                         FeatureSupportedDebugString(endpoint, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get));
-    emberAfDebugPrintln("Constant Flow %s",
+    emberAfDebugPrintln("PCC Server: Constant Flow %s",
                         FeatureSupportedDebugString(endpoint, Attributes::MinConstFlow::Get, Attributes::MaxConstFlow::Get));
-    emberAfDebugPrintln("Constant Temperature %s",
+    emberAfDebugPrintln("PCC Server: Constant Temperature %s",
                         FeatureSupportedDebugString(endpoint, Attributes::MinConstTemp::Get, Attributes::MaxConstTemp::Get));
-    emberAfDebugPrintln("Constant Speed %s",
+    emberAfDebugPrintln("PCC Server: Constant Speed %s",
                         FeatureSupportedDebugString(endpoint, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get));
+
+    if (!emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::ControlMode::Id))
+    {
+        emberAfDebugPrintln("PCC Server: ControlMode attribute not available");
+    }
+
+    if (!emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::PumpStatus::Id))
+    {
+        emberAfDebugPrintln("PCC Server: PumpStatus attribute not available");
+    }
 }
 
 chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(

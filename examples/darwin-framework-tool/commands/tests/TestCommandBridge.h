@@ -264,6 +264,31 @@ protected:
         return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
     }
 
+    template <typename T> bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    {
+        for (id currentElement in current) {
+            if ([currentElement isEqualToNumber:@(expected)]) {
+                return true;
+            }
+        }
+
+        Exit(std::string(itemName) + " expect the value " + std::to_string(expected) + " but the list does not contains it.");
+        return false;
+    }
+
+    template <typename T> bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    {
+        for (id currentElement in current) {
+            if ([currentElement isEqualToNumber:@(expected)]) {
+                Exit(std::string(itemName) + " does not expect the value " + std::to_string(expected)
+                    + " but the list contains it.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSData * _Nonnull current, const NSData * _Nonnull expected)
     {
         const chip::ByteSpan currentValue(static_cast<const uint8_t *>([current bytes]), [current length]);

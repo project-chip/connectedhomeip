@@ -2032,8 +2032,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2313,8 +2313,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type videoplayer = 35;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2408,8 +2408,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type speaker = 34;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2445,8 +2445,8 @@ endpoint 2 {
     callback attribute clusterRevision default = 1;
   }
 }
-
 endpoint 3 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2494,8 +2494,8 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 4 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2526,8 +2526,8 @@ endpoint 4 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 5 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
