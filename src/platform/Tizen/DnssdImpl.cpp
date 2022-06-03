@@ -64,13 +64,13 @@ bool CheckForSuccess(GenericContext * context, int err, const char * func, bool 
 {
     if (context == nullptr)
     {
-        ChipLogError(DeviceLayer, "%s (Dnssd context is null)", func);
+        ChipLogError(DeviceLayer, "DNSsd %s (context is null)", func);
         return false;
     }
 
     if (err != DNSSD_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "%s Err(%d)", func, err);
+        ChipLogError(DeviceLayer, "DNSsd %s Err(%d)", func, err);
         if (useCallback)
         {
             switch (context->contextType)
@@ -108,7 +108,7 @@ CHIP_ERROR Initialize()
 
 CHIP_ERROR UpdateTXTRecord(dnssd_service_h service, TextEntry * textEntries, size_t textEntrySize)
 {
-    ChipLogProgress(DeviceLayer, "%s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
     // TODO
     return CHIP_NO_ERROR;
@@ -116,7 +116,7 @@ CHIP_ERROR UpdateTXTRecord(dnssd_service_h service, TextEntry * textEntries, siz
 
 void OnRegister(dnssd_error_e error, dnssd_service_h service, void * data)
 {
-    ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<RegisterContext *>(data);
     auto loop = reinterpret_cast<GMainLoop *>(rCtx->context);
 
@@ -124,13 +124,13 @@ void OnRegister(dnssd_error_e error, dnssd_service_h service, void * data)
 
     VerifyOrReturn(CheckForSuccess(rCtx, static_cast<int>(error), __func__));
     rCtx->isRegistered = true;
-    ChipLogDetail(DeviceLayer, "Dnssd: %s name: %s, type: %s, port: %u, interfaceId: %u", __func__, rCtx->name, rCtx->type,
+    ChipLogDetail(DeviceLayer, "DNSsd %s name: %s, type: %s, port: %u, interfaceId: %u", __func__, rCtx->name, rCtx->type,
                   rCtx->port, rCtx->interfaceId);
 }
 
 gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
 {
-    ChipLogProgress(DeviceLayer, "%s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
     auto rCtx     = reinterpret_cast<RegisterContext *>(userData);
     rCtx->context = mainLoop;
@@ -162,7 +162,7 @@ CHIP_ERROR RegisterService(const char * type, const char * name, uint16_t port, 
         return UpdateTXTRecord(context->service, textEntries, textEntrySize);
     }
 
-    ChipLogProgress(DeviceLayer, "%s type: %s, name: %s, port: %u, interfaceId: %u", __func__, type, name, port, interfaceId);
+    ChipLogProgress(DeviceLayer, "DNSsd %s type: %s, name: %s, port: %u, interfaceId: %u", __func__, type, name, port, interfaceId);
 
     context = chip::Platform::New<RegisterContext>();
 
@@ -214,7 +214,7 @@ CHIP_ERROR UnregisterAllServices()
 
 void OnBrowseAdd(BrowseContext * context, dnssd_service_h service, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "Dnssd: %s  type: %s, name: %s", __func__, type, name);
+    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s", __func__, type, name);
 
     char * tokens  = strdup(type);
     char * regtype = strtok(tokens, ".");
@@ -234,7 +234,7 @@ void OnBrowseAdd(BrowseContext * context, dnssd_service_h service, const char * 
 
 void OnBrowseRemove(BrowseContext * context, dnssd_service_h service, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "Dnssd: %s  type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
 
     auto it = std::remove_if(
         context->services.begin(), context->services.end(), [name, type, interfaceId](const DnssdService & mdnsService) {
@@ -254,7 +254,7 @@ void StopBrowse(BrowseContext * context)
 
 void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
 {
-    ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto bCtx = reinterpret_cast<BrowseContext *>(data);
     auto loop = reinterpret_cast<GMainLoop *>(bCtx->context);
 
@@ -277,7 +277,7 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     interfaceId = if_nametoindex(ifaceName);
     VerifyOrExit(interfaceId > 0, );
 
-    ChipLogDetail(DeviceLayer, "Dnssd: %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
 
     if (state == DNSSD_SERVICE_STATE_AVAILABLE)
     {
@@ -309,7 +309,7 @@ exit:
 
 gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
 {
-    ChipLogProgress(DeviceLayer, "%s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
     BrowseContext * bCtx = reinterpret_cast<BrowseContext *>(userData);
     bCtx->context        = mainLoop;
@@ -363,7 +363,7 @@ void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<T
 {
     if (txtLen <= 1)
     {
-        ChipLogDetail(DeviceLayer, "Dnssd: %s No TXT records", __func__);
+        ChipLogDetail(DeviceLayer, "DNSsd %s: No TXT records", __func__);
         return;
     }
 
@@ -377,7 +377,7 @@ void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<T
         const uint8_t * const end = ptr + 1 + ptr[0];
         if (end > max)
         {
-            ChipLogError(DeviceLayer, "Dnssd: %s Invalid TXT data", __func__);
+            ChipLogError(DeviceLayer, "DNSsd %s: Invalid TXT data", __func__);
             return;
         }
 
@@ -405,7 +405,7 @@ void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<T
 
 void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 {
-    ChipLogDetail(DeviceLayer, "Dnssd: %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<ResolveContext *>(data);
     auto loop = reinterpret_cast<GMainLoop *>(rCtx->context);
 
@@ -455,7 +455,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     }
 #endif
 
-    ChipLogDetail(DeviceLayer, "Dnssd: %s ipv4: %s, ipv6: %s, valid: %d", __func__, ipv4, ipv6, validIP);
+    ChipLogDetail(DeviceLayer, "DNSsd %s ipv4: %s, ipv6: %s, valid: %d", __func__, ipv4, ipv6, validIP);
 
     if (validIP)
     {
@@ -476,7 +476,7 @@ exit:
 
 gboolean ResolveAsync(GMainLoop * mainLoop, gpointer userData)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
     ResolveContext * rCtx = reinterpret_cast<ResolveContext *>(userData);
     rCtx->context         = mainLoop;
@@ -491,7 +491,7 @@ gboolean ResolveAsync(GMainLoop * mainLoop, gpointer userData)
 
 CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, DnssdResolveCallback callback, void * context)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
 
     ResolveContext * rCtx = chip::Platform::New<ResolveContext>(type, name, interfaceId, callback, context);
 
@@ -621,7 +621,7 @@ CHIP_ERROR DnssdContexts::Add(ResolveContext * context, dnssd_service_h service)
 
 CHIP_ERROR DnssdContexts::Remove(GenericContext * context)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto iter = mContexts.cbegin();
     while (iter != mContexts.end())
     {
@@ -638,7 +638,7 @@ CHIP_ERROR DnssdContexts::Remove(GenericContext * context)
 
 CHIP_ERROR DnssdContexts::Remove(const char * type, const char * name, uint16_t port, uint32_t interfaceId)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd %s type: %s, name %s, port: %u, interfaceId: %u", __func__, type, name, port, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name %s, port: %u, interfaceId: %u", __func__, type, name, port, interfaceId);
     for (auto iter = mContexts.begin(); iter != mContexts.end(); ++iter)
     {
         if ((*iter)->contextType == ContextType::Register)
@@ -658,7 +658,7 @@ CHIP_ERROR DnssdContexts::Remove(const char * type, const char * name, uint16_t 
 
 CHIP_ERROR DnssdContexts::Remove(ContextType type)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     bool found = false;
 
     auto iter = mContexts.cbegin();
@@ -700,7 +700,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback successCallback, DnssdAsyncRet
     VerifyOrReturnError(successCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(errorCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(DeviceLayer, "Dnssd: %s", __func__);
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     CHIP_ERROR err = Initialize();
     if (err == CHIP_NO_ERROR)
     {
@@ -720,7 +720,7 @@ CHIP_ERROR ChipDnssdShutdown()
 
 CHIP_ERROR ChipDnssdSetHostname(const char * hostname)
 {
-    ChipLogProgress(DeviceLayer, "Dnssd: hostname %s", hostname);
+    ChipLogProgress(DeviceLayer, "DNSsd: hostname: %s", hostname);
     return CHIP_NO_ERROR;
 }
 
