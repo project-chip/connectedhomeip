@@ -14363,7 +14363,8 @@ public:
 namespace CSRRequest {
 enum class Fields
 {
-    kCSRNonce = 0,
+    kCSRNonce       = 0,
+    kIsForUpdateNOC = 1,
 };
 
 struct Type
@@ -14374,6 +14375,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
+    Optional<bool> isForUpdateNOC;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14389,6 +14391,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
+    Optional<bool> isForUpdateNOC;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CSRRequest

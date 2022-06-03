@@ -6675,6 +6675,7 @@ public:
     OperationalCredentialsCSRRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("csrrequest", credsIssuerConfig)
     {
         AddArgument("CSRNonce", &mRequest.CSRNonce);
+        AddArgument("IsForUpdateNOC", 0, 1, &mRequest.isForUpdateNOC);
         ClusterCommand::AddArguments();
     }
 

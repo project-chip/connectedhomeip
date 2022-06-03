@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.8. [TC-DM-4.8][Thread] Verification for AddOrUpdateThreadNetwork
+    10.4.8. [TC-DM-4.8] [Thread] Verification for AddOrUpdateThreadNetwork
     command [DUT-Commissionee]
 
 config:
@@ -23,7 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 sends ArmFailSafe command to the DUT"
+    - label:
+          "During the commissioning process, TH sends ArmFailSafe command to the
+          DUT"
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -38,9 +40,9 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddOrUpdateThreadNetwork command to the DUT with
-          OperationalDataset argument value as 'Userth_op' and Breadcrumb
-          argument value as 0"
+          "During the commissioning process, TH sends AddOrUpdateThreadNetwork
+          command to the DUT with OperationalDataset argument value as
+          'Userth_op' and Breadcrumb argument value as 1"
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -57,7 +59,9 @@ tests:
           [1650388639.091393][9682:9687] CHIP:CTL: Performing next commissioning step 'ThreadNetworkEnable'
       disabled: true
 
-    - label: "TH1 reads MaxNetworks attribute from the DUT"
+    - label:
+          "After commissioning completes, TH reads MaxNetworks attribute from
+          the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
 
@@ -70,7 +74,7 @@ tests:
           [1645772548.258032][3837:3842] CHIP:EM: Sending Standalone Ack for MessageCounter:7388528 on exchange 41499i
       disabled: true
 
-    - label: "TH1 reads LastNetworkingStatus attribute from the DUT"
+    - label: "TH reads LastNetworkingStatus attribute from the DUT"
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 51 0
 
@@ -79,7 +83,7 @@ tests:
           [1650371954.334942][7548:7553] CHIP:EM: Sending Standalone Ack for MessageCounter:4654405 on exchange 45344i
       disabled: true
 
-    - label: "TH1 reads Networks attribute from the DUT"
+    - label: "TH reads Networks attribute from the DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 

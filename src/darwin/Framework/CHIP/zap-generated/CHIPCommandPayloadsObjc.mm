@@ -2897,6 +2897,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _csrNonce = [NSData data];
+
+        _isForUpdateNOC = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2904,8 +2906,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: csrNonce:%@; >", NSStringFromClass([self class]), [_csrNonce base64EncodedStringWithOptions:0]];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: csrNonce:%@; isForUpdateNOC:%@; >", NSStringFromClass([self class]),
+                  [_csrNonce base64EncodedStringWithOptions:0], _isForUpdateNOC];
     return descriptionString;
 }
 
