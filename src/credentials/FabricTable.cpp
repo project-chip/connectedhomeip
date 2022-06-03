@@ -704,6 +704,21 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
+CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFabricInfo)
+{
+    FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    NotBeforeCollector notBeforeCollector;
+    ReturnErrorOnFailure(fabricInfo->SetFabricInfo(newFabricInfo, &notBeforeCollector));
+    ReturnErrorOnFailure(Store(fabricIndex));
+    // Update failure of Last Known Good Time is non-fatal.  If Last
+    // Known Good Time is unknown during incoming certificate validation
+    // for CASE and current time is also unknown, the certificate
+    // validity policy will see this condition and can act appropriately.
+    mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
 {

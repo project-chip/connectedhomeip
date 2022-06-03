@@ -205,25 +205,6 @@ public:
         mFabricIndex = kUndefinedFabricIndex;
     }
 
-    /**
-     * Verify the validity of the passed fabric info, and then emplace into
-     * this.  If a policy is passed, enact this for the fabric info validation.
-     *
-     * @param fabric fabric to emplace into this
-     * @param policy validation policy to apply, or nulllptr for none
-     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
-     */
-    CHIP_ERROR SetFabricInfo(FabricInfo & fabric, Credentials::CertificateValidityPolicy * policy);
-
-    /**
-     * Verify the validity of the passed fabric info, and then emplace into
-     * this.
-     *
-     * @param fabric fabric to emplace into this
-     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
-     */
-    CHIP_ERROR SetFabricInfo(FabricInfo & fabric) { return SetFabricInfo(fabric, nullptr); }
-
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
        output parameter */
@@ -267,6 +248,16 @@ private:
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage);
     CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage);
     static CHIP_ERROR DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex);
+
+    /**
+     * Verify the validity of the passed fabric info, and then emplace into
+     * this.  If a policy is passed, enact this for the fabric info validation.
+     *
+     * @param fabric fabric to emplace into this
+     * @param policy validation policy to apply, or nulllptr for none
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric, Credentials::CertificateValidityPolicy * policy);
 
     void ReleaseCert(MutableByteSpan & cert);
     void ReleaseOperationalCerts()
@@ -402,6 +393,15 @@ public:
     // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
     // test-cases
     CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);
+
+    /**
+     * Update fabric at the specified fabric index with the passed fabric info.
+     *
+     * @param fabricIndex index at which to update fabric info
+     * @param fabricInfo fabric info to validate and copy into the specified index
+     * @return CHIP_NO_ERROR on success, an appropriate CHIP_ERROR on failure
+     */
+    CHIP_ERROR UpdateFabric(FabricIndex fabricIndex, FabricInfo & fabricInfo);
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);

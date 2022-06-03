@@ -870,10 +870,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
     }
 
-    err = fabric->SetFabricInfo(gFabricBeingCommissioned);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
+    err = Server::GetInstance().GetFabricTable().UpdateFabric(fabricIndex, gFabricBeingCommissioned);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
