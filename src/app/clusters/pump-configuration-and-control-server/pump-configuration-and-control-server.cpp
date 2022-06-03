@@ -16,6 +16,7 @@
  */
 
 #include <app/util/af.h>
+#include <app/util/util.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -50,8 +51,6 @@ private:
 };
 
 PumpConfigurationAndControlAttrAccess gAttrAccess;
-bool isControlModeAvailable = true;
-bool isPumpStatusAvailable  = true;
 
 // Enum for RemoteSensorType
 enum class RemoteSensorType : uint8_t
@@ -75,6 +74,11 @@ static void updateAttributeLinks(EndpointId endpoint)
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
     BitFlags<PumpStatus> pumpStatus;
+    bool isControlModeAvailable = true;
+    bool isPumpStatusAvailable  = true;
+
+    isControlModeAvailable = emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::ControlMode::Id);
+    isPumpStatusAvailable  = emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::PumpStatus::Id);
 
     // Get the current control- and operation modes
     Attributes::OperationMode::Get(endpoint, &operationMode);
@@ -86,7 +90,7 @@ static void updateAttributeLinks(EndpointId endpoint)
     else
     {
         // If controlMode attribute is not available, then use the default value
-        // of the effectiveControlMode attriute as the effectiveControlMode
+        // of the effectiveControlMode attribute as the effectiveControlMode
         // if this is not suitable, the application should override this value in
         // the post attribute change callback for the operation mode attribute
         const EmberAfAttributeMetadata * effectiveControlModeMetaData;
@@ -302,10 +306,6 @@ const char * FeatureSupportedDebugString(EndpointId endpoint, EmberAfStatus (*ge
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status;
-    PumpControlMode controlMode;
-    BitFlags<PumpStatus> pumpStatus;
-
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
 
     // Determine the internal feature set of the pump, depending on the pump
@@ -332,18 +332,14 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     emberAfDebugPrintln("PCC Server: Constant Speed %s",
                         FeatureSupportedDebugString(endpoint, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get));
 
-    status = Attributes::ControlMode::Get(endpoint, &controlMode);
-    if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+    if (!emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::ControlMode::Id))
     {
         emberAfDebugPrintln("PCC Server: ControlMode attribute not available");
-        isControlModeAvailable = false;
     }
 
-    status = Attributes::PumpStatus::Get(endpoint, &pumpStatus);
-    if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+    if (!emberAfContainsAttribute(endpoint, PumpConfigurationAndControl::Id, Attributes::PumpStatus::Id))
     {
         emberAfDebugPrintln("PCC Server: PumpStatus attribute not available");
-        isPumpStatusAvailable = false;
     }
 }
 
