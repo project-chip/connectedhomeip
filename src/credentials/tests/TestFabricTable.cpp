@@ -215,12 +215,13 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    // Test that certificate NotBefore times that are at or after the Firmware
-    // build time do result in Last Known Good Times set to these.
     System::Clock::Seconds32 testCaseFirmwareBuildTimes[] = { testCertNotBeforeTime,
                                                               System::Clock::Seconds32(testCertNotBeforeTime.count() - 1),
                                                               System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000),
                                                               System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000) };
+    // Test that certificate NotBefore times that are at or after the Firmware
+    // build time do result in Last Known Good Times set to these.  Then test
+    // that we can do a fail-safe roll back.
     for (auto buildTime : testCaseFirmwareBuildTimes)
     {
         // Give us a configuration manager with firmware build time set to the desired value.
@@ -264,6 +265,51 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
+        }
+    }
+    // Test that certificate NotBefore times that are at or after the Firmware
+    // build time do result in Last Known Good Times set to these.  Then test
+    // that we can commit these to storage.  Attempted fail-safe roll back after
+    // commit will be a no-op.
+    for (auto buildTime : testCaseFirmwareBuildTimes)
+    {
+        // Give us a configuration manager with firmware build time set to the desired value.
+        SettableFirmwareBuildTimeConfigurationManager configManager(buildTime);
+        DeviceLayer::SetConfigurationMgr(&configManager);
+        chip::TestPersistentStorageDelegate testStorage;
+        {
+            // Initialize a fabric table.
+            FabricTable fabricTable;
+            NL_TEST_ASSERT(inSuite, fabricTable.Init(&testStorage) == CHIP_NO_ERROR);
+
+            // Load a test fabric
+            NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable) == CHIP_NO_ERROR);
+
+            // Read Last Known Good Time and verify that it is now set to the certificate
+            // NotBefore time, as this should be at or after firmware build time.
+            System::Clock::Seconds32 lastKnownGoodTime;
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
+
+            // Commit to storage.
+            NL_TEST_ASSERT(inSuite, fabricTable.CommitLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
+
+            // Verify that we can do a no-op fail-safe roll back.
+            NL_TEST_ASSERT(inSuite, fabricTable.RevertLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
+        }
+        {
+            // Test reloading last known good time from persistence.
+            FabricTable fabricTable;
+            NL_TEST_ASSERT(inSuite, fabricTable.Init(&testStorage) == CHIP_NO_ERROR);
+
+            // Verify that last known good time was retained.
+            System::Clock::Seconds32 lastKnownGoodTime;
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
         }
     }
 }

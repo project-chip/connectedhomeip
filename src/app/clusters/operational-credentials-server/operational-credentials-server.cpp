@@ -343,11 +343,26 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     }
 }
 
+void CommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
+{
+    ChipLogProgress(Zcl, "OpCreds: Commissioning Complete");
+
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().CommitLastKnownGoodChipEpochTime();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OpCreds: failed to commit Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
 void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         FailSafeCleanup(event);
+    }
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        CommissioningComplete(event);
     }
 }
 

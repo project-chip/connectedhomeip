@@ -93,6 +93,14 @@ public:
     CHIP_ERROR UpdateLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
 
     /*
+     * Commit the Last Known Good Time by deleting the fail-safe backup from
+     * storage.
+     *
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR CommitLastKnownGoodChipEpochTime();
+
+    /*
      * Revert the Last Known Good Time to the fail-safe backup value in
      * persistence if any exists.
      *

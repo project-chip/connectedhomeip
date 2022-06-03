@@ -220,6 +220,22 @@ exit:
     return err;
 }
 
+CHIP_ERROR LastKnownGoodTime::CommitLastKnownGoodChipEpochTime()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mLastKnownGoodChipEpochTime.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    LogTime("Committing Last Known Good Time to storage: ", mLastKnownGoodChipEpochTime.Value());
+    // Writing with no fail-safe backup removes the fail-safe backup from
+    // storage, thus committing the new Last Known Good Time.
+    SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(mLastKnownGoodChipEpochTime.Value()));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(TimeService, "Failed to commit Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+
 CHIP_ERROR LastKnownGoodTime::RevertLastKnownGoodChipEpochTime()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
