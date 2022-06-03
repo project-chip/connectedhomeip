@@ -129,7 +129,7 @@ static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, bt_gatt_type_e * typ
     return bt_gatt_get_uuid(gattHandle, uuid);
 }
 
-static const char * __ConvertAttTypeToStr(int type)
+static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
 {
     switch (type)
     {
@@ -140,7 +140,7 @@ static const char * __ConvertAttTypeToStr(int type)
     case BT_GATT_TYPE_DESCRIPTOR:
         return "Descriptor";
     default:
-        return nullptr;
+        return "(unknown)";
     }
 }
 

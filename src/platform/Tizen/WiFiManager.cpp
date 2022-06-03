@@ -25,7 +25,7 @@
 #include "WiFiManager.h"
 
 namespace {
-const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
+static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
     switch (state)
     {
@@ -38,7 +38,7 @@ const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
     }
 }
 
-const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
+static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
 {
     switch (state)
     {
@@ -51,7 +51,7 @@ const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
     }
 }
 
-const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
+static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
 {
     switch (state)
     {
@@ -70,7 +70,7 @@ const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
     }
 }
 
-const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
+static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
 {
     switch (state)
     {
@@ -83,7 +83,7 @@ const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
     }
 }
 
-const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
+static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
 {
     switch (state)
     {
@@ -96,7 +96,7 @@ const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
     }
 }
 
-const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
+static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
 {
     switch (type)
     {
