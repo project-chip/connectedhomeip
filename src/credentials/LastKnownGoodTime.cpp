@@ -52,13 +52,13 @@ void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipE
 CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
                                                              Optional<System::Clock::Seconds32> & failSafeBackup) const
 {
-    TLV::ContiguousBufferTLVReader reader;
     uint8_t buf[LastKnownGoodTimeTLVMaxSize()];
     uint16_t size = sizeof(buf);
     uint32_t seconds;
-    reader.Init(buf, size);
     DefaultStorageKeyAllocator keyAlloc;
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(keyAlloc.LastKnownGoodTimeKey(), buf, size));
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(buf, size);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
