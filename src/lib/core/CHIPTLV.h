@@ -32,6 +32,7 @@
 #include <lib/core/CHIPTLVTypes.h>
 
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ScopedBuffer.h>
@@ -524,6 +525,21 @@ public:
      */
     template <typename T>
     CHIP_ERROR Get(BitFlags<T> & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v.SetRaw(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get the value of the current element as a BitMask value, if it's an integer
+     * value that fits in the BitMask type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T>
+    CHIP_ERROR Get(BitMask<T> & v)
     {
         std::underlying_type_t<T> val;
         ReturnErrorOnFailure(Get(val));
@@ -1429,6 +1445,16 @@ public:
      */
     template <typename T>
     CHIP_ERROR Put(Tag tag, BitFlags<T> data)
+    {
+        return Put(tag, data.Raw());
+    }
+
+    /**
+     *
+     * Encodes an unsigned integer with bits corresponding to the flags set when data is a BitMask
+     */
+    template <typename T>
+    CHIP_ERROR Put(Tag tag, BitMask<T> data)
     {
         return Put(tag, data.Raw());
     }
