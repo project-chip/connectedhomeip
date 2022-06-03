@@ -22,6 +22,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -79,6 +80,11 @@ struct CompletionStatus
 };
 
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
+
+// Per spec, all commands that are sent with the failsafe armed need at least
+// a 30s timeout.
+constexpr System::Clock::Timeout kMinimumCommissioningStepTimeout = System::Clock::Seconds16(30);
+
 class CommissioningParameters
 {
 public:
