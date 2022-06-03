@@ -23,8 +23,8 @@
 
 #include <lib/support/BufferWriter.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/ConfigurationManager.h>
 #include <lib/support/SafeInt.h>
+#include <platform/ConfigurationManager.h>
 
 namespace chip {
 
@@ -110,21 +110,17 @@ CHIP_ERROR LastKnownGoodTime::StoreLastKnownGoodChipEpochTime(System::Clock::Sec
 
 CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
 {
-    mStorage = storage;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mStorage       = storage;
     // 3.5.6.1 Last Known Good UTC Time:
     //
     // "A Node’s initial out-of-box Last Known Good UTC time SHALL be the
     // compile-time of the firmware."
-    //
-    // Read build time from the configuration manager to get our initial Last
-    // Known Good Time.  Note 'SHALL' above: it is impermissible for a platform
-    // not to know this.  Hence return an error to the caller if build time is
-    // not available.  Callers should consider this fatal.
     System::Clock::Seconds32 buildTime;
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime));
+    SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime));
     System::Clock::Seconds32 storedLastKnownGoodChipEpochTime;
-    CHIP_ERROR err = LoadLastKnownGoodChipEpochTime(storedLastKnownGoodChipEpochTime);
-    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+    err = LoadLastKnownGoodChipEpochTime(storedLastKnownGoodChipEpochTime);
+    VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, ;);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogProgress(TimeService, "Last Known Good Time: [unknown]");
@@ -140,13 +136,18 @@ CHIP_ERROR LastKnownGoodTime::Init(PersistentStorageDelegate * storage)
         // firmware build time and write back.
         LogTime("Setting Last Known Good Time to firmware build time ", buildTime);
         mLastKnownGoodChipEpochTime.SetValue(buildTime);
-        return StoreLastKnownGoodChipEpochTime(buildTime);
+        SuccessOrExit(err = StoreLastKnownGoodChipEpochTime(buildTime));
     }
     else
     {
         mLastKnownGoodChipEpochTime.SetValue(storedLastKnownGoodChipEpochTime);
-        return CHIP_NO_ERROR;
     }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(TimeService, "Failed to init Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
 }
 
 CHIP_ERROR LastKnownGoodTime::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
@@ -199,7 +200,7 @@ CHIP_ERROR LastKnownGoodTime::UpdateLastKnownGoodChipEpochTime(System::Clock::Se
     {
         LogTime("Current Last Known Good time retained in fail-safe context, updating to ", lastKnownGoodChipEpochTime);
         // We have a later timestamp.  Advance last known good time and store
-        // the failsafe value.
+        // the fail-safe value.
         SuccessOrExit(
             err = StoreLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime, MakeOptional(mLastKnownGoodChipEpochTime.Value())));
         mLastKnownGoodChipEpochTime.SetValue(lastKnownGoodChipEpochTime);

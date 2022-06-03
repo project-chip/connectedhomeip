@@ -732,8 +732,12 @@ FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex
             }
 
             UpdateNextAvailableFabricIndex();
-            if ((err = StoreFabricIndexInfo()) != CHIP_NO_ERROR ||
-                (err = mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore)) != CHIP_NO_ERROR)
+            // Update failure of Last Known Good Time is non-fatal.  If Last
+            // Known Good Time is unknown during incoming certificate validation
+            // for CASE and current time is also unknown, the certificate
+            // validity policy will see this condition and can act appropriately.
+            mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
+            if ((err = StoreFabricIndexInfo()) != CHIP_NO_ERROR)
             {
                 // Roll everything back.
                 mNextAvailableFabricIndex.SetValue(newFabricIndex);
@@ -837,7 +841,11 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     }
     mNextAvailableFabricIndex.SetValue(kMinValidFabricIndex);
 
-    ReturnErrorOnFailure(mLastKnownGoodTime.Init(storage));
+    // Init failure of Last Known Good Time is non-fatal.  If Last Known Good
+    // Time is unknown during incoming certificate validation for CASE and
+    // current time is also unknown, the certificate validity policy will see
+    // this condition and can act appropriately.
+    mLastKnownGoodTime.Init(storage);
 
     uint8_t buf[IndexInfoTLVMaxSize()];
     uint16_t size = sizeof(buf);
