@@ -275,12 +275,9 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
         jobjectArray keys   = (jobjectArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryKeysMethod, textEntries);
         size_t size         = env->GetArrayLength(keys);
         TextEntry * entries = new (std::nothrow) TextEntry[size];
-        if (entries == nullptr)
-        {
-            ChipLogError(Discovery, "entries alloc failure");
-            goto exit;
-        }
+        VerifyOrExit(entries != nullptr, ChipLogError(Discovery, "entries alloc failure"));
         memset(entries, 0, sizeof(entries[0]) * size);
+
         service.mTextEntries = entries;
         for (size_t i = 0; i < size; i++)
         {
@@ -294,11 +291,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
             {
                 size_t dataSize = env->GetArrayLength(datas);
                 uint8_t * data  = new (std::nothrow) uint8_t[dataSize];
-                if (data == nullptr)
-                {
-                    ChipLogError(Discovery, "data alloc failure");
-                    goto exit;
-                }
+                VerifyOrExit(data != nullptr, ChipLogError(Discovery, "data alloc failure"));
 
                 jbyte * jnidata = env->GetByteArrayElements(datas, nullptr);
                 for (size_t j = 0; j < dataSize; j++)
