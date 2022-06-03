@@ -92,8 +92,8 @@ class StatefulShell:
             redirect = ""
 
         command_with_state = (
-            f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect};"
-            f" env -0 > {self.envfile_path}")
+            f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect}; RETCODE=$?;"
+            f" env -0 > {self.envfile_path}; exit $RETCODE")
         with subprocess.Popen(
             [command_with_state],
             env=self.env, cwd=self.cwd,
@@ -114,7 +114,9 @@ class StatefulShell:
 
         if raise_on_returncode and returncode != 0:
             raise RuntimeError(
-                f"Error. Return code is not 0. It is: {returncode}")
+                "Error. Nonzero return code."
+                f"\nReturncode: {returncode}"
+                f"\nCmd: {cmd}")
 
         if return_cmd_output:
             with open(self.cmd_output_path, encoding="latin1") as f:
