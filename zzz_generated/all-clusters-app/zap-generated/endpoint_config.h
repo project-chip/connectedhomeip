@@ -371,7 +371,10 @@
             { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* nullable_range_restricted_int16u */                        \
             { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* nullable_range_restricted_int16s */                        \
                                                                                                                                    \
-        /* Endpoint: 2, Cluster: On/Off (server) */ { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 } /* StartUpOnOff */          \
+        /* Endpoint: 2, Cluster: On/Off (server) */                                                                                \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2                                                                         \
+        } /* StartUpOnOff */                                                                                                       \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
@@ -2851,7 +2854,10 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-        { 0x0016, 1 }, { 0x0100, 1 }, { 0x0100, 1 }, { 0xF002, 1 }                                                                 \
+        { 0x0016, 1 }, { 0x0100, 1 }, { 0x0100, 1 },                                                                               \
+        {                                                                                                                          \
+            0xF002, 1                                                                                                              \
+        }                                                                                                                          \
     }
 
 // Array of device type offsets
