@@ -144,112 +144,112 @@ limitations under the License.
     <define>TEST_CLUSTER</define>
     <description>The Test Cluster is meant to validate the generated code</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="false">boolean</attribute>
-    <attribute side="server" code="0x0001" define="BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" optional="false">bitmap8</attribute>
-    <attribute side="server" code="0x0002" define="BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" optional="false">bitmap16</attribute>
-    <attribute side="server" code="0x0003" define="BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" optional="false">bitmap32</attribute>
-    <attribute side="server" code="0x0004" define="BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" optional="false">bitmap64</attribute>
-    <attribute side="server" code="0x0005" define="INT8U" type="INT8U" writable="true" default="0" optional="false">int8u</attribute>
-    <attribute side="server" code="0x0006" define="INT16U" type="INT16U" writable="true" default="0" optional="false">int16u</attribute>
-    <attribute side="server" code="0x0007" define="INT24U" type="INT24U" writable="true" default="0" optional="false">int24u</attribute>
-    <attribute side="server" code="0x0008" define="INT32U" type="INT32U" writable="true" default="0" optional="false">int32u</attribute>
-    <attribute side="server" code="0x0009" define="INT40U" type="INT40U" writable="true" default="0" optional="false">int40u</attribute>
-    <attribute side="server" code="0x000A" define="INT48U" type="INT48U" writable="true" default="0" optional="false">int48u</attribute>
-    <attribute side="server" code="0x000B" define="INT56U" type="INT56U" writable="true" default="0" optional="false">int56u</attribute>
-    <attribute side="server" code="0x000C" define="INT64U" type="INT64U" writable="true" default="0" optional="false">int64u</attribute>
-    <attribute side="server" code="0x000D" define="INT8S" type="INT8S" writable="true" default="0" optional="false">int8s</attribute>
-    <attribute side="server" code="0x000E" define="INT16S" type="INT16S" writable="true" default="0" optional="false">int16s</attribute>
-    <attribute side="server" code="0x000F" define="INT24S" type="INT24S" writable="true" default="0" optional="false">int24s</attribute>
-    <attribute side="server" code="0x0010" define="INT32S" type="INT32S" writable="true" default="0" optional="false">int32s</attribute>
-    <attribute side="server" code="0x0011" define="INT40S" type="INT40S" writable="true" default="0" optional="false">int40s</attribute>
-    <attribute side="server" code="0x0012" define="INT48S" type="INT48S" writable="true" default="0" optional="false">int48s</attribute>
-    <attribute side="server" code="0x0013" define="INT56S" type="INT56S" writable="true" default="0" optional="false">int56s</attribute>
-    <attribute side="server" code="0x0014" define="INT64S" type="INT64S" writable="true" default="0" optional="false">int64s</attribute>
-    <attribute side="server" code="0x0015" define="ENUM8" type="ENUM8" writable="true" default="0" optional="false">enum8</attribute>
-    <attribute side="server" code="0x0016" define="ENUM16" type="ENUM16" writable="true" default="0" optional="false">enum16</attribute>
-    <attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="SINGLE" writable="true" default="0" optional="false">float_single</attribute>
-    <attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" optional="false">float_double</attribute>
-    <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="false">octet_string</attribute>
-    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="true" optional="false">list_int8u</attribute>
-    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="true" optional="false">list_octet_string</attribute>
-    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="true" optional="false">list_struct_octet_string</attribute>
-    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
-    <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="false">char_string</attribute>
-    <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
-    <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="false">epoch_us</attribute>
-    <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
+    <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="true">boolean</attribute>
+    <attribute side="server" code="0x0001" define="BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" optional="true">bitmap8</attribute>
+    <attribute side="server" code="0x0002" define="BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" optional="true">bitmap16</attribute>
+    <attribute side="server" code="0x0003" define="BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" optional="true">bitmap32</attribute>
+    <attribute side="server" code="0x0004" define="BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" optional="true">bitmap64</attribute>
+    <attribute side="server" code="0x0005" define="INT8U" type="INT8U" writable="true" default="0" optional="true">int8u</attribute>
+    <attribute side="server" code="0x0006" define="INT16U" type="INT16U" writable="true" default="0" optional="true">int16u</attribute>
+    <attribute side="server" code="0x0007" define="INT24U" type="INT24U" writable="true" default="0" optional="true">int24u</attribute>
+    <attribute side="server" code="0x0008" define="INT32U" type="INT32U" writable="true" default="0" optional="true">int32u</attribute>
+    <attribute side="server" code="0x0009" define="INT40U" type="INT40U" writable="true" default="0" optional="true">int40u</attribute>
+    <attribute side="server" code="0x000A" define="INT48U" type="INT48U" writable="true" default="0" optional="true">int48u</attribute>
+    <attribute side="server" code="0x000B" define="INT56U" type="INT56U" writable="true" default="0" optional="true">int56u</attribute>
+    <attribute side="server" code="0x000C" define="INT64U" type="INT64U" writable="true" default="0" optional="true">int64u</attribute>
+    <attribute side="server" code="0x000D" define="INT8S" type="INT8S" writable="true" default="0" optional="true">int8s</attribute>
+    <attribute side="server" code="0x000E" define="INT16S" type="INT16S" writable="true" default="0" optional="true">int16s</attribute>
+    <attribute side="server" code="0x000F" define="INT24S" type="INT24S" writable="true" default="0" optional="true">int24s</attribute>
+    <attribute side="server" code="0x0010" define="INT32S" type="INT32S" writable="true" default="0" optional="true">int32s</attribute>
+    <attribute side="server" code="0x0011" define="INT40S" type="INT40S" writable="true" default="0" optional="true">int40s</attribute>
+    <attribute side="server" code="0x0012" define="INT48S" type="INT48S" writable="true" default="0" optional="true">int48s</attribute>
+    <attribute side="server" code="0x0013" define="INT56S" type="INT56S" writable="true" default="0" optional="true">int56s</attribute>
+    <attribute side="server" code="0x0014" define="INT64S" type="INT64S" writable="true" default="0" optional="true">int64s</attribute>
+    <attribute side="server" code="0x0015" define="ENUM8" type="ENUM8" writable="true" default="0" optional="true">enum8</attribute>
+    <attribute side="server" code="0x0016" define="ENUM16" type="ENUM16" writable="true" default="0" optional="true">enum16</attribute>
+    <attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="SINGLE" writable="true" default="0" optional="true">float_single</attribute>
+    <attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" optional="true">float_double</attribute>
+    <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="true">octet_string</attribute>
+    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="true" optional="true">list_int8u</attribute>
+    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="true" optional="true">list_octet_string</attribute>
+    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="true" optional="true">list_struct_octet_string</attribute>
+    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="true">long_octet_string</attribute>
+    <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="true">char_string</attribute>
+    <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="true">long_char_string</attribute>
+    <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="true">epoch_us</attribute>
+    <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="true">epoch_s</attribute>
     <attribute side="server" code="0x0022" define="TEST_VENDOR_ID" type="vendor_id"
-               writable="true" optional="false" default="0">vendor_id</attribute>
+               writable="true" optional="true" default="0">vendor_id</attribute>
     <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
-               writable="true" optional="false">list_nullables_and_optionals_struct</attribute>
-    <attribute side="server" code="0x0024" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">enum_attr</attribute>
-    <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="false">struct_attr</attribute>
-    <attribute side="server" code="0x0026" define="RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" optional="false" default="70">range_restricted_int8u</attribute>
-    <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
-    <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
-    <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
-    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="true" optional="false">list_long_octet_string</attribute>
-    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="ARRAY" entryType="TestFabricScoped" length="10" writable="true" optional="false">list_fabric_scoped</attribute>
+               writable="true" optional="true">list_nullables_and_optionals_struct</attribute>
+    <attribute side="server" code="0x0024" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="true">enum_attr</attribute>
+    <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="true">struct_attr</attribute>
+    <attribute side="server" code="0x0026" define="RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" optional="true" default="70">range_restricted_int8u</attribute>
+    <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="true" default="-5">range_restricted_int8s</attribute>
+    <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="true" default="200">range_restricted_int16u</attribute>
+    <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="true" default="-5">range_restricted_int16s</attribute>
+    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="true" optional="true">list_long_octet_string</attribute>
+    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="ARRAY" entryType="TestFabricScoped" length="10" writable="true" optional="true">list_fabric_scoped</attribute>
     <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
                type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
     <!-- Reading/writing the following two attributes will respond with a
          general error or a cluster-specific error respectively -->
     <attribute side="server" code="0x0031" define="GENERAL_ERROR_BOOLEAN"
-               type="BOOLEAN" writable="true" optional="false">general_error_boolean</attribute>
+               type="BOOLEAN" writable="true" optional="true">general_error_boolean</attribute>
     <attribute side="server" code="0x0032" define="CLUSTER_ERROR_BOOLEAN"
-               type="BOOLEAN" writable="true" optional="false">cluster_error_boolean</attribute>
+               type="BOOLEAN" writable="true" optional="true">cluster_error_boolean</attribute>
 
-    <attribute side="server" code="0x4000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
-    <attribute side="server" code="0x4001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
-    <attribute side="server" code="0x4002" define="NULLABLE_BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap16</attribute>
-    <attribute side="server" code="0x4003" define="NULLABLE_BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap32</attribute>
-    <attribute side="server" code="0x4004" define="NULLABLE_BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap64</attribute>
-    <attribute side="server" code="0x4005" define="NULLABLE_INT8U" type="INT8U" writable="true" default="0" isNullable="true" optional="false">nullable_int8u</attribute>
-    <attribute side="server" code="0x4006" define="NULLABLE_INT16U" type="INT16U" writable="true" default="0" isNullable="true" optional="false">nullable_int16u</attribute>
-    <attribute side="server" code="0x4007" define="NULLABLE_INT24U" type="INT24U" writable="true" default="0" isNullable="true" optional="false">nullable_int24u</attribute>
-    <attribute side="server" code="0x4008" define="NULLABLE_INT32U" type="INT32U" writable="true" default="0" isNullable="true" optional="false">nullable_int32u</attribute>
-    <attribute side="server" code="0x4009" define="NULLABLE_INT40U" type="INT40U" writable="true" default="0" isNullable="true" optional="false">nullable_int40u</attribute>
-    <attribute side="server" code="0x400A" define="NULLABLE_INT48U" type="INT48U" writable="true" default="0" isNullable="true" optional="false">nullable_int48u</attribute>
-    <attribute side="server" code="0x400B" define="NULLABLE_INT56U" type="INT56U" writable="true" default="0" isNullable="true" optional="false">nullable_int56u</attribute>
-    <attribute side="server" code="0x400C" define="NULLABLE_INT64U" type="INT64U" writable="true" default="0" isNullable="true" optional="false">nullable_int64u</attribute>
-    <attribute side="server" code="0x400D" define="NULLABLE_INT8S" type="INT8S" writable="true" default="0" isNullable="true" optional="false">nullable_int8s</attribute>
-    <attribute side="server" code="0x400E" define="NULLABLE_INT16S" type="INT16S" writable="true" default="0" isNullable="true" optional="false">nullable_int16s</attribute>
-    <attribute side="server" code="0x400F" define="NULLABLE_INT24S" type="INT24S" writable="true" default="0" isNullable="true" optional="false">nullable_int24s</attribute>
-    <attribute side="server" code="0x4010" define="NULLABLE_INT32S" type="INT32S" writable="true" default="0" isNullable="true" optional="false">nullable_int32s</attribute>
-    <attribute side="server" code="0x4011" define="NULLABLE_INT40S" type="INT40S" writable="true" default="0" isNullable="true" optional="false">nullable_int40s</attribute>
-    <attribute side="server" code="0x4012" define="NULLABLE_INT48S" type="INT48S" writable="true" default="0" isNullable="true" optional="false">nullable_int48s</attribute>
-    <attribute side="server" code="0x4013" define="NULLABLE_INT56S" type="INT56S" writable="true" default="0" isNullable="true" optional="false">nullable_int56s</attribute>
-    <attribute side="server" code="0x4014" define="NULLABLE_INT64S" type="INT64S" writable="true" default="0" isNullable="true" optional="false">nullable_int64s</attribute>
-    <attribute side="server" code="0x4015" define="NULLABLE_ENUM8" type="ENUM8" writable="true" default="0" isNullable="true" optional="false">nullable_enum8</attribute>
-    <attribute side="server" code="0x4016" define="NULLABLE_ENUM16" type="ENUM16" writable="true" default="0" isNullable="true" optional="false">nullable_enum16</attribute>
-    <attribute side="server" code="0x4017" define="NULLABLE_FLOAT_SINGLE" type="SINGLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_single</attribute>
-    <attribute side="server" code="0x4018" define="NULLABLE_FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_double</attribute>
-    <attribute side="server" code="0x4019" define="NULLABLE_OCTET_STRING" type="OCTET_STRING" length="10" writable="true" isNullable="true" optional="false">nullable_octet_string</attribute>
-    <attribute side="server" code="0x401E" define="NULLABLE_CHAR_STRING" type="CHAR_STRING" length="10" writable="true" isNullable="true" optional="false">nullable_char_string</attribute>
-    <attribute side="server" code="0x4024" define="NULLABLE_SIMPLE_ENUM" type="SimpleEnum" writable="true" isNullable="true" optional="false">nullable_enum_attr</attribute>
-    <attribute side="server" code="0x4025" define="NULLABLE_STRUCT" type="SimpleStruct" writable="true" isNullable="true" optional="false">nullable_struct</attribute>
-    <attribute side="server" code="0x4026" define="NULLABLE_RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" isNullable="true" optional="false" default="70">nullable_range_restricted_int8u</attribute>
-    <attribute side="server" code="0x4027" define="NULLABLE_RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" isNullable="true" optional="false" default="-5">nullable_range_restricted_int8s</attribute>
-    <attribute side="server" code="0x4028" define="NULLABLE_RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" isNullable="true" optional="false" default="200">nullable_range_restricted_int16u</attribute>
-    <attribute side="server" code="0x4029" define="NULLABLE_RANGE_RESTRICTED_INT16S" type="int16s" min="-150" max="200" writable="true" isNullable="true" optional="false" default="-5">nullable_range_restricted_int16s</attribute>
+    <attribute side="server" code="0x4000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="true">nullable_boolean</attribute>
+    <attribute side="server" code="0x4001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="true">nullable_bitmap8</attribute>
+    <attribute side="server" code="0x4002" define="NULLABLE_BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" isNullable="true" optional="true">nullable_bitmap16</attribute>
+    <attribute side="server" code="0x4003" define="NULLABLE_BITMAP32" type="Bitmap32MaskMap" writable="true" default="0" isNullable="true" optional="true">nullable_bitmap32</attribute>
+    <attribute side="server" code="0x4004" define="NULLABLE_BITMAP64" type="Bitmap64MaskMap" writable="true" default="0" isNullable="true" optional="true">nullable_bitmap64</attribute>
+    <attribute side="server" code="0x4005" define="NULLABLE_INT8U" type="INT8U" writable="true" default="0" isNullable="true" optional="true">nullable_int8u</attribute>
+    <attribute side="server" code="0x4006" define="NULLABLE_INT16U" type="INT16U" writable="true" default="0" isNullable="true" optional="true">nullable_int16u</attribute>
+    <attribute side="server" code="0x4007" define="NULLABLE_INT24U" type="INT24U" writable="true" default="0" isNullable="true" optional="true">nullable_int24u</attribute>
+    <attribute side="server" code="0x4008" define="NULLABLE_INT32U" type="INT32U" writable="true" default="0" isNullable="true" optional="true">nullable_int32u</attribute>
+    <attribute side="server" code="0x4009" define="NULLABLE_INT40U" type="INT40U" writable="true" default="0" isNullable="true" optional="true">nullable_int40u</attribute>
+    <attribute side="server" code="0x400A" define="NULLABLE_INT48U" type="INT48U" writable="true" default="0" isNullable="true" optional="true">nullable_int48u</attribute>
+    <attribute side="server" code="0x400B" define="NULLABLE_INT56U" type="INT56U" writable="true" default="0" isNullable="true" optional="true">nullable_int56u</attribute>
+    <attribute side="server" code="0x400C" define="NULLABLE_INT64U" type="INT64U" writable="true" default="0" isNullable="true" optional="true">nullable_int64u</attribute>
+    <attribute side="server" code="0x400D" define="NULLABLE_INT8S" type="INT8S" writable="true" default="0" isNullable="true" optional="true">nullable_int8s</attribute>
+    <attribute side="server" code="0x400E" define="NULLABLE_INT16S" type="INT16S" writable="true" default="0" isNullable="true" optional="true">nullable_int16s</attribute>
+    <attribute side="server" code="0x400F" define="NULLABLE_INT24S" type="INT24S" writable="true" default="0" isNullable="true" optional="true">nullable_int24s</attribute>
+    <attribute side="server" code="0x4010" define="NULLABLE_INT32S" type="INT32S" writable="true" default="0" isNullable="true" optional="true">nullable_int32s</attribute>
+    <attribute side="server" code="0x4011" define="NULLABLE_INT40S" type="INT40S" writable="true" default="0" isNullable="true" optional="true">nullable_int40s</attribute>
+    <attribute side="server" code="0x4012" define="NULLABLE_INT48S" type="INT48S" writable="true" default="0" isNullable="true" optional="true">nullable_int48s</attribute>
+    <attribute side="server" code="0x4013" define="NULLABLE_INT56S" type="INT56S" writable="true" default="0" isNullable="true" optional="true">nullable_int56s</attribute>
+    <attribute side="server" code="0x4014" define="NULLABLE_INT64S" type="INT64S" writable="true" default="0" isNullable="true" optional="true">nullable_int64s</attribute>
+    <attribute side="server" code="0x4015" define="NULLABLE_ENUM8" type="ENUM8" writable="true" default="0" isNullable="true" optional="true">nullable_enum8</attribute>
+    <attribute side="server" code="0x4016" define="NULLABLE_ENUM16" type="ENUM16" writable="true" default="0" isNullable="true" optional="true">nullable_enum16</attribute>
+    <attribute side="server" code="0x4017" define="NULLABLE_FLOAT_SINGLE" type="SINGLE" writable="true" default="0" isNullable="true" optional="true">nullable_float_single</attribute>
+    <attribute side="server" code="0x4018" define="NULLABLE_FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" isNullable="true" optional="true">nullable_float_double</attribute>
+    <attribute side="server" code="0x4019" define="NULLABLE_OCTET_STRING" type="OCTET_STRING" length="10" writable="true" isNullable="true" optional="true">nullable_octet_string</attribute>
+    <attribute side="server" code="0x401E" define="NULLABLE_CHAR_STRING" type="CHAR_STRING" length="10" writable="true" isNullable="true" optional="true">nullable_char_string</attribute>
+    <attribute side="server" code="0x4024" define="NULLABLE_SIMPLE_ENUM" type="SimpleEnum" writable="true" isNullable="true" optional="true">nullable_enum_attr</attribute>
+    <attribute side="server" code="0x4025" define="NULLABLE_STRUCT" type="SimpleStruct" writable="true" isNullable="true" optional="true">nullable_struct</attribute>
+    <attribute side="server" code="0x4026" define="NULLABLE_RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" isNullable="true" optional="true" default="70">nullable_range_restricted_int8u</attribute>
+    <attribute side="server" code="0x4027" define="NULLABLE_RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" isNullable="true" optional="true" default="-5">nullable_range_restricted_int8s</attribute>
+    <attribute side="server" code="0x4028" define="NULLABLE_RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" isNullable="true" optional="true" default="200">nullable_range_restricted_int16u</attribute>
+    <attribute side="server" code="0x4029" define="NULLABLE_RANGE_RESTRICTED_INT16S" type="int16s" min="-150" max="200" writable="true" isNullable="true" optional="true" default="-5">nullable_range_restricted_int16s</attribute>
 
     <!-- This attribute should not be enabled on the server side -->
-    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
+    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="true">unsupported</attribute>
 
     <!-- Test Commands -->
-    <command source="client" code="0x00" name="Test" optional="false">
+    <command source="client" code="0x00" name="Test" optional="true">
       <description>
         Simple command without any parameters and without a specific response
       </description>
     </command>
 
-    <command source="client" code="0x01" name="TestNotHandled" optional="false">
+    <command source="client" code="0x01" name="TestNotHandled" optional="true">
       <description>
         Simple command without any parameters and without a specific response not handled by the server
       </description>
     </command>
 
-    <command source="client" code="0x02" name="TestSpecific" response="TestSpecificResponse" optional="false">
+    <command source="client" code="0x02" name="TestSpecific" response="TestSpecificResponse" optional="true">
       <description>
         Simple command without any parameters and with a specific response
       </description>
@@ -261,7 +261,7 @@ limitations under the License.
       </description>
     </command>
 
-    <command source="client" code="0x04" name="TestAddArguments" response="TestAddArgumentsResponse" optional="false">
+    <command source="client" code="0x04" name="TestAddArguments" response="TestAddArgumentsResponse" optional="true">
       <description>
         Command that takes two arguments and returns their sum.
       </description>
@@ -269,14 +269,14 @@ limitations under the License.
       <arg name="arg2" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x05" name="TestSimpleArgumentRequest" response="TestSimpleArgumentResponse" optional="false">
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" response="TestSimpleArgumentResponse" optional="true">
       <description>
         Command that takes an argument which is bool
       </description>
       <arg name="arg1" type="BOOLEAN"/>
     </command>
 
-    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" response="TestStructArrayArgumentResponse" optional="false">
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" response="TestStructArrayArgumentResponse" optional="true">
       <description>
         Command that takes various arguments that are arrays, including an array of structs which have a list member.
       </description>
@@ -289,7 +289,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x07" name="TestStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+             response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is struct.  The response echoes the
         'b' field of the single arg.
@@ -298,7 +298,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x08" name="TestNestedStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+             response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is nested struct.  The response
         echoes the 'b' field of ar1.c.
@@ -306,7 +306,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStruct"/>
     </command>
 
-    <command source="client" code="0x09" name="TestListStructArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x09" name="TestListStructArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of structs.  The response
         returns false if there is some struct in the list whose 'b' field is
@@ -315,7 +315,7 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct" array="true"/>
     </command>
 
-    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of INT8U.  The response
         returns false if the list contains a 0 in it, true otherwise (including
@@ -324,7 +324,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a Nested Struct List.  The
         response returns false if there is some struct in arg1 (either directly
@@ -334,7 +334,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList"/>
     </command>
 
-    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of Nested Struct List.
         The response returns false if there is some struct in arg1 (either
@@ -344,7 +344,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList" array="true"/>
     </command>
 
-    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" response="TestListInt8UReverseResponse" optional="false">
+    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" response="TestListInt8UReverseResponse" optional="true">
       <description>
         Command that takes an argument which is a list of INT8U and expects a
         response that reverses the list.
@@ -352,7 +352,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="client" code="0x0E" name="TestEnumsRequest" response="TestEnumsResponse" optional="false">
+    <command source="client" code="0x0E" name="TestEnumsRequest" response="TestEnumsResponse" optional="true">
       <description>
         Command that sends a vendor id and an enum.  The server is expected to
         echo them back.
@@ -362,7 +362,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x0F" name="TestNullableOptionalRequest"
-             optional="false" response="TestNullableOptionalResponse">
+             optional="true" response="TestNullableOptionalResponse">
       <description>
         Command that takes an argument which is nullable and optional.  The
         response returns a boolean indicating whether the argument was present,
@@ -373,7 +373,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x10" name="TestComplexNullableOptionalRequest"
-             optional="false" response="TestComplexNullableOptionalResponse">
+             optional="true" response="TestComplexNullableOptionalResponse">
       <description>
         Command that takes various arguments which can be nullable and/or optional.  The
         response returns information about which things were received and what
@@ -398,7 +398,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x11" name="SimpleStructEchoRequest"
-             response="SimpleStructResponse" optional="false">
+             response="SimpleStructResponse" optional="true">
       <description>
         Command that takes an argument which is a struct.  The response echoes
         the struct back.
@@ -407,14 +407,14 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x12" name="TimedInvokeRequest"
-             mustUseTimedInvoke="true" optional="false">
+             mustUseTimedInvoke="true" optional="true">
       <description>
         Command that just responds with a success status if the timed invoke
         conditions are met.
       </description>
     </command>
 
-    <command source="client" code="0x13" name="TestSimpleOptionalArgumentRequest" optional="false">
+    <command source="client" code="0x13" name="TestSimpleOptionalArgumentRequest" optional="true">
       <description>
         Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value.
       </description>
@@ -422,7 +422,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x14" name="TestEmitTestEventRequest"
-             optional="false" response="TestEmitTestEventResponse">
+             optional="true" response="TestEmitTestEventResponse">
       <description>
         Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response.
       </description>
@@ -432,35 +432,35 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x15" name="TestEmitTestFabricScopedEventRequest"
-             optional="false" response="TestEmitTestFabricScopedEventResponse">
+             optional="true" response="TestEmitTestFabricScopedEventResponse">
       <description>
         Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response.
       </description>
       <arg name="arg1" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x00" name="TestSpecificResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response for TestAddArguments that returns the sum.
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestSimpleArgumentRequest with a simple return value
       </description>
       <arg name="returnValue" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response for TestStructArrayArgumentRequest with complicated return arguments
       </description>
@@ -472,14 +472,14 @@ limitations under the License.
       <arg name="arg6" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response that delivers the reversed list of uint8.
       </description>
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="server" code="0x05" name="TestEnumsResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x05" name="TestEnumsResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response that delivers a vendor id and an enum..
       </description>
@@ -487,7 +487,7 @@ limitations under the License.
       <arg name="arg2" type="SimpleEnum"/>
     </command>
 
-    <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers information about the argument TestNullableOptionalRequest had,
         and the original value if there was one.
@@ -498,7 +498,7 @@ limitations under the License.
       <arg name="originalValue" type="INT8U" optional="true" isNullable="true"/>
     </command>
 
-    <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers information about the arguments TestComplexNullableOptionalRequest had.
       </description>
@@ -535,7 +535,7 @@ limitations under the License.
            optional="true"/>
     </command>
 
-    <command source="server" code="0x08" name="BooleanResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x08" name="BooleanResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers a single boolean argument. What the argument means depends on
         what we're responding to.
@@ -543,7 +543,7 @@ limitations under the License.
       <arg name="value" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x09" name="SimpleStructResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x09" name="SimpleStructResponse" optional="true" disableDefaultResponse="true">
       <description>
         Command that returns a single argument which is a struct.  The contents
         of the struct depend on what we are responding to.
@@ -551,14 +551,14 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct"/>
     </command>
 
-    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers the ID of an event in response to test command emitting fabric scoped events.
       </description>
       <arg name="value" type="INT64U"/>
     </command>
 
-    <command source="server" code="0x0B" name="TestEmitTestFabricScopedEventResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0B" name="TestEmitTestFabricScopedEventResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers the ID of an event in response to test command emitting fabric scope events.
       </description>
