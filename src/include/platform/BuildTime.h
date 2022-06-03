@@ -24,6 +24,7 @@
 // Expects input as provided by __DATE__ and __TIME__ macros.
 //
 // Example of __DATE__ string: "Jul 27 2012"
+// Example of __DATE__ string: "Jul  2 2012" -> note leading whitespace for single-digit day of month
 // Example of __TIME__ string: "21:06:19"
 
 #define COMPUTE_BUILD_YEAR(_date)                                                                                                  \
@@ -31,7 +32,7 @@
 
 #define COMPUTE_BUILD_DAY(_date) ((((_date)[4] >= '0') ? ((_date)[4] - '0') * 10 : 0) + ((_date)[5] - '0'))
 
-#define BUILD_MONTH_IS_JAN(_date) ((_date)[0] == 'J' && (_date)[1] == 'a' && (_date)[2] == 'n')
+#define BUILD_MONTH_IS_JAN(_date) ((_date)[0] == 'J' && (_date)[1] == 'a')
 #define BUILD_MONTH_IS_FEB(_date) ((_date)[0] == 'F')
 #define BUILD_MONTH_IS_MAR(_date) ((_date)[0] == 'M' && (_date)[1] == 'a' && (_date)[2] == 'r')
 #define BUILD_MONTH_IS_APR(_date) ((_date)[0] == 'A' && (_date)[1] == 'p')
