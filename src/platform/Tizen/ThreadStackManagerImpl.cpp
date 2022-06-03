@@ -493,7 +493,7 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
                                                   const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval,
                                                   uint32_t aKeyLeaseInterval)
 {
-    ChipLogProgress(DeviceLayer, "%s +", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s +", __func__);
     CHIP_ERROR error = CHIP_NO_ERROR;
     int threadErr    = THREAD_ERROR_NONE;
 

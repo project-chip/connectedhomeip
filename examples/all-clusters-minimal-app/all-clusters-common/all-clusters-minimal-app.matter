@@ -778,16 +778,6 @@ server cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -2078,6 +2068,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -3228,8 +3219,8 @@ server cluster WindowCovering = 258 {
   command StopMotion(): DefaultSuccess = 2;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -3468,8 +3459,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type onofflight = 256;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -3847,8 +3838,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type onofflight = 256;
 
   server cluster Groups {
     ram      attribute nameSupport;
@@ -3887,8 +3878,8 @@ endpoint 2 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 65534 {
+  device type anonymousEndpointType = 61442;
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

@@ -48,7 +48,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 SubscriptionId subscriptionId;
                 ReturnErrorOnFailure(reader.Get(subscriptionId));
-                PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
+                PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx32 ",", subscriptionId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -87,21 +87,14 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
         }
     }
     PRETTY_PRINT("}");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields = (1 << to_underlying(Tag::kSubscriptionId)) |
+        const uint16_t requiredFields = (1 << to_underlying(Tag::kSubscriptionId)) |
             (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
-
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
+                                                                   : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

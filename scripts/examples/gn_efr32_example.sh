@@ -137,6 +137,10 @@ else
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
+            --chip_disable_wifi_ipv4)
+                optArgs+="chip_disable_wifi_ipv4=true "
+                shift
+                ;;
             *)
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true

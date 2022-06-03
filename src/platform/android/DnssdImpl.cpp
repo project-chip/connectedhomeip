@@ -29,6 +29,7 @@
 
 #include <cstddef>
 #include <jni.h>
+#include <memory>
 #include <string>
 
 namespace chip {
@@ -37,11 +38,14 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject         = nullptr;
-jobject sMdnsCallbackObject     = nullptr;
-jmethodID sResolveMethod        = nullptr;
-jmethodID sPublishMethod        = nullptr;
-jmethodID sRemoveServicesMethod = nullptr;
+jobject sResolverObject           = nullptr;
+jobject sMdnsCallbackObject       = nullptr;
+jmethodID sResolveMethod          = nullptr;
+jmethodID sGetTextEntryKeysMethod = nullptr;
+jmethodID sGetTextEntryDataMethod = nullptr;
+jclass sMdnsCallbackClass         = nullptr;
+jmethodID sPublishMethod          = nullptr;
+jmethodID sRemoveServicesMethod   = nullptr;
 } // namespace
 
 // Implementation of functions declared in lib/dnssd/platform/Dnssd.h
@@ -185,14 +189,31 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
     sResolverObject      = env->NewGlobalRef(resolverObject);
     sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
     jclass resolverClass = env->GetObjectClass(sResolverObject);
+    sMdnsCallbackClass   = env->GetObjectClass(sMdnsCallbackObject);
 
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
+
+    sGetTextEntryKeysMethod = env->GetMethodID(sMdnsCallbackClass, "getTextEntryKeys", "(Ljava/util/Map;)[Ljava/lang/String;");
+
+    sGetTextEntryDataMethod = env->GetMethodID(sMdnsCallbackClass, "getTextEntryData", "(Ljava/util/Map;Ljava/lang/String;)[B");
 
     sResolveMethod =
         env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
     if (sResolveMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'resolve' method");
+        env->ExceptionClear();
+    }
+
+    if (sGetTextEntryKeysMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access MdnsCallback 'getTextEntryKeys' method");
+        env->ExceptionClear();
+    }
+
+    if (sGetTextEntryDataMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access MdnsCallback 'getTextEntryData' method");
         env->ExceptionClear();
     }
 
@@ -213,7 +234,8 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
     }
 }
 
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle, jlong contextHandle)
+void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject textEntries, jlong callbackHandle,
+                   jlong contextHandle)
 {
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
@@ -241,9 +263,74 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
-    service.mPort = static_cast<uint16_t>(port);
+    service.mPort          = static_cast<uint16_t>(port);
+    service.mTextEntrySize = 0;
+    service.mTextEntries   = nullptr;
 
+    // Note on alloc/free memory use
+    // We are only allocating the entries list and the data field of each entry
+    // so we free these in the exit section
+    if (textEntries != nullptr)
+    {
+        jobjectArray keys   = (jobjectArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryKeysMethod, textEntries);
+        size_t size         = env->GetArrayLength(keys);
+        TextEntry * entries = new (std::nothrow) TextEntry[size];
+        VerifyOrExit(entries != nullptr, ChipLogError(Discovery, "entries alloc failure"));
+        memset(entries, 0, sizeof(entries[0]) * size);
+
+        service.mTextEntries = entries;
+        for (size_t i = 0; i < size; i++)
+        {
+            jstring jniKeyObject = (jstring) env->GetObjectArrayElement(keys, i);
+            JniUtfString key(env, jniKeyObject);
+            entries[i].mKey = strdup(key.c_str());
+
+            jbyteArray datas =
+                (jbyteArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryDataMethod, textEntries, jniKeyObject);
+            if (datas != nullptr)
+            {
+                size_t dataSize = env->GetArrayLength(datas);
+                uint8_t * data  = new (std::nothrow) uint8_t[dataSize];
+                VerifyOrExit(data != nullptr, ChipLogError(Discovery, "data alloc failure"));
+
+                jbyte * jnidata = env->GetByteArrayElements(datas, nullptr);
+                for (size_t j = 0; j < dataSize; j++)
+                {
+                    data[j] = static_cast<uint8_t>(jnidata[j]);
+                }
+                entries[i].mDataSize = dataSize;
+                entries[i].mData     = data;
+
+                ChipLogProgress(Discovery, " ----- entry [%u] : %s %s\n", static_cast<unsigned int>(i), entries[i].mKey,
+                                std::string(reinterpret_cast<char *>(data), dataSize).c_str());
+            }
+            else
+            {
+                ChipLogProgress(Discovery, " ----- entry [%u] : %s NULL\n", static_cast<unsigned int>(i), entries[i].mKey);
+
+                entries[i].mDataSize = 0;
+                entries[i].mData     = nullptr;
+            }
+            service.mTextEntrySize = size;
+        }
+    }
+
+exit:
     dispatch(CHIP_NO_ERROR, &service, &ipAddress);
+
+    if (service.mTextEntries != nullptr)
+    {
+        size_t size = service.mTextEntrySize;
+        for (size_t i = 0; i < size; i++)
+        {
+            delete[] service.mTextEntries[i].mKey;
+            if (service.mTextEntries[i].mData != nullptr)
+            {
+                delete[] service.mTextEntries[i].mData;
+            }
+        }
+        delete[] service.mTextEntries;
+    }
 }
 
 } // namespace Dnssd

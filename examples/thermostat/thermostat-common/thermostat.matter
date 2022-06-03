@@ -810,6 +810,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1371,8 +1372,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -1646,8 +1647,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type thermostat = 769;
   binding cluster Identify;
 
   server cluster Identify {

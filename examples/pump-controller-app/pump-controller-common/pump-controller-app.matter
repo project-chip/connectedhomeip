@@ -905,6 +905,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1296,8 +1297,8 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -1552,8 +1553,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type pumpcontroller = 772;
   binding cluster OnOff;
   binding cluster PumpConfigurationAndControl;
   binding cluster TemperatureMeasurement;

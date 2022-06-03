@@ -831,6 +831,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     FabricInfo * fabric               = RetrieveCurrentFabric(commandObj);
+    ByteSpan rcac;
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
@@ -844,10 +845,35 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
     fabricIndex = fabric->GetFabricIndex();
 
-    err = fabric->SetNOCCert(NOCValue);
+    // Initialize fields of gFabricBeingCommissioned:
+    //  - the root certificate, fabric label, and vendor id are copied from the existing fabric record
+    //  - the NOC and ICAC certificates are taken from the UpdateNOC command
+    // Note that the operational keypair was set at the preceding CSRRequest step.
+    // The remaining operation id and fabric id fields will be extracted from the new operational
+    // credentials and set by following SetFabricInfo() call.
+    {
+        err = fabric->GetRootCert(rcac);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+        err = gFabricBeingCommissioned.SetRootCert(rcac);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+        err = gFabricBeingCommissioned.SetFabricLabel(fabric->GetFabricLabel());
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+        gFabricBeingCommissioned.SetVendorId(fabric->GetVendorId());
+
+        err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+        err = gFabricBeingCommissioned.SetICACert(ICACValue);
+        VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    }
+
+    err = fabric->SetFabricInfo(gFabricBeingCommissioned);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = fabric->SetICACert(ICACValue);
+    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
@@ -860,6 +886,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     app::DnssdServer::Instance().StartServer();
 
 exit:
+    gFabricBeingCommissioned.Reset();
     // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {

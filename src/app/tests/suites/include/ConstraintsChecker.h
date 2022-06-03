@@ -419,4 +419,46 @@ protected:
         }
         return false;
     }
+
+    template <typename T, typename U>
+    bool CheckConstraintContains(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, const U & expected)
+    {
+        auto iterValue = current.begin();
+        while (iterValue.Next())
+        {
+            auto currentValue = iterValue.GetValue();
+            if (currentValue == expected)
+            {
+                return true;
+            }
+        }
+
+        Exit(std::string(itemName) + " expect the value " + std::to_string(expected) + " but the list does not contains it.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintExcludes(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, const U & expected)
+    {
+        auto iterValue = current.begin();
+        while (iterValue.Next())
+        {
+            auto currentValue = iterValue.GetValue();
+            if (currentValue == expected)
+            {
+                Exit(std::string(itemName) + " does not expect the value " + std::to_string(expected) +
+                     " but the list contains it.");
+                return false;
+            }
+        }
+
+        CHIP_ERROR err = iterValue.GetStatus();
+        if (CHIP_NO_ERROR != err)
+        {
+            Exit(std::string(chip::ErrorStr(err)));
+            return false;
+        }
+
+        return true;
+    }
 };
