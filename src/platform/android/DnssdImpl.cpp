@@ -280,6 +280,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
             ChipLogError(Discovery, "entries alloc failure");
             goto exit;
         }
+        memset(entries, 0, sizeof(entries[0]) * size);
         service.mTextEntries = entries;
         for (size_t i = 0; i < size; i++)
         {
