@@ -224,6 +224,29 @@ PICS:
     - label: "Does the device implement the EndProductType attribute?"
       id: A_ENDPRODUCTTYPE
 
+    - label: "Does the device implement the OperationalStatus attribute?"
+      id: A_OPERATIONALSTATUS
+
+    - label:
+          "Does the device implement the TargetPositionLiftPercent100ths
+          attribute?"
+      id: A_TARGETPOSITIONLIFTPERCENT100THS
+
+    - label:
+          "Does the device implement the TargetPositionTiltPercent100ths
+          attribute?"
+      id: A_TARGETPOSITIONTILTPERCENT100THS
+
+    - label:
+          "Does the device implement the CurrentPositionLiftPercent100ths
+          attribute?"
+      id: A_CURRENTPOSITIONLIFTPERCENT100THS
+
+    - label:
+          "Does the device implement the CurrentPositionTiltPercent100ths
+          attribute?"
+      id: A_CURRENTPOSITIONTILTPERCENT100THS
+
     - label:
           "Does the device implement the CurrentPositionLiftPercentage
           attribute?"
@@ -233,6 +256,42 @@ PICS:
           "Does the device implement the CurrentPositionTiltPercentage
           attribute?"
       id: A_CURRENTPOSITIONTILTPERCENTAGE
+
+    - label: "Does the device implement the CurrentPositionLift attribute?"
+      id: A_CURRENTPOSITIONLIFT
+
+    - label: "Does the device implement the CurrentPositionTilt attribute?"
+      id: A_CURRENTPOSITIONTILT
+
+    - label: "Does the device implement the NumberOfActuationsLift attribute?"
+      id: A_NUMBEROFACTUATIONSLIFT
+
+    - label: "Does the device implement the NumberOfActuationsTilt attribute?"
+      id: A_NUMBEROFACTUATIONSTILT
+
+    - label: "Does the device implement the PhysicalClosedLimitLift attribute?"
+      id: A_PHYSICALCLOSEDLIMITLIFT
+
+    - label: "Does the device implement the PhysicalClosedLimitTilt attribute?"
+      id: A_PHYSICALCLOSEDLIMITTILT
+
+    - label: "Does the device implement the InstalledOpenLimitLift attribute?"
+      id: A_INSTALLEDOPENLIMITLIFT
+
+    - label: "Does the device implement the InstalledOpenLimitTilt attribute?"
+      id: A_INSTALLEDOPENLIMITTILT
+
+    - label: "Does the device implement the InstalledClosedLimitLift attribute?"
+      id: A_INSTALLEDCLOSEDLIMITLIFT
+
+    - label: "Does the device implement the InstalledClosedLimitTilt attribute?"
+      id: A_INSTALLEDCLOSEDLIMITTILT
+
+    - label: "Does the device implement the Mode attribute?"
+      id: A_MODE
+
+    - label: "Does the device implement the SafetyStatus attribute?"
+      id: A_SAFETYSTATUS
 
       ## WC-Commands received
     - label:
