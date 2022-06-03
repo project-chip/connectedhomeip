@@ -181,7 +181,7 @@ CHIP_ERROR LastKnownGoodTime::SetLastKnownGoodChipEpochTime(System::Clock::Secon
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(TimeService, "Failed to update Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(TimeService, "Failed to update Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
     }
     else
     {
