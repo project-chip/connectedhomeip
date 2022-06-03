@@ -537,7 +537,7 @@ def main(argv: Sequence[str]) -> None:
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.do_clean:
-                shell.run_cmd(f"rm {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+                shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
                 shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
                 shell.run_cmd("idf.py fullclean")
