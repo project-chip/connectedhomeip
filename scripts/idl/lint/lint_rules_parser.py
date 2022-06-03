@@ -140,13 +140,20 @@ class LintRulesContext:
         """Mark that a specific cluster is always required in the given endpoint
         """
         if name not in self._cluster_codes:
-            logging.error("UNKNOWN cluster name %s" % name)
-            logging.error("Known names: %s" % (",".join(self._cluster_codes.keys()), ))
-            return
+            # Name may be a number. If this can be parsed as a number, accept it anyway
+            try:
+                cluster_code=parseNumberString(name)
+                name="ID_%s" % name
+            except ValueError:
+                logging.error("UNKNOWN cluster name %s" % name)
+                logging.error("Known names: %s" % (",".join(self._cluster_codes.keys()), ))
+                return
+        else:
+            cluster_code = self._cluster_codes[name]
 
         self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
-            cluster_code=self._cluster_codes[name],
+            cluster_code=cluster_code,
             cluster_name=name,
         ))
 
