@@ -541,6 +541,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {

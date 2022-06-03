@@ -13989,13 +13989,17 @@ public class ChipClusters {
       attestationRequest(chipClusterPtr, callback, attestationNonce, timedInvokeTimeoutMs);
     }
 
-    public void CSRRequest(CSRResponseCallback callback, byte[] CSRNonce) {
-      CSRRequest(chipClusterPtr, callback, CSRNonce, null);
+    public void CSRRequest(
+        CSRResponseCallback callback, byte[] CSRNonce, Optional<Boolean> isForUpdateNOC) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, isForUpdateNOC, null);
     }
 
     public void CSRRequest(
-        CSRResponseCallback callback, byte[] CSRNonce, int timedInvokeTimeoutMs) {
-      CSRRequest(chipClusterPtr, callback, CSRNonce, timedInvokeTimeoutMs);
+        CSRResponseCallback callback,
+        byte[] CSRNonce,
+        Optional<Boolean> isForUpdateNOC,
+        int timedInvokeTimeoutMs) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, isForUpdateNOC, timedInvokeTimeoutMs);
     }
 
     public void certificateChainRequest(
@@ -14067,6 +14071,7 @@ public class ChipClusters {
         long chipClusterPtr,
         CSRResponseCallback Callback,
         byte[] CSRNonce,
+        Optional<Boolean> isForUpdateNOC,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void certificateChainRequest(

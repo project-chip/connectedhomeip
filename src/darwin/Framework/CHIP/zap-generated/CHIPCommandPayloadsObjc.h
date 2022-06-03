@@ -3156,6 +3156,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterCSRRequestParams : NSObject
 
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
+
+@property (strong, nonatomic) NSNumber * _Nullable isForUpdateNOC;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
