@@ -46,7 +46,6 @@ namespace Platform {
  * This function is platform specific and might be empty in certain cases.
  * For example, this function is doing nothing when the C Standard Library malloc()
  * and free() functions are used for memory allocation.
- * Note- The MemoryInit and MemoryShutdown APIs are thread-safe, unless CHIP_SYSTEM_CONFIG_NO_LOCKING is enabled
  *
  * @param[in]  buf      A pointer to a dedicated memory buffer, which should be used as
  *                      a memory pool for CHIP memory allocation.
@@ -74,7 +73,6 @@ extern CHIP_ERROR MemoryInit(void * buf = nullptr, size_t bufSize = 0);
  * This function can be an empty call if there is no need to release resources. For example,
  * this is the case when the C Standard Library malloc() and free() functions are used
  * for memory allocation.
- * Note- The MemoryInit and MemoryShutdown APIs are thread-safe, unless CHIP_SYSTEM_CONFIG_NO_LOCKING is enabled
  *
  */
 extern void MemoryShutdown();
