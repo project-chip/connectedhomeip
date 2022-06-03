@@ -79,9 +79,25 @@ all endpoints {
 
 endpoint 0 {
   // Identifiers for clusters are loaded from XML files
+  // The required clusters are from the spec for RootNode (section 2.1.5 at the moment):
+
   require server cluster Basic;
+  require server cluster AccessControl;
   require server cluster GroupKeyManagement;
-  require server cluster NetworkCommissioning;
   require server cluster GeneralCommissioning;
-  require server cluster OTASoftwareUpdateRequestor;
+  require server cluster AdministratorCommissioning;
+  require server cluster OperationalCredentials;
+  require server cluster GeneralDiagnostics;
+
+  // Required only if !CustomNetworkConfig. 
+  // require server cluster NetworkCommissioning;
+
+  // If Ethernet
+  // require server cluster EthernetNetworkDiagnostics;
+
+  // If WiFi
+  // require server cluster WiFiNetworkDiagnostics;
+
+  // If Thread
+  // require server cluster ThreadNetworkDiagnostics;
 }
