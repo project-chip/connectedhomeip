@@ -665,8 +665,8 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     bool dbusAsyncErr         = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, kMaxWiFiSSIDLength + 1);
-    g_strlcpy(sInstance.mWiFiKey, key, kMaxWiFiKeyLength + 1);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
+    g_strlcpy(sInstance.mWiFiKey, key, sizeof(sInstance.mWiFiKey));
 
     wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
@@ -705,7 +705,7 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, kMaxWiFiSSIDLength + 1);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
 
     wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
