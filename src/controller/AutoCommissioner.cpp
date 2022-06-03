@@ -298,10 +298,10 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
     // Network clusters can indicate the time required to connect, so if we are
     // connecting, use that time as our "how long it takes to process server
     // side" time.  Otherwise pick a time that should be enough for the command
-    // processing: 15s for slow steps the can involve crypto, the default IM
+    // processing: 7s for slow steps the can involve crypto, the default IM
     // timeout otherwise.
     // TODO: is this a reasonable estimate for the slow-crypto cases?
-    constexpr System::Clock::Timeout kSlowCryptoProcessingTime = System::Clock::Seconds16(15);
+    constexpr System::Clock::Timeout kSlowCryptoProcessingTime = System::Clock::Seconds16(7);
 
     System::Clock::Timeout timeout;
     switch (stage)

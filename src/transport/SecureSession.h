@@ -164,7 +164,7 @@ public:
         case Transport::Type::kBle:
             // TODO: Figure out what this should be, but zero is not the right
             // answer.
-            return System::Clock::Seconds16(30);
+            return System::Clock::Seconds16(5);
         default:
             break;
         }
