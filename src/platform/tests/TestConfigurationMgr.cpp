@@ -234,8 +234,8 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
     System::Clock::Seconds32 chipEpochTime;
     NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime) == CHIP_NO_ERROR);
 
-    char date[strlen("Jul 27 2012") + 1];
-    char timeOfDay[strlen("21:06:19") + 1];
+    char date[14];      // strlen("Jan 000 00000") == 13
+    char timeOfDay[12]; // strlen("000:000:000") == 11
 
     {
         int printed;
