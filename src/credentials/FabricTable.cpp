@@ -821,7 +821,6 @@ void FabricTable::DeleteAllFabrics()
 
 CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
-    CHIP_ERROR err;
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorage = storage;
@@ -844,7 +843,7 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     uint8_t buf[IndexInfoTLVMaxSize()];
     uint16_t size = sizeof(buf);
     DefaultStorageKeyAllocator keyAlloc;
-    err = mStorage->SyncGetKeyValue(keyAlloc.FabricIndexInfo(), buf, size);
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyAlloc.FabricIndexInfo(), buf, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // No fabrics yet.  Nothing to be done here.
