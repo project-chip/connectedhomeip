@@ -585,6 +585,23 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric, Credentials::Certif
 {
     P256PublicKey pubkey;
     ValidationContext validContext;
+    // Note that we do NOT set a time in the validation context.  This will
+    // cause the certificate chain NotBefore / NotAfter time validation logic
+    // to report CertificateValidityResult::kTimeUnknown.
+    //
+    // The default CHIPCert policy passes NotBefore / NotAfter validation for
+    // this case where time is unknown.  If an override policy is passed, it
+    // will be up to the passed policy to decide how to handle this.
+    //
+    // In the FabricTable::AddNewFabric and FabricTable::UpdateFabric calls,
+    // the passed policy always passes for all questions of time validity.  The
+    // rationale is that installed certificates should be valid at the time of
+    // installation by definition.  If they are not and the commissionee and
+    // commissioner disagree enough on current time, CASE will fail and our
+    // fail-safe timer will expire.
+    //
+    // This then is ultimately how we validate that NotBefore / NotAfter in
+    // newly installed certificates is workable.
     validContext.Reset();
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
@@ -679,14 +696,19 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return AddNewFabricInner(newFabric, outputIndex);
 }
 
-/**
- * A placeholder validation policy we can pass into VerifyCredentials to extract the
+/*
+ * A validation policy we can pass into VerifyCredentials to extract the
  * latest NotBefore time in the certificate chain without having to load the
- * certificates into memory twice.
+ * certificates into memory again, and one which will pass validation for all
+ * questions of NotBefore / NotAfter validity.
  *
- * Note that we don't inject current time into this validation path anyway
- * because certificates themselves can change our notion of time AND our test
- * for working certificates is that subsequent CASE rendezvous succeeds.
+ * The rationale is that installed certificates should be valid at the time of
+ * installation by definition.  If they are not and the commissionee and
+ * commissioner disagree enough on current time, CASE will fail and our
+ * fail-safe timer will expire.
+ *
+ * This then is ultimately how we validate that NotBefore / NotAfter in
+ * newly installed certificates is workable.
  */
 class NotBeforeCollector : public Credentials::CertificateValidityPolicy
 {
