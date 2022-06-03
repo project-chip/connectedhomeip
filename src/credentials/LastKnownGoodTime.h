@@ -145,7 +145,7 @@ private:
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
      */
     CHIP_ERROR StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
-                                               Optional<System::Clock::Seconds32> failSafeBackup) const;
+                                               const Optional<System::Clock::Seconds32> & failSafeBackup) const;
 
     /**
      * Store the Last Known Good Time to storage.  This overload also clears

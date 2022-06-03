@@ -84,7 +84,7 @@ CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seco
 }
 
 CHIP_ERROR LastKnownGoodTime::StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
-                                                              Optional<System::Clock::Seconds32> failSafeBackup) const
+                                                              const Optional<System::Clock::Seconds32> & failSafeBackup) const
 {
     uint8_t buf[LastKnownGoodTimeTLVMaxSize()];
     TLV::TLVWriter writer;
