@@ -438,7 +438,6 @@ public:
      *      • The not-before timestamp of any of its operational certificates
      *
      * @param lastKnownGoodChipEpochTime Last Known Good Time in seconds since CHIP epoch
-     * @param notBefore the latest NotBefore time of all installed certificates
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
     CHIP_ERROR SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);

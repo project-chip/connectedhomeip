@@ -40,8 +40,6 @@ public:
     virtual ~CertificateValidityPolicy() {}
 
     /**
-     * @brief
-     *
      *  If a policy is provided to CHIPCert, this method is invoked to
      *  determine what action an application determines is appropriate given
      *  CHIPCert's evaluation of certificate validity based upon the best

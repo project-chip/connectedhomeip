@@ -112,7 +112,7 @@ private:
      * Log the message, appending the passed CHIP epoch time in ISO8601 format.
      *
      * @param msg message to log with ISO8601 time appended
-     * @param chipEpochTiwme time in seconds from the CHIP epoch
+     * @param chipEpochTime time in seconds from the CHIP epoch
      */
     void LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime);
 
