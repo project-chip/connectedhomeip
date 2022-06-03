@@ -4331,8 +4331,8 @@ client cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-
 endpoint 1 {
+  device type rootdevice = 22;
   binding cluster Identify;
   binding cluster Groups;
   binding cluster Scenes;

@@ -3218,8 +3218,8 @@ server cluster WindowCovering = 258 {
   command StopMotion(): DefaultSuccess = 2;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -3458,8 +3458,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type onofflight = 256;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -3837,8 +3837,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type onofflight = 256;
 
   server cluster Groups {
     ram      attribute nameSupport;
@@ -3877,8 +3877,8 @@ endpoint 2 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 65534 {
+  device type anonymousEndpointType = 61442;
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

@@ -39,6 +39,18 @@ class AddBindingToEndpointTransform:
         endpoint.client_bindings.append(self.name)
 
 
+class AddDeviceTypeToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a device type to it
+    """
+
+    def __init__(self, device_type: DeviceType):
+        self.device_type = device_type
+
+    def apply(self, endpoint):
+        endpoint.device_types.append(self.device_type)
+
+
 class MatterIdlTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to 
@@ -313,6 +325,10 @@ class MatterIdlTransformer(Transformer):
             t.apply(endpoint)
 
         return endpoint
+
+    @v_args(inline=True)
+    def endpoint_device_type(self, name, code):
+        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code))
 
     @v_args(inline=True)
     def endpoint_cluster_binding(self, id):
