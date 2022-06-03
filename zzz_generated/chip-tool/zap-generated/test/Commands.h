@@ -35699,8 +35699,8 @@ private:
             LogStep(6, "1f: write a value into the RW mandatory attribute:: Mode");
             VerifyOrDo(!ShouldSkip("A_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
