@@ -221,6 +221,12 @@ public:
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled();
+    /**
+     * Enable or disable BLE advertising.
+     *
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if BLE advertising is not
+     * supported or other error on other failures.
+     */
     CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
     bool IsBLEAdvertising();
     CHIP_ERROR SetBLEAdvertisingMode(BLEAdvertisingMode mode);
