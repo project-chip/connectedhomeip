@@ -80,20 +80,7 @@ CHIP_ERROR TizenWiFiDriver::RevertConfiguration()
 
 bool TizenWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
-    if (networkId.size() != network.ssidLen)
-    {
-        ChipLogProgress(NetworkProvisioning, "ssidLen is mismatched. network.ssidLen: %u, networkId.size(): %u", network.ssidLen,
-                        networkId.size());
-        return false;
-    }
-    if (memcmp(networkId.data(), network.ssid, network.ssidLen) != 0)
-    {
-        ChipLogProgress(NetworkProvisioning, "ssid is mismatched. network.ssid: %s, networkId.data(): %s", network.ssid,
-                        networkId.data());
-        return false;
-    }
-
-    return true;
+    return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
 Status TizenWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
@@ -141,7 +128,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s", (char *) mStagingNetwork.ssid);
+    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %.*s",
+                    static_cast<int>(sizeof(mStagingNetwork.ssid)), reinterpret_cast<char *>(mStagingNetwork.ssid));
 
     err = WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid), reinterpret_cast<char *>(mStagingNetwork.credentials),
                             callback);

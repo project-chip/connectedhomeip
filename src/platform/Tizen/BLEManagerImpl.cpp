@@ -160,7 +160,7 @@ static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt
     ret = bt_gatt_get_value(gattHandle, &value, &len);
     VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_get_value() failed. ret: %d", ret));
 
-    ChipLogProgress(DeviceLayer, "Read Value: %s(len: %d)", value, len);
+    ChipLogProgress(DeviceLayer, "Read Value (len: %d): %.*s", len, len, value);
 
     ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_READ, offset, 0x00, value, len);
     g_free(value);
@@ -181,8 +181,8 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
 
-    ChipLogProgress(DeviceLayer, "Write Requested on %s(%s)", __ConvertAttTypeToStr(type), uuid);
-    ChipLogProgress(DeviceLayer, "Write Value: %s(len: %d)", value, len);
+    ChipLogProgress(DeviceLayer, "Write Requested on %s: %s", __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Write Value (len: %d): %.*s ", len, len, value);
     g_free(uuid);
 
     ret = bt_gatt_set_value(gattHandle, value, len);
@@ -215,7 +215,7 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
 
-    ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s(%s)", notify, __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s: %s", notify, __ConvertAttTypeToStr(type), uuid);
     g_free(uuid);
     sInstance.NotifyBLESubscribed(notify ? true : false, conn);
 }
