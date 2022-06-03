@@ -89,8 +89,8 @@ endpoint 0 {
   require server cluster OperationalCredentials;
   require server cluster GeneralDiagnostics;
 
-  // Required only if !CustomNetworkConfig. For now assume yes for matter examples
-  require server cluster NetworkCommissioning;
+  // Required only if !CustomNetworkConfig. 
+  // require server cluster NetworkCommissioning;
 
   // If Ethernet
   // require server cluster EthernetNetworkDiagnostics;
