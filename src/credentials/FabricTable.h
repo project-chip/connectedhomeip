@@ -415,7 +415,7 @@ public:
      * Get the current Last Known Good Time.
      *
      * @param lastKnownGoodChipEpochTime (out) the current last known good time, if any is known
-     * &return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
      */
     CHIP_ERROR GetLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const
     {
