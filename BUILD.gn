@@ -484,7 +484,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
   }
-  
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -505,9 +505,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       ]
     }
     if (enable_tizen_builds) {
-      deps += [
-        ":tizen_lighting_app",
-      ]
+      deps += [ ":tizen_lighting_app" ]
     }
     if (enable_standalone_chip_cert_build) {
       deps += [ ":standalone_chip_cert" ]
