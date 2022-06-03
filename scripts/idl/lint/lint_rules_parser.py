@@ -142,8 +142,8 @@ class LintRulesContext:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                cluster_code=parseNumberString(name)
-                name="ID_%s" % name
+                cluster_code = parseNumberString(name)
+                name = "ID_%s" % name
             except ValueError:
                 logging.error("UNKNOWN cluster name %s" % name)
                 logging.error("Known names: %s" % (",".join(self._cluster_codes.keys()), ))
