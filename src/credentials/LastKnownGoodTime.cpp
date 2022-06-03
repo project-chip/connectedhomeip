@@ -24,7 +24,6 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/ConfigurationManager.h>
-//#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
