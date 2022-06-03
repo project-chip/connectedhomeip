@@ -263,7 +263,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
-    service.mPort = static_cast<uint16_t>(port);
+    service.mPort          = static_cast<uint16_t>(port);
     service.mTextEntrySize = 0;
     service.mTextEntries   = nullptr;
 
