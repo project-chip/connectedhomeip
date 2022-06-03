@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 45.1.2. [TC-ETHDIAG-1.2] Attributes with client as DUT
+name: 45.3.1. [TC-DGETH-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
