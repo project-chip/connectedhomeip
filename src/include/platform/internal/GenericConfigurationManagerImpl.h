@@ -72,9 +72,10 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
-    CHIP_ERROR GetFirmwareBuildDate(const char **) override;
-    CHIP_ERROR GetFirmwareBuildTimeOfDay(const char **) override;
+    CHIP_ERROR GetHardCodedFirmwareBuildDate(const char **) override;
+    CHIP_ERROR GetHardCodedFirmwareBuildTimeOfDay(const char **) override;
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override;
+    CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
@@ -125,6 +126,7 @@ public:
     ~GenericConfigurationManagerImpl() override = default;
 
 protected:
+    Optional<System::Clock::Seconds32> mFirmwareBuildChipEpochTime;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     chip::LifetimePersistedCounter<uint32_t> mLifetimePersistedCounter;
     uint8_t mRotatingDeviceIdUniqueId[kRotatingDeviceIDUniqueIDLength] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;

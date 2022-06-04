@@ -249,12 +249,12 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(timeOfDay)));
     }
 
-    // Read build date / time strings that the configuration managre used to
-    // compute firmware build CHIP epoch time.
+    // Read the hard-coded build date / time strings that the configuration
+    // manager used to compute firmware build CHIP epoch time.
     const char * expectedDate;
     const char * expectedTimeOfDay;
-    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildDate(&expectedDate) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildTimeOfDay(&expectedTimeOfDay) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetHardCodedFirmwareBuildDate(&expectedDate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetHardCodedFirmwareBuildTimeOfDay(&expectedTimeOfDay) == CHIP_NO_ERROR);
 
     // Compare the strings.  If they are identical, this means the configuration
     // manager's parser for the __DATE__ / __TIME__ strings worked for the
@@ -303,6 +303,12 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         NL_TEST_ASSERT(inSuite, minute == COMPUTE_BUILD_MIN(timeOfDay));
         NL_TEST_ASSERT(inSuite, second == COMPUTE_BUILD_SEC(timeOfDay));
     }
+
+    // Now override the hard-coded values with the setter and verify operation.
+    System::Clock::Seconds32 overrideValue = System::Clock::Seconds32(rand());
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().SetFirmwareBuildChipEpochTime(overrideValue) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, overrideValue == chipEpochTime);
 }
 
 static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)

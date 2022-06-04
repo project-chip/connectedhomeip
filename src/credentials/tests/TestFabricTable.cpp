@@ -80,7 +80,6 @@ void TestGetCompressedFabricID(nlTestSuite * inSuite, void * inContext)
 void TestLastKnownGoodTimeInit(nlTestSuite * inSuite, void * inContext)
 {
     // Fabric table init should init Last Known Good Time to the firmware build time.
-    DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
     FabricTable fabricTable;
     chip::TestPersistentStorageDelegate testStorage;
     NL_TEST_ASSERT(inSuite, fabricTable.Init(&testStorage) == CHIP_NO_ERROR);
@@ -90,26 +89,6 @@ void TestLastKnownGoodTimeInit(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(firmwareBuildTime) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, lastKnownGoodChipEpochTime == firmwareBuildTime);
 }
-
-/**
- * Extension of the platform's Configuration Manager implementation that allows
- * us to override the Firmware Build Time.
- */
-class SettableFirmwareBuildTimeConfigurationManager : public DeviceLayer::ConfigurationManagerImpl
-{
-public:
-    SettableFirmwareBuildTimeConfigurationManager(System::Clock::Seconds32 firmwareBuildChipEpochTime) :
-        mFirmwareBuildChipEpochTime(firmwareBuildChipEpochTime)
-    {}
-    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
-    {
-        buildTime = mFirmwareBuildChipEpochTime;
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    const System::Clock::Seconds32 mFirmwareBuildChipEpochTime;
-};
 
 /**
  * Load a single test fabric with with the Root01:ICA01:Node01_01 identity.
@@ -156,8 +135,6 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     // Test that certificate NotBefore times that are before the Firmware build time
     // do not advance Last Known Good Time.
     {
-        // Give us a real configuration manager.
-        DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::TestPersistentStorageDelegate testStorage;
         System::Clock::Seconds32 buildTime;
         NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
@@ -224,9 +201,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     // that we can do a fail-safe roll back.
     for (auto buildTime : testCaseFirmwareBuildTimes)
     {
-        // Give us a configuration manager with firmware build time set to the desired value.
-        SettableFirmwareBuildTimeConfigurationManager configManager(buildTime);
-        DeviceLayer::SetConfigurationMgr(&configManager);
+        // Set build time to the desired value.
+        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
         chip::TestPersistentStorageDelegate testStorage;
         {
             // Initialize a fabric table.
@@ -273,9 +249,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     // commit will be a no-op.
     for (auto buildTime : testCaseFirmwareBuildTimes)
     {
-        // Give us a configuration manager with firmware build time set to the desired value.
-        SettableFirmwareBuildTimeConfigurationManager configManager(buildTime);
-        DeviceLayer::SetConfigurationMgr(&configManager);
+        // Set build time to the desired value.
+        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
         chip::TestPersistentStorageDelegate testStorage;
         {
             // Initialize a fabric table.
@@ -328,21 +303,14 @@ void TestSetLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, Credentials::ASN1ToChipEpochTime(asn1Expected, testCertNotBeforeSeconds) == CHIP_NO_ERROR);
     System::Clock::Seconds32 testCertNotBeforeTime = System::Clock::Seconds32(testCertNotBeforeSeconds);
 
-    // Test config manager with build time before certificate NotBefore times.
-    System::Clock::Seconds32 buildTimeBeforeCertNotBefore = System::Clock::Seconds32(testCertNotBeforeTime.count() - 100000);
-    SettableFirmwareBuildTimeConfigurationManager testConfigManager(buildTimeBeforeCertNotBefore);
-
     // Iterate over two cases: one with build time prior to our certificates' NotBefore, one with build time after.
-    DeviceLayer::ConfigurationManager * cfgManagers[] = { &testConfigManager,
-                                                          &DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance() };
-    for (auto cfgManager : cfgManagers)
+    System::Clock::Seconds32 testCaseFirmwareBuildTimes[] = { System::Clock::Seconds32(testCertNotBeforeTime.count() - 100000),
+                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() + 100000) };
+
+    for (auto buildTime : testCaseFirmwareBuildTimes)
     {
-        DeviceLayer::SetConfigurationMgr(cfgManager);
-
-        // Read back our buildTime.
-        System::Clock::Seconds32 buildTime;
-        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
-
+        // Set build time to the desired value.
+        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
         chip::TestPersistentStorageDelegate testStorage;
         System::Clock::Seconds32 newTime;
         {
@@ -443,6 +411,7 @@ static nlTestSuite sSuite =
  */
 int TestFabricTable_Setup(void * inContext)
 {
+    DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
     return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 

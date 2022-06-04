@@ -94,9 +94,10 @@ public:
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)            = 0;
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) = 0;
     virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)           = 0;
-    virtual CHIP_ERROR GetFirmwareBuildDate(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    virtual CHIP_ERROR GetFirmwareBuildTimeOfDay(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR GetHardCodedFirmwareBuildDate(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR GetHardCodedFirmwareBuildTimeOfDay(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) = 0;
+    virtual CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)             = 0;
