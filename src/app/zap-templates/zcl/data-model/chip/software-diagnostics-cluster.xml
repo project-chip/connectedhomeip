@@ -19,10 +19,10 @@ limitations under the License.
   <struct name="ThreadMetrics">
     <cluster code="0x0034"/>
     <item name="Id" type="INT64U"/>
-    <item name="Name" type="CHAR_STRING" length="8"/>
-    <item name="StackFreeCurrent" type="INT32U"/>
-    <item name="StackFreeMinimum" type="INT32U"/>
-    <item name="StackSize" type="INT32U"/>
+    <item name="Name" type="CHAR_STRING" length="8" optional="true"/>
+    <item name="StackFreeCurrent" type="INT32U" optional="true"/>
+    <item name="StackFreeMinimum" type="INT32U" optional="true"/>
+    <item name="StackSize" type="INT32U" optional="true"/>
   </struct>
   <struct name="SoftwareFaultStruct">
     <cluster code="0x0034"/>

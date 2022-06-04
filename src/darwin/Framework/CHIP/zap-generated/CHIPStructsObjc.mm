@@ -928,13 +928,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _id = @(0);
 
-        _name = @"";
+        _name = nil;
 
-        _stackFreeCurrent = @(0);
+        _stackFreeCurrent = nil;
 
-        _stackFreeMinimum = @(0);
+        _stackFreeMinimum = nil;
 
-        _stackSize = @(0);
+        _stackSize = nil;
     }
     return self;
 }

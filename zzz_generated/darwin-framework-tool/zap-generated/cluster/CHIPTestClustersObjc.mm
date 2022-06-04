@@ -16738,10 +16738,22 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPSoftwareDiagnosticsClusterThreadMetrics *) value[i_0];
                         listHolder_0->mList[i_0].id = element_0.id.unsignedLongLongValue;
-                        listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
-                        listHolder_0->mList[i_0].stackFreeCurrent = element_0.stackFreeCurrent.unsignedIntValue;
-                        listHolder_0->mList[i_0].stackFreeMinimum = element_0.stackFreeMinimum.unsignedIntValue;
-                        listHolder_0->mList[i_0].stackSize = element_0.stackSize.unsignedIntValue;
+                        if (element_0.name != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.name];
+                        }
+                        if (element_0.stackFreeCurrent != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].stackFreeCurrent.Emplace();
+                            definedValue_2 = element_0.stackFreeCurrent.unsignedIntValue;
+                        }
+                        if (element_0.stackFreeMinimum != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].stackFreeMinimum.Emplace();
+                            definedValue_2 = element_0.stackFreeMinimum.unsignedIntValue;
+                        }
+                        if (element_0.stackSize != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].stackSize.Emplace();
+                            definedValue_2 = element_0.stackSize.unsignedIntValue;
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

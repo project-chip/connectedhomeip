@@ -18850,25 +18850,66 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
         chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
             newElement_0_idClassName.c_str(), newElement_0_idCtorSignature.c_str(), entry_0.id, newElement_0_id);
         jobject newElement_0_name;
-        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        if (!entry_0.name.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_name);
+        }
+        else
+        {
+            jobject newElement_0_nameInsideOptional;
+            newElement_0_nameInsideOptional =
+                env->NewStringUTF(std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nameInsideOptional, newElement_0_name);
+        }
         jobject newElement_0_stackFreeCurrent;
-        std::string newElement_0_stackFreeCurrentClassName     = "java/lang/Long";
-        std::string newElement_0_stackFreeCurrentCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackFreeCurrentClassName.c_str(),
-                                                                       newElement_0_stackFreeCurrentCtorSignature.c_str(),
-                                                                       entry_0.stackFreeCurrent, newElement_0_stackFreeCurrent);
+        if (!entry_0.stackFreeCurrent.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_stackFreeCurrent);
+        }
+        else
+        {
+            jobject newElement_0_stackFreeCurrentInsideOptional;
+            std::string newElement_0_stackFreeCurrentInsideOptionalClassName     = "java/lang/Long";
+            std::string newElement_0_stackFreeCurrentInsideOptionalCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                newElement_0_stackFreeCurrentInsideOptionalClassName.c_str(),
+                newElement_0_stackFreeCurrentInsideOptionalCtorSignature.c_str(), entry_0.stackFreeCurrent.Value(),
+                newElement_0_stackFreeCurrentInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_stackFreeCurrentInsideOptional,
+                                                              newElement_0_stackFreeCurrent);
+        }
         jobject newElement_0_stackFreeMinimum;
-        std::string newElement_0_stackFreeMinimumClassName     = "java/lang/Long";
-        std::string newElement_0_stackFreeMinimumCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackFreeMinimumClassName.c_str(),
-                                                                       newElement_0_stackFreeMinimumCtorSignature.c_str(),
-                                                                       entry_0.stackFreeMinimum, newElement_0_stackFreeMinimum);
+        if (!entry_0.stackFreeMinimum.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_stackFreeMinimum);
+        }
+        else
+        {
+            jobject newElement_0_stackFreeMinimumInsideOptional;
+            std::string newElement_0_stackFreeMinimumInsideOptionalClassName     = "java/lang/Long";
+            std::string newElement_0_stackFreeMinimumInsideOptionalCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                newElement_0_stackFreeMinimumInsideOptionalClassName.c_str(),
+                newElement_0_stackFreeMinimumInsideOptionalCtorSignature.c_str(), entry_0.stackFreeMinimum.Value(),
+                newElement_0_stackFreeMinimumInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_stackFreeMinimumInsideOptional,
+                                                              newElement_0_stackFreeMinimum);
+        }
         jobject newElement_0_stackSize;
-        std::string newElement_0_stackSizeClassName     = "java/lang/Long";
-        std::string newElement_0_stackSizeCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_stackSizeClassName.c_str(),
-                                                                       newElement_0_stackSizeCtorSignature.c_str(),
-                                                                       entry_0.stackSize, newElement_0_stackSize);
+        if (!entry_0.stackSize.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_stackSize);
+        }
+        else
+        {
+            jobject newElement_0_stackSizeInsideOptional;
+            std::string newElement_0_stackSizeInsideOptionalClassName     = "java/lang/Long";
+            std::string newElement_0_stackSizeInsideOptionalCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                newElement_0_stackSizeInsideOptionalClassName.c_str(), newElement_0_stackSizeInsideOptionalCtorSignature.c_str(),
+                entry_0.stackSize.Value(), newElement_0_stackSizeInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_stackSizeInsideOptional, newElement_0_stackSize);
+        }
 
         jclass threadMetricsStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18880,7 +18921,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
         }
         jmethodID threadMetricsStructCtor =
             env->GetMethodID(threadMetricsStructClass, "<init>",
-                             "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
+                             "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
         if (threadMetricsStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$SoftwareDiagnosticsClusterThreadMetrics constructor");
