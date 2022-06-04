@@ -444,7 +444,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
             ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
             break;
         default:
-            SuccessOrExit(err = CHIP_ERROR_INTERNAL);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
             break;
         }
     }
