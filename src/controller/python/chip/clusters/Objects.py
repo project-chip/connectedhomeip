@@ -14334,9 +14334,11 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="CSRNonce", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="isForUpdateNOC", Tag=1, Type=typing.Optional[bool]),
                     ])
 
             CSRNonce: 'bytes' = b""
+            isForUpdateNOC: 'typing.Optional[bool]' = None
 
         @dataclass
         class CSRResponse(ClusterCommand):

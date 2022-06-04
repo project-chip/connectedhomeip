@@ -11162,6 +11162,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCSRNonce)), CSRNonce));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIsForUpdateNOC)), isForUpdateNOC));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -11182,6 +11183,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
         case to_underlying(Fields::kCSRNonce):
             ReturnErrorOnFailure(DataModel::Decode(reader, CSRNonce));
+            break;
+        case to_underlying(Fields::kIsForUpdateNOC):
+            ReturnErrorOnFailure(DataModel::Decode(reader, isForUpdateNOC));
             break;
         default:
             break;

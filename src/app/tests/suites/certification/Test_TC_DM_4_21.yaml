@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.21. [TC-DM-4.21][Thread] Verification for commands check
+    10.4.21. [TC-DM-4.21] [Thread] Verification for commands check
     [DUT-Commissioner]
 
 config:
@@ -105,18 +105,6 @@ tests:
           [1650388639.091393][9682:9687] CHIP:CTL: Performing next commissioning step 'ThreadNetworkEnable'
       disabled: true
 
-    - label: "DUT sends the RemoveNetwork command to the TH"
-      verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
-
-          [1650391420.469341][10048:10053] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650391420.469452][10048:10053] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650391420.469634][10048:10053] CHIP:TOO:   NetworkConfigResponse: {
-          [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 3
-          [1650391420.469812][10048:10053] CHIP:TOO:    }
-          [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
     - label: "DUT sends the ConnectNetwork command to the TH"
       verification: |
           Executed during the commissioning
@@ -136,4 +124,16 @@ tests:
           [1650392602.379725][10158:10163] CHIP:TOO:     networkingStatus: 3
           [1650392602.379792][10158:10163] CHIP:TOO:    }
           [1650392602.379882][10158:10163] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label: "DUT sends the RemoveNetwork command to the TH"
+      verification: |
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
+
+          [1650391420.469341][10048:10053] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650391420.469452][10048:10053] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650391420.469634][10048:10053] CHIP:TOO:   NetworkConfigResponse: {
+          [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 3
+          [1650391420.469812][10048:10053] CHIP:TOO:    }
+          [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

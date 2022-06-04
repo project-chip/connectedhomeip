@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.1.1. [TC-DM-1.1] Basic Cluster Server Attributes
+name:
+    10.1.1. [TC-DM-1.1] Global Attributes for Basic Information Cluster
+    [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -21,172 +23,80 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Commission DUT to TH"
+      verification: |
 
-    - label: "Query Data Model Revision"
-      command: "readAttribute"
-      attribute: "DataModelRevision"
-      response:
-          constraints:
-              type: uint16
+      disabled: true
 
-    - label: "Query Vendor Name"
-      command: "readAttribute"
-      attribute: "VendorName"
-      response:
-          constraints:
-              type: string
-              maxLength: 32
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool basic read cluster-revision 1 0
 
-    - label: "Query VendorID"
-      command: "readAttribute"
-      attribute: "VendorID"
-      response:
-          constraints:
-              type: uint16
 
-    - label: "Query Product Name"
-      command: "readAttribute"
-      attribute: "ProductName"
-      response:
-          constraints:
-              type: string
-              maxLength: 32
+          [1651214669.313397][2666:2671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 158558310
+          [1651214669.313472][2666:2671] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
 
-    - label: "Query ProductID"
-      command: "readAttribute"
-      attribute: "ProductID"
-      response:
-          constraints:
-              type: uint16
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool basic read feature-map 1 0
 
-    - label: "Query Node Label"
-      command: "readAttribute"
-      attribute: "NodeLabel"
-      response:
-          constraints:
-              type: string
-              maxLength: 32
+          [1653459580.065669][29174:29179] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFC DataVersion: 46104872
+          [1653459580.065758][29174:29179] CHIP:TOO:   FeatureMap: 0
+          [1653459580.065936][29174:29179] CHIP:EM: Sending Standalone Ack for MessageCounter:14961519 on exchange 31457i
+      disabled: true
 
-    - label: "Query User Location"
-      command: "readAttribute"
-      attribute: "Location"
-      response:
-          constraints:
-              type: string
-              maxLength: 2
-              format: "ISO 3166-1 alpha-2" # Step 6 11.2.3.1-6 Verify it follows ISO 3166-1 alpha-2 code / or it is empty, since it is user-defined
+    - label: "TH reads AttributeList from DUT"
+      verification: |
+          ./chip-tool basic read attribute-list 1 0
 
-    - label: "Query HardwareVersion"
-      command: "readAttribute"
-      attribute: "HardwareVersion"
-      response:
-          constraints:
-              type: uint16
+          [1651214730.462010][2685:2690] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFB DataVersion: 158558310
+          [1651214730.462091][2685:2690] CHIP:TOO:   AttributeList: 24 entries
+          [1651214730.462123][2685:2690] CHIP:TOO:     [1]: 0
+          [1651214730.462158][2685:2690] CHIP:TOO:     [2]: 1
+          [1651214730.462183][2685:2690] CHIP:TOO:     [3]: 2
+          [1651214730.462207][2685:2690] CHIP:TOO:     [4]: 3
+          [1651214730.462241][2685:2690] CHIP:TOO:     [5]: 4
+          [1651214730.462266][2685:2690] CHIP:TOO:     [6]: 5
+          [1651214730.462300][2685:2690] CHIP:TOO:     [7]: 6
+          [1651214730.462325][2685:2690] CHIP:TOO:     [8]: 7
+          [1651214730.462349][2685:2690] CHIP:TOO:     [9]: 8
+          [1651214730.462383][2685:2690] CHIP:TOO:     [10]: 9
+          [1651214730.462407][2685:2690] CHIP:TOO:     [11]: 10
+          [1651214730.462441][2685:2690] CHIP:TOO:     [12]: 11
+          [1651214730.462465][2685:2690] CHIP:TOO:     [13]: 12
+          [1651214730.462499][2685:2690] CHIP:TOO:     [14]: 13
+          [1651214730.462523][2685:2690] CHIP:TOO:     [15]: 14
+          [1651214730.462556][2685:2690] CHIP:TOO:     [16]: 15
+          [1651214730.462580][2685:2690] CHIP:TOO:     [17]: 16
+          [1651214730.462615][2685:2690] CHIP:TOO:     [18]: 17
+          [1651214730.462640][2685:2690] CHIP:TOO:     [19]: 18
+          [1651214730.462676][2685:2690] CHIP:TOO:     [20]: 19
+          [1651214730.462700][2685:2690] CHIP:TOO:     [21]: 65528
+          [1651214730.462736][2685:2690] CHIP:TOO:     [22]: 65529
+          [1651214730.462761][2685:2690] CHIP:TOO:     [23]: 65531
+          [1651214730.462799][2685:2690] CHIP:TOO:     [24]: 65533
+      disabled: true
 
-    - label: "Query HardwareVersionString"
-      command: "readAttribute"
-      attribute: "HardwareVersionString"
-      response:
-          constraints:
-              type: string
-              minLength: 1
-              maxLength: 64
+    - label: "TH reads EventList from DUT"
+      verification: |
+          out of scope for V1.0
+      disabled: true
 
-    - label: "Query SoftwareVersion"
-      command: "readAttribute"
-      attribute: "SoftwareVersion"
-      response:
-          constraints:
-              type: uint32
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool basic read accepted-command-list 1 0
 
-    - label: "Query SoftwareVersionString"
-      command: "readAttribute"
-      attribute: "SoftwareVersionString"
-      response:
-          constraints:
-              type: string
-              minLength: 1
-              maxLength: 64
-              format: "ASCII" # Step 10 11.2.3.1-10 Verify it uses 7-bit ASCII alphanumeric and punctuation characters
 
-    - label: "Query ManufacturingDate"
-      command: "readAttribute"
-      attribute: "ManufacturingDate"
-      PICS: MANF_DATE
-      optional: true
-      response:
-          constraints:
-              type: string
-              minLength: 8
-              maxLength: 16
-              format: "ISO 8601" # Step 11  11.2.3.1-11 Verify if the first 8 characters specify date according to ISO 8601, i.e, YYYYMMDD
+          [1651214820.355561][2695:2700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9 DataVersion: 158558310
+          [1651214820.355673][2695:2700] CHIP:TOO:   AcceptedCommandList: 0 entries
+      disabled: true
 
-    - label: "Query PartNumber"
-      command: "readAttribute"
-      attribute: "PartNumber"
-      PICS: PART_NUM
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 32
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool basic read generated-command-list 1 0
 
-    - label: "Query ProductURL"
-      command: "readAttribute"
-      attribute: "ProductURL"
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 256
-              format: "RFC3986" # Step 13 11.2.3.1-13 Verify that it follows the syntax rules specified in RFC 3986
 
-    - label: "Query ProductLabel"
-      command: "readAttribute"
-      attribute: "ProductLabel"
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 64
-
-    - label: "Query SerialNumber"
-      command: "readAttribute"
-      attribute: "SerialNumber"
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 32
-
-    - label: "Query LocalConfigDisabled"
-      command: "readAttribute"
-      attribute: "LocalConfigDisabled"
-      optional: true
-      response:
-          constraints:
-              type: boolean
-
-    - label: "Query Reachable"
-      command: "readAttribute"
-      attribute: "Reachable"
-      optional: true
-      response:
-          constraints:
-              type: boolean
-
-    - label: "Query UniqueID"
-      command: "readAttribute"
-      attribute: "UniqueID"
-      optional: true
-      response:
-          constraints:
-              type: string
-              maxLength: 32
+          [1651214861.208575][2702:2707] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF8 DataVersion: 158558310
+          [1651214861.208682][2702:2707] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true

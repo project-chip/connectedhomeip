@@ -404,6 +404,17 @@ function asUpperCamelCase(label)
   return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
+function chip_friendly_endpoint_type_name(options)
+{
+  var name = this.endpointTypeName;
+  if (name.startsWith("MA-")) {
+    // prefix likely for "Matter" and is redundant
+    name = name.substring(3);
+  }
+
+  return asLowerCamelCase(name);
+}
+
 function asMEI(prefix, suffix)
 {
   return cHelper.asHex((prefix << 16) + suffix, 8);
@@ -480,7 +491,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
       if (s) {
         return 'uint' + s[1] + '_t';
       }
-      return 'chip::BitFlags<' + ns + type + '>';
+      return 'chip::BitMask<' + ns + type + '>';
     }
 
     if (types.isStruct) {
@@ -865,6 +876,7 @@ exports.asTypedExpression                     = asTypedExpression;
 exports.asTypedLiteral                        = asTypedLiteral;
 exports.asLowerCamelCase                      = asLowerCamelCase;
 exports.asUpperCamelCase                      = asUpperCamelCase;
+exports.chip_friendly_endpoint_type_name      = chip_friendly_endpoint_type_name;
 exports.hasProperty                           = hasProperty;
 exports.hasSpecificAttributes                 = hasSpecificAttributes;
 exports.asMEI                                 = asMEI;
