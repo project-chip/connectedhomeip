@@ -655,6 +655,17 @@
 #endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
 
 /**
+ * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+ *
+ * @brief This enables logging of changes to the underlying reference count of
+ * SecureSession objects.
+ *
+ */
+#ifndef CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+#define CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING 0
+#endif
+
+/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
