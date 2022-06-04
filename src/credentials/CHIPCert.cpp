@@ -441,7 +441,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
             break;
         case CertificateValidityResult::kExpired:
         case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
-            SuccessOrExit(err = CHIP_ERROR_CERT_EXPIRED);
+            ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
             break;
         default:
             SuccessOrExit(err = CHIP_ERROR_INTERNAL);
