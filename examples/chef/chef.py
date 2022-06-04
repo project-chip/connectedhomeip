@@ -270,7 +270,7 @@ def main(argv: Sequence[str]) -> None:
     if options.validate_zzz:
         flush_print(f"Validating\n{_CHEF_ZZZ_ROOT}\n",
                     with_border=True)
-        fix_instructions = textwrap.dedent(f""" \
+        fix_instructions = textwrap.dedent("""\
         Cached files out of date!
         Please:
           ./scripts/bootstrap.sh
@@ -316,11 +316,12 @@ def main(argv: Sequence[str]) -> None:
     if options.do_bootstrap_zap:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
-            shell.run_cmd(
-                textwrap.dedent(""" \
-                sudo apt-get install sudo apt-get install node node-yargs npm \
-                libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp \
-                libjpeg9-dev libgif-dev node-typescript \""""))
+            install_deps_cmd = textwrap.dedent("""\
+            sudo apt-get install node node-yargs npm
+            libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
+            libjpeg9-dev libgif-dev node-typescript""")
+            install_deps_cmd = install_deps_cmd.replace("\n", " ")
+            shell.run_cmd(install_deps_cmd)
         if sys.platform == "darwin":
             flush_print("Installation of ZAP OS packages not supported on MacOS")
         if sys.platform == "win32":
@@ -495,7 +496,7 @@ def main(argv: Sequence[str]) -> None:
                                    options.sample_device_type_name,
                                    "zap-generated")
             if not os.path.exists(zzz_dir):
-                flush_print(textwrap.dedent(f"""
+                flush_print(textwrap.dedent(f"""\
                 You have specified --use_zzz
                 for device {options.sample_device_type_name}
                 which does not exist in the cached ZAP output.
