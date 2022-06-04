@@ -16,6 +16,7 @@ import os
 import shlex
 import subprocess
 import sys
+import time
 from typing import Dict, Optional
 
 import constants
@@ -23,12 +24,18 @@ import constants
 _ENV_FILENAME = ".shell_env"
 _OUTPUT_FILENAME = ".shell_output"
 _HERE = os.path.dirname(os.path.abspath(__file__))
+_FILE_CHECK_TIMEOUT = 3
 
 TermColors = constants.TermColors
 
 
 class StatefulShell:
-    """A Shell that tracks state changes of the environment."""
+    """A Shell that tracks state changes of the environment.
+
+    Attributes:
+        env: Env variables passed to command. It gets updated after every command.
+        cwd: Current working directory of shell.
+    """
 
     def __init__(self) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -44,8 +51,8 @@ class StatefulShell:
 
         # This file holds the env after running a command. This is a better approach
         # than writing to stdout because commands could redirect the stdout.
-        self.envfile_path: str = os.path.join(_HERE, _ENV_FILENAME)
-        self.cmd_output_path: str = os.path.join(_HERE, _OUTPUT_FILENAME)
+        self._envfile_path: str = os.path.join(_HERE, _ENV_FILENAME)
+        self._cmd_output_path: str = os.path.join(_HERE, _OUTPUT_FILENAME)
 
     def print_env(self) -> None:
         """Print environment variables in commandline friendly format for export.
@@ -87,13 +94,15 @@ class StatefulShell:
         if return_cmd_output:
             # Piping won't work here because piping will affect how environment variables
             # are propagated. This solution uses tee without piping to preserve env variables.
-            redirect = f" > >(tee \"{self.cmd_output_path}\") 2>&1 "  # include stderr
+            redirect = f" > >(tee \"{self._cmd_output_path}\") 2>&1 "  # include stderr
+            if os.path.isfile(self._cmd_output_path):
+                os.remove(self._cmd_output_path)
         else:
             redirect = ""
 
         command_with_state = (
             f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect}; RETCODE=$?;"
-            f" env -0 > {self.envfile_path}; exit $RETCODE")
+            f" env -0 > {self._envfile_path}; exit $RETCODE")
         with subprocess.Popen(
             [command_with_state],
             env=self.env, cwd=self.cwd,
@@ -102,7 +111,7 @@ class StatefulShell:
             returncode = proc.wait()
 
         # Load env state from envfile.
-        with open(self.envfile_path, encoding="latin1") as f:
+        with open(self._envfile_path, encoding="latin1") as f:
             # Split on null char because we use env -0.
             env_entries = f.read().split("\0")
             for entry in env_entries:
@@ -119,6 +128,15 @@ class StatefulShell:
                 f"\nCmd: {cmd}")
 
         if return_cmd_output:
-            with open(self.cmd_output_path, encoding="latin1") as f:
-                output = f.read()
+            # Poll for file due to race condition writing file contents.
+            start_time = time.time()
+            while time.time() - start_time < _FILE_CHECK_TIMEOUT:
+                try:
+                    with open(self._cmd_output_path, encoding="latin1") as f:
+                        output = f.read()
+                    break
+                except FileNotFoundError:
+                    pass
+                time.sleep(0.1)
+
             return output
