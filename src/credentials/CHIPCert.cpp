@@ -437,7 +437,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         case CertificateValidityResult::kTimeUnknown:
             break;
         case CertificateValidityResult::kNotYetValid:
-            SuccessOrExit(err = CHIP_ERROR_CERT_NOT_VALID_YET);
+            ExitNow(err = CHIP_ERROR_CERT_NOT_VALID_YET);
             break;
         case CertificateValidityResult::kExpired:
         case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
