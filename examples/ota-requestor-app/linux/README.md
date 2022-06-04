@@ -304,7 +304,7 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 **Write to the DefaultOTAProviders attribute**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 3735928559, "endpoint": 0}]' 0x1234567890 0
 ```
 
 Every 60 seconds from when the OTA Requestor application has launched, the OTA
@@ -319,13 +319,13 @@ structs. Each entry in this list is a default OTA Provider per fabric. There can
 not be more than one entry containing the same fabric.
 
 To add more than one entry to the `DefaultOTAProviders` attribute, the OTA
-Requestor app must be commissioned on multiple fabrics. At least one OTA
-Provider app should be commissioned to each corresponding fabric that the OTA
-Requestor app had been commissioned to.
+Requestor app must be commissioned into multiple fabrics. At least one OTA
+Provider app should be commissioned into each corresponding fabric that the OTA
+Requestor app had been commissioned into.
 
-The following example has two OTA Provider apps, each commissioned on a
-different fabric (alpha and beta) and one OTA Requestor app commissioned to both
-alpha and beta fabrics.
+The following example has two OTA Provider apps, each commissioned into a
+different fabric (alpha and beta) and one OTA Requestor app commissioned into
+both alpha and beta fabrics.
 
 ### In terminal 1:
 
@@ -365,19 +365,19 @@ out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /
 
 ### In terminal 4:
 
-**Commission the first OTA Provider to the first fabric (alpha)**
+**Commission the first OTA Provider into the first fabric (alpha)**
 
 ```
 out/chip-tool pairing onnetwork-long 0xC0FFEE 20202021 22
 ```
 
-**Commission the second OTA Provider to the second fabric (beta)**
+**Commission the second OTA Provider into the second fabric (beta)**
 
 ```
 out/chip-tool pairing onnetwork-long 0xB0BA 20202021 23 --commissioner-name beta
 ```
 
-**Commission the OTA Requestor application to the first fabric (alpha)**
+**Commission the OTA Requestor application into the first fabric (alpha)**
 
 ```
 out/chip-tool pairing onnetwork-long 0xDEB 20202021 18
@@ -389,7 +389,7 @@ out/chip-tool pairing onnetwork-long 0xDEB 20202021 18
 out/chip-tool administratorcommissioning open-basic-commissioning-window 600 0xDEB 0 --timedInteractionTimeoutMs 600
 ```
 
-**Commission the OTA Requestor application to the second fabric (beta)**
+**Commission the OTA Requestor application into the second fabric (beta)**
 
 ```
 out/chip-tool pairing onnetwork-long 0xB0B 20202021 18 --commissioner-name beta
@@ -398,27 +398,27 @@ out/chip-tool pairing onnetwork-long 0xB0B 20202021 18 --commissioner-name beta
 **Write/Read DefaultOTAProviders on the first fabric (alpha)**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 12648430, "endpoint": 0}]' 0xDEB 0
+out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 12648430, "endpoint": 0}]' 0xDEB 0
 out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0xDEB 0
 ```
 
 **Write/Read DefaultOTAProviders on second fabric (beta)**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 45242, "endpoint": 0}]' 0xB0B 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 45242, "endpoint": 0}]' 0xB0B 0 --commissioner-name beta
 out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0xB0B 0 --commissioner-name beta
 ```
 
 **Write ACL for the first OTA Provider application**
 
 ```
-out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xC0FFEE 0
+out/chip-tool accesscontrol write acl '[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xC0FFEE 0
 ```
 
 **Write ACL for the second OTA Provider application**
 
 ```
-out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xB0BA 0 --commissioner-name beta
+out/chip-tool accesscontrol write acl '[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xB0BA 0 --commissioner-name beta
 ```
 
 NOTE: For all operations, specify which fabric to use by passing in
