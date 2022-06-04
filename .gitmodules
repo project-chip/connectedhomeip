@@ -61,12 +61,12 @@
 [submodule "freertos"]
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-	branch  = V10.3.1-kernel-only
+	branch  = main
 	platforms = ameba,cc13x2_26x2,bl602,efr32,esp32,k32w0,p6,qpg
 [submodule "efr32_sdk"]
 	path = third_party/efr32_sdk/repo
 	url = https://github.com/SiliconLabs/sdk_support.git
-	branch  = master
+	branch  = main
 	platforms = efr32
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
