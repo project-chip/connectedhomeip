@@ -149,7 +149,7 @@ void CASESession::Clear()
     mFabricInfo  = nullptr;
 }
 
-CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate, ScopedNodeId peerNodeId)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -159,7 +159,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
+    ReturnErrorOnFailure(AllocateSecureSession(sessionManager, peerNodeId));
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -169,13 +169,13 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
-                                           SessionResumptionStorage * sessionResumptionStorage,
-                                           SessionEstablishmentDelegate * delegate,
-                                           Optional<ReliableMessageProtocolConfig> mrpConfig)
+CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
+                                            SessionResumptionStorage * sessionResumptionStorage,
+                                            SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
+                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(sessionManager, delegate));
+    ReturnErrorOnFailure(Init(sessionManager, delegate, previouslyEstablishedPeer));
 
     mRole                     = CryptoContext::SessionRole::kResponder;
     mFabricsTable             = fabrics;
@@ -198,7 +198,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(sessionManager, delegate);
+    err = Init(sessionManager, delegate, ScopedNodeId(peerNodeId, fabric->GetFabricIndex()));
 
     mRole = CryptoContext::SessionRole::kInitiator;
 

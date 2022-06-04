@@ -158,12 +158,13 @@ public:
     /**
      * @brief
      *   Allocate a secure session and non-colliding session ID in the secure
-     *   session table.
+     *   session table. If known, the scoped nodeid of the peer that should be considered can be passed in if necessary
+     *   as part of the session allocation algorithm.
      *
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType);
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType, ScopedNodeId peerNodeId);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);

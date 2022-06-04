@@ -35,6 +35,7 @@ static_library("transport") {
     "SecureMessageCodec.h",
     "SecureSession.cpp",
     "SecureSession.h",
+    "SecureSessionTable.cpp",
     "SecureSessionTable.h",
     "Session.cpp",
     "Session.h",

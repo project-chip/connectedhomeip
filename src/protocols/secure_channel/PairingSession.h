@@ -63,11 +63,27 @@ public:
         return localSessionId;
     }
 
+    /**
+     * Copy the underlying session (if present) into a SessionHandle that a caller can use to
+     * obtain a reference to the session.
+     */
+    Optional<SessionHandle> CopySecureSession()
+    {
+        if (mSecureSessionHolder)
+        {
+            VerifyOrDie(mSecureSessionHolder->GetSessionType() == Transport::Session::SessionType::kSecure);
+            return MakeOptional<SessionHandle>(*mSecureSessionHolder->AsSecureSession());
+        }
+
+        return Optional<SessionHandle>::Missing();
+    }
+
     uint16_t GetPeerSessionId() const
     {
         VerifyOrDie(mPeerSessionId.HasValue());
         return mPeerSessionId.Value();
     }
+
     bool IsValidPeerSessionId() const { return mPeerSessionId.HasValue(); }
 
     /**
@@ -93,10 +109,12 @@ protected:
      * Allocate a secure session object from the passed session manager for the
      * pending session establishment operation.
      *
-     * @param sessionManager session manager from which to allocate a secure session object
+     * @param sessionManager    Session manager from which to allocate a secure session object
+     * @param peerNodeId        If known, the scoped nodeid of the peer that should be considered if necessary
+     *                          as part of the session allocation algorithm.
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId peerNodeId = ScopedNodeId());
 
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
 

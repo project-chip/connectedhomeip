@@ -73,12 +73,16 @@ public:
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
+     * @param previouslyEstablishedPeer     If known, the scoped nodeid of the previous peer to which a session
+     *                                      had just been established with (in responder role), or the peer to whom we're about to
+     *                                      establish a session to (in initiator role). Set to default ScopedNode() if not known.
+     * @param mrpConfig                     MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(
+    CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate,
+        SessionEstablishmentDelegate * delegate, ScopedNodeId peerNodeId,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -177,7 +181,8 @@ private:
         kFinishedViaResume = 7,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate,
+                    ScopedNodeId previouslyEstablishedPeer);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

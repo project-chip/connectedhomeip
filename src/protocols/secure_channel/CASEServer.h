@@ -61,6 +61,8 @@ private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
+    Optional<SessionHandle> mCaseSession;
+
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;
 

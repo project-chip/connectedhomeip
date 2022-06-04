@@ -43,19 +43,17 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mExchangeManager          = exchangeManager;
     mGroupDataProvider        = responderGroupDataProvider;
 
+    // Setup CASE state machine using the credentials for the current fabric.
+    GetSession().SetGroupDataProvider(mGroupDataProvider);
+
     Cleanup();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Setup CASE state machine using the credentials for the current fabric.
-    GetSession().SetGroupDataProvider(mGroupDataProvider);
-    ReturnErrorOnFailure(
-        GetSession().ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
-                                                   Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
@@ -90,6 +88,7 @@ exit:
     {
         Cleanup();
     }
+
     return err;
 }
 
@@ -100,7 +99,39 @@ void CASEServer::Cleanup()
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
     mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
 
+    //
+    // If we previously had a session to a peer, latch it its details. If we didn't, this will
+    // contain kInvalidPeerNodeId.
+    //
+    ScopedNodeId previouslyEstablishedPeer = GetSession().GetPeer();
+
     GetSession().Clear();
+
+    //
+    // Indicate to the underlying CASE session to prepare for session establishment requests coming its way. This will
+    // involve allocating a SecureSession that will be held until it's needed for the next CASE session handshake.
+    //
+    // Logically speaking, we're attempting to evict a session using details of the just-established session (to ensure
+    // we're evicting sessions from the right fabric if needed) and then transferring the just established session into that
+    // slot (and there-by free'ing up the slot for the next session attempt). However, this transfer isn't necessary - just
+    // evicting a session will ensure it is available for the next attempt.
+    //
+    VerifyOrDie(GetSession().PrepareForSessionEstablishment(
+                    *mSessionManager, mFabrics, mSessionResumptionStorage, this, previouslyEstablishedPeer,
+                    Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())) == CHIP_NO_ERROR);
+
+    //
+    // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForRemoval is called on this session, the session is
+    // going to get de-allocated from underneath us. This session that has just been allocated should *never* get evicted, and
+    // remain available till the next hand-shake is received.
+    //
+    // TODO: Converting SessionHolder to a true weak-ref and making PairingSession hold a strong-ref (#18397) would avoid this
+    // headache...
+    //
+    // Let's create a SessionHandle strong-reference to it to keep it resident.
+    //
+    mCaseSession = GetSession().CopySecureSession();
+    VerifyOrDie(mCaseSession.HasValue());
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)

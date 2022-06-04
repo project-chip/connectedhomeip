@@ -23,9 +23,9 @@
 
 namespace chip {
 
-CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId peerNodeId)
 {
-    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
+    auto handle = sessionManager.AllocateSession(GetSecureSessionType(), peerNodeId);
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mSecureSessionHolder.GrabPairing(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
