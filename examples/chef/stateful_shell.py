@@ -16,6 +16,7 @@ import os
 import shlex
 import subprocess
 import sys
+import time
 from typing import Dict, Optional
 
 import constants
@@ -23,12 +24,18 @@ import constants
 _ENV_FILENAME = ".shell_env"
 _OUTPUT_FILENAME = ".shell_output"
 _HERE = os.path.dirname(os.path.abspath(__file__))
+_TEE_WAIT_TIMEOUT = 3
 
 TermColors = constants.TermColors
 
 
 class StatefulShell:
-    """A Shell that tracks state changes of the environment."""
+    """A Shell that tracks state changes of the environment.
+
+    Attributes:
+        env: Env variables passed to command. It gets updated after every command.
+        cwd: Current working directory of shell.
+    """
 
     def __init__(self) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -44,8 +51,8 @@ class StatefulShell:
 
         # This file holds the env after running a command. This is a better approach
         # than writing to stdout because commands could redirect the stdout.
-        self.envfile_path: str = os.path.join(_HERE, _ENV_FILENAME)
-        self.cmd_output_path: str = os.path.join(_HERE, _OUTPUT_FILENAME)
+        self._envfile_path: str = os.path.join(_HERE, _ENV_FILENAME)
+        self._cmd_output_path: str = os.path.join(_HERE, _OUTPUT_FILENAME)
 
     def print_env(self) -> None:
         """Print environment variables in commandline friendly format for export.
@@ -87,13 +94,25 @@ class StatefulShell:
         if return_cmd_output:
             # Piping won't work here because piping will affect how environment variables
             # are propagated. This solution uses tee without piping to preserve env variables.
-            redirect = f" > >(tee \"{self.cmd_output_path}\") 2>&1 "  # include stderr
+            redirect = f" > >(tee \"{self._cmd_output_path}\") 2>&1 "  # include stderr
+
+            # Delete the file before running the command so we can later check if the file
+            # exists as a signal that tee has finished writing to the file.
+            if os.path.isfile(self._cmd_output_path):
+                os.remove(self._cmd_output_path)
         else:
             redirect = ""
 
+        # TODO: Use env -0 when `macos-latest` refers to macos-12 in github actions.
+        # env -0 is ideal because it will support cases where an env variable that has newline
+        # characters. The flag "-0" is requires MacOS 12 which is still in beta in Github Actions.
+        # The less ideal `env` command is used by itself, with the caveat that newline chars
+        # are unsupported in env variables.
+        save_env_cmd = f"env > {self._envfile_path}"
+
         command_with_state = (
-            f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect}; RETCODE=$?;"
-            f" env -0 > {self.envfile_path}; exit $RETCODE")
+            f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect}; RETCODE=$?; "
+            f"{save_env_cmd}; exit $RETCODE")
         with subprocess.Popen(
             [command_with_state],
             env=self.env, cwd=self.cwd,
@@ -102,9 +121,9 @@ class StatefulShell:
             returncode = proc.wait()
 
         # Load env state from envfile.
-        with open(self.envfile_path, encoding="latin1") as f:
-            # Split on null char because we use env -0.
-            env_entries = f.read().split("\0")
+        with open(self._envfile_path, encoding="latin1") as f:
+            # TODO: Split on null char after updating to env -0 - requires MacOS 12.
+            env_entries = f.read().split("\n")
             for entry in env_entries:
                 parts = entry.split("=")
                 # Handle case where an env variable contains text with '='.
@@ -119,6 +138,21 @@ class StatefulShell:
                 f"\nCmd: {cmd}")
 
         if return_cmd_output:
-            with open(self.cmd_output_path, encoding="latin1") as f:
-                output = f.read()
+            # Poll for file due to give 'tee' time to close.
+            # This is necessary because 'tee' waits for all subshells to finish before writing.
+            start_time = time.time()
+            while time.time() - start_time < _TEE_WAIT_TIMEOUT:
+                try:
+                    with open(self._cmd_output_path, encoding="latin1") as f:
+                        output = f.read()
+                    break
+                except FileNotFoundError:
+                    pass
+                time.sleep(0.1)
+            else:
+                raise TimeoutError(
+                    f"Error. Output file: {self._cmd_output_path} not created within "
+                    f"the alloted time of: {_TEE_WAIT_TIMEOUT}s"
+                )
+
             return output
