@@ -162,6 +162,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_link_tests) {
       deps = [
         "//:fake_platform_tests",
+        "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/idl:idl.tests",
         "//src:tests_run",
