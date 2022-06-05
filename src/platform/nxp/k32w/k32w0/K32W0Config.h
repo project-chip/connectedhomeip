@@ -56,11 +56,13 @@ public:
     // PDM ids used by the CHIP Device Layer
     static constexpr uint8_t kPDMId_ChipFactory = 0x01; /**< PDM id for settings containing persistent config values set at
                                                          * manufacturing time. Retained during factory reset. */
-    static constexpr uint8_t kPDMId_ChipConfig = 0x02;  /**< PDM id for settings containing dynamic config values set at runtime.
+    static constexpr uint8_t kPDMId_ChipConfig  = 0x02;  /**< PDM id for settings containing dynamic config values set at runtime.
                                                          *   Cleared during factory reset. */
     static constexpr uint8_t kPDMId_ChipCounter = 0x03; /**< PDM id for settings containing dynamic counter values set at runtime.
                                                          *   Retained during factory reset. */
-    static constexpr uint8_t kPDMId_KVS = 0x04;         /**< PDM id for settings containing KVS set at runtime.
+    static constexpr uint8_t kPDMId_KVSKey      = 0x04; /**< PDM id for settings containing KVS keys set at runtime.
+                                                         *   Cleared during factory reset. */
+    static constexpr uint8_t kPDMId_KVSValue    = 0x05; /**< PDM id for settings containing KVS values set at runtime.
                                                          *   Cleared during factory reset. */
 
     using Key = uint32_t;
@@ -105,8 +107,10 @@ public:
     static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0xFF);
     static constexpr Key kMinConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0x00);
     static constexpr Key kMaxConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0xFF); // Allows 32 Counters to be created.
-    static constexpr Key kMinConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0x00);
-    static constexpr Key kMaxConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0xFF);
+    static constexpr Key kMinConfigKey_KVSKey      = K32WConfigKey(kPDMId_KVSKey, 0x00);
+    static constexpr Key kMaxConfigKey_KVSKey      = K32WConfigKey(kPDMId_KVSKey, 0xFF);
+    static constexpr Key kMinConfigKey_KVSValue    = K32WConfigKey(kPDMId_KVSValue, 0x00);
+    static constexpr Key kMaxConfigKey_KVSValue    = K32WConfigKey(kPDMId_KVSValue, 0xFF);
 
     static CHIP_ERROR Init(void);
 
@@ -139,7 +143,7 @@ private:
     static CHIP_ERROR MapPdmStatus(PDM_teStatus pdmStatus);
     static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
     static CHIP_ERROR MapPdmInitStatus(int pdmStatus);
-    static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
+    static void FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
 
 /**

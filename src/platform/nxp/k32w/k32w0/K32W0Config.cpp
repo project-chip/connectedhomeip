@@ -266,15 +266,12 @@ bool K32WConfig::ConfigValueExists(Key key)
 
 CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PDM_teStatus pdmStatus;
 
-    err = FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
-    }
+    FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
+    FactoryResetConfigInternal(kMinConfigKey_KVSKey, kMaxConfigKey_KVSKey);
+    FactoryResetConfigInternal(kMinConfigKey_KVSValue, kMaxConfigKey_KVSValue);
 
     pdmStatus = PDM_eSaveRecordData((uint16_t) kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
@@ -283,16 +280,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
+void K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     for (Key key = firstKey; key <= lastKey; key++)
     {
         ramStorageDelete(ramDescr, key, 0);
     }
-
-    return err;
 }
 
 CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
@@ -340,7 +333,7 @@ CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
 bool K32WConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS))
+    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVSValue))
     {
         return true;
     }
