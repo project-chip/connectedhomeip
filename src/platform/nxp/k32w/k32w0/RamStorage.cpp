@@ -47,16 +47,16 @@
 /* increment size for dynamic memory re-allocation in case the
  * initial RAM buffer size gets insufficient
  */
-constexpr size_t kRamBufferReallocSize = 512;
+constexpr size_t kRamBufferReallocSize  = 512;
 constexpr size_t kRamBufferMaxAllocSize = 10240;
 
-ramBufferDescriptor *getRamBuffer(uint16_t nvmId, uint16_t initialSize)
+ramBufferDescriptor * getRamBuffer(uint16_t nvmId, uint16_t initialSize)
 {
-    ramBufferDescriptor *ramDescr = NULL;
-    bool bLoadDataFromNvm = false;
-    uint16_t bytesRead = 0;
-    uint16_t recordSize = 0;
-    uint16_t allocSize  = initialSize;
+    ramBufferDescriptor * ramDescr = NULL;
+    bool bLoadDataFromNvm          = false;
+    uint16_t bytesRead             = 0;
+    uint16_t recordSize            = 0;
+    uint16_t allocSize             = initialSize;
 
     /* Check if dataset is present and get its size */
     if (PDM_bDoesDataExist(nvmId, &recordSize))
@@ -93,9 +93,9 @@ ramBufferDescriptor *getRamBuffer(uint16_t nvmId, uint16_t initialSize)
 
 static rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
-    rsError error = RS_ERROR_NONE;
-    struct settingsBlock currentBlock = {0};
-    const uint16_t newBlockLength = sizeof(struct settingsBlock) + aValueLength;
+    rsError error                     = RS_ERROR_NONE;
+    struct settingsBlock currentBlock = { 0 };
+    const uint16_t newBlockLength     = sizeof(struct settingsBlock) + aValueLength;
 
     if (pBuffer->ramBufferLen + newBlockLength <= pBuffer->ramBufferMaxLen)
     {
@@ -120,12 +120,12 @@ static rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const
 
 rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
 {
-    uint16_t i           = 0;
-    uint16_t valueLength = 0;
-    uint16_t readLength = 0;
-    int currentIndex = 0;
-    struct settingsBlock currentBlock = {0};
-    rsError error = RS_ERROR_NOT_FOUND;
+    uint16_t i                        = 0;
+    uint16_t valueLength              = 0;
+    uint16_t readLength               = 0;
+    int currentIndex                  = 0;
+    struct settingsBlock currentBlock = { 0 };
+    rsError error                     = RS_ERROR_NOT_FOUND;
 
     while (i < pBuffer->ramBufferLen)
     {
@@ -172,10 +172,10 @@ rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aI
 
 static rsError ramStorageSetInternal(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
-    uint16_t i = 0;
-    uint16_t currentBlockLength = 0;
-    uint16_t nextBlockStart = 0;
-    struct settingsBlock currentBlock = {0};
+    uint16_t i                        = 0;
+    uint16_t currentBlockLength       = 0;
+    uint16_t nextBlockStart           = 0;
+    struct settingsBlock currentBlock = { 0 };
 
     // Delete all entries of aKey
     while (i < pBuffer->ramBufferLen)
@@ -241,12 +241,12 @@ exit:
 
 rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex)
 {
-    uint16_t i       = 0;
-    int currentIndex = 0;
-    uint16_t nextBlockStart = 0;
-    uint16_t currentBlockLength = 0;
-    struct settingsBlock currentBlock = {0};
-    rsError error = RS_ERROR_NOT_FOUND;
+    uint16_t i                        = 0;
+    int currentIndex                  = 0;
+    uint16_t nextBlockStart           = 0;
+    uint16_t currentBlockLength       = 0;
+    struct settingsBlock currentBlock = { 0 };
+    rsError error                     = RS_ERROR_NOT_FOUND;
 
     while (i < pBuffer->ramBufferLen)
     {

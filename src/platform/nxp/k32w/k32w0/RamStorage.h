@@ -44,9 +44,10 @@ struct settingsBlock
     uint16_t length;
 } __attribute__((packed));
 
-#define member_size(type, member) sizeof(((type *)0)->member)
+#define member_size(type, member) sizeof(((type *) 0)->member)
 
-constexpr size_t kRamDescHeaderSize    = member_size(ramBufferDescriptor, ramBufferLen) + member_size(ramBufferDescriptor, ramBufferMaxLen);
+constexpr size_t kRamDescHeaderSize =
+    member_size(ramBufferDescriptor, ramBufferLen) + member_size(ramBufferDescriptor, ramBufferMaxLen);
 
 /* Return a RAM buffer with initialSize and populated with the contents of NVM ID - if found in flash */
 ramBufferDescriptor * getRamBuffer(uint16_t nvmId, uint16_t initialSize);
