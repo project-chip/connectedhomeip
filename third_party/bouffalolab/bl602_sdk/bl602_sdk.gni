@@ -117,6 +117,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
 
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver",
       "${bl602_sdk_root}/components/network/dns_server/include",
 
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
@@ -213,7 +214,7 @@ template("bl602_sdk") {
       #dump backtrace
       "CONF_ENABLE_FRAME_PTR=1",
       "CONF_ENABLE_FUNC_BACKTRACE_ELF=connectedhomeip/examples/lock-app/bl602/out/debug/chip-bl602-lock-example.out",
-      "CHIP_SYSTEM_HEADER_RESERVE_SIZE=134",
+      "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=128",
     ]
 
     if (bl602_board == "BL-HWC-G1") {
@@ -265,6 +266,7 @@ template("bl602_sdk") {
     ]
 
     cflags_cc = [ "-fpermissive" ]
+    cflags_cc += [ "-std=c++17" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]

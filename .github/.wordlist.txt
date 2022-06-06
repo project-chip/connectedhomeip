@@ -429,6 +429,7 @@ dryrun
 DS
 duplicative
 DV
+DVK
 dynload
 eabi
 EB
@@ -531,6 +532,7 @@ fsync
 ftd
 fullclean
 fuzzer
+FW
 gbl
 gcloud
 GDB
@@ -1099,6 +1101,7 @@ RPi
 RPis
 rsn
 RSSI
+RST
 rsync
 RTL
 rtld
