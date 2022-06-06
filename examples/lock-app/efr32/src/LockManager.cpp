@@ -372,7 +372,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
-    
+
     memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
     credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
