@@ -749,7 +749,7 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
  * This does not perform any sort of validation on the certificate structure
  * other than parsing it.
  *
- * @param chipCert CHIP certficiate in TLV-encoded form
+ * @param chipCert CHIP certificate in TLV-encoded form
  * @param notBeforeChipEpochTime (out) certificate NotBefore time as seconds from the CHIP epoch
  * @return CHIP_NO_ERROR if certificate parsing was successful, else an appropriate CHIP_ERROR
  */
