@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "PDM.h"
 #include "PWR_Interface.h"
 #include "TimersManager.h"
 #include "board.h"
@@ -51,6 +52,8 @@
 #else
 #define APP_DBG_LOG(...)
 #endif
+
+#define PDM_MAX_WRITES_INFINITE 0xFF
 
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
@@ -229,10 +232,11 @@ static void BOARD_ActionOnIdle(void)
 #endif
 }
 
-extern void OTAIdleActivities();
+extern void OTAIdleActivities(void);
 
 void vApplicationIdleHook(void)
 {
+    PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
     OTAIdleActivities();
     BOARD_ActionOnIdle();
 }

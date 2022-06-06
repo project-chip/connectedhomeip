@@ -161,6 +161,10 @@ public:
             return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            // TODO: Figure out what this should be, but zero is not the right
+            // answer.
+            return System::Clock::Seconds16(5);
         default:
             break;
         }

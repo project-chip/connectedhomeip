@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Location of The Tizen sysroot
-  tizen_sdk_sysroot = ""
+import("//build_overrides/build.gni")
+import("${build_root}/config/tizen/config.gni")
 
-  # Location of the Tizen SDK.
-  tizen_sdk_root = ""
-}
+sysroot = tizen_sdk_sysroot

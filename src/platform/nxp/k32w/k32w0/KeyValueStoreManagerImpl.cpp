@@ -38,105 +38,65 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 /* TODO: adjust these values */
-constexpr size_t kMaxNumberOfKeys  = 125;
+constexpr size_t kMaxNumberOfKeys  = 150;
 constexpr size_t kMaxKeyValueBytes = 255;
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-/* hashmap having:
- * 	- the matter key string as key;
- * 	- internal PDM identifier as value;
- */
-std::unordered_map<std::string, uint8_t> g_kvs_map;
-
-/* set containing used PDM identifiers */
-std::set<uint8_t> g_key_ids_set;
-
-/* used to check if we need to restore values from flash (e.g.: reset) */
-static bool g_restored_from_flash = false;
-
-CHIP_ERROR RestoreFromFlash()
+uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    uint8_t key_id                        = 0;
-    char key_string_id[kMaxKeyValueBytes] = { 0 };
-    size_t key_string_id_size             = 0;
-    uint8_t pdm_id_kvs                    = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
-    uint16_t pdm_internal_id              = 0;
+    CHIP_ERROR err                    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    uint8_t keyId                     = 0;
+    uint8_t pdmIdKvsKey               = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSKey;
+    bool bFreeIdxFound                = false;
+    char keyString[kMaxKeyValueBytes] = { 0 };
+    size_t keyStringSize              = 0;
+    uint16_t pdmInternalId;
 
-    if (g_restored_from_flash)
+    for (keyId = 0; keyId < kMaxNumberOfKeys; keyId++)
     {
-        /* already restored from flash, nothing to do */
-        return err;
-    }
+        pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsKey, keyId);
+        err =
+            chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(pdmInternalId, keyString, kMaxKeyValueBytes, keyStringSize);
 
-    for (key_id = 0; key_id < kMaxNumberOfKeys; key_id++)
-    {
-        /* key was saved as string in flash (key_string_id) using (key_id + kMaxNumberOfKeys) as PDM key
-         * value corresponding to key_string_id was saved in flash using key_id as PDM key
-         */
-
-        pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys);
-        err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(pdm_internal_id, key_string_id, kMaxKeyValueBytes,
-                                                                          key_string_id_size);
-
-        if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        if (err == CHIP_NO_ERROR)
         {
-            err = CHIP_NO_ERROR;
-            continue;
-        }
-        else if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(DeviceLayer, "KVS, Error while restoring Matter key [%s] from flash with PDM id: %i", key_string_id,
-                            pdm_internal_id);
-            return err;
-        }
-
-        if (key_string_id_size)
-        {
-            g_key_ids_set.insert(key_id);
-            key_string_id_size = 0;
-            if (!g_kvs_map.insert(std::make_pair(std::string(key_string_id), key_id)).second)
+            if (strcmp(key, keyString) == 0)
             {
-                /* key collision is not expected when restoring from flash */
-                ChipLogProgress(DeviceLayer, "KVS, Unexpected collision while restoring Matter key [%s] from flash with PDM id: %i",
-                                key_string_id, pdm_internal_id);
-            }
-            else
-            {
-                ChipLogProgress(DeviceLayer, "KVS, restored Matter key [%s] from flash with PDM id: %i", key_string_id,
-                                pdm_internal_id);
+                // found the entry we are looking for
+                break;
             }
         }
+        else if ((NULL != freeId) && (false == bFreeIdxFound))
+        {
+            bFreeIdxFound = true;
+            *freeId       = keyId;
+        }
     }
-
-    g_restored_from_flash = true;
-
-    return err;
+    return keyId;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    CHIP_ERROR err     = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    uint8_t pdm_id_kvs = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
-    std::unordered_map<std::string, uint8_t>::const_iterator it;
-    size_t read_bytes        = 0;
-    uint8_t key_id           = 0;
-    uint16_t pdm_internal_id = 0;
+    CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    uint8_t pdmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSValue;
+    size_t read_bytes      = 0;
+    uint8_t keyId          = 0;
+    uint16_t pdmInternalId = 0;
 
-    VerifyOrExit((key != NULL) && (value != NULL) && (RestoreFromFlash() == CHIP_NO_ERROR), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if ((it = g_kvs_map.find(key)) != g_kvs_map.end())
+    keyId = GetStringKeyId(key, NULL);
+
+    if (keyId < kMaxNumberOfKeys)
     {
-        key_id          = it->second;
-        pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id);
-
-        err =
-            chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(pdm_internal_id, (uint8_t *) value, value_size, read_bytes);
+        // This is the ID of the actual data
+        pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsValue, keyId);
+        err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(pdmInternalId, (uint8_t *) value, value_size, read_bytes);
         *read_bytes_size = read_bytes;
 
-        ChipLogProgress(DeviceLayer, "KVS, get Matter key [%s] with PDM id: %i", key, pdm_internal_id);
+        ChipLogProgress(DeviceLayer, "KVS, get Matter key [%s] with PDM id: %i", key, pdmInternalId);
     }
 
 exit:
@@ -145,69 +105,57 @@ exit:
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-    uint8_t key_id;
-    bool_t put_key     = false;
-    uint8_t pdm_id_kvs = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
-    std::unordered_map<std::string, uint8_t>::const_iterator it;
-    uint16_t pdm_internal_id = 0;
+    CHIP_ERROR err         = CHIP_ERROR_INVALID_ARGUMENT;
+    bool_t putKey          = false;
+    uint8_t pdmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSKey;
+    uint8_t pdmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSValue;
+    uint16_t pdmInternalId = 0;
+    uint16_t freeKeyId;
+    uint8_t keyId;
 
-    VerifyOrExit((key != NULL) && (value != NULL) && (RestoreFromFlash() == CHIP_NO_ERROR), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if ((it = g_kvs_map.find(key)) == g_kvs_map.end()) /* new key */
+    keyId = GetStringKeyId(key, &freeKeyId);
+
+    // Key already exists
+    if (keyId < kMaxNumberOfKeys)
     {
-        for (key_id = 0; key_id < kMaxNumberOfKeys; key_id++)
-        {
-            std::set<uint8_t>::iterator iter = std::find(g_key_ids_set.begin(), g_key_ids_set.end(), key_id);
-
-            if (iter == g_key_ids_set.end())
-            {
-                if (g_key_ids_set.size() >= kMaxNumberOfKeys)
-                {
-                    return CHIP_ERROR_NO_MEMORY;
-                }
-
-                g_key_ids_set.insert(key_id);
-
-                put_key = true;
-                break;
-            }
-        }
+        // Update just the value in this case
+        putKey = false;
     }
-    else /* overwrite key */
+    else
     {
-        put_key = true;
-        key_id  = it->second;
+        // Need to write both the value and the string key
+        putKey = true;
+        keyId  = freeKeyId;
     }
 
-    if (put_key)
+    pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsValue, keyId);
+    ChipLogProgress(DeviceLayer, "KVS, save in flash the value of the Matter key [%s] with PDM id: %i", key, pdmInternalId);
+
+    err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueBin(pdmInternalId, (uint8_t *) value, value_size);
+
+    /* save the 'key' in flash such that it can be retrieved later on */
+    if (err == CHIP_NO_ERROR)
     {
-        pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id);
-        ChipLogProgress(DeviceLayer, "KVS, save in flash the value of the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
-
-        g_kvs_map.insert(std::make_pair(std::string(key), key_id));
-        err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueBin(pdm_internal_id, (uint8_t *) value, value_size);
-
-        /* save the 'key' in flash such that it can be retrieved later on */
-        if (err == CHIP_NO_ERROR)
+        if (true == putKey)
         {
-            pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys);
-            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
+            pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsKey, keyId);
+            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i", key, pdmInternalId);
 
-            /* TODO (MATTER-132): do we need to make sure that "key" is NULL-terminated? */
-            err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(pdm_internal_id, key, strlen(key) + 1);
+            err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(pdmInternalId, key, strlen(key) + 1);
 
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the Matter key [%s] with PDM id: %i", key,
-                                pdm_internal_id);
+                                pdmInternalId);
             }
         }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the value of the Matter key [%s] with PDM id: %i", key,
-                            pdm_internal_id);
-        }
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the value of the Matter key [%s] with PDM id: %i", key,
+                        pdmInternalId);
     }
 
 exit:
@@ -216,48 +164,46 @@ exit:
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    std::unordered_map<std::string, uint8_t>::const_iterator it;
-    uint8_t pdm_id_kvs       = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
-    uint8_t key_id           = 0;
-    uint16_t pdm_internal_id = 0;
+    CHIP_ERROR err         = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    uint8_t pdmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSKey;
+    uint8_t pdmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSValue;
+    uint8_t keyId          = 0;
+    uint16_t pdmInternalId = 0;
 
-    VerifyOrExit((key != NULL) && (RestoreFromFlash() == CHIP_NO_ERROR), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((key != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if ((it = g_kvs_map.find(key)) != g_kvs_map.end())
+    keyId = GetStringKeyId(key, NULL);
+
+    if (keyId < kMaxNumberOfKeys)
     {
-        key_id          = it->second;
-        pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id);
+        // entry exists so we can remove it
+        pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsKey, keyId);
 
-        g_key_ids_set.erase(key_id);
-        g_kvs_map.erase(it);
-
-        ChipLogProgress(DeviceLayer, "KVS, delete from flash the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
-        err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(pdm_internal_id);
+        ChipLogProgress(DeviceLayer, "KVS, delete from flash the Matter key [%s] with PDM id: %i", key, pdmInternalId);
+        err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(pdmInternalId);
 
         /* also delete the 'key string' from flash */
         if (err == CHIP_NO_ERROR)
         {
-            pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys);
+            pdmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(pdmIdKvsValue, keyId);
             ChipLogProgress(DeviceLayer, "KVS, delete from flash the value of the Matter key [%s] with PDM id: %i", key,
-                            pdm_internal_id);
+                            pdmInternalId);
 
-            err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(pdm_internal_id);
+            err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(pdmInternalId);
 
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer,
                                 "KVS, Error while deleting from flash the value of the Matter key [%s] with PDM id: %i", key,
-                                pdm_internal_id);
+                                pdmInternalId);
             }
         }
         else
         {
             ChipLogProgress(DeviceLayer, "KVS, Error while deleting from flash the Matter key [%s] with PDM id: %i", key,
-                            pdm_internal_id);
+                            pdmInternalId);
         }
     }
-
 exit:
     return err;
 }
