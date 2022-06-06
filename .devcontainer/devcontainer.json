@@ -38,7 +38,8 @@
         "christian-kohler.path-intellisense",
         "knisterpeter.vscode-github",
         "npclaudiu.vscode-gn",
-        "marus25.cortex-debug"
+        "marus25.cortex-debug",
+        "msedge-dev.gnls"
     ],
     // Use 'settings' to set *default* container specific settings.json values on container create.
     // You can edit these settings after create using File > Preferences > Settings > Remote.
