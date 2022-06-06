@@ -11216,10 +11216,10 @@ struct Type
 {
 public:
     uint64_t id = static_cast<uint64_t>(0);
-    chip::CharSpan name;
-    uint32_t stackFreeCurrent = static_cast<uint32_t>(0);
-    uint32_t stackFreeMinimum = static_cast<uint32_t>(0);
-    uint32_t stackSize        = static_cast<uint32_t>(0);
+    Optional<chip::CharSpan> name;
+    Optional<uint32_t> stackFreeCurrent;
+    Optional<uint32_t> stackFreeMinimum;
+    Optional<uint32_t> stackSize;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

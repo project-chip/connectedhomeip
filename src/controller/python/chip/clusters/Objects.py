@@ -10738,17 +10738,17 @@ class SoftwareDiagnostics(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="stackFreeCurrent", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="stackFreeMinimum", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="stackSize", Tag=4, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="stackFreeCurrent", Tag=2, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="stackFreeMinimum", Tag=3, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="stackSize", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             id: 'uint' = 0
-            name: 'str' = ""
-            stackFreeCurrent: 'uint' = 0
-            stackFreeMinimum: 'uint' = 0
-            stackSize: 'uint' = 0
+            name: 'typing.Optional[str]' = None
+            stackFreeCurrent: 'typing.Optional[uint]' = None
+            stackFreeMinimum: 'typing.Optional[uint]' = None
+            stackSize: 'typing.Optional[uint]' = None
 
 
 
