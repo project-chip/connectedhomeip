@@ -178,6 +178,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Enable building for Android.
     enable_android_builds = false
 
+    # Enable building for Tizen.
+    enable_tizen_builds = false
+
     # Set this to true to enable TI builds by default.
     enable_ti_simplelink_builds = false
 
@@ -284,6 +287,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_bl602_lighting_app_build = enable_bl602_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
+
+    enable_tizen_lighting_app = enable_tizen_builds
   }
 
   if (enable_host_clang_build) {
@@ -468,6 +473,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_tizen_lighting_app) {
+    group("tizen_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
+    }
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -486,6 +497,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":android_x64",
         ":android_x86",
       ]
+    }
+    if (enable_tizen_builds) {
+      deps += [ ":tizen_lighting_app" ]
     }
     if (enable_standalone_chip_cert_build) {
       deps += [ ":standalone_chip_cert" ]

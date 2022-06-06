@@ -26,6 +26,8 @@ if (sysroot_platform_config == "") {
     sysroot_platform_config = "${build_root}/config/webos/webos_sysroot.gni"
   } else if (is_clang && current_cpu == "arm" && current_os == "freertos") {
     sysroot_platform_config = "${build_root}/toolchain/arm/arm_sysroot.gni"
+  } else if (current_os == "tizen") {
+    sysroot_platform_config = "${build_root}/config/tizen/tizen_sysroot.gni"
   }
 }
 

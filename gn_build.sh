@@ -192,6 +192,20 @@ fi
 
 echo
 
+tizen_sdk_args=""
+
+if [[ -d "${TIZEN_SDK_ROOT}" && -d "${TIZEN_SDK_SYSROOT}" ]]; then
+    tizen_sdk_args+="tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\""
+    extra_args+=" $tizen_sdk_args enable_tizen_builds=true"
+else
+    echo
+    echo "Hint: Set \$TIZEN_SDK_ROOT and \$TIZEN_SDK_SYSROOT to enable building for Tizen"
+    echo "      Required Tizen SDK can be obtained from"
+    echo "      https://developer.tizen.org/development/tizen-studio/download"
+fi
+
+echo
+
 _chip_banner "Build: GN configure"
 
 gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
