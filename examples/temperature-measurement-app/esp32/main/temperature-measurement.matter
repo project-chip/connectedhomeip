@@ -632,6 +632,10 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   info event SoftwareFault = 0 {
     SoftwareFaultStruct softwareFault = 0;
   }

@@ -177,6 +177,10 @@ public:
     /**
      * Software Diagnostics methods.
      */
+
+    /// Feature support - this returns support gor GetCurrentHeapHighWatermark and ResetWatermarks()
+    virtual bool SupportsWatermarks() { return false; }
+
     virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
     virtual CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     virtual CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);

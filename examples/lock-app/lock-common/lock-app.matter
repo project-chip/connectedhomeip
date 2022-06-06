@@ -593,7 +593,6 @@ server cluster DoorLock = 257 {
   attribute access(write: manage) boolean enablePrivacyModeButton = 43;
   attribute access(write: administer) int8u wrongCodeEntryLimit = 48;
   attribute access(write: administer) int8u userCodeTemporaryDisableTime = 49;
-  attribute access(write: administer) boolean requirePINforRemoteOperation = 51;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1569,12 +1568,16 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -2183,8 +2186,7 @@ endpoint 1 {
     ram      attribute enablePrivacyModeButton;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
-    ram      attribute requirePINforRemoteOperation;
-    ram      attribute featureMap default = 0x113;
+    ram      attribute featureMap default = 0x133;
     ram      attribute clusterRevision default = 6;
   }
 }

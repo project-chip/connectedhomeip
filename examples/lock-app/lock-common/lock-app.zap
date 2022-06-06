@@ -7850,7 +7850,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -7934,7 +7934,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x113",
+              "defaultValue": "0x133",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8082,5 +8082,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ]
+  ],
+  "log": []
 }
