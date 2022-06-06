@@ -63,23 +63,6 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 };
 
 /**
- * Defines the Software Diagnostics Delegate class to notify software events.
- */
-class SoftwareDiagnosticsDelegate
-{
-public:
-    virtual ~SoftwareDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a software fault that has taken place on the Node.
-     */
-    virtual void
-    OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
-    {}
-};
-
-/**
  * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
  */
 class WiFiDiagnosticsDelegate
@@ -112,9 +95,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    void SetSoftwareDiagnosticsDelegate(SoftwareDiagnosticsDelegate * delegate) { mSoftwareDiagnosticsDelegate = delegate; }
-    SoftwareDiagnosticsDelegate * GetSoftwareDiagnosticsDelegate() const { return mSoftwareDiagnosticsDelegate; }
-
     void SetWiFiDiagnosticsDelegate(WiFiDiagnosticsDelegate * delegate) { mWiFiDiagnosticsDelegate = delegate; }
     WiFiDiagnosticsDelegate * GetWiFiDiagnosticsDelegate() const { return mWiFiDiagnosticsDelegate; }
 
@@ -195,8 +175,7 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    SoftwareDiagnosticsDelegate * mSoftwareDiagnosticsDelegate = nullptr;
-    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate         = nullptr;
+    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
     DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;

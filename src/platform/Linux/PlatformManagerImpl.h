@@ -61,8 +61,6 @@ private:
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
-    void _HandleSoftwareFault(uint32_t eventId);
-    void _HandleGeneralFault(uint32_t eventId);
 
     // ===== Members for internal use by the following friends.
 
