@@ -19,7 +19,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello Objective-C from Swift! " + String(CastingServerBridge().add(5, secondNum: 6)))
+        Text("Hello tv-casting-common C++, from Objective-C, from Swift! Sum: " + String(CastingServerBridge.getSharedInstance().add(5, secondNum: 6)))
             .padding()
     }
 }

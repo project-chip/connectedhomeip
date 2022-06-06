@@ -21610,6 +21610,10 @@ typedef NS_ENUM(uint8_t, CHIPGeneralDiagnosticsRadioFaultType) {
     CHIPGeneralDiagnosticsRadioFaultTypeEthernetFault = 0x06,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPSoftwareDiagnosticsFeature) {
+    CHIPSoftwareDiagnosticsFeatureWaterMarks = 0x1,
+};
+
 typedef NS_ENUM(uint8_t, CHIPThreadNetworkDiagnosticsNetworkFault) {
     CHIPThreadNetworkDiagnosticsNetworkFaultUnspecified = 0x00,
     CHIPThreadNetworkDiagnosticsNetworkFaultLinkDown = 0x01,

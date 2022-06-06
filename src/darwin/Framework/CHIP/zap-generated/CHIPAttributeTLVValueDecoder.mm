@@ -12101,12 +12101,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
                     newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
                     newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
-                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                                 length:entry_0.name.size()
-                                                               encoding:NSUTF8StringEncoding];
-                    newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
-                    newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
-                    newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
+                    if (entry_0.name.HasValue()) {
+                        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
+                                                                     length:entry_0.name.Value().size()
+                                                                   encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.name = nil;
+                    }
+                    if (entry_0.stackFreeCurrent.HasValue()) {
+                        newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent.Value()];
+                    } else {
+                        newElement_0.stackFreeCurrent = nil;
+                    }
+                    if (entry_0.stackFreeMinimum.HasValue()) {
+                        newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum.Value()];
+                    } else {
+                        newElement_0.stackFreeMinimum = nil;
+                    }
+                    if (entry_0.stackSize.HasValue()) {
+                        newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize.Value()];
+                    } else {
+                        newElement_0.stackSize = nil;
+                    }
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
