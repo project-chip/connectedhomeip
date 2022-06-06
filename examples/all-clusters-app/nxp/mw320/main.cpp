@@ -62,7 +62,8 @@
 #include "mw320_ota.h"
 
 // ota--
-
+#include "app/clusters/bindings/BindingManager.h"
+#include "binding-handler.h"
 
 /* platform specific */
 #include "pin_mux.h"
@@ -991,8 +992,11 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
         #endif //MW320_OTA_TEST
     }
 // ota --
+// binding ++
+    InitBindingHandlers();
+// binding --
 
-	return;
+    return;
 }
 
 static void run_dnssrv(System::Layer * aSystemLayer, void * aAppState)
@@ -1393,19 +1397,23 @@ exit:
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-	PRINTF("==> MatterPostAttributeChangeCallback, cluster: %x, attr: %x, size: %d \r\n", path.mClusterId, path.mAttributeId, size);
-	// path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value
-	switch (path.mClusterId)
+    PRINTF("==> MatterPostAttributeChangeCallback, cluster: %x, attr: %x, size: %d \r\n", path.mClusterId, path.mAttributeId, size);
+    // path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value
+    switch (path.mClusterId)
     {
     case ZCL_ON_OFF_CLUSTER_ID:
         OnOnOffPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
-	case ZCL_SWITCH_CLUSTER_ID:
-		OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
+    case ZCL_SWITCH_CLUSTER_ID:
+        OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
+        //SwitchToggleOnOff();
+        // Trigger to send on/off/toggle command to the bound devices
+        chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+        break;
     default:
         break;
     }
-	return;
+    return;
 }
 
 EmberAfStatus

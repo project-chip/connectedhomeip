@@ -71,7 +71,8 @@ mw320_executable("shell_mw320") {
   ]
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    #"${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     #"${examples_plat_dir}/app/project_include/CHIPProjectConfig.h",
     #"${examples_plat_dir}/app/project_include/FreeRTOSConfig.h",
