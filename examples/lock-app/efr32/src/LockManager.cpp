@@ -22,6 +22,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -67,17 +68,23 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUser),
-                                    sizeof(EmberAfPluginDoorLockUserInfo), outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+                                    sizeof(EmberAfPluginDoorLockUserInfo) * DOOR_LOCK_MAX_USERS, outLen);
+
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                    sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * MAX_CREDENTIAL_PER_USER, outLen);
 
-    EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_LockUserName, mUserName, DOOR_LOCK_USER_NAME_BUFFER_SIZE, outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+                                    sizeof(mUserNames), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_CredentialData, mCredentialData, sizeof(mCredentialData), outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+                                    sizeof(mCredentialData), outLen);
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials.Get()),
-                                    sizeof(DlCredential), outLen);
+                                    sizeof(DlCredential) * MAX_CREDENTIAL_PER_USER, outLen);
+
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_TotalCredentials, reinterpret_cast<uint8_t *>(mTotalCredentialsPerUser),
+                                    sizeof(mTotalCredentialsPerUser), outLen);
 
     return true;
 }
@@ -212,21 +219,21 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
     return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
 }
 
-bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
+bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    // chip::ByteSpan credentialData(mLockCredentials.credentialData, mLockCredentials.credentialDataSize);
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
-    const auto & userInDb = mLockUser;
-    user.userStatus       = userInDb.userStatus;
+    const auto & userInDb = mLockUsers[userIndex - 1];
+
+    user.userStatus = userInDb.userStatus;
     if (DlUserStatus::kAvailable == user.userStatus)
     {
-        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", mEndpointId);
+        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
         return true;
     }
 
     user.userName       = chip::CharSpan(userInDb.userName.data(), userInDb.userName.size());
-    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials.data(), userInDb.credentials.size());
+    user.credentials    = chip::Span<const DlCredential>(mCredentials.Get(), mTotalCredentialsPerUser[userIndex - 1]);
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
@@ -241,14 +248,14 @@ bool LockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & us
                   "Found occupied user "
                   "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
+                  endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
                   user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
                   user.lastModifiedBy);
 
     return true;
 }
 
-bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                           const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
                           DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
 {
@@ -256,27 +263,28 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
                     "Door Lock App: LockManager::SetUser "
                     "[endpoint=%d,userIndex=%d,creator=%d,modifier=%d,userName=%s,uniqueId=%ld "
                     "userStatus=%u,userType=%u,credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    mEndpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
+                    endpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
                     to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
 
-    auto & userInStorage = mLockUser;
+    auto & userInStorage = mLockUsers[userIndex - 1];
+
+    mTotalCredentialsPerUser[userIndex - 1] = totalCredentials;
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
-        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", mEndpointId, userIndex);
+        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", endpointId, userIndex);
         return false;
     }
 
     if (totalCredentials > mMaxCredentialsPerUser)
     {
         ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
-                     mEndpointId, userIndex, totalCredentials);
+                     endpointId, userIndex, totalCredentials);
         return false;
     }
 
-    chip::Platform::CopyString(mUserName, userName);
-    mUserName[userName.size()]   = 0;
-    userInStorage.userName       = chip::CharSpan(mUserName, userName.size());
+    chip::Platform::CopyString(mUserNames[userIndex - 1], userName);
+    userInStorage.userName       = chip::CharSpan(mUserNames[userIndex - 1], userName.size());
     userInStorage.userUniqueId   = uniqueId;
     userInStorage.userStatus     = userStatus;
     userInStorage.userType       = usertype;
@@ -294,15 +302,19 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
     userInStorage.credentials = chip::Span<const DlCredential>(mCredentials.Get(), totalCredentials);
 
     // Save user information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&userInStorage),
-                                     sizeof(EmberAfPluginDoorLockUserInfo));
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * DOOR_LOCK_MAX_USERS);
 
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials.Get()),
-                                     sizeof(DlCredential));
+                                     sizeof(DlCredential) * totalCredentials);
 
-    EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_LockUserName, mUserName, sizeof(userName.size()));
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+                                     sizeof(mUserNames));
 
-    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", mEndpointId, userIndex);
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_TotalCredentials,
+                                     reinterpret_cast<const uint8_t *>(mTotalCredentialsPerUser), sizeof(mTotalCredentialsPerUser));
+
+    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
     return true;
 }
@@ -312,9 +324,11 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 {
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u]", to_underlying(credentialType));
 
-    const auto & credentialInStorage = mLockCredentials;
+    const auto & credentialInStorage = mLockCredentials[credentialIndex];
 
     credential.status = credentialInStorage.status;
+    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+
     if (DlCredentialStatus::kAvailable == credential.status)
     {
         ChipLogDetail(Zcl, "Found unoccupied credential ");
@@ -344,7 +358,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    auto & credentialInStorage = mLockCredentials;
+    auto & credentialInStorage = mLockCredentials[credentialIndex];
+
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
         ChipLogError(Zcl,
@@ -357,18 +372,16 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
+    
+    memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
+    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
-    memcpy(mCredentialData, credentialData.data(), credentialData.size());
-    mCredentialData[credentialData.size()] = 0;
-
-    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData, credentialData.size() };
-
-    // Save user information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&credentialInStorage),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo));
+    // Save credential information in NVM flash
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * MAX_CREDENTIAL_PER_USER);
 
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                     credentialData.size());
+                                     sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -400,28 +413,42 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     if (curState == lockState)
     {
         ChipLogDetail(Zcl, "Door Lock App: door is already locked, ignoring command to set lock state to \"%s\" [endpointId=%d]",
-                      lockStateToString(lockState), mEndpointId);
-        return false;
-    }
-
-    if (!pin.HasValue())
-    {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, setting door lock state to \"%s\" [endpointId=%d]",
-                      lockStateToString(lockState), mEndpointId);
-        curState = lockState;
-
+                      lockStateToString(lockState), endpointId);
         return true;
     }
 
-    // Check the PIN code
-    for (uint8_t i; i < 10; i++)
+    // Check the RequirePINforRemoteOperation attribute
+    bool requirePin;
+    chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
+
+    // If a pin code is not required
+    if (!requirePin)
     {
-        if (mLockCredentials.credentialType != DlCredentialType::kPin || mLockCredentials.status == DlCredentialStatus::kAvailable)
+        ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
+                      endpointId);
+        curState = lockState;
+        return true;
+    }
+
+    // If a pin code is required but not given
+    if (!pin.HasValue())
+    {
+        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", mEndpointId);
+        curState = lockState;
+
+        return false;
+    }
+
+    // Check the PIN code
+    for (uint8_t i = 0; i < mMaxCredentialsPerUser; i++)
+    {
+        if (mLockCredentials[i].credentialType != DlCredentialType::kPin ||
+            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials.credentialData.data_equal(pin.Value()))
+        if (mLockCredentials[i].credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
