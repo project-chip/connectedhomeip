@@ -785,7 +785,8 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 
 bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
 {
-    const size_t minSupportedPathsPerFabricForRead = GetGuaranteedReadRequestsPerFabric() * kMinSupportedPathsPerReadRequest;
+    const size_t guaranteedReadRequestsPerFabric   = GetGuaranteedReadRequestsPerFabric();
+    const size_t minSupportedPathsPerFabricForRead = guaranteedReadRequestsPerFabric * kMinSupportedPathsPerReadRequest;
 
     size_t attributePathsUsedByCurrentFabric = 0;
     size_t eventPathsUsedByCurrentFabric     = 0;
@@ -841,7 +842,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
     if (candidate != nullptr &&
         ((attributePathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
           eventPathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
-          readTransactionsOnCurrentFabric > GetGuaranteedReadRequestsPerFabric()) ||
+          readTransactionsOnCurrentFabric > guaranteedReadRequestsPerFabric) ||
          // Always evict the transactions on PASE sessions if the fabric table is full.
          (aFabricIndex == kUndefinedFabricIndex && mpFabricTable->FabricCount() == GetConfigMaxFabrics())))
     {
@@ -870,6 +871,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     const size_t attributePathCap = allowUnlimited ? SIZE_MAX : GetPathPoolCapacityForReads();
     const size_t eventPathCap     = allowUnlimited ? SIZE_MAX : GetPathPoolCapacityForReads();
     const size_t readHandlerCap   = allowUnlimited ? SIZE_MAX : GetReadHandlerPoolCapacityForReads();
+
+    const size_t guaranteedReadRequestsPerFabric = GetGuaranteedReadRequestsPerFabric();
 
     size_t usedAttributePaths = 0;
     size_t usedEventPaths     = 0;
@@ -931,10 +934,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
 
     // Resources exhausted, since there is already some read requests ongoing on this fabric, please retry later.
     if (usedAttributePathsInFabric + aRequestedAttributePathCount >
-            kMinSupportedPathsPerReadRequest * GetGuaranteedReadRequestsPerFabric() ||
-        usedEventPathsInFabric + aRequestedEventPathCount >
-            kMinSupportedPathsPerReadRequest * GetGuaranteedReadRequestsPerFabric() ||
-        usedReadHandlersInFabric >= GetGuaranteedReadRequestsPerFabric())
+            kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
+        usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
+        usedReadHandlersInFabric >= guaranteedReadRequestsPerFabric)
     {
         return Protocols::InteractionModel::Status::Busy;
     }
@@ -983,7 +985,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     {
         return Protocols::InteractionModel::Status::Busy;
     }
-    else if (usedReadHandlers >= readHandlerCap)
+    if (usedReadHandlers >= readHandlerCap)
     {
         return Protocols::InteractionModel::Status::Busy;
     }
