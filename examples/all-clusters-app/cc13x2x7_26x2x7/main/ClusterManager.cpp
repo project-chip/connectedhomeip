@@ -132,13 +132,13 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-	    app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
+            app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-	    app::Clusters::ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
+            app::Clusters::ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
         }
         PLAT_LOG("Color Control triggered: Hue: %d Saturation: %d", hue, saturation);
     }
