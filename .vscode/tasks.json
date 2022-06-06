@@ -192,6 +192,25 @@
             "problemMatcher": {
                 "base": "$gcc"
             }
+        },
+        {
+            "label": "Run Open IoT SDK Application",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-C${input:openiotsdkCommand}",
+                "-d${input:openiotsdkDebugMode}",
+                "${input:openiotsdkApp}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
         }
     ],
     "inputs": [
@@ -236,6 +255,27 @@
             "description": "What mbed application type do you want to use?",
             "options": ["simple", "boot", "upgrade"],
             "default": "simple"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkCommand",
+            "description": "What do you want to do?",
+            "options": ["build", "run", "build-run"],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkDebugMode",
+            "description": "Do you want to use debug mode?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkApp",
+            "description": "What Open IoT SDK application do you want to use?",
+            "options": ["shell"],
+            "default": "shell"
         },
         {
             "type": "promptString",
