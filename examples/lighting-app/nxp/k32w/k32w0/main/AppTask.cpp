@@ -97,8 +97,6 @@ static OTAImageProcessorImpl gImageProcessor;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
-extern bool shouldReset;
-
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
