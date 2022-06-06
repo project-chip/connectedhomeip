@@ -581,6 +581,7 @@ void ValidationContext::Reset()
 {
     mEffectiveTime = EffectiveTime{};
     mTrustAnchor   = nullptr;
+    mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
     mRequiredCertType = kCertType_NotSpecified;
