@@ -32,6 +32,7 @@ from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 from builders.imx import IMXApp, IMXBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 
 
 class Target:
@@ -589,6 +590,11 @@ def IMXTargets():
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
 
+def OpenIotSdkTargets():
+    target = Target('openiotsdk', OpenIotSdkBuilder)
+
+    yield target.Extend('shell', app=OpenIotSdkApp.SHELL)
+
 ALL = []
 
 target_generators = [
@@ -607,6 +613,7 @@ target_generators = [
     TizenTargets(),
     Bl602Targets(),
     IMXTargets(),
+    OpenIotSdkTargets(),
 ]
 
 for generator in target_generators:

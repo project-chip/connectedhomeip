@@ -225,6 +225,7 @@ nrf-nrf5340dk-lock
 nrf-nrf5340dk-pump
 nrf-nrf5340dk-pump-controller
 nrf-nrf5340dk-shell
+openiotsdk-shell
 qpg-light
 qpg-lock
 qpg-persistent-storage
