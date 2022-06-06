@@ -21,21 +21,20 @@
 namespace chip {
 namespace Credentials {
 
-class TolerantCertificateValidityPolicyExample : public CertificateValidityPolicy
+class LastKnownGoodTimeCertificateValidityPolicyExample : public CertificateValidityPolicy
 {
 public:
-    ~TolerantCertificateValidityPolicyExample() {}
+    ~LastKnownGoodTimeCertificateValidityPolicyExample() {}
 
     /**
      * @brief
      *
-     * This certificate validity policy is tolerant in that it only rejects
-     * certificates if the node has access to wall clock time and knows with
-     * certainty that the current time is outside of the passed certificate's
-     * validity period.
+     * This certificate validity policy will validate NotBefore / NotAfter if
+     * current time is known and also validates NotAfter if only Last Known
+     * Good Time is known.
      *
-     * This policy suppresses kExpiredAtLastKnownGoodTime to prevent an
-     * incorrect Last Known Good time from breaking comms.
+     * This provides an example for enforcing certificate expiration on nodes
+     * where no current time source is available.
      *
      * @param cert CHIP Certificate for which we are evaluating validity
      * @param depth the depth of the certificate in the chain, where the leaf is at depth 0
@@ -48,12 +47,12 @@ public:
         {
         case CertificateValidityResult::kValid:
         case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
-        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
         case CertificateValidityResult::kTimeUnknown:
             return CHIP_NO_ERROR;
         case CertificateValidityResult::kNotYetValid:
             return CHIP_ERROR_CERT_NOT_VALID_YET;
         case CertificateValidityResult::kExpired:
+        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
             return CHIP_ERROR_CERT_EXPIRED;
         default:
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -63,3 +62,4 @@ public:
 
 } // namespace Credentials
 } // namespace chip
+

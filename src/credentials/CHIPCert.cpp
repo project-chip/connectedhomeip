@@ -434,13 +434,16 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         {
         case CertificateValidityResult::kValid:
         case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+        // By default, we do not enforce certificate validity based upon a Last
+        // Known Good Time source.  However, implementations may always inject a
+        // policy that does enforce based upon this.
+        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
         case CertificateValidityResult::kTimeUnknown:
             break;
         case CertificateValidityResult::kNotYetValid:
             ExitNow(err = CHIP_ERROR_CERT_NOT_VALID_YET);
             break;
         case CertificateValidityResult::kExpired:
-        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
             ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
             break;
         default:
@@ -579,8 +582,8 @@ bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
 
 void ValidationContext::Reset()
 {
-    mEffectiveTime = EffectiveTime{};
-    mTrustAnchor   = nullptr;
+    mEffectiveTime  = EffectiveTime{};
+    mTrustAnchor    = nullptr;
     mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
