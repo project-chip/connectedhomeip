@@ -357,6 +357,13 @@ limitations under the License.
         Command description for StopWithOnOff
       </description>
     </command>
+    <command source="client" code="0x08" name="MoveToClosestFrequency" optional="true">
+      <description>
+        Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible.
+      </description>
+      <arg name="Frequency" type="int16u"/>
+    </command>
   </cluster>
   <cluster>
     <name>Alarms</name>

@@ -12,48 +12,100 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    10.2.3. [TC-DM-2.3] Basic Information Cluster Server Attributes [DUT -
+    Controller]
 
 config:
     nodeId: 0x12344321
-    cluster: "Operational Credentials"
+    cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Wait for Arm Fail Safe"
-      wait: "ArmFailSafe"
-      cluster: "General Commissioning"
-
-    - label: "Wait for Set Regulatory Config"
-      wait: "SetRegulatoryConfig"
-      cluster: "General Commissioning"
-
-    - label: "Wait for Attestation Certificate Chain Request"
-      wait: "CertificateChainRequest"
-
-    - label: "Wait for Attestation Certificate Chain Request"
-      wait: "CertificateChainRequest"
-
-    - label: "Wait for Attestation Request"
-      wait: "AttestationRequest"
-
-    - label: "Wait for CSR Request"
-      wait: "CSRRequest"
-
-    - label: "Wait for Add Trusted Root Certificate Request"
-      wait: "AddTrustedRootCertificate"
-
-    - label: "Wait for Add Op NOC"
-      wait: "AddNOC"
-
-    - label: "Wait for Commissioning Complete"
-      wait: "CommissioningComplete"
-      cluster: "General Commissioning"
-
-    - label: "Wait 3000ms"
+    - label: "Wait for the device to be commissioned"
       cluster: "DelayCommands"
-      command: "WaitForMs"
+      command: "WaitForCommissioning"
+
+    - label: "Log OnOff Test Startup"
+      cluster: "LogCommands"
+      command: "Log"
       arguments:
           values:
-              - name: "ms"
-                value: 3000
+              - name: "message"
+                value: "*** Basic Cluster Tests Ready"
+
+    - label: "Query Data Model Revision"
+      wait: "readAttribute"
+      attribute: "DataModelRevision"
+
+    - label: "Query Vendor Name"
+      wait: "readAttribute"
+      attribute: "VendorName"
+
+    - label: "Query VendorID"
+      wait: "readAttribute"
+      attribute: "VendorID"
+
+    - label: "Query Product Name"
+      wait: "readAttribute"
+      attribute: "ProductName"
+
+    - label: "Query ProductID"
+      wait: "readAttribute"
+      attribute: "ProductID"
+
+    - label: "Query Node Label"
+      wait: "readAttribute"
+      attribute: "NodeLabel"
+
+    - label: "Query User Location"
+      wait: "readAttribute"
+      attribute: "Location"
+
+    - label: "Query HardwareVersion"
+      wait: "readAttribute"
+      attribute: "HardwareVersion"
+
+    - label: "Query HardwareVersionString"
+      wait: "readAttribute"
+      attribute: "HardwareVersionString"
+
+    - label: "Query SoftwareVersion"
+      wait: "readAttribute"
+      attribute: "SoftwareVersion"
+
+    - label: "Query SoftwareVersionString"
+      wait: "readAttribute"
+      attribute: "SoftwareVersionString"
+
+    - label: "Query ManufacturingDate"
+      wait: "readAttribute"
+      attribute: "ManufacturingDate"
+
+    - label: "Query PartNumber"
+      wait: "readAttribute"
+      attribute: "PartNumber"
+
+    - label: "Query ProductURL"
+      wait: "readAttribute"
+      attribute: "ProductURL"
+
+    - label: "Query ProductLabel"
+      wait: "readAttribute"
+      attribute: "ProductLabel"
+
+    - label: "Query SerialNumber"
+      wait: "readAttribute"
+      attribute: "SerialNumber"
+
+    - label: "Query LocalConfigDisabled"
+      wait: "readAttribute"
+      attribute: "LocalConfigDisabled"
+
+    - label: "Query Reachable"
+      wait: "readAttribute"
+      attribute: "Reachable"
+
+    - label: "Query UniqueID"
+      wait: "readAttribute"
+      attribute: "UniqueID"

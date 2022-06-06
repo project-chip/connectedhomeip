@@ -44,4 +44,5 @@ private:
     char ** mArgv = nullptr;
     OptionsProxy mLinuxArgs;
     std::thread mLinuxThread;
+    bool initialized = false;
 };

@@ -234,6 +234,10 @@ namespace StopWithOnOff {
 static constexpr CommandId Id = 0x00000007;
 } // namespace StopWithOnOff
 
+namespace MoveToClosestFrequency {
+static constexpr CommandId Id = 0x00000008;
+} // namespace MoveToClosestFrequency
+
 } // namespace Commands
 } // namespace LevelControl
 
@@ -784,46 +788,6 @@ namespace UnlockWithTimeout {
 static constexpr CommandId Id = 0x00000003;
 } // namespace UnlockWithTimeout
 
-namespace GetLogRecord {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecord
-
-namespace GetLogRecordResponse {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecordResponse
-
-namespace SetPINCode {
-static constexpr CommandId Id = 0x00000005;
-} // namespace SetPINCode
-
-namespace GetPINCode {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCode
-
-namespace GetPINCodeResponse {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCodeResponse
-
-namespace ClearPINCode {
-static constexpr CommandId Id = 0x00000007;
-} // namespace ClearPINCode
-
-namespace ClearAllPINCodes {
-static constexpr CommandId Id = 0x00000008;
-} // namespace ClearAllPINCodes
-
-namespace SetUserStatus {
-static constexpr CommandId Id = 0x00000009;
-} // namespace SetUserStatus
-
-namespace GetUserStatus {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatus
-
-namespace GetUserStatusResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatusResponse
-
 namespace SetWeekDaySchedule {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace SetWeekDaySchedule
@@ -872,38 +836,6 @@ namespace ClearHolidaySchedule {
 static constexpr CommandId Id = 0x00000013;
 } // namespace ClearHolidaySchedule
 
-namespace SetUserType {
-static constexpr CommandId Id = 0x00000014;
-} // namespace SetUserType
-
-namespace GetUserType {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserType
-
-namespace GetUserTypeResponse {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserTypeResponse
-
-namespace SetRFIDCode {
-static constexpr CommandId Id = 0x00000016;
-} // namespace SetRFIDCode
-
-namespace GetRFIDCode {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCode
-
-namespace GetRFIDCodeResponse {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCodeResponse
-
-namespace ClearRFIDCode {
-static constexpr CommandId Id = 0x00000018;
-} // namespace ClearRFIDCode
-
-namespace ClearAllRFIDCodes {
-static constexpr CommandId Id = 0x00000019;
-} // namespace ClearAllRFIDCodes
-
 namespace SetUser {
 static constexpr CommandId Id = 0x0000001A;
 } // namespace SetUser
@@ -919,14 +851,6 @@ static constexpr CommandId Id = 0x0000001C;
 namespace ClearUser {
 static constexpr CommandId Id = 0x0000001D;
 } // namespace ClearUser
-
-namespace OperatingEventNotification {
-static constexpr CommandId Id = 0x00000020;
-} // namespace OperatingEventNotification
-
-namespace ProgrammingEventNotification {
-static constexpr CommandId Id = 0x00000021;
-} // namespace ProgrammingEventNotification
 
 namespace SetCredential {
 static constexpr CommandId Id = 0x00000022;

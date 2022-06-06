@@ -1204,18 +1204,6 @@ enum class DoorLockUserType : uint8_t
     kNotSupported        = 0xFF,
 };
 
-// Bitmap for DlAlarmMask
-enum class DlAlarmMask : uint16_t
-{
-    kLockingMechanismJammed                 = 0x1,
-    kLockResetToFactoryDefaults             = 0x2,
-    kReserved                               = 0x4,
-    kRFModulePowerCycled                    = 0x8,
-    kWrongCodeEntryLimit                    = 0x10,
-    kFrontEscutcheonRemovedFromMain         = 0x20,
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40,
-};
-
 // Bitmap for DlCredentialRuleMask
 enum class DlCredentialRuleMask : uint8_t
 {

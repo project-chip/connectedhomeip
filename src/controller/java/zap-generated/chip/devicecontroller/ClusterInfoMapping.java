@@ -10977,13 +10977,19 @@ public class ClusterInfoMapping {
     operationalCredentialsCSRRequestCommandParams.put(
         "CSRNonce", operationalCredentialsCSRRequestCSRNonceCommandParameterInfo);
 
+    CommandParameterInfo operationalCredentialsCSRRequestisForUpdateNOCCommandParameterInfo =
+        new CommandParameterInfo("isForUpdateNOC", Optional.class);
+    operationalCredentialsCSRRequestCommandParams.put(
+        "isForUpdateNOC", operationalCredentialsCSRRequestisForUpdateNOCCommandParameterInfo);
+
     InteractionInfo operationalCredentialsCSRRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
                   .CSRRequest(
                       (ChipClusters.OperationalCredentialsCluster.CSRResponseCallback) callback,
-                      (byte[]) commandArguments.get("CSRNonce"));
+                      (byte[]) commandArguments.get("CSRNonce"),
+                      (Optional<Boolean>) commandArguments.get("isForUpdateNOC"));
             },
             () -> new DelegatedCSRResponseCallback(),
             operationalCredentialsCSRRequestCommandParams);

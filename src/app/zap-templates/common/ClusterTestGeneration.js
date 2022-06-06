@@ -998,6 +998,18 @@ async function chip_tests_only_cluster_response_parameters(options)
   return asBlocks.call(this, Promise.resolve(this.arguments), options);
 }
 
+function chip_tests_iterate_expected_list(values, options)
+{
+  values = values.map(value => {
+    return {
+      global: this.global, parent: this.parent, name: this.name, type: this.type, isArray: this.isArray,
+          isNullable: this.isNullable, value: value,
+    }
+  });
+
+  return asBlocks.call(this, Promise.resolve(values), options);
+}
+
 //
 // Module exports
 //
@@ -1028,3 +1040,4 @@ exports.chip_tests_only_cluster_response_parameters = chip_tests_only_cluster_re
 exports.isHexString                                 = isHexString;
 exports.octetStringLengthFromHexString              = octetStringLengthFromHexString;
 exports.octetStringFromHexString                    = octetStringFromHexString;
+exports.chip_tests_iterate_expected_list            = chip_tests_iterate_expected_list;

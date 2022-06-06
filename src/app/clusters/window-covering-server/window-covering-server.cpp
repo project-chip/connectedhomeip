@@ -165,7 +165,7 @@ Type TypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus)
+void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
 {
     emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
                                       configStatus.Has(ConfigStatus::kOperational),
@@ -177,14 +177,14 @@ void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus)
         configStatus.Has(ConfigStatus::kTiltPositionAware), configStatus.Has(ConfigStatus::kTiltEncoderControlled));
 }
 
-void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & configStatus)
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
 {
     Attributes::ConfigStatus::Set(endpoint, configStatus);
 }
 
-chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
+chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
 {
-    chip::BitFlags<ConfigStatus> configStatus;
+    chip::BitMask<ConfigStatus> configStatus;
     Attributes::ConfigStatus::Get(endpoint, &configStatus);
 
     return configStatus;
@@ -192,7 +192,7 @@ chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
 
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
 {
-    chip::BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+    chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
     configStatus.Set(ConfigStatus::kLiftPositionAware, HasFeaturePaLift(endpoint));
     configStatus.Set(ConfigStatus::kTiltPositionAware, HasFeaturePaTilt(endpoint));
@@ -255,19 +255,19 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint)
     return value;
 }
 
-void ModePrint(const chip::BitFlags<Mode> & mode)
+void ModePrint(const chip::BitMask<Mode> & mode)
 {
     emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
                                       mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback),
                                       mode.Has(Mode::kMaintenanceMode), mode.Has(Mode::kCalibrationMode));
 }
 
-void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
+void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
 {
-    chip::BitFlags<ConfigStatus> newStatus;
+    chip::BitMask<ConfigStatus> newStatus;
 
-    chip::BitFlags<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
-    chip::BitFlags<Mode> oldMode           = ModeGet(endpoint);
+    chip::BitMask<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
+    chip::BitMask<Mode> oldMode           = ModeGet(endpoint);
 
     newStatus = oldStatus;
 
@@ -288,9 +288,9 @@ void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & newMode)
         ConfigStatusSet(endpoint, newStatus);
 }
 
-chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint)
+chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
 {
-    chip::BitFlags<Mode> mode;
+    chip::BitMask<Mode> mode;
 
     Attributes::Mode::Get(endpoint, &mode);
     return mode;
@@ -591,8 +591,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 {
     // all-cluster-app: simulation for the CI testing
     // otherwise it is defined for manufacturer specific implementation */
-    BitFlags<Mode> mode;
-    BitFlags<ConfigStatus> configStatus;
+    BitMask<Mode> mode;
+    BitMask<ConfigStatus> configStatus;
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
     OperationalStatus opStatus     = prevOpStatus;
@@ -659,8 +659,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
 {
-    BitFlags<Mode> mode                 = ModeGet(endpoint);
-    BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+    BitMask<Mode> mode                 = ModeGet(endpoint);
+    BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
     // Is the device locked?
     if (!configStatus.Has(ConfigStatus::kOperational))

@@ -1603,6 +1603,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -2208,8 +2209,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2477,8 +2478,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type videoplayer = 35;
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster Descriptor;
@@ -2630,8 +2631,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type occupancysensor = 263;
 
   server cluster OnOff {
     ram      attribute onOff;

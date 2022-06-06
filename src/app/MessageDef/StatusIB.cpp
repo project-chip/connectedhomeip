@@ -113,7 +113,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {

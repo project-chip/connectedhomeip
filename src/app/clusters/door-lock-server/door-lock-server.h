@@ -160,7 +160,7 @@ public:
 
     inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
 
-    inline bool SupportsPFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
+    inline bool SupportsRFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
 
     inline bool SupportsFingers(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFingerCredentials); }
 
@@ -174,6 +174,8 @@ public:
         // TODO: Add missing functions to check if RID, FGP or FACE are supported
         return HasFeature(endpointId, DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
     }
+
+    bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
@@ -189,9 +191,13 @@ private:
     bool getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize);
     bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t & maxNumberOfCredentials);
 
+    bool findOccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
+
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
 
+    bool findOccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
+                                    uint16_t & credentialIndex);
     bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
                                       uint16_t & credentialIndex);
 
@@ -214,6 +220,8 @@ private:
                             uint16_t userIndex, bool sendUserChangeEvent);
     EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
                             uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+
+    bool clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
@@ -246,6 +254,9 @@ private:
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
                                    DlCredentialType credentialType);
+
+    bool clearFabricFromCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, chip::FabricIndex fabricToRemove);
+    bool clearFabricFromCredentials(chip::EndpointId endpointId, chip::FabricIndex fabricToRemove);
 
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
@@ -420,15 +431,25 @@ enum class DlCredentialStatus : uint8_t
     kOccupied  = 0x01, /**< Indicates if credential slot is already occupied. */
 };
 
+enum class DlAssetSource : uint8_t
+{
+    kUnspecified = 0x00,
+    kMatterIM    = 0x01,
+};
+
 /**
  * @brief Structure that holds the credential information.
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;        /**< Indicates if credential slot is occupied or not. */
-    DlCredentialType credentialType;  /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;    /**< Credential data bytes. */
-    chip::FabricIndex createdBy;      /**< ID of the fabric that created the user. */
+    DlCredentialStatus status;       /**< Indicates if credential slot is occupied or not. */
+    DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;   /**< Credential data bytes. */
+
+    DlAssetSource creationSource;
+    chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
+
+    DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
@@ -443,8 +464,12 @@ struct EmberAfPluginDoorLockUserInfo
     DlUserStatus userStatus;                    /**< Status of the user slot (available/occupied). */
     DlUserType userType;                        /**< Type of the user. */
     DlCredentialRule credentialRule;            /**< Number of supported credentials. */
-    chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
-    chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
+
+    DlAssetSource creationSource;
+    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
+
+    DlAssetSource modificationSource;
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
 /**

@@ -103,6 +103,16 @@ public:
     }
 
     template <typename T>
+    static CHIP_ERROR Setup(const char * label, chip::BitMask<T> & request, Json::Value & value)
+    {
+        T requestValue;
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(label, requestValue, value));
+
+        request = chip::BitMask<T>(requestValue);
+        return CHIP_NO_ERROR;
+    }
+
+    template <typename T>
     static CHIP_ERROR Setup(const char * label, chip::Optional<T> & request, Json::Value & value)
     {
         T requestValue;

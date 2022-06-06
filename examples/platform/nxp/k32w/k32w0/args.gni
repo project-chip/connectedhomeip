@@ -32,3 +32,6 @@ chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_system_config_provide_statistics = false
 chip_with_nlfaultinjection = true
+
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
