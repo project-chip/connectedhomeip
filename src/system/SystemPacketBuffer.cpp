@@ -414,33 +414,30 @@ uint8_t * PacketBuffer::GetReserve(uint16_t aSize, uint16_t aAlignmentMask)
         return nullptr;
     }
 
-    uintptr_t requestStart = (reserveStart + aAlignmentMask) & ~aAlignmentMask;
+    const uintptr_t requestStart = (reserveStart + aAlignmentMask) & ~aAlignmentMask;
     if (requestStart < reserveStart)
     {
         // Overflow here means the request can't be satisfied because the alignment is too large.
         return nullptr;
     }
 
-    const uintptr_t requestEnd = requestStart + aSize;
-    if (requestEnd < requestStart)
+    // This cast is safe because the difference is at most `aAlignmentMask`.
+    const uint16_t reserveAlignmentOffset = static_cast<uint16_t>(requestStart - reserveStart);
+
+    // This cast is not safe in itself, but the result is checked.
+    const uint16_t requestSize = static_cast<uint16_t>(reserveAlignmentOffset + aSize);
+    if (requestSize < aSize)
     {
         // Overflow here means the requested size can't possibly fit.
         return nullptr;
     }
-    if (requestEnd <= reinterpret_cast<uintptr_t>(payload))
-    {
-        // The request fits without moving payload data.
-        return reinterpret_cast<uint8_t *>(requestStart);
-    }
 
-    if (requestEnd - reserveStart + len > AllocSize())
+    if (!EnsureReservedSize(requestSize))
     {
-        // Not enough space to move the payload.
+        // The requested size is too large for the available space.
         return nullptr;
     }
 
-    memmove(reinterpret_cast<void *>(requestEnd), payload, len);
-    payload = reinterpret_cast<uint8_t *>(requestEnd);
     return reinterpret_cast<uint8_t *>(requestStart);
 }
 

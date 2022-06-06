@@ -1219,7 +1219,8 @@ void PacketBufferTest::CheckGetReserve(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, config.handle->ReservedSize() == instance.init.reserve_length);
         NL_TEST_ASSERT(inSuite, config.handle->TotalLength() == instance.init.payload_length);
 
-        const uint8_t * const reserve = config.handle->GetReserve(instance.request.length, instance.request.alignment - 1);
+        const uint8_t * const reserve =
+            config.handle->GetReserve(instance.request.length, static_cast<uint16_t>(instance.request.alignment - 1));
         if (instance.expect.success)
         {
             NL_TEST_ASSERT(inSuite, reserve != nullptr);
