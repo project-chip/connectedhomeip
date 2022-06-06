@@ -506,7 +506,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constarints:
+              minValue: 0
+              maxValue: 5
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -590,7 +592,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 5
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -631,7 +635,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 5
 
     - label: "17a:Send On Command"
       command: "On"
@@ -705,7 +711,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 5
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -947,7 +955,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 300
+          constraints:
+              minValue: 295
+              maxValue: 305
 
     - label: "Wait 40000ms"
       cluster: "DelayCommands"
@@ -976,7 +986,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 5
 
     - label: "24a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -1002,7 +1014,9 @@ tests:
       attribute: "OnTime"
       PICS: A_ONTIME
       response:
-          value: 300
+          constraints:
+              minValue: 295
+              maxValue: 305
 
     - label: "24b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -1038,7 +1052,9 @@ tests:
       attribute: "OffWaitTime"
       PICS: A_OFFWAITTIME
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 5
 
     - label: "Send Off Command"
       command: "Off"
