@@ -274,8 +274,10 @@ void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
-        DataModel::List<const HardwareFaultType> previousList(reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
+        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()),
+                                                             current.size());
+        DataModel::List<const HardwareFaultType> previousList(reinterpret_cast<const HardwareFaultType *>(previous.data()),
+                                                              previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
