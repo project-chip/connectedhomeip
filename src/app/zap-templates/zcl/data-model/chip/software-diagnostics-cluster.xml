@@ -49,6 +49,7 @@ limitations under the License.
     </event>    
   </cluster>
   <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
+    <cluster code="0x0034"/>
     <field name="WaterMarks" mask="0x1"/>
   </bitmap>   
 </configurator>

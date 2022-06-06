@@ -63,21 +63,26 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case CurrentHeapFree::Id: {
+    case CurrentHeapFree::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapFree, aEncoder);
-    }
-    case CurrentHeapUsed::Id: {
+    case CurrentHeapUsed::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapUsed, aEncoder);
-    }
-    case CurrentHeapHighWatermark::Id: {
+    case CurrentHeapHighWatermark::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapHighWatermark, aEncoder);
-    }
-    case ThreadMetrics::Id: {
+    case ThreadMetrics::Id:
         return ReadThreadMetrics(aEncoder);
+    case Clusters::Globals::Attributes::FeatureMap::Id: {
+        BitFlags<SoftwareDiagnosticsFeature> features;
+
+        if (DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+        {
+            features.Set(SoftwareDiagnosticsFeature::kWaterMarks);
+        }
+
+        return aEncoder.Encode(features);
     }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }

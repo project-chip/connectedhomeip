@@ -40,6 +40,7 @@ public:
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
 
     // ===== Methods that implement the DiagnosticDataProvider abstract interface.
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR ResetWatermarks() override;
 };
 

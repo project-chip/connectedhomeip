@@ -1716,6 +1716,10 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
     optional char_string<8> name = 1;
