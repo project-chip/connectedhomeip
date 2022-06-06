@@ -140,13 +140,13 @@ class HostApp(Enum):
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.NL_TEST_RUNNER:
             yield 'chip_nl_test_runner_wheels'
-        elif self == HostApp.LIGHTING:
+        elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
-        elif self == HostApp.TV_CASTING_APP:
+        elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.BRIDGE_APP:
+        elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
         else:
