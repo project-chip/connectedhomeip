@@ -67,5 +67,5 @@
 #define COMPUTE_BUILD_MIN(_time) (((_time)[3] - '0') * 10 + (_time)[4] - '0')
 #define COMPUTE_BUILD_SEC(_time) (((_time)[6] - '0') * 10 + (_time)[7] - '0')
 
-#define BUILD_DATE_IS_BAD(_date) ((_date)[0] == '?')
-#define BUILD_TIME_IS_BAD(_time) ((_time)[0] == '?')
+#define BUILD_DATE_IS_BAD(_date) ((_date) == nullptr || strlen(_date) < strlen("Jan 01 2000") || (_date)[0] == '?')
+#define BUILD_TIME_IS_BAD(_time) ((_time) == nullptr || strlen(_time) < strlen("00:00:00") || (_time)[0] == '?')

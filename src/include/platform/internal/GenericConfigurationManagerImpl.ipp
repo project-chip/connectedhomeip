@@ -477,6 +477,7 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardCodedFirmwareBuildDate(const char ** date)
 {
     VerifyOrReturnError(date != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
     *date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
     return CHIP_NO_ERROR;
 }
@@ -485,6 +486,7 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardCodedFirmwareBuildTimeOfDay(const char ** time)
 {
     VerifyOrReturnError(time != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
     *time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
     return CHIP_NO_ERROR;
 }
