@@ -21,13 +21,12 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace GeneralDiagnostics {
+namespace SoftwareDiagnostics {
 
 /**
  * @brief general-diagnostics-server class
@@ -39,36 +38,15 @@ public:
 
     /**
      * @brief
-     *   Called after the current device is rebooted.
+     *   Called when a software fault that has taken place on the Node.
      */
-    void OnDeviceReboot(BootReasonType bootReason);
-
-    /**
-     * @brief
-     *   Called when the Node detects a hardware fault has been raised.
-     */
-    void OnHardwareFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
-
-    /**
-     * @brief
-     *   Called when the Node detects a radio fault has been raised.
-     */
-    void OnRadioFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
-
-    /**
-     * @brief
-     *   Called when the Node detects a network fault has been raised.
-     */
-    void OnNetworkFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+    void OnSoftwareFaultDetect(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault);
 
 private:
     static Server instance;
 };
 
-} // namespace GeneralDiagnostics
+} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip

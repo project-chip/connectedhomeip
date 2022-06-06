@@ -66,18 +66,6 @@ void SignalHandler(int signum)
 
     switch (signum)
     {
-    case SIGUSR1:
-        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
-        break;
-    case SIGUSR2:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
-        break;
-    case SIGHUP:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
-        break;
-    case SIGTTIN:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
-        break;
     case SIGTSTP:
         PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
         break;
@@ -236,91 +224,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
-}
-
-void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
-{
-    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (delegate == nullptr)
-    {
-        ChipLogError(DeviceLayer, "No delegate registered to handle General Diagnostics event");
-        return;
-    }
-
-    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::Id)
-    {
-        GeneralFaults<kMaxHardwareFaults> previous;
-        GeneralFaults<kMaxHardwareFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
-#endif
-        delegate->OnHardwareFaultsDetected(previous, current);
-    }
-    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::Id)
-    {
-        GeneralFaults<kMaxRadioFaults> previous;
-        GeneralFaults<kMaxRadioFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
-#endif
-        delegate->OnRadioFaultsDetected(previous, current);
-    }
-    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::Id)
-    {
-        GeneralFaults<kMaxNetworkFaults> previous;
-        GeneralFaults<kMaxNetworkFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
-#endif
-        delegate->OnNetworkFaultsDetected(previous, current);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
-    }
-}
-
-void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
-{
-    SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
-
-    if (delegate != nullptr)
-    {
-        SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
-        char threadName[kMaxThreadNameLength + 1];
-
-        softwareFault.id = gettid();
-        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
-        threadName[kMaxThreadNameLength] = '\0';
-        softwareFault.name               = CharSpan::fromCharString(threadName);
-        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
-
-        delegate->OnSoftwareFaultDetected(softwareFault);
-    }
 }
 
 void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)

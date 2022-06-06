@@ -113,116 +113,6 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-/**
- * Should be called when a software fault takes place on the Node.
- */
-void HandleSoftwareFault(intptr_t arg)
-{
-
-}
-
-/**
- * Should be called when a general fault takes place on the Node.
- */
-void HandleGeneralFault(intptr_t arg)
-{
-    uint32_t eventId = static_cast<uint32_t>(arg);
-}
-
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-// We should stop using signals for those faults, and move to a different notification
-// means, like a pipe. (see issue #19114)
-#if !defined(ENABLE_CHIP_SHELL)
-void OnRebootSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
-    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
-    // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::kUnspecified;
-    switch (signum)
-    {
-    case SIGVTALRM:
-        bootReason = BootReasonType::kPowerOnReboot;
-        break;
-    case SIGALRM:
-        bootReason = BootReasonType::kBrownOutReset;
-        break;
-    case SIGILL:
-        bootReason = BootReasonType::kSoftwareWatchdogReset;
-        break;
-    case SIGTRAP:
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-        break;
-    case SIGIO:
-        bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        break;
-    case SIGINT:
-        bootReason = BootReasonType::kSoftwareReset;
-        break;
-    default:
-        IgnoreUnusedVariable(bootReason);
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    Server::GetInstance().DispatchShutDownAndStopEventLoop();
-}
-
-void OnSoftwareFaultSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    VerifyOrDie(signum == SIGUSR1);
-    PlatformMgr().ScheduleWork(HandleSoftwareFault);
-}
-
-void OnGeneralFaultSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    uint32_t eventId;
-    switch (signum)
-    {
-    case SIGUSR2:
-        eventId = GeneralDiagnostics::Events::HardwareFaultChange::Id;
-        break;
-    case SIGHUP:
-        eventId = GeneralDiagnostics::Events::RadioFaultChange::Id;
-        break;
-    case SIGTTIN:
-        eventId = GeneralDiagnostics::Events::NetworkFaultChange::Id;
-        break;
-    default:
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    PlatformMgr().ScheduleWork(HandleGeneralFault, static_cast<intptr_t>(eventId));
-}
-
-void SetupSignalHandlers()
-{
-    // sigaction is not used here because Tsan interceptors seems to
-    // never dispatch the signals on darwin.
-    signal(SIGALRM, OnRebootSignalHandler);
-    signal(SIGVTALRM, OnRebootSignalHandler);
-    signal(SIGILL, OnRebootSignalHandler);
-    signal(SIGTRAP, OnRebootSignalHandler);
-    signal(SIGTERM, OnRebootSignalHandler);
-    signal(SIGIO, OnRebootSignalHandler);
-    signal(SIGINT, OnRebootSignalHandler);
-    signal(SIGUSR1, OnFaultSignalHandler);
-    signal(SIGUSR2, OnGeneralFaultSignalHandler);
-    signal(SIGHUP, OnGeneralFaultSignalHandler);
-    signal(SIGTTIN, OnGeneralFaultSignalHandler);
-}
-#endif // !defined(ENABLE_CHIP_SHELL)
-
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -429,10 +319,6 @@ void ChipLinuxAppMainLoop()
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
-#if !defined(ENABLE_CHIP_SHELL)
-    SetupSignalHandlers();
-#endif // !defined(ENABLE_CHIP_SHELL)
 
     ApplicationInit();
 

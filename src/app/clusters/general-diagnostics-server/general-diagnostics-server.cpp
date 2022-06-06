@@ -43,7 +43,7 @@ namespace {
 
 bool IsTestEventTriggerEnabled()
 {
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
     if (triggerDelegate == nullptr)
     {
         return false;
@@ -66,6 +66,14 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
         }
     }
     return true;
+}
+
+void ReportAttributeOnAllEndpoints(AttributeId attribute)
+{
+    for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    {
+        MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, attribute);
+    }
 }
 
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
@@ -205,14 +213,6 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
 
 class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate
 {
-    static void ReportAttributeOnAllEndpoints(AttributeId attribute)
-    {
-        for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-        {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, attribute);
-        }
-    }
-
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
@@ -243,7 +243,7 @@ Server & Server::Instance()
 }
 
 // Gets called when the device has been rebooted.
-void OnDeviceReboot(BootReasonType bootReason) override
+void Server::OnDeviceReboot(BootReasonType bootReason)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
 
@@ -262,8 +262,7 @@ void OnDeviceReboot(BootReasonType bootReason) override
 }
 
 // Get called when the Node detects a hardware fault has been raised.
-void OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous,
-                              GeneralFaults<kMaxHardwareFaults> & current) override
+void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
 
@@ -275,10 +274,10 @@ void OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous,
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList = DataModel::List<const HardwareFaultType>(
-            reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
-        DataModel::List<const HardwareFaultType> previousList = DataModel::List<const HardwareFaultType>(
-            reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
+        DataModel::List<const HardwareFaultType> currentList =
+            DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
+        DataModel::List<const HardwareFaultType> previousList =
+            DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -289,7 +288,7 @@ void OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous,
 }
 
 // Get called when the Node detects a radio fault has been raised.
-void OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) override
+void Server::OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
 
@@ -315,7 +314,7 @@ void OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, GeneralFault
 }
 
 // Get called when the Node detects a network fault has been raised.
-void OnNetworkFaultsDetect(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) override
+void Server::OnNetworkFaultsDetect(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
 
@@ -329,8 +328,8 @@ void OnNetworkFaultsDetect(GeneralFaults<kMaxNetworkFaults> & previous, GeneralF
         EventNumber eventNumber;
         DataModel::List<const NetworkFaultType> currentList =
             DataModel::List<const NetworkFaultType>(reinterpret_cast<const NetworkFaultType *>(current.data()), current.size());
-        DataModel::List<const NetworkFaultType> previousList = DataModel::List<const NetworkFaultType>(
-            reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
+        DataModel::List<const NetworkFaultType> previousList =
+            DataModel::List<const NetworkFaultType>(reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -361,7 +360,7 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
         return true;
     }
 
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
     {
@@ -385,6 +384,13 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
+    BootReasonType bootReason;
+
     registerAttributeAccessOverride(&gAttrAccess);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
+
+    if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+    {
+        GeneralDiagnostics::Server::Instance().OnDeviceReboot(bootReason);
+    }
 }
