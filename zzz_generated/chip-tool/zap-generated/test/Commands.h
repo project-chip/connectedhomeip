@@ -10472,7 +10472,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10495,7 +10495,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10518,7 +10518,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
@@ -10541,7 +10541,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10564,7 +10564,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10599,7 +10599,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10634,7 +10634,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
@@ -10657,7 +10657,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10692,7 +10692,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10755,7 +10755,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10778,7 +10778,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10813,7 +10813,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10848,7 +10848,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
@@ -10871,7 +10871,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -10906,7 +10906,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -11159,7 +11159,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
@@ -11206,7 +11206,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -11235,7 +11235,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
@@ -11258,7 +11258,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -11511,7 +11511,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
@@ -11552,7 +11552,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -11587,7 +11587,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 60U;
@@ -11610,7 +11610,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
@@ -27083,7 +27083,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
+                chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -35421,7 +35421,7 @@ private:
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
@@ -35451,7 +35451,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
@@ -35699,8 +35699,8 @@ private:
             LogStep(6, "1f: write a value into the RW mandatory attribute:: Mode");
             VerifyOrDo(!ShouldSkip("A_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -35947,8 +35947,8 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValA;
-    chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValB;
+    chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValA;
+    chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValB;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
@@ -35972,7 +35972,7 @@ private:
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 4));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -35984,7 +35984,7 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -35996,7 +35996,7 @@ private:
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36012,7 +36012,7 @@ private:
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36021,7 +36021,7 @@ private:
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36036,7 +36036,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36052,7 +36052,7 @@ private:
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36061,7 +36061,7 @@ private:
         case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
+                chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
@@ -36096,8 +36096,8 @@ private:
             LogStep(1, "1a: TH set the Mode Attribute bit0 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(1);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -36111,8 +36111,8 @@ private:
             LogStep(3, "1c: TH clear the Mode Attribute bit0 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -36126,8 +36126,8 @@ private:
             LogStep(5, "2a: TH set the Mode Attribute bit1 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(2);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -36151,8 +36151,8 @@ private:
             LogStep(8, "2d: TH clear the Mode Attribute bit1 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -36182,8 +36182,8 @@ private:
             LogStep(12, "3a: TH set the Mode Attribute bit2 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(4);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(4);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -36207,8 +36207,8 @@ private:
             LogStep(15, "3d: TH clear the Mode Attribute bit2 of the DUT");
             VerifyOrDo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -41188,7 +41188,7 @@ private:
     chip::Optional<uint16_t> mTimeout;
 
     chip::app::DataModel::Nullable<bool> booValueNull;
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableValue254;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableValue254;
     chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> nullableEnumAttr254;
     uint8_t * nullableOctetStrTestValueBuffer = nullptr;
     chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStrTestValue;
@@ -41269,7 +41269,7 @@ private:
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap8", value, 0));
             }
@@ -41280,7 +41280,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap8", value, 255));
             }
@@ -41291,7 +41291,7 @@ private:
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap8", value, 0));
             }
@@ -41299,7 +41299,7 @@ private:
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap16", value, 0U));
             }
@@ -41310,7 +41310,7 @@ private:
         case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap16", value, 65535U));
             }
@@ -41321,7 +41321,7 @@ private:
         case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap16", value, 0U));
             }
@@ -41329,7 +41329,7 @@ private:
         case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap32", value, 0UL));
             }
@@ -41340,7 +41340,7 @@ private:
         case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap32", value, 4294967295UL));
             }
@@ -41351,7 +41351,7 @@ private:
         case 25:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap32", value, 0UL));
             }
@@ -41359,7 +41359,7 @@ private:
         case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap64", value, 0ULL));
             }
@@ -41370,7 +41370,7 @@ private:
         case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap64", value, 18446744073709551615ULL));
             }
@@ -41381,7 +41381,7 @@ private:
         case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap64", value, 0ULL));
             }
@@ -42590,7 +42590,7 @@ private:
         case 187:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap8", value));
                 VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254));
@@ -42602,7 +42602,7 @@ private:
         case 189:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap8", value));
                 VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254));
@@ -42616,7 +42616,7 @@ private:
         case 191:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNull("nullableBitmap8", value));
             }
@@ -42624,7 +42624,7 @@ private:
         case 192:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, nullableValue254));
             }
@@ -42635,7 +42635,7 @@ private:
         case 194:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap16", value));
                 VerifyOrReturn(CheckValue("nullableBitmap16.Value()", value.Value(), 65534U));
@@ -42647,7 +42647,7 @@ private:
         case 196:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap16", value));
                 VerifyOrReturn(CheckValue("nullableBitmap16.Value()", value.Value(), 65534U));
@@ -42659,7 +42659,7 @@ private:
         case 198:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNull("nullableBitmap16", value));
             }
@@ -42670,7 +42670,7 @@ private:
         case 200:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap32", value));
                 VerifyOrReturn(CheckValue("nullableBitmap32.Value()", value.Value(), 4294967294UL));
@@ -42682,7 +42682,7 @@ private:
         case 202:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap32", value));
                 VerifyOrReturn(CheckValue("nullableBitmap32.Value()", value.Value(), 4294967294UL));
@@ -42694,7 +42694,7 @@ private:
         case 204:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNull("nullableBitmap32", value));
             }
@@ -42705,7 +42705,7 @@ private:
         case 206:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap64", value));
                 VerifyOrReturn(CheckValue("nullableBitmap64.Value()", value.Value(), 18446744073709551614ULL));
@@ -42717,7 +42717,7 @@ private:
         case 208:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap64", value));
                 VerifyOrReturn(CheckValue("nullableBitmap64.Value()", value.Value(), 18446744073709551614ULL));
@@ -42729,7 +42729,7 @@ private:
         case 210:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNull("nullableBitmap64", value));
             }
@@ -44610,8 +44610,8 @@ private:
         case 12: {
             LogStep(12, "Write attribute BITMAP8 Max Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44623,8 +44623,8 @@ private:
         case 14: {
             LogStep(14, "Write attribute BITMAP8 Min Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44641,8 +44641,8 @@ private:
         case 17: {
             LogStep(17, "Write attribute BITMAP16 Max Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44654,8 +44654,8 @@ private:
         case 19: {
             LogStep(19, "Write attribute BITMAP16 Min Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(0U);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44672,8 +44672,8 @@ private:
         case 22: {
             LogStep(22, "Write attribute BITMAP32 Max Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44685,8 +44685,8 @@ private:
         case 24: {
             LogStep(24, "Write attribute BITMAP32 Min Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(0UL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(0UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44703,8 +44703,8 @@ private:
         case 27: {
             LogStep(27, "Write attribute BITMAP64 Max Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -44716,8 +44716,8 @@ private:
         case 29: {
             LogStep(29, "Write attribute BITMAP64 Min Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(0ULL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(0ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -45588,7 +45588,7 @@ private:
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.g = 0.0f;
             value.arg1.h = 0;
 
@@ -45607,7 +45607,7 @@ private:
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.g = 0.0f;
             value.arg1.h = 0;
 
@@ -45629,7 +45629,7 @@ private:
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -45651,7 +45651,7 @@ private:
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -45673,7 +45673,7 @@ private:
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -45687,7 +45687,7 @@ private:
                 listHolder_1->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_1->mList[0].g = 0.0f;
                 listHolder_1->mList[0].h = 0;
 
@@ -45697,7 +45697,7 @@ private:
                 listHolder_1->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_1->mList[1].g = 0.0f;
                 listHolder_1->mList[1].h = 0;
 
@@ -45752,7 +45752,7 @@ private:
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -45766,7 +45766,7 @@ private:
                 listHolder_1->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_1->mList[0].g = 0.0f;
                 listHolder_1->mList[0].h = 0;
 
@@ -45776,7 +45776,7 @@ private:
                 listHolder_1->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_1->mList[1].g = 0.0f;
                 listHolder_1->mList[1].h = 0;
 
@@ -45828,7 +45828,7 @@ private:
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
             value.arg1.g = 0.1f;
             value.arg1.h = 0.1;
 
@@ -45936,7 +45936,7 @@ private:
                 listHolder_0->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
                 listHolder_0->mList[0].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
-                listHolder_0->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[0].g = 0.0f;
                 listHolder_0->mList[0].h = 0;
 
@@ -45946,7 +45946,7 @@ private:
                 listHolder_0->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_0->mList[1].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
-                listHolder_0->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[1].g = 0.0f;
                 listHolder_0->mList[1].h = 0;
 
@@ -45973,7 +45973,7 @@ private:
                 listHolder_0->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_0->mList[0].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
-                listHolder_0->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[0].g = 0.0f;
                 listHolder_0->mList[0].h = 0;
 
@@ -45983,7 +45983,7 @@ private:
                 listHolder_0->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
                 listHolder_0->mList[1].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
-                listHolder_0->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[1].g = 0.0f;
                 listHolder_0->mList[1].h = 0;
 
@@ -46014,7 +46014,7 @@ private:
                 listHolder_0->mList[0].c.d =
                     chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
                 listHolder_0->mList[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-                listHolder_0->mList[0].c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[0].c.g = 0.0f;
                 listHolder_0->mList[0].c.h = 0;
 
@@ -46028,7 +46028,7 @@ private:
                     listHolder_2->mList[0].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                     listHolder_2->mList[0].g = 0.0f;
                     listHolder_2->mList[0].h = 0;
 
@@ -46038,7 +46038,7 @@ private:
                     listHolder_2->mList[1].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                     listHolder_2->mList[1].g = 0.0f;
                     listHolder_2->mList[1].h = 0;
 
@@ -46102,7 +46102,7 @@ private:
                 listHolder_0->mList[0].c.d =
                     chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
                 listHolder_0->mList[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-                listHolder_0->mList[0].c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                 listHolder_0->mList[0].c.g = 0.0f;
                 listHolder_0->mList[0].c.h = 0;
 
@@ -46116,7 +46116,7 @@ private:
                     listHolder_2->mList[0].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                     listHolder_2->mList[0].g = 0.0f;
                     listHolder_2->mList[0].h = 0;
 
@@ -46126,7 +46126,7 @@ private:
                     listHolder_2->mList[1].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
                     listHolder_2->mList[1].g = 0.0f;
                     listHolder_2->mList[1].h = 0;
 
@@ -46350,9 +46350,9 @@ private:
         case 186: {
             LogStep(186, "Write attribute NULLABLE_BITMAP8 Max Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46364,9 +46364,9 @@ private:
         case 188: {
             LogStep(188, "Write attribute NULLABLE_BITMAP8 Invalid Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46378,7 +46378,7 @@ private:
         case 190: {
             LogStep(190, "Write attribute NULLABLE_BITMAP8 null Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
@@ -46396,9 +46396,9 @@ private:
         case 193: {
             LogStep(193, "Write attribute NULLABLE_BITMAP16 Max Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65534U);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65534U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46410,9 +46410,9 @@ private:
         case 195: {
             LogStep(195, "Write attribute NULLABLE_BITMAP16 Invalid Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46424,7 +46424,7 @@ private:
         case 197: {
             LogStep(197, "Write attribute NULLABLE_BITMAP16 null Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
@@ -46437,9 +46437,9 @@ private:
         case 199: {
             LogStep(199, "Write attribute NULLABLE_BITMAP32 Max Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967294UL);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967294UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46451,9 +46451,9 @@ private:
         case 201: {
             LogStep(201, "Write attribute NULLABLE_BITMAP32 Invalid Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46465,7 +46465,7 @@ private:
         case 203: {
             LogStep(203, "Write attribute NULLABLE_BITMAP32 null Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
@@ -46478,9 +46478,9 @@ private:
         case 205: {
             LogStep(205, "Write attribute NULLABLE_BITMAP64 Max Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551614ULL);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551614ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46492,9 +46492,9 @@ private:
         case 207: {
             LogStep(207, "Write attribute NULLABLE_BITMAP64 Invalid Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -46506,7 +46506,7 @@ private:
         case 209: {
             LogStep(209, "Write attribute NULLABLE_BITMAP64 null Value");
             ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
@@ -48428,7 +48428,7 @@ private:
             value.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.d = chip::ByteSpan(chip::Uint8::from_const_char("abcgarbage: not in length on purpose"), 3);
             value.e = chip::Span<const char>("garbage: not in length on purpose", 0);
-            value.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(17);
+            value.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(17);
             value.g = 1.5f;
             value.h = 3.14159265358979;
 
@@ -50201,10 +50201,10 @@ private:
 
     uint8_t TestAddArgumentDefaultValue;
     bool readAttributeBooleanDefaultValue;
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> readAttributeBitmap8DefaultValue;
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> readAttributeBitmap16DefaultValue;
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> readAttributeBitmap32DefaultValue;
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> readAttributeBitmap64DefaultValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> readAttributeBitmap8DefaultValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> readAttributeBitmap16DefaultValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> readAttributeBitmap32DefaultValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> readAttributeBitmap64DefaultValue;
     uint8_t readAttributeInt8uDefaultValue;
     uint16_t readAttributeInt16uDefaultValue;
     uint32_t readAttributeInt32uDefaultValue;
@@ -50304,7 +50304,7 @@ private:
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap8", value, 0));
 
@@ -50317,7 +50317,7 @@ private:
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, readAttributeBitmap8DefaultValue));
             }
@@ -50328,7 +50328,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap8", value, readAttributeBitmap8DefaultValue));
             }
@@ -50336,7 +50336,7 @@ private:
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap16", value, 0U));
 
@@ -50349,7 +50349,7 @@ private:
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, readAttributeBitmap16DefaultValue));
             }
@@ -50360,7 +50360,7 @@ private:
         case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap16", value, readAttributeBitmap16DefaultValue));
             }
@@ -50368,7 +50368,7 @@ private:
         case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap32", value, 0UL));
 
@@ -50381,7 +50381,7 @@ private:
         case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, readAttributeBitmap32DefaultValue));
             }
@@ -50392,7 +50392,7 @@ private:
         case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap32", value, readAttributeBitmap32DefaultValue));
             }
@@ -50400,7 +50400,7 @@ private:
         case 24:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap64", value, 0ULL));
 
@@ -50413,7 +50413,7 @@ private:
         case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, readAttributeBitmap64DefaultValue));
             }
@@ -50424,7 +50424,7 @@ private:
         case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("bitmap64", value, readAttributeBitmap64DefaultValue));
             }
@@ -51076,8 +51076,8 @@ private:
         case 10: {
             LogStep(10, "Write attribute BITMAP8 Not Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -51089,7 +51089,7 @@ private:
         case 12: {
             LogStep(12, "Write attribute BITMAP8 Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             value = readAttributeBitmap8DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -51107,8 +51107,8 @@ private:
         case 15: {
             LogStep(15, "Write attribute BITMAP16 Not Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(1U);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(1U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -51120,7 +51120,7 @@ private:
         case 17: {
             LogStep(17, "Write attribute BITMAP16 Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             value = readAttributeBitmap16DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -51138,8 +51138,8 @@ private:
         case 20: {
             LogStep(20, "Write attribute BITMAP32 Not Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(1UL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(1UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -51151,7 +51151,7 @@ private:
         case 22: {
             LogStep(22, "Write attribute BITMAP32 Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             value = readAttributeBitmap32DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -51169,8 +51169,8 @@ private:
         case 25: {
             LogStep(25, "Write attribute BITMAP64 Not Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(1ULL);
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(1ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -51182,7 +51182,7 @@ private:
         case 27: {
             LogStep(27, "Write attribute BITMAP64 Default Value");
             ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             value = readAttributeBitmap64DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -60810,7 +60810,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60826,7 +60826,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60842,7 +60842,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 0U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60858,7 +60858,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60874,7 +60874,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 2U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60890,7 +60890,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60906,7 +60906,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60922,7 +60922,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60938,7 +60938,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 24;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -60954,7 +60954,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 60;
             value.endHour      = 18;
@@ -60970,7 +60970,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 24;
@@ -60986,7 +60986,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -61002,7 +61002,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 19;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -61018,7 +61018,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 50;
             value.endHour      = 15;
@@ -61349,7 +61349,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
             value.endHour      = 18;
@@ -61626,7 +61626,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
             value.startHour    = 0;
             value.startMinute  = 0;
             value.endHour      = 23;
@@ -61786,7 +61786,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
             value.startHour    = 0;
             value.startMinute  = 0;
             value.endHour      = 23;
@@ -61884,7 +61884,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 0;
             value.startMinute  = 0;
             value.endHour      = 23;
@@ -61935,7 +61935,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
             value.userIndex    = 2U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64);
             value.startHour    = 23;
             value.startMinute  = 0;
             value.endHour      = 23;
@@ -62101,7 +62101,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 0;
             value.startMinute  = 0;
             value.endHour      = 23;
@@ -63133,7 +63133,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
             value.startHour    = 15;
             value.startMinute  = 45;
             value.endHour      = 16;
@@ -63160,7 +63160,7 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(7);
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(7);
             value.startHour    = 15;
             value.startMinute  = 45;
             value.endHour      = 16;

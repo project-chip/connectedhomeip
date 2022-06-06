@@ -22,7 +22,6 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
-//#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
@@ -73,7 +72,7 @@ static void updateAttributeLinks(EndpointId endpoint)
 {
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
-    BitFlags<PumpStatus> pumpStatus;
+    BitMask<PumpStatus> pumpStatus;
     bool isControlModeAvailable = true;
     bool isPumpStatusAvailable  = true;
 

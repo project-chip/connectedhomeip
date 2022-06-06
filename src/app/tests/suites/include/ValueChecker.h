@@ -94,6 +94,12 @@ protected:
         return CheckValue(itemName, current.Raw(), expected);
     }
 
+    template <typename T, typename U>
+    bool CheckValue(const char * itemName, chip::BitMask<T> current, U expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected);
+    }
+
     // Allow an expected value that is a nullable wrapped around the actual
     // value (e.g. a SaveAs from reading a different attribute that has a value
     // space that includes null).  In that case we check that:
@@ -110,6 +116,12 @@ protected:
 
     template <typename T>
     bool CheckValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected.Raw());
+    }
+
+    template <typename T>
+    bool CheckValue(const char * itemName, chip::BitMask<T> current, chip::BitMask<T> expected)
     {
         return CheckValue(itemName, current.Raw(), expected.Raw());
     }

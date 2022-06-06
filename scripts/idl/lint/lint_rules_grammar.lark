@@ -10,7 +10,7 @@ specific_endpoint_rule: "endpoint" integer "{" required_server_cluster* "}"
 
 required_global_attribute: "require" "global" "attribute" id "=" integer ";"
 
-required_server_cluster: "require" "server" "cluster" id ";"
+required_server_cluster: "require" "server" "cluster" (id|POSITIVE_INTEGER|HEX_INTEGER) ";"
 
 integer: positive_integer | negative_integer
 
