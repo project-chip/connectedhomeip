@@ -94,7 +94,7 @@ static void InitServer(intptr_t context)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-    Initialize device attestation config
+    // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 }
 
