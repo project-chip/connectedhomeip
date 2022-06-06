@@ -335,7 +335,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     // components may work simultaneously on a single device.
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
-                                                                &gDeviceFabrics, nullptr,
+                                                                &gDeviceFabrics, nullptr, nullptr,
                                                                 &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
@@ -762,7 +762,7 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         loopback.mSentMessageCount = 0;
         NL_TEST_ASSERT(inSuite,
                        gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
-                                                                    &gDeviceFabrics, &testVectors[i].responderStorage,
+                                                                    &gDeviceFabrics, &testVectors[i].responderStorage, nullptr,
                                                                     &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
         ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal =
