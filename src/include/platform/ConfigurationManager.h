@@ -85,17 +85,15 @@ public:
         kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
-    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)            = 0;
-    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                     = 0;
-    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)           = 0;
-    virtual CHIP_ERROR GetProductId(uint16_t & productId)                   = 0;
-    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)            = 0;
-    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)              = 0;
-    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)            = 0;
-    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)           = 0;
-    virtual CHIP_ERROR GetHardCodedFirmwareBuildDate(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    virtual CHIP_ERROR GetHardCodedFirmwareBuildTimeOfDay(const char **) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                           = 0;
+    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                    = 0;
+    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                          = 0;
+    virtual CHIP_ERROR GetProductId(uint16_t & productId)                                  = 0;
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                           = 0;
+    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                             = 0;
+    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                           = 0;
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                          = 0;
     virtual CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) = 0;
     virtual CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)

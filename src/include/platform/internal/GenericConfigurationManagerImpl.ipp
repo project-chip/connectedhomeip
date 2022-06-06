@@ -476,24 +476,6 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVer
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardCodedFirmwareBuildDate(const char ** date)
-{
-    VerifyOrReturnError(date != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
-    *date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardCodedFirmwareBuildTimeOfDay(const char ** time)
-{
-    VerifyOrReturnError(time != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
-    *time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
@@ -503,10 +485,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpo
         return CHIP_NO_ERROR;
     }
     // Else, attempt to read the hard-coded values.
-    const char * date;
-    const char * time;
-    ReturnErrorOnFailure(GetHardCodedFirmwareBuildDate(&date));
-    ReturnErrorOnFailure(GetHardCodedFirmwareBuildTimeOfDay(&time));
+    VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
+    const char * date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
+    const char * time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
     uint32_t seconds;
     auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date), COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);
     if (good)
