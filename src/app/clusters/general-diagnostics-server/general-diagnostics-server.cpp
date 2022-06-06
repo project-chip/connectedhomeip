@@ -274,8 +274,7 @@ void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList =
-            DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
+        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
         DataModel::List<const HardwareFaultType> previousList =
             DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
