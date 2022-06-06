@@ -127,6 +127,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     mHandler->RunInteractive(argsCount, args);
     gIsCommandRunning = false;
 
+    // Do not delete arg[0]
     while (--argsCount)
         delete[] args[argsCount];
 
