@@ -35,9 +35,20 @@ using namespace chip::app::Clusters::WindowCovering;
 
 static const struct pwm_dt_spec sLiftPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 static const struct pwm_dt_spec sTiltPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
-static k_timer sLiftTimer;
-static k_timer sTiltTimer;
+
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
+
+static constexpr uint32_t FromOneRangeToAnother(uint32_t aInMin, uint32_t aInMax, uint32_t aOutMin, uint32_t aOutMax,
+                                                uint32_t aInput)
+{
+    const auto diffInput  = aInMax - aInMin;
+    const auto diffOutput = aOutMax - aOutMin;
+    if (diffInput > 0)
+    {
+        return static_cast<uint32_t>(aOutMin + static_cast<uint64_t>(aInput - aInMin) * diffOutput / diffInput);
+    }
+    return 0;
+}
 
 WindowCovering::WindowCovering()
 {
@@ -51,24 +62,6 @@ WindowCovering::WindowCovering()
     if (mTiltIndicator.Init(&sTiltPwmDevice, 0, 255) != 0)
     {
         LOG_ERR("Cannot initialize the tilt indicator");
-    }
-
-    k_timer_init(&sLiftTimer, MoveTimerTimeoutCallback, nullptr);
-    k_timer_init(&sTiltTimer, MoveTimerTimeoutCallback, nullptr);
-}
-
-void WindowCovering::MoveTimerTimeoutCallback(k_timer * aTimer)
-{
-    if (!aTimer)
-        return;
-
-    if (aTimer == &sLiftTimer)
-    {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(DriveCurrentLiftPosition);
-    }
-    else if (aTimer == &sTiltTimer)
-    {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(DriveCurrentTiltPosition);
     }
 }
 
@@ -164,12 +157,24 @@ void WindowCovering::StartTimer(MoveType aMoveType, uint32_t aTimeoutMs)
 {
     if (aMoveType == MoveType::LIFT)
     {
-        k_timer_start(&sLiftTimer, K_MSEC(sMoveTimeoutMs), K_NO_WAIT);
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(sMoveTimeoutMs),
+                                                           MoveTimerTimeoutCallbackLift, nullptr);
     }
     else if (aMoveType == MoveType::TILT)
     {
-        k_timer_start(&sTiltTimer, K_MSEC(sMoveTimeoutMs), K_NO_WAIT);
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(sMoveTimeoutMs),
+                                                           MoveTimerTimeoutCallbackTilt, nullptr);
     }
+}
+
+void WindowCovering::MoveTimerTimeoutCallbackLift(chip::System::Layer * systemLayer, void * appState)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
+}
+
+void WindowCovering::MoveTimerTimeoutCallbackTilt(chip::System::Layer * systemLayer, void * appState)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
 }
 
 void WindowCovering::DriveCurrentTiltPosition(intptr_t)
@@ -309,20 +314,18 @@ void WindowCovering::SetBrightness(MoveType aMoveType, uint16_t aPosition)
 
 uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveType)
 {
-    AbsoluteLimits pwmLimits{};
+	uint8_t pwmMin{};
+	uint8_t pwmMax{};
 
-    if (aMoveType == MoveType::LIFT)
-    {
-        pwmLimits.open   = mLiftIndicator.GetMinLevel();
-        pwmLimits.closed = mLiftIndicator.GetMaxLevel();
-    }
-    else if (aMoveType == MoveType::TILT)
-    {
-        pwmLimits.open   = mTiltIndicator.GetMinLevel();
-        pwmLimits.closed = mTiltIndicator.GetMaxLevel();
-    }
+	if (aMoveType == MoveType::LIFT) {
+		pwmMin = mLiftIndicator.GetMinLevel();
+		pwmMax = mLiftIndicator.GetMaxLevel();
+	} else if (aMoveType == MoveType::TILT) {
+		pwmMin = mTiltIndicator.GetMinLevel();
+		pwmMax = mTiltIndicator.GetMaxLevel();
+	}
 
-    return Percent100thsToValue(pwmLimits, aPosition);
+	return FromOneRangeToAnother(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, pwmMin, pwmMax, aPosition);
 }
 
 void WindowCovering::SchedulePostAttributeChange(chip::EndpointId aEndpoint, chip::AttributeId aAttributeId)
