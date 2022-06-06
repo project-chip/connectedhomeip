@@ -86,7 +86,8 @@ architectures on a micro SD card. This release will have bluez 5.55 or newer
 which is required for BLE functionality.
 
 Boot the SD card, login with the default user account "ubuntu" and password
-"ubuntu", then proceed with "How to install prerequisites on Linux".
+"ubuntu", then proceed with
+[Installing prerequisites on Linux](#installing-prerequisites-on-linux).
 
 Finally, install some Raspberry Pi specific dependencies:
 
