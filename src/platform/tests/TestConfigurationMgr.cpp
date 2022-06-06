@@ -234,6 +234,8 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
     System::Clock::Seconds32 chipEpochTime;
     NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime) == CHIP_NO_ERROR);
 
+    ChipLogProgress(TimeService, "Configuration Manager reported CHIP epoch build time: %" PRIu32, chipEpochTime.count());
+
     char date[14];      // strlen("Jan 000 00000") == 13
     char timeOfDay[12]; // strlen("000:000:000") == 11
 
@@ -249,12 +251,16 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(timeOfDay)));
     }
 
+    ChipLogProgress(TimeService, "Recomputation to build date / time: %s %s", date, timeOfDay);
+
     // Read the hard-coded build date / time strings that the configuration
     // manager used to compute firmware build CHIP epoch time.
     const char * expectedDate;
     const char * expectedTimeOfDay;
     NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetHardCodedFirmwareBuildDate(&expectedDate) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetHardCodedFirmwareBuildTimeOfDay(&expectedTimeOfDay) == CHIP_NO_ERROR);
+
+    ChipLogProgress(TimeService, "Expected date / time: %s %s", expectedDate, expectedTimeOfDay);
 
     // Compare the strings.  If they are identical, this means the configuration
     // manager's parser for the __DATE__ / __TIME__ strings worked for the
