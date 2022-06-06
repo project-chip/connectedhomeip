@@ -62,4 +62,3 @@ public:
 
 } // namespace Credentials
 } // namespace chip
-
