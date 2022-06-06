@@ -26723,7 +26723,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
             }
             break;
         case 63:
@@ -26790,7 +26789,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 74:
@@ -26821,7 +26821,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 79:
@@ -26883,7 +26884,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 89:
@@ -27071,7 +27073,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
             }
             break;
         case 119:
@@ -27099,7 +27102,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 123:
@@ -27118,7 +27122,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 300U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
             }
             break;
         case 126:
@@ -27154,7 +27159,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 131:
