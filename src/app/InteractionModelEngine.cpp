@@ -785,7 +785,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 
 bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
 {
-    constexpr size_t minSupportedPathsPerFabricForRead = kMinSupportedReadRequestsPerFabric * kMinSupportedPathsPerReadRequest;
+    const size_t minSupportedPathsPerFabricForRead = GetGuaranteedReadRequestsPerFabric() * kMinSupportedPathsPerReadRequest;
 
     size_t attributePathsUsedByCurrentFabric = 0;
     size_t eventPathsUsedByCurrentFabric     = 0;
@@ -841,7 +841,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
     if (candidate != nullptr &&
         ((attributePathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
           eventPathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
-          readTransactionsOnCurrentFabric > kMinSupportedReadRequestsPerFabric) ||
+          readTransactionsOnCurrentFabric > GetGuaranteedReadRequestsPerFabric()) ||
          // Always evict the transactions on PASE sessions if the fabric table is full.
          (aFabricIndex == kUndefinedFabricIndex && mpFabricTable->FabricCount() == GetConfigMaxFabrics())))
     {
@@ -931,13 +931,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
 
     // Resources exhausted, since there is already some read requests ongoing on this fabric, please retry later.
     if (usedAttributePathsInFabric + aRequestedAttributePathCount >
-            kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric ||
-        usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * kMinSupportedReadRequestsPerFabric)
-    {
-        return Protocols::InteractionModel::Status::Busy;
-    }
-
-    if (usedReadHandlersInFabric >= kMinSupportedReadRequestsPerFabric)
+            kMinSupportedPathsPerReadRequest * GetGuaranteedReadRequestsPerFabric() ||
+        usedEventPathsInFabric + aRequestedEventPathCount >
+            kMinSupportedPathsPerReadRequest * GetGuaranteedReadRequestsPerFabric() ||
+        usedReadHandlersInFabric >= GetGuaranteedReadRequestsPerFabric())
     {
         return Protocols::InteractionModel::Status::Busy;
     }

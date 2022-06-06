@@ -277,7 +277,8 @@ public:
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
-    // out of memory scenarios in unit-tests.
+    // out of memory scenarios in unit-tests. You need to SetConfigMaxFabrics to make GetGuaranteedReadRequestsPerFabric
+    // working correctly.
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
@@ -439,6 +440,11 @@ private:
 #else
         return CHIP_CONFIG_MAX_FABRICS;
 #endif
+    }
+
+    inline size_t GetGuaranteedReadRequestsPerFabric() const
+    {
+        return GetReadHandlerPoolCapacityForReads() / GetConfigMaxFabrics();
     }
 
     /**

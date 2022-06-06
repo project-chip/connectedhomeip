@@ -2436,6 +2436,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(2);
+    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(2);
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(
         2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
@@ -2597,7 +2598,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
     // Case 5: The device's fabric table is not full, PASE sessions are counted as a valid fabric and can evict existing read
     // transactions.
     {
-        app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
+        app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(3);
 
         TestReadCallback readCallback;
         TestPerpetualListReadCallback backgroundReadCallback1;
