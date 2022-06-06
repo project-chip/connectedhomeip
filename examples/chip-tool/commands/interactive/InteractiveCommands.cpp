@@ -117,7 +117,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
             return true;
         }
 
-        char * carg = new char[arg.size()];
+        char * carg = new char[arg.size() + 1];
         strcpy(carg, arg.c_str());
         args[argsCount++] = carg;
     }
