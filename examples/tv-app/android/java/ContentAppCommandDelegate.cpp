@@ -26,9 +26,14 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <app/CommandHandlerInterface.h>
+#include <zap-generated/endpoint_config.h>
+#include <lib/support/jsontlv/TlvJson.h>
 
 namespace chip {
 namespace AppPlatform {
+
+using CommandHandlerInterface = chip::app::CommandHandlerInterface;
 
 const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
 {
@@ -53,6 +58,44 @@ const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::
     }
     const char * ret = env->GetStringUTFChars(resp, 0);
     return ret;
+}
+
+void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
+{
+    ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got called");
+    ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got called for endpoint %d ", handlerContext.mRequestPath.mEndpointId);
+    if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT) {
+        TLV::TLVReader readerForJson;
+        readerForJson.Init(handlerContext.mPayload);
+        
+        CHIP_ERROR err           = CHIP_NO_ERROR;
+        Json::Value json;
+        err = TlvToJson(readerForJson, json);
+        if (err != CHIP_NO_ERROR) {
+            // TODO : Add an interface to let the apps know a message came but there was a serialization error.
+            return;
+        }
+
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        UtfString jsonString(env, JsonToString(json).c_str());
+
+        // TODO : Remove payload from logs once development is done.
+        ChipLogProgress(Zcl, "ContentAppCommandDelegate::sendCommand with payload %s", JsonToString(json).c_str());
+        
+        env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
+                                                    jsonString.jniValue());
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            // TODO : Need to have proper errors passed back.
+        }
+        // TODO : Change this when handling is fully done including response.
+        handlerContext.SetCommandNotHandled();
+    } else {
+        handlerContext.SetCommandNotHandled();
+    }
 }
 
 } // namespace AppPlatform
