@@ -556,24 +556,31 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     current = FindCommissioneeDevice(peerAddress);
     if (current != nullptr)
     {
-
-        if (current->IsSecureConnected())
+        if (current->GetDeviceId() == remoteDeviceId)
         {
-            if (mPairingDelegate)
+            // We might be able to just reuse its connection if it has one or is
+            // working on one.
+            if (current->IsSecureConnected())
             {
-                // We already have an open secure session to this device, call the callback immediately and early return.
-                mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+                if (mPairingDelegate)
+                {
+                    // We already have an open secure session to this device, call the callback immediately and early return.
+                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+                }
+                return CHIP_NO_ERROR;
             }
-            return CHIP_NO_ERROR;
-        }
-        if (current->IsSessionSetupInProgress())
-        {
-            // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when
-            // connection completes
-            return CHIP_NO_ERROR;
+            if (current->IsSessionSetupInProgress())
+            {
+                // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when
+                // connection completes
+                return CHIP_NO_ERROR;
+            }
         }
 
-        // Something has gone strange. Delete the old device, try again.
+        // Either the consumer wants to assign a different device id to this
+        // peer address now (so we can't reuse the commissionee device we have
+        // already) or something has gone strange. Delete the old device, try
+        // again.
         ChipLogError(Controller, "Found unconnected device, removing");
         ReleaseCommissioneeDevice(current);
     }

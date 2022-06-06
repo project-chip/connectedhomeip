@@ -44,7 +44,7 @@ struct GenericContext
 struct RegisterContext : public GenericContext
 {
     dnssd_service_h service;
-    char type[kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1];
+    char type[kDnssdTypeAndProtocolMaxSize + 1];
     char name[Common::kInstanceNameMaxLength + 1];
     uint16_t port;
     uint32_t interfaceId;
@@ -64,7 +64,7 @@ struct RegisterContext : public GenericContext
 struct BrowseContext : public GenericContext
 {
     dnssd_browser_h browser;
-    char type[kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1];
+    char type[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t interfaceId;
 
     std::vector<DnssdService> services;
@@ -89,7 +89,7 @@ struct BrowseContext : public GenericContext
 struct ResolveContext : public GenericContext
 {
     dnssd_service_h service;
-    char type[kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1];
+    char type[kDnssdTypeAndProtocolMaxSize + 1];
     char name[Common::kInstanceNameMaxLength + 1];
     uint32_t interfaceId;
     bool isResolving;
