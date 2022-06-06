@@ -508,7 +508,7 @@ tests:
       response:
           constarints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -594,7 +594,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -637,7 +637,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "17a:Send On Command"
       command: "On"
@@ -713,7 +713,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -988,7 +988,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "24a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -1054,7 +1054,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 5
+              maxValue: 10
 
     - label: "Send Off Command"
       command: "Off"
