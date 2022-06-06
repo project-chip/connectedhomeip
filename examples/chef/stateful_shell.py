@@ -61,7 +61,7 @@ class StatefulShell:
 
     def run_cmd(
         self, cmd: str, *,
-        raise_on_returncode=False,
+        raise_on_returncode=True,
         return_cmd_output=False,
     ) -> Optional[str]:
         """Runs a command and updates environment.
