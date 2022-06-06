@@ -26790,7 +26790,7 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
             }
             break;
         case 74:
@@ -26822,7 +26822,7 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
             }
             break;
         case 79:
@@ -26885,7 +26885,7 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
             }
             break;
         case 89:
@@ -27103,7 +27103,7 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
             }
             break;
         case 123:
@@ -27160,7 +27160,7 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
             }
             break;
         case 131:
