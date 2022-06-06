@@ -150,7 +150,7 @@ Server & Server::Instance()
 }
 
 // Gets called when a software fault that has taken place on the Node.
-void Server::OnSoftwareFaultDetect(SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+void Server::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 

@@ -47,22 +47,22 @@ public:
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
      */
-    void OnHardwareFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+    void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
-    void OnRadioFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+    void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
-    void OnNetworkFaultsDetect(DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+    void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
 private:
     static Server instance;

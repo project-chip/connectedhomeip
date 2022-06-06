@@ -250,19 +250,22 @@ void Server::OnDeviceReboot(BootReasonType bootReason)
     ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
 
     // GeneralDiagnostics cluster should exist only for endpoint 0.
-
-    Events::BootReason::Type event{ bootReason };
-    EventNumber eventNumber;
-
-    CHIP_ERROR err = LogEvent(event, 0, eventNumber);
-    if (CHIP_NO_ERROR != err)
+    if (emberAfContainsServer(0, GeneralDiagnostics::Id))
     {
-        ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
+        Events::BootReason::Type event{ bootReason };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
 
 // Get called when the Node detects a hardware fault has been raised.
-void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
+void Server::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
+                                    const GeneralFaults<kMaxHardwareFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
 
@@ -274,10 +277,10 @@ void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList =
-            DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
-        DataModel::List<const HardwareFaultType> previousList =
-            DataModel::List<const HardwareFaultType>(reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
+        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()),
+                                                             current.size());
+        DataModel::List<const HardwareFaultType> previousList(reinterpret_cast<const HardwareFaultType *>(previous.data()),
+                                                              previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -288,7 +291,7 @@ void Server::OnHardwareFaultsDetect(GeneralFaults<kMaxHardwareFaults> & previous
 }
 
 // Get called when the Node detects a radio fault has been raised.
-void Server::OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current)
+void Server::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous, const GeneralFaults<kMaxRadioFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
 
@@ -300,10 +303,9 @@ void Server::OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, Gene
 
         // Record RadioFault event
         EventNumber eventNumber;
-        DataModel::List<const RadioFaultType> currentList =
-            DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
-        DataModel::List<const RadioFaultType> previousList =
-            DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(previous.data()), previous.size());
+        DataModel::List<const RadioFaultType> currentList(reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
+        DataModel::List<const RadioFaultType> previousList(reinterpret_cast<const RadioFaultType *>(previous.data()),
+                                                           previous.size());
         Events::RadioFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -314,7 +316,8 @@ void Server::OnRadioFaultsDetect(GeneralFaults<kMaxRadioFaults> & previous, Gene
 }
 
 // Get called when the Node detects a network fault has been raised.
-void Server::OnNetworkFaultsDetect(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current)
+void Server::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                   const GeneralFaults<kMaxNetworkFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
 
@@ -326,10 +329,10 @@ void Server::OnNetworkFaultsDetect(GeneralFaults<kMaxNetworkFaults> & previous, 
 
         // Record NetworkFault event
         EventNumber eventNumber;
-        DataModel::List<const NetworkFaultType> currentList =
-            DataModel::List<const NetworkFaultType>(reinterpret_cast<const NetworkFaultType *>(current.data()), current.size());
-        DataModel::List<const NetworkFaultType> previousList =
-            DataModel::List<const NetworkFaultType>(reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
+        DataModel::List<const NetworkFaultType> currentList(reinterpret_cast<const NetworkFaultType *>(current.data()),
+                                                            current.size());
+        DataModel::List<const NetworkFaultType> previousList(reinterpret_cast<const NetworkFaultType *>(previous.data()),
+                                                             previous.size());
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))

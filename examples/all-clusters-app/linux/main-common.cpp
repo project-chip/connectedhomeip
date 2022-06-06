@@ -47,13 +47,15 @@ static LowPowerManager lowPowerManager;
 
 bool EnabledWithServerCluster(ClusterId clusterId)
 {
+    bool retval = false;
+
     for (auto endpointId : EnabledEndpointsWithServerCluster(clusterId))
     {
         IgnoreUnusedVariable(endpointId);
-        return true;
+        retval = true;
     }
 
-    return false;
+    return retval;
 }
 
 /**
@@ -67,11 +69,11 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
     char threadName[kMaxThreadNameLength + 1];
 
-    softwareFault.id = gettid();
-    strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
-    threadName[kMaxThreadNameLength] = '\0';
-    softwareFault.name               = CharSpan::fromCharString(threadName);
-    softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
+    softwareFault.id = static_cast<uint64_t>(gettid());
+    Platform::CopyString(threadName, kMaxThreadNameLength + 1, std::to_string(softwareFault.id).c_str());
+
+    softwareFault.name           = CharSpan::fromCharString(threadName);
+    softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(threadName), strlen(threadName));
 
     Clusters::SoftwareDiagnostics::Server::Instance().OnSoftwareFaultDetect(softwareFault);
 }
