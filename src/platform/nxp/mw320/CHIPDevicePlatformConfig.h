@@ -70,5 +70,3 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 1
 // mdns/dns_sd --
 
-// Log
-#define MW320_LOG_ENABLED 1

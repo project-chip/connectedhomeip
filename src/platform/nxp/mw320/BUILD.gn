@@ -52,6 +52,10 @@ static_library("mw320") {
     "mw320_ota.h",
   ]
 
+  defines = [
+    "MW320_LOG_ENABLED=1",
+  ]
+
   deps = []
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
