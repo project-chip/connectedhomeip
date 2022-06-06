@@ -1454,7 +1454,7 @@ CHIP_ERROR CASESession::SetEffectiveTime()
         // If the system has given us a wall clock time, we must use it or
         // fail.  Conversion failures here are therefore always an error.
         System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
-        return mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime);
+        err = mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime);
     }
     else
     {
@@ -1477,8 +1477,9 @@ CHIP_ERROR CASESession::SetEffectiveTime()
         {
             mValidContext.SetEffectiveTime<LastKnownGoodChipEpochTime>(lastKnownGoodChipEpochTime);
         }
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
+    return err;
 }
 
 void CASESession::OnSuccessStatusReport()
