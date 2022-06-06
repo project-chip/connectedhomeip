@@ -143,10 +143,10 @@ class HostApp(Enum):
         elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
-        elif self == HostApp.TV_CASTING_APP:
+        elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.BRIDGE_APP:
+        elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
         else:
