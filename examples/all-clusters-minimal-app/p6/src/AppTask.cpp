@@ -75,7 +75,7 @@ namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
 
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;    
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 } // namespace
 
