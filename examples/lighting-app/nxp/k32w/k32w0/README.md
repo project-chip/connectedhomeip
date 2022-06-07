@@ -28,13 +28,14 @@ network.
     -   [Notes](#detokenizer-notes)
     -   [Known issues](#detokenizer-known-issues)
 -   [Tinycrypt ECC operations](#tinycrypt)
-    -    [Building steps](#tinycryptbuildingsteps)
+    -   [Building steps](#tinycryptbuildingsteps)
 -   [OTA](#ota)
-    -    [Writing the SSBL](#ssbl)
-    -    [Writing the PSECT](#psect)
-    -    [Writing the application](#appwrite)
-    -    [OTA Testing](#otatesting)
-    -    [Known issues](#otaissues)
+
+    -   [Writing the SSBL](#ssbl)
+    -   [Writing the PSECT](#psect)
+    -   [Writing the application](#appwrite)
+    -   [OTA Testing](#otatesting)
+    -   [Known issues](#otaissues)
 
     </hr>
 
@@ -197,8 +198,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ 
         Exactly the same steps as above but set chip_with_se05x=1 in the gn command
         and add argument chip_enable_ota_requestor=false
 
-Note that option chip_enable_ota_requestor=false are required for building with Secure Element.
-These can be changed if building without Secure Element
+Note that option chip_enable_ota_requestor=false are required for building with
+Secure Element. These can be changed if building without Secure Element
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.4.
@@ -309,17 +310,20 @@ unplug and plug the board and then rerun the script.
 ## Tinycrypt ECC operations
 
 <a name="tinycryptbuildingsteps"></a>
-### Building steps
 
+### Building steps
 
 Note: This solution is temporary.
 
 In order to use the tinycrypt ecc operations, use the following build arguments:
 
-- Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled (_mbedtls_use_tinycrypt=true_) and with the NXPmicro/mbedtls library (_mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"_).
+-   Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled
+    (_mbedtls_use_tinycrypt=true_) and with the NXPmicro/mbedtls library
+    (_mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"_).
 
-To disable tinycrypt ecc operations, simply build without _mbedtls_use_tinycrypt=true_ and without _mbedtls_repo_.
- 
+To disable tinycrypt ecc operations, simply build without
+_mbedtls_use_tinycrypt=true_ and without _mbedtls_repo_.
+
 <a name="ota"></a>
 
 ## OTA
