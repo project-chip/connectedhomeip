@@ -34,10 +34,10 @@ public:
      *  Only one pending operational keypair is supported at a time.
      *
      * @param fabricIndex - FabricIndex for which a new keypair must be made available
-     * @param certificateSigningRequest - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
+     * @param outCertificateSigningRequest - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
      *
      * @retval CHIP_NO_ERROR on success
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `certificateSigningRequest` buffer is too small
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outCertificateSigningRequest` buffer is too small
      * @retval CHIP_ERROR_INCORRECT_STATE if Init() had not been called or Finish() was already called
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is already a pending keypair for another `fabricIndex` value
      *                                         or if fabricIndex is an invalid value.
