@@ -75,7 +75,6 @@
 typedef struct
 {
     uint32_t id;
-    uint32_t mfgCode;
     const char * name;
 } EmberAfClusterName;
 
