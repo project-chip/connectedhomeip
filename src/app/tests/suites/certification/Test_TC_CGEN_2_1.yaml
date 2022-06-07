@@ -13,8 +13,9 @@
 # limitations under the License.
 
 name:
-    88.2. [TC-GC-2.1] Breadcrumb, BasicCommissioningInfo, RegulatoryConfig and
-    LocationCapability attributes [DUT - Commissionee]
+    90.2. [TC-CGEN-2.1] Breadcrumb, BasicCommissioningInfo, RegulatoryConfig,
+    LocationCapability and SupportsConcurrentConnection attributes [DUT -
+    Server]
 
 config:
     nodeId: 0x12344321

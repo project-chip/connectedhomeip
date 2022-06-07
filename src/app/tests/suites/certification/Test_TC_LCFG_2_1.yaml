@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    100.2.1. [TC-LO-2.1] Localization Configuration Cluster
+    101.2.1. [TC-LCFG-2.1] Localization Configuration Cluster
     Attributes[DUT-Server]
 
 config:

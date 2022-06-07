@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 88.1. [TC-GC-1.1] Global Attributes [DUT-Server]
+name: 90.1. [TC-CGEN-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
