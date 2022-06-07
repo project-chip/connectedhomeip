@@ -134,10 +134,14 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
 
     // Test that certificate NotBefore times that are before the Firmware build time
     // do not advance Last Known Good Time.
+    System::Clock::Seconds32 afterNotBeforeBuildTimes[] = { System::Clock::Seconds32(testCertNotBeforeTime.count() + 1),
+                                                            System::Clock::Seconds32(testCertNotBeforeTime.count() + 1000),
+                                                            System::Clock::Seconds32(testCertNotBeforeTime.count() + 1000000) };
+    for (auto buildTime : afterNotBeforeBuildTimes)
     {
+        // Set build time to the desired value.
+        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
         chip::TestPersistentStorageDelegate testStorage;
-        System::Clock::Seconds32 buildTime;
-        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().GetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
         {
             // Initialize a fabric table.
             FabricTable fabricTable;
@@ -147,10 +151,6 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
-
-            // This test was written after the test certs' NotBefore times.
-            // Verify the configuration manager reflects this.
-            NL_TEST_ASSERT(inSuite, buildTime > testCertNotBeforeTime);
 
             // Load a test fabric
             NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable) == CHIP_NO_ERROR);
@@ -192,14 +192,14 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    System::Clock::Seconds32 testCaseFirmwareBuildTimes[] = { testCertNotBeforeTime,
-                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1),
-                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000),
-                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000) };
+    System::Clock::Seconds32 beforeNotBeforeBuildTimes[] = { testCertNotBeforeTime,
+                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() - 1),
+                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000),
+                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000) };
     // Test that certificate NotBefore times that are at or after the Firmware
     // build time do result in Last Known Good Times set to these.  Then test
     // that we can do a fail-safe roll back.
-    for (auto buildTime : testCaseFirmwareBuildTimes)
+    for (auto buildTime : beforeNotBeforeBuildTimes)
     {
         // Set build time to the desired value.
         NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
@@ -247,7 +247,7 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     // build time do result in Last Known Good Times set to these.  Then test
     // that we can commit these to storage.  Attempted fail-safe roll back after
     // commit will be a no-op.
-    for (auto buildTime : testCaseFirmwareBuildTimes)
+    for (auto buildTime : beforeNotBeforeBuildTimes)
     {
         // Set build time to the desired value.
         NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
