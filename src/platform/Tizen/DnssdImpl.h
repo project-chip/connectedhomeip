@@ -108,13 +108,12 @@ struct ResolveContext : public GenericContext
     }
 };
 
-class DnssdContexts
+class DnssdTizen
 {
 public:
-    DnssdContexts(const DnssdContexts &) = delete;
-    DnssdContexts & operator=(const DnssdContexts &) = delete;
-    ~DnssdContexts();
-    static DnssdContexts & GetInstance() { return sInstance; }
+    DnssdTizen(const DnssdTizen &) = delete;
+    DnssdTizen & operator=(const DnssdTizen &) = delete;
+    ~DnssdTizen();
 
     CHIP_ERROR Add(RegisterContext * context, dnssd_service_h service, const char * type, const char * name, uint16_t port,
                    uint32_t interfaceId);
@@ -125,9 +124,11 @@ public:
     CHIP_ERROR Remove(ContextType type);
     RegisterContext * Get(const char * type, const char * name, uint16_t port, uint32_t interfaceId);
 
+    static DnssdTizen & GetInstance() { return sInstance; }
+
 private:
-    DnssdContexts(){};
-    static DnssdContexts sInstance;
+    DnssdTizen(){};
+    static DnssdTizen sInstance;
 
     void Delete(GenericContext * context);
     std::vector<GenericContext *> mContexts;

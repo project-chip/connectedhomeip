@@ -54,7 +54,7 @@ std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
 
 void RemoveContext(GenericContext * context)
 {
-    if (DnssdContexts::GetInstance().Remove(context) == CHIP_ERROR_KEY_NOT_FOUND)
+    if (DnssdTizen::GetInstance().Remove(context) == CHIP_ERROR_KEY_NOT_FOUND)
     {
         chip::Platform::Delete(context);
     }
@@ -156,7 +156,7 @@ CHIP_ERROR RegisterService(const char * type, const char * name, uint16_t port, 
         return CHIP_ERROR_INTERNAL;
     }
 
-    auto context = DnssdContexts::GetInstance().Get(type, name, port, interfaceId);
+    auto context = DnssdTizen::GetInstance().Get(type, name, port, interfaceId);
     if (context != nullptr)
     {
         return UpdateTXTRecord(context->service, textEntries, textEntrySize);
@@ -194,7 +194,7 @@ CHIP_ERROR RegisterService(const char * type, const char * name, uint16_t port, 
         VerifyOrReturnError(CheckForSuccess(context, ret, __func__), CHIP_ERROR_INTERNAL);
     }
 
-    DnssdContexts::GetInstance().Add(context, service, type, name, port, interfaceId);
+    DnssdTizen::GetInstance().Add(context, service, type, name, port, interfaceId);
     if (MainLoop::Instance().AsyncRequest(RegisterAsync, context) == false)
     {
         chip::Platform::Delete(context);
@@ -206,7 +206,7 @@ CHIP_ERROR RegisterService(const char * type, const char * name, uint16_t port, 
 
 CHIP_ERROR UnregisterAllServices()
 {
-    CHIP_ERROR err = DnssdContexts::GetInstance().Remove(ContextType::Register);
+    CHIP_ERROR err = DnssdTizen::GetInstance().Remove(ContextType::Register);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
         err = CHIP_NO_ERROR;
     return err;
@@ -249,7 +249,7 @@ void OnBrowseRemove(BrowseContext * context, dnssd_service_h service, const char
 
 void StopBrowse(BrowseContext * context)
 {
-    DnssdContexts::GetInstance().Remove(context);
+    DnssdTizen::GetInstance().Remove(context);
 }
 
 void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
@@ -336,7 +336,7 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
 
     VerifyOrReturnError(CheckForSuccess(bCtx, ret, __func__, true), false);
     bCtx->isBrowsing = true;
-    DnssdContexts::GetInstance().Add(bCtx, browser);
+    DnssdTizen::GetInstance().Add(bCtx, browser);
 
     return true;
 }
@@ -356,7 +356,7 @@ CHIP_ERROR Browse(uint32_t interfaceId, const char * type, DnssdServiceProtocol 
 
 void StopResolve(ResolveContext * context)
 {
-    DnssdContexts::GetInstance().Remove(context);
+    DnssdTizen::GetInstance().Remove(context);
 }
 
 void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
@@ -517,7 +517,7 @@ CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, D
 
     VerifyOrReturnError(CheckForSuccess(rCtx, ret, __func__, true), CHIP_ERROR_INTERNAL);
 
-    DnssdContexts::GetInstance().Add(rCtx, service);
+    DnssdTizen::GetInstance().Add(rCtx, service);
     if (MainLoop::Instance().AsyncRequest(ResolveAsync, rCtx) == false)
     {
         chip::Platform::Delete(rCtx);
@@ -532,9 +532,9 @@ CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, D
 namespace chip {
 namespace Dnssd {
 
-DnssdContexts DnssdContexts::sInstance;
+DnssdTizen DnssdTizen::sInstance;
 
-void DnssdContexts::Delete(GenericContext * context)
+void DnssdTizen::Delete(GenericContext * context)
 {
     switch (context->contextType)
     {
@@ -575,7 +575,7 @@ void DnssdContexts::Delete(GenericContext * context)
     chip::Platform::Delete(context);
 }
 
-DnssdContexts::~DnssdContexts()
+DnssdTizen::~DnssdTizen()
 {
     auto iter = mContexts.cbegin();
     while (iter != mContexts.cend())
@@ -585,8 +585,8 @@ DnssdContexts::~DnssdContexts()
     }
 }
 
-CHIP_ERROR DnssdContexts::Add(RegisterContext * context, dnssd_service_h service, const char * type, const char * name,
-                              uint16_t port, uint32_t interfaceId)
+CHIP_ERROR DnssdTizen::Add(RegisterContext * context, dnssd_service_h service, const char * type, const char * name, uint16_t port,
+                           uint32_t interfaceId)
 {
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(service != 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -602,7 +602,7 @@ CHIP_ERROR DnssdContexts::Add(RegisterContext * context, dnssd_service_h service
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DnssdContexts::Add(BrowseContext * context, dnssd_browser_h browser)
+CHIP_ERROR DnssdTizen::Add(BrowseContext * context, dnssd_browser_h browser)
 {
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(browser != 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -611,7 +611,7 @@ CHIP_ERROR DnssdContexts::Add(BrowseContext * context, dnssd_browser_h browser)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DnssdContexts::Add(ResolveContext * context, dnssd_service_h service)
+CHIP_ERROR DnssdTizen::Add(ResolveContext * context, dnssd_service_h service)
 {
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     context->service = service;
@@ -619,7 +619,7 @@ CHIP_ERROR DnssdContexts::Add(ResolveContext * context, dnssd_service_h service)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DnssdContexts::Remove(GenericContext * context)
+CHIP_ERROR DnssdTizen::Remove(GenericContext * context)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto iter = mContexts.cbegin();
@@ -636,7 +636,7 @@ CHIP_ERROR DnssdContexts::Remove(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR DnssdContexts::Remove(const char * type, const char * name, uint16_t port, uint32_t interfaceId)
+CHIP_ERROR DnssdTizen::Remove(const char * type, const char * name, uint16_t port, uint32_t interfaceId)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name %s, port: %u, interfaceId: %u", __func__, type, name, port, interfaceId);
     for (auto iter = mContexts.begin(); iter != mContexts.end(); ++iter)
@@ -656,7 +656,7 @@ CHIP_ERROR DnssdContexts::Remove(const char * type, const char * name, uint16_t 
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR DnssdContexts::Remove(ContextType type)
+CHIP_ERROR DnssdTizen::Remove(ContextType type)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     bool found = false;
@@ -678,7 +678,7 @@ CHIP_ERROR DnssdContexts::Remove(ContextType type)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-RegisterContext * DnssdContexts::Get(const char * type, const char * name, uint16_t port, uint32_t interfaceId)
+RegisterContext * DnssdTizen::Get(const char * type, const char * name, uint16_t port, uint32_t interfaceId)
 {
     for (auto iter = mContexts.begin(); iter != mContexts.end(); ++iter)
     {
