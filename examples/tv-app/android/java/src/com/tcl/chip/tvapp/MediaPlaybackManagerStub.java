@@ -131,14 +131,20 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
       case REQUEST_SKIP_FORWARD:
         Log.d(TAG, "request skip forward " + parameter + " milliseconds at " + endpoint);
         newPosition = playbackPosition + parameter;
-        playbackPosition = (newPosition > playbackDuration) ? playbackDuration : (newPosition >= 0 ? newPosition : 0);
+        playbackPosition =
+            (newPosition > playbackDuration)
+                ? playbackDuration
+                : (newPosition >= 0 ? newPosition : 0);
 
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SKIP_BACKWARD:
         Log.d(TAG, "request skip backward " + parameter + " milliseconds at " + endpoint);
         newPosition = playbackPosition - parameter;
-        playbackPosition = (newPosition > playbackDuration) ? playbackDuration : (newPosition >= 0 ? newPosition : 0);
+        playbackPosition =
+            (newPosition > playbackDuration)
+                ? playbackDuration
+                : (newPosition >= 0 ? newPosition : 0);
 
         return RESPONSE_STATUS_SUCCESS;
 
@@ -150,7 +156,6 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         } else {
           playbackPosition = parameter;
         }
-
 
         return RESPONSE_STATUS_SUCCESS;
     }
