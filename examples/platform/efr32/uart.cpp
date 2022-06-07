@@ -44,10 +44,21 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
+
+#ifdef EFR32MG24
+#define HELPER1(x) EUSART##x##_RX_IRQn
+#else
 #define HELPER1(x) USART##x##_RX_IRQn
+#endif 
+
 #define HELPER2(x) HELPER1(x)
 
+#ifdef EFR32MG24
+#define HELPER3(x) EUSART##x##_RX_IRQHandler
+#else
 #define HELPER3(x) USART##x##_RX_IRQHandler
+#endif
+
 #define HELPER4(x) HELPER3(x)
 
 // On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
