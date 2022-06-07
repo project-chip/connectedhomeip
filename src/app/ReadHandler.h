@@ -181,11 +181,11 @@ public:
     CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
-        mMaxIntervalCeilingSeconds = aMaxInterval;
-        VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mMaxIntervalCeilingSeconds <=
+        VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aMaxInterval <=
                                 std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxIntervalCeilingSeconds),
                             CHIP_ERROR_INVALID_ARGUMENT);
+        mMaxIntervalCeilingSeconds = aMaxInterval;
         return CHIP_NO_ERROR;
     }
 
