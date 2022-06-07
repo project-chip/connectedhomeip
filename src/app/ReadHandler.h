@@ -182,8 +182,7 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <=
-                                std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxIntervalCeilingSeconds),
+        VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxIntervalCeilingSeconds),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxIntervalCeilingSeconds = aMaxInterval;
         return CHIP_NO_ERROR;
