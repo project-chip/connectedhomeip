@@ -16,6 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+  <!-- This extends the ModeSelect cluster -->
   <clusterExtension code="0x0050">
     <!--
        Manufacturer specific extension attribute:
@@ -23,7 +24,7 @@ limitations under the License.
           - Suffix: 0x0001 - Non-global attribute id
      -->
     <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION" type="INT8U" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
-    <command source="client" code="0x0001" name="SampleMfgExtensionCommand" optional="true" manufacturerCode="0xFFF1">
+    <command source="client" code="0x01" name="SampleMfgExtensionCommand" optional="true" manufacturerCode="0xFFF1">
       <description>Sample manufacturer specific extension command</description>
     </command>
   </clusterExtension>
