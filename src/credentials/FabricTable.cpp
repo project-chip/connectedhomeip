@@ -51,14 +51,6 @@ static_assert(CHIP_CONFIG_MAX_FABRICS <= kMaxValidFabricIndex, "Max fabric count
 constexpr TLV::Tag kVendorIdTag    = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);
 
-// Tags for our operational keypair storage.
-constexpr TLV::Tag kOpKeyVersionTag = TLV::ContextTag(0);
-constexpr TLV::Tag kOpKeyDataTag    = TLV::ContextTag(1);
-
-// If this version grows beyond UINT16_MAX, adjust OpKeypairTLVMaxSize
-// accordingly.
-constexpr uint16_t kOpKeyVersion = 1;
-
 // Tags for our index list storage.
 constexpr TLV::Tag kNextAvailableFabricIndexTag = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricIndicesTag            = TLV::ContextTag(1);
