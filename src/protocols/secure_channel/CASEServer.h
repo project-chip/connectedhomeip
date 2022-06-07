@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -40,6 +41,7 @@ public:
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
                                              FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+                                             Credentials::CertificateValidityPolicy * policy,
                                              Credentials::GroupDataProvider * responderGroupDataProvider);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -58,8 +60,9 @@ public:
     virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
-    Messaging::ExchangeManager * mExchangeManager        = nullptr;
-    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * mExchangeManager                       = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
 
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;

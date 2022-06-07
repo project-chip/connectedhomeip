@@ -30,6 +30,7 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPTLV.h>
@@ -72,13 +73,14 @@ public:
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate,
+        Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -86,17 +88,19 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabric                        The fabric that should be used for connecting with the peer
+     * @param fabricTable                   The fabric table to be used for connecting with the peer
+     * @param fabricIndex                   The index of the fabric to be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
+    EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, FabricIndex fabricIndex, NodeId peerNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                     SessionEstablishmentDelegate * delegate,
+                     Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -157,7 +161,7 @@ public:
     //// SessionDelegate ////
     void OnSessionReleased() override;
 
-    FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -177,7 +181,8 @@ private:
         kFinishedViaResume = 7,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                    SessionEstablishmentDelegate * delegate);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();
@@ -241,10 +246,10 @@ private:
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    FabricTable * mFabricsTable    = nullptr;
-    const FabricInfo * mFabricInfo = nullptr;
-    NodeId mPeerNodeId             = kUndefinedNodeId;
-    NodeId mLocalNodeId            = kUndefinedNodeId;
+    FabricTable * mFabricsTable = nullptr;
+    FabricIndex mFabricIndex    = kUndefinedFabricIndex;
+    NodeId mPeerNodeId          = kUndefinedNodeId;
+    NodeId mLocalNodeId         = kUndefinedNodeId;
     CATValues mPeerCATs;
 
     SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session

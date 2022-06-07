@@ -32,6 +32,7 @@
 #include <stddef.h>
 
 #include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
@@ -273,7 +274,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     context.mTrustAnchor = nullptr;
 
-    return ValidateCert(cert, context, context.mValidateFlags, 0);
+    return ValidateCert(cert, context, 0);
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
@@ -281,7 +282,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 {
     context.mTrustAnchor = nullptr;
 
-    return FindValidCert(subjectDN, subjectKeyId, context, context.mValidateFlags, 0, certData);
+    return FindValidCert(subjectDN, subjectKeyId, context, 0, certData);
 }
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
@@ -304,8 +305,7 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth)
+CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context, uint8_t depth)
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     const ChipCertificateData * caCert = nullptr;
@@ -371,15 +371,85 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         }
     }
 
-    // Verify the validity time of the certificate, if requested.
-    if (cert->mNotBeforeTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
+    // Verify NotBefore and NotAfter validity of the certificates.
+    //
+    // See also ASN1ToChipEpochTime().
+    //
+    // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no
+    // well-defined expiration date'.  In CHIP TLV-encoded certificates, this
+    // special value is represented as a CHIP Epoch time value of 0 sec
+    // (2020-01-01 00:00:00 UTC).
+    //
+    // When evaluating NotBefore from a CHIP TLV-encoded certificate, this
+    // special value 0 does not require additional handling, as it is impossible
+    // for CHIP epoch time to represent any moment before the epoch, and so all
+    // representable times at or after this will be considered valid.  But for
+    // NotAfter, we special case this value as always passing (not expired).
+    CertificateValidityResult validityResult;
+    if (context.mEffectiveTime.Is<CurrentChipEpochTime>())
     {
-        // TODO - enable check for certificate validity dates
-        // VerifyOrExit(context.mEffectiveTime >= cert->mNotBeforeTime, err = CHIP_ERROR_CERT_NOT_VALID_YET);
+        if (context.mEffectiveTime.Get<CurrentChipEpochTime>().count() < cert->mNotBeforeTime)
+        {
+            validityResult = CertificateValidityResult::kNotYetValid;
+        }
+        else if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
+        {
+            validityResult = CertificateValidityResult::kExpired;
+        }
+        else
+        {
+            validityResult = CertificateValidityResult::kValid;
+        }
     }
-    if (cert->mNotAfterTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
+    else if (context.mEffectiveTime.Is<LastKnownGoodChipEpochTime>())
     {
-        VerifyOrExit(context.mEffectiveTime <= cert->mNotAfterTime, err = CHIP_ERROR_CERT_EXPIRED);
+        // Last Known Good Time may not be moved forward except at the time of
+        // commissioning or firmware update, so we can't use it to validate
+        // NotBefore.  However, so long as firmware build times are properly
+        // recorded and certificates loaded during commissioning are in fact
+        // valid at the time of commissioning, observing a NotAfter that falls
+        // before Last Known Good Time is a reliable indicator that the
+        // certificate in question is expired.  Check for this.
+        if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count() > cert->mNotAfterTime)
+        {
+            validityResult = CertificateValidityResult::kExpiredAtLastKnownGoodTime;
+        }
+        else
+        {
+            validityResult = CertificateValidityResult::kNotExpiredAtLastKnownGoodTime;
+        }
+    }
+    else
+    {
+        validityResult = CertificateValidityResult::kTimeUnknown;
+    }
+
+    if (context.mValidityPolicy != nullptr)
+    {
+        SuccessOrExit(err = context.mValidityPolicy->ApplyCertificateValidityPolicy(cert, depth, validityResult));
+    }
+    else
+    {
+        switch (validityResult)
+        {
+        case CertificateValidityResult::kValid:
+        case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+        // By default, we do not enforce certificate validity based upon a Last
+        // Known Good Time source.  However, implementations may always inject a
+        // policy that does enforce based upon this.
+        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
+        case CertificateValidityResult::kTimeUnknown:
+            break;
+        case CertificateValidityResult::kNotYetValid:
+            ExitNow(err = CHIP_ERROR_CERT_NOT_VALID_YET);
+            break;
+        case CertificateValidityResult::kExpired:
+            ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
+            break;
+        default:
+            ExitNow(err = CHIP_ERROR_INTERNAL);
+            break;
+        }
     }
 
     // If the certificate itself is trusted, then it is implicitly valid.  Record this certificate as the trust
@@ -411,7 +481,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
-    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, static_cast<uint8_t>(depth + 1), &caCert);
+    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
@@ -427,8 +497,7 @@ exit:
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
-                                             ValidationContext & context, BitFlags<CertValidateFlags> validateFlags, uint8_t depth,
-                                             const ChipCertificateData ** certData)
+                                             ValidationContext & context, uint8_t depth, const ChipCertificateData ** certData)
 {
     CHIP_ERROR err;
 
@@ -461,7 +530,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
         // Attempt to validate the cert.  If the cert is valid, return it to the caller. Otherwise,
         // save the returned error and continue searching.  If there are no other matching certs this
         // will be the error returned to the caller.
-        err = ValidateCert(candidateCert, context, validateFlags, depth);
+        err = ValidateCert(candidateCert, context, depth);
         if (err == CHIP_NO_ERROR)
         {
             *certData = candidateCert;
@@ -513,11 +582,11 @@ bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
 
 void ValidationContext::Reset()
 {
-    mEffectiveTime = 0;
-    mTrustAnchor   = nullptr;
+    mEffectiveTime  = EffectiveTime{};
+    mTrustAnchor    = nullptr;
+    mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
-    mValidateFlags.ClearAll();
     mRequiredCertType = kCertType_NotSpecified;
 }
 
@@ -1013,7 +1082,7 @@ DLL_EXPORT CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // In CHIP certificate it is represented as a CHIP Epoch UTC time value of 0 sec (2000-01-01 00:00:00 UTC).
+    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 sec (2000-01-01 00:00:00 UTC).
     if ((asn1Time.Year == kX509NoWellDefinedExpirationDateYear) && (asn1Time.Month == kMonthsPerYear) &&
         (asn1Time.Day == kMaxDaysPerMonth) && (asn1Time.Hour == kHoursPerDay - 1) && (asn1Time.Minute == kMinutesPerHour - 1) &&
         (asn1Time.Second == kSecondsPerMinute - 1))
@@ -1272,6 +1341,20 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
     publicKey = certData.mPublicKey;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    notBeforeChipEpochTime = chip::System::Clock::Seconds32(certData.mNotBeforeTime);
 
     return CHIP_NO_ERROR;
 }

@@ -41,6 +41,16 @@ private:
     CHIP_ERROR GetProductId(uint16_t & productId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
+    {
+        buildTime = mFirmwareBuildChipEpochTime;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override
+    {
+        mFirmwareBuildChipEpochTime = buildTime;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -98,7 +108,8 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+private:
+    System::Clock::Seconds32 mFirmwareBuildChipEpochTime = System::Clock::Seconds32(0);
 };
 
 } // namespace DeviceLayer

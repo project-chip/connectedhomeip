@@ -316,7 +316,17 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // command.
     if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked)
     {
-        DeleteFabricFromTable(fabricIndex);
+        CHIP_ERROR err;
+        err = DeleteFabricFromTable(fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+        }
+        err = Server::GetInstance().GetFabricTable().RevertLastKnownGoodChipEpochTime();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: failed to revert Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
@@ -325,6 +335,22 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     if (event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
     {
         // TODO: Revert the state of operational key pair, NOC and ICAC
+        CHIP_ERROR err = Server::GetInstance().GetFabricTable().RevertLastKnownGoodChipEpochTime();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: failed to revert Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void CommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
+{
+    ChipLogProgress(Zcl, "OpCreds: Commissioning Complete");
+
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().CommitLastKnownGoodChipEpochTime();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OpCreds: failed to commit Last Known Good Time: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -333,6 +359,10 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         FailSafeCleanup(event);
+    }
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        CommissioningComplete(event);
     }
 }
 
@@ -840,10 +870,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
     }
 
-    err = fabric->SetFabricInfo(gFabricBeingCommissioned);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
+    err = Server::GetInstance().GetFabricTable().UpdateFabric(fabricIndex, gFabricBeingCommissioned);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // Flag on the fail-safe context that the UpdateNOC command was invoked.

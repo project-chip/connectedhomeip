@@ -47,12 +47,13 @@ namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager                     = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage = nullptr;
-    Messaging::ExchangeManager * exchangeMgr            = nullptr;
-    FabricTable * fabricTable                           = nullptr;
-    CASEClientPoolDelegate * clientPool                 = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
+    SessionManager * sessionManager                                    = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
+    FabricTable * fabricTable                                          = nullptr;
+    CASEClientPoolDelegate * clientPool                                = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
@@ -105,8 +106,16 @@ public:
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mPeerId      = peerId;
-        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
-        mState       = State::NeedsAddress;
+        mFabricTable = params.fabricTable;
+        if (mFabricTable != nullptr)
+        {
+            auto fabricInfo = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
+            if (fabricInfo != nullptr)
+            {
+                mFabricIndex = fabricInfo->GetFabricIndex();
+            }
+        }
+        mState = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
 
@@ -192,14 +201,7 @@ public:
     /**
      * @brief Get the raw Fabric ID assigned to the device.
      */
-    FabricIndex GetFabricIndex() const
-    {
-        if (mFabricInfo != nullptr)
-        {
-            return mFabricInfo->GetFabricIndex();
-        }
-        return kUndefinedFabricIndex;
-    }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address for this operational device.
@@ -222,7 +224,8 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
-    FabricInfo * mFabricInfo;
+    FabricTable * mFabricTable = nullptr;
+    FabricIndex mFabricIndex   = kUndefinedFabricIndex;
     System::Layer * mSystemLayer;
 
     // mCASEClient is only non-null if we are in State::Connecting or just
