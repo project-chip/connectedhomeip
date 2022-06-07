@@ -24,7 +24,7 @@ limitations under the License.
           - Suffix: 0x0001 - Non-global attribute id
      -->
     <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION" type="INT8U" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
-    <command source="client" code="0x01" name="SampleMfgExtensionCommand" optional="true" manufacturerCode="0xFFF1">
+    <command source="client" code="0xFFF10001" name="SampleMfgExtensionCommand" optional="true">
       <description>Sample manufacturer specific extension command</description>
     </command>
   </clusterExtension>
