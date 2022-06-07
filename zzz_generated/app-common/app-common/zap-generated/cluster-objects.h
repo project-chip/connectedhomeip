@@ -15695,6 +15695,11 @@ struct Type;
 struct DecodableType;
 } // namespace ChangeToMode
 
+namespace SampleMfgExtensionCommand {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgExtensionCommand
+
 } // namespace Commands
 
 namespace Commands {
@@ -15730,6 +15735,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToMode
+namespace SampleMfgExtensionCommand {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgExtensionCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgExtensionCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgExtensionCommand
 } // namespace Commands
 
 namespace Attributes {
@@ -15839,6 +15872,18 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
 };
 } // namespace ClusterRevision
+namespace ManufacturerExtension {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturerExtension::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ManufacturerExtension
 
 struct TypeInfo
 {
@@ -15857,8 +15902,9 @@ struct TypeInfo
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap                       = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision             = static_cast<uint16_t>(0);
+        Attributes::ManufacturerExtension::TypeInfo::DecodableType manufacturerExtension = static_cast<uint8_t>(0);
     };
 };
 } // namespace Attributes

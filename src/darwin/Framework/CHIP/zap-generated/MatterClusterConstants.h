@@ -848,6 +848,7 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterModeSelectAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
     kMatterClusterModeSelectAttributeFeatureMapID = kMatterClusterGlobalAttributeFeatureMapID,
     kMatterClusterModeSelectAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
+    kMatterClusterModeSelectAttributeManufacturerExtensionID = 0xFFF10001,
 
     // Cluster ShadeConfiguration attributes
     kMatterClusterShadeConfigurationAttributePhysicalClosedLimitID = 0x00000000,
@@ -2270,6 +2271,7 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
 
     // Cluster ModeSelect commands
     kMatterClusterModeSelectCommandChangeToModeID = 0x00000000,
+    kMatterClusterModeSelectCommandSampleMfgExtensionCommandID = 0x00 - EFFFF,
 
     // Cluster DoorLock commands
     kMatterClusterDoorLockCommandLockDoorID = 0x00000000,

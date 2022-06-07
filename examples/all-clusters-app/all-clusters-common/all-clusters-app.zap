@@ -12459,6 +12459,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "SampleMfgExtensionCommand",
+              "code": 4293984257,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
             }
           ],
           "attributes": [

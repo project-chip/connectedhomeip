@@ -230,6 +230,7 @@
 
 // Commands for cluster: Mode Select
 #define ZCL_CHANGE_TO_MODE_COMMAND_ID (0x00)
+#define ZCL_SAMPLE_MFG_EXTENSION_COMMAND_COMMAND_ID (0x01)
 
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)

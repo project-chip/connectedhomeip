@@ -673,6 +673,7 @@
 #define ZCL_CURRENT_MODE_ATTRIBUTE_ID (0x0003)
 #define ZCL_START_UP_MODE_ATTRIBUTE_ID (0x0004)
 #define ZCL_ON_MODE_ATTRIBUTE_ID (0x0005)
+#define ZCL_MEI_EXTENSION_ATTRIBUTE_ID (0xFFF10001)
 
 // Attribute ids for cluster: Shade Configuration
 
