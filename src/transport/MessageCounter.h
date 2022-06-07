@@ -29,8 +29,7 @@
 namespace chip {
 
 /**
- * MessageCounter represents a local message counter. There are 3 types
- * of message counter
+ * MessageCounter represents a local message counter. There are 2 types of message counter
  *
  * 1. Global unencrypted message counter
  * 2. Secure session message counter
