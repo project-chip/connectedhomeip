@@ -82,14 +82,14 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         Log.d(TAG, "request pause at " + endpoint);
         playbackState = PLAYBACK_STATE_PAUSED;
         playbackSpeed = 0;
-        
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_STOP:
         Log.d(TAG, "request stop at " + endpoint);
         playbackState = PLAYBACK_STATE_NOT_PLAYING;
         playbackSpeed = 0;
-        
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_START_OVER:
@@ -150,7 +150,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         } else {
           playbackPosition = parameter;
         }
-    
+
 
         return RESPONSE_STATUS_SUCCESS;
     }
