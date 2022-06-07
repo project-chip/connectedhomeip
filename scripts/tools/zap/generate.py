@@ -57,6 +57,7 @@ def getDirPath(name):
     checkDirExists(fullpath)
     return fullpath
 
+
 def detectZclFile(zapFile):
     # FIXME: implement
     print(f"Searching for zcl file from {zapFile}")
@@ -76,6 +77,7 @@ def detectZclFile(zapFile):
 
     return getFilePath(path)
 
+
 def runArgumentsParser():
     default_templates = 'src/app/zap-templates/app-templates.json'
     default_output_dir = 'zap-generated/'
@@ -90,7 +92,6 @@ def runArgumentsParser():
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: automatically selected)')
     args = parser.parse_args()
-
 
     # By default, this script assumes that the global CHIP template is used with
     # a default 'zap-generated/' output folder relative to APP_ROOT_DIR.
