@@ -147,7 +147,7 @@ public:
     {
         std::set<std::string> keys;
 
-        for(auto it = mStorage.begin(); it != mStorage.end(); ++it)
+        for (auto it = mStorage.begin(); it != mStorage.end(); ++it)
         {
             keys.insert(it->first);
         }
@@ -161,10 +161,7 @@ public:
      * @param key - key to find (case-sensitive)
      * @return true if key is present in storage, false otherwise
      */
-    virtual bool HasKey(const std::string & key)
-    {
-        return (mStorage.find(key) != mStorage.end());
-    }
+    virtual bool HasKey(const std::string & key) { return (mStorage.find(key) != mStorage.end()); }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;

@@ -31,8 +31,8 @@ using namespace chip;
 
 namespace {
 
-template<class T, size_t N>
-bool SetMatches(const std::set<T> & set, const std::array<T,N> expectedContents)
+template <class T, size_t N>
+bool SetMatches(const std::set<T> & set, const std::array<T, N> expectedContents)
 {
     if (set.size() != N)
     {
@@ -102,7 +102,7 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 2);
     auto keys = storage.GetKeys();
-    std::array<std::string, 2> kExpectedKeys{"key2", "key3"};
+    std::array<std::string, 2> kExpectedKeys{ "key2", "key3" };
     NL_TEST_ASSERT(inSuite, SetMatches(keys, kExpectedKeys) == true);
 
     // Read them back

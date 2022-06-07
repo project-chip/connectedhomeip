@@ -788,7 +788,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
     CHIP_ERROR err           = FabricInfo::DeleteFromStorage(mStorage, fabricIndex); // Delete from storage regardless
 
-    CHIP_ERROR opKeyErr      = CHIP_NO_ERROR;
+    CHIP_ERROR opKeyErr = CHIP_NO_ERROR;
     if (mOperationalKeystore != nullptr)
     {
         opKeyErr = mOperationalKeystore->RemoveOpKeypairForFabric(fabricIndex);
