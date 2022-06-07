@@ -98,11 +98,10 @@ void CommissioningWindowManager::ResetState()
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    if (failSafeContext.IsFailSafeArmed())
-    {
-        failSafeContext.ForceFailSafeTimerExpiry();
-    }
+
+    // We don't expire the safe, we let it keep going until it reaches its normal
+    // expiry because the commissioning window is merely for announcement, and allowing
+    // PASE, but if a PASE session is ongoing, we let it be.
 
     ResetState();
 }

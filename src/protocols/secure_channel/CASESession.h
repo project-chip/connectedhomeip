@@ -33,6 +33,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -86,15 +87,15 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabric                        The fabric that should be used for connecting with the peer
-     * @param peerNodeId                    Node id of the peer node
+     * @param fabricTable                   The fabric table that contains a fabric in common with the peer
+     * @param peerScopedNodeId              Node to which we want to establish a session
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
+    EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                      SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
@@ -157,7 +158,7 @@ public:
     //// SessionDelegate ////
     void OnSessionReleased() override;
 
-    FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -242,9 +243,9 @@ private:
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     FabricTable * mFabricsTable    = nullptr;
-    const FabricInfo * mFabricInfo = nullptr;
     NodeId mPeerNodeId             = kUndefinedNodeId;
     NodeId mLocalNodeId            = kUndefinedNodeId;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
     CATValues mPeerCATs;
 
     SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session

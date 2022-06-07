@@ -105,7 +105,15 @@ public:
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mPeerId      = peerId;
-        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
+
+        const auto * fabricInfo = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
+        if (fabricInfo == nullptr)
+        {
+            mState = State::Uninitialized;
+            return;
+        }
+
+        mFabricIndex  = fabricInfo->GetFabricIndex();
         mState       = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
@@ -190,15 +198,11 @@ public:
     }
 
     /**
-     * @brief Get the raw Fabric ID assigned to the device.
+     * @brief Get the fabricIndex
      */
     FabricIndex GetFabricIndex() const
     {
-        if (mFabricInfo != nullptr)
-        {
-            return mFabricInfo->GetFabricIndex();
-        }
-        return kUndefinedFabricIndex;
+        return mFabricIndex;
     }
 
     /**
@@ -222,7 +226,7 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
-    FabricInfo * mFabricInfo;
+    FabricIndex mFabricIndex;
     System::Layer * mSystemLayer;
 
     // mCASEClient is only non-null if we are in State::Connecting or just

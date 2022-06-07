@@ -26,6 +26,7 @@
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -103,8 +104,6 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey() const { return mOperationalKey; }
-
     /**
      * Sets the P256Keypair used for this fabric.  This will make a copy of the keypair
      * via the P256Keypair::Serialize and P256Keypair::Deserialize methods.
@@ -140,6 +139,8 @@ public:
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
+
+    bool HasOperationalKey() const { return mOperationalKey != nullptr; }
 
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
@@ -183,6 +184,10 @@ public:
                                         Credentials::ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
                                         Crypto::P256PublicKey & nocPubkey);
 
+    // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks)
+    static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac, FabricId existingFabricId,
+                                               PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey);
+
     /**
      *  Reset the state to a completely uninitialized status.
      */
@@ -202,19 +207,30 @@ public:
         mFabricIndex = kUndefinedFabricIndex;
     }
 
-    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
+    CHIP_ERROR SetFabricInfo(FabricInfo & newFabric);
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
        output parameter */
     static CHIP_ERROR GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId);
 
-    friend class FabricTable;
-
     // Test-only, build a fabric using given root cert and NOC
     CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey);
 
-private:
+    friend class FabricTable;
+
+protected:
+    /**
+     * @brief Sign a message with the fabric's operational private key. This ONLY
+     *        works if `SetOperationalKeypair` or `SetExternallyOwnedOperationalKeypair`
+     *        had been called and is an API that is present ONLY to be called by FabricTable.
+     *
+     * @param message - message to sign
+     * @param outSignature - buffer to hold the signature
+     * @return CHIP_NO_ERROR on success or another CHIP_ERROR on crypto internal errors
+     */
+    CHIP_ERROR SignWithOpKeypair(ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
+
     static constexpr size_t MetadataTLVMaxSize()
     {
         return TLV::EstimateStructOverhead(sizeof(VendorId), kFabricLabelMaxLengthInBytes);
@@ -385,9 +401,12 @@ public:
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
+    const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR Init(PersistentStorageDelegate * storage, Crypto::OperationalKeystore * operationalKeystore);
+
     CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
     void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
@@ -397,6 +416,23 @@ public:
     ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
+
+    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
+
+    CHIP_ERROR AllocatePendingOperationalKey(Optional<FabricIndex> fabricIndex, MutableByteSpan & outputCsr);
+    CHIP_ERROR ActivatePendingOperationalKey(const Crypto::P256PublicKey & nocSubjectPublicKey);
+    bool HasPendingOperationalKey() const;
+
+    // Currently only operational key is managed by this API.
+    /**
+     * @brief
+     *
+     * If nothing is pending to commit, returns CHIP_NO_ERROR right away.
+     *
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR CommitPendingFabricData();
+    void RevertPendingFabricData();
 
 private:
     static constexpr size_t IndexInfoTLVMaxSize()
@@ -418,6 +454,12 @@ private:
     void UpdateNextAvailableFabricIndex();
 
     /**
+     * Ensure that next available fabric index has been updated. This covers
+     * some FabricIndex allocation corner cases.
+     */
+    void EnsureNextAvailableFabricIndexUpdated();
+
+    /**
      * Store our current fabric index state: what our next available index is
      * and what indices we're using right now.
      */
@@ -433,6 +475,7 @@ private:
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore = nullptr;
 
     // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form
     // of intrusive linked-list item.
@@ -442,6 +485,14 @@ private:
     // it can go and is full.
     Optional<FabricIndex> mNextAvailableFabricIndex;
     uint8_t mFabricCount = 0;
+
+    // If true, we are in the process of a fail-safe and there was at least one
+    // operation that cause partial data in the fabric table.
+    bool mIsPendingFabricDataPresent = false;
+
+    // When mIsPendingFabricDataPresent is true, this holds the index of the fabric
+    // for which is there is currently pending data.
+    FabricIndex mFabricIndexWithPendingState = kUndefinedFabricIndex;
 };
 
 } // namespace chip
