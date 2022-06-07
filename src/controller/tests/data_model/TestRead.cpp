@@ -219,6 +219,7 @@ public:
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_SubscriptionLargeAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
@@ -228,8 +229,9 @@ public:
     static void TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static constexpr uint16_t kTestMinInterval = 33;
     static constexpr uint16_t kTestMaxInterval = 66;
+
+    static uint16_t mMaxInterval;
 
     CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
     {
@@ -237,7 +239,7 @@ private:
 
         if (mAlterSubscriptionIntervals)
         {
-            ReturnErrorOnFailure(aReadHandler.SetReportingIntervals(kTestMinInterval, kTestMaxInterval));
+            ReturnErrorOnFailure(aReadHandler.SetReportingIntervals(mMaxInterval));
         }
         return CHIP_NO_ERROR;
     }
@@ -258,6 +260,8 @@ private:
     int32_t mNumActiveSubscriptions  = 0;
     bool mAlterSubscriptionIntervals = false;
 };
+
+uint16_t TestReadInteraction::mMaxInterval = 66;
 
 TestReadInteraction gTestReadInteraction;
 
@@ -1644,7 +1648,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
 
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(apSuite, minInterval == kTestMinInterval);
+        NL_TEST_ASSERT(apSuite, minInterval == 0);
         NL_TEST_ASSERT(apSuite, maxInterval == kTestMaxInterval);
 
         numSubscriptionEstablishedCalls++;
@@ -1673,6 +1677,76 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
     // implementation.
     //
     NL_TEST_ASSERT(apSuite, numSuccessCalls != 0);
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
+    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    gTestReadInteraction.mAlterSubscriptionIntervals = false;
+}
+
+void TestReadInteraction::TestReadHandler_SubscriptionLargeAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                       = ctx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+    uint16_t largeMaxInterval                = 6000;
+    responseDirective                        = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite,
+                                        largeMaxInterval](const app::ReadClient & readClient) {
+        uint16_t minInterval = 0, maxInterval = 0;
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, minInterval == 0);
+        NL_TEST_ASSERT(apSuite, maxInterval == largeMaxInterval);
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    gTestReadInteraction.mAlterSubscriptionIntervals = true;
+    gTestReadInteraction.mMaxInterval                = largeMaxInterval;
+
+    NL_TEST_ASSERT(apSuite,
+                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == 1);
     NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 1);
@@ -2617,6 +2691,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
+    NL_TEST_DEF("TestReadHandler_SubscriptionLargeAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionLargeAlteredReportingIntervals),
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),

@@ -45,6 +45,8 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
+constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
+
 namespace chip {
 namespace app {
 
@@ -172,15 +174,18 @@ public:
 
     /*
      * Set the reporting intervals for the subscription. This SHALL only be called
-     * from the OnSubscriptionRequested callback above.
+     * from the OnSubscriptionRequested callback above. The restriction is as below
+     * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
+     * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
      */
-    CHIP_ERROR SetReportingIntervals(uint16_t aMinInterval, uint16_t aMaxInterval)
+    CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(aMinInterval <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-
-        mMinIntervalFloorSeconds   = aMinInterval;
         mMaxIntervalCeilingSeconds = aMaxInterval;
+        VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mMaxIntervalCeilingSeconds <=
+                                std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxIntervalCeilingSeconds),
+                            CHIP_ERROR_INVALID_ARGUMENT);
         return CHIP_NO_ERROR;
     }
 
