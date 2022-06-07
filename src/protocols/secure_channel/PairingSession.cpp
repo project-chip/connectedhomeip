@@ -27,7 +27,7 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 {
     auto handle = sessionManager.AllocateSession(GetSecureSessionType());
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(mSecureSessionHolder.GrabPairing(handle.Value()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSecureSessionHolder.GrabPairingSession(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
     return CHIP_NO_ERROR;
 }
