@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "software-diagnostics-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -130,30 +131,44 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
     return err;
 }
 
-class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDelegate
+} // anonymous namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+SoftwareDiagnosticsServer SoftwareDiagnosticsServer::instance;
+
+/**********************************************************
+ * SoftwareDiagnosticsServer Implementation
+ *********************************************************/
+
+SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
 {
-    // Gets called when a software fault that has taken place on the Node.
-    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault) override
+    return instance;
+}
+
+// Gets called when a software fault that has taken place on the Node.
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+{
+    ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+
+    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
     {
-        ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+        // If Software Diagnostics cluster is implemented on this endpoint
+        EventNumber eventNumber;
+        Events::SoftwareFault::Type event{ softwareFault };
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
         {
-            // If Software Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-            Events::SoftwareFault::Type event{ softwareFault };
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-            {
-                ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
-            }
+            ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
         }
     }
-};
+}
 
-SoftwareDiagnosticsDelegate gDiagnosticDelegate;
-
-} // anonymous namespace
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
                                                               const app::ConcreteCommandPath & commandPath,
@@ -176,5 +191,4 @@ bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandle
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
-    GetDiagnosticDataProvider().SetSoftwareDiagnosticsDelegate(&gDiagnosticDelegate);
 }
