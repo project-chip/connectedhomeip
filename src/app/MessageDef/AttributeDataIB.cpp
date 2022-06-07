@@ -93,7 +93,7 @@ AttributeDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
     }
 
     case TLV::kTLVType_UTF8String: {
-        char value_s[256];
+        char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
         err = aReader.GetString(value_s, sizeof(value_s));
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
@@ -111,7 +111,7 @@ AttributeDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
     }
 
     case TLV::kTLVType_ByteString: {
-        uint8_t value_b[256];
+        uint8_t value_b[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         uint32_t len, readerLen;
 
         readerLen = aReader.GetLength();

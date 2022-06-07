@@ -69,6 +69,7 @@ public:
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
+        AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
     }
@@ -162,5 +163,6 @@ private:
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::Optional<char *> mTraceFile;
     chip::Optional<bool> mTraceLog;
+    chip::Optional<bool> mTraceDecode;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 };

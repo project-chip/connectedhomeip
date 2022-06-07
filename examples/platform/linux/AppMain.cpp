@@ -63,6 +63,7 @@
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -99,10 +100,6 @@ namespace {
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-chip::trace::TraceStream * gTraceStream = nullptr;
-#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -171,11 +168,6 @@ void SetupSignalHandlers()
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    if (gTraceStream != nullptr)
-    {
-        delete gTraceStream;
-        gTraceStream = nullptr;
-    }
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -277,17 +269,25 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
     {
         const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
-        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
+        auto traceStream           = new chip::trace::TraceStreamFile(traceFilename);
+        chip::trace::AddTraceStream(traceStream);
     }
     else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
     {
-        gTraceStream = new chip::trace::TraceStreamLog();
+        auto traceStream = new chip::trace::TraceStreamLog();
+        chip::trace::AddTraceStream(traceStream);
+    }
+
+    if (LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled)
+    {
+        chip::trace::TraceDecoderOptions options;
+        options.mEnableProtocolInteractionModelResponse = false;
+
+        chip::trace::TraceDecoder * decoder = new chip::trace::TraceDecoder();
+        decoder->SetOptions(options);
+        chip::trace::AddTraceStream(decoder);
     }
     chip::trace::InitTrace();
-    if (gTraceStream != nullptr)
-    {
-        chip::trace::SetTraceStream(gTraceStream);
-    }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CONFIG_NETWORK_LAYER_BLE
