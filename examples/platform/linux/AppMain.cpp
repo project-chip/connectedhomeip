@@ -286,7 +286,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     chip::trace::InitTrace();
     if (gTraceStream != nullptr)
     {
-        chip::trace::SetTraceStream(gTraceStream);
+        chip::trace::AddTraceStream(gTraceStream);
     }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 

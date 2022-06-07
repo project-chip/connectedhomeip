@@ -90,7 +90,7 @@ private:
     std::ofstream mFile;
 };
 
-void SetTraceStream(TraceStream * stream);
+void AddTraceStream(TraceStream * stream);
 void InitTrace();
 void DeInitTrace();
 
