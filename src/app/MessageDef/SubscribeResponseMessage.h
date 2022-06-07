@@ -32,7 +32,7 @@ namespace SubscribeResponseMessage {
 enum class Tag : uint8_t
 {
     kSubscriptionId            = 0,
-    kMaxIntervalCeilingSeconds = 2,
+    kMaxInterval = 2,
 };
 
 class Parser : public MessageParser
@@ -67,7 +67,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
+    CHIP_ERROR GetMaxInterval(uint16_t * const apMaxInterval) const;
 };
 
 class Builder : public MessageBuilder
@@ -81,7 +81,7 @@ public:
     /**
      *  @brief Final Max Interval for the subscription back to the clients.
      */
-    SubscribeResponseMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds);
+    SubscribeResponseMessage::Builder & MaxInterval(const uint16_t aMaxInterval);
 
     /**
      *  @brief Mark the end of this SubscribeResponseMessage

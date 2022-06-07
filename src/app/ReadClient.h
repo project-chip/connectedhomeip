@@ -290,7 +290,7 @@ public:
         VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
-        aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
+        aMaxIntervalCeilingSeconds = mMaxInterval;
 
         return CHIP_NO_ERROR;
     }
@@ -418,7 +418,7 @@ private:
     bool mIsPrimingReports              = true;
     bool mPendingMoreChunks             = false;
     uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
+    uint16_t mMaxInterval = 0;
     SubscriptionId mSubscriptionId      = 0;
     NodeId mPeerNodeId                  = kUndefinedNodeId;
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;

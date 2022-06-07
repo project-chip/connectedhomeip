@@ -95,7 +95,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mIsPrimingReports          = true;
     mPendingMoreChunks         = false;
     mMinIntervalFloorSeconds   = 0;
-    mMaxIntervalCeilingSeconds = 0;
+    mMaxInterval = 0;
     mSubscriptionId            = 0;
     MoveToState(ClientState::Idle);
 }
@@ -755,7 +755,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     VerifyOrReturnError(mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     System::Clock::Timeout timeout =
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
+        System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(DataManagement,
                     "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
@@ -819,12 +819,12 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     SubscriptionId subscriptionId = 0;
     ReturnErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
     VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
+    ReturnErrorOnFailure(subscribeResponse.GetMaxInterval(&mMaxInterval));
 
     ChipLogProgress(DataManagement,
                     "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mFabricIndex,
                     ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());

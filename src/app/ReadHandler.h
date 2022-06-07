@@ -45,6 +45,7 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
+//https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
 constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
 
 namespace chip {
@@ -169,7 +170,7 @@ public:
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
-        aMaxInterval = mMaxIntervalCeilingSeconds;
+        aMaxInterval = mMaxInterval;
     }
 
     /*
@@ -181,11 +182,11 @@ public:
     CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
-        mMaxIntervalCeilingSeconds = aMaxInterval;
-        VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mMaxIntervalCeilingSeconds <=
-                                std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxIntervalCeilingSeconds),
+        VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aMaxInterval <=
+                                std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
+        mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
     }
 
@@ -435,7 +436,7 @@ private:
 
     SubscriptionId mSubscriptionId      = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
+    uint16_t mMaxInterval = 0;
 
     EventNumber mEventMin = 0;
 
