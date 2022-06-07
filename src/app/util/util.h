@@ -74,8 +74,8 @@
 // Cluster name structure
 typedef struct
 {
-    uint16_t id;
-    uint16_t mfgCode;
+    uint32_t id;
+    uint32_t mfgCode;
     const char * name;
 } EmberAfClusterName;
 
