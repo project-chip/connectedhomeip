@@ -249,6 +249,7 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, overrideValue == chipEpochTime);
 
     // Verify that the BuildTime.h parser can parse current CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE / TIME.
+    do
     {
         const char * date      = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
         const char * timeOfDay = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
@@ -256,6 +257,10 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         // Check that strings look good.
         NL_TEST_ASSERT(inSuite, !BUILD_DATE_IS_BAD(date));
         NL_TEST_ASSERT(inSuite, !BUILD_TIME_IS_BAD(timeOfDay));
+        if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
+        {
+            break;
+        }
 
         // Parse.
         uint16_t year  = COMPUTE_BUILD_YEAR(date);
@@ -266,7 +271,7 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         uint8_t second = COMPUTE_BUILD_SEC(timeOfDay);
 
         // Print the date to a string as would be given by the __DATE__ macro.
-        char parsedDate[14]; // strlen("Jan 000 00000") == 13
+        char parsedDate[14] = { 0 }; // strlen("Jan 000 00000") == 13
         {
             int printed;
             printed = SnprintfBuildDate(parsedDate, sizeof(parsedDate), year, month, day);
@@ -274,7 +279,7 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         }
 
         // Print the time of day to a straing as would be given by the __TIME__ macro.
-        char parsedTimeOfDay[12]; // strlen("000:000:000") == 11
+        char parsedTimeOfDay[12] = { 0 }; // strlen("000:000:000") == 11
         {
             int printed;
             printed = SnprintfBuildTimeOfDay(parsedTimeOfDay, sizeof(parsedTimeOfDay), hour, minute, second);
@@ -284,14 +289,14 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         // Verify match.
         NL_TEST_ASSERT(inSuite, strcmp(date, parsedDate) == 0);
         NL_TEST_ASSERT(inSuite, strcmp(timeOfDay, parsedTimeOfDay) == 0);
-    }
+    } while (0);
 
     // Generate random chip epoch times and verify that our BuildTime.h parser
     // macros also work for these.
     for (int i = 0; i < 10000; ++i)
     {
-        char date[14];      // strlen("Jan 000 00000") == 13
-        char timeOfDay[12]; // strlen("000:000:000") == 11
+        char date[14]      = { 0 }; // strlen("Jan 000 00000") == 13
+        char timeOfDay[12] = { 0 }; // strlen("000:000:000") == 11
 
         chipEpochTime = System::Clock::Seconds32(rand());
 
@@ -311,6 +316,14 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
             int printed;
             printed = SnprintfBuildTimeOfDay(timeOfDay, sizeof(timeOfDay), chipEpochTime);
             NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(timeOfDay)));
+        }
+
+        // Check that strings look good.
+        NL_TEST_ASSERT(inSuite, !BUILD_DATE_IS_BAD(date));
+        NL_TEST_ASSERT(inSuite, !BUILD_TIME_IS_BAD(timeOfDay));
+        if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
+        {
+            continue;
         }
 
         // Convert from chip epoch seconds to calendar time.
