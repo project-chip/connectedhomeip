@@ -24,11 +24,9 @@ pw_python_package("chef") {
   sources = [
     "__init__.py",
     "chef.py",
-    "stateful_shell.py",
     "constants.py",
+    "stateful_shell.py",
   ]
 
-  tests = [
-    "test_stateful_shell.py",
-  ]
+  tests = [ "test_stateful_shell.py" ]
 }
