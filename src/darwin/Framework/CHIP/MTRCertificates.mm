@@ -18,24 +18,15 @@
 #import "CHIPError_Internal.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPP256KeypairBridge.h"
+#import "MTRMemory.h"
 #import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/CHIPMem.h>
 
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::Credentials;
-
-// RAII helper for doing MemoryInit/MemoryShutdown, just in case the underlying
-// Matter APIs we are using use Platform::Memory.  MemoryInit/MemoryShutdown are
-// refcounted, so it's OK if we use AutoPlatformMemory after MemoryInit has
-// already happened elsewhere.
-struct AutoPlatformMemory {
-    AutoPlatformMemory() { Platform::MemoryInit(); }
-    ~AutoPlatformMemory() { Platform::MemoryShutdown(); }
-};
 
 @implementation MTRCertificates
 
@@ -46,7 +37,7 @@ struct AutoPlatformMemory {
 {
     NSLog(@"Generating root certificate");
 
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     NSData * rootCert = nil;
     CHIP_ERROR err = CHIPOperationalCredentialsDelegate::GenerateRootCertificate(keypair, issuerId, fabricId, &rootCert);
@@ -70,7 +61,7 @@ struct AutoPlatformMemory {
 {
     NSLog(@"Generating intermediate certificate");
 
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     NSData * intermediate = nil;
     CHIP_ERROR err = CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(
@@ -96,7 +87,7 @@ struct AutoPlatformMemory {
 {
     NSLog(@"Generating operational certificate");
 
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     NSData * opcert = nil;
     CHIP_ERROR err = CHIPOperationalCredentialsDelegate::GenerateOperationalCertificate(
@@ -114,7 +105,7 @@ struct AutoPlatformMemory {
 
 + (BOOL)keypair:(id<CHIPKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     P256PublicKey keypairPubKey;
     CHIP_ERROR err = CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.pubkey, &keypairPubKey);
@@ -137,7 +128,7 @@ struct AutoPlatformMemory {
 
 + (BOOL)isCertificate:(NSData *)certificate1 equalTo:(NSData *)certificate2
 {
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     P256PublicKey pubKey1;
     CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
@@ -179,7 +170,7 @@ struct AutoPlatformMemory {
 + (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
-    AutoPlatformMemory platformMemory;
+    [MTRMemory ensureInit];
 
     CHIPP256KeypairBridge keypairBridge;
     CHIP_ERROR err = CHIP_NO_ERROR;
