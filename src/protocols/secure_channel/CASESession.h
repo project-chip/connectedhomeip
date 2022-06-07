@@ -164,7 +164,38 @@ public:
      **/
     void Clear();
 
+    void InvalidateIfPendingEstablishment();
+
 private:
+    class CASESessionFabricDelegate final : public chip::FabricTable::Delegate
+    {
+    public:
+        CASESessionFabricDelegate(CASESession * caseSession)
+        :  mCASESession(caseSession) {}
+
+        void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+            mCASESession->InvalidateIfPendingEstablishment();
+        }
+
+        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
+        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
+    private:
+        CASESession * mCASESession;
+    };
+
     enum class State : uint8_t
     {
         kInitialized       = 0,
@@ -218,6 +249,8 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
+    void AbortPendingEstablish(CHIP_ERROR err);
+
     CHIP_ERROR GetHardcodedTime();
 
     CHIP_ERROR SetEffectiveTime();
@@ -252,6 +285,7 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
+    CASESessionFabricDelegate mFabricDelegate = CASESessionFabricDelegate(this);
     State mState;
 };
 

@@ -360,8 +360,15 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
     {
+        // TODO We likely want to do the same thing regardless of fabricDeleted. For
+        // now bailing out early when only update.
+        if (!fabricDeleted)
+        {
+            return;
+        }
+
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
@@ -823,6 +830,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
     err = failSafeContext.SetUpdateNocCommandInvoked();
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    // TODO calling SendFabricChangeNotification seems a little out of place, would it be better to have this called
+    // maybe in SetNOCCert(), or maybe somewhere else.
+    Server::GetInstance().GetFabricTable().SendFabricChangeNotification(fabric->GetFabricIndex());
 
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.

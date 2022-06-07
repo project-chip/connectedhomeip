@@ -144,13 +144,27 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
+    // TODO we need to use the fabric table provided after Tennessee's PR.
+    //mFabricTable->RemoveFabricDelegate(&mFabricDelegate);
+
     mLocalNodeId = kUndefinedNodeId;
     mPeerNodeId  = kUndefinedNodeId;
     mFabricInfo  = nullptr;
 }
 
+void CASESession::InvalidateIfPendingEstablishment()
+{
+    if (!IsSessionEstablishmentInProgress()) {
+        return;
+    }
+    // TODO Double check if there is maybe a more suitable CHIP_ERROR, some other options are
+    // CHIP_ERROR_CERT_EXPIRED, CHIP_ERROR_TRANSACTION_CANCELED, or CHIP_ERROR_INCORRECT_STATE
+    AbortPendingEstablish(CHIP_ERROR_CANCELLED);
+}
+
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -158,14 +172,22 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
+    // TODO we need to use the fabric table provided after Tennessee's PR.
+    // SuccessOrExit(err = mFabricTable->AddFabricDelegate(&mFabricDelegate));
+
     mDelegate = delegate;
-    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
+    SuccessOrExit(err = AllocateSecureSession(sessionManager));
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
-    return CHIP_NO_ERROR;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
+    return err;
 }
 
 CHIP_ERROR
@@ -232,18 +254,23 @@ exit:
     return err;
 }
 
+void CASESession::AbortPendingEstablish(CHIP_ERROR err)
+{
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
+    Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(err);
+}
+
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
-    // Discard the exchange so that Clear() doesn't try closing it.  The
-    // exchange will handle that.
-    DiscardExchange();
-    Clear();
-    // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
@@ -1730,12 +1757,7 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        // Discard the exchange so that Clear() doesn't try closing it.  The
-        // exchange will handle that.
-        DiscardExchange();
-        Clear();
-        // Do this last in case the delegate frees us.
-        mDelegate->OnSessionEstablishmentError(err);
+        AbortPendingEstablish(err);
     }
     return err;
 }

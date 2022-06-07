@@ -670,6 +670,24 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return AddNewFabricInner(newFabric, outputIndex);
 }
 
+void FabricTable::NotifyDelegatesOfFabricChange(FabricIndex fabricIndex, bool fabricDeleted)
+{
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in OnFabricHasChanged,
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricHasChanged(*this, fabricIndex, fabricDeleted);
+        delegate = nextDelegate;
+    }
+}
+
+void FabricTable::SendFabricChangeNotification(FabricIndex fabricIndex)
+{
+    NotifyDelegatesOfFabricChange(fabricIndex, false /* fabricDeleted */);
+}
+
 CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
 {
     if (!mNextAvailableFabricIndex.HasValue())
@@ -764,16 +782,11 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         else
         {
             mFabricCount--;
-            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
+            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricHasChanged",
                             static_cast<unsigned>(fabricIndex));
         }
 
-        FabricTable::Delegate * delegate = mDelegateListRoot;
-        while (delegate)
-        {
-            delegate->OnFabricDeletedFromStorage(*this, fabricIndex);
-            delegate = delegate->next;
-        }
+        NotifyDelegatesOfFabricChange(fabricIndex, true /* fabricDeleted */);
     }
     return CHIP_NO_ERROR;
 }

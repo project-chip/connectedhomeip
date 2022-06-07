@@ -336,9 +336,11 @@ public:
         virtual ~Delegate() {}
 
         /**
-         * Gets called when a fabric is deleted, such as on FabricTable::Delete().
+         * Gets called when a fabric is changed in a significant way, such as cert being updated or fabric being delete.
+         * `fabricDeleted` indicates if the fabric has been deleted in case delegate treats updates differently from
+         * updates.
          **/
-        virtual void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+        virtual void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) = 0;
 
         /**
          * Gets called when a fabric is loaded into Fabric Table from storage, such as
@@ -378,6 +380,11 @@ public:
      * The fabric information will also be persisted to storage.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
+
+    /**
+     * Send notification that fabricIndex was updated to all FabricTable Delegates.
+     */
+    void SendFabricChangeNotification(FabricIndex fabricIndex);
 
     // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
     // test-cases
@@ -430,6 +437,8 @@ private:
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
 
     CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
+
+    void NotifyDelegatesOfFabricChange(FabricIndex fabricIndex, bool fabricDeleted);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;

@@ -25,8 +25,14 @@ namespace {
 
 class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
     {
+        // TODO We likely want to do the same thing regardless of fabricDeleted. For
+        // now bailing out early when only update.
+        if (!fabricDeleted)
+        {
+            return;
+        }
         chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
         auto iter                         = bindingTable.begin();
         while (iter != bindingTable.end())

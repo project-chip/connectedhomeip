@@ -324,8 +324,15 @@ private:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
         {
+            // TODO We likely want to do the same thing regardless of fabricDeleted. For
+            // now bailing out early when only update.
+            if (!fabricDeleted)
+            {
+                return;
+            }
+
             (void) fabricTable;
             auto & sessionManager = mServer->GetSecureSessionManager();
             sessionManager.FabricRemoved(fabricIndex);
