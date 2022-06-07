@@ -109,11 +109,11 @@ private:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec) override
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
     {
         if (mOnResubscriptionAttempt)
         {
-            mOnResubscriptionAttempt(*mReadClient.get(), aError, aNextResubscribeIntervalMsec);
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, aNextResubscribeIntervalMsec);
         }
     }
 
@@ -214,11 +214,11 @@ private:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec) override
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
     {
         if (mOnResubscriptionAttempt)
         {
-            mOnResubscriptionAttempt(*mReadClient.get(), aError, aNextResubscribeIntervalMsec);
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, aNextResubscribeIntervalMsec);
         }
     }
 

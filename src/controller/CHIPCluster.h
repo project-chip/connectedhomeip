@@ -265,12 +265,12 @@ public:
     SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
                        ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                        SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                       ResubscriptionAttemptCallback ResubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
+                       ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
                        bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb, ResubscriptionAttemptCb, aIsFabricFiltered,
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
             aKeepPreviousSubscriptions, aDataVersion);
     }
 
@@ -279,7 +279,7 @@ public:
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                                  ResubscriptionAttemptCallback ResubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
+                                  ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
                                   bool aKeepPreviousSubscriptions            = false,
                                   const Optional<DataVersion> & aDataVersion = NullOptional)
     {
@@ -306,11 +306,11 @@ public:
             }
         };
 
-        auto onResubscriptionAttemptCb = [context, ResubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+        auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
                                                                             uint32_t aNextResubscribeIntervalMsec) {
-            if (ResubscriptionAttemptCb != nullptr)
+            if (resubscriptionAttemptCb != nullptr)
             {
-                ResubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
+                resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
             }
         };
 
@@ -363,7 +363,7 @@ public:
                               ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                               uint16_t maxIntervalCeilingSeconds,
                               SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                              ResubscriptionAttemptCallback ResubscriptionAttemptCb     = nullptr,
+                              ResubscriptionAttemptCallback resubscriptionAttemptCb     = nullptr,
                               bool aKeepPreviousSubscriptions = false, bool aIsUrgentEvent = false)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -389,11 +389,11 @@ public:
             }
         };
 
-        auto onResubscriptionAttemptCb = [context, ResubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+        auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
                                                                             uint32_t aNextResubscribeIntervalMsec) {
-            if (ResubscriptionAttemptCb != nullptr)
+            if (resubscriptionAttemptCb != nullptr)
             {
-                ResubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
+                resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
             }
         };
 

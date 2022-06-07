@@ -976,6 +976,8 @@ void ReadClient::ResubscribeIfNeeded(bool & aResubscribe, uint32_t & aNextResubs
 {
     bool shouldResubscribe = true;
     uint32_t intervalMsec  = 0;
+    aResubscribe = false;
+    aNextResubscribeIntervalMsec = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
         ChipLogDetail(DataManagement, "mResubscribePolicy is null");

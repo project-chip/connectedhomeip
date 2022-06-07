@@ -81,9 +81,9 @@ private:
         mCallback.OnSubscriptionEstablished(aSubscriptionId);
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec) override
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
     {
-        mCallback.OnResubscriptionAttempt(aError, aNextResubscribeIntervalMsec);
+        mCallback.OnResubscriptionAttempt(aTerminationCause, aNextResubscribeIntervalMsec);
     }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
