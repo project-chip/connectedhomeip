@@ -756,12 +756,6 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, 1295, "Test Cluster" },
-#else
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER
-#endif
-
 #if defined(ZCL_USING_MESSAGING_CLUSTER_SERVER) || defined(ZCL_USING_MESSAGING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MESSAGING_CLUSTER { ZCL_MESSAGING_CLUSTER_ID, 1795, "Messaging" },
 #else
@@ -798,6 +792,12 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER { ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID, 2820, "Electrical Measurement" },
 #else
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, 4293985551, "Test Cluster" },
+#else
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER
 #endif
 
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
@@ -911,12 +911,12 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
     CHIP_PRINTCLUSTER_MESSAGING_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
+    CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
+    CHIP_PRINTCLUSTER_TEST_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 52
