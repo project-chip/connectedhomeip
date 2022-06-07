@@ -75,7 +75,7 @@ public:
     {
         Retain(); // Put the test session in Active state
         SetFabricIndex(fabric);
-        ChipLogDetail(Inet, "SecureSession Allocated for test %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+        ChipLogDetail(Inet, "SecureSession[%p]: Allocated for Test Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
     }
 
@@ -88,7 +88,8 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
         mTable(table), mState(State::kPairing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
-        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Allocated Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     /**
@@ -120,11 +121,13 @@ public:
 
         Retain();
         mState = State::kActive;
-        ChipLogDetail(Inet, "SecureSession Active %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
     ~SecureSession() override
     {
-        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Released - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     SecureSession(SecureSession &&)      = delete;
@@ -132,8 +135,8 @@ public:
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
 
-    void Retain() override { ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Retain(); }
-    void Release() override { ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release(); }
+    void Retain() override;
+    void Release() override;
 
     bool IsActiveSession() const override { return mState == State::kActive; }
     bool IsPairing() const { return mState == State::kPairing; }
