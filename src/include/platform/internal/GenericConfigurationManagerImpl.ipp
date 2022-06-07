@@ -39,6 +39,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/BuildTime.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -52,6 +53,8 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+static Optional<System::Clock::Seconds32> sFirmwareBuildChipEpochTime;
 
 #if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
 template <class ConfigClass>
@@ -470,6 +473,42 @@ template <class ConfigClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersion(uint32_t softwareVer)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
+{
+    // If the setter was called and we have a value in memory, return this.
+    if (sFirmwareBuildChipEpochTime.HasValue())
+    {
+        chipEpochTime = sFirmwareBuildChipEpochTime.Value();
+        return CHIP_NO_ERROR;
+    }
+    // Else, attempt to read the hard-coded values.
+    VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
+    const char * date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
+    const char * time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+    uint32_t seconds;
+    auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date), COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);
+    if (good)
+    {
+        chipEpochTime = chip::System::Clock::Seconds32(seconds);
+    }
+    return good ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 chipEpochTime)
+{
+    // The setter is sticky in that once the hard-coded time is overriden, it
+    // will be for the lifetime of the configuration manager singleton.
+    // However, this is not persistent across boots.
+    //
+    // Implementations that can't use the hard-coded time for whatever reason
+    // should set this at each init.
+    sFirmwareBuildChipEpochTime.SetValue(chipEpochTime);
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
