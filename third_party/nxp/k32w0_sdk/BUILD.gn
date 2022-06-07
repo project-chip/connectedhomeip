@@ -56,7 +56,7 @@ config("mbedtls_k32w0_config") {
   if (mbedtls_use_tinycrypt) {
     defines += [
       "MBEDTLS_USE_TINYCRYPT",
-      "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM"
+      "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
     ]
   }
 
@@ -73,8 +73,7 @@ mbedtls_target("mbedtls") {
     "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/ksdk_mbedtls.c",
   ]
 
-  if (mbedtls_use_tinycrypt)
-  {
+  if (mbedtls_use_tinycrypt) {
     sources += [
       "${mbedtls_repo}/repo/tinycrypt/ecc.c",
       "${mbedtls_repo}/repo/tinycrypt/ecc_dh.c",
