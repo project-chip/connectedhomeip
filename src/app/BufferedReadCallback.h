@@ -69,7 +69,12 @@ private:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        mBufferedList.clear();
+        return mCallback.OnError(aError);
+    }
+
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
         return mCallback.OnEventData(aEventHeader, apData, apStatus);
