@@ -2724,10 +2724,6 @@ namespace ClusterRevision {
 static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
-namespace ManufacturerExtension {
-static constexpr AttributeId Id = 0xFFF10001;
-} // namespace ManufacturerExtension
-
 } // namespace Attributes
 } // namespace ModeSelect
 

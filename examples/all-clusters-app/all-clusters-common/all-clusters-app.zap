@@ -18,7 +18,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },

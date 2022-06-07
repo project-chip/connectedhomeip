@@ -1,6 +1,6 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/", "./data-model/test"],
+    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -38,7 +38,6 @@
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
         "mode-select-cluster.xml",
-        "mode-select-extensions.xml",
         "network-commissioning-cluster.xml",
         "onoff-cluster.xml",
         "operational-credentials-cluster.xml",

@@ -15740,7 +15740,6 @@ class ModeSelect(Cluster):
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
-                ClusterObjectFieldDescriptor(Label="manufacturerExtension", Tag=0xFFF10001, Type=typing.Optional[uint]),
             ])
 
     description: 'str' = None
@@ -15754,7 +15753,6 @@ class ModeSelect(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
-    manufacturerExtension: 'typing.Optional[uint]' = None
 
 
     class Structs:
@@ -15803,19 +15801,6 @@ class ModeSelect(Cluster):
                     ])
 
             newMode: 'uint' = 0
-
-        @dataclass
-        class SampleMfgExtensionCommand(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0050
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
 
 
     class Attributes:
@@ -15994,22 +15979,6 @@ class ModeSelect(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-        @dataclass
-        class ManufacturerExtension(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0050
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0xFFF10001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
 
 
 

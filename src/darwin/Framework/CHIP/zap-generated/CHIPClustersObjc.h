@@ -11040,9 +11040,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)changeToModeWithParams:(CHIPModeSelectClusterChangeToModeParams *)params
              completionHandler:(StatusCompletion)completionHandler;
-- (void)sampleMfgExtensionCommandWithParams:(CHIPModeSelectClusterSampleMfgExtensionCommandParams * _Nullable)params
-                          completionHandler:(StatusCompletion)completionHandler;
-- (void)sampleMfgExtensionCommandWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -11244,25 +11241,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                  queue:(dispatch_queue_t)queue
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeManufacturerExtensionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * CHIPSubscribeParams.
- */
-- (void)subscribeAttributeManufacturerExtensionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                        params:(CHIPSubscribeParams * _Nullable)params
-                                       subscriptionEstablished:
-                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                 reportHandler:
-                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeManufacturerExtensionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                                    endpoint:(NSNumber *)endpoint
-                                                       queue:(dispatch_queue_t)queue
-                                           completionHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 @end
 

@@ -770,10 +770,6 @@ namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace SampleMfgExtensionCommand {
-static constexpr CommandId Id = 0x00 - EFFFF;
-} // namespace SampleMfgExtensionCommand
-
 } // namespace Commands
 } // namespace ModeSelect
 

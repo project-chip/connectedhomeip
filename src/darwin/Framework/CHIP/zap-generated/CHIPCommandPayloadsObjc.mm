@@ -3198,22 +3198,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation CHIPModeSelectClusterSampleMfgExtensionCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
 @implementation CHIPDoorLockClusterLockDoorParams
 - (instancetype)init
 {
