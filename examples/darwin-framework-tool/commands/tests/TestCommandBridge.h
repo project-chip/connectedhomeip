@@ -264,6 +264,31 @@ protected:
         return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
     }
 
+    template <typename T> bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    {
+        for (id currentElement in current) {
+            if ([currentElement isEqualToNumber:@(expected)]) {
+                return true;
+            }
+        }
+
+        Exit(std::string(itemName) + " expect the value " + std::to_string(expected) + " but the list does not contains it.");
+        return false;
+    }
+
+    template <typename T> bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    {
+        for (id currentElement in current) {
+            if ([currentElement isEqualToNumber:@(expected)]) {
+                Exit(std::string(itemName) + " does not expect the value " + std::to_string(expected)
+                    + " but the list contains it.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSData * _Nonnull current, const NSData * _Nonnull expected)
     {
         const chip::ByteSpan currentValue(static_cast<const uint8_t *>([current bytes]), [current length]);
@@ -298,6 +323,38 @@ protected:
     {
         NSNumber * currentValue = @([CHIPError errorToCHIPErrorCode:current].AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
+    }
+
+    using ConstraintsChecker::CheckConstraintMinValue;
+
+    // Used when the minValue is a saved variable, since ConstraintsChecker does
+    // not expect Core Foundation types.
+    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected longLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    using ConstraintsChecker::CheckConstraintMaxValue;
+
+    // Used when the maxValue is a saved variable, since ConstraintsChecker does
+    // not expect Core Foundation types.
+    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected longLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected unsignedLongLongValue]);
     }
 
     bool CheckValueAsString(const char * _Nonnull itemName, const id _Nonnull current, const NSString * _Nonnull expected)

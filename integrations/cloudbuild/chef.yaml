@@ -1,0 +1,42 @@
+steps:
+    - name: "connectedhomeip/chip-build-vscode:0.5.75"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - "-c"
+          - source ./scripts/bootstrap.sh
+      id: Bootstrap
+      entrypoint: /usr/bin/bash
+      volumes:
+          - name: pwenv
+            path: /pwenv
+      timeout: 900s
+
+    - name: "connectedhomeip/chip-build-vscode:0.5.75"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./examples/chef/chef.py --build_all
+      id: CompileAll
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+logsBucket: matter-build-automation-build-logs
+
+# Global timeout for all steps
+timeout: 14400s
+
+artifacts:
+    objects:
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
+# Using higher CPU machines generally speeds up builds, except bootstrap is always
+# slow.
+options:
+    machineType: "E2_HIGHCPU_32"
+    diskSizeGb: 200

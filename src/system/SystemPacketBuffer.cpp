@@ -401,6 +401,46 @@ bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
     return true;
 }
 
+uint8_t * PacketBuffer::GetReserve(uint16_t aSize, uint16_t aAlignmentMask)
+{
+    // This private utility method requires that `aAlignmentMask` be one less than a power-of-two alignment. This requirement
+    // is satisfied when aAlignmentMask=alignof(T)-1 for some type T, as passed by the public GetReserve<T>().
+
+    // Computing `reserveStart` can't overflow because a valid PacketBuffer must be larger than kStructureSize.
+    const uintptr_t reserveStart = reinterpret_cast<uintptr_t>(this) + kStructureSize;
+    if (reserveStart + aSize < reserveStart)
+    {
+        // Overflow here means the requested size can't possibly fit.
+        return nullptr;
+    }
+
+    const uintptr_t requestStart = (reserveStart + aAlignmentMask) & ~aAlignmentMask;
+    if (requestStart < reserveStart)
+    {
+        // Overflow here means the request can't be satisfied because the alignment is too large.
+        return nullptr;
+    }
+
+    // This cast is safe because the difference is at most `aAlignmentMask`.
+    const uint16_t reserveAlignmentOffset = static_cast<uint16_t>(requestStart - reserveStart);
+
+    // This cast is not safe in itself, but the result is checked.
+    const uint16_t requestSize = static_cast<uint16_t>(reserveAlignmentOffset + aSize);
+    if (requestSize < aSize)
+    {
+        // Overflow here means the requested size can't possibly fit.
+        return nullptr;
+    }
+
+    if (!EnsureReservedSize(requestSize))
+    {
+        // The requested size is too large for the available space.
+        return nullptr;
+    }
+
+    return reinterpret_cast<uint8_t *>(requestStart);
+}
+
 bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
 {
     if (aAlignBytes == 0)

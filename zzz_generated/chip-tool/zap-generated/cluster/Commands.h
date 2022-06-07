@@ -2633,6 +2633,7 @@ private:
 | * MoveWithOnOff                                                     |   0x05 |
 | * StepWithOnOff                                                     |   0x06 |
 | * StopWithOnOff                                                     |   0x07 |
+| * MoveToClosestFrequency                                            |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentLevel                                                      | 0x0000 |
@@ -2911,6 +2912,37 @@ public:
 
 private:
     chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type mRequest;
+};
+
+/*
+ * Command MoveToClosestFrequency
+ */
+class LevelControlMoveToClosestFrequency : public ClusterCommand
+{
+public:
+    LevelControlMoveToClosestFrequency(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("move-to-closest-frequency", credsIssuerConfig)
+    {
+        AddArgument("Frequency", 0, UINT16_MAX, &mRequest.frequency);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000008, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000008, mRequest);
+    }
+
+private:
+    chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type mRequest;
 };
 
 class WriteLevelControlOptions : public WriteAttribute
@@ -6643,6 +6675,7 @@ public:
     OperationalCredentialsCSRRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("csrrequest", credsIssuerConfig)
     {
         AddArgument("CSRNonce", &mRequest.CSRNonce);
+        AddArgument("IsForUpdateNOC", 0, 1, &mRequest.isForUpdateNOC);
         ClusterCommand::AddArguments();
     }
 
@@ -7332,13 +7365,6 @@ private:
 | * LockDoor                                                          |   0x00 |
 | * UnlockDoor                                                        |   0x01 |
 | * UnlockWithTimeout                                                 |   0x03 |
-| * GetLogRecord                                                      |   0x04 |
-| * SetPINCode                                                        |   0x05 |
-| * GetPINCode                                                        |   0x06 |
-| * ClearPINCode                                                      |   0x07 |
-| * ClearAllPINCodes                                                  |   0x08 |
-| * SetUserStatus                                                     |   0x09 |
-| * GetUserStatus                                                     |   0x0A |
 | * SetWeekDaySchedule                                                |   0x0B |
 | * GetWeekDaySchedule                                                |   0x0C |
 | * ClearWeekDaySchedule                                              |   0x0D |
@@ -7348,12 +7374,6 @@ private:
 | * SetHolidaySchedule                                                |   0x11 |
 | * GetHolidaySchedule                                                |   0x12 |
 | * ClearHolidaySchedule                                              |   0x13 |
-| * SetUserType                                                       |   0x14 |
-| * GetUserType                                                       |   0x15 |
-| * SetRFIDCode                                                       |   0x16 |
-| * GetRFIDCode                                                       |   0x17 |
-| * ClearRFIDCode                                                     |   0x18 |
-| * ClearAllRFIDCodes                                                 |   0x19 |
 | * SetUser                                                           |   0x1A |
 | * GetUser                                                           |   0x1B |
 | * ClearUser                                                         |   0x1D |
@@ -7369,7 +7389,6 @@ private:
 | * DoorOpenEvents                                                    | 0x0004 |
 | * DoorClosedEvents                                                  | 0x0005 |
 | * OpenPeriod                                                        | 0x0006 |
-| * NumberOfLogRecordsSupported                                       | 0x0010 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
 | * NumberOfRFIDUsersSupported                                        | 0x0013 |
@@ -7382,7 +7401,6 @@ private:
 | * MinRFIDCodeLength                                                 | 0x001A |
 | * CredentialRulesSupport                                            | 0x001B |
 | * NumberOfCredentialsSupportedPerUser                               | 0x001C |
-| * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
 | * LEDSettings                                                       | 0x0022 |
 | * AutoRelockTime                                                    | 0x0023 |
@@ -7400,14 +7418,6 @@ private:
 | * SendPINOverTheAir                                                 | 0x0032 |
 | * RequirePINforRemoteOperation                                      | 0x0033 |
 | * ExpiringUserTimeout                                               | 0x0035 |
-| * AlarmMask                                                         | 0x0040 |
-| * KeypadOperationEventMask                                          | 0x0041 |
-| * RemoteOperationEventMask                                          | 0x0042 |
-| * ManualOperationEventMask                                          | 0x0043 |
-| * RFIDOperationEventMask                                            | 0x0044 |
-| * KeypadProgrammingEventMask                                        | 0x0045 |
-| * RemoteProgrammingEventMask                                        | 0x0046 |
-| * RFIDProgrammingEventMask                                          | 0x0047 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7512,219 +7522,6 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
-};
-
-/*
- * Command GetLogRecord
- */
-class DoorLockGetLogRecord : public ClusterCommand
-{
-public:
-    DoorLockGetLogRecord(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-log-record", credsIssuerConfig)
-    {
-        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type mRequest;
-};
-
-/*
- * Command SetPINCode
- */
-class DoorLockSetPINCode : public ClusterCommand
-{
-public:
-    DoorLockSetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-pincode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        AddArgument("Pin", &mRequest.pin);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000005, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetPINCode::Type mRequest;
-};
-
-/*
- * Command GetPINCode
- */
-class DoorLockGetPINCode : public ClusterCommand
-{
-public:
-    DoorLockGetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-pincode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000006, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetPINCode::Type mRequest;
-};
-
-/*
- * Command ClearPINCode
- */
-class DoorLockClearPINCode : public ClusterCommand
-{
-public:
-    DoorLockClearPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-pincode", credsIssuerConfig)
-    {
-        AddArgument("PinSlotIndex", 0, UINT16_MAX, &mRequest.pinSlotIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000007, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000007, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearPINCode::Type mRequest;
-};
-
-/*
- * Command ClearAllPINCodes
- */
-class DoorLockClearAllPINCodes : public ClusterCommand
-{
-public:
-    DoorLockClearAllPINCodes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-all-pincodes", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000008, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000008, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Type mRequest;
-};
-
-/*
- * Command SetUserStatus
- */
-class DoorLockSetUserStatus : public ClusterCommand
-{
-public:
-    DoorLockSetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-status", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000009, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000009, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserStatus::Type mRequest;
-};
-
-/*
- * Command GetUserStatus
- */
-class DoorLockGetUserStatus : public ClusterCommand
-{
-public:
-    DoorLockGetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-status", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000A, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000A, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserStatus::Type mRequest;
 };
 
 /*
@@ -8023,190 +7820,6 @@ private:
 };
 
 /*
- * Command SetUserType
- */
-class DoorLockSetUserType : public ClusterCommand
-{
-public:
-    DoorLockSetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-type", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000014, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000014, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserType::Type mRequest;
-};
-
-/*
- * Command GetUserType
- */
-class DoorLockGetUserType : public ClusterCommand
-{
-public:
-    DoorLockGetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-type", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000015, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000015, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserType::Type mRequest;
-};
-
-/*
- * Command SetRFIDCode
- */
-class DoorLockSetRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockSetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        AddArgument("RfidCode", &mRequest.rfidCode);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000016, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000016, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Type mRequest;
-};
-
-/*
- * Command GetRFIDCode
- */
-class DoorLockGetRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockGetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000017, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000017, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearRFIDCode
- */
-class DoorLockClearRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockClearRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("RfidSlotIndex", 0, UINT16_MAX, &mRequest.rfidSlotIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000018, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000018, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearAllRFIDCodes
- */
-class DoorLockClearAllRFIDCodes : public ClusterCommand
-{
-public:
-    DoorLockClearAllRFIDCodes(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("clear-all-rfidcodes", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000019, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000019, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Type mRequest;
-};
-
-/*
  * Command SetUser
  */
 class DoorLockSetUser : public ClusterCommand
@@ -8483,32 +8096,6 @@ private:
     uint16_t mValue;
 };
 
-class WriteDoorLockEnableLogging : public WriteAttribute
-{
-public:
-    WriteDoorLockEnableLogging(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EnableLogging", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "enable-logging");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockEnableLogging() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000020, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000020, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
 class WriteDoorLockLanguage : public WriteAttribute
 {
 public:
@@ -8771,7 +8358,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8907,221 +8494,6 @@ public:
 
 private:
     uint16_t mValue;
-};
-
-class WriteDoorLockAlarmMask : public WriteAttribute
-{
-public:
-    WriteDoorLockAlarmMask(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AlarmMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "alarm-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockAlarmMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000040, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000040, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
-};
-
-class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockKeypadOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("KeypadOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "keypad-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockKeypadOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000041, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000041, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
-};
-
-class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRemoteOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RemoteOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "remote-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRemoteOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000042, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000042, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
-};
-
-class WriteDoorLockManualOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockManualOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ManualOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "manual-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockManualOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000043, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000043, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
-};
-
-class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRFIDOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RFIDOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "rfidoperation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRFIDOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000044, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000044, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
-};
-
-class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockKeypadProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("KeypadProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "keypad-programming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockKeypadProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000045, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000045, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
-};
-
-class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRemoteProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RemoteProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "remote-programming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRemoteProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000046, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000046, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
-};
-
-class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRFIDProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RFIDProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "rfidprogramming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRFIDProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000047, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000047, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9402,7 +8774,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
+    chip::BitMask<chip::app::Clusters::WindowCovering::Mode> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16323,7 +15695,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap16 : public WriteAttribute
@@ -16349,7 +15721,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap32 : public WriteAttribute
@@ -16375,7 +15747,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap64 : public WriteAttribute
@@ -16401,7 +15773,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
 };
 
 class WriteTestClusterInt8u : public WriteAttribute
@@ -17600,7 +16972,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap16 : public WriteAttribute
@@ -17627,7 +16999,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap32 : public WriteAttribute
@@ -17654,7 +17026,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap64 : public WriteAttribute
@@ -17681,7 +17053,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableInt8u : public WriteAttribute
@@ -19749,15 +19121,16 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
-        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),          //
-        make_unique<LevelControlMove>(credsIssuerConfig),                 //
-        make_unique<LevelControlStep>(credsIssuerConfig),                 //
-        make_unique<LevelControlStop>(credsIssuerConfig),                 //
-        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig), //
-        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),            //
+        make_unique<LevelControlMove>(credsIssuerConfig),                   //
+        make_unique<LevelControlStep>(credsIssuerConfig),                   //
+        make_unique<LevelControlStop>(credsIssuerConfig),                   //
+        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig),   //
+        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlMoveToClosestFrequency>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -22075,13 +21448,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockLockDoor>(credsIssuerConfig),             //
         make_unique<DoorLockUnlockDoor>(credsIssuerConfig),           //
         make_unique<DoorLockUnlockWithTimeout>(credsIssuerConfig),    //
-        make_unique<DoorLockGetLogRecord>(credsIssuerConfig),         //
-        make_unique<DoorLockSetPINCode>(credsIssuerConfig),           //
-        make_unique<DoorLockGetPINCode>(credsIssuerConfig),           //
-        make_unique<DoorLockClearPINCode>(credsIssuerConfig),         //
-        make_unique<DoorLockClearAllPINCodes>(credsIssuerConfig),     //
-        make_unique<DoorLockSetUserStatus>(credsIssuerConfig),        //
-        make_unique<DoorLockGetUserStatus>(credsIssuerConfig),        //
         make_unique<DoorLockSetWeekDaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockGetWeekDaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockClearWeekDaySchedule>(credsIssuerConfig), //
@@ -22091,12 +21457,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockSetHolidaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockGetHolidaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockClearHolidaySchedule>(credsIssuerConfig), //
-        make_unique<DoorLockSetUserType>(credsIssuerConfig),          //
-        make_unique<DoorLockGetUserType>(credsIssuerConfig),          //
-        make_unique<DoorLockSetRFIDCode>(credsIssuerConfig),          //
-        make_unique<DoorLockGetRFIDCode>(credsIssuerConfig),          //
-        make_unique<DoorLockClearRFIDCode>(credsIssuerConfig),        //
-        make_unique<DoorLockClearAllRFIDCodes>(credsIssuerConfig),    //
         make_unique<DoorLockSetUser>(credsIssuerConfig),              //
         make_unique<DoorLockGetUser>(credsIssuerConfig),              //
         make_unique<DoorLockClearUser>(credsIssuerConfig),            //
@@ -22114,8 +21474,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "door-open-events", Attributes::DoorOpenEvents::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "door-closed-events", Attributes::DoorClosedEvents::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "open-period", Attributes::OpenPeriod::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "number-of-log-records-supported", Attributes::NumberOfLogRecordsSupported::Id,
-                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id,
@@ -22135,7 +21493,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-credentials-supported-per-user",
                                    Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig),                   //
@@ -22155,22 +21512,8 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                   credsIssuerConfig),                                                                   //
-        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "keypad-operation-event-mask", Attributes::KeypadOperationEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "remote-operation-event-mask", Attributes::RemoteOperationEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "manual-operation-event-mask", Attributes::ManualOperationEventMask::Id,
-                                   credsIssuerConfig),                                                                         //
-        make_unique<ReadAttribute>(Id, "rfidoperation-event-mask", Attributes::RFIDOperationEventMask::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "keypad-programming-event-mask", Attributes::KeypadProgrammingEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "remote-programming-event-mask", Attributes::RemoteProgrammingEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "rfidprogramming-event-mask", Attributes::RFIDProgrammingEventMask::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22180,7 +21523,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteDoorLockDoorOpenEvents>(credsIssuerConfig),                                                       //
         make_unique<WriteDoorLockDoorClosedEvents>(credsIssuerConfig),                                                     //
         make_unique<WriteDoorLockOpenPeriod>(credsIssuerConfig),                                                           //
-        make_unique<WriteDoorLockEnableLogging>(credsIssuerConfig),                                                        //
         make_unique<WriteDoorLockLanguage>(credsIssuerConfig),                                                             //
         make_unique<WriteDoorLockLEDSettings>(credsIssuerConfig),                                                          //
         make_unique<WriteDoorLockAutoRelockTime>(credsIssuerConfig),                                                       //
@@ -22196,14 +21538,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteDoorLockSendPINOverTheAir>(credsIssuerConfig),                                                    //
         make_unique<WriteDoorLockRequirePINforRemoteOperation>(credsIssuerConfig),                                         //
         make_unique<WriteDoorLockExpiringUserTimeout>(credsIssuerConfig),                                                  //
-        make_unique<WriteDoorLockAlarmMask>(credsIssuerConfig),                                                            //
-        make_unique<WriteDoorLockKeypadOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockRemoteOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockManualOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockRFIDOperationEventMask>(credsIssuerConfig),                                               //
-        make_unique<WriteDoorLockKeypadProgrammingEventMask>(credsIssuerConfig),                                           //
-        make_unique<WriteDoorLockRemoteProgrammingEventMask>(credsIssuerConfig),                                           //
-        make_unique<WriteDoorLockRFIDProgrammingEventMask>(credsIssuerConfig),                                             //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "lock-state", Attributes::LockState::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "lock-type", Attributes::LockType::Id, credsIssuerConfig),                     //
@@ -22212,8 +21546,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "door-open-events", Attributes::DoorOpenEvents::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "door-closed-events", Attributes::DoorClosedEvents::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "open-period", Attributes::OpenPeriod::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "number-of-log-records-supported", Attributes::NumberOfLogRecordsSupported::Id,
-                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id,
@@ -22234,7 +21566,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-credentials-supported-per-user",
                                         Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig), //
@@ -22259,23 +21590,8 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                        credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "keypad-operation-event-mask", Attributes::KeypadOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "remote-operation-event-mask", Attributes::RemoteOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "manual-operation-event-mask", Attributes::ManualOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "rfidoperation-event-mask", Attributes::RFIDOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "keypad-programming-event-mask", Attributes::KeypadProgrammingEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "remote-programming-event-mask", Attributes::RemoteProgrammingEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "rfidprogramming-event-mask", Attributes::RFIDProgrammingEventMask::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

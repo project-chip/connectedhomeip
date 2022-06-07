@@ -913,6 +913,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1223,8 +1224,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-
 endpoint 0 {
+  device type pump = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1391,8 +1392,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type pump = 771;
   binding cluster OccupancySensing;
 
   server cluster Identify {

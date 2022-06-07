@@ -26,6 +26,11 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   private final String TAG = MediaPlaybackManagerStub.class.getSimpleName();
 
   private int endpoint;
+  private int playbackState = PLAYBACK_STATE_PLAYING;
+  private int playbackSpeed = 1;
+  private long playbackPosition = 0;
+  private long playbackDuration = 5 * 60 * 1000;
+  private long startTime = 100;
 
   public MediaPlaybackManagerStub(int endpoint) {
     this.endpoint = endpoint;
@@ -36,27 +41,27 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
     switch (attributesId) {
       case ATTRIBUTE_PLAYBACK_STATE:
         Log.d(TAG, "getAttributes CurrentState at " + endpoint);
-        return PLAYBACK_STATE_PLAYING;
+        return playbackState;
 
       case ATTRIBUTE_PLAYBACK_START_TIME:
         Log.d(TAG, "getAttributes StartTime at " + endpoint);
-        return 100;
+        return startTime;
 
       case ATTRIBUTE_PLAYBACK_DURATION:
         Log.d(TAG, "getAttributes Duration at " + endpoint);
-        return 5 * 60 * 1000;
+        return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SPEED:
         Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed at " + endpoint);
-        return 10000;
+        return playbackSpeed;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_END:
         Log.d(TAG, "getAttributes SampledPosition SeekRangeEnd at " + endpoint);
-        return 5 * 60 * 1000;
+        return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_START:
         Log.d(TAG, "getAttributes SampledPosition SeekRangeStart at " + endpoint);
-        return 200;
+        return startTime;
     }
 
     return -1;
@@ -64,49 +69,94 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
 
   @Override
   public int request(int cmd, long parameter) {
+    long newPosition;
     switch (cmd) {
       case REQUEST_PLAY:
         Log.d(TAG, "request Play at " + endpoint);
+        playbackState = PLAYBACK_STATE_PLAYING;
+        playbackSpeed = 1;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_PAUSE:
         Log.d(TAG, "request pause at " + endpoint);
+        playbackState = PLAYBACK_STATE_PAUSED;
+        playbackSpeed = 0;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_STOP:
         Log.d(TAG, "request stop at " + endpoint);
+        playbackState = PLAYBACK_STATE_NOT_PLAYING;
+        playbackSpeed = 0;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_START_OVER:
         Log.d(TAG, "request start over at " + endpoint);
+        playbackPosition = 0;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_PREVIOUS:
         Log.d(TAG, "request previous at " + endpoint);
+        playbackState = PLAYBACK_STATE_PLAYING;
+        playbackSpeed = 1;
+        playbackPosition = 0;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_NEXT:
         Log.d(TAG, "request next at " + endpoint);
+        playbackState = PLAYBACK_STATE_PLAYING;
+        playbackSpeed = 1;
+        playbackPosition = 0;
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_REWIND:
         Log.d(TAG, "request rewind at " + endpoint);
+        playbackState = PLAYBACK_STATE_PLAYING;
+        playbackSpeed = (playbackSpeed >= 0 ? -1 : playbackSpeed * 2);
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_FAST_FORWARD:
         Log.d(TAG, "request fast forward at " + endpoint);
+        playbackState = PLAYBACK_STATE_PLAYING;
+        playbackSpeed = (playbackSpeed <= 0 ? 1 : playbackSpeed * 2);
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SKIP_FORWARD:
         Log.d(TAG, "request skip forward " + parameter + " milliseconds at " + endpoint);
+        newPosition = playbackPosition + parameter;
+        playbackPosition =
+            (newPosition > playbackDuration)
+                ? playbackDuration
+                : (newPosition >= 0 ? newPosition : 0);
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SKIP_BACKWARD:
         Log.d(TAG, "request skip backward " + parameter + " milliseconds at " + endpoint);
+        newPosition = playbackPosition - parameter;
+        playbackPosition =
+            (newPosition > playbackDuration)
+                ? playbackDuration
+                : (newPosition >= 0 ? newPosition : 0);
+
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SEEK:
         Log.d(TAG, "request seek to " + parameter + " milliseconds at " + endpoint);
+
+        if (parameter > playbackDuration) {
+          return RESPONSE_STATUS_SEEK_OUT_OF_RANGE;
+        } else {
+          playbackPosition = parameter;
+        }
+
         return RESPONSE_STATUS_SUCCESS;
     }
 
@@ -115,6 +165,6 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
 
   @Override
   public MediaPlaybackPosition getPosition() {
-    return new MediaPlaybackPosition(3 * 60 * 1000);
+    return new MediaPlaybackPosition(playbackPosition);
   }
 }

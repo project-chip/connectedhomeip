@@ -164,8 +164,9 @@
         ],
         "Software Diagnostics": [
             "CurrentHeapFree",
-            "CurrentHeapUsed",
             "CurrentHeapHighWatermark",
+            "CurrentHeapUsed",
+            "FeatureMap",
             "ThreadMetrics"
         ],
         "Test Cluster": [

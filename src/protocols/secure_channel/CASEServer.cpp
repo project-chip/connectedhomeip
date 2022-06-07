@@ -31,17 +31,19 @@ namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
                                                      FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+                                                     Credentials::CertificateValidityPolicy * certificateValidityPolicy,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSessionManager           = sessionManager;
-    mSessionResumptionStorage = sessionResumptionStorage;
-    mFabrics                  = fabrics;
-    mExchangeManager          = exchangeManager;
-    mGroupDataProvider        = responderGroupDataProvider;
+    mSessionManager            = sessionManager;
+    mSessionResumptionStorage  = sessionResumptionStorage;
+    mCertificateValidityPolicy = certificateValidityPolicy;
+    mFabrics                   = fabrics;
+    mExchangeManager           = exchangeManager;
+    mGroupDataProvider         = responderGroupDataProvider;
 
     // Set up the group state provider that persists across all handshakes.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
@@ -117,9 +119,10 @@ void CASEServer::Cleanup(ScopedNodeId previouslyEstablishedPeer)
     // TODO: Once session eviction is actually in place, this call should NEVER fail and if so, is a logic bug.
     // Dying here on failure is even more appropriate then.
     //
-    VerifyOrDie(GetSession().PrepareForSessionEstablishment(
-                    *mSessionManager, mFabrics, mSessionResumptionStorage, this, previouslyEstablishedPeer,
-                    Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())) == CHIP_NO_ERROR);
+    VerifyOrDie(GetSession().PrepareForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage,
+                                                            mCertificateValidityPolicy, this, previouslyEstablishedPeer,
+                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())) ==
+                CHIP_NO_ERROR);
 
     //
     // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForRemoval is called on this session, the session is

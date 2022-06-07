@@ -37,7 +37,6 @@ chip_test_suite("tests") {
     "TestPeerConnections.cpp",
     "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
-    "TestSecureSessionTable.cpp",
     "TestSessionManager.cpp",
   ]
 

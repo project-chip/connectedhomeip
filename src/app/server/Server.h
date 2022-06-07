@@ -94,6 +94,9 @@ struct ServerInitParams
     // Session resumption storage: Optional. Support session resumption when provided.
     // Must be initialized before being provided.
     SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    // Certificate validity policy: Optional. If none is injected, CHIPCert
+    // enforces a default policy.
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
@@ -394,6 +397,7 @@ private:
 
     PersistentStorageDelegate * mDeviceStorage;
     SessionResumptionStorage * mSessionResumptionStorage;
+    Credentials::CertificateValidityPolicy * mCertificateValidityPolicy;
     Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;

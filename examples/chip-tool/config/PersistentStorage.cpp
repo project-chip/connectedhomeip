@@ -37,7 +37,7 @@ constexpr const char kPortKey[]             = "ListenPort";
 constexpr const char kLoggingKey[]          = "LoggingLevel";
 constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
 constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
-constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Detail;
+constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
 
 std::string GetFilename(const char * name)
 {
@@ -222,6 +222,10 @@ LogCategory PersistentStorage::GetLoggingLevel()
         else if (strcasecmp(value, "detail") == 0)
         {
             chipLogLevel = kLogCategory_Detail;
+        }
+        else if (strcasecmp(value, "automation") == 0)
+        {
+            chipLogLevel = kLogCategory_Automation;
         }
     }
 

@@ -209,47 +209,13 @@ class {{filename}}: public TestCommandBridge
               {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
             }
             {{/if}}
-            {{#if hasExpectedConstraints}}
-            {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
-            {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.startsWith}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>actualValue}}, "{{expectedConstraints.endsWith}}"));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isUpperCase}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>actualValue}}, {{expectedConstraints.isLowerCase}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>actualValue}}, {{expectedConstraints.isHexString}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.minLength}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.maxLength}}));{{/if}}
-            {{~#if (hasProperty expectedConstraints "minValue")}}
-              if ({{>actualValue}} != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}}));
-              }
+            {{>maybeCheckExpectedConstraints}}
+            {{#if saveAs}}
+            {
+              {{saveAs}} = {{>actualValue}};
+            }
             {{/if}}
-            {{~#if (hasProperty expectedConstraints "maxValue")}}
-              if ({{>actualValue}} != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}}));
-              }
-            {{/if}}
-            {{~#if (hasProperty expectedConstraints "notValue")}}
-              {{#if (isLiteralNull expectedConstraints.notValue)}}
-              VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>actualValue}}));
-              {{else}}
-              if ({{>actualValue}} != nil) {
-                {{#if (isString type)}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
-                {{else}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>actualValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
-                {{/if}}
-              }
-              {{/if}}
-            {{/if}}
-        {{/if}}
-        {{#if saveAs}}
-        {
-          {{saveAs}} = {{>actualValue}};
-        }
-        {{/if}}
-        {{/chip_tests_item_response_parameters}}
+            {{/chip_tests_item_response_parameters}}
 
         {{#unless async}}
         NextTest();

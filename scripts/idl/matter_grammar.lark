@@ -49,9 +49,10 @@ cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|
 ?cluster_side: "server"i -> server_cluster
              | "client"i -> client_cluster
 
-endpoint: "endpoint"i positive_integer "{" endpoint_cluster* "}"
-?endpoint_cluster: endpoint_cluster_binding | endpoint_server_cluster
+endpoint: "endpoint"i positive_integer "{" endpoint_content* "}"
+?endpoint_content: endpoint_cluster_binding | endpoint_server_cluster | endpoint_device_type
 
+endpoint_device_type: "device" "type" id "=" positive_integer ";"
 endpoint_cluster_binding: "binding"i "cluster"i id ";"
 endpoint_server_cluster: "server"i "cluster"i id "{" endpoint_attribute_instantiation* "}"
 

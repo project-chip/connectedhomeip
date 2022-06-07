@@ -13989,13 +13989,17 @@ public class ChipClusters {
       attestationRequest(chipClusterPtr, callback, attestationNonce, timedInvokeTimeoutMs);
     }
 
-    public void CSRRequest(CSRResponseCallback callback, byte[] CSRNonce) {
-      CSRRequest(chipClusterPtr, callback, CSRNonce, null);
+    public void CSRRequest(
+        CSRResponseCallback callback, byte[] CSRNonce, Optional<Boolean> isForUpdateNOC) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, isForUpdateNOC, null);
     }
 
     public void CSRRequest(
-        CSRResponseCallback callback, byte[] CSRNonce, int timedInvokeTimeoutMs) {
-      CSRRequest(chipClusterPtr, callback, CSRNonce, timedInvokeTimeoutMs);
+        CSRResponseCallback callback,
+        byte[] CSRNonce,
+        Optional<Boolean> isForUpdateNOC,
+        int timedInvokeTimeoutMs) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, isForUpdateNOC, timedInvokeTimeoutMs);
     }
 
     public void certificateChainRequest(
@@ -14067,6 +14071,7 @@ public class ChipClusters {
         long chipClusterPtr,
         CSRResponseCallback Callback,
         byte[] CSRNonce,
+        Optional<Boolean> isForUpdateNOC,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void certificateChainRequest(
@@ -23896,6 +23901,24 @@ public class ChipClusters {
       subscribeTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readPhysicalClosedLimitLiftAttribute(IntegerAttributeCallback callback) {
+      readPhysicalClosedLimitLiftAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePhysicalClosedLimitLiftAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePhysicalClosedLimitLiftAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPhysicalClosedLimitTiltAttribute(IntegerAttributeCallback callback) {
+      readPhysicalClosedLimitTiltAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePhysicalClosedLimitTiltAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePhysicalClosedLimitTiltAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readCurrentPositionLiftAttribute(CurrentPositionLiftAttributeCallback callback) {
       readCurrentPositionLiftAttribute(chipClusterPtr, callback);
     }
@@ -23912,6 +23935,24 @@ public class ChipClusters {
     public void subscribeCurrentPositionTiltAttribute(
         CurrentPositionTiltAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentPositionTiltAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNumberOfActuationsLiftAttribute(IntegerAttributeCallback callback) {
+      readNumberOfActuationsLiftAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfActuationsLiftAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfActuationsLiftAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNumberOfActuationsTiltAttribute(IntegerAttributeCallback callback) {
+      readNumberOfActuationsTiltAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfActuationsTiltAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfActuationsTiltAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readConfigStatusAttribute(IntegerAttributeCallback callback) {
@@ -24130,6 +24171,18 @@ public class ChipClusters {
     private native void subscribeTypeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
+    private native void readPhysicalClosedLimitLiftAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribePhysicalClosedLimitLiftAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readPhysicalClosedLimitTiltAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribePhysicalClosedLimitTiltAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
     private native void readCurrentPositionLiftAttribute(
         long chipClusterPtr, CurrentPositionLiftAttributeCallback callback);
 
@@ -24147,6 +24200,18 @@ public class ChipClusters {
         CurrentPositionTiltAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readNumberOfActuationsLiftAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfActuationsLiftAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNumberOfActuationsTiltAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfActuationsTiltAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readConfigStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

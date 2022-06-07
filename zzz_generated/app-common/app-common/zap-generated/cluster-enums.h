@@ -755,6 +755,12 @@ using RadioFaultType                  = EmberAfRadioFaultType;
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
+
+// Bitmap for SoftwareDiagnosticsFeature
+enum class SoftwareDiagnosticsFeature : uint32_t
+{
+    kWaterMarks = 0x1,
+};
 } // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {
@@ -1202,18 +1208,6 @@ enum class DoorLockUserType : uint8_t
     kMasterUser          = 0x03,
     kNonAccessUser       = 0x04,
     kNotSupported        = 0xFF,
-};
-
-// Bitmap for DlAlarmMask
-enum class DlAlarmMask : uint16_t
-{
-    kLockingMechanismJammed                 = 0x1,
-    kLockResetToFactoryDefaults             = 0x2,
-    kReserved                               = 0x4,
-    kRFModulePowerCycled                    = 0x8,
-    kWrongCodeEntryLimit                    = 0x10,
-    kFrontEscutcheonRemovedFromMain         = 0x20,
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40,
 };
 
 // Bitmap for DlCredentialRuleMask

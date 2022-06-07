@@ -874,6 +874,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1119,12 +1120,16 @@ client cluster Scenes = 5 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -1500,8 +1505,12 @@ server cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
+  readonly attribute int16u physicalClosedLimitLift = 1;
+  readonly attribute int16u physicalClosedLimitTilt = 2;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
+  readonly attribute int16u numberOfActuationsLift = 5;
+  readonly attribute int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
@@ -1545,8 +1554,8 @@ server cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-
 endpoint 0 {
+  device type windowcovering = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1857,8 +1866,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type windowcovering = 514;
   binding cluster Scenes;
 
   server cluster Identify {
@@ -1885,8 +1894,12 @@ endpoint 1 {
 
   server cluster WindowCovering {
     ram      attribute type;
+    ram      attribute physicalClosedLimitLift default = 0xFFFF;
+    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift;
     persist  attribute currentPositionTilt;
+    persist  attribute numberOfActuationsLift;
+    persist  attribute numberOfActuationsTilt;
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage;
     persist  attribute currentPositionTiltPercentage;
@@ -1906,8 +1919,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 5;
   }
 }
-
 endpoint 2 {
+  device type windowcovering = 514;
   binding cluster Scenes;
 
   server cluster Groups {
@@ -1927,8 +1940,12 @@ endpoint 2 {
 
   server cluster WindowCovering {
     ram      attribute type;
+    ram      attribute physicalClosedLimitLift default = 0xFFFF;
+    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift;
     persist  attribute currentPositionTilt;
+    persist  attribute numberOfActuationsLift;
+    persist  attribute numberOfActuationsTilt;
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage;
     persist  attribute currentPositionTiltPercentage;

@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.12. [TC-DM-4.12][Thread]Verification for ConnectNetwork Command
+    10.4.12. [TC-DM-4.12] [Thread]Verification for ConnectNetwork Command
     [DUT-Commissionee]
 
 config:
@@ -23,7 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH1 sends ArmFailSafe command to the DUT"
+    - label:
+          "During the commissioning process, TH and DUT, TH sends ArmFailSafe
+          command to the DUT"
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -37,14 +39,36 @@ tests:
           [1650388635.103426][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ArmFailSafe'
       disabled: true
 
-    - label: "TH1 saves the timestamp as CT1"
+    - label:
+          "During the commissioning process, TH sends AddOrUpdateThreadNetwork
+          command to the DUT with OperationalDataset argument value as
+          'Userth_op' and Breadcrumb argument value as 1"
       verification: |
+          Executed during the commissioning
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
+          [1650388629.653868][9682:9682] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_kvs
 
+
+          [1650388638.775935][9682:9687] CHIP:CTL: Successfully finished commissioning step 'SendNOC'
+          [1650388638.775991][9682:9687] CHIP:CTL: Commissioning stage next step: 'SendNOC' -> 'ThreadNetworkSetup'
+          [1650388638.776048][9682:9687] CHIP:CTL: Performing next commissioning step 'ThreadNetworkSetup'
+          [1650388639.091089][9682:9687] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650388639.091215][9682:9687] CHIP:CTL: Received NetworkConfig response
+          [1650388639.091281][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkSetup'
+          [1650388639.091336][9682:9687] CHIP:CTL: Commissioning stage next step: 'ThreadNetworkSetup' -> 'ThreadNetworkEnable'
+          [1650388639.091393][9682:9687] CHIP:CTL: Performing next commissioning step 'ThreadNetworkEnable'
       disabled: true
 
     - label:
-          "TH1 sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 0"
+          "TH saves record current wall clock time with seconds resolution as
+          CT1"
+      verification: |
+          TH1 saves the timestamp as CT1
+      disabled: true
+
+    - label:
+          "TH sends ConnectNetwork command to the DUT with NetworkID argument
+          value as 'Userth_op' and Breadcrumb argument value as 1"
       verification: |
           Executed during the commissioning
 
@@ -53,12 +77,16 @@ tests:
           [1650388642.195614][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkEnable'
       disabled: true
 
-    - label: "TH1 saves the timestamp as CT2"
+    - label:
+          "TH saves record current wall clock time with seconds resolution as
+          CT2"
       verification: |
-
+          TH1 saves the timestamp as CT2
       disabled: true
 
-    - label: "TH1 reads Networks attribute from the DUT"
+    - label:
+          "After commissioning completes, TH reads Networks attribute from the
+          DUT"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 

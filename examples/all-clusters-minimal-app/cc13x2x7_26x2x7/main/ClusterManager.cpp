@@ -34,7 +34,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
 
 constexpr uint32_t kIdentifyTimerDelayMS     = 250;
 constexpr uint32_t kIdentifyTimerDelayPerSec = 4;
@@ -43,6 +42,45 @@ ClusterManager ClusterManager::sCluster;
 #define ENDPOINT_ID_0 (0)
 #define ENDPOINT_ID_1 (1)
 #define ENDPOINT_ID_2 (2)
+
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        PLAT_LOG("No identifier effect");
+        break;
+    }
+    return;
+}
+
+Identify gIdentify0 = {
+    chip::EndpointId{ 0 },
+    [](Identify *) { PLAT_LOG("onIdentifyStart"); },
+    [](Identify *) { PLAT_LOG("onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
+
+Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { PLAT_LOG("onIdentifyStart"); },
+    [](Identify *) { PLAT_LOG("onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
 
 void ClusterManager::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
@@ -94,13 +132,13 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-            ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
+            app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-            ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
+            app::Clusters::ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
         }
         PLAT_LOG("Color Control triggered: Hue: %d Saturation: %d", hue, saturation);
     }
@@ -111,7 +149,7 @@ exit:
 void ClusterManager::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
                                                            uint8_t * value)
 {
-    if (attributeId == Identify::Attributes::IdentifyTime::Id && size == 2)
+    if (attributeId == app::Clusters::Identify::Attributes::IdentifyTime::Id && size == 2)
     {
         uint16_t identifyTime;
         memcpy(&identifyTime, value, size);

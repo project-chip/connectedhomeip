@@ -989,16 +989,6 @@ server cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1966,6 +1956,16 @@ server cluster KeypadInput = 1289 {
 
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SendKeyRequest {
+    CecKeyCode keyCode = 0;
+  }
+
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
+  }
+
+  command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 server cluster LevelControl = 8 {
@@ -2561,6 +2561,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -2937,12 +2938,16 @@ server cluster Scenes = 5 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -3013,6 +3018,18 @@ server cluster TargetNavigator = 1285 {
   readonly attribute int8u currentTarget = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct NavigateTargetRequest {
+    INT8U target = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
 server cluster TemperatureMeasurement = 1026 {
@@ -3794,8 +3811,12 @@ server cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
+  readonly attribute int16u physicalClosedLimitLift = 1;
+  readonly attribute int16u physicalClosedLimitTilt = 2;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
+  readonly attribute int16u numberOfActuationsLift = 5;
+  readonly attribute int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
@@ -3811,6 +3832,9 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
   readonly attribute bitmap16 safetyStatus = 26;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -3839,8 +3863,8 @@ server cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -4158,8 +4182,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type onofflight = 256;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -4340,23 +4364,30 @@ endpoint 1 {
 
   server cluster WindowCovering {
     ram      attribute type;
+    ram      attribute physicalClosedLimitLift default = 0xFFFF;
+    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift default = 0x7FFF;
     persist  attribute currentPositionTilt default = 0x7FFF;
+    persist  attribute numberOfActuationsLift;
+    persist  attribute numberOfActuationsTilt;
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
     ram      attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths default = 500;
-    ram      attribute targetPositionTiltPercent100ths default = 500;
+    ram      attribute targetPositionLiftPercent100ths default = 5000;
+    ram      attribute targetPositionTiltPercent100ths default = 5000;
     ram      attribute endProductType;
-    persist  attribute currentPositionLiftPercent100ths default = 500;
-    persist  attribute currentPositionTiltPercent100ths default = 500;
+    persist  attribute currentPositionLiftPercent100ths default = 5000;
+    persist  attribute currentPositionTiltPercent100ths default = 5000;
     persist  attribute installedOpenLimitLift;
     persist  attribute installedClosedLimitLift default = 0xFFFF;
     persist  attribute installedOpenLimitTilt;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode;
     ram      attribute safetyStatus;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x17;
     ram      attribute clusterRevision default = 5;
   }
@@ -4750,8 +4781,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 2 {
+  device type onofflight = 256;
 
   server cluster Groups {
     ram      attribute nameSupport;
@@ -4797,8 +4828,8 @@ endpoint 2 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 65534 {
+  device type anonymousEndpointType = 61442;
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;
