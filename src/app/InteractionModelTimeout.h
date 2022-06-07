@@ -18,11 +18,15 @@
 #pragma once
 
 #include <system/SystemClock.h>
+#include <transport/Session.h>
+#include <transport/SessionHandle.h>
 
 namespace chip {
 namespace app {
 
-static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
+// This is an expected upper bound of time-to-first-byte for IM transactions, the actual processing time should never exceed this
+// value unless specified elsewhere (e.g. async command handling for some clusters).
+static constexpr System::Clock::Timeout kExpectedIMProcessingTime = System::Clock::Seconds16(2);
 
 } // namespace app
 } // namespace chip

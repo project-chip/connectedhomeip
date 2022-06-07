@@ -46,5 +46,14 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
+{
+    if (IsGroupSession())
+    {
+        return System::Clock::kZero;
+    }
+    return GetAckTimeout() + upperlayerProcessingTimeout;
+}
+
 } // namespace Transport
 } // namespace chip

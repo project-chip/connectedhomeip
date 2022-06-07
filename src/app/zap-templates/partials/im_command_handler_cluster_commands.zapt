@@ -36,7 +36,7 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
     if (argExists[currentDecodeTagId])
     {
       ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-      TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+      TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
       break;
     }
     else

@@ -36,8 +36,8 @@ DevicePreset "30739 Flash"
 	DLConfigSerialControlBaudRate = 115200
 	DLConfigEEPROMAccessSpeed = 100
 	DLConfigVSOffset = 0
-	ConfigDSLocation = 0x508000
-	ConfigDS2Location = 0x51b000
+	ConfigDSLocation = 0x505000
+	ConfigDS2Location = 0x519000
 	DLConfigSSLocation = 0x500000
 	DLConfigIncludeBTWSecurityKey = 0
 	DLConfigVSLocation = 0x501000

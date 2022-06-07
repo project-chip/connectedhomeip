@@ -623,6 +623,28 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
 
+# Generating esp32-devkitc-ota-requestor
+mkdir -p {out}/esp32-devkitc-ota-requestor
+
+cp examples/ota-requestor-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor reconfigure'
+
+# Generating esp32-devkitc-ota-requestor-rpc
+mkdir -p {out}/esp32-devkitc-ota-requestor-rpc
+
+cp examples/ota-requestor-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc reconfigure'
+
 # Generating esp32-devkitc-shell
 mkdir -p {out}/esp32-devkitc-shell
 
@@ -1095,28 +1117,28 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
 
 # Generating tizen-arm-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
 
 # Generating tizen-arm-light-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-asan
 
 # Generating tizen-arm-light-no-ble
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble
 
 # Generating tizen-arm-light-no-ble-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-asan
 
 # Generating tizen-arm-light-no-ble-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi
 
 # Generating tizen-arm-light-no-ble-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi-asan
 
 # Generating tizen-arm-light-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi
 
 # Generating tizen-arm-light-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi-asan
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
@@ -1823,6 +1845,20 @@ rm -f examples/lock-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock build'
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+# Building esp32-devkitc-ota-requestor
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor build'
+
+rm -f examples/ota-requestor-app/esp32/sdkconfig
+
+# Building esp32-devkitc-ota-requestor-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
+idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc build'
 
 rm -f examples/shell/esp32/sdkconfig
 

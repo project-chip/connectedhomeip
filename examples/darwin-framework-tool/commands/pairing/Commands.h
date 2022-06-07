@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
 
 class PairCode : public PairingCommandBridge
@@ -55,8 +56,9 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<PairCode>(), make_unique<PairWithIPAddress>(), make_unique<PairBleWiFi>(), make_unique<PairBleThread>(),
-        make_unique<Unpair>(),
+        make_unique<PairCode>(),    make_unique<PairWithIPAddress>(),
+        make_unique<PairBleWiFi>(), make_unique<PairBleThread>(),
+        make_unique<Unpair>(),      make_unique<OpenCommissioningWindowCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -467,7 +467,7 @@ void AppTask::UpdateClusterState(void)
 void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
-    BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
+    BitMask<PumpConfigurationAndControl::PumpStatus> pumpStatus;
 
     ChipLogProgress(NotSpecified, "Update Cluster State");
 

@@ -1013,7 +1013,7 @@ DLL_EXPORT CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // In CHIP certificate it is represented as a CHIP Epoch UTC time value of 0 sec (2020-01-01 00:00:00 UTC).
+    // In CHIP certificate it is represented as a CHIP Epoch UTC time value of 0 sec (2000-01-01 00:00:00 UTC).
     if ((asn1Time.Year == kX509NoWellDefinedExpirationDateYear) && (asn1Time.Month == kMonthsPerYear) &&
         (asn1Time.Day == kMaxDaysPerMonth) && (asn1Time.Hour == kHoursPerDay - 1) && (asn1Time.Minute == kMinutesPerHour - 1) &&
         (asn1Time.Second == kSecondsPerMinute - 1))
@@ -1036,7 +1036,7 @@ exit:
 DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time)
 {
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2020-01-01 00:00:00 UTC).
+    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2000-01-01 00:00:00 UTC).
     if (epochTime == kNullCertTime)
     {
         asn1Time.Year   = kX509NoWellDefinedExpirationDateYear;

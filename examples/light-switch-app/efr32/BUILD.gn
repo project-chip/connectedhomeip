@@ -60,6 +60,9 @@ declare_args() {
 
   # Disable LCD on supported devices
   disable_lcd = false
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_disable_wifi_ipv4 = false
 }
 
 declare_args() {
@@ -213,6 +216,10 @@ efr32_executable("light_switch_app") {
   if (chip_enable_ota_requestor) {
     defines += [ "EFR32_OTA_ENABLED" ]
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  }
+
+  if (chip_disable_wifi_ipv4) {
+    defines += [ "WIFI_IPV4_DISABLED" ]
   }
 
   # WiFi Settings

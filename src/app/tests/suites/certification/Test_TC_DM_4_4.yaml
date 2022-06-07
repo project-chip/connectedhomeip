@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.4. [TC-DM-4.4][WiFi]Verification for ScanNetworks command
+    10.4.4. [TC-DM-4.4] [WiFi]Verification for ScanNetworks command
     [DUT-Commissionee]
 
 config:
@@ -24,8 +24,8 @@ config:
 
 tests:
     - label:
-          "TH1 sends ScanNetworks command to the DUT with the SSID argument
-          value as null and Breadcrumb argument value as 0"
+          "TH sends ScanNetworks command to the DUT with the SSID argument value
+          as 'null' and Breadcrumb argument value as 1"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning scan-networks null 0 1 0 --paa-trust-store-path ./credentials/development/paa-root-certs
 
@@ -160,8 +160,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends ScanNetworks Command to the DUT with SSID argument value as
-          'Userwifi_ssid' and Breadcrumb argument value 0"
+          "TH sends ScanNetworks Command to the DUT with SSID argument value as
+          'Userwifi_ssid' and Breadcrumb argument value 1"
       verification: |
           ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning scan-networks 47524C507269766174655F455854 0 1 0
 

@@ -1,4 +1,24 @@
 #!/usr/bin/env python
+#
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+"""BTP file reader
+
+This is a helper script to parse BTP file into json.
+
+"""
 
 import argparse
 import json
@@ -26,17 +46,24 @@ def main():
                 else:
                     items[key] = int(value, 0)
 
-    items["XS_LOCATION_ACTIVE"] = 0x0052E000
+    ds_len = items["ConfigDS2Location"] - items["ConfigDSLocation"]
+    xs_location_end = 0x00600000
+
+    items["ConfigXS1Location"] = items["ConfigDS2Location"] + ds_len
 
     if option.enable_ota:
-        items["XS_LOCATION_UPGRADE"] = 0x005A3000
+        items["ConfigXS1Length"] = 0x00076000
+        items["ConfigXS2Location"] = (
+            items["ConfigXS1Location"] + items["ConfigXS1Length"]
+        )
+        items["ConfigXS2Length"] = xs_location_end - items["ConfigXS2Location"]
     else:
-        items["XS_LOCATION_UPGRADE"] = 0x00600000
+        items["ConfigXS1Length"] = xs_location_end - items["ConfigXS1Location"]
+        items["ConfigXS2Length"] = 0
+        items["ConfigXS2Location"] = xs_location_end
 
-    items["XIP_DS_OFFSET"] = items["XS_LOCATION_ACTIVE"] - \
+    items["ConfigXS1DS1Offset"] = items["ConfigXS1Location"] - \
         items["ConfigDSLocation"]
-    items["XIP_LEN"] = items["XS_LOCATION_UPGRADE"] - \
-        items["XS_LOCATION_ACTIVE"]
 
     for key in items:
         if type(items[key]) is int:

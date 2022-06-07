@@ -31,7 +31,9 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif
 
 #include <openthread/platform/entropy.h>
 
@@ -114,8 +116,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);

@@ -28,6 +28,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <inet/EndPointStateOpenThread.h>
+
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -94,8 +96,6 @@ static OTAImageProcessorImpl gImageProcessor;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
-
-extern bool shouldReset;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -184,12 +184,27 @@ CHIP_ERROR AppTask::Init()
     return err;
 }
 
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+
 void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     // Init ZCL Data Model and start server
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
 }
 
@@ -690,13 +705,6 @@ void AppTask::OTAResumeEventHandler(AppEvent * aEvent)
     }
 }
 
-extern "C" void vApplicationIdleHook(void)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    OTA_TransactionResume();
-#endif
-}
-
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
@@ -752,4 +760,11 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);
+}
+
+extern "C" void OTAIdleActivities(void)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OTA_TransactionResume();
+#endif
 }

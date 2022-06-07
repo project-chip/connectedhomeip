@@ -83,8 +83,9 @@ static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 
     level = (blue * 10000) / UINT8_MAX;
     log_info("blue level: %d\r\n", level);
-    pwmB.port              = 2;
-    pwmB.config.pin        = 17;
+    pwmB.port = 2;
+    // not use debug port
+    // pwmB.config.pin        = 17;
     pwmB.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
     pwmB.config.freq       = 1000;
     hosal_pwm_init(&pwmB);

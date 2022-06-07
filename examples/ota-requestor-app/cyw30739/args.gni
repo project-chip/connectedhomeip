@@ -19,8 +19,4 @@ cyw30739_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_openthread_ftd = true
 
-# Disable progress logging to fit in flash
-chip_progress_logging = false
-chip_error_logging = false
-
 chip_enable_ota_requestor = true

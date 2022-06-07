@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.18. [TC-DM-4.18][Thread] Verification for attributes check
+    10.4.18. [TC-DM-4.18] [Thread] Verification for attributes check
     [DUT-Commissioner]
 
 config:
@@ -88,7 +88,7 @@ tests:
           [1645772984.654530][3895:3900] CHIP:EM: Sending Standalone Ack for MessageCounter:14026610 on exchange 33717i
       disabled: true
 
-    - label: "DUT reads LastNetowrkingStatus attribute from the TH"
+    - label: "DUT reads LastNetworkingStatus attribute from the TH"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
 

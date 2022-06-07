@@ -1276,16 +1276,6 @@ client cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
-  bitmap DlAlarmMask : BITMAP16 {
-    kLockingMechanismJammed = 0x1;
-    kLockResetToFactoryDefaults = 0x2;
-    kReserved = 0x4;
-    kRFModulePowerCycled = 0x8;
-    kWrongCodeEntryLimit = 0x10;
-    kFrontEscutcheonRemovedFromMain = 0x20;
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
-  }
-
   bitmap DlCredentialRuleMask : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1622,11 +1612,6 @@ client cluster DoorLock = 257 {
     optional epoch_s localStartTime = 2;
     optional epoch_s localEndTime = 3;
     optional DlOperatingMode operatingMode = 4;
-  }
-
-  response struct GetUserTypeResponse = 21 {
-    INT16U userId = 0;
-    DlUserType userType = 1;
   }
 
   response struct GetUserResponse = 28 {
@@ -2953,6 +2938,7 @@ client cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -3376,12 +3362,16 @@ client cluster Scenes = 5 {
 }
 
 client cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -4298,8 +4288,12 @@ client cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
+  readonly attribute int16u physicalClosedLimitLift = 1;
+  readonly attribute int16u physicalClosedLimitTilt = 2;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
+  readonly attribute int16u numberOfActuationsLift = 5;
+  readonly attribute int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
@@ -4346,8 +4340,8 @@ client cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
-
 endpoint 1 {
+  device type rootdevice = 22;
   binding cluster Identify;
   binding cluster Groups;
   binding cluster Scenes;

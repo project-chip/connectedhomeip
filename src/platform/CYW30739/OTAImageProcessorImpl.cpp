@@ -17,10 +17,13 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <ota_fw_upgrade.h>
 #include <wiced_hal_wdog.h>
 
 #include "OTAImageProcessorImpl.h"
+
+using namespace chip::System;
 
 namespace chip {
 
@@ -66,6 +69,35 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != requestor->GetTargetVersion())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
@@ -79,6 +111,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
+
+    imageProcessor->mHeaderParser.Init();
 
     if (!wiced_firmware_upgrade_prepare())
     {
@@ -113,10 +147,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(imageProcessor != nullptr);
 
     if (!wiced_firmware_upgrade_apply())
     {
@@ -126,7 +157,13 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "OTA upgrade completed");
 
-    wiced_hal_wdog_reset_system();
+    DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Seconds32(15),
+        [](Layer *, void *) {
+            ChipLogProgress(SoftwareUpdate, "Rebooting...");
+            wiced_hal_wdog_reset_system();
+        },
+        nullptr);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -158,11 +195,20 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    if (IsSpanUsable(imageProcessor->mBlock))
+    ByteSpan block   = imageProcessor->mBlock;
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    if (error != CHIP_NO_ERROR)
     {
-        const uint32_t written = wiced_firmware_upgrade_process_block(imageProcessor->mParams.downloadedBytes,
-                                                                      imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
-        if (written != imageProcessor->mBlock.size())
+        ChipLogError(SoftwareUpdate, "Image does not contain a valid header");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+        return;
+    }
+
+    if (IsSpanUsable(block))
+    {
+        const uint32_t written =
+            wiced_firmware_upgrade_process_block(imageProcessor->mParams.downloadedBytes, block.data(), block.size());
+        if (written != block.size())
         {
             ChipLogError(SoftwareUpdate, "wiced_firmware_upgrade_process_block 0x%08lx", written);
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
@@ -170,8 +216,33 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         }
     }
 
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    imageProcessor->mParams.downloadedBytes += block.size();
     imageProcessor->mDownloader->FetchNextData();
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+
+        /* Skip inserted zeroes before sections */
+        const size_t header_size = mBlock.size() - block.size();
+        if (header_size % 4 != 0)
+        {
+            block = block.SubSpan(4 - header_size % 4);
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
