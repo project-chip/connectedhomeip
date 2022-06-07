@@ -78,9 +78,6 @@ void SignalHandler(int signum)
     case SIGTTIN:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
-    case SIGTSTP:
-        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
-        break;
     default:
         break;
     }
@@ -323,88 +320,7 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
     }
 }
 
-void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
-{
-    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
 
-    if (delegate == nullptr)
-    {
-        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
-        return;
-    }
-
-    if (EventId == Switch::Events::SwitchLatched::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnSwitchLatched(newPosition);
-    }
-    else if (EventId == Switch::Events::InitialPress::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnInitialPressed(newPosition);
-    }
-    else if (EventId == Switch::Events::LongPress::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnLongPressed(newPosition);
-    }
-    else if (EventId == Switch::Events::ShortRelease::Id)
-    {
-        uint8_t previousPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        previousPosition = 50;
-#endif
-        delegate->OnShortReleased(previousPosition);
-    }
-    else if (EventId == Switch::Events::LongRelease::Id)
-    {
-        uint8_t previousPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        previousPosition = 50;
-#endif
-        delegate->OnLongReleased(previousPosition);
-    }
-    else if (EventId == Switch::Events::MultiPressOngoing::Id)
-    {
-        uint8_t newPosition                   = 0;
-        uint8_t currentNumberOfPressesCounted = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition                   = 10;
-        currentNumberOfPressesCounted = 5;
-#endif
-        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
-    }
-    else if (EventId == Switch::Events::MultiPressComplete::Id)
-    {
-        uint8_t newPosition                 = 0;
-        uint8_t totalNumberOfPressesCounted = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition                 = 10;
-        totalNumberOfPressesCounted = 5;
-#endif
-        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
-    }
-}
 
 #if CHIP_WITH_GIO
 GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
