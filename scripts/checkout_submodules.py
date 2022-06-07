@@ -42,6 +42,7 @@ ALL_PLATFORMS = set([
     'telink',
     'tizen',
     'webos',
+    'openiotsdk',
 ])
 
 Module = namedtuple('Module', 'name path platforms')
