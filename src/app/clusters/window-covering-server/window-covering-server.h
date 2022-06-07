@@ -80,11 +80,11 @@ void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus
 chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
-void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus);
-void OperationalStatusSet(chip::EndpointId endpoint, chip::BitFlags<OperationalStatus> newStatus);
-chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint);
-void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state);
-OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field);
+void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus);
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus);
+chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint);
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state);
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
@@ -97,8 +97,8 @@ void ModePrint(const chip::BitMask<Mode> & mode);
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 
-void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitFlags<SafetyStatus> & status);
-chip::BitFlags<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
+void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status);
+chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 

@@ -175,25 +175,25 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
     ConfigStatusSet(endpoint, configStatus);
 }
 
-void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus)
+void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
 {
     emberAfWindowCoveringClusterPrint("OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
                                       opStatus.GetField(OperationalStatus::kGlobal), opStatus.GetField(OperationalStatus::kLift),
                                       opStatus.GetField(OperationalStatus::kTilt));
 }
 
-chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
+chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
 {
-    chip::BitFlags<OperationalStatus> status;
+    chip::BitMask<OperationalStatus> status;
 
     Attributes::OperationalStatus::Get(endpoint, &status);
 
     return status;
 }
 
-void OperationalStatusSet(chip::EndpointId endpoint, chip::BitFlags<OperationalStatus> newStatus)
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus)
 {
-    chip::BitFlags<OperationalStatus> prevStatus;
+    chip::BitMask<OperationalStatus> prevStatus;
     Attributes::OperationalStatus::Get(endpoint, &prevStatus);
 
     // Filter changes
@@ -203,9 +203,9 @@ void OperationalStatusSet(chip::EndpointId endpoint, chip::BitFlags<OperationalS
     }
 }
 
-void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state)
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state)
 {
-    chip::BitFlags<OperationalStatus> status;
+    chip::BitMask<OperationalStatus> status;
     Attributes::OperationalStatus::Get(endpoint, &status);
 
     /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
@@ -215,7 +215,7 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<Operati
         status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
 
         /* Global Always follow Lift by priority or therefore fallback to Tilt */
-        chip::BitFlags<OperationalStatus> opGlobal =
+        chip::BitMask<OperationalStatus> opGlobal =
             status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
         status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
 
@@ -223,9 +223,9 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<Operati
     }
 }
 
-OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field)
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field)
 {
-    chip::BitFlags<OperationalStatus> status;
+    chip::BitMask<OperationalStatus> status;
 
     Attributes::OperationalStatus::Get(endpoint, &status);
 
@@ -286,14 +286,14 @@ chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
     return mode;
 }
 
-void SafetyStatusSet(chip::EndpointId endpoint, chip::BitFlags<SafetyStatus> & newSafetyStatus)
+void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
 {
     Attributes::SafetyStatus::Set(endpoint, newSafetyStatus);
 }
 
-chip::BitFlags<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
+chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
 {
-    chip::BitFlags<SafetyStatus> safetyStatus;
+    chip::BitMask<SafetyStatus> safetyStatus;
 
     Attributes::SafetyStatus::Get(endpoint, &safetyStatus);
     return safetyStatus;
