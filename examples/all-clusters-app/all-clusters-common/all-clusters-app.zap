@@ -12587,7 +12587,7 @@
             },
             {
               "name": "ManufacturerExtension",
-              "code": 0xFFF10001,
+              "code": 4293984257,
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
