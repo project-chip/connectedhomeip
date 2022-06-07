@@ -41,7 +41,7 @@ public:
      * @retval CHIP_ERROR_INCORRECT_STATE if Init() had not been called or Finish() was already called
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is already a pending keypair for another `fabricIndex` value
      *                                         or if fabricIndex is an invalid value.
-     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `IngestKeypairForFabric` is supported
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `SignWithOpKeypair` is supported
      * @retval other CHIP_ERROR value on internal crypto engine errors
      */
     virtual CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) = 0;
@@ -62,8 +62,8 @@ public:
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no pending operational keypair for `fabricIndex`
      * @retval CHIP_ERROR_INVALID_PUBLIC_KEY if `nocPublicKey` does not match the public key associated with the
      *                                       public key from last `NewOpKeypairForFabric`.
-     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `IngestKeypairForFabric` is supported
-     * @retval other CHIP_ERROR value on internal crypto engine errors
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `SignWithOpKeypair` is supported
+     * @retval other CHIP_ERROR value on internal storage or crypto engine errors
      */
     virtual CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) = 0;
 
@@ -80,10 +80,25 @@ public:
      * @retval CHIP_ERROR_INCORRECT_STATE if Init() had not been called or Finish() was already called,
      *                                    or ActivateOpKeypairForFabric not yet called
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no pending operational keypair for `fabricIndex`
-     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `IngestKeypairForFabric` is supported
-     * @retval other CHIP_ERROR value on internal crypto engine errors
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `SignWithOpKeypair` is supported
+     * @retval other CHIP_ERROR value on internal storage or crypto engine errors
      */
     virtual CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) = 0;
+
+    /**
+     * @brief Permanently remove the keypair associated with a fabric
+     *
+     * This is to be used for fail-safe handling and RemoveFabric
+     *
+     * @param fabricIndex - FabricIndex for which to remove the keypair
+     *
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INCORRECT_STATE if Init() had not been called or Finish() was already called.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no pending operational keypair for `fabricIndex`
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `SignWithOpKeypair` is supported
+     * @retval other CHIP_ERROR value on internal storage errors
+     */
+    virtual CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) = 0;
 
     /**
      * @brief Permanently release the operational keypair last generated with `NewOpKeypairForFabric`,

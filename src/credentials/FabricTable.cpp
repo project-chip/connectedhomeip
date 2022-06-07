@@ -228,8 +228,7 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     // Try to delete all the state even if one of the deletes fails.
     typedef const char * (DefaultStorageKeyAllocator::*KeyGetter)(FabricIndex);
     constexpr KeyGetter keyGetters[] = { &DefaultStorageKeyAllocator::FabricNOC, &DefaultStorageKeyAllocator::FabricICAC,
-                                         &DefaultStorageKeyAllocator::FabricRCAC, &DefaultStorageKeyAllocator::FabricMetadata,
-                                         &DefaultStorageKeyAllocator::FabricOpKey };
+                                         &DefaultStorageKeyAllocator::FabricRCAC, &DefaultStorageKeyAllocator::FabricMetadata };
 
     CHIP_ERROR prevDeleteErr = CHIP_NO_ERROR;
 
@@ -796,6 +795,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     FabricInfo * fabric      = FindFabricWithIndex(fabricIndex);
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
     CHIP_ERROR err           = FabricInfo::DeleteFromStorage(mStorage, fabricIndex); // Delete from storage regardless
+
+    CHIP_ERROR opKeyErr      = CHIP_NO_ERROR;
+    if (mOperationalKeystore != nullptr)
+    {
+        opKeyErr = mOperationalKeystore->RemoveOpKeypairForFabric(fabricIndex);
+    }
+
     if (!fabricIsInitialized)
     {
         // Make sure to return the error our API promises, not whatever storage
@@ -803,6 +809,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         return CHIP_ERROR_NOT_FOUND;
     }
     ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(opKeyErr);
 
     // Since fabricIsInitialized was true, fabric is not null.
     fabric->Reset();

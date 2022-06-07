@@ -54,8 +54,6 @@ constexpr size_t OpKeyTLVMaxSize()
  */
 CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegate * storage, P256Keypair * keypair)
 {
-
-    printf("=========== STORE OP \n");
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (storage != nullptr) && (keypair != nullptr),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -85,7 +83,6 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
     DefaultStorageKeyAllocator keyAlloc;
     VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorOnFailure(storage->SyncSetKeyValue(keyAlloc.FabricOpKey(fabricIndex), buf, static_cast<uint16_t>(opKeyLength)));
-    printf("=========== DONE STORE OP \n");
 
     return CHIP_NO_ERROR;
 }
@@ -219,6 +216,27 @@ CHIP_ERROR PersistentStorageOperationalKeystore::CommitOpKeypairForFabric(Fabric
     // If we got here, we succeeded and can reset the pending key: next `SignWithOpKeypair` will use the stored key.
     ResetPendingKey();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PersistentStorageOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    // Remove pending state if matching
+    if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
+    {
+        RevertPendingKeypairs();
+    }
+
+    DefaultStorageKeyAllocator keyAlloc;
+    CHIP_ERROR err = mStorage->SyncDeleteKeyValue(keyAlloc.FabricOpKey(fabricIndex));
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_ERROR_INVALID_FABRIC_INDEX;
+    }
+
+    return err;
 }
 
 void PersistentStorageOperationalKeystore::RevertPendingKeypairs()
