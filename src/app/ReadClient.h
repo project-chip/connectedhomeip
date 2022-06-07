@@ -66,16 +66,18 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * Once OnReportBegin has been called, either OnReportEnd or OnError will be called before OnDone.
          *
          */
         virtual void OnReportBegin() {}
 
         /**
-         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         * Used to signal the completion of processing of the last attribute or event report in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -395,6 +397,8 @@ private:
     CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
+    // Called to ensure OnReportBegin is called before calling OnEventData or OnAttributeData
+    void NoteReportingData();
 
     /*
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -414,6 +418,7 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback & mpCallback;
     ClientState mState                = ClientState::Idle;
+    bool mIsReporting                 = false;
     bool mIsInitialReport             = true;
     bool mIsPrimingReports            = true;
     bool mPendingMoreChunks           = false;
@@ -424,7 +429,6 @@ private:
     FabricIndex mFabricIndex          = kUndefinedFabricIndex;
     InteractionType mInteractionType  = InteractionType::Read;
     Timestamp mEventTimestamp;
-    bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
