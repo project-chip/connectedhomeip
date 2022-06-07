@@ -9874,7 +9874,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentPositionTiltPercentage", 1, value);
         }
         case WindowCovering::Attributes::OperationalStatus::Id: {
-            chip::BitFlags<chip::app::Clusters::WindowCovering::OperationalStatus> value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalStatus", 1, value);
         }
@@ -9929,7 +9929,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Mode", 1, value);
         }
         case WindowCovering::Attributes::SafetyStatus::Id: {
-            chip::BitFlags<chip::app::Clusters::WindowCovering::SafetyStatus> value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SafetyStatus", 1, value);
         }
