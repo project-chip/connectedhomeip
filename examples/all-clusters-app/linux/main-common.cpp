@@ -69,11 +69,14 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
     char threadName[kMaxThreadNameLength + 1];
 
-    softwareFault.id = static_cast<uint64_t>(gettid());
-    Platform::CopyString(threadName, kMaxThreadNameLength + 1, std::to_string(softwareFault.id).c_str());
+    softwareFault.id = static_cast<uint64_t>(getpid());
+    Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
 
-    softwareFault.name           = CharSpan::fromCharString(threadName);
-    softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(threadName), strlen(threadName));
+    softwareFault.name = CharSpan::fromCharString(threadName);
+
+    std::time_t result           = std::time(nullptr);
+    char * asctime               = std::asctime(std::localtime(&result));
+    softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(asctime), strlen(asctime));
 
     Clusters::SoftwareDiagnostics::Server::Instance().OnSoftwareFaultDetect(softwareFault);
 }
