@@ -115,6 +115,9 @@ public:
     DnssdTizen & operator=(const DnssdTizen &) = delete;
     ~DnssdTizen();
 
+    CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
+    CHIP_ERROR Shutdown();
+
     CHIP_ERROR Add(RegisterContext * context, dnssd_service_h service, const char * type, const char * name, uint16_t port,
                    uint32_t interfaceId);
     CHIP_ERROR Add(BrowseContext * context, dnssd_browser_h browser);
@@ -127,7 +130,7 @@ public:
     static DnssdTizen & GetInstance() { return sInstance; }
 
 private:
-    DnssdTizen(){};
+    DnssdTizen() = default;
     static DnssdTizen sInstance;
 
     void Delete(GenericContext * context);

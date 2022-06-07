@@ -96,16 +96,6 @@ bool CheckForSuccess(GenericContext * context, int err, const char * func, bool 
     return true;
 }
 
-CHIP_ERROR Initialize()
-{
-    int ret = dnssd_initialize();
-
-    VerifyOrReturnError(ret == DNSSD_ERROR_NONE || ret == DNSSD_ERROR_INVALID_OPERATION /* Already initialized */,
-                        CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR UpdateTXTRecord(dnssd_service_h service, TextEntry * textEntries, size_t textEntrySize)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
@@ -534,6 +524,26 @@ namespace Dnssd {
 
 DnssdTizen DnssdTizen::sInstance;
 
+CHIP_ERROR DnssdTizen::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
+{
+    int ret = dnssd_initialize();
+    VerifyOrExit(ret == DNSSD_ERROR_NONE || ret == DNSSD_ERROR_INVALID_OPERATION /* Already initialized */, );
+
+    initCallback(context, CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+
+exit:
+    errorCallback(context, CHIP_ERROR_INTERNAL);
+    return CHIP_ERROR_INTERNAL;
+}
+
+CHIP_ERROR DnssdTizen::Shutdown()
+{
+    int ret = dnssd_deinitialize();
+    VerifyOrReturnError(ret == DNSSD_ERROR_NONE, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
 void DnssdTizen::Delete(GenericContext * context)
 {
     switch (context->contextType)
@@ -695,33 +705,16 @@ RegisterContext * DnssdTizen::Get(const char * type, const char * name, uint16_t
     return nullptr;
 }
 
-CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback successCallback, DnssdAsyncReturnCallback errorCallback, void * context)
+CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    VerifyOrReturnError(successCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(initCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(errorCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    CHIP_ERROR err = Initialize();
-    if (err == CHIP_NO_ERROR)
-    {
-        successCallback(context, CHIP_NO_ERROR);
-    }
-    else
-    {
-        errorCallback(context, CHIP_ERROR_INTERNAL);
-    }
-    return err;
+    return DnssdTizen::GetInstance().Init(initCallback, errorCallback, context);
 }
 
 CHIP_ERROR ChipDnssdShutdown()
 {
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ChipDnssdSetHostname(const char * hostname)
-{
-    ChipLogProgress(DeviceLayer, "DNSsd: hostname: %s", hostname);
-    return CHIP_NO_ERROR;
+    return DnssdTizen::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
