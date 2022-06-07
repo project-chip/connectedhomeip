@@ -109,12 +109,14 @@ protected:
      * Allocate a secure session object from the passed session manager for the
      * pending session establishment operation.
      *
-     * @param sessionManager    Session manager from which to allocate a secure session object
-     * @param peerNodeId        If known, the scoped nodeid of the peer that should be considered if necessary
-     *                          as part of the session allocation algorithm.
+     * @param sessionManager        Session manager from which to allocate a secure session object
+     * @param sessionEvictionHint   If we're either establishing or just finished establishing a session to a peer in either
+     * initiator or responder roles, the node id of that peer should be provided in this argument. Else, it should be initialized to
+     * a default-constructed ScopedNodeId().
+     *
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId peerNodeId = ScopedNodeId());
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId sessionEvictionHint = ScopedNodeId());
 
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
 

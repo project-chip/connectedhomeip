@@ -725,7 +725,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     {
         // Allocate some session handles at pseudo-random offsets in the session
         // ID space.
-        constexpr size_t numHandles = CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE - 1;
+        constexpr size_t numHandles = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE - 1;
         Optional<SessionHandle> handles[numHandles];
         uint16_t sessionIds[numHandles];
         for (size_t h = 0; h < numHandles; ++h)

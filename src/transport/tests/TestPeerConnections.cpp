@@ -67,7 +67,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
     System::Clock::Internal::SetSystemClockForTesting(&clock);
     clock.SetMonotonic(100_ms64);
     CATValues peerCATs;
-    Optional<SessionHandle> sessions[CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE];
+    Optional<SessionHandle> sessions[CHIP_CONFIG_SECURE_SESSION_POOL_SIZE];
 
     // First node, peer session id 1, local session id 2
     auto optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 2, kLocalNodeId, kCasePeer1NodeId,
@@ -97,7 +97,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
     // This define guard will be needed when migrating SecureSessionTable to ObjectPool
     //#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     // If not using a heap, we can fill the SecureSessionTable
-    for (uint16_t i = 2; i < CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE; ++i)
+    for (uint16_t i = 2; i < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE; ++i)
     {
         sessions[i] =
             connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, static_cast<uint16_t>(i + 6u), kLocalNodeId,

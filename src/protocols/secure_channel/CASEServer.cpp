@@ -43,7 +43,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mExchangeManager          = exchangeManager;
     mGroupDataProvider        = responderGroupDataProvider;
 
-    // Setup CASE state machine using the credentials for the current fabric.
+    // Set up the group state provider that persists across all handshakes.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
 
     Cleanup();
@@ -92,18 +92,12 @@ exit:
     return err;
 }
 
-void CASEServer::Cleanup()
+void CASEServer::Cleanup(ScopedNodeId previouslyEstablishedPeer)
 {
     // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
     // https://github.com/project-chip/connectedhomeip/issues/8342
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
     mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
-
-    //
-    // If we previously had a session to a peer, latch it its details. If we didn't, this will
-    // contain kInvalidPeerNodeId.
-    //
-    ScopedNodeId previouslyEstablishedPeer = GetSession().GetPeer();
 
     GetSession().Clear();
 
@@ -113,8 +107,15 @@ void CASEServer::Cleanup()
     //
     // Logically speaking, we're attempting to evict a session using details of the just-established session (to ensure
     // we're evicting sessions from the right fabric if needed) and then transferring the just established session into that
-    // slot (and there-by free'ing up the slot for the next session attempt). However, this transfer isn't necessary - just
+    // slot (and thereby free'ing up the slot for the next session attempt). However, this transfer isn't necessary - just
     // evicting a session will ensure it is available for the next attempt.
+    //
+    // This call can fail if we have run out memory to allocate SecureSessions. Continuing without taking any action
+    // however will render this node deaf to future handshake requests, so it's better to die here to raise attention to the problem
+    // / facilitate recovery.
+    //
+    // TODO: Once session eviction is actually in place, this call should NEVER fail and if so, is a logic bug.
+    // Dying here on failure is even more appropriate then.
     //
     VerifyOrDie(GetSession().PrepareForSessionEstablishment(
                     *mSessionManager, mFabrics, mSessionResumptionStorage, this, previouslyEstablishedPeer,
@@ -130,8 +131,13 @@ void CASEServer::Cleanup()
     //
     // Let's create a SessionHandle strong-reference to it to keep it resident.
     //
-    mCaseSession = GetSession().CopySecureSession();
-    VerifyOrDie(mCaseSession.HasValue());
+    mPinnedSecureSession = GetSession().CopySecureSession();
+
+    //
+    // If we've gotten this far, it means we have successfully allocated a SecureSession to back our next attempt. If we haven't,
+    // there is a bug somewhere and we should raise attention to it by dying.
+    //
+    VerifyOrDie(mPinnedSecureSession.HasValue());
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
@@ -144,6 +150,6 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
-    Cleanup();
+    Cleanup(session->GetPeer());
 }
 } // namespace chip

@@ -73,16 +73,16 @@ public:
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
-     * @param previouslyEstablishedPeer     If known, the scoped nodeid of the previous peer to which a session
-     *                                      had just been established with (in responder role), or the peer to whom we're about to
-     *                                      establish a session to (in initiator role). Set to default ScopedNode() if not known.
+     * @param previouslyEstablishedPeer     If a session had previously been established successfully to a peer, this should
+     *                                      be set to its scoped node-id. Else, this should be initialized to a
+     *                                      default-constructed ScopedNodeId().
      * @param mrpConfig                     MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate, ScopedNodeId peerNodeId,
+        SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -181,8 +181,16 @@ private:
         kFinishedViaResume = 7,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate,
-                    ScopedNodeId previouslyEstablishedPeer);
+    /*
+     * Initialize the object given a reference to the SessionManager and a delegate which will be notified
+     * of any further progress on this session.
+     *
+     * If we're either establishing or finished establishing a session to a peer in either initiator or responder
+     * roles, the node id of that peer should be provided in sessionEvictionHint. Else, it should be initialized
+     * to a default-constructed ScopedNodeId().
+     *
+     */
+    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate, ScopedNodeId sessionEvictionHint);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

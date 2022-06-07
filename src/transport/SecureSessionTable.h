@@ -214,7 +214,7 @@ private:
         return NullOptional;
     }
 
-    BitMapObjectPool<SecureSession, CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE> mEntries;
+    BitMapObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
     uint16_t mNextSessionId = 0;
 };
 

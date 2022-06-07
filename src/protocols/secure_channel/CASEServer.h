@@ -61,7 +61,18 @@ private:
     Messaging::ExchangeManager * mExchangeManager        = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    Optional<SessionHandle> mCaseSession;
+    //
+    // When we're in the process of establishing a session, this is used
+    // to maintain an additional, strong reference to the underlying SecureSession.
+    // This is because the existing reference in PairingSession is a weak one
+    // (i.e a SessionHolder) and can lose its reference if the session is evicted
+    // for any reason.
+    //
+    // This initially points to a session that is not yet active. Upon activation, it
+    // transfers ownership of the session to the SecureSessionManager and this reference
+    // is released before simultaneously acquiring ownership of a new SecureSession.
+    //
+    Optional<SessionHandle> mPinnedSecureSession;
 
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;
@@ -71,7 +82,16 @@ private:
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 
-    void Cleanup();
+    /*
+     * This will clean up any state from a previous session establishment
+     * attempt (if any) and setup the machinery to listen for and handle
+     * any session handshakes there-after.
+     *
+     * If a session had previously been established successfully, previouslyEstablishedPeer
+     * should be set to the scoped node-id of the peer associated with that session.
+     *
+     */
+    void Cleanup(ScopedNodeId previouslyEstablishedPeer = ScopedNodeId());
 };
 
 } // namespace chip

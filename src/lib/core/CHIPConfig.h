@@ -644,7 +644,7 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE
+ * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
  *
  * @brief Defines the size of the pool used for tracking the state of
  * secure sessions. This controls the maximum number of concurrent
@@ -656,9 +656,9 @@
  *  - 1 reserved slot for PASE.
  *
  */
-#ifndef CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE
-#define CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
-#endif // CHIP_CONFIG_PEER_SECURE_SESSION_POOL_SIZE
+#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
+#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS
