@@ -61,7 +61,7 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState = PlaybackStateEnum::kPlaying;
+    mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = 1;
 
     Commands::PlaybackResponse::Type response;
@@ -73,7 +73,7 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState = PlaybackStateEnum::kPaused;
+    mCurrentState  = PlaybackStateEnum::kPaused;
     mPlaybackSpeed = 0;
 
     Commands::PlaybackResponse::Type response;
@@ -85,7 +85,7 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState = PlaybackStateEnum::kNotPlaying;
+    mCurrentState     = PlaybackStateEnum::kNotPlaying;
     mPlaybackSpeed    = 0;
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
