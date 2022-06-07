@@ -2177,7 +2177,6 @@ server cluster ModeSelect = 80 {
   }
 
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
-  command SampleMfgExtensionCommand(): DefaultSuccess = 4293984257;
 }
 
 server cluster NetworkCommissioning = 49 {
