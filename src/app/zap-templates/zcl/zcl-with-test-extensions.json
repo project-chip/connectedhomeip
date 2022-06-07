@@ -1,6 +1,11 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/", "./data-model/test"],
+    "xmlRoot": [
+        ".",
+        "./data-model/chip/",
+        "./data-model/silabs/",
+        "./data-model/test"
+    ],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
