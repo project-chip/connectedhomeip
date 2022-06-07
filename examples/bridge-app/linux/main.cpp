@@ -654,10 +654,10 @@ void * bridge_polling_thread(void * context)
                     Light2.Toggle();
                 }
             }
-            continue;            
+            continue;
         }
 
-        // Sleep to avoid tight loop reading commands        
+        // Sleep to avoid tight loop reading commands
         usleep(POLL_INTERVAL_MS * 1000);
     }
 
@@ -674,10 +674,10 @@ int main(int argc, char * argv[])
 
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    
+
     Light1.SetReachable(true);
     Light2.SetReachable(true);
-    
+
     Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
     Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
 
@@ -732,11 +732,11 @@ int main(int argc, char * argv[])
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
-    
+
     // Add light 1 -> will be mapped to ZCL endpoints 3
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions), 1);
-    
+
     // Add switch 1..2 --> will be mapped to ZCL endpoints 4,5
     AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
                       Span<DataVersion>(gSwitch1DataVersions), 1);
