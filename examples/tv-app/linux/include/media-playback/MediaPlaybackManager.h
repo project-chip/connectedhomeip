@@ -52,9 +52,10 @@ public:
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
 
 protected:
-    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
+    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState =
+        chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kNotPlaying;
     PlaybackPositionType mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
-    float mPlaybackSpeed                   = 1;
+    float mPlaybackSpeed                   = 0;
     uint64_t mStartTime                    = 0;
     // Magic number for testing.
     uint64_t mDuration = 80000;
