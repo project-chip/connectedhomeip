@@ -12592,7 +12592,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "NVM",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "255",

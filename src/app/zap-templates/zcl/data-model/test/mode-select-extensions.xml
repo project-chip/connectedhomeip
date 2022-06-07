@@ -14,16 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<clusterExtension code="0x0050">
+<configurator>
+  <domain name="CHIP"/>
+  <clusterExtension code="0x0050">
     <!--
        Manufacturer specific extension attribute:
           - Prefix: 0xFFF1 - Test vendor MC
           - Suffix: 0x0001 - Non-global attribute id
      -->
-  <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION"   type="INT8U" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
-
-  <command source="client" code="0x0001" name="SampleMfgExtensionCommand" optional="true" manufacturerCode="0xFFF1">
+    <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION" type="INT8U" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
+    <command source="client" code="0x0001" name="SampleMfgExtensionCommand" optional="true" manufacturerCode="0xFFF1">
       <description>Sample manufacturer specific extension command</description>
-  </command>
-</clusterExtension>
-
+    </command>
+  </clusterExtension>
+</configurator>
