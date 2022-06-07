@@ -99,7 +99,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 {
     // TODO: Insert code here
     mCurrentState  = PlaybackStateEnum::kPlaying;
-    mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 0.5 : mPlaybackSpeed * 2);
+    mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -124,7 +124,7 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
 {
     // TODO: Insert code here
     mCurrentState  = PlaybackStateEnum::kPlaying;
-    mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -0.5 : mPlaybackSpeed * 2);
+    mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
