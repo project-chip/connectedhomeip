@@ -229,21 +229,20 @@ GeneralDiagnosticsDelegate gDiagnosticDelegate;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace GeneralDiagnostics {
 
-Server Server::instance;
+GeneralDiagnosticsServer GeneralDiagnosticsServer::instance;
 
 /**********************************************************
- * Server Implementation
+ * GeneralDiagnosticsServer Implementation
  *********************************************************/
 
-Server & Server::Instance()
+GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
 {
     return instance;
 }
 
 // Gets called when the device has been rebooted.
-void Server::OnDeviceReboot(BootReasonType bootReason)
+void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonType bootReason)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
 
@@ -264,8 +263,8 @@ void Server::OnDeviceReboot(BootReasonType bootReason)
 }
 
 // Get called when the Node detects a hardware fault has been raised.
-void Server::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                                    const GeneralFaults<kMaxHardwareFaults> & current)
+void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
+                                                      const GeneralFaults<kMaxHardwareFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
 
@@ -291,7 +290,8 @@ void Server::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & pr
 }
 
 // Get called when the Node detects a radio fault has been raised.
-void Server::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous, const GeneralFaults<kMaxRadioFaults> & current)
+void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
+                                                   const GeneralFaults<kMaxRadioFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
 
@@ -316,8 +316,8 @@ void Server::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous
 }
 
 // Get called when the Node detects a network fault has been raised.
-void Server::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                                   const GeneralFaults<kMaxNetworkFaults> & current)
+void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                                     const GeneralFaults<kMaxNetworkFaults> & current)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
 
@@ -342,7 +342,6 @@ void Server::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & prev
     }
 }
 
-} // namespace GeneralDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip
@@ -394,6 +393,6 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
-        GeneralDiagnostics::Server::Instance().OnDeviceReboot(bootReason);
+        GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
     }
 }

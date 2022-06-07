@@ -27,21 +27,20 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace GeneralDiagnostics {
 
 /**
  * @brief general-diagnostics-server class
  */
-class Server
+class GeneralDiagnosticsServer
 {
 public:
-    static Server & Instance();
+    static GeneralDiagnosticsServer & Instance();
 
     /**
      * @brief
      *   Called after the current device is rebooted.
      */
-    void OnDeviceReboot(BootReasonType bootReason);
+    void OnDeviceReboot(GeneralDiagnostics::BootReasonType bootReason);
 
     /**
      * @brief
@@ -65,10 +64,9 @@ public:
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
 private:
-    static Server instance;
+    static GeneralDiagnosticsServer instance;
 };
 
-} // namespace GeneralDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -26,15 +26,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SoftwareDiagnostics {
 
 /**
- * @brief general-diagnostics-server class
+ * @brief software-diagnostics-server class
  */
-class Server
+class SoftwareDiagnosticsServer
 {
 public:
-    static Server & Instance();
+    static SoftwareDiagnosticsServer & Instance();
 
     /**
      * @brief
@@ -43,10 +42,9 @@ public:
     void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault);
 
 private:
-    static Server instance;
+    static SoftwareDiagnosticsServer instance;
 };
 
-} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip

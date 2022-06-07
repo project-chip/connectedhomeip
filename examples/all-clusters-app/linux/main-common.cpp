@@ -45,7 +45,7 @@ using namespace chip::DeviceLayer;
 namespace {
 static LowPowerManager lowPowerManager;
 
-bool EnabledWithServerCluster(ClusterId clusterId)
+bool IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
     bool retval = false;
 
@@ -63,7 +63,7 @@ bool EnabledWithServerCluster(ClusterId clusterId)
  */
 void HandleSoftwareFaultEvent(intptr_t arg)
 {
-    if (!EnabledWithServerCluster(Clusters::SoftwareDiagnostics::Id))
+    if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
         return;
 
     Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
@@ -78,7 +78,7 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     char * asctime               = std::asctime(std::localtime(&result));
     softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(asctime), strlen(asctime));
 
-    Clusters::SoftwareDiagnostics::Server::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
 
 /**
@@ -88,7 +88,7 @@ void HandleGeneralFaultEvent(intptr_t arg)
 {
     uint32_t eventId = static_cast<uint32_t>(arg);
 
-    if (!EnabledWithServerCluster(Clusters::GeneralDiagnostics::Id))
+    if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
         return;
 
     if (eventId == Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id)
@@ -106,7 +106,7 @@ void HandleGeneralFaultEvent(intptr_t arg)
         ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
         ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
 #endif
-        Clusters::GeneralDiagnostics::Server::Instance().OnHardwareFaultsDetect(previous, current);
+        Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
     {
@@ -123,7 +123,7 @@ void HandleGeneralFaultEvent(intptr_t arg)
         ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
         ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
 #endif
-        Clusters::GeneralDiagnostics::Server::Instance().OnRadioFaultsDetect(previous, current);
+        Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
     {
@@ -139,7 +139,7 @@ void HandleGeneralFaultEvent(intptr_t arg)
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
 #endif
-        Clusters::GeneralDiagnostics::Server::Instance().OnNetworkFaultsDetect(previous, current);
+        Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
     }
     else
     {

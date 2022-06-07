@@ -136,21 +136,20 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SoftwareDiagnostics {
 
-Server Server::instance;
+SoftwareDiagnosticsServer SoftwareDiagnosticsServer::instance;
 
 /**********************************************************
- * Server Implementation
+ * SoftwareDiagnosticsServer Implementation
  *********************************************************/
 
-Server & Server::Instance()
+SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
 {
     return instance;
 }
 
 // Gets called when a software fault that has taken place on the Node.
-void Server::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
@@ -167,7 +166,6 @@ void Server::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareF
     }
 }
 
-} // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app
 } // namespace chip
