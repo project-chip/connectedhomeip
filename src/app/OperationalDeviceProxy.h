@@ -115,7 +115,6 @@ public:
                 mFabricIndex = fabricInfo->GetFabricIndex();
             }
         }
-        mFabricIndex  = fabricInfo->GetFabricIndex();
         mState = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }

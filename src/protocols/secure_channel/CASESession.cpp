@@ -180,8 +180,8 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
 
-    mRole                     = CryptoContext::SessionRole::kResponder;
     mFabricsTable             = fabrics;
+    mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
 
@@ -197,7 +197,6 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    FabricInfo * fabricInfo = nullptr;
 
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -205,9 +204,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
-    mFabricsTable = fabricTable;
     ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
+    auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, policy, delegate);
@@ -222,6 +220,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
+    mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;

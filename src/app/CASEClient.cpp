@@ -30,6 +30,7 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
                                         const ReliableMessageProtocolConfig & remoteMRPConfig,
                                         SessionEstablishmentDelegate * delegate)
 {
+    VerifyOrDie(mInitParams.fabricTable != nullptr);
     // Create a UnauthenticatedSession for CASE pairing.
     Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, remoteMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);

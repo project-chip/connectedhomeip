@@ -92,6 +92,8 @@ public:
         mKeypair = std::move(keypair);
     }
 
+    bool HasPendingOpKeypair() const override {  return false; }
+
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

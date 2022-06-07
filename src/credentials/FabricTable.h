@@ -190,7 +190,7 @@ public:
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks)
     static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac, FabricId existingFabricId,
                                                 Credentials::CertificateValidityPolicy * policy,
-                                                PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey)
+                                                PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
