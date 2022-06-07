@@ -974,9 +974,9 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 
 void ReadClient::ResubscribeIfNeeded(bool & aResubscribe, uint32_t & aNextResubscribeIntervalMsec)
 {
-    bool shouldResubscribe = true;
-    uint32_t intervalMsec  = 0;
-    aResubscribe = false;
+    bool shouldResubscribe       = true;
+    uint32_t intervalMsec        = 0;
+    aResubscribe                 = false;
     aNextResubscribeIntervalMsec = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {

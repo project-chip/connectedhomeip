@@ -1424,8 +1424,8 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// After client initiated subscription request, test expire session so that subscription fails to establish, and trigger the timeout error.
-// Client would automatically try to resubscribe and bump the value for numResubscriptionAttemptedCalls.
+// After client initiated subscription request, test expire session so that subscription fails to establish, and trigger the timeout
+// error. Client would automatically try to resubscribe and bump the value for numResubscriptionAttemptedCalls.
 void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);

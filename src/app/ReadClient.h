@@ -128,10 +128,9 @@ public:
         virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
 
         /**
-         * OnResubscriptionAttempt will be called when a re-subscription has been scheduled as a result of the termination of an in-progress
-         * or previously active subscription."
-         * This object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy the object.
+         * OnResubscriptionAttempt will be called when a re-subscription has been scheduled as a result of the termination of an
+         * in-progress or previously active subscription." This object MUST continue to exist after this call is completed. The
+         * application shall wait until it receives an OnDone call to destroy the object.
          *
          * @param[in] aTerminationCause The cause of failure of the subscription that just terminated.
          * @param[in] aNextResubscribeIntervalMsec tell How long we will wait before trying to auto-resubscribe.
@@ -379,8 +378,8 @@ private:
     const char * GetStateStr() const;
 
     /*
-     * Called internally to check if the client needs to resubscribe based upon the resubscribe policy, schedule when to re-subscribe
-     * next time, and update aResubscribe and aNextResubscribeIntervalMsec accordingly.
+     * Called internally to check if the client needs to resubscribe based upon the resubscribe policy, schedule when to
+     * re-subscribe next time, and update aResubscribe and aNextResubscribeIntervalMsec accordingly.
      *
      *  @param[out]    aResubscribe       whether to resubscribe next time.
      *  @param[out]    aNextResubscribeIntervalMsec    when to re-subscribe next time
