@@ -83,13 +83,17 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     uint32_t timerId;
     uint8_t buttonevent = 0;
     timerId             = (uint32_t) pvTimerGetTimerID(xTimer);
-    if (timerId)
+    switch (timerId)
     {
+    case APP_FUNCTION_BUTTON:
         buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
-    }
-    else
-    {
-        buttonevent = cyhal_gpio_read(APP_LOCK_BUTTON);
+        break;
+    case APP_LOCK_BUTTON:
+	    buttonevent = cyhal_gpio_read(APP_LOCK_BUTTON);
+	    break;
+    default:
+        P6_LOG("Unhandled TimerID: %d", timerId);
+        break;
     }
     GetAppTask().ButtonEventHandler(timerId, (buttonevent) ? APP_BUTTON_PRESSED : APP_BUTTON_RELEASED);
 }

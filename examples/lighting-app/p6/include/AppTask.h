@@ -62,10 +62,10 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
-    static void LightActionEventHandler(AppEvent * aEvent);
-    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void FunctionTimerEventHandler(AppEvent * event);
+    static void FunctionHandler(AppEvent * event);
+    static void LightActionEventHandler(AppEvent * event);
+    static void TimerEventHandler(TimerHandle_t timer);
 
     static void UpdateClusterState(intptr_t context);
 
