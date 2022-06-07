@@ -116,7 +116,8 @@ public:
      * @retval other CHIP_ERROR value on internal crypto engine errors
      *
      */
-    virtual CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message, Crypto::P256ECDSASignature & outSignature) const = 0;
+    virtual CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                         Crypto::P256ECDSASignature & outSignature) const = 0;
 };
 
 } // namespace Crypto

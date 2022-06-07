@@ -188,9 +188,10 @@ public:
                                         Crypto::P256PublicKey & nocPubkey);
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks)
-    static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac, FabricId existingFabricId,
-                                                Credentials::CertificateValidityPolicy * policy,
-                                                PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey);
+    static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                               FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+                                               PeerId & outOperationalId, FabricId & outFabricId,
+                                               Crypto::P256PublicKey & outNocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -220,7 +221,6 @@ public:
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
     CHIP_ERROR SetFabricInfo(FabricInfo & newFabric, Credentials::CertificateValidityPolicy * policy);
-
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
@@ -543,7 +543,7 @@ private:
     CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
-    PersistentStorageDelegate * mStorage = nullptr;
+    PersistentStorageDelegate * mStorage               = nullptr;
     Crypto::OperationalKeystore * mOperationalKeystore = nullptr;
 
     // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form

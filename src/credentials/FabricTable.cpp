@@ -290,9 +290,10 @@ CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPai
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac, FabricId existingFabricId,
-                                                Credentials::CertificateValidityPolicy * policy,
-                                                PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey)
+CHIP_ERROR FabricInfo::ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                                FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+                                                PeerId & outOperationalId, FabricId & outFabricId,
+                                                Crypto::P256PublicKey & outNocPubkey)
 {
     Credentials::ValidationContext validContext;
 
@@ -319,8 +320,7 @@ CHIP_ERROR FabricInfo::ValidateIncomingNOCChain(const ByteSpan & noc, const Byte
     validContext.mValidityPolicy = policy;
 
     ChipLogProgress(FabricProvisioning, "Validating NOC chain");
-    CHIP_ERROR err = FabricInfo::VerifyCredentials(noc, icac, rcac, validContext, outOperationalId,
-                                                   outFabricId, outNocPubkey);
+    CHIP_ERROR err = FabricInfo::VerifyCredentials(noc, icac, rcac, validContext, outOperationalId, outFabricId, outNocPubkey);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WRONG_NODE_ID)
     {
         err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
@@ -590,7 +590,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric, Credentials::Certif
     PeerId operationalId;
     FabricId fabricId;
 
-    ReturnErrorOnFailure(ValidateIncomingNOCChain(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, mFabricId, policy, operationalId, fabricId, pubkey));
+    ReturnErrorOnFailure(ValidateIncomingNOCChain(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, mFabricId, policy,
+                                                  operationalId, fabricId, pubkey));
 
     if (operationalKey != nullptr)
     {
@@ -607,7 +608,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric, Credentials::Certif
         {
             ReturnErrorOnFailure(SetOperationalKeypair(operationalKey));
         }
-        else {
+        else
+        {
             return CHIP_ERROR_INCORRECT_STATE;
         }
     }
@@ -1238,7 +1240,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
     if (err == CHIP_NO_ERROR)
     {
-        mIsPendingFabricDataPresent = false;
+        mIsPendingFabricDataPresent  = false;
         mFabricIndexWithPendingState = kUndefinedFabricIndex;
     }
     return err;
@@ -1246,7 +1248,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
 void FabricTable::RevertPendingFabricData()
 {
-    mIsPendingFabricDataPresent = false;
+    mIsPendingFabricDataPresent  = false;
     mFabricIndexWithPendingState = kUndefinedFabricIndex;
 
     VerifyOrReturn(mOperationalKeystore != nullptr);

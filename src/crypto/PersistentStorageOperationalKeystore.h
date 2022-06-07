@@ -40,10 +40,7 @@ class PersistentStorageOperationalKeystore : public Crypto::OperationalKeystore
 {
 public:
     PersistentStorageOperationalKeystore() = default;
-    virtual ~PersistentStorageOperationalKeystore()
-    {
-        Finish();
-    }
+    virtual ~PersistentStorageOperationalKeystore() { Finish(); }
 
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
@@ -55,11 +52,11 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mPendingFabricIndex = kUndefinedFabricIndex;
+        mPendingFabricIndex       = kUndefinedFabricIndex;
         mIsExternallyOwnedKeypair = false;
-        mStorage = storage;
-        mPendingKeypair = nullptr;
-        mIsPendingKeypairActive = false;
+        mStorage                  = storage;
+        mPendingKeypair           = nullptr;
+        mIsPendingKeypairActive   = false;
         return CHIP_NO_ERROR;
     }
 
@@ -74,16 +71,14 @@ public:
         mStorage = nullptr;
     }
 
-    bool HasPendingOpKeypair() const override
-    {
-        return (mPendingKeypair != nullptr);
-    }
+    bool HasPendingOpKeypair() const override { return (mPendingKeypair != nullptr); }
 
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
     virtual CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override;
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
     virtual void RevertPendingKeypairs() override;
-    virtual CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message, Crypto::P256ECDSASignature & outSignature) const override;
+    virtual CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                         Crypto::P256ECDSASignature & outSignature) const override;
 
 protected:
     void ResetPendingKey()
@@ -92,18 +87,18 @@ protected:
         {
             Platform::Delete(mPendingKeypair);
         }
-        mPendingKeypair = nullptr;
+        mPendingKeypair           = nullptr;
         mIsExternallyOwnedKeypair = false;
-        mIsPendingKeypairActive = false;
-        mPendingFabricIndex = kUndefinedFabricIndex;
+        mIsPendingKeypairActive   = false;
+        mPendingFabricIndex       = kUndefinedFabricIndex;
     }
 
-    PersistentStorageDelegate *mStorage = nullptr;
+    PersistentStorageDelegate * mStorage = nullptr;
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
-    FabricIndex mPendingFabricIndex = kUndefinedFabricIndex;
-    Crypto::P256Keypair *mPendingKeypair = nullptr;
-    bool mIsPendingKeypairActive = false;
+    FabricIndex mPendingFabricIndex       = kUndefinedFabricIndex;
+    Crypto::P256Keypair * mPendingKeypair = nullptr;
+    bool mIsPendingKeypairActive          = false;
 
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
     // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.

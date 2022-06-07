@@ -1102,8 +1102,8 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     auto & fabricTable                = Server::GetInstance().GetFabricTable();
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    auto & CSRNonce         = commandData.CSRNonce;
-    bool isForUpdateNoc     = commandData.isForUpdateNOC.ValueOr(false);
+    auto & CSRNonce     = commandData.CSRNonce;
+    bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
 
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
     FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
@@ -1130,7 +1130,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             err = CHIP_ERROR_NO_MEMORY;
             VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
         }
-        csrSpan = MutableByteSpan{csr.Get(), csrLength};
+        csrSpan = MutableByteSpan{ csr.Get(), csrLength };
 
         Optional<FabricIndex> fabricIndexForCsr;
         if (isForUpdateNoc)
@@ -1154,7 +1154,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         ChipLogProgress(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),       // CSR buffer
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),  // CSR buffer
                                                           CSRNonce.size(), // CSR Nonce
                                                           0u               // no vendor reserved data
         );
@@ -1167,8 +1167,8 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
 
-        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved, kNoVendorReserved,
-                                                  kNoVendorReserved, nocsrElementsSpan);
+        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
+                                                  kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
         VerifyOrExit((err == CHIP_NO_ERROR) && (nocsrElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
     }
 

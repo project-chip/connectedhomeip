@@ -155,7 +155,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)", static_cast<unsigned>(commandData.expiryLengthSeconds));
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
 
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
@@ -245,7 +246,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
                 CHIP_ERROR err = fabricTable.CommitPendingFabricData();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
                 }
                 else
                 {
@@ -260,8 +262,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
              * Once bindings are implemented, this may no longer be needed.
              */
             failSafe.DisarmFailSafe();
-            CheckSuccess(server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
-                         Failure);
+            CheckSuccess(
+                server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningError::kOk;

@@ -175,7 +175,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // KVS-based persistent storage delegate injection
         if (persistentStorageDelegate == nullptr)
         {
-            chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+            chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
+                DeviceLayer::PersistedStorage::KeyValueStoreMgr();
             ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
             this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
         }

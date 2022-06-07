@@ -31,8 +31,7 @@ namespace chip {
 
 using namespace chip::Crypto;
 
-namespace
-{
+namespace {
 
 // Tags for our operational keypair storage.
 constexpr TLV::Tag kOpKeyVersionTag = TLV::ContextTag(0);
@@ -53,7 +52,7 @@ constexpr size_t OpKeyTLVMaxSize()
  *           only of the API and it is recommended to avoid directly accessing raw private key bits
  *           in storage.
  */
-CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegate *storage, P256Keypair *keypair)
+CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegate * storage, P256Keypair * keypair)
 {
 
     printf("=========== STORE OP \n");
@@ -96,7 +95,8 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
  *           only of the API and it is recommended to avoid directly accessing raw private key bits
  *           in storage.
  */
-CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate *storage, const ByteSpan & message, P256ECDSASignature & outSignature)
+CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate * storage, const ByteSpan & message,
+                               P256ECDSASignature & outSignature)
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (storage != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -159,7 +159,8 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
 } // namespace
 
-CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest)
+CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
+                                                                       MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -176,7 +177,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
 
     mPendingKeypair->Initialize();
     size_t csrLength = outCertificateSigningRequest.size();
-    CHIP_ERROR err = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
+    CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
 
     // No need to free the mPendingKeypair on failure, it may be OK and other paths will clean it.
     ReturnErrorOnFailure(err);
@@ -187,7 +188,8 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PersistentStorageOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey)
+CHIP_ERROR PersistentStorageOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
+                                                                            const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -227,7 +229,8 @@ void PersistentStorageOperationalKeystore::RevertPendingKeypairs()
     ResetPendingKey();
 }
 
-CHIP_ERROR PersistentStorageOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message, Crypto::P256ECDSASignature & outSignature) const
+CHIP_ERROR PersistentStorageOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                                                   Crypto::P256ECDSASignature & outSignature) const
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);

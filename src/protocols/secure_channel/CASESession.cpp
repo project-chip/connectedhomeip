@@ -144,10 +144,10 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
-    mLocalNodeId = kUndefinedNodeId;
-    mPeerNodeId  = kUndefinedNodeId;
+    mLocalNodeId  = kUndefinedNodeId;
+    mPeerNodeId   = kUndefinedNodeId;
     mFabricsTable = nullptr;
-    mFabricIndex = kUndefinedFabricIndex;
+    mFabricIndex  = kUndefinedFabricIndex;
 }
 
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
@@ -196,7 +196,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
                                          Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -710,7 +710,7 @@ CHIP_ERROR CASESession::SendSigma2()
     // Generate a Signature
     P256ECDSASignature tbsData2Signature;
     ReturnErrorOnFailure(
-        mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{msg_R2_Signed.Get(), msg_r2_signed_len}, tbsData2Signature));
+        mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{ msg_R2_Signed.Get(), msg_r2_signed_len }, tbsData2Signature));
     msg_R2_Signed.Free();
 
     // Construct Sigma2 TBE Data
@@ -1063,7 +1063,7 @@ CHIP_ERROR CASESession::SendSigma3()
                                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msg_R3_Signed.Get(), msg_r3_signed_len));
 
     // Generate a signature
-    err = mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{msg_R3_Signed.Get(), msg_r3_signed_len}, tbsData3Signature);
+    err = mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{ msg_R3_Signed.Get(), msg_r3_signed_len }, tbsData3Signature);
     SuccessOrExit(err);
 
     // Prepare Sigma3 TBE Data Blob

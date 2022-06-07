@@ -320,8 +320,8 @@ CHIP_ERROR Server::InitFailSafe()
         err = DeviceLayer::FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
         if (err == CHIP_NO_ERROR)
         {
-            DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked,
-                                                                                                 updateNocCommandInvoked);
+            DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(
+                fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
         }
         else
         {
