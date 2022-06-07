@@ -320,8 +320,6 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
     }
 }
 
-
-
 #if CHIP_WITH_GIO
 GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
 {
