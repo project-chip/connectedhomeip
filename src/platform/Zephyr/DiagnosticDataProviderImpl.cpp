@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for Zephy platform.
+ *          for Zephyr platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
