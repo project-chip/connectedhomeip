@@ -25,6 +25,8 @@
 // Include module header
 #include <system/SystemMutex.h>
 
+#include <lib/support/logging/CHIPLogging.h>
+
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 // Include system headers
@@ -32,6 +34,27 @@
 
 namespace chip {
 namespace System {
+
+DLL_EXPORT Mutex::Mutex()
+{
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+    mCmsisRTOSMutex = osMutexNew(NULL);
+    if (mCmsisRTOSMutex == NULL)
+    {
+        ChipLogError(chipSystemLayer, "osMutexNew failed");
+    }
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+}
+
+DLL_EXPORT Mutex::~Mutex()
+{
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+    if (mCmsisRTOSMutex && osMutexDelete(mCmsisRTOSMutex) != osOK)
+    {
+        ChipLogError(chipSystemLayer, "osMutexDelete failed");
+    }
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+}
 
 /**
  * Initialize the mutual exclusion lock instance.
@@ -107,6 +130,24 @@ DLL_EXPORT void Mutex::Lock(void)
     xSemaphoreTake(this->mFreeRTOSSemaphore, portMAX_DELAY);
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+DLL_EXPORT void Mutex::Lock(void)
+{
+    if (mCmsisRTOSMutex && osMutexAcquire(mCmsisRTOSMutex, osWaitForever) != osOK)
+    {
+        ChipLogError(chipSystemLayer, "osMutexAcquire failed");
+    }
+}
+
+DLL_EXPORT void Mutex::Unlock(void)
+{
+    if (mCmsisRTOSMutex && osMutexRelease(mCmsisRTOSMutex) != osOK)
+    {
+        ChipLogError(chipSystemLayer, "osMutexRelease failed");
+    }
+}
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 
 } // namespace System
 } // namespace chip

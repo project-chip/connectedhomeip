@@ -52,6 +52,10 @@
 #include <rtos/Mutex.h>
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+#include <cmsis_os2.h>
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+
 namespace chip {
 namespace System {
 
@@ -101,12 +105,13 @@ private:
     rtos::Mutex mMbedMutex;
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+    osMutexId_t mCmsisRTOSMutex;
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+
     Mutex(const Mutex &) = delete;
     Mutex & operator=(const Mutex &) = delete;
 };
-
-inline Mutex::Mutex() {}
-inline Mutex::~Mutex() {}
 
 #if CHIP_SYSTEM_CONFIG_NO_LOCKING
 inline CHIP_ERROR Init(Mutex & aMutex)
@@ -154,6 +159,15 @@ inline void Mutex::Unlock(void)
     return mMbedMutex.unlock();
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+inline CHIP_ERROR Mutex::Init(Mutex & aMutex)
+{
+    // The mutex is initialized when constructed and generates
+    // a runtime error in case of failure.
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 
 } // namespace System
 } // namespace chip

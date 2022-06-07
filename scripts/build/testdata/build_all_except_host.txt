@@ -933,6 +933,9 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
+# Generating openiotsdk-shell
+cmake -GNinja -S {root}/examples/shell/openiotsdk -B {out}/openiotsdk-shell --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55
+
 # Generating qpg-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-light
 
@@ -1915,6 +1918,12 @@ ninja -C {out}/nrf-nrf5340dk-pump-controller
 
 # Building nrf-nrf5340dk-shell
 ninja -C {out}/nrf-nrf5340dk-shell
+
+# Remove old artifacts openiotsdk-shell
+bash -c 'rm -rf {out}/openiotsdk-shell/chip-*'
+
+# Building openiotsdk-shell
+cmake --build {out}/openiotsdk-shell
 
 # Building qpg-light
 ninja -C {out}/qpg-light
