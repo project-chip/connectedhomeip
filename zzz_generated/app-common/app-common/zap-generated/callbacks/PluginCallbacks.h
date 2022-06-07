@@ -209,12 +209,6 @@ void __attribute__((weak)) MatterChloroformConcentrationMeasurementPluginClientI
 void MatterChloroformConcentrationMeasurementPluginServerInitCallback();
 void __attribute__((weak)) MatterSodiumConcentrationMeasurementPluginClientInitCallback() {}
 void MatterSodiumConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak)) MatterIasZonePluginClientInitCallback() {}
-void MatterIasZonePluginServerInitCallback();
-void __attribute__((weak)) MatterIasAcePluginClientInitCallback() {}
-void MatterIasAcePluginServerInitCallback();
-void __attribute__((weak)) MatterIasWdPluginClientInitCallback() {}
-void MatterIasWdPluginServerInitCallback();
 void __attribute__((weak)) MatterWakeOnLanPluginClientInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback();
 void __attribute__((weak)) MatterChannelPluginClientInitCallback() {}

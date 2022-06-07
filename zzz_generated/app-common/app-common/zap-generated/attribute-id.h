@@ -1349,32 +1349,6 @@
 #define ZCL_SODIUM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE_ATTRIBUTE_ID (0x0002)
 #define ZCL_SODIUM_CONCENTRATION_MEASUREMENT_TOLERANCE_ATTRIBUTE_ID (0x0003)
 
-// Attribute ids for cluster: IAS Zone
-
-// Client attributes
-
-// Server attributes
-#define ZCL_ZONE_STATE_ATTRIBUTE_ID (0x0000)
-#define ZCL_ZONE_TYPE_ATTRIBUTE_ID (0x0001)
-#define ZCL_ZONE_STATUS_ATTRIBUTE_ID (0x0002)
-#define ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID (0x0010)
-#define ZCL_ZONE_ID_ATTRIBUTE_ID (0x0011)
-#define ZCL_NUMBER_OF_ZONE_SENSITIVITY_LEVELS_SUPPORTED_ATTRIBUTE_ID (0x0012)
-#define ZCL_CURRENT_ZONE_SENSITIVITY_LEVEL_ATTRIBUTE_ID (0x0013)
-
-// Attribute ids for cluster: IAS ACE
-
-// Client attributes
-
-// Server attributes
-
-// Attribute ids for cluster: IAS WD
-
-// Client attributes
-
-// Server attributes
-#define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
-
 // Attribute ids for cluster: Wake on LAN
 
 // Client attributes

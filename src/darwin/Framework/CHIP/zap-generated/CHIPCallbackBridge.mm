@@ -12626,178 +12626,183 @@ void CHIPTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucc
     void * context, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
     auto * response = [CHIPTestClusterClusterTestStructArrayArgumentResponseParams new];
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = data.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        CHIPTestClusterClusterNestedStructList * newElement_0;
-        newElement_0 = [CHIPTestClusterClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [CHIPTestClusterClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                    length:entry_0.c.e.size()
-                                                  encoding:NSUTF8StringEncoding];
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                CHIPTestClusterClusterSimpleStruct * newElement_2;
-                newElement_2 = [CHIPTestClusterClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                          length:entry_2.e.size()
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg1.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPTestClusterClusterNestedStructList * newElement_0;
+                newElement_0 = [CHIPTestClusterClusterNestedStructList new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [CHIPTestClusterClusterSimpleStruct new];
+                newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+                newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+                newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+                newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
+                newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
+                                                            length:entry_0.c.e.size()
+                                                          encoding:NSUTF8StringEncoding];
+                newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+                newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+                newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.d.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        CHIPTestClusterClusterSimpleStruct * newElement_2;
+                        newElement_2 = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                        newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                        newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                        newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
+                        newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
+                                                                  length:entry_2.e.size()
+                                                                encoding:NSUTF8StringEncoding];
+                        newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                        newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                        newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.d = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.e.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.e = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.f.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSData * newElement_2;
+                        newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.f = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.g.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.g = array_2;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg1 = array_0;
+        }
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg2.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPTestClusterClusterSimpleStruct * newElement_0;
+                newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+                newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
+                newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
+                                                          length:entry_0.e.size()
                                                         encoding:NSUTF8StringEncoding];
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
+                newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+                newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            newElement_0.d = array_2;
+            response.arg2 = array_0;
         }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.e = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.f = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.g = array_2;
-        }
-        [array_0 addObject:newElement_0];
     }
-    CHIP_ERROR err = iter_0.GetStatus();
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg3.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg3 = array_0;
+        }
     }
-    response.arg1 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg2.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    CHIPTestClusterClusterSimpleStruct * newElement_0;
-    newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
-    newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-    newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
-    newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-    newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg2 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg3.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg3 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg4.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithBool:entry_0];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg4 = array_0;
-}
-}
-{
-    response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
-}
-{
-    response.arg6 = [NSNumber numberWithBool:data.arg6];
-}
-DispatchSuccess(context, response);
-}
-;
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg4.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithBool:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg4 = array_0;
+        }
+    }
+    {
+        response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
+    }
+    {
+        response.arg6 = [NSNumber numberWithBool:data.arg6];
+    }
+    DispatchSuccess(context, response);
+};
 
 void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)
@@ -18446,475 +18451,6 @@ void CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSu
 {
     auto * self
         = static_cast<CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasZone::IasEnrollResponseCode value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasEnrollResponseCode> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasZone::IasZoneType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasZoneType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceAlarmStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAlarmStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceArmMode value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmMode> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceArmNotification value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmNotification> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceAudibleNotification value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAudibleNotification> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceBypassResult value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceBypassResult> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAcePanelStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAcePanelStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasZoneType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasZoneType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

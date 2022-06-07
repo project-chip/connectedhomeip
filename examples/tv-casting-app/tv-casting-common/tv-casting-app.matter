@@ -777,74 +777,6 @@ server cluster Groups = 4 {
   command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster IasZone = 1280 {
-  enum IasEnrollResponseCode : ENUM8 {
-    kSuccess = 0;
-    kNotSupported = 1;
-    kNoEnrollPermit = 2;
-    kTooManyZones = 3;
-  }
-
-  enum IasZoneType : ENUM16 {
-    kStandardCie = 0;
-    kMotionSensor = 13;
-    kContactSwitch = 21;
-    kFireSensor = 40;
-    kWaterSensor = 42;
-    kGasSensor = 43;
-    kPersonalEmergencyDevice = 44;
-    kVibrationMovementSensor = 45;
-    kRemoteControl = 271;
-    kKeyFob = 277;
-    kKeypad = 541;
-    kStandardWarningDevice = 549;
-    kGlassBreakSensor = 550;
-    kCarbonMonoxideSensor = 551;
-    kSecurityRepeater = 553;
-    kInvalidZoneType = 65535;
-  }
-
-  bitmap IasZoneStatus : BITMAP16 {
-    kAlarm1 = 0x1;
-    kAlarm2 = 0x2;
-    kTamper = 0x4;
-    kBattery = 0x8;
-    kSupervisionReports = 0x10;
-    kRestoreReports = 0x20;
-    kTrouble = 0x40;
-    kAc = 0x80;
-    kTest = 0x100;
-    kBatteryDefect = 0x200;
-  }
-
-  readonly attribute enum8 zoneState = 0;
-  readonly attribute enum16 zoneType = 1;
-  readonly attribute bitmap16 zoneStatus = 2;
-  attribute node_id iasCieAddress = 16;
-  readonly attribute int8u zoneId = 17;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ZoneEnrollResponseRequest {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
-  }
-
-  response struct ZoneStatusChangeNotification = 0 {
-    IasZoneStatus zoneStatus = 0;
-    BITMAP8 extendedStatus = 1;
-    INT8U zoneId = 2;
-    INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollRequest = 1 {
-    IasZoneType zoneType = 0;
-    INT16U manufacturerCode = 1;
-  }
-
-  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -2592,16 +2524,6 @@ endpoint 1 {
     ram      attribute barrierPosition;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster IasZone {
-    ram      attribute zoneState;
-    ram      attribute zoneType;
-    ram      attribute zoneStatus;
-    ram      attribute iasCieAddress;
-    ram      attribute zoneId default = 0xff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WakeOnLan {

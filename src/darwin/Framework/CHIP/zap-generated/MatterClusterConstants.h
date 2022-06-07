@@ -121,9 +121,6 @@ typedef NS_ENUM(uint32_t, MatterClusterIDType) {
     kMatterClusterChlorodibromomethaneConcentrationMeasurementID = 0x00000427,
     kMatterClusterChloroformConcentrationMeasurementID = 0x00000428,
     kMatterClusterSodiumConcentrationMeasurementID = 0x00000429,
-    kMatterClusterIasZoneID = 0x00000500,
-    kMatterClusterIasAceID = 0x00000501,
-    kMatterClusterIasWdID = 0x00000502,
     kMatterClusterWakeOnLanID = 0x00000503,
     kMatterClusterChannelID = 0x00000504,
     kMatterClusterTargetNavigatorID = 0x00000505,
@@ -1641,35 +1638,6 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterSodiumConcentrationMeasurementAttributeFeatureMapID = kMatterClusterGlobalAttributeFeatureMapID,
     kMatterClusterSodiumConcentrationMeasurementAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster IasZone attributes
-    kMatterClusterIasZoneAttributeZoneStateID = 0x00000000,
-    kMatterClusterIasZoneAttributeZoneTypeID = 0x00000001,
-    kMatterClusterIasZoneAttributeZoneStatusID = 0x00000002,
-    kMatterClusterIasZoneAttributeIasCieAddressID = 0x00000010,
-    kMatterClusterIasZoneAttributeZoneIdID = 0x00000011,
-    kMatterClusterIasZoneAttributeNumberOfZoneSensitivityLevelsSupportedID = 0x00000012,
-    kMatterClusterIasZoneAttributeCurrentZoneSensitivityLevelID = 0x00000013,
-    kMatterClusterIasZoneAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
-    kMatterClusterIasZoneAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
-    kMatterClusterIasZoneAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
-    kMatterClusterIasZoneAttributeFeatureMapID = kMatterClusterGlobalAttributeFeatureMapID,
-    kMatterClusterIasZoneAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster IasAce attributes
-    kMatterClusterIasAceAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
-    kMatterClusterIasAceAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
-    kMatterClusterIasAceAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
-    kMatterClusterIasAceAttributeFeatureMapID = kMatterClusterGlobalAttributeFeatureMapID,
-    kMatterClusterIasAceAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster IasWd attributes
-    kMatterClusterIasWdAttributeMaxDurationID = 0x00000000,
-    kMatterClusterIasWdAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
-    kMatterClusterIasWdAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
-    kMatterClusterIasWdAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
-    kMatterClusterIasWdAttributeFeatureMapID = kMatterClusterGlobalAttributeFeatureMapID,
-    kMatterClusterIasWdAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
-
     // Cluster WakeOnLan attributes
     kMatterClusterWakeOnLanAttributeMACAddressID = 0x00000000,
     kMatterClusterWakeOnLanAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
@@ -2337,40 +2305,6 @@ typedef NS_ENUM(uint32_t, MatterClusterCommandIDType) {
     kMatterClusterColorControlCommandStopMoveStepID = 0x00000047,
     kMatterClusterColorControlCommandMoveColorTemperatureID = 0x0000004B,
     kMatterClusterColorControlCommandStepColorTemperatureID = 0x0000004C,
-
-    // Cluster IasZone commands
-    kMatterClusterIasZoneCommandZoneEnrollResponseID = 0x00000000,
-    kMatterClusterIasZoneCommandZoneStatusChangeNotificationID = 0x00000000,
-    kMatterClusterIasZoneCommandInitiateNormalOperationModeID = 0x00000001,
-    kMatterClusterIasZoneCommandZoneEnrollRequestID = 0x00000001,
-    kMatterClusterIasZoneCommandInitiateTestModeID = 0x00000002,
-    kMatterClusterIasZoneCommandInitiateNormalOperationModeResponseID = 0x00000002,
-    kMatterClusterIasZoneCommandInitiateTestModeResponseID = 0x00000003,
-
-    // Cluster IasAce commands
-    kMatterClusterIasAceCommandArmID = 0x00000000,
-    kMatterClusterIasAceCommandArmResponseID = 0x00000000,
-    kMatterClusterIasAceCommandBypassID = 0x00000001,
-    kMatterClusterIasAceCommandGetZoneIdMapResponseID = 0x00000001,
-    kMatterClusterIasAceCommandEmergencyID = 0x00000002,
-    kMatterClusterIasAceCommandGetZoneInformationResponseID = 0x00000002,
-    kMatterClusterIasAceCommandFireID = 0x00000003,
-    kMatterClusterIasAceCommandZoneStatusChangedID = 0x00000003,
-    kMatterClusterIasAceCommandPanicID = 0x00000004,
-    kMatterClusterIasAceCommandPanelStatusChangedID = 0x00000004,
-    kMatterClusterIasAceCommandGetZoneIdMapID = 0x00000005,
-    kMatterClusterIasAceCommandGetPanelStatusResponseID = 0x00000005,
-    kMatterClusterIasAceCommandGetZoneInformationID = 0x00000006,
-    kMatterClusterIasAceCommandSetBypassedZoneListID = 0x00000006,
-    kMatterClusterIasAceCommandGetPanelStatusID = 0x00000007,
-    kMatterClusterIasAceCommandBypassResponseID = 0x00000007,
-    kMatterClusterIasAceCommandGetBypassedZoneListID = 0x00000008,
-    kMatterClusterIasAceCommandGetZoneStatusResponseID = 0x00000008,
-    kMatterClusterIasAceCommandGetZoneStatusID = 0x00000009,
-
-    // Cluster IasWd commands
-    kMatterClusterIasWdCommandStartWarningID = 0x00000000,
-    kMatterClusterIasWdCommandSquawkID = 0x00000001,
 
     // Cluster Channel commands
     kMatterClusterChannelCommandChangeChannelID = 0x00000000,

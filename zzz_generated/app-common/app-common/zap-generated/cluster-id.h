@@ -307,15 +307,6 @@ static constexpr chip::ClusterId ZCL_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTE
 // Definitions for cluster: Sodium Concentration Measurement
 static constexpr chip::ClusterId ZCL_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0429;
 
-// Definitions for cluster: IAS Zone
-static constexpr chip::ClusterId ZCL_IAS_ZONE_CLUSTER_ID = 0x0500;
-
-// Definitions for cluster: IAS ACE
-static constexpr chip::ClusterId ZCL_IAS_ACE_CLUSTER_ID = 0x0501;
-
-// Definitions for cluster: IAS WD
-static constexpr chip::ClusterId ZCL_IAS_WD_CLUSTER_ID = 0x0502;
-
 // Definitions for cluster: Wake on LAN
 static constexpr chip::ClusterId ZCL_WAKE_ON_LAN_CLUSTER_ID = 0x0503;
 

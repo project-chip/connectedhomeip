@@ -666,24 +666,6 @@
 #define CHIP_PRINTCLUSTER_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_IAS_ZONE_CLUSTER_SERVER) || defined(ZCL_USING_IAS_ZONE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER { ZCL_IAS_ZONE_CLUSTER_ID, 1280, "IAS Zone" },
-#else
-#define CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER
-#endif
-
-#if defined(ZCL_USING_IAS_ACE_CLUSTER_SERVER) || defined(ZCL_USING_IAS_ACE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER { ZCL_IAS_ACE_CLUSTER_ID, 1281, "IAS ACE" },
-#else
-#define CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER
-#endif
-
-#if defined(ZCL_USING_IAS_WD_CLUSTER_SERVER) || defined(ZCL_USING_IAS_WD_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER { ZCL_IAS_WD_CLUSTER_ID, 1282, "IAS WD" },
-#else
-#define CHIP_PRINTCLUSTER_IAS_WD_CLUSTER
-#endif
-
 #if defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER) || defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER { ZCL_WAKE_ON_LAN_CLUSTER_ID, 1283, "Wake on LAN" },
 #else
@@ -896,9 +878,6 @@
     CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
     CHIP_PRINTCLUSTER_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                 \
     CHIP_PRINTCLUSTER_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                     \
-    CHIP_PRINTCLUSTER_IAS_ZONE_CLUSTER                                                                                             \
-    CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \

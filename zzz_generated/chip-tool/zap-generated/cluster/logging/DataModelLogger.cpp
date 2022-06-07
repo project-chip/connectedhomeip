@@ -846,30 +846,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("ZoneId", indent + 1, value.zoneId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ZoneId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ZoneStatus", indent + 1, value.zoneStatus);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ZoneStatus'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");

@@ -43,7 +43,6 @@
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterGroupsPluginServerInitCallback();                                                                                        \
-    MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginClientInitCallback();                                                                                  \
