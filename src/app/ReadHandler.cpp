@@ -676,10 +676,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     SubscribeResponseMessage::Builder response;
     ReturnErrorOnFailure(response.Init(&writer));
-    response.SubscriptionId(mSubscriptionId)
-        .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
-        .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
-        .EndOfSubscribeResponseMessage();
+    response.SubscriptionId(mSubscriptionId).MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds).EndOfSubscribeResponseMessage();
     ReturnErrorOnFailure(response.GetError());
 
     ReturnErrorOnFailure(writer.Finalize(&packet));

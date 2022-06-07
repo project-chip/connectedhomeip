@@ -32,7 +32,6 @@ namespace SubscribeResponseMessage {
 enum class Tag : uint8_t
 {
     kSubscriptionId            = 0,
-    kMinIntervalFloorSeconds   = 1,
     kMaxIntervalCeilingSeconds = 2,
 };
 
@@ -63,14 +62,6 @@ public:
     CHIP_ERROR GetSubscriptionId(SubscriptionId * const apSubscriptionId) const;
 
     /**
-     *  @brief Get Final MinIntervalFloorSeconds. Next() must be called before accessing them.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const;
-
-    /**
      *  @brief Get Final MaxIntervalCeilingSeconds. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
@@ -86,11 +77,6 @@ public:
      *  @brief final subscription Id for the subscription back to the client.s.
      */
     SubscribeResponseMessage::Builder & SubscriptionId(const chip::SubscriptionId SubscriptionId);
-
-    /**
-     *  @brief Final Min Interval for the subscription back to the clients.
-     */
-    SubscribeResponseMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
 
     /**
      *  @brief Final Max Interval for the subscription back to the clients.
