@@ -1,14 +1,16 @@
 {%- macro encode_optional(target, source, depth, encodable) -%}
-  if ({{source}} != nullptr) {
-    jobject optionalValue_{{depth}};
+  {
+    jobject optionalValue_{{depth}} = nullptr;
     chip::JniReferences::GetInstance().GetOptionalValue({{source}}, optionalValue_{{depth}});
-    auto & definedValue_{{depth}} = {{target}}.Emplace();
-    {{ encode_value(
-       "definedValue_{}".format(depth),
-       "optionalValue_{}".format(depth),
-       depth+1,
-       encodable.without_optional()
-    )}}
+    if (optionalValue_{{depth}}) {
+      auto & definedValue_{{depth}} = {{target}}.Emplace();
+      {{ encode_value(
+          "definedValue_{}".format(depth),
+          "optionalValue_{}".format(depth),
+          depth+1,
+          encodable.without_optional()
+      )}}
+    }
   }
 {%- endmacro %}
 

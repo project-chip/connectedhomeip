@@ -22,6 +22,9 @@
 
 @interface CastingServerBridge : NSObject
 
++ (CastingServerBridge *)getSharedInstance;
+
+// TBD: placeholder will be replaced with true CastingServer functions
 - (int)add:(int)a secondNum:(int)b;
 
 @end

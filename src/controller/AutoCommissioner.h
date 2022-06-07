@@ -53,7 +53,11 @@ private:
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
-    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage) const;
+    /**
+     * The device argument to GetCommandTimeout is the device whose session will
+     * be used for sending the relevant command.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 

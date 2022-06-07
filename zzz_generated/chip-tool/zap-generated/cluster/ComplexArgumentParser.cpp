@@ -2183,29 +2183,34 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.id", "id", value.isMember("id")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackFreeCurrent", "stackFreeCurrent",
-                                                                  value.isMember("stackFreeCurrent")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackFreeMinimum", "stackFreeMinimum",
-                                                                  value.isMember("stackFreeMinimum")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackSize", "stackSize", value.isMember("stackSize")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.id, value["id"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeCurrent");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeCurrent, value["stackFreeCurrent"]));
+    if (value.isMember("stackFreeCurrent"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeCurrent");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeCurrent, value["stackFreeCurrent"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeMinimum");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeMinimum, value["stackFreeMinimum"]));
+    if (value.isMember("stackFreeMinimum"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeMinimum");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeMinimum, value["stackFreeMinimum"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackSize");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackSize, value["stackSize"]));
+    if (value.isMember("stackSize"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackSize");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackSize, value["stackSize"]));
+    }
 
     return CHIP_NO_ERROR;
 }

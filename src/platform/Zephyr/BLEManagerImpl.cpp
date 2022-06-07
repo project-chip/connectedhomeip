@@ -125,7 +125,7 @@ CHIP_ERROR InitRandomStaticAddress()
 
     error = bt_id_create(&addr, nullptr);
 
-    if (error)
+    if (error < 0)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
         return System::MapErrorZephyr(error);

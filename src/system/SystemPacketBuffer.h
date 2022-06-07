@@ -116,7 +116,7 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr uint16_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
 #else  // CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr uint16_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
+    static constexpr uint16_t kStructureSize = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), alignof(::chip::System::pbuf));
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 public:
@@ -289,6 +289,23 @@ public:
     CHECK_RETURN_VALUE bool EnsureReservedSize(uint16_t aReservedSize);
 
     /**
+     * Get a pointer to reserved space.
+     *
+     *  Returns a pointer to space in the packet buffer with size and alignment suitable for type T. Payload data is
+     *  moved if necessary to increase the reserve. Due to alignment and padding, the returned space is not necessarily
+     *  adjacent to either the packet buffer header or to the payload.
+     *
+     *  @return \c pointer to the requested reserve if available, \c nullptr if there's not enough room in the buffer.
+     */
+    template <typename T>
+    T * GetReserve()
+    {
+        static_assert(sizeof(T) <= UINT16_MAX, "type too large");
+        static_assert(alignof(T) <= UINT16_MAX, "alignment too large");
+        return reinterpret_cast<T *>(GetReserve(static_cast<uint16_t>(sizeof(T)), static_cast<uint16_t>(alignof(T) - 1)));
+    }
+
+    /**
      * Align the buffer payload on the specified bytes boundary.
      *
      *  Moving the payload in the buffer forward if necessary.
@@ -373,6 +390,7 @@ private:
     static void InternalCheck(const PacketBuffer * buffer);
 #endif
 
+    uint8_t * GetReserve(uint16_t aSize, uint16_t aAlignmentMask);
     void AddRef();
     bool HasSoleOwnership() const { return (this->ref == 1); }
     static void Free(PacketBuffer * aPacket);

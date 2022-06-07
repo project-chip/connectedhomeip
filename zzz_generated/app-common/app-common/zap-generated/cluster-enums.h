@@ -755,6 +755,12 @@ using RadioFaultType                  = EmberAfRadioFaultType;
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
+
+// Bitmap for SoftwareDiagnosticsFeature
+enum class SoftwareDiagnosticsFeature : uint32_t
+{
+    kWaterMarks = 0x1,
+};
 } // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {

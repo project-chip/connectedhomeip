@@ -37,6 +37,7 @@ ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
+    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",

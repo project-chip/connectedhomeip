@@ -299,6 +299,7 @@ if (chip_device_platform != "none") {
     output_name = "libDeviceLayer"
 
     sources = [
+      "../include/platform/BuildTime.h",
       "../include/platform/CHIPDeviceConfig.h",
       "../include/platform/CHIPDeviceError.h",
       "../include/platform/CHIPDeviceEvent.h",

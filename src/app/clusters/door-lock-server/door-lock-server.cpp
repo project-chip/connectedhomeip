@@ -2395,7 +2395,7 @@ void DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHandler * 
     response.status       = status;
     if (DlStatus::kSuccess == status)
     {
-        response.daysMask    = Optional<chip::BitFlags<DlDaysMaskMap>>(daysMask);
+        response.daysMask    = Optional<chip::BitMask<DlDaysMaskMap>>(daysMask);
         response.startHour   = Optional<uint8_t>(startHour);
         response.startMinute = Optional<uint8_t>(startMinute);
         response.endHour     = Optional<uint8_t>(endHour);

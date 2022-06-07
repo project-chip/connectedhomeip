@@ -1956,6 +1956,16 @@ server cluster KeypadInput = 1289 {
 
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SendKeyRequest {
+    CecKeyCode keyCode = 0;
+  }
+
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
+  }
+
+  command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 server cluster LevelControl = 8 {
@@ -2928,12 +2938,16 @@ server cluster Scenes = 5 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -3004,6 +3018,18 @@ server cluster TargetNavigator = 1285 {
   readonly attribute int8u currentTarget = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct NavigateTargetRequest {
+    INT8U target = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
 server cluster TemperatureMeasurement = 1026 {

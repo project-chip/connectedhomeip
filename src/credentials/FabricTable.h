@@ -25,6 +25,9 @@
 
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
+#include <credentials/CertificateValidityPolicy.h>
+#include <credentials/LastKnownGoodTime.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -186,7 +189,8 @@ public:
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks)
     static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac, FabricId existingFabricId,
-                                               PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey);
+                                                Credentials::CertificateValidityPolicy * policy,
+                                                PeerId & outOperationalId, FabricId & outFabricId, Crypto::P256PublicKey & outNocPubkey)
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -207,7 +211,16 @@ public:
         mFabricIndex = kUndefinedFabricIndex;
     }
 
-    CHIP_ERROR SetFabricInfo(FabricInfo & newFabric);
+    /**
+     * Verify the validity of the passed fabric info, and then emplace into
+     * this.  If a policy is passed, enact this for the fabric info validation.
+     *
+     * @param newFabric fabric to emplace into this
+     * @param policy validation policy to apply, or nulllptr for none
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR SetFabricInfo(FabricInfo & newFabric, Credentials::CertificateValidityPolicy * policy);
+
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
@@ -399,6 +412,15 @@ public:
     // test-cases
     CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);
 
+    /**
+     * Update fabric at the specified fabric index with the passed fabric info.
+     *
+     * @param fabricIndex index at which to update fabric info
+     * @param fabricInfo fabric info to validate and copy into the specified index
+     * @return CHIP_NO_ERROR on success, an appropriate CHIP_ERROR on failure
+     */
+    CHIP_ERROR UpdateFabric(FabricIndex fabricIndex, FabricInfo & fabricInfo);
+
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
@@ -409,6 +431,53 @@ public:
 
     CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
     void RemoveFabricDelegate(FabricTable::Delegate * delegate);
+
+    /**
+     * Get the current Last Known Good Time.
+     *
+     * @param lastKnownGoodChipEpochTime (out) the current last known good time, if any is known
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
+     */
+    CHIP_ERROR GetLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const
+    {
+        return mLastKnownGoodTime.GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
+    }
+
+    /**
+     * Validate that the passed Last Known Good Time is within bounds and then
+     * store this and write back to storage.  Legal values are those which are
+     * not earlier than firmware build time or any of our stored certificates'
+     * NotBefore times:
+     *
+     *    3.5.6.1. Last Known Good UTC Time
+     *
+     *    A Node MAY adjust the Last Known Good UTC Time backwards if it
+     *    believes the current Last Known Good UTC Time is incorrect and it has
+     *    a good time value from a trusted source. The Node SHOULD NOT adjust
+     *    the Last Known Good UTC to a time before the later of:
+     *      • The build timestamp of its currently running software image
+     *      • The not-before timestamp of any of its operational certificates
+     *
+     * @param lastKnownGoodChipEpochTime Last Known Good Time in seconds since CHIP epoch
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
+
+    /*
+     * Commit the Last Known Good Time by deleting the fail-safe backup from
+     * storage.
+     *
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR CommitLastKnownGoodChipEpochTime() { return mLastKnownGoodTime.CommitLastKnownGoodChipEpochTime(); }
+
+    /*
+     * Revert the Last Known Good Time to the fail-safe backup value in
+     * persistence if any exists.
+     *
+     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
+     */
+    CHIP_ERROR RevertLastKnownGoodChipEpochTime() { return mLastKnownGoodTime.RevertLastKnownGoodChipEpochTime(); }
 
     uint8_t FabricCount() const { return mFabricCount; }
 
@@ -493,6 +562,8 @@ private:
     // When mIsPendingFabricDataPresent is true, this holds the index of the fabric
     // for which is there is currently pending data.
     FabricIndex mFabricIndexWithPendingState = kUndefinedFabricIndex;
+
+    LastKnownGoodTime mLastKnownGoodTime;
 };
 
 } // namespace chip

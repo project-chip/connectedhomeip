@@ -87,13 +87,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
             thread->NameBuf[kMaxThreadNameLength] = '\0';
-            thread->name                          = CharSpan(thread->NameBuf, strlen(thread->NameBuf));
-            thread->id                            = taskStatusArray[x].xTaskNumber;
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = taskStatusArray[x].xTaskNumber;
 
-            thread->stackFreeMinimum = taskStatusArray[x].usStackHighWaterMark;
+            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
             /* Unsupported metrics */
-            thread->stackSize        = 0;
-            thread->stackFreeCurrent = 0;
+            // thread->stackSize
+            // thread->stackFreeCurrent
 
             thread->Next = head;
             head         = thread;

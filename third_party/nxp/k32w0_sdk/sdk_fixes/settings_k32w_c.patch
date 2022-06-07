@@ -1,0 +1,11 @@
+--- a/settings_k32w.c
++++ b/settings_k32w.c
+@@ -52,7 +52,7 @@
+ #define NVM_START_ID 0x4F00
+ 
+ /* WARNING - the defines below must be in sync with OT NVM datasets from Settings.hpp */
+-#define NVM_MAX_ID 7
++#define NVM_MAX_ID 20
+ 
+ static uint8_t sPdmBuffer[pdmBufferSize] __attribute__((aligned(4))) = {0};
+ 

@@ -1117,28 +1117,28 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
 
 # Generating tizen-arm-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
 
 # Generating tizen-arm-light-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-asan
 
 # Generating tizen-arm-light-no-ble
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble
 
 # Generating tizen-arm-light-no-ble-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-asan
 
 # Generating tizen-arm-light-no-ble-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi
 
 # Generating tizen-arm-light-no-ble-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi-asan
 
 # Generating tizen-arm-light-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi
 
 # Generating tizen-arm-light-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi-asan
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters

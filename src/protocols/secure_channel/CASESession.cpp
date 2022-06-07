@@ -146,10 +146,12 @@ void CASESession::Clear()
 
     mLocalNodeId = kUndefinedNodeId;
     mPeerNodeId  = kUndefinedNodeId;
+    mFabricsTable = nullptr;
     mFabricIndex = kUndefinedFabricIndex;
 }
 
-CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                             SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,6 +166,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    mValidContext.mValidityPolicy = policy;
 
     return CHIP_NO_ERROR;
 }
@@ -171,11 +174,11 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
 CHIP_ERROR
 CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
                                            SessionResumptionStorage * sessionResumptionStorage,
-                                           SessionEstablishmentDelegate * delegate,
+                                           Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(sessionManager, delegate));
+    ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
 
     mRole                     = CryptoContext::SessionRole::kResponder;
     mFabricsTable             = fabrics;
@@ -189,21 +192,25 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
 
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                                          ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                                         SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+                                         Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    FabricInfo * fabricInfo = nullptr;
 
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
     mFabricsTable = fabricTable;
+    ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
     auto * fabricInfo = mFabricsTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(sessionManager, delegate);
+    err = Init(sessionManager, policy, delegate);
 
     mRole = CryptoContext::SessionRole::kInitiator;
 
@@ -224,7 +231,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mLocalNodeId = fabricInfo->GetNodeId();
 
     ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
+                    static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
     err = SendSigma1();
     SuccessOrExit(err);
@@ -295,9 +302,8 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
 CHIP_ERROR CASESession::RecoverInitiatorIpk()
 {
     Credentials::GroupDataProvider::KeySet ipkKeySet;
-    FabricIndex fabricIndex = mFabricIndex;
 
-    CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricIndex, ipkKeySet);
+    CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(mFabricIndex, ipkKeySet);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -344,8 +350,9 @@ CHIP_ERROR CASESession::SendSigma1()
     TLV::TLVType outerContainerType                    = TLV::kTLVType_NotSpecified;
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
+    // Lookup fabric info.
     auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Validate that we have a session ID allocated.
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -495,8 +502,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
 CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                          ByteSpan initiatorRandom)
 {
-    if (mSessionResumptionStorage == nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mSessionResumptionStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     SessionResumptionStorage::ConstResumptionIdView resumptionIdSpan(resumptionId);
     ScopedNodeId node;
@@ -506,11 +513,10 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
     ReturnErrorOnFailure(
         ValidateSigmaResumeMIC(resume1MIC, initiatorRandom, resumptionId, ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce)));
 
-    mFabricIndex = node.GetFabricIndex();
     auto * fabricInfo = mFabricsTable->FindFabricWithIndex(node.GetFabricIndex());
-    if (fabricInfo == nullptr)
-        return CHIP_ERROR_INTERNAL;
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    mFabricIndex = node.GetFabricIndex();
     mPeerNodeId  = node.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
@@ -659,7 +665,7 @@ CHIP_ERROR CASESession::SendSigma2()
     MATTER_TRACE_EVENT_SCOPE("SendSigma2", "CASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1018,7 +1024,8 @@ exit:
 CHIP_ERROR CASESession::SendSigma3()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    FabricInfo * fabricInfo = nullptr;
 
     MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferHandle msg_R3;
@@ -1041,7 +1048,8 @@ CHIP_ERROR CASESession::SendSigma3()
     ByteSpan icaCert;
     ByteSpan nocCert;
 
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = fabricInfo->GetICACert(icaCert));
@@ -1402,6 +1410,7 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
                                              Crypto::P256PublicKey & peerPublicKey)
 {
+    ReturnErrorCodeIf(mFabricsTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1448,39 +1457,41 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::GetHardcodedTime()
-{
-    using namespace ASN1;
-    ASN1UniversalTime effectiveTime;
-
-    effectiveTime.Year   = 2022;
-    effectiveTime.Month  = 1;
-    effectiveTime.Day    = 1;
-    effectiveTime.Hour   = 10;
-    effectiveTime.Minute = 10;
-    effectiveTime.Second = 10;
-
-    return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
-}
-
 CHIP_ERROR CASESession::SetEffectiveTime()
 {
-    System::Clock::Milliseconds64 currentTimeMS;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+    System::Clock::Milliseconds64 currentUnixTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
 
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel,
-                     "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup "
-                     "failures. API error: %" CHIP_ERROR_FORMAT,
-                     err.Format());
-        // TODO: Remove use of hardcoded time during CASE setup
-        return GetHardcodedTime();
+        // If the system has given us a wall clock time, we must use it or
+        // fail.  Conversion failures here are therefore always an error.
+        System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+        ReturnErrorOnFailure(mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime));
     }
-
-    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
-    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
-
+    else
+    {
+        // If we don't have wall clock time, the spec dictates that we should
+        // fall back to Last Known Good Time.  Ultimately, the calling application's
+        // validity policy will determine whether this is permissible.
+        System::Clock::Seconds32 lastKnownGoodChipEpochTime;
+        ChipLogError(SecureChannel,
+                     "The device does not support GetClock_RealTimeMS() API: %" CHIP_ERROR_FORMAT
+                     ".  Falling back to Last Known Good UTC Time",
+                     err.Format());
+        VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // If we have no time available, the Validity Policy will
+            // determine what to do.
+            ChipLogError(SecureChannel, "Failed to retrieve Last Known Good UTC Time");
+        }
+        else
+        {
+            mValidContext.SetEffectiveTime<LastKnownGoodChipEpochTime>(lastKnownGoodChipEpochTime);
+        }
+    }
     return CHIP_NO_ERROR;
 }
 

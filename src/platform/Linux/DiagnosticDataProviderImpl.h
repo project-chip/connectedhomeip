@@ -39,6 +39,7 @@ public:
 
     // ===== Methods that implement the DiagnosticDataProvider abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;

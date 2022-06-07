@@ -3719,7 +3719,7 @@ void CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3743,7 +3743,7 @@ void CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3767,7 +3767,7 @@ void CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3791,7 +3791,7 @@ void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
 }
 
 void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -8167,7 +8167,7 @@ void CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -8560,12 +8560,28 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
             CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
             newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
-            newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
-            newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
+            if (entry_0.name.HasValue()) {
+                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
+                                                             length:entry_0.name.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
+            } else {
+                newElement_0.name = nil;
+            }
+            if (entry_0.stackFreeCurrent.HasValue()) {
+                newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent.Value()];
+            } else {
+                newElement_0.stackFreeCurrent = nil;
+            }
+            if (entry_0.stackFreeMinimum.HasValue()) {
+                newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum.Value()];
+            } else {
+                newElement_0.stackFreeMinimum = nil;
+            }
+            if (entry_0.stackSize.HasValue()) {
+                newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize.Value()];
+            } else {
+                newElement_0.stackSize = nil;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9107,7 +9123,7 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9131,7 +9147,7 @@ void CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEs
 }
 
 void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9155,7 +9171,7 @@ void CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9179,7 +9195,7 @@ void CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -9703,7 +9719,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9731,7 +9747,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9759,7 +9775,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9787,7 +9803,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11229,7 +11245,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -11253,7 +11269,7 @@ void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];

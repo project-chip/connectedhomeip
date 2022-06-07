@@ -112,14 +112,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   public void promptCommissioningFailed(String commissioneeName, String error) {
-    Log.d(
-        TAG,
-        "Received prompt for failure vendor id:"
-            + vendorId
-            + " productId:"
-            + productId
-            + ". Commissionee: "
-            + commissioneeName);
+    Log.d(TAG, "Received prompt for failure Commissionee: " + commissioneeName);
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(activity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)

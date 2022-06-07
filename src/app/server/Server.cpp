@@ -127,6 +127,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
     mOperationalKeystore      = initParams.operationalKeystore;
 
+    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
@@ -259,6 +261,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
+            .certificateValidityPolicy = mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
@@ -270,8 +273,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err =
-        mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
+                                                    mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot

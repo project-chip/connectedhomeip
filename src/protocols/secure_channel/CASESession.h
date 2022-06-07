@@ -30,6 +30,7 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPTLV.h>
@@ -73,13 +74,14 @@ public:
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate,
+        Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -90,6 +92,7 @@ public:
      * @param fabricTable                   The fabric table that contains a fabric in common with the peer
      * @param peerScopedNodeId              Node to which we want to establish a session
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
@@ -97,7 +100,7 @@ public:
     CHIP_ERROR
     EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                     SessionEstablishmentDelegate * delegate,
+                     Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -178,7 +181,8 @@ private:
         kFinishedViaResume = 7,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                    SessionEstablishmentDelegate * delegate);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();
@@ -242,10 +246,10 @@ private:
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    FabricTable * mFabricsTable    = nullptr;
-    NodeId mPeerNodeId             = kUndefinedNodeId;
-    NodeId mLocalNodeId            = kUndefinedNodeId;
-    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+    FabricTable * mFabricsTable = nullptr;
+    FabricIndex mFabricIndex    = kUndefinedFabricIndex;
+    NodeId mPeerNodeId          = kUndefinedNodeId;
+    NodeId mLocalNodeId         = kUndefinedNodeId;
     CATValues mPeerCATs;
 
     SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session

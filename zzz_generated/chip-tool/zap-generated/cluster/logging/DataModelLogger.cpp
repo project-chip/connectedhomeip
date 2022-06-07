@@ -5569,7 +5569,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MinRFIDCodeLength", 1, value);
         }
         case DoorLock::Attributes::CredentialRulesSupport::Id: {
-            chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value;
+            chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CredentialRulesSupport", 1, value);
         }
@@ -5604,12 +5604,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperatingMode", 1, value);
         }
         case DoorLock::Attributes::SupportedOperatingModes::Id: {
-            chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value;
+            chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedOperatingModes", 1, value);
         }
         case DoorLock::Attributes::DefaultConfigurationRegister::Id: {
-            chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value;
+            chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DefaultConfigurationRegister", 1, value);
         }
@@ -5634,7 +5634,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EnablePrivacyModeButton", 1, value);
         }
         case DoorLock::Attributes::LocalProgrammingFeatures::Id: {
-            chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value;
+            chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocalProgrammingFeatures", 1, value);
         }
@@ -8078,7 +8078,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
-            chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
+            chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
@@ -8466,22 +8466,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("boolean", 1, value);
         }
         case TestCluster::Attributes::Bitmap8::Id: {
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap8", 1, value);
         }
         case TestCluster::Attributes::Bitmap16::Id: {
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap16", 1, value);
         }
         case TestCluster::Attributes::Bitmap32::Id: {
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap32", 1, value);
         }
         case TestCluster::Attributes::Bitmap64::Id: {
-            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap64", 1, value);
         }
@@ -8709,22 +8709,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("nullable_boolean", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap8::Id: {
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap8", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap16::Id: {
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap16", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap32::Id: {
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap32", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap64::Id: {
-            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap64", 1, value);
         }
@@ -9859,7 +9859,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("NumberOfActuationsTilt", 1, value);
         }
         case WindowCovering::Attributes::ConfigStatus::Id: {
-            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConfigStatus", 1, value);
         }
@@ -9924,7 +9924,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("InstalledClosedLimitTilt", 1, value);
         }
         case WindowCovering::Attributes::Mode::Id: {
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mode", 1, value);
         }

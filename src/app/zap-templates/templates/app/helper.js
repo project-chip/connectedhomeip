@@ -491,7 +491,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
       if (s) {
         return 'uint' + s[1] + '_t';
       }
-      return 'chip::BitFlags<' + ns + type + '>';
+      return 'chip::BitMask<' + ns + type + '>';
     }
 
     if (types.isStruct) {

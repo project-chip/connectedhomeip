@@ -1449,13 +1449,17 @@ public class ChipStructs {
 
   public static class SoftwareDiagnosticsClusterThreadMetrics {
     public Long id;
-    public String name;
-    public Long stackFreeCurrent;
-    public Long stackFreeMinimum;
-    public Long stackSize;
+    public Optional<String> name;
+    public Optional<Long> stackFreeCurrent;
+    public Optional<Long> stackFreeMinimum;
+    public Optional<Long> stackSize;
 
     public SoftwareDiagnosticsClusterThreadMetrics(
-        Long id, String name, Long stackFreeCurrent, Long stackFreeMinimum, Long stackSize) {
+        Long id,
+        Optional<String> name,
+        Optional<Long> stackFreeCurrent,
+        Optional<Long> stackFreeMinimum,
+        Optional<Long> stackSize) {
       this.id = id;
       this.name = name;
       this.stackFreeCurrent = stackFreeCurrent;

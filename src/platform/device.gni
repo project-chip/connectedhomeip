@@ -149,6 +149,9 @@ declare_args() {
   # If true, disables KVS implementation for the platform.  May not be
   # supported on all platforms.
   chip_disable_platform_kvs = false
+
+  # If true, builds the tv-casting-common static lib
+  build_tv_casting_common_a = false
 }
 
 assert(chip_disable_platform_kvs == false || chip_device_platform == "darwin",
