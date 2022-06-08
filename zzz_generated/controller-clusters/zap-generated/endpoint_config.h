@@ -778,7 +778,7 @@
     },\
   { \
       /* Endpoint: 1, Cluster: Test Cluster (client) */ \
-      .clusterId = 0xFFF1050F,  \
+      .clusterId = 0xFFF1FC05,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \

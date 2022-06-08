@@ -37817,7 +37817,7 @@ class ElectricalMeasurement(Cluster):
 
 @dataclass
 class TestCluster(Cluster):
-    id: typing.ClassVar[int] = 0xFFF1050F
+    id: typing.ClassVar[int] = 0xFFF1FC05
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
@@ -38157,7 +38157,7 @@ class TestCluster(Cluster):
     class Commands:
         @dataclass
         class Test(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
 
@@ -38170,7 +38170,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestSpecificResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
 
@@ -38185,7 +38185,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestNotHandled(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
 
@@ -38198,7 +38198,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestAddArgumentsResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
@@ -38213,7 +38213,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestSpecific(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
 
@@ -38226,7 +38226,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestSimpleArgumentResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
 
@@ -38241,7 +38241,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestUnknownCommand(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
 
@@ -38254,7 +38254,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestStructArrayArgumentResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
 
@@ -38279,7 +38279,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestAddArguments(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
 
@@ -38296,7 +38296,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestListInt8UReverseResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = False
 
@@ -38311,7 +38311,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestSimpleArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
 
@@ -38326,7 +38326,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEnumsResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
 
@@ -38343,7 +38343,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestStructArrayArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
 
@@ -38368,7 +38368,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestNullableOptionalResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = False
 
@@ -38389,7 +38389,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestStructArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
 
@@ -38404,7 +38404,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestComplexNullableOptionalResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = False
 
@@ -38473,7 +38473,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestNestedStructArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
 
@@ -38488,7 +38488,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class BooleanResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = False
 
@@ -38503,7 +38503,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestListStructArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
 
@@ -38518,7 +38518,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class SimpleStructResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = False
 
@@ -38533,7 +38533,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestListInt8UArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = True
 
@@ -38548,7 +38548,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEmitTestEventResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = False
 
@@ -38563,7 +38563,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestNestedStructListArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
 
@@ -38578,7 +38578,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEmitTestFabricScopedEventResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = False
 
@@ -38593,7 +38593,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestListNestedStructListArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000C
             is_client: typing.ClassVar[bool] = True
 
@@ -38608,7 +38608,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestListInt8UReverseRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000D
             is_client: typing.ClassVar[bool] = True
 
@@ -38623,7 +38623,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEnumsRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000E
             is_client: typing.ClassVar[bool] = True
 
@@ -38640,7 +38640,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestNullableOptionalRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000F
             is_client: typing.ClassVar[bool] = True
 
@@ -38655,7 +38655,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestComplexNullableOptionalRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0010
             is_client: typing.ClassVar[bool] = True
 
@@ -38692,7 +38692,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class SimpleStructEchoRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0011
             is_client: typing.ClassVar[bool] = True
 
@@ -38707,7 +38707,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TimedInvokeRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0012
             is_client: typing.ClassVar[bool] = True
 
@@ -38724,7 +38724,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestSimpleOptionalArgumentRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0013
             is_client: typing.ClassVar[bool] = True
 
@@ -38739,7 +38739,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEmitTestEventRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0014
             is_client: typing.ClassVar[bool] = True
 
@@ -38758,7 +38758,7 @@ class TestCluster(Cluster):
 
         @dataclass
         class TestEmitTestFabricScopedEventRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xFFF1050F
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0015
             is_client: typing.ClassVar[bool] = True
 
@@ -38777,7 +38777,7 @@ class TestCluster(Cluster):
         class Boolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38793,7 +38793,7 @@ class TestCluster(Cluster):
         class Bitmap8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38809,7 +38809,7 @@ class TestCluster(Cluster):
         class Bitmap16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38825,7 +38825,7 @@ class TestCluster(Cluster):
         class Bitmap32(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38841,7 +38841,7 @@ class TestCluster(Cluster):
         class Bitmap64(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38857,7 +38857,7 @@ class TestCluster(Cluster):
         class Int8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38873,7 +38873,7 @@ class TestCluster(Cluster):
         class Int16u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38889,7 +38889,7 @@ class TestCluster(Cluster):
         class Int24u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38905,7 +38905,7 @@ class TestCluster(Cluster):
         class Int32u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38921,7 +38921,7 @@ class TestCluster(Cluster):
         class Int40u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38937,7 +38937,7 @@ class TestCluster(Cluster):
         class Int48u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38953,7 +38953,7 @@ class TestCluster(Cluster):
         class Int56u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38969,7 +38969,7 @@ class TestCluster(Cluster):
         class Int64u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -38985,7 +38985,7 @@ class TestCluster(Cluster):
         class Int8s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39001,7 +39001,7 @@ class TestCluster(Cluster):
         class Int16s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39017,7 +39017,7 @@ class TestCluster(Cluster):
         class Int24s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39033,7 +39033,7 @@ class TestCluster(Cluster):
         class Int32s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39049,7 +39049,7 @@ class TestCluster(Cluster):
         class Int40s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39065,7 +39065,7 @@ class TestCluster(Cluster):
         class Int48s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39081,7 +39081,7 @@ class TestCluster(Cluster):
         class Int56s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39097,7 +39097,7 @@ class TestCluster(Cluster):
         class Int64s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39113,7 +39113,7 @@ class TestCluster(Cluster):
         class Enum8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39129,7 +39129,7 @@ class TestCluster(Cluster):
         class Enum16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39145,7 +39145,7 @@ class TestCluster(Cluster):
         class FloatSingle(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39161,7 +39161,7 @@ class TestCluster(Cluster):
         class FloatDouble(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39177,7 +39177,7 @@ class TestCluster(Cluster):
         class OctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39193,7 +39193,7 @@ class TestCluster(Cluster):
         class ListInt8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39209,7 +39209,7 @@ class TestCluster(Cluster):
         class ListOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39225,7 +39225,7 @@ class TestCluster(Cluster):
         class ListStructOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39241,7 +39241,7 @@ class TestCluster(Cluster):
         class LongOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39257,7 +39257,7 @@ class TestCluster(Cluster):
         class CharString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39273,7 +39273,7 @@ class TestCluster(Cluster):
         class LongCharString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39289,7 +39289,7 @@ class TestCluster(Cluster):
         class EpochUs(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39305,7 +39305,7 @@ class TestCluster(Cluster):
         class EpochS(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39321,7 +39321,7 @@ class TestCluster(Cluster):
         class VendorId(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39337,7 +39337,7 @@ class TestCluster(Cluster):
         class ListNullablesAndOptionalsStruct(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39353,7 +39353,7 @@ class TestCluster(Cluster):
         class EnumAttr(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39369,7 +39369,7 @@ class TestCluster(Cluster):
         class StructAttr(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39385,7 +39385,7 @@ class TestCluster(Cluster):
         class RangeRestrictedInt8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39401,7 +39401,7 @@ class TestCluster(Cluster):
         class RangeRestrictedInt8s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39417,7 +39417,7 @@ class TestCluster(Cluster):
         class RangeRestrictedInt16u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39433,7 +39433,7 @@ class TestCluster(Cluster):
         class RangeRestrictedInt16s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39449,7 +39449,7 @@ class TestCluster(Cluster):
         class ListLongOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39465,7 +39465,7 @@ class TestCluster(Cluster):
         class ListFabricScoped(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39481,7 +39481,7 @@ class TestCluster(Cluster):
         class TimedWriteBoolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39501,7 +39501,7 @@ class TestCluster(Cluster):
         class GeneralErrorBoolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39517,7 +39517,7 @@ class TestCluster(Cluster):
         class ClusterErrorBoolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39533,7 +39533,7 @@ class TestCluster(Cluster):
         class Unsupported(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39549,7 +39549,7 @@ class TestCluster(Cluster):
         class NullableBoolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39565,7 +39565,7 @@ class TestCluster(Cluster):
         class NullableBitmap8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39581,7 +39581,7 @@ class TestCluster(Cluster):
         class NullableBitmap16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39597,7 +39597,7 @@ class TestCluster(Cluster):
         class NullableBitmap32(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39613,7 +39613,7 @@ class TestCluster(Cluster):
         class NullableBitmap64(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39629,7 +39629,7 @@ class TestCluster(Cluster):
         class NullableInt8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39645,7 +39645,7 @@ class TestCluster(Cluster):
         class NullableInt16u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39661,7 +39661,7 @@ class TestCluster(Cluster):
         class NullableInt24u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39677,7 +39677,7 @@ class TestCluster(Cluster):
         class NullableInt32u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39693,7 +39693,7 @@ class TestCluster(Cluster):
         class NullableInt40u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39709,7 +39709,7 @@ class TestCluster(Cluster):
         class NullableInt48u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39725,7 +39725,7 @@ class TestCluster(Cluster):
         class NullableInt56u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39741,7 +39741,7 @@ class TestCluster(Cluster):
         class NullableInt64u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39757,7 +39757,7 @@ class TestCluster(Cluster):
         class NullableInt8s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39773,7 +39773,7 @@ class TestCluster(Cluster):
         class NullableInt16s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39789,7 +39789,7 @@ class TestCluster(Cluster):
         class NullableInt24s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39805,7 +39805,7 @@ class TestCluster(Cluster):
         class NullableInt32s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39821,7 +39821,7 @@ class TestCluster(Cluster):
         class NullableInt40s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39837,7 +39837,7 @@ class TestCluster(Cluster):
         class NullableInt48s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39853,7 +39853,7 @@ class TestCluster(Cluster):
         class NullableInt56s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39869,7 +39869,7 @@ class TestCluster(Cluster):
         class NullableInt64s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39885,7 +39885,7 @@ class TestCluster(Cluster):
         class NullableEnum8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39901,7 +39901,7 @@ class TestCluster(Cluster):
         class NullableEnum16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39917,7 +39917,7 @@ class TestCluster(Cluster):
         class NullableFloatSingle(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39933,7 +39933,7 @@ class TestCluster(Cluster):
         class NullableFloatDouble(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39949,7 +39949,7 @@ class TestCluster(Cluster):
         class NullableOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39965,7 +39965,7 @@ class TestCluster(Cluster):
         class NullableCharString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39981,7 +39981,7 @@ class TestCluster(Cluster):
         class NullableEnumAttr(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -39997,7 +39997,7 @@ class TestCluster(Cluster):
         class NullableStruct(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40013,7 +40013,7 @@ class TestCluster(Cluster):
         class NullableRangeRestrictedInt8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40029,7 +40029,7 @@ class TestCluster(Cluster):
         class NullableRangeRestrictedInt8s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40045,7 +40045,7 @@ class TestCluster(Cluster):
         class NullableRangeRestrictedInt16u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40061,7 +40061,7 @@ class TestCluster(Cluster):
         class NullableRangeRestrictedInt16s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40077,7 +40077,7 @@ class TestCluster(Cluster):
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40093,7 +40093,7 @@ class TestCluster(Cluster):
         class AcceptedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40109,7 +40109,7 @@ class TestCluster(Cluster):
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40125,7 +40125,7 @@ class TestCluster(Cluster):
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40141,7 +40141,7 @@ class TestCluster(Cluster):
         class ClusterRevision(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -40159,7 +40159,7 @@ class TestCluster(Cluster):
         class TestEvent(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def event_id(cls) -> int:
@@ -40188,7 +40188,7 @@ class TestCluster(Cluster):
         class TestFabricScopedEvent(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-                return 0xFFF1050F
+                return 0xFFF1FC05
 
             @ChipUtility.classproperty
             def event_id(cls) -> int:

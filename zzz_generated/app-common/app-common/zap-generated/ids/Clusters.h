@@ -374,7 +374,7 @@ namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
 namespace TestCluster {
-static constexpr ClusterId Id = 0xFFF1050F;
+static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace TestCluster
 
 } // namespace Clusters

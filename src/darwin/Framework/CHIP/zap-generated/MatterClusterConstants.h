@@ -142,7 +142,7 @@ typedef NS_ENUM(uint32_t, MatterClusterIDType) {
     kMatterClusterApplianceEventsAndAlertID = 0x00000B02,
     kMatterClusterApplianceStatisticsID = 0x00000B03,
     kMatterClusterElectricalMeasurementID = 0x00000B04,
-    kMatterClusterTestClusterID = 0xFFF1050F,
+    kMatterClusterTestClusterID = 0xFFF1FC05,
 };
 
 #pragma mark - Attributes IDs

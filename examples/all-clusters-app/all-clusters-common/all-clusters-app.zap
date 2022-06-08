@@ -19327,7 +19327,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 4294046994294046991,
+          "code": 4294046991,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "server",

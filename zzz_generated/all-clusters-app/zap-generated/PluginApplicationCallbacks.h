@@ -76,7 +76,6 @@
     MatterSwitchPluginServerInitCallback();                                                                                        \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
-    MatterTestClusterPluginServerInitCallback();                                                                                   \
     MatterThermostatPluginServerInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();                                                          \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \

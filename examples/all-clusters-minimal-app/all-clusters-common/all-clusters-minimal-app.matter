@@ -2511,7 +2511,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster TestCluster = 4293985551 {
+server cluster TestCluster = 4294046991 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
