@@ -727,7 +727,6 @@ libglib
 libical
 libncurses
 libreadline
-libs
 libsdl
 libshell
 libssl
@@ -895,7 +894,6 @@ NVM
 NVS
 nwk
 NXP
-NXPmicro
 objcopy
 OccupancySensing
 OctetString
@@ -1280,7 +1278,6 @@ TimeFormatLocalization
 timeoutMs
 TimeSynchronization
 tinycrypt
-tinycryptbuildingsteps
 Tizen
 TKIP
 tlsr
