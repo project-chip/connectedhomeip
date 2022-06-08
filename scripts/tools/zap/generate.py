@@ -59,7 +59,6 @@ def getDirPath(name):
 
 
 def detectZclFile(zapFile):
-    # FIXME: implement
     print(f"Searching for zcl file from {zapFile}")
 
     path = 'src/app/zap-templates/zcl/zcl.json'
