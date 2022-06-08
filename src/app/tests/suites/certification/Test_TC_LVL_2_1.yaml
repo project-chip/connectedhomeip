@@ -66,13 +66,16 @@ tests:
           constraints:
               type: uint16
 
+    # For lighting Device type current level minimal value is 1
     - label: "Reads the MinLevel attribute"
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 0
+          value: 1
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 1
 
     - label: "Reads the MaxLevel attribute"
       command: "readAttribute"
