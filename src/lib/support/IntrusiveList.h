@@ -218,12 +218,7 @@ protected:
 
     IntrusiveListBase(IntrusiveListBase && that) : mNode(&mNode, &mNode)
     {
-        if (!that.Empty())
-        {
-            mNode.TakePlaceOf(&that.mNode);
-            that.mNode.mNext = &that.mNode;
-            that.mNode.mPrev = &that.mNode;
-        }
+        *this = std::move(that);
     }
 
     IntrusiveListBase & operator=(IntrusiveListBase && that)
