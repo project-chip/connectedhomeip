@@ -390,9 +390,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     // If the WiFi station is currently in the connected state...
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
-#if LWIP_IPV4
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
         haveIPv4Conn = wfx_have_ipv4_addr(SL_WFX_STA_INTERFACE);
-#endif /* LWIP_IPV4 */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = wfx_have_ipv6_addr(SL_WFX_STA_INTERFACE);
     }
 
