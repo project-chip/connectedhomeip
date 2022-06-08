@@ -211,7 +211,7 @@ exit:
     return err;
 }
 
-void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR& err)
+void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR & err)
 {
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
