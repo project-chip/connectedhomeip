@@ -556,11 +556,11 @@ private:
     uint8_t mFabricCount = 0;
 
     // If true, we are in the process of a fail-safe and there was at least one
-    // operation that cause partial data in the fabric table.
+    // operation that caused partial data in the fabric table.
     bool mIsPendingFabricDataPresent = false;
 
     // When mIsPendingFabricDataPresent is true, this holds the index of the fabric
-    // for which is there is currently pending data.
+    // for which there is currently pending data.
     FabricIndex mFabricIndexWithPendingState = kUndefinedFabricIndex;
 
     LastKnownGoodTime mLastKnownGoodTime;

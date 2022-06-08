@@ -110,7 +110,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
             storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabricIndex), buf, static_cast<uint16_t>(metadataLength)));
     }
 
-    // NOTE: Operational Key is never save to storage here. See OperationalKeystore interface for how it is accessed
+    // NOTE: Operational Key is never saved to storage here. See OperationalKeystore interface for how it is accessed
 
     return CHIP_NO_ERROR;
 }
@@ -636,7 +636,7 @@ CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert,
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
     ReturnErrorOnFailure(SetOperationalKeypair(&opKey));
 
-    // NOTE: mVendorId and mFabricLabel are not initialize, because they are not used in tests.
+    // NOTE: mVendorId and mFabricLabel d, because they are not used in tests.
     return CHIP_NO_ERROR;
 }
 
