@@ -216,10 +216,7 @@ protected:
     IntrusiveListBase(const IntrusiveListBase &) = delete;
     IntrusiveListBase & operator=(const IntrusiveListBase &) = delete;
 
-    IntrusiveListBase(IntrusiveListBase && that) : mNode(&mNode, &mNode)
-    {
-        *this = std::move(that);
-    }
+    IntrusiveListBase(IntrusiveListBase && that) : mNode(&mNode, &mNode) { *this = std::move(that); }
 
     IntrusiveListBase & operator=(IntrusiveListBase && that)
     {
