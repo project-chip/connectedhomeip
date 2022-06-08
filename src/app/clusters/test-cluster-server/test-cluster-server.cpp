@@ -681,9 +681,9 @@ bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::Con
         gListUint8Data[i] = 0;
         gListOctetStringData[i].SetLength(0);
         gListOperationalCert[i].SetLength(0);
-        listStructOctetStringData[i].member1         = 0;
-        listStructOctetStringData[i].member2         = ByteSpan();
-        gSimpleEnums[i]                              = SimpleEnum::kUnspecified;
+        listStructOctetStringData[i].member1 = 0;
+        listStructOctetStringData[i].member2 = ByteSpan();
+        gSimpleEnums[i]                      = SimpleEnum::kUnspecified;
     }
     gSimpleEnumCount = 0;
 
