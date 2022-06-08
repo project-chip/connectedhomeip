@@ -48,6 +48,12 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     mMaxCredentialsPerUser = maxNumberOfCredentialsPerUser;
 
     mMaxUsers = numberOfSupportedUsers;
+    if (mMaxUsers > DOOR_LOCK_MAX_USERS)
+    {
+        EFR32_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
+                  DOOR_LOCK_MAX_USERS);
+        return APP_ERROR_ALLOCATION_FAILED;
+    }
 
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel

@@ -31,8 +31,9 @@
 
 using namespace ::chip;
 
-#define DOOR_LOCK_MAX_CREDENTIAL_SIZE 8
+// Currently up to 10 users are support on the EFR32 platform
 #define DOOR_LOCK_MAX_USERS 10
+#define DOOR_LOCK_MAX_CREDENTIAL_SIZE 8
 #define MININUM_USER_INDEX 1
 #define MINIMUM_CREDENTIAL_INDEX 1
 #define MAX_CREDENTIAL_PER_USER 10
