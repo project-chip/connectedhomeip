@@ -2203,10 +2203,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        CHIP_ERROR err = LogValue("FabricId", indent + 1, value.fabricId);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricId'");
             return err;
         }
     }

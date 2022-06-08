@@ -2062,15 +2062,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.fabricId", "fabricId", value.isMember("fabricId")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.operationalCert", "operationalCert",
                                                                   value.isMember("operationalCert")));
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricId, value["fabricId"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operationalCert");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.operationalCert, value["operationalCert"]));
@@ -2080,7 +2079,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.fabricIndex);
+    ComplexArgumentParser::Finalize(request.fabricId);
     ComplexArgumentParser::Finalize(request.operationalCert);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

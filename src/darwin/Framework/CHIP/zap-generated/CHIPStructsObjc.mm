@@ -2665,7 +2665,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
+        _fabricId = @(0);
 
         _operationalCert = [NSData data];
     }
@@ -2675,7 +2675,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: fabricIndex:%@; operationalCert:%@; >", NSStringFromClass([self class]), _fabricIndex,
+        [NSString stringWithFormat:@"<%@: fabricId:%@; operationalCert:%@; >", NSStringFromClass([self class]), _fabricId,
                   [_operationalCert base64EncodedStringWithOptions:0]];
     return descriptionString;
 }

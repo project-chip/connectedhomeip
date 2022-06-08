@@ -1825,11 +1825,11 @@ public class ChipStructs {
   }
 
   public static class TestClusterClusterTestListStructOctet {
-    public Integer fabricIndex;
+    public Long fabricId;
     public byte[] operationalCert;
 
-    public TestClusterClusterTestListStructOctet(Integer fabricIndex, byte[] operationalCert) {
-      this.fabricIndex = fabricIndex;
+    public TestClusterClusterTestListStructOctet(Long fabricId, byte[] operationalCert) {
+      this.fabricId = fabricId;
       this.operationalCert = operationalCert;
     }
 
@@ -1837,8 +1837,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("TestClusterClusterTestListStructOctet {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
+      output.append("\tfabricId: ");
+      output.append(fabricId);
       output.append("\n");
       output.append("\toperationalCert: ");
       output.append(Arrays.toString(operationalCert));

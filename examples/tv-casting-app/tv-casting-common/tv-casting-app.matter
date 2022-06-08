@@ -1897,7 +1897,7 @@ server cluster TestCluster = 1295 {
   }
 
   struct TestListStructOctet {
-    fabric_idx fabricIndex = 0;
+    fabric_id fabricId = 0;
     octet_string<32> operationalCert = 1;
   }
 

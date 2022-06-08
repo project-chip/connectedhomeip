@@ -13729,12 +13729,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
+                jobject newElement_0_fabricId;
+                std::string newElement_0_fabricIdClassName     = "java/lang/Long";
+                std::string newElement_0_fabricIdCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIdClassName.c_str(),
+                                                                               newElement_0_fabricIdCtorSignature.c_str(),
+                                                                               entry_0.fabricId, newElement_0_fabricId);
                 jobject newElement_0_operationalCert;
                 jbyteArray newElement_0_operationalCertByteArray =
                     env->NewByteArray(static_cast<jsize>(entry_0.operationalCert.size()));
@@ -13752,15 +13752,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID testListStructOctetStructCtor =
-                    env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Integer;[B)V");
+                    env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Long;[B)V");
                 if (testListStructOctetStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestListStructOctet constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor,
-                                              newElement_0_fabricIndex, newElement_0_operationalCert);
+                newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor, newElement_0_fabricId,
+                                              newElement_0_operationalCert);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

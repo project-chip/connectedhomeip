@@ -9308,7 +9308,7 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
             auto & entry_0 = iter_0.GetValue();
             CHIPTestClusterClusterTestListStructOctet * newElement_0;
             newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
-            newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+            newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
             newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data()
                                                           length:entry_0.operationalCert.size()];
             [array_0 addObject:newElement_0];
