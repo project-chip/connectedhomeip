@@ -78,6 +78,3 @@ After MW320 is reset, console will allow you to enter commands:
 
 ![MW320_CONSOLE](../../../platform/nxp/mw320/doc/images/mw320_console.jpg)
 
-## Testing the example
-
-![MW320 LED ON](../../../platform/nxp/mw320/doc/images/mw320_on.jpg)
