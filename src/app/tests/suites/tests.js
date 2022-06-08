@@ -224,6 +224,8 @@ function getManualTests() {
     'Test_TC_MF_1_2',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
+    'Test_TC_MF_1_9',
+    'Test_TC_MF_1_10',
     'Test_TC_MF_1_11',
     'Test_TC_MF_1_12',
     'Test_TC_MF_1_13',
@@ -620,8 +622,6 @@ function getTests() {
     'Test_TC_MF_1_4',
     'Test_TC_MF_1_5',
     'Test_TC_MF_1_6',
-    'Test_TC_MF_1_9',
-    'Test_TC_MF_1_10',
     'Test_TC_MF_1_15',
   ];
 
