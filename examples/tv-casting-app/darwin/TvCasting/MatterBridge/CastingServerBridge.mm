@@ -48,15 +48,72 @@
             return nil;
         }
 
+        // init app Server
+        static chip::CommonCaseDeviceServerInitParams initParams;
+        err = initParams.InitializeStaticResourcesBeforeServerInit();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
+            return nil;
+        }
+        err = chip::Server::GetInstance().Init(initParams);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+            return nil;
+        }
+
+        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+
         CastingServer::GetInstance()->Init();
     }
     return self;
 }
 
-// TBD: placeholder will be replaced with true CastingServer functions
-- (int)add:(int)a secondNum:(int)b
+- (bool)discoverCommissioners
 {
-    return a + b;
+    ChipLogProgress(AppServer, "CastingServerBridge().discoverCommissioners() called");
+    CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
 }
 
+- (DiscoveredNodeData *)getDiscoveredCommissioner:(int)index
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().getDiscoveredCommissioner() called");
+
+    DiscoveredNodeData * commissioner = nil;
+    const chip::Dnssd::DiscoveredNodeData * chipDiscoveredNodeData = CastingServer::GetInstance()->GetDiscoveredCommissioner(index);
+    if (chipDiscoveredNodeData != nullptr) {
+        commissioner = [[DiscoveredNodeData alloc] initWithChipDiscoveredNodeData:(void *) chipDiscoveredNodeData];
+    }
+    return commissioner;
+}
+
+- (bool)sendUserDirectedCommissioningRequest:(NSString *)commissionerIpAddress
+                            commissionerPort:(uint16_t)commissionerPort
+                           platformInterface:(unsigned int)platformInterface
+{
+    ChipLogProgress(
+        AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with port %d", commissionerPort);
+    chip::Inet::IPAddress commissionerAddrInet;
+    if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
+        ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to parse IP address");
+        return false;
+    }
+
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId(platformInterface);
+
+    chip::Transport::PeerAddress commissionerPeerAddress
+        = chip::Transport::PeerAddress::UDP(commissionerAddrInet, commissionerPort, interfaceId);
+
+    CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(commissionerPeerAddress);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(
+            AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
 @end

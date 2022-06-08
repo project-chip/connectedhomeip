@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "DiscoveredNodeData.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CastingServerBridge_h
@@ -24,8 +25,13 @@
 
 + (CastingServerBridge *)getSharedInstance;
 
-// TBD: placeholder will be replaced with true CastingServer functions
-- (int)add:(int)a secondNum:(int)b;
+- (bool)discoverCommissioners;
+
+- (DiscoveredNodeData *)getDiscoveredCommissioner:(int)index;
+
+- (bool)sendUserDirectedCommissioningRequest:(NSString *)commissionerIpAddress
+                            commissionerPort:(uint16_t)commissionerPort
+                           platformInterface:(unsigned int)platformInterface;
 
 @end
 
