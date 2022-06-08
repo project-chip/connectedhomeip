@@ -144,8 +144,7 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
-    // TODO we need to use the fabric table provided after Tennessee's PR.
-    //mFabricTable->RemoveFabricDelegate(&mFabricDelegate);
+    mFabricsTable->RemoveFabricDelegate(&mFabricDelegate);
 
     mLocalNodeId  = kUndefinedNodeId;
     mPeerNodeId   = kUndefinedNodeId;
@@ -166,7 +165,6 @@ void CASESession::InvalidateIfPendingEstablishment()
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
                              SessionEstablishmentDelegate * delegate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -174,16 +172,36 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    // TODO we need to use the fabric table provided after Tennessee's PR.
-    // SuccessOrExit(err = mFabricTable->AddFabricDelegate(&mFabricDelegate));
-
     mDelegate = delegate;
-    SuccessOrExit(err = AllocateSecureSession(sessionManager));
+    ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
     mValidContext.mValidityPolicy = policy;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
+                                           SessionResumptionStorage * sessionResumptionStorage,
+                                           Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+                                           Optional<ReliableMessageProtocolConfig> mrpConfig)
+{
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(&mFabricDelegate));
+
+    mRole                     = CryptoContext::SessionRole::kResponder;
+    mFabricsTable             = fabricTable;
+    mSessionResumptionStorage = sessionResumptionStorage;
+    mLocalMRPConfig           = mrpConfig;
+
+    ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
+                  mSecureSessionHolder.Get().Value()->AsSecureSession());
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -191,26 +209,6 @@ exit:
         Clear();
     }
     return err;
-}
-
-CHIP_ERROR
-CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
-                                           SessionResumptionStorage * sessionResumptionStorage,
-                                           Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-                                           Optional<ReliableMessageProtocolConfig> mrpConfig)
-{
-    VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
-
-    mRole                     = CryptoContext::SessionRole::kResponder;
-    mFabricsTable             = fabrics;
-    mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpConfig;
-
-    ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
-                  mSecureSessionHolder.Get().Value()->AsSecureSession());
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, FabricIndex fabricIndex,
@@ -241,6 +239,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(&mFabricDelegate));
+
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricIndex;
     mSessionResumptionStorage = sessionResumptionStorage;
@@ -264,6 +264,15 @@ exit:
     return err;
 }
 
+void CASESession::OnResponseTimeout(ExchangeContext * ec)
+{
+    VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
+    VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
+    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
+                 to_underlying(mState));
+    AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
+}
+
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
     // Discard the exchange so that Clear() doesn't try closing it.  The
@@ -272,15 +281,6 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     Clear();
     // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablishmentError(err);
-}
-
-void CASESession::OnResponseTimeout(ExchangeContext * ec)
-{
-    VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
-                 to_underlying(mState));
-    AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const

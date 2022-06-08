@@ -884,10 +884,6 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     err = failSafeContext.SetUpdateNocCommandInvoked();
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // TODO calling SendFabricChangeNotification seems a little out of place, would it be better to have this called
-    // maybe in SetNOCCert(), or maybe somewhere else.
-    Server::GetInstance().GetFabricTable().SendFabricChangeNotification(fabric->GetFabricIndex());
-
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.
     // So we need to StartServer() here.

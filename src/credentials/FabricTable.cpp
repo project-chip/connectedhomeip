@@ -709,12 +709,6 @@ void FabricTable::NotifyDelegatesOfFabricChange(FabricIndex fabricIndex, bool fa
     }
 }
 
-void FabricTable::SendFabricChangeNotification(FabricIndex fabricIndex)
-{
-    NotifyDelegatesOfFabricChange(fabricIndex, false /* fabricDeleted */);
-}
-
-CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
 /*
  * A validation policy we can pass into VerifyCredentials to extract the
  * latest NotBefore time in the certificate chain without having to load the
@@ -757,6 +751,8 @@ CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFa
     // for CASE and current time is also unknown, the certificate
     // validity policy will see this condition and can act appropriately.
     mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
+
+    NotifyDelegatesOfFabricChange(fabricIndex, false /* fabricDeleted */);
     return CHIP_NO_ERROR;
 }
 

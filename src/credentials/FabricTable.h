@@ -392,11 +392,6 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    /**
-     * Send notification that fabricIndex was updated to all FabricTable Delegates.
-     */
-    void SendFabricChangeNotification(FabricIndex fabricIndex);
-
     // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
     // test-cases
     CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);

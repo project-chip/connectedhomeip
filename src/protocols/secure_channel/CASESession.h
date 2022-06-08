@@ -79,7 +79,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+        SessionManager & sessionManager, FabricTable * fabricTable, SessionResumptionStorage * sessionResumptionStorage,
         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
@@ -290,7 +290,7 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
-    CASESessionFabricDelegate mFabricDelegate = CASESessionFabricDelegate(this);
+    CASESessionFabricDelegate mFabricDelegate{this};
     State mState;
 };
 
