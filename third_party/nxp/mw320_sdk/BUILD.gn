@@ -59,7 +59,8 @@ config("mbedtls_mw320_config") {
     "MBEDTLS_CIPHER_C",
     "MBEDTLS_CCM_C",
     "MBEDTLS_ENTROPY_C",
-#    "MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED",
+
+    #    "MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED",
   ]
 
   include_dirs = [ chip_root ]

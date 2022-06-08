@@ -22,6 +22,6 @@ config("chip_examples_project_config") {
 }
 
 source_set("config_mw320_chip_examples") {
-#  sources = [ "app/project_include/CHIPProjectConfig.h" ]
+  #  sources = [ "app/project_include/CHIPProjectConfig.h" ]
   public_configs = [ ":chip_examples_project_config" ]
 }

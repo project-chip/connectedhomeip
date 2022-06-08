@@ -37,24 +37,22 @@ static_library("mw320") {
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
     "MW320Config.cpp",
     "MW320Config.h",
-    "Logging.cpp",
     "NetworkProvisioningServerImpl.h",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SoftwareUpdateManagerImpl.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-    "OTAImageProcessorImpl.cpp",
-    "OTAImageProcessorImpl.h",
     "mw320_ota.cpp",
     "mw320_ota.h",
   ]
 
-  defines = [
-    "MW320_LOG_ENABLED=1",
-  ]
+  defines = [ "MW320_LOG_ENABLED=1" ]
 
   deps = []
 

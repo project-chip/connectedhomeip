@@ -120,8 +120,10 @@ template("mw320_sdk") {
       "-fno-builtin",
       "-mapcs",
     ]
-    
-    cflags += [ "-include" + rebase_path("${mw320_sdk_root}/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/wifi_config.h", root_build_dir)]
+
+    cflags += [ "-include" + rebase_path(
+                    "${mw320_sdk_root}/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/wifi_config.h",
+                    root_build_dir) ]
 
     # Now add our "system-header" include dirs
     foreach(include_dir, _sdk_include_dirs) {
