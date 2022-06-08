@@ -403,10 +403,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
         SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
     }
 
-    error =
-        MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
-                                            OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
-                                            _OnNetworkScanFinished, this));
+    error = MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
+                                                OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
+                                                _OnNetworkScanFinished, this));
 
 exit:
     Impl()->UnlockThreadStack();
