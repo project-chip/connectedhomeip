@@ -88,7 +88,7 @@ bool LockManager::ReadConfigValues()
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials[0].Get()),
                                     sizeof(DlCredential)*mMaxUsers*mMaxCredentialsPerUser, outLen);
-    
+
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_TotalCredentials, reinterpret_cast<uint8_t *>(mTotalCredentialsPerUser),
                                     sizeof(mTotalCredentialsPerUser), outLen);
 
@@ -252,7 +252,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     user.createdBy          = userInDb.createdBy;
     user.modificationSource = DlAssetSource::kMatterIM;
     user.lastModifiedBy     = userInDb.lastModifiedBy;
-    
+
     ChipLogDetail(Zcl,
                   "Found occupied user "
                   "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
@@ -332,7 +332,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
     uint16_t adjustedCredentialIndex = credentialIndex - 1;
 
-    ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d", to_underlying(credentialType), 
+    ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d", to_underlying(credentialType),
                     adjustedCredentialIndex);
 
     // door-lock-server checks for valid credential index
@@ -370,7 +370,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    uint16_t adjustedCredentialIndex = credentialIndex - 1;    
+    uint16_t adjustedCredentialIndex = credentialIndex - 1;
 
     // door-lock-server checks for valid credential index
     auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
