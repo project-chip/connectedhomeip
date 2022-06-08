@@ -4290,7 +4290,7 @@ endpoint 1 {
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute multiPressMax default = 2;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
