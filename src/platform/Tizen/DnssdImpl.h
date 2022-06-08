@@ -18,6 +18,9 @@
 #pragma once
 
 #include <lib/dnssd/platform/Dnssd.h>
+#include <memory>
+#include <mutex>
+#include <set>
 #include <string>
 #include <sys/param.h>
 #include <vector>
@@ -28,9 +31,10 @@
 namespace chip {
 namespace Dnssd {
 
+class DnssdTizen;
+
 enum class ContextType
 {
-    Register,
     Browse,
     Resolve,
 };
@@ -41,24 +45,24 @@ struct GenericContext
     void * context;
 };
 
-struct RegisterContext : public GenericContext
+struct RegisterContext
 {
-    dnssd_service_h service;
-    char type[kDnssdTypeAndProtocolMaxSize + 1];
-    char name[Common::kInstanceNameMaxLength + 1];
-    uint16_t port;
-    uint32_t interfaceId;
-    bool isRegistered;
+    DnssdTizen * mInstance;
+    char mName[Common::kInstanceNameMaxLength + 1];
+    char mType[kDnssdTypeAndProtocolMaxSize + 1];
+    uint32_t mInterfaceId;
+    uint16_t mPort;
 
-    RegisterContext()
-    {
-        contextType  = ContextType::Register;
-        context      = nullptr;
-        service      = 0;
-        port         = 0;
-        interfaceId  = 0;
-        isRegistered = false;
-    }
+    DnssdPublishCallback mCallback;
+    void * mCallbackContext;
+
+    dnssd_service_h mServiceHandle = 0;
+    bool mIsRegistered             = false;
+    void * mContext                = nullptr;
+
+    RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
+                    void * context);
+    ~RegisterContext();
 };
 
 struct BrowseContext : public GenericContext
@@ -118,14 +122,13 @@ public:
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
     CHIP_ERROR Shutdown();
 
-    CHIP_ERROR Add(RegisterContext * context, dnssd_service_h service, const char * type, const char * name, uint16_t port,
-                   uint32_t interfaceId);
+    CHIP_ERROR RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context);
+    CHIP_ERROR UnregisterService(dnssd_service_h serviceHandle);
+    CHIP_ERROR UnregisterAllServices();
+
     CHIP_ERROR Add(BrowseContext * context, dnssd_browser_h browser);
     CHIP_ERROR Add(ResolveContext * context, dnssd_service_h service);
     CHIP_ERROR Remove(GenericContext * context);
-    CHIP_ERROR Remove(const char * type, const char * name, uint16_t port, uint32_t interfaceId);
-    CHIP_ERROR Remove(ContextType type);
-    RegisterContext * Get(const char * type, const char * name, uint16_t port, uint32_t interfaceId);
 
     static DnssdTizen & GetInstance() { return sInstance; }
 
@@ -134,7 +137,10 @@ private:
     static DnssdTizen sInstance;
 
     void Delete(GenericContext * context);
+
+    std::mutex mMutex;
     std::vector<GenericContext *> mContexts;
+    std::set<std::shared_ptr<RegisterContext>> mRegisteredServices;
 };
 
 } // namespace Dnssd
