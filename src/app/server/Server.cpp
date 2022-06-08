@@ -301,7 +301,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Server::InitFailSafe()
+void Server::InitFailSafe()
 {
     bool failSafeArmed = false;
 
@@ -332,8 +332,6 @@ CHIP_ERROR Server::InitFailSafe()
             err = CHIP_NO_ERROR;
         }
     }
-
-    return err;
 }
 
 void Server::RejoinExistingMulticastGroups()

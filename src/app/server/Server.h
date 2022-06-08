@@ -288,7 +288,7 @@ private:
 
     static Server sServer;
 
-    CHIP_ERROR InitFailSafe();
+    void InitFailSafe();
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {

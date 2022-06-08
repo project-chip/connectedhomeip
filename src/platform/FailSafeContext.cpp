@@ -49,6 +49,13 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 
 void FailSafeContext::FailSafeTimerExpired()
 {
+    if (!IsFailSafeArmed())
+    {
+        // In case this was a pending timer event in event loop, and we had
+        // done CommissioningComplete or manual disarm.
+        return;
+    }
+
     ChipLogProgress(FailSafe, "Fail-safe timer expired");
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
     ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);

@@ -38,7 +38,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     PersistentStorageOperationalKeystore opKeystore;
 
     FabricIndex kFabricIndex    = 111;
-    FabricIndex kBadFabricIndex = kFabricIndex + 10;
+    FabricIndex kBadFabricIndex = static_cast<FabricIndex>(kFabricIndex + 10u);
 
     // Failure before Init
     P256PublicKey placeHolderPublicKey;

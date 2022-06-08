@@ -1225,7 +1225,7 @@ CHIP_ERROR FabricTable::ActivatePendingOperationalKey(const Crypto::P256PublicKe
     return err;
 }
 
-// Currently only operational key is managed by this API.
+// Currently only operational key and last known good time are managed by this API.
 CHIP_ERROR FabricTable::CommitPendingFabricData()
 {
     // We can only manage commissionable pending fail-safe state if we have a keystore
@@ -1246,6 +1246,13 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         mIsPendingFabricDataPresent  = false;
         mFabricIndexWithPendingState = kUndefinedFabricIndex;
     }
+
+    CHIP_ERROR lkgtErr = CommitLastKnownGoodChipEpochTime();
+    if (lkgtErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(FabricProvisioning, "Failed to commit Last Known Good Time: %" CHIP_ERROR_FORMAT, lkgtErr.Format());
+    }
+
     return err;
 }
 
