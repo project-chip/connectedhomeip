@@ -494,9 +494,7 @@ public:
 
     // Currently only operational key is managed by this API.
     /**
-     * @brief
-     *
-     * If nothing is pending to commit, returns CHIP_NO_ERROR right away.
+     * @brief If nothing is pending to commit, returns CHIP_NO_ERROR right away.
      *
      * @return CHIP_ERROR
      */
