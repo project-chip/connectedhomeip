@@ -55,8 +55,15 @@ DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
     {
+        // TODO We likely want to do the same thing regardless of fabricDeleted. For
+        // now bailing out early when only update.
+        if (!fabricDeleted)
+        {
+            return;
+        }
+
         for (auto endpointId : EnabledEndpointsWithServerCluster(chip::app::Clusters::DoorLock::Id))
         {
             if (!DoorLockServer::Instance().OnFabricRemoved(endpointId, fabricIndex))

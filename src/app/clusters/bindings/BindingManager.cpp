@@ -25,7 +25,7 @@ namespace {
 
 class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+    void OnFabricHasChanged(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex, bool fabricDeleted) override
     {
         // TODO We likely want to do the same thing regardless of fabricDeleted. For
         // now bailing out early when only update.

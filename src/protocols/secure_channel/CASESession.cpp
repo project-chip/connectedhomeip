@@ -144,7 +144,10 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
-    mFabricsTable->RemoveFabricDelegate(&mFabricDelegate);
+    if (mFabricsTable)
+    {
+        mFabricsTable->RemoveFabricDelegate(&mFabricDelegate);
+    }
 
     mLocalNodeId  = kUndefinedNodeId;
     mPeerNodeId   = kUndefinedNodeId;
