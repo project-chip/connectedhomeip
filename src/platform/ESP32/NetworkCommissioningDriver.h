@@ -25,8 +25,7 @@ namespace NetworkCommissioning {
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kClientCommunicationDalay         = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30 + kClientCommunicationDalay;
+constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
 } // namespace
 
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
