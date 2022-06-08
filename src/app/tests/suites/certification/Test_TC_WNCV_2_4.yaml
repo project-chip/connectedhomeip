@@ -34,7 +34,6 @@ tests:
       attribute: "Type"
       PICS: A_TYPE
       response:
-          value: 0
           constraints:
               type: enum8
               minValue: 0
