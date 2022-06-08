@@ -50,31 +50,31 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 }
 
 // ToDo: Find a suitable for HEAP_SIZE
-#define HEAP_SIZE	0x200
+#define HEAP_SIZE 0x200
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-/*
-    size_t freeHeapSize;
-    size_t usedHeapSize;
+    /*
+        size_t freeHeapSize;
+        size_t usedHeapSize;
 
-    freeHeapSize = xPortGetFreeHeapSize();
-    usedHeapSize = HEAP_SIZE - freeHeapSize;
+        freeHeapSize = xPortGetFreeHeapSize();
+        usedHeapSize = HEAP_SIZE - freeHeapSize;
 
-    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
-*/
+        currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
+    */
     currentHeapUsed = HEAP_SIZE - xPortGetFreeHeapSize();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-/*
-    size_t highWatermarkHeapSize;
+    /*
+        size_t highWatermarkHeapSize;
 
-    highWatermarkHeapSize    = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
-    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
-*/
+        highWatermarkHeapSize    = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
+        currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
+    */
     currentHeapHighWatermark = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
     return CHIP_NO_ERROR;
 }

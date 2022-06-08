@@ -27,8 +27,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/nxp/mw320/MW320Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/nxp/mw320/MW320Config.h>
 
 //#include "core_cm7.h"
 
@@ -41,7 +41,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 /** Singleton instance of the ConfigurationManager implementation object.
  */
-//ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+// ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
@@ -59,7 +59,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    //err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    // err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
     err = Internal::GenericConfigurationManagerImpl<MW320Config>::Init();
     SuccessOrExit(err);
 
@@ -89,7 +89,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                uint32_t & value)
+                                                               uint32_t & value)
 {
     CHIP_ERROR err;
 
@@ -105,14 +105,14 @@ exit:
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                 uint32_t value)
+                                                                uint32_t value)
 {
     // This method reads Chip Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    //err = WriteConfigValueCounter(persistedStorageKey, value);
-    err=CHIP_NO_ERROR;
+    // err = WriteConfigValueCounter(persistedStorageKey, value);
+    err = CHIP_NO_ERROR;
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -194,8 +194,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
     }
-
-
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");

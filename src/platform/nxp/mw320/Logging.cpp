@@ -18,9 +18,9 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <src/lib/support/CodeUtils.h>
-#include <lib/support/logging/Constants.h>
 #include <system/SystemClock.h>
 
 #include <cstring>
@@ -34,7 +34,7 @@
 #include <utils/uart.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-//static bool isLogInitialized;
+// static bool isLogInitialized;
 extern uint8_t gOtLogUartInstance;
 
 namespace chip {
@@ -145,30 +145,31 @@ namespace Platform {
 /**
  * CHIP log output function.
  */
-#define MSGBUFLEN	256
+#define MSGBUFLEN 256
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;
 #if MW320_LOG_ENABLED
     System::Clock::Milliseconds32 now = chip::System::SystemClock().GetMonotonicTimestamp();
-    uint32_t now_v = now.count();
-//    char _msgbuf[MSGBUFLEN];
-    char *msgbuf=0;
-    char *bufpt;
+    uint32_t now_v                    = now.count();
+    //    char _msgbuf[MSGBUFLEN];
+    char * msgbuf = 0;
+    char * bufpt;
     uint16_t buflen;
 
-    msgbuf = (char*)malloc(MSGBUFLEN);
-//    msgbuf = _msgbuf;
-    if (msgbuf == nullptr) {
+    msgbuf = (char *) malloc(MSGBUFLEN);
+    //    msgbuf = _msgbuf;
+    if (msgbuf == nullptr)
+    {
         return;
     }
     memset(msgbuf, 0, MSGBUFLEN);
 
-    snprintf(msgbuf, MSGBUFLEN, "[%lu.%03lu]CHIP:%s: ", now_v/1000, now_v%1000, module);
-    buflen=strlen(msgbuf);
-    bufpt = &msgbuf[buflen];
-    vsnprintf(bufpt, (MSGBUFLEN-buflen), msg, v);
+    snprintf(msgbuf, MSGBUFLEN, "[%lu.%03lu]CHIP:%s: ", now_v / 1000, now_v % 1000, module);
+    buflen = strlen(msgbuf);
+    bufpt  = &msgbuf[buflen];
+    vsnprintf(bufpt, (MSGBUFLEN - buflen), msg, v);
     PRINTF("%s \r\n", msgbuf);
 
     free(msgbuf);

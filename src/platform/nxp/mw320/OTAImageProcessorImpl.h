@@ -28,7 +28,7 @@
 namespace chip {
 
 // Full file path to where the new image will be executed from post-download
-//static char kImageExecPath[] = "/tmp/ota.update";
+// static char kImageExecPath[] = "/tmp/ota.update";
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
@@ -49,7 +49,7 @@ private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
-//    static void HandleApply(intptr_t context);
+    //    static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
 

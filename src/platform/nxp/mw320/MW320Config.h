@@ -66,13 +66,13 @@ public:
 
     // Key definitions for well-known configuration values.
     // Factory Config Keys
-    static constexpr Key kConfigKey_SerialNum           = ConfigKey(kFileId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId         = ConfigKey(kFileId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert       = ConfigKey(kFileId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = ConfigKey(kFileId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate   = ConfigKey(kFileId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode        = ConfigKey(kFileId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = ConfigKey(kFileId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_SerialNum             = ConfigKey(kFileId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = ConfigKey(kFileId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = ConfigKey(kFileId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = ConfigKey(kFileId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = ConfigKey(kFileId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_SetupPinCode          = ConfigKey(kFileId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = ConfigKey(kFileId_ChipFactory, 0x06);
     static constexpr Key kConfigKey_HardwareVersion       = ConfigKey(kFileId_ChipFactory, 0x07);
     static constexpr Key kConfigKey_SetupDiscriminator    = ConfigKey(kFileId_ChipFactory, 0x08);
     static constexpr Key kConfigKey_Spake2pIterationCount = ConfigKey(kFileId_ChipFactory, 0x09);
@@ -93,8 +93,8 @@ public:
     static constexpr Key kConfigKey_OperationalDevicePrivateKey = ConfigKey(kFileId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_RegulatoryLocation          = ConfigKey(kFileId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_CountryCode                 = ConfigKey(kFileId_ChipConfig, 0x0C);
-    //static constexpr Key kConfigKey_Breadcrumb           = ConfigKey(kFileId_ChipConfig, 0x0D);
-    static constexpr Key kConfigKey_UniqueId             = ConfigKey(kFileId_ChipConfig, 0x0D);
+    // static constexpr Key kConfigKey_Breadcrumb           = ConfigKey(kFileId_ChipConfig, 0x0D);
+    static constexpr Key kConfigKey_UniqueId = ConfigKey(kFileId_ChipConfig, 0x0D);
 
     static constexpr Key kConfigKey_GroupKey   = ConfigKey(kFileId_ChipConfig, 0x0E);
     static constexpr Key kConfigKey_GroupKey0  = ConfigKey(kFileId_ChipConfig, 0x0F);

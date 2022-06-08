@@ -88,7 +88,8 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
         auto onFailure = [](CHIP_ERROR error) {
             ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
         };
-	// Note: Need to change using toggle command since sSwitchOnOffState won't be changed if not triggerred from the switch command (SwitchCommandHandler)
+        // Note: Need to change using toggle command since sSwitchOnOffState won't be changed if not triggerred from the switch
+        // command (SwitchCommandHandler)
 #if 0
         if (sSwitchOnOffState)
         {
@@ -103,10 +104,10 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
                                              binding.remote, offCommand, onSuccess, onFailure);
         }
 #else
-	{
+        {
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                         binding.remote, toggleCommand, onSuccess, onFailure);
+                                             binding.remote, toggleCommand, onSuccess, onFailure);
         }
 #endif // 0|1
     }

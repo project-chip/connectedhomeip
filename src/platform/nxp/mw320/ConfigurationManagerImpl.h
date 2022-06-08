@@ -46,7 +46,7 @@ class NetworkProvisioningServerImpl;
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the MW320 platform.
  */
-//class ConfigurationManagerImpl final : public ConfigurationManager,
+// class ConfigurationManagerImpl final : public ConfigurationManager,
 //                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
 //                                       private Internal::MW320Config
 class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::MW320Config>
@@ -57,13 +57,13 @@ public:
 
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
-//    friend class ConfigurationManager;
+    //    friend class ConfigurationManager;
 
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
-//#ifndef DOXYGEN_SHOULD_SKIP_THIS
-//    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-//#endif
+    //#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    //    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
+    //#endif
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -91,14 +91,13 @@ private:
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
 
-
     // ===== Members for internal use by the following friends.
 
     friend class Internal::NetworkProvisioningServerImpl;
     friend ConfigurationManager & ConfigurationMgr(void);
     friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
-//    static ConfigurationManagerImpl sInstance;
+    //    static ConfigurationManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
 
@@ -127,7 +126,7 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 {
     return ConfigurationManagerImpl::sInstance;
 }
-#endif //0
+#endif // 0
 
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
@@ -136,7 +135,7 @@ inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * b
 
     memcpy(buf, mac_addr.mac, 6);
     PRINTF("MAC: %02x:%02x:%02x:%02x:%02x:%02x \r\n", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
-    //return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    // return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     return CHIP_NO_ERROR;
 }
 

@@ -44,7 +44,6 @@
 
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the MW320 platform.
@@ -63,7 +62,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
-
 
 // mdns/mdns_sd ++
 //#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1

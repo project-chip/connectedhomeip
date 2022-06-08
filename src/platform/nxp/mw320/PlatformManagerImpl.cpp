@@ -26,11 +26,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/TimeUtils.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
-#include <lib/support/TimeUtils.h>
-
 
 #include <lwip/tcpip.h>
 
@@ -62,7 +61,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::MW320Config::Init();
     SuccessOrExit(err);
 
-    //SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    // SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
@@ -73,8 +72,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    //err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    //SuccessOrExit(err);
+    // err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    // SuccessOrExit(err);
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
     ReturnErrorOnFailure(InitClock_RealTime());

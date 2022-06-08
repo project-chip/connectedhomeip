@@ -31,7 +31,6 @@ extern "C" {
 #include <network_flash_storage.h>
 }
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -46,17 +45,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     uint32_t ret;
-    uint32_t read_size=kMaxKeyValueBytes;
+    uint32_t read_size = kMaxKeyValueBytes;
     uint8_t buf[kMaxKeyValueBytes];
 
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ret = ::get_saved_wifi_network((char*)key, buf, &read_size);
-    VerifyOrReturnError(ret==0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    VerifyOrReturnError(read_size<=kMaxKeyValueBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ret = ::get_saved_wifi_network((char *) key, buf, &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(read_size <= kMaxKeyValueBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     size_t copy_size = std::min(value_size, (size_t)(read_size - offset_bytes));
-    if (read_bytes_size != nullptr) {
+    if (read_bytes_size != nullptr)
+    {
         *read_bytes_size = copy_size;
     }
     ::memcpy(value, &buf[offset_bytes], copy_size);
@@ -66,8 +66,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     uint32_t ret;
-    ret = ::save_wifi_network((char*)key, (uint8_t*)value, value_size);
-    VerifyOrReturnError(ret==0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    ret = ::save_wifi_network((char *) key, (uint8_t *) value, value_size);
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     return CHIP_NO_ERROR;
 }
@@ -75,8 +75,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     uint32_t ret;
-    ret = ::reset_saved_wifi_network((char*)key);
-    VerifyOrReturnError(ret==0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    ret = ::reset_saved_wifi_network((char *) key);
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     return CHIP_NO_ERROR;
 }

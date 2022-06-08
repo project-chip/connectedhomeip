@@ -19,8 +19,8 @@
 
 #include <lib/shell/Engine.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <lib/core/CHIPCore.h>
@@ -29,17 +29,17 @@
 #include <lib/support/CodeUtils.h>
 
 //#include <lib/support/RandUtils.h>   //==> rm from TE7.5
-#include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <app/server/Server.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
-#include <app/server/Dnssd.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <app/InteractionModelEngine.h>
 
@@ -50,10 +50,10 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 // cr--
 // ota++
-#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 //#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include "platform/nxp/mw320/OTAImageProcessorImpl.h"
 //#include "app/clusters/ota-requestor/OTARequestorDriver.h"
@@ -66,28 +66,27 @@
 #include "binding-handler.h"
 
 /* platform specific */
-#include "pin_mux.h"
-#include "clock_config.h"
 #include "board.h"
+#include "clock_config.h"
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"
+#include "pin_mux.h"
 
 #include <wm_os.h>
 extern "C" {
-#include "wm_net.h"
-#include "wlan.h"
-#include "mflash_drv.h"
-#include "dhcp-server.h"
-#include "cli.h"
-#include "ping.h"
-#include "iperf.h"
-#include "partition.h"
 #include "boot_flags.h"
+#include "cli.h"
+#include "dhcp-server.h"
+#include "iperf.h"
+#include "mflash_drv.h"
 #include "network_flash_storage.h"
+#include "partition.h"
+#include "ping.h"
+#include "wlan.h"
+#include "wm_net.h"
 }
-#include "lpm.h"
 #include "fsl_aes.h"
-
+#include "lpm.h"
 
 /*******************************************************************************
  * Definitions
@@ -101,7 +100,7 @@ enum
     MAX_SELECTION,
 };
 static int Matter_Selection = MAX_SELECTION;
-#define RUN_RST_LT_DELAY	10
+#define RUN_RST_LT_DELAY 10
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -109,9 +108,9 @@ static SemaphoreHandle_t aesLock;
 static struct wlan_network sta_network;
 static struct wlan_network uap_network;
 
-const int TASK_MAIN_PRIO       = OS_PRIO_3;
-const int TASK_MAIN_STACK_SIZE = 800;
-portSTACK_TYPE *task_main_stack = NULL;
+const int TASK_MAIN_PRIO         = OS_PRIO_3;
+const int TASK_MAIN_STACK_SIZE   = 800;
+portSTACK_TYPE * task_main_stack = NULL;
 TaskHandle_t task_main_task_handler;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -119,7 +118,6 @@ extern "C" {
 #include <openthread/platform/platform-softdevice.h>
 }
 #endif // CHIP_ENABLE_OPENTHREAD
-
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -129,18 +127,18 @@ using namespace chip::DeviceLayer;
 
 // ota ++
 using chip::BDXDownloader;
+using chip::DefaultOTARequestor;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
 using chip::OTAImageProgress;
-using chip::DefaultOTARequestor;
 
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 chip::DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
-//chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-//static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
+// chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+// static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
 
 void InitOTARequestor(void)
 {
@@ -156,21 +154,21 @@ void InitOTARequestor(void)
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
     // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
     // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
-    //OTAImageProcessor ipParams;
-    //ipParams.imageFile = CharSpan("dnld_img.txt");
-    //gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    // OTAImageProcessor ipParams;
+    // ipParams.imageFile = CharSpan("dnld_img.txt");
+    // gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-/*
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-*/
+    /*
+        if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+        {
+            gUserConsentProvider.SetUserConsentState(gUserConsentState);
+            gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+        }
+    */
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 
@@ -185,56 +183,60 @@ extern "C" {
 #endif /* __cplusplus */
 
 volatile int g_ButtonPress = 0;
-bool need2sync_sw_attr=false;
-
+bool need2sync_sw_attr     = false;
 
 void sw2_handle(bool frm_clk)
 {
-	static uint8_t click_cnt=0;
-	static uint8_t run_times=0;
+    static uint8_t click_cnt = 0;
+    static uint8_t run_times = 0;
 
-	if (frm_clk == true) {
-		// Called while user clicks the button
-		click_cnt ++;
-		PRINTF(" (%d times) \r\n", click_cnt);
-		return;
-	}
-	// Called regularlly from a thread every 500ms
-	run_times++;
-	if (click_cnt > 4) {
-		// More than 4 clicks within the last second => erase the saved parameters
-		PRINTF("--> enough clicks (%d times) => resetting the saved parameters \r\n", click_cnt);
-		::erase_all_params();
-		DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(RUN_RST_LT_DELAY), rst_args_lt, nullptr);
-		click_cnt = 0;
-	}
-	if (run_times >= 2) {
-		// Called twice with gap==500ms
-		click_cnt = 0;
-		run_times = 0;
-	}
+    if (frm_clk == true)
+    {
+        // Called while user clicks the button
+        click_cnt++;
+        PRINTF(" (%d times) \r\n", click_cnt);
+        return;
+    }
+    // Called regularlly from a thread every 500ms
+    run_times++;
+    if (click_cnt > 4)
+    {
+        // More than 4 clicks within the last second => erase the saved parameters
+        PRINTF("--> enough clicks (%d times) => resetting the saved parameters \r\n", click_cnt);
+        ::erase_all_params();
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(RUN_RST_LT_DELAY), rst_args_lt, nullptr);
+        click_cnt = 0;
+    }
+    if (run_times >= 2)
+    {
+        // Called twice with gap==500ms
+        click_cnt = 0;
+        run_times = 0;
+    }
 
-	return;
-
+    return;
 }
 
 void GPIO_IRQHandler(void)
 {
-	uint32_t intrval = GPIO_PortGetInterruptFlags(GPIO, GPIO_PORT(BOARD_SW1_GPIO_PIN));
+    uint32_t intrval = GPIO_PortGetInterruptFlags(GPIO, GPIO_PORT(BOARD_SW1_GPIO_PIN));
 
-	// Clear the interrupt
-	GPIO_PortClearInterruptFlags(GPIO, GPIO_PORT(BOARD_SW1_GPIO_PIN), intrval);
-	// Check which sw tiggers the interrupt
-	if (intrval & 1UL << GPIO_PORT_PIN(BOARD_SW1_GPIO_PIN)) {
-		PRINTF("SW_1 click => do switch handler\r\n");
-		/* Change state of button. */
-		g_ButtonPress++;
-		need2sync_sw_attr=true;
-	} else if (intrval & 1UL << GPIO_PORT_PIN(BOARD_SW2_GPIO_PIN)) {
-		PRINTF("SW_2 click \r\n");
-		sw2_handle(true);
-	}
-	SDK_ISR_EXIT_BARRIER;
+    // Clear the interrupt
+    GPIO_PortClearInterruptFlags(GPIO, GPIO_PORT(BOARD_SW1_GPIO_PIN), intrval);
+    // Check which sw tiggers the interrupt
+    if (intrval & 1UL << GPIO_PORT_PIN(BOARD_SW1_GPIO_PIN))
+    {
+        PRINTF("SW_1 click => do switch handler\r\n");
+        /* Change state of button. */
+        g_ButtonPress++;
+        need2sync_sw_attr = true;
+    }
+    else if (intrval & 1UL << GPIO_PORT_PIN(BOARD_SW2_GPIO_PIN))
+    {
+        PRINTF("SW_2 click \r\n");
+        sw2_handle(true);
+    }
+    SDK_ISR_EXIT_BARRIER;
 }
 
 #if defined(__cplusplus)
@@ -256,18 +258,19 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 */
 
 namespace {
-typedef enum {
-	chip_srv_all,
-	dns_srv,
-	srv_type_max
+typedef enum
+{
+    chip_srv_all,
+    dns_srv,
+    srv_type_max
 } srv_type_t;
 
-typedef enum {
-	led_yellow,
-	led_amber,
-	led_max
+typedef enum
+{
+    led_yellow,
+    led_amber,
+    led_max
 } led_id_t;
-
 
 static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState);
 static void run_dnssrv(System::Layer * aSystemLayer, void * aAppState);
@@ -304,8 +307,6 @@ static struct cli_command mcuPower[] = {
 */
 
 TaskHandle_t sShellTaskHandle;
-
-
 
 /*******************************************************************************
  * Code
@@ -511,209 +512,209 @@ static void mcuInitPower(void)
     LPM_Init(&config);
 }
 
-
 /* Callback Function passed to WLAN Connection Manager. The callback function
  * gets called when there are WLAN Events that need to be handled by the
  * application.
  */
-int wlan_event_callback(enum wlan_event_reason reason, void *data)
+int wlan_event_callback(enum wlan_event_reason reason, void * data)
 {
     int ret;
     struct wlan_ip_config addr;
     char ip[16];
     static int auth_fail = 0;
 
-//    PRINTF("[%s] WLAN: received event %d\r\n", __FUNCTION__, reason);
+    //    PRINTF("[%s] WLAN: received event %d\r\n", __FUNCTION__, reason);
     switch (reason)
     {
-        case WLAN_REASON_INITIALIZED:
+    case WLAN_REASON_INITIALIZED:
 //            PRINTF("app_cb: WLAN initialized\r\n");
 #ifdef MCUXPRESSO_WIFI_CLI
-            ret = wlan_basic_cli_init();
-            if (ret != WM_SUCCESS)
-            {
-                PRINTF("Failed to initialize BASIC WLAN CLIs\r\n");
-                return 0;
-            }
+        ret = wlan_basic_cli_init();
+        if (ret != WM_SUCCESS)
+        {
+            PRINTF("Failed to initialize BASIC WLAN CLIs\r\n");
+            return 0;
+        }
 
-            ret = wlan_cli_init();
-            if (ret != WM_SUCCESS)
-            {
-                PRINTF("Failed to initialize WLAN CLIs\r\n");
-                return 0;
-            }
-            PRINTF("WLAN CLIs are initialized\r\n");
+        ret = wlan_cli_init();
+        if (ret != WM_SUCCESS)
+        {
+            PRINTF("Failed to initialize WLAN CLIs\r\n");
+            return 0;
+        }
+        PRINTF("WLAN CLIs are initialized\r\n");
 
-            ret = ping_cli_init();
-            if (ret != WM_SUCCESS)
-            {
-                PRINTF("Failed to initialize PING CLI\r\n");
-                return 0;
-            }
+        ret = ping_cli_init();
+        if (ret != WM_SUCCESS)
+        {
+            PRINTF("Failed to initialize PING CLI\r\n");
+            return 0;
+        }
 
-            ret = iperf_cli_init();
-            if (ret != WM_SUCCESS)
-            {
-                PRINTF("Failed to initialize IPERF CLI\r\n");
-                return 0;
-            }
+        ret = iperf_cli_init();
+        if (ret != WM_SUCCESS)
+        {
+            PRINTF("Failed to initialize IPERF CLI\r\n");
+            return 0;
+        }
 #endif
-            ret = dhcpd_cli_init();
-            if (ret != WM_SUCCESS)
-            {
-//                PRINTF("Failed to initialize DHCP Server CLI\r\n");
-                return 0;
-            }
+        ret = dhcpd_cli_init();
+        if (ret != WM_SUCCESS)
+        {
+            //                PRINTF("Failed to initialize DHCP Server CLI\r\n");
+            return 0;
+        }
 #ifdef MCUXPRESSO_WIFI_CLI
-            if (cli_register_commands(saveload, sizeof(saveload) / sizeof(struct cli_command)))
-            {
-                return -WM_FAIL;
-            }
+        if (cli_register_commands(saveload, sizeof(saveload) / sizeof(struct cli_command)))
+        {
+            return -WM_FAIL;
+        }
 
-            if (cli_register_commands(wlanPower, sizeof(wlanPower) / sizeof(struct cli_command)))
-            {
-                return -WM_FAIL;
-            }
+        if (cli_register_commands(wlanPower, sizeof(wlanPower) / sizeof(struct cli_command)))
+        {
+            return -WM_FAIL;
+        }
 
-            if (cli_register_commands(mcuPower, sizeof(mcuPower) / sizeof(struct cli_command)))
-            {
-                return -WM_FAIL;
-            }
+        if (cli_register_commands(mcuPower, sizeof(mcuPower) / sizeof(struct cli_command)))
+        {
+            return -WM_FAIL;
+        }
 
-            PRINTF("CLIs Available:\r\n");
-            if(Matter_Selection == MCUXPRESSO_WIFI_CLI)
+        PRINTF("CLIs Available:\r\n");
+        if (Matter_Selection == MCUXPRESSO_WIFI_CLI)
             help_command(0, NULL);
 #endif
-            break;
-        case WLAN_REASON_INITIALIZATION_FAILED:
-//            PRINTF("app_cb: WLAN: initialization failed\r\n");
-            break;
-        case WLAN_REASON_SUCCESS:
-//            PRINTF("app_cb: WLAN: connected to network\r\n");
-            ret = wlan_get_address(&addr);
-            if (ret != WM_SUCCESS)
-            {
-//                PRINTF("failed to get IP address\r\n");
-                return 0;
-            }
+        break;
+    case WLAN_REASON_INITIALIZATION_FAILED:
+        //            PRINTF("app_cb: WLAN: initialization failed\r\n");
+        break;
+    case WLAN_REASON_SUCCESS:
+        //            PRINTF("app_cb: WLAN: connected to network\r\n");
+        ret = wlan_get_address(&addr);
+        if (ret != WM_SUCCESS)
+        {
+            //                PRINTF("failed to get IP address\r\n");
+            return 0;
+        }
 
-            net_inet_ntoa(addr.ipv4.address, ip);
+        net_inet_ntoa(addr.ipv4.address, ip);
 
-            ret = wlan_get_current_network(&sta_network);
-            if (ret != WM_SUCCESS)
-            {
-//                PRINTF("Failed to get External AP network\r\n");
-                return 0;
-            }
+        ret = wlan_get_current_network(&sta_network);
+        if (ret != WM_SUCCESS)
+        {
+            //                PRINTF("Failed to get External AP network\r\n");
+            return 0;
+        }
 
-            PRINTF("Connected to following BSS:\r\n");
-            PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
+        PRINTF("Connected to following BSS:\r\n");
+        PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
 
 #ifdef CONFIG_IPV6
+        {
+            int i;
+            (void) PRINTF("\r\n\tIPv6 Addresses\r\n");
+            for (i = 0; i < MAX_IPV6_ADDRESSES; i++)
             {
-                int i;
-                (void)PRINTF("\r\n\tIPv6 Addresses\r\n");
-                for (i = 0; i < MAX_IPV6_ADDRESSES; i++)
+                if (sta_network.ip.ipv6[i].addr_state != IP6_ADDR_INVALID)
                 {
-                    if (sta_network.ip.ipv6[i].addr_state != IP6_ADDR_INVALID)
-                    {
-                        (void)PRINTF("\t%-13s:\t%s (%s)\r\n", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
-                             inet6_ntoa(sta_network.ip.ipv6[i].address), ipv6_addr_state_to_desc(sta_network.ip.ipv6[i].addr_state));
-                    }
+                    (void) PRINTF("\t%-13s:\t%s (%s)\r\n", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
+                                  inet6_ntoa(sta_network.ip.ipv6[i].address),
+                                  ipv6_addr_state_to_desc(sta_network.ip.ipv6[i].addr_state));
                 }
-                (void)PRINTF("\r\n");
             }
+            (void) PRINTF("\r\n");
+        }
 #endif
+        auth_fail    = 0;
+        is_connected = true;
+        run_update_chipsrv(dns_srv);
+
+        if (is_uap_started())
+        {
+            wlan_get_current_uap_network(&uap_network);
+            ret = wlan_stop_network(uap_network.name);
+            /*			    if (ret != WM_SUCCESS)
+                                            PRINTF("Error: unable to stop network\r\n");
+                                            else
+                                                    PRINTF("stop uAP, SSID = [%s]\r\n", uap_network.ssid);
+            */
+        }
+        break;
+    case WLAN_REASON_CONNECT_FAILED:
+        //            PRINTF("app_cb: WLAN: connect failed\r\n");
+        break;
+    case WLAN_REASON_NETWORK_NOT_FOUND:
+        //            PRINTF("app_cb: WLAN: network not found\r\n");
+        break;
+    case WLAN_REASON_NETWORK_AUTH_FAILED:
+        //            PRINTF("app_cb: WLAN: network authentication failed\r\n");
+        auth_fail++;
+        if (auth_fail >= 3)
+        {
+            //                PRINTF("Authentication Failed. Disconnecting ... \r\n");
+            wlan_disconnect();
             auth_fail = 0;
-            is_connected = true;
-            run_update_chipsrv(dns_srv);
+        }
+        break;
+    case WLAN_REASON_ADDRESS_SUCCESS:
+        //            PRINTF("network mgr: DHCP new lease\r\n");
+        break;
+    case WLAN_REASON_ADDRESS_FAILED:
+        //            PRINTF("app_cb: failed to obtain an IP address\r\n");
+        break;
+    case WLAN_REASON_USER_DISCONNECT:
+        //            PRINTF("app_cb: disconnected\r\n");
+        auth_fail = 0;
+        break;
+    case WLAN_REASON_LINK_LOST:
+        is_connected = false;
+        run_update_chipsrv(dns_srv);
+        //            PRINTF("app_cb: WLAN: link lost\r\n");
+        break;
+    case WLAN_REASON_CHAN_SWITCH:
+        //            PRINTF("app_cb: WLAN: channel switch\r\n");
+        break;
+    case WLAN_REASON_UAP_SUCCESS:
+        //            PRINTF("app_cb: WLAN: UAP Started\r\n");
+        ret = wlan_get_current_uap_network(&uap_network);
 
-            if (is_uap_started())
-            {
-                wlan_get_current_uap_network(&uap_network);
-                ret = wlan_stop_network(uap_network.name);
-/*			    if (ret != WM_SUCCESS)
-			        PRINTF("Error: unable to stop network\r\n");
-				else
-					PRINTF("stop uAP, SSID = [%s]\r\n", uap_network.ssid);
-*/
-			}
-            break;
-        case WLAN_REASON_CONNECT_FAILED:
-//            PRINTF("app_cb: WLAN: connect failed\r\n");
-            break;
-        case WLAN_REASON_NETWORK_NOT_FOUND:
-//            PRINTF("app_cb: WLAN: network not found\r\n");
-            break;
-        case WLAN_REASON_NETWORK_AUTH_FAILED:
-//            PRINTF("app_cb: WLAN: network authentication failed\r\n");
-            auth_fail++;
-            if (auth_fail >= 3)
-            {
-//                PRINTF("Authentication Failed. Disconnecting ... \r\n");
-                wlan_disconnect();
-                auth_fail = 0;
-            }
-            break;
-        case WLAN_REASON_ADDRESS_SUCCESS:
-//            PRINTF("network mgr: DHCP new lease\r\n");
-            break;
-        case WLAN_REASON_ADDRESS_FAILED:
-//            PRINTF("app_cb: failed to obtain an IP address\r\n");
-            break;
-        case WLAN_REASON_USER_DISCONNECT:
-//            PRINTF("app_cb: disconnected\r\n");
-            auth_fail = 0;
-            break;
-        case WLAN_REASON_LINK_LOST:
-            is_connected = false;
-            run_update_chipsrv(dns_srv);
-//            PRINTF("app_cb: WLAN: link lost\r\n");
-            break;
-        case WLAN_REASON_CHAN_SWITCH:
-//            PRINTF("app_cb: WLAN: channel switch\r\n");
-            break;
-        case WLAN_REASON_UAP_SUCCESS:
-//            PRINTF("app_cb: WLAN: UAP Started\r\n");
-            ret = wlan_get_current_uap_network(&uap_network);
+        if (ret != WM_SUCCESS)
+        {
+            PRINTF("Failed to get Soft AP network\r\n");
+            return 0;
+        }
 
-            if (ret != WM_SUCCESS)
-            {
-                PRINTF("Failed to get Soft AP network\r\n");
-                return 0;
-            }
-
-//            PRINTF("Soft AP \"%s\" started successfully\r\n", uap_network.ssid);
-            if (dhcp_server_start(net_get_uap_handle()))
-                PRINTF("Error in starting dhcp server\r\n");
-//            PRINTF("DHCP Server started successfully\r\n");
-            break;
-        case WLAN_REASON_UAP_CLIENT_ASSOC:
-            PRINTF("app_cb: WLAN: UAP a Client Associated\r\n");
-//            PRINTF("Client => ");
-//            print_mac((const char *)data);
-//            PRINTF("Associated with Soft AP\r\n");
-            break;
-        case WLAN_REASON_UAP_CLIENT_DISSOC:
-//            PRINTF("app_cb: WLAN: UAP a Client Dissociated\r\n");
-//            PRINTF("Client => ");
-//            print_mac((const char *)data);
-//            PRINTF("Dis-Associated from Soft AP\r\n");
-            break;
-        case WLAN_REASON_UAP_STOPPED:
-//            PRINTF("app_cb: WLAN: UAP Stopped\r\n");
-//            PRINTF("Soft AP \"%s\" stopped successfully\r\n", uap_network.ssid);
-            dhcp_server_stop();
-//            PRINTF("DHCP Server stopped successfully\r\n");
-             break;
-        case WLAN_REASON_PS_ENTER:
-//            PRINTF("app_cb: WLAN: PS_ENTER\r\n");
-            break;
-        case WLAN_REASON_PS_EXIT:
-//            PRINTF("app_cb: WLAN: PS EXIT\r\n");
-            break;
-        default:
-            PRINTF("app_cb: WLAN: Unknown Event: %d\r\n", reason);
+        //            PRINTF("Soft AP \"%s\" started successfully\r\n", uap_network.ssid);
+        if (dhcp_server_start(net_get_uap_handle()))
+            PRINTF("Error in starting dhcp server\r\n");
+        //            PRINTF("DHCP Server started successfully\r\n");
+        break;
+    case WLAN_REASON_UAP_CLIENT_ASSOC:
+        PRINTF("app_cb: WLAN: UAP a Client Associated\r\n");
+        //            PRINTF("Client => ");
+        //            print_mac((const char *)data);
+        //            PRINTF("Associated with Soft AP\r\n");
+        break;
+    case WLAN_REASON_UAP_CLIENT_DISSOC:
+        //            PRINTF("app_cb: WLAN: UAP a Client Dissociated\r\n");
+        //            PRINTF("Client => ");
+        //            print_mac((const char *)data);
+        //            PRINTF("Dis-Associated from Soft AP\r\n");
+        break;
+    case WLAN_REASON_UAP_STOPPED:
+        //            PRINTF("app_cb: WLAN: UAP Stopped\r\n");
+        //            PRINTF("Soft AP \"%s\" stopped successfully\r\n", uap_network.ssid);
+        dhcp_server_stop();
+        //            PRINTF("DHCP Server stopped successfully\r\n");
+        break;
+    case WLAN_REASON_PS_ENTER:
+        //            PRINTF("app_cb: WLAN: PS_ENTER\r\n");
+        break;
+    case WLAN_REASON_PS_EXIT:
+        //            PRINTF("app_cb: WLAN: PS EXIT\r\n");
+        break;
+    default:
+        PRINTF("app_cb: WLAN: Unknown Event: %d\r\n", reason);
     }
     return 0;
 }
@@ -805,7 +806,7 @@ std::string createSetupPayload()
     }
     return result;
 }
-#endif //0
+#endif // 0
 
 #if 0
 void demo_init(void)
@@ -861,9 +862,9 @@ void demo_init(void)
 		PRINTF("start uAP ssid: %s\r\n", network.ssid);
 
 }
-#endif //0
+#endif // 0
 
-void task_main(void *param)
+void task_main(void * param)
 {
 #if 0
     int32_t result = 0;
@@ -957,73 +958,77 @@ void task_main(void *param)
         os_thread_sleep(os_msec_to_ticks(5000));
 		PRINTF("[%s]: looping\r\n", __FUNCTION__);
     }
-#endif //0
+#endif // 0
 }
 
 static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
 {
-	// Init ZCL Data Model and CHIP App Server
+    // Init ZCL Data Model and CHIP App Server
     {
         // Initialize device attestation config
         SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     }
     {
-//    chip::Server::GetInstance().Init();
-        //uint16_t securePort   = CHIP_PORT;
-        //uint16_t unsecurePort = CHIP_UDC_PORT;
+        //    chip::Server::GetInstance().Init();
+        // uint16_t securePort   = CHIP_PORT;
+        // uint16_t unsecurePort = CHIP_UDC_PORT;
 
-        //PRINTF("==> call chip::Server() \r\n");
-        //PRINTF("Orig DNSS Discovery Timeout: %d sec \r\n", chip::app::DnssdServer::Instance().GetDiscoveryTimeoutSecs());
-        //chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(60);
-		//chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(30);
-        //chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+        // PRINTF("==> call chip::Server() \r\n");
+        // PRINTF("Orig DNSS Discovery Timeout: %d sec \r\n", chip::app::DnssdServer::Instance().GetDiscoveryTimeoutSecs());
+        // chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(60);
+        // chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(30);
+        // chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
         static chip::CommonCaseDeviceServerInitParams initParams;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
         chip::Server::GetInstance().Init(initParams);
         PRINTF("Done to call chip::Server() \r\n");
     }
-// ota ++
+    // ota ++
     {
         InitOTARequestor();
-       #if (MW320_OTA_TEST == 1)
+#if (MW320_OTA_TEST == 1)
         // for ota module test
         mw320_fw_update_test();
-        #endif //MW320_OTA_TEST
+#endif // MW320_OTA_TEST
     }
-// ota --
-// binding ++
+    // ota --
+    // binding ++
     InitBindingHandlers();
-// binding --
+    // binding --
 
     return;
 }
 
 static void run_dnssrv(System::Layer * aSystemLayer, void * aAppState)
 {
-	chip::app::DnssdServer::Instance().StartServer();
-	if (is_connected == true) {
-		led_on_off(led_amber, true);
-	} else {
-		led_on_off(led_amber, false);
-	}
-	return;
+    chip::app::DnssdServer::Instance().StartServer();
+    if (is_connected == true)
+    {
+        led_on_off(led_amber, true);
+    }
+    else
+    {
+        led_on_off(led_amber, false);
+    }
+    return;
 }
 
-#define RUN_CHIPSRV_DELAY	1
+#define RUN_CHIPSRV_DELAY 1
 static void run_update_chipsrv(srv_type_t srv_type)
 {
-	switch (srv_type) {
-		case chip_srv_all:
-			DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(RUN_CHIPSRV_DELAY), run_chip_srv, nullptr);
-			break;
-		case dns_srv:
-			DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(RUN_CHIPSRV_DELAY), run_dnssrv, nullptr);
-			break;
-		default:
-			return;
-	}
-	return;
+    switch (srv_type)
+    {
+    case chip_srv_all:
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(RUN_CHIPSRV_DELAY), run_chip_srv, nullptr);
+        break;
+    case dns_srv:
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(RUN_CHIPSRV_DELAY), run_dnssrv, nullptr);
+        break;
+    default:
+        return;
+    }
+    return;
 }
 
 //=============================================================================
@@ -1031,41 +1036,43 @@ static void run_update_chipsrv(srv_type_t srv_type)
 //
 static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState)
 {
-	// PRINTF("%s(), Turn on lights \r\n", __FUNCTION__);
-	led_on_off(led_amber, true);
-	led_on_off(led_yellow, true);
-	// sleep 3 second
-	// PRINTF("%s(), sleep 3 seconds \r\n", __FUNCTION__);
-	os_thread_sleep(os_msec_to_ticks(3000));
-	//PRINTF("%s(), Turn off lights \r\n", __FUNCTION__);
-	led_on_off(led_amber, false);
-	led_on_off(led_yellow, false);
-	return;
+    // PRINTF("%s(), Turn on lights \r\n", __FUNCTION__);
+    led_on_off(led_amber, true);
+    led_on_off(led_yellow, true);
+    // sleep 3 second
+    // PRINTF("%s(), sleep 3 seconds \r\n", __FUNCTION__);
+    os_thread_sleep(os_msec_to_ticks(3000));
+    // PRINTF("%s(), Turn off lights \r\n", __FUNCTION__);
+    led_on_off(led_amber, false);
+    led_on_off(led_yellow, false);
+    return;
 }
 
-void task_test_main(void *param)
+void task_test_main(void * param)
 {
-	while (1)
+    while (1)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(500));
-		/*PRINTF("[%s]: looping\r\n", __FUNCTION__);*/
-		if (need2sync_sw_attr==true) {
-			static	bool is_on = false;
-			uint16_t	value = g_ButtonPress&0x1;
-			is_on = !is_on;
-			value = (uint16_t)is_on;
-			// sync-up the switch attribute:
-			PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-			emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t*)&value, sizeof(value), true, false);
-			need2sync_sw_attr = false;
-		}
-		// =============================
-		// Call sw2_handle to clear click_count if needed
-		sw2_handle(false);
-		// =============================
+        /*PRINTF("[%s]: looping\r\n", __FUNCTION__);*/
+        if (need2sync_sw_attr == true)
+        {
+            static bool is_on = false;
+            uint16_t value    = g_ButtonPress & 0x1;
+            is_on             = !is_on;
+            value             = (uint16_t) is_on;
+            // sync-up the switch attribute:
+            PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
+            emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
+                               false);
+            need2sync_sw_attr = false;
+        }
+        // =============================
+        // Call sw2_handle to clear click_count if needed
+        sw2_handle(false);
+        // =============================
     }
-	return;
+    return;
 }
 
 void ShellCLIMain(void * pvParameter)
@@ -1073,8 +1080,8 @@ void ShellCLIMain(void * pvParameter)
     flash_desc_t fl;
     struct partition_entry *p, *f1, *f2;
     short history = 0;
-    uint32_t *wififw;
-    struct partition_entry *psm;
+    uint32_t * wififw;
+    struct partition_entry * psm;
 
     const int rc = streamer_init(streamer_get());
     if (rc != 0)
@@ -1095,9 +1102,9 @@ void ShellCLIMain(void * pvParameter)
 #endif
 
     cmd_misc_init();
-    //cmd_otcli_init();
-    //cmd_ping_init();
-    //cmd_send_init();
+    // cmd_otcli_init();
+    // cmd_ping_init();
+    // cmd_send_init();
 
     ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
     PRINTF("call mcuInitPower() \r\n");
@@ -1108,7 +1115,7 @@ void ShellCLIMain(void * pvParameter)
     part_init();
     psm = part_get_layout_by_id(FC_COMP_PSM, NULL);
     part_to_flash_desc(psm, &fl);
-    init_flash_storage((char *)CONNECTION_INFO_FILENAME, &fl);
+    init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
     f1 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     f2 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     if (f1 && f2)
@@ -1125,66 +1132,66 @@ void ShellCLIMain(void * pvParameter)
     }
     else
     {
-//        PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
+        //        PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
         p = NULL;
     }
     if (p != NULL)
     {
         part_to_flash_desc(p, &fl);
-        wififw = (uint32_t *)mflash_drv_phys2log(fl.fl_start, fl.fl_size);
-//        assert(wififw != NULL);
+        wififw = (uint32_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
+        //        assert(wififw != NULL);
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
-        wlan_init((const uint8_t *)(wififw + 2U), *(wififw + 1U));
-//        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
+        wlan_init((const uint8_t *) (wififw + 2U), *(wififw + 1U));
+        //        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
-//		demo_init();
+        //		demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
     }
 
-//    std::string qrCodeText = createSetupPayload();
-//    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
+    //    std::string qrCodeText = createSetupPayload();
+    //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
 
     ConnectivityMgrImpl().ProvisionWiFiNetwork("nxp_matter", "nxp12345");
 
-	// Run CHIP servers
-	run_update_chipsrv(chip_srv_all);
+    // Run CHIP servers
+    run_update_chipsrv(chip_srv_all);
 
     Engine::Root().RunMainLoop();
 }
 
 static void led_on_off(led_id_t lt_id, bool is_on)
 {
-	GPIO_Type *pgpio;
-	uint32_t gpio_pin;
+    GPIO_Type * pgpio;
+    uint32_t gpio_pin;
 
-	// Configure the GPIO / PIN
-	switch (lt_id)
-	{
-		case led_amber:
-			pgpio = BOARD_LED_AMBER_GPIO;
-			gpio_pin = BOARD_LED_AMBER_GPIO_PIN;
-			break;
-		case led_yellow:
-		default: // Note: led_yellow as default
-			pgpio = BOARD_LED_YELLOW_GPIO;
-			gpio_pin = BOARD_LED_YELLOW_GPIO_PIN;
-	}
-	// Do on/off the LED
-	if (is_on == true) {
-		// PRINTF("led on\r\n");
-		GPIO_PortClear(pgpio, GPIO_PORT(gpio_pin), 1u << GPIO_PORT_PIN(gpio_pin));
-	} else {
-		// PRINTF("led off\r\n");
-		GPIO_PortSet(pgpio, GPIO_PORT(gpio_pin), 1u << GPIO_PORT_PIN(gpio_pin));
-	}
-	return;
+    // Configure the GPIO / PIN
+    switch (lt_id)
+    {
+    case led_amber:
+        pgpio    = BOARD_LED_AMBER_GPIO;
+        gpio_pin = BOARD_LED_AMBER_GPIO_PIN;
+        break;
+    case led_yellow:
+    default: // Note: led_yellow as default
+        pgpio    = BOARD_LED_YELLOW_GPIO;
+        gpio_pin = BOARD_LED_YELLOW_GPIO_PIN;
+    }
+    // Do on/off the LED
+    if (is_on == true)
+    {
+        // PRINTF("led on\r\n");
+        GPIO_PortClear(pgpio, GPIO_PORT(gpio_pin), 1u << GPIO_PORT_PIN(gpio_pin));
+    }
+    else
+    {
+        // PRINTF("led off\r\n");
+        GPIO_PortSet(pgpio, GPIO_PORT(gpio_pin), 1u << GPIO_PORT_PIN(gpio_pin));
+    }
+    return;
 }
 
-
 } // namespace
-
-
 
 int StartShellTask(void)
 {
@@ -1193,21 +1200,24 @@ int StartShellTask(void)
     // Start Shell task.
     switch (Matter_Selection)
     {
-        case MCUXPRESSO_WIFI_CLI:
+    case MCUXPRESSO_WIFI_CLI:
 #ifdef MCUXPRESSO_WIFI_CLI
-        if (xTaskCreate(task_main, "main", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO, &task_main_task_handler)!= pdPASS)
+        if (xTaskCreate(task_main, "main", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO, &task_main_task_handler) !=
+            pdPASS)
         {
             ret = -1;
         }
         break;
 #endif
-        case MATTER_SHELL:
-        default:
-        if (xTaskCreate(ShellCLIMain, "SHELL", TASK_MAIN_STACK_SIZE, NULL, TASK_MAIN_PRIO, &sShellTaskHandle)!= pdPASS)
+    case MATTER_SHELL:
+    default:
+        if (xTaskCreate(ShellCLIMain, "SHELL", TASK_MAIN_STACK_SIZE, NULL, TASK_MAIN_PRIO, &sShellTaskHandle) != pdPASS)
         {
             ret = -1;
         }
-        if (xTaskCreate(task_test_main, "testmain", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO, &task_main_task_handler) != pdPASS) {
+        if (xTaskCreate(task_test_main, "testmain", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO,
+                        &task_main_task_handler) != pdPASS)
+        {
             PRINTF("Failed to crete task_test_main() \r\n");
             ret = -1;
         }
@@ -1217,48 +1227,56 @@ int StartShellTask(void)
     return ret;
 }
 
-#define gpio_led_cfg(base, pin, cfg) {\
-	GPIO_PinInit(base, pin, cfg);\
-	GPIO_PortSet(base, GPIO_PORT(pin), 1u << GPIO_PORT_PIN(pin));\
-}
+#define gpio_led_cfg(base, pin, cfg)                                                                                               \
+    {                                                                                                                              \
+        GPIO_PinInit(base, pin, cfg);                                                                                              \
+        GPIO_PortSet(base, GPIO_PORT(pin), 1u << GPIO_PORT_PIN(pin));                                                              \
+    }
 
-#define gpio_sw_cfg(base, pin, cfg, irq, trig) {\
-	GPIO_PinInit(base, pin, cfg);\
-    GPIO_PinSetInterruptConfig(base, pin, trig);\
-    GPIO_PortEnableInterrupts(base, GPIO_PORT(pin), 1UL << GPIO_PORT_PIN(pin));\
-    EnableIRQ(irq);\
-}
+#define gpio_sw_cfg(base, pin, cfg, irq, trig)                                                                                     \
+    {                                                                                                                              \
+        GPIO_PinInit(base, pin, cfg);                                                                                              \
+        GPIO_PinSetInterruptConfig(base, pin, trig);                                                                               \
+        GPIO_PortEnableInterrupts(base, GPIO_PORT(pin), 1UL << GPIO_PORT_PIN(pin));                                                \
+        EnableIRQ(irq);                                                                                                            \
+    }
 
 void gpio_init(void)
 {
-	gpio_pin_config_t led_config = {kGPIO_DigitalOutput, 0, };
-	gpio_pin_config_t sw_config = {kGPIO_DigitalInput, 0, };
+    gpio_pin_config_t led_config = {
+        kGPIO_DigitalOutput,
+        0,
+    };
+    gpio_pin_config_t sw_config = {
+        kGPIO_DigitalInput,
+        0,
+    };
 
-	/* Init output amber led gpio off */
-	gpio_led_cfg(BOARD_LED_AMBER_GPIO, BOARD_LED_AMBER_GPIO_PIN, &led_config);
+    /* Init output amber led gpio off */
+    gpio_led_cfg(BOARD_LED_AMBER_GPIO, BOARD_LED_AMBER_GPIO_PIN, &led_config);
 
-	/* Init output yellow led gpio off */
-	gpio_led_cfg(BOARD_LED_YELLOW_GPIO, BOARD_LED_YELLOW_GPIO_PIN, &led_config);
+    /* Init output yellow led gpio off */
+    gpio_led_cfg(BOARD_LED_YELLOW_GPIO, BOARD_LED_YELLOW_GPIO_PIN, &led_config);
 
-	/* Init/config input sw_1 GPIO. */
-	gpio_sw_cfg(BOARD_SW1_GPIO, BOARD_SW1_GPIO_PIN, &sw_config, BOARD_SW1_IRQ, kGPIO_InterruptFallingEdge);
+    /* Init/config input sw_1 GPIO. */
+    gpio_sw_cfg(BOARD_SW1_GPIO, BOARD_SW1_GPIO_PIN, &sw_config, BOARD_SW1_IRQ, kGPIO_InterruptFallingEdge);
 
-	/* Init/config input sw_2 GPIO. */
-	gpio_sw_cfg(BOARD_SW2_GPIO, BOARD_SW2_GPIO_PIN, &sw_config, BOARD_SW2_IRQ, kGPIO_InterruptFallingEdge);
-	return;
+    /* Init/config input sw_2 GPIO. */
+    gpio_sw_cfg(BOARD_SW2_GPIO, BOARD_SW2_GPIO_PIN, &sw_config, BOARD_SW2_IRQ, kGPIO_InterruptFallingEdge);
+    return;
 }
 
 int main(void)
 {
-//    char ch;
-//    unsigned int bp;
-//    unsigned int mw320_sec = 9000000;
-//    unsigned int default_ch;
-//    unsigned int default_1= 0;
-//    unsigned int default_2= 0;
+    //    char ch;
+    //    unsigned int bp;
+    //    unsigned int mw320_sec = 9000000;
+    //    unsigned int default_ch;
+    //    unsigned int default_1= 0;
+    //    unsigned int default_2= 0;
 
     /* Initialize platform */
-    //BOARD_ConfigMPU();
+    // BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
 
@@ -1269,14 +1287,15 @@ int main(void)
     {
         ch = GETCHAR();
         PUTCHAR(ch);
-        if(ch == '1')
+        if (ch == '1')
             Matter_Selection = MCUXPRESSO_WIFI_CLI;
-        else if(ch == '2')
+        else if (ch == '2')
             Matter_Selection = MATTER_SHELL;
-    }while (ch != '\r');
+    } while (ch != '\r');
     if (Matter_Selection == MAX_SELECTION)
         Matter_Selection = MATTER_SHELL;
-    PRINTF("\n\n[%s]:  MW320 %s .\r\n", __FUNCTION__, (Matter_Selection==MCUXPRESSO_WIFI_CLI)?"MCUXPresso WiFi CLI":"Matter Shell");
+    PRINTF("\n\n[%s]:  MW320 %s .\r\n", __FUNCTION__,
+           (Matter_Selection == MCUXPRESSO_WIFI_CLI) ? "MCUXPresso WiFi CLI" : "Matter Shell");
 #else
 #ifdef CONFIGURE_UAP
     PRINTF("\nDo you want to use the default SSID and key for mw320 uAP? [y/n]\r\n");
@@ -1284,9 +1303,10 @@ int main(void)
     {
         ch = GETCHAR();
         PUTCHAR(ch);
-        if(ch == 'n') {
+        if (ch == 'n')
+        {
             PRINTF("\nPlease input your SSID: [ 1 ~ 32 characters]\r\n");
-            bp =0;
+            bp = 0;
             do
             {
                 ssid[bp] = GETCHAR();
@@ -1297,10 +1317,10 @@ int main(void)
                     PRINTF("\n ERROR: your SSID length=%d is larger than %d \r\n", bp, sizeof(ssid));
                     return 0;
                 }
-            }while (ssid[bp-1] != '\r');
-            ssid[bp-1] = '\0';
+            } while (ssid[bp - 1] != '\r');
+            ssid[bp - 1] = '\0';
             PRINTF("\nPlease input your KEY: [ 8 ~ 63 characters]\r\n");
-            bp =0;
+            bp = 0;
             do
             {
                 psk[bp] = GETCHAR();
@@ -1311,21 +1331,23 @@ int main(void)
                     PRINTF("\n ERROR: your KEY length=%d is larger than %d \r\n", bp, sizeof(psk));
                     return 0;
                 }
-            }while (psk[bp-1] != '\r');
-            psk[bp-1] = '\0';
-            if ((bp-1) < 8)
+            } while (psk[bp - 1] != '\r');
+            psk[bp - 1] = '\0';
+            if ((bp - 1) < 8)
             {
-                PRINTF("\n ERROR: KEY length=%d is less than 8 \r\n", (bp-1));
+                PRINTF("\n ERROR: KEY length=%d is less than 8 \r\n", (bp - 1));
                 return 0;
             }
             break;
-        } if(ch == '\r') {
+        }
+        if (ch == '\r')
+        {
             break;
         }
-    }while (ch != 'y');
+    } while (ch != 'y');
 #endif
 #endif
-//    PRINTF("\nMW320 uAP SSID=%s key=%s ip=%s \r\n", ssid, psk, network_ip);
+    //    PRINTF("\nMW320 uAP SSID=%s key=%s ip=%s \r\n", ssid, psk, network_ip);
 
     CLOCK_EnableXtal32K(kCLOCK_Osc32k_External);
     CLOCK_AttachClk(kXTAL32K_to_RTC);
@@ -1335,7 +1357,7 @@ int main(void)
 
     AES_Init(APP_AES);
     AES_SetLockFunc(APP_AES_Lock, APP_AES_Unlock);
-	gpio_init();
+    gpio_init();
 
     StartShellTask();
 
@@ -1354,11 +1376,10 @@ static void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeI
 {
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
-    VerifyOrExit(endpointId == 1 || endpointId == 2,
-                 ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
-	led_on_off(led_yellow, (*value!=0)?true:false);
+    led_on_off(led_yellow, (*value != 0) ? true : false);
 
 exit:
     return;
@@ -1366,33 +1387,34 @@ exit:
 
 static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-//	auto * pimEngine = chip::app::InteractionModelEngine::GetInstance();
-//	bool do_sendrpt = false;
+    //	auto * pimEngine = chip::app::InteractionModelEngine::GetInstance();
+    //	bool do_sendrpt = false;
 
-	VerifyOrExit(attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
-	// Send the switch status report now
+    // Send the switch status report now
 /*
-	for (uint32_t i = 0 ; i<pimEngine->GetNumActiveReadHandlers() ; i++) {
-		ReadHandler * phandler = pimEngine->ActiveHandlerAt(i);
-		if (phandler->IsType(chip::app::ReadHandler::InteractionType::Subscribe) &&
-			(phandler->IsGeneratingReports() || phandler->IsAwaitingReportResponse())) {
-			phandler->UnblockUrgentEventDelivery();
-			do_sendrpt = true;
-			break;
-		}
-	}
-	if (do_sendrpt == true) {
-		ConcreteEventPath event_path(endpointId, ZCL_SWITCH_CLUSTER_ID, 0);
-		pimEngine->GetReportingEngine().ScheduleEventDelivery(event_path, chip::app::EventOptions::Type::kUrgent, sizeof(uint16_t));
-	}
+        for (uint32_t i = 0 ; i<pimEngine->GetNumActiveReadHandlers() ; i++) {
+                ReadHandler * phandler = pimEngine->ActiveHandlerAt(i);
+                if (phandler->IsType(chip::app::ReadHandler::InteractionType::Subscribe) &&
+                        (phandler->IsGeneratingReports() || phandler->IsAwaitingReportResponse())) {
+                        phandler->UnblockUrgentEventDelivery();
+                        do_sendrpt = true;
+                        break;
+                }
+        }
+        if (do_sendrpt == true) {
+                ConcreteEventPath event_path(endpointId, ZCL_SWITCH_CLUSTER_ID, 0);
+                pimEngine->GetReportingEngine().ScheduleEventDelivery(event_path, chip::app::EventOptions::Type::kUrgent,
+   sizeof(uint16_t));
+        }
 */
 exit:
-	return;
+    return;
 }
 
 /*
-	Callback to receive the cluster modification event
+        Callback to receive the cluster modification event
 */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -1406,7 +1428,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         break;
     case ZCL_SWITCH_CLUSTER_ID:
         OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
-        //SwitchToggleOnOff();
+        // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices
         chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
         break;
@@ -1416,17 +1438,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     return;
 }
 
-EmberAfStatus
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                      uint8_t * buffer)
+EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     PRINTF("====> %s() \r\n", __FUNCTION__);
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                     uint8_t * buffer, uint16_t maxReadLength)
+EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
 {
     // Added for the pairing of TE9 to report the commission_info
     // default function (in zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp)

@@ -25,10 +25,10 @@
 
 namespace chip {
 
-static fw_update_id_t	fwupid;
+static fw_update_id_t fwupid;
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    //mw320++
+    // mw320++
     /*
     if (mImageFile == nullptr)
     {
@@ -36,7 +36,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
         return CHIP_ERROR_INTERNAL;
     }
     */
-    //mw320--
+    // mw320--
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
@@ -50,13 +50,13 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    //DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    // DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    //mw320++
+    // mw320++
     /*
     if (mImageFile == nullptr)
     {
@@ -64,7 +64,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
         return CHIP_ERROR_INTERNAL;
     }
     */
-    //mw320--
+    // mw320--
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
@@ -72,7 +72,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    //mw320++
+    // mw320++
     /*
     if (!mOfs.is_open() || !mOfs.good())
     {
@@ -80,7 +80,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     }
     */
     ChipLogProgress(SoftwareUpdate, "==> %s()", __FUNCTION__);
-    //mw320--
+    // mw320--
 
     if ((block.data() == nullptr) || block.empty())
     {
@@ -143,7 +143,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
-    //mw320++
+    // mw320++
     // No need to open file for mw320
     imageProcessor->mHeaderParser.Init();
     /*
@@ -159,7 +159,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     */
     ChipLogProgress(SoftwareUpdate, "==> %s(), [open the file]", __FUNCTION__);
     fwupid = mw320_fw_update_begin();
-    //mw320--
+    // mw320--
     // TODO: if file already exists and is not empty, erase previous contents
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -172,11 +172,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         return;
     }
-    //mw320++
+    // mw320++
     //	imageProcessor->mOfs.close();
     ChipLogProgress(SoftwareUpdate, "==> %s(), [close the file]", __FUNCTION__);
     mw320_fw_update_end(fwupid, -1);
-    //mw320--
+    // mw320--
     imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile);
@@ -200,7 +200,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().HandleServerShuttingDown(); });
     DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
 }
-#endif //0
+#endif // 0
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
@@ -210,12 +210,12 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    //mw320++
+    // mw320++
     //	imageProcessor->mOfs.close();
     ChipLogProgress(SoftwareUpdate, "==> %s(), [close the file]", __FUNCTION__);
     mw320_fw_update_end(fwupid, -1);
-    //mw320--
-    //unlink(imageProcessor->mImageFile);
+    // mw320--
+    // unlink(imageProcessor->mImageFile);
     imageProcessor->ReleaseBlock();
 }
 
@@ -234,8 +234,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     // TODO: Process block header if any
-    //mw320++
-//	/*
+    // mw320++
+    //	/*
     ByteSpan block   = imageProcessor->mBlock;
     CHIP_ERROR error = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
@@ -251,19 +251,22 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
-	*/
+        */
     {
-    int error_wtblk;
-    //uint32_t blksize = static_cast<uint32_t>(imageProcessor->mBlock.size());
-    uint32_t blksize = static_cast<uint32_t>(block.size());
-    ChipLogProgress(SoftwareUpdate, "==> %s(), [write the block, %lu]", __FUNCTION__, blksize);
-    error_wtblk = mw320_fw_update_wrblock(fwupid, const_cast<unsigned char*>(reinterpret_cast<const unsigned char *>(block.data())), static_cast<uint32_t>(block.size()));
-    if (error_wtblk != 0) {
-        ChipLogProgress(SoftwareUpdate, "==> %s(), failed to write", __FUNCTION__);
-    }
+        int error_wtblk;
+        // uint32_t blksize = static_cast<uint32_t>(imageProcessor->mBlock.size());
+        uint32_t blksize = static_cast<uint32_t>(block.size());
+        ChipLogProgress(SoftwareUpdate, "==> %s(), [write the block, %lu]", __FUNCTION__, blksize);
+        error_wtblk =
+            mw320_fw_update_wrblock(fwupid, const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(block.data())),
+                                    static_cast<uint32_t>(block.size()));
+        if (error_wtblk != 0)
+        {
+            ChipLogProgress(SoftwareUpdate, "==> %s(), failed to write", __FUNCTION__);
+        }
 
-    imageProcessor->mParams.downloadedBytes += block.size();
-    //imageProcessor->mParams.downloadedBytes += blksize;
+        imageProcessor->mParams.downloadedBytes += block.size();
+        // imageProcessor->mParams.downloadedBytes += blksize;
     }
     // mw320--
     imageProcessor->mDownloader->FetchNextData();
@@ -280,7 +283,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        //mParams.totalFileBytes = header.mPayloadSize;
+        // mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
     }
 
