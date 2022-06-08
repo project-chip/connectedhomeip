@@ -167,7 +167,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished,
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
               params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );

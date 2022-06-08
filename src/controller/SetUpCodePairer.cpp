@@ -128,6 +128,18 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 {
+    // Make sure to not call CancelBleIncompleteConnection unless we are in fact
+    // waiting on BLE discovery.  It will cancel connections that are in fact
+    // completed. In particular, if we just established PASE over BLE calling
+    // CancelBleIncompleteConnection here unconditionally would cancel the BLE
+    // connection underlying the PASE session.  So make sure to only call
+    // CancelBleIncompleteConnection if we're still waiting to hear back on the
+    // BLE discovery bits.
+    if (!mWaitingForDiscovery[kBLETransport])
+    {
+        return CHIP_NO_ERROR;
+    }
+
     mWaitingForDiscovery[kBLETransport] = false;
 #if CONFIG_NETWORK_LAYER_BLE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -178,8 +190,6 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
-    mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
-
     if (mWaitingForPASE)
     {
         // Nothing to do.  Just wait until we either succeed or fail at that
@@ -187,17 +197,14 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         return false;
     }
 
-    for (auto & storedParams : mDiscoveredParameters)
+    if (!mDiscoveredParameters.empty())
     {
-        if (!storedParams.HasPeerAddress())
-        {
-            continue;
-        }
-
-        // Clear out those params, since we will kick off a connection to them
-        // now.
-        RendezvousParameters params(storedParams);
-        storedParams = RendezvousParameters();
+        // Grab the first element from the queue and try connecting to it.
+        // Remove it from the queue before we try to connect, in case the
+        // connection attempt fails and calls right back into us to try the next
+        // thing.
+        RendezvousParameters params(mDiscoveredParameters.front());
+        mDiscoveredParameters.pop();
 
         params.SetSetupPINCode(mSetUpPINCode);
 
@@ -240,12 +247,9 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     mWaitingForDiscovery[kBLETransport] = false;
 
-    // Probably safe to stop connections over other transports at this point?
-    LogErrorOnFailure(StopConnectOverIP());
-    LogErrorOnFailure(StopConnectOverSoftAP());
-
-    Transport::PeerAddress peerAddress   = Transport::PeerAddress::BLE();
-    mDiscoveredParameters[kBLETransport] = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
+    Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
+    mDiscoveredParameters.emplace();
+    mDiscoveredParameters.back().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
     ConnectToDiscoveredDevice();
 }
 
@@ -295,16 +299,12 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    // Don't stop trying to connect over BLE, because we may be dealing with
-    // stale DNS-SD records.
-    LogErrorOnFailure(StopConnectOverIP());
-    LogErrorOnFailure(StopConnectOverSoftAP());
-
     Inet::InterfaceId interfaceId =
         nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.resolutionData.interfaceId : Inet::InterfaceId::Null();
     Transport::PeerAddress peerAddress =
         Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
-    mDiscoveredParameters[kIPTransport] = RendezvousParameters().SetPeerAddress(peerAddress);
+    mDiscoveredParameters.emplace();
+    mDiscoveredParameters.back().SetPeerAddress(peerAddress);
     ConnectToDiscoveredDevice();
 }
 
@@ -316,11 +316,21 @@ bool SetUpCodePairer::TryNextRendezvousParameters()
         return true;
     }
 
+    if (DiscoveryInProgress())
+    {
+        ChipLogProgress(Controller, "Waiting to discover commissionees that match our filters");
+        return true;
+    }
+
+    return false;
+}
+
+bool SetUpCodePairer::DiscoveryInProgress() const
+{
     for (const auto & waiting : mWaitingForDiscovery)
     {
         if (waiting)
         {
-            ChipLogProgress(Controller, "Waiting to discover commissionees that match our filters");
             return true;
         }
     }
@@ -330,15 +340,22 @@ bool SetUpCodePairer::TryNextRendezvousParameters()
 
 void SetUpCodePairer::ResetDiscoveryState()
 {
+    StopConnectOverBle();
+    StopConnectOverIP();
+    StopConnectOverSoftAP();
+
+    // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)
     {
         waiting = false;
     }
 
-    for (auto & params : mDiscoveredParameters)
+    while (!mDiscoveredParameters.empty())
     {
-        params = RendezvousParameters();
+        mDiscoveredParameters.pop();
     }
+
+    mLastPASEError = CHIP_NO_ERROR;
 }
 
 void SetUpCodePairer::ExpectPASEEstablishment()
@@ -365,6 +382,28 @@ void SetUpCodePairer::PASEEstablishmentComplete()
 
 void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
+    if (status == DevicePairingDelegate::Status::SecurePairingFailed)
+    {
+        // If we're still waiting on discovery, don't propagate this failure
+        // (which is due to PASE failure with something we discovered, but the
+        // "something" may not have been the right thing) for now.  Wait until
+        // discovery completes.  Then we will either succeed and notify
+        // accordingly or time out and land in OnStatusUpdate again, but at that
+        // point we will not be waiting on discovery anymore.
+        if (!mDiscoveredParameters.empty())
+        {
+            ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
+            return;
+        }
+
+        if (DiscoveryInProgress())
+        {
+            ChipLogProgress(Controller,
+                            "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
+            return;
+        }
+    }
+
     if (mPairingDelegate)
     {
         mPairingDelegate->OnStatusUpdate(status);
@@ -382,18 +421,8 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
 
     if (CHIP_NO_ERROR == error)
     {
-        // StopConnectOverBle calls CancelBleIncompleteConnection, which will
-        // cancel connections that are in fact completed. In particular, if we
-        // just established PASE over BLE calling StopConnectOverBle here
-        // unconditionally would cancel the BLE connection underlying the PASE
-        // session.  So make sure to only call StopConnectOverBle if we're still
-        // waiting to hear back on the BLE discovery bits.
-        if (mWaitingForDiscovery[kBLETransport])
-        {
-            StopConnectOverBle();
-        }
-        StopConnectOverIP();
-        StopConnectOverSoftAP();
+        mSystemLayer->CancelTimer(OnDeviceDiscoveredTimeoutCallback, this);
+
         ResetDiscoveryState();
         pairingDelegate->OnPairingComplete(error);
         return;
@@ -404,6 +433,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     if (TryNextRendezvousParameters())
     {
         // Keep waiting until that finishes.  Don't call OnPairingComplete yet.
+        mLastPASEError = error;
         return;
     }
 
@@ -429,11 +459,23 @@ void SetUpCodePairer::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 
 void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context)
 {
+    ChipLogError(Controller, "Discovery timed out");
     auto * pairer = static_cast<SetUpCodePairer *>(context);
     LogErrorOnFailure(pairer->StopConnectOverBle());
     LogErrorOnFailure(pairer->StopConnectOverIP());
     LogErrorOnFailure(pairer->StopConnectOverSoftAP());
-    pairer->mCommissioner->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    if (!pairer->mWaitingForPASE && pairer->mDiscoveredParameters.empty())
+    {
+        // We're not waiting on any more PASE attempts, and we're not going to
+        // discover anything at this point, so we should just notify our
+        // listener.
+        CHIP_ERROR err = pairer->mLastPASEError;
+        if (err == CHIP_NO_ERROR)
+        {
+            err = CHIP_ERROR_TIMEOUT;
+        }
+        pairer->mCommissioner->OnSessionEstablishmentError(err);
+    }
 }
 
 } // namespace Controller

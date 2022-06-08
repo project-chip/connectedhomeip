@@ -185,7 +185,8 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
 
-    ChipLogDetail(SecureChannel, "Waiting for Sigma1 msg");
+    ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
+                  mSecureSessionHolder.Get().Value()->AsSecureSession());
 
     return CHIP_NO_ERROR;
 }

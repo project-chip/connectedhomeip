@@ -45,7 +45,6 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>

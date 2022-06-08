@@ -37,7 +37,7 @@ namespace app {
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
-char gLineBuffer[256];
+char gLineBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 size_t gCurLineBufferSize = 0;
 } // namespace
 

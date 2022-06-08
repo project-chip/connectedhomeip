@@ -27,6 +27,7 @@
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "MTRCertificates.h"
+#import "MTRMemory.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -42,7 +43,6 @@
 using namespace chip;
 using namespace chip::Controller;
 
-static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
@@ -92,10 +92,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
     _isRunning = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    CHIP_ERROR errorCode = Platform::MemoryInit();
-    if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorMemoryInit]) {
-        return nil;
-    }
+    [MTRMemory ensureInit];
 
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
@@ -109,7 +106,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
     }
 
     _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
-    errorCode = _groupDataProvider->Init();
+    CHIP_ERROR errorCode = _groupDataProvider->Init();
     if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
         return nil;
     }
@@ -155,8 +152,6 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
         delete _groupStorageDelegate;
         _groupStorageDelegate = nullptr;
     }
-
-    Platform::MemoryShutdown();
 }
 
 - (void)cleanupStartupObjects
