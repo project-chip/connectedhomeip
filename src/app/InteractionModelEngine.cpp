@@ -821,8 +821,8 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
         {
             candidate = handler;
         }
-        // This handler is older than the one we picked before.
-        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
+        // This handler is younger than the one we picked before, should evict the younger one.
+        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
                   (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
@@ -932,7 +932,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         return Loop::Continue;
     });
 
-    // Resources exhausted, since there is already some read requests ongoing on this fabric, please retry later.
+    // Busy, since there is already some read requests ongoing on this fabric, please retry later.
     if (usedAttributePathsInFabric + aRequestedAttributePathCount >
             kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
         usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
@@ -962,7 +962,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         {
             break;
         }
-        if (didEvictHandler)
+        // If the fabric table is full, we won't evict read requests from normal fabrics before we have evicted all read requests
+        // from PASE sessions.
+        if (mpFabricTable->FabricCount() == GetConfigMaxFabrics() && didEvictHandler)
         {
             continue;
         }
