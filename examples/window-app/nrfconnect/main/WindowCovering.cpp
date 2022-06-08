@@ -164,7 +164,7 @@ void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer,
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
     }
-    
+
     chip::Platform::Delete(moveType);
 }
 
