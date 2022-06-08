@@ -183,6 +183,9 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
+    // This API is used by UpdateNOC command, to invalid all exchanges except the given one.
+    void AbortExchangeForNodeExceptOne(const ScopedNodeId & node, ExchangeContext * stay);
+
     SessionManager * GetSessionManager() const { return mSessionManager; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };

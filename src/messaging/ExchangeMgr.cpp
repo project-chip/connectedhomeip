@@ -376,5 +376,16 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
     });
 }
 
+void ExchangeManager::AbortExchangeForNodeExceptOne(const ScopedNodeId & node, ExchangeContext * stay)
+{
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec != stay && ec->HasSessionHandle() && ec->GetSessionHandle()->GetPeer() == node)
+        {
+            ec->Abort();
+        }
+        return Loop::Continue;
+    });
+}
+
 } // namespace Messaging
 } // namespace chip
