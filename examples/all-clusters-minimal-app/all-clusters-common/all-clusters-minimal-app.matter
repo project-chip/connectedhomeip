@@ -2554,8 +2554,8 @@ server cluster TestCluster = 1295 {
   }
 
   struct TestListStructOctet {
-    fabric_id fabricId = 0;
-    octet_string<32> operationalCert = 1;
+    int64u member1 = 0;
+    octet_string<32> member2 = 1;
   }
 
   struct NullablesAndOptionalsStruct {

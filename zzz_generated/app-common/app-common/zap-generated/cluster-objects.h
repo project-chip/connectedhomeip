@@ -31350,15 +31350,15 @@ public:
 namespace TestListStructOctet {
 enum class Fields
 {
-    kFabricId        = 0,
-    kOperationalCert = 1,
+    kMember1 = 0,
+    kMember2 = 1,
 };
 
 struct Type
 {
 public:
-    chip::FabricId fabricId = static_cast<chip::FabricId>(0);
-    chip::ByteSpan operationalCert;
+    uint64_t member1 = static_cast<uint64_t>(0);
+    chip::ByteSpan member2;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

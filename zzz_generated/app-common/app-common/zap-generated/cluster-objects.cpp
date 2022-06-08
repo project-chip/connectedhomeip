@@ -23441,8 +23441,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricId)), fabricId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOperationalCert)), operationalCert));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMember1)), member1));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMember2)), member2));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -23462,11 +23462,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricId));
+        case to_underlying(Fields::kMember1):
+            ReturnErrorOnFailure(DataModel::Decode(reader, member1));
             break;
-        case to_underlying(Fields::kOperationalCert):
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationalCert));
+        case to_underlying(Fields::kMember2):
+            ReturnErrorOnFailure(DataModel::Decode(reader, member2));
             break;
         default:
             break;

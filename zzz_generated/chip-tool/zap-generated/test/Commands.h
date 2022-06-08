@@ -42443,20 +42443,20 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listStructOctetString", iter_0, 0));
-                    VerifyOrReturn(CheckValue("listStructOctetString[0].fabricId", iter_0.GetValue().fabricId, 0ULL));
-                    VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter_0.GetValue().operationalCert,
+                    VerifyOrReturn(CheckValue("listStructOctetString[0].member1", iter_0.GetValue().member1, 0ULL));
+                    VerifyOrReturn(CheckValueAsString("listStructOctetString[0].member2", iter_0.GetValue().member2,
                                                       chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listStructOctetString", iter_0, 1));
-                    VerifyOrReturn(CheckValue("listStructOctetString[1].fabricId", iter_0.GetValue().fabricId, 1ULL));
-                    VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter_0.GetValue().operationalCert,
+                    VerifyOrReturn(CheckValue("listStructOctetString[1].member1", iter_0.GetValue().member1, 1ULL));
+                    VerifyOrReturn(CheckValueAsString("listStructOctetString[1].member2", iter_0.GetValue().member2,
                                                       chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listStructOctetString", iter_0, 2));
-                    VerifyOrReturn(CheckValue("listStructOctetString[2].fabricId", iter_0.GetValue().fabricId, 2ULL));
-                    VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter_0.GetValue().operationalCert,
+                    VerifyOrReturn(CheckValue("listStructOctetString[2].member1", iter_0.GetValue().member1, 2ULL));
+                    VerifyOrReturn(CheckValueAsString("listStructOctetString[2].member2", iter_0.GetValue().member2,
                                                       chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listStructOctetString", iter_0, 3));
-                    VerifyOrReturn(CheckValue("listStructOctetString[3].fabricId", iter_0.GetValue().fabricId, 3ULL));
-                    VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter_0.GetValue().operationalCert,
+                    VerifyOrReturn(CheckValue("listStructOctetString[3].member1", iter_0.GetValue().member1, 3ULL));
+                    VerifyOrReturn(CheckValueAsString("listStructOctetString[3].member2", iter_0.GetValue().member2,
                                                       chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listStructOctetString", iter_0, 4));
                 }
@@ -46220,20 +46220,20 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>(4);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].fabricId = 0ULL;
-                listHolder_0->mList[0].operationalCert =
+                listHolder_0->mList[0].member1 = 0ULL;
+                listHolder_0->mList[0].member2 =
                     chip::ByteSpan(chip::Uint8::from_const_char("Test0garbage: not in length on purpose"), 5);
 
-                listHolder_0->mList[1].fabricId = 1ULL;
-                listHolder_0->mList[1].operationalCert =
+                listHolder_0->mList[1].member1 = 1ULL;
+                listHolder_0->mList[1].member2 =
                     chip::ByteSpan(chip::Uint8::from_const_char("Test1garbage: not in length on purpose"), 5);
 
-                listHolder_0->mList[2].fabricId = 2ULL;
-                listHolder_0->mList[2].operationalCert =
+                listHolder_0->mList[2].member1 = 2ULL;
+                listHolder_0->mList[2].member2 =
                     chip::ByteSpan(chip::Uint8::from_const_char("Test2garbage: not in length on purpose"), 5);
 
-                listHolder_0->mList[3].fabricId = 3ULL;
-                listHolder_0->mList[3].operationalCert =
+                listHolder_0->mList[3].member1 = 3ULL;
+                listHolder_0->mList[3].member2 =
                     chip::ByteSpan(chip::Uint8::from_const_char("Test3garbage: not in length on purpose"), 5);
 
                 value = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>(

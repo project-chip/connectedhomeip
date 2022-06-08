@@ -2665,18 +2665,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricId = @(0);
+        _member1 = @(0);
 
-        _operationalCert = [NSData data];
+        _member2 = [NSData data];
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: fabricId:%@; operationalCert:%@; >", NSStringFromClass([self class]), _fabricId,
-                  [_operationalCert base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: member1:%@; member2:%@; >", NSStringFromClass([self class]),
+                                             _member1, [_member2 base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 

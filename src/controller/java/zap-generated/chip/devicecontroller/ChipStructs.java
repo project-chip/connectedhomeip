@@ -1825,23 +1825,23 @@ public class ChipStructs {
   }
 
   public static class TestClusterClusterTestListStructOctet {
-    public Long fabricId;
-    public byte[] operationalCert;
+    public Long member1;
+    public byte[] member2;
 
-    public TestClusterClusterTestListStructOctet(Long fabricId, byte[] operationalCert) {
-      this.fabricId = fabricId;
-      this.operationalCert = operationalCert;
+    public TestClusterClusterTestListStructOctet(Long member1, byte[] member2) {
+      this.member1 = member1;
+      this.member2 = member2;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("TestClusterClusterTestListStructOctet {\n");
-      output.append("\tfabricId: ");
-      output.append(fabricId);
+      output.append("\tmember1: ");
+      output.append(member1);
       output.append("\n");
-      output.append("\toperationalCert: ");
-      output.append(Arrays.toString(operationalCert));
+      output.append("\tmember2: ");
+      output.append(Arrays.toString(member2));
       output.append("\n");
       output.append("}\n");
       return output.toString();

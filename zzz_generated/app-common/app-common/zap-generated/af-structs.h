@@ -543,8 +543,8 @@ typedef struct _TargetStruct
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
-    chip::FabricId fabricId;
-    chip::ByteSpan operationalCert;
+    uint64_t member1;
+    chip::ByteSpan member2;
 } TestListStructOctet;
 
 // Struct for ThermostatScheduleTransition
