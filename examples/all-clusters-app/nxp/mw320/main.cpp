@@ -1057,7 +1057,7 @@ void task_test_main(void *param)
 			value = (uint16_t)is_on;
 			// sync-up the switch attribute:
 			PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-			emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t*)&value, sizeof(value), true, false);
+			emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t*)&value, sizeof(value), true, false);
 			need2sync_sw_attr = false;
 		}
 		// =============================
