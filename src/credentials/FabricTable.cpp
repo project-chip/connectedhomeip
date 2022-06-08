@@ -636,7 +636,7 @@ CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert,
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
     ReturnErrorOnFailure(SetOperationalKeypair(&opKey));
 
-    // NOTE: mVendorId and mFabricLabel d, because they are not used in tests.
+    // NOTE: mVendorId and mFabricLabel are not initialized, because they are not used in tests.
     return CHIP_NO_ERROR;
 }
 
@@ -901,7 +901,10 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 
 CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage, OperationalKeystore * operationalKeystore)
 {
-    VerifyOrReturnError(operationalKeystore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (operationalKeystore == nullptr)
+    {
+        ChipLogError(FabricProvisioning, "*** WARNING: No operational keystore provided: all FabricInfo must have Set*OperationalKey() called. ***");
+    }
     mOperationalKeystore = operationalKeystore;
     return Init(storage);
 }

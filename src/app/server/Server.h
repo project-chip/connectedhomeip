@@ -184,6 +184,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // PersistentStorageDelegate "software-based" operational key access injection
         if (this->operationalKeystore == nullptr)
         {
+            // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
+            //          for examples and for now.
             ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
             this->operationalKeystore = &sPersistentStorageOperationalKeystore;
         }
