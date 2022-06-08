@@ -8268,7 +8268,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 4293985551,
+          "code": 4294046991,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "client",
@@ -8320,7 +8320,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 4293985551,
+          "code": 4294046991,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "server",
@@ -19155,7 +19155,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 4293985551,
+          "code": 4294046991,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "client",
@@ -19327,7 +19327,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 4293985551,
+          "code": 4294046994294046991,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "server",
