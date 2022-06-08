@@ -29,11 +29,13 @@
 #include <app/CommandHandlerInterface.h>
 #include <zap-generated/endpoint_config.h>
 #include <lib/support/jsontlv/TlvJson.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace AppPlatform {
 
 using CommandHandlerInterface = chip::app::CommandHandlerInterface;
+using LaunchResponseType        = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
 const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
 {
@@ -62,38 +64,76 @@ const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::
 
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
 {
-    ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got called");
-    ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got called for endpoint %d ", handlerContext.mRequestPath.mEndpointId);
     if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT) {
         TLV::TLVReader readerForJson;
         readerForJson.Init(handlerContext.mPayload);
         
-        CHIP_ERROR err           = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
         Json::Value json;
         err = TlvToJson(readerForJson, json);
         if (err != CHIP_NO_ERROR) {
             // TODO : Add an interface to let the apps know a message came but there was a serialization error.
+            handlerContext.SetCommandNotHandled();
             return;
         }
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         UtfString jsonString(env, JsonToString(json).c_str());
 
-        // TODO : Remove payload from logs once development is done.
-        ChipLogProgress(Zcl, "ContentAppCommandDelegate::sendCommand with payload %s", JsonToString(json).c_str());
+        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s", JsonToString(json).c_str());
         
-        env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
+        jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
+                                                    static_cast<jint>(handlerContext.mRequestPath.mClusterId),
+                                                    static_cast<jint>(handlerContext.mRequestPath.mCommandId),
                                                     jsonString.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
             env->ExceptionDescribe();
             env->ExceptionClear();
-            // TODO : Need to have proper errors passed back.
+            FormatResponseData(handlerContext, "{\"value\":{}}");
+            return;
         }
-        // TODO : Change this when handling is fully done including response.
-        handlerContext.SetCommandNotHandled();
+        const char * respStr = env->GetStringUTFChars(resp, 0);
+        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr);
+        FormatResponseData(handlerContext, respStr);
     } else {
+        handlerContext.SetCommandNotHandled();
+    }
+}
+
+void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response) {
+    Json::Reader reader;
+    Json::Value resJson;
+    reader.parse(response, resJson);
+    Json::Value value = resJson["value"];
+
+    switch (handlerContext.mRequestPath.mClusterId)
+    {
+    case app::Clusters::ContentLauncher::Id: {
+        LaunchResponseType launchResponse;
+        if (value["0"].empty()) {
+            launchResponse.status = chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
+        } else {
+            launchResponse.status  = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value["0"].asInt());
+            if (!value["1"].empty()) {
+                launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value["1"].asCString()));
+            }
+        }
+        handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, launchResponse);
+        handlerContext.SetCommandHandled();
+        break;
+    }
+
+    // case app::Clusters::TargetNavigator::Id:
+    //     break;
+
+    // case app::Clusters::MediaPlayback::Id:
+    //     break;
+
+    // case app::Clusters::AccountLogin::Id:
+    //     break;
+    default:
         handlerContext.SetCommandNotHandled();
     }
 }

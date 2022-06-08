@@ -77,13 +77,15 @@ private:
                        ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
 
         mSendCommandMethod =
-            env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(ILjava/lang/String;)Ljava/lang/String;");
+            env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(IIILjava/lang/String;)Ljava/lang/String;");
         if (mSendCommandMethod == nullptr)
         {
             ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'sendCommand' method");
             env->ExceptionClear();
         }
     }
+
+    void FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response);
 
     jobject mContentAppEndpointManager = nullptr;
     jmethodID mSendCommandMethod       = nullptr;
