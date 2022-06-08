@@ -45,6 +45,8 @@ tests:
 
     - label: "Reads the Status attribute"
       PICS: PICS_SKIP_SAMPLE_APP
+      # This is nonsense: Application Launcher and Application Basic are never
+      # on the same endpoint.
       cluster: "Application Basic"
       command: "readAttribute"
       attribute: "Status"
