@@ -237,6 +237,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
+        params.operationalKeystore = _keystore;
         errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
