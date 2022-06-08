@@ -156,6 +156,8 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override {}
+
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;
     bool mOnReportEnd               = false;
