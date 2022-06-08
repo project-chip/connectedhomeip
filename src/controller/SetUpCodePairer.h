@@ -41,6 +41,8 @@
 
 #include <controller/DeviceDiscoveryDelegate.h>
 
+#include <queue>
+
 namespace chip {
 namespace Controller {
 
@@ -113,6 +115,10 @@ private:
     // actually failed or not.
     bool TryNextRendezvousParameters();
 
+    // True if we are still waiting on discovery to possibly produce new
+    // RendezvousParameters in the future.
+    bool DiscoveryInProgress() const;
+
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes
     {
@@ -151,17 +157,18 @@ private:
     // process happening via the relevant transport.
     bool mWaitingForDiscovery[kTransportTypeCount] = { false };
 
-    // HasPeerAddress() for a given transport type will test true if we have
-    // discovered an address for that transport and not tried connecting to it
-    // yet.  The general discovery/pairing process will terminate once all
-    // parameters test false for HasPeerAddress() and all the booleans in
-    // mWaitingForDiscovery are false.
-    RendezvousParameters mDiscoveredParameters[kTransportTypeCount];
+    // Queue of things we have discovered but not tried connecting to yet.  The
+    // general discovery/pairing process will terminate once this queue is empty
+    // and all the booleans in mWaitingForDiscovery are false.
+    std::queue<RendezvousParameters> mDiscoveredParameters;
 
     // mWaitingForPASE is true if we have called either
     // EstablishPASEConnection or PairDevice on mCommissioner and are now just
     // waiting to see whether that works.
     bool mWaitingForPASE = false;
+
+    // mLastPASEError is the error from the last OnPairingComplete call we got.
+    CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 };
 
 } // namespace Controller
