@@ -22,8 +22,8 @@
 #include "Command.h"
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
-#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 
 #pragma once
 

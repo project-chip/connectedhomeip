@@ -320,7 +320,7 @@ void DeviceControllerFactory::Shutdown()
         mSystemState = nullptr;
     }
     mFabricIndependentStorage = nullptr;
-    mOperationalKeystore = nullptr;
+    mOperationalKeystore      = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()

@@ -903,7 +903,8 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage, OperationalKey
 {
     if (operationalKeystore == nullptr)
     {
-        ChipLogError(FabricProvisioning, "*** WARNING: No operational keystore provided: all FabricInfo must have Set*OperationalKey() called. ***");
+        ChipLogError(FabricProvisioning,
+                     "*** WARNING: No operational keystore provided: all FabricInfo must have Set*OperationalKey() called. ***");
     }
     mOperationalKeystore = operationalKeystore;
     return Init(storage);
