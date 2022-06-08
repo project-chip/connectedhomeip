@@ -79,7 +79,7 @@ public:
         if (mDropAckResponse)
         {
             auto * rc = ec->GetReliableMessageContext();
-            if (rc->HasAckCounter())
+            if (rc->HasPiggybackAckPending())
             {
                 (void) rc->TakePendingPeerAckMessageCounter();
             }

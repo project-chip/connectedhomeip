@@ -125,7 +125,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
 
         bool wasAckPending = IsAckPending() && mPendingPeerAckMessageCounter != messageCounter;
 
-        bool messageCounterWasValid = HasAckCounter();
+        bool messageCounterWasValid = HasPiggybackAckPending();
 
         // Temporary store currently pending ack message counter (even if there is none).
         uint32_t tempAckMessageCounter = mPendingPeerAckMessageCounter;

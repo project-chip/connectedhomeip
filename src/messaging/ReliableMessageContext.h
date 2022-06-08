@@ -56,7 +56,7 @@ public:
 
     /**
      * Take the pending peer ack message counter from the context.  This must
-     * only be called when HasAckCounter() is true.  After this call,
+     * only be called when HasPiggybackAckPending() is true.  After this call,
      * IsAckPending() will be false; it's the caller's responsibility to send
      * the ack.
      */
@@ -70,7 +70,7 @@ public:
      * Check whether we have a valid message counter. The counter is valid once received a message with a request ack flag. It never
      * flips to false.
      */
-    bool HasAckCounter() const;
+    bool HasPiggybackAckPending() const;
 
     /**
      *  Send a SecureChannel::StandaloneAck message.
@@ -203,7 +203,7 @@ inline bool ReliableMessageContext::IsMessageNotAcked() const
     return mFlags.Has(Flags::kFlagMessageNotAcked);
 }
 
-inline bool ReliableMessageContext::HasAckCounter() const
+inline bool ReliableMessageContext::HasPiggybackAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
