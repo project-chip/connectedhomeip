@@ -254,7 +254,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         MoveToState(HandlerState::AwaitingReportResponse);
     }
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+
+    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err =
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                    Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
@@ -530,7 +531,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         err = path.GetEndpoint(&(event.mEndpointId));
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrReturnError(!event.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+            VerifyOrReturnError(!event.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
         }
         else if (err == CHIP_END_OF_TLV)
         {
@@ -541,7 +542,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         err = path.GetCluster(&(event.mClusterId));
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrReturnError(!event.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+            VerifyOrReturnError(!event.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
         }
         else if (err == CHIP_END_OF_TLV)
         {
@@ -556,7 +557,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         }
         else if (err == CHIP_NO_ERROR)
         {
-            VerifyOrReturnError(!event.HasWildcardEventId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+            VerifyOrReturnError(!event.HasWildcardEventId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
         }
         ReturnErrorOnFailure(err);
 

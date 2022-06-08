@@ -136,6 +136,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
     // No need to explicitly set the UDC port since we will use default
+    ChipLogProgress(Support, " ----- UDC listening on port %d", udcListenPort);
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(udcListenPort));
 
     // Initialize device attestation verifier
@@ -223,8 +224,6 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
-    CHIP_ERROR UpdateNetworkAddress();
-
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
@@ -237,12 +236,6 @@ private:
 
 PairingCommand gPairingCommand;
 NodeId gRemoteId = kTestDeviceNodeId;
-
-CHIP_ERROR PairingCommand::UpdateNetworkAddress()
-{
-    ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
-    return gCommissioner.UpdateDevice(gRemoteId);
-}
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
@@ -266,11 +259,6 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     else
     {
         ChipLogProgress(AppServer, "Pairing Failure: %s", ErrorStr(err));
-        // For some devices, it may take more time to appear on the network and become discoverable
-        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
-        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
-        // the `pairing` command it equals 120s).
-        // UpdateNetworkAddress();
     }
 }
 

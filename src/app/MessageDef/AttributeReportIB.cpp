@@ -32,7 +32,7 @@ namespace app {
 CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeReportIB =");
@@ -52,8 +52,8 @@ CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
         {
         case to_underlying(Tag::kAttributeStatus):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kAttributeStatus))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kAttributeStatus));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kAttributeStatus))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kAttributeStatus));
             {
                 AttributeStatusIB::Parser attributeStatus;
                 ReturnErrorOnFailure(attributeStatus.Init(reader));
@@ -65,8 +65,8 @@ CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kAttributeData):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kAttributeData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kAttributeData));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kAttributeData))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kAttributeData));
             {
                 AttributeDataIB::Parser attributeData;
                 ReturnErrorOnFailure(attributeData.Init(reader));
@@ -83,7 +83,7 @@ CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
@@ -91,15 +91,15 @@ CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
         const int CheckDataField   = 1 << to_underlying(Tag::kAttributeData);
         const int CheckStatusField = (1 << to_underlying(Tag::kAttributeStatus));
 
-        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusField) == CheckStatusField)
+        if ((tagPresenceMask & CheckDataField) == CheckDataField && (tagPresenceMask & CheckStatusField) == CheckStatusField)
         {
             // kAttributeData and kAttributeStatus both exist
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE;
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB;
         }
-        else if ((TagPresenceMask & CheckDataField) != CheckDataField && (TagPresenceMask & CheckStatusField) != CheckStatusField)
+        else if ((tagPresenceMask & CheckDataField) != CheckDataField && (tagPresenceMask & CheckStatusField) != CheckStatusField)
         {
             // kPath and kErrorStatus not exist
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE;
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB;
         }
         else
         {
@@ -108,8 +108,7 @@ CHIP_ERROR AttributeReportIB::Parser::CheckSchemaValidity() const
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -117,16 +116,14 @@ CHIP_ERROR AttributeReportIB::Parser::GetAttributeStatus(AttributeStatusIB::Pars
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeStatus)), reader));
-    ReturnErrorOnFailure(apAttributeStatus->Init(reader));
-    return CHIP_NO_ERROR;
+    return apAttributeStatus->Init(reader);
 }
 
 CHIP_ERROR AttributeReportIB::Parser::GetAttributeData(AttributeDataIB::Parser * const apAttributeData) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeData)), reader));
-    ReturnErrorOnFailure(apAttributeData->Init(reader));
-    return CHIP_NO_ERROR;
+    return apAttributeData->Init(reader);
 }
 
 AttributeStatusIB::Builder & AttributeReportIB::Builder::CreateAttributeStatus()

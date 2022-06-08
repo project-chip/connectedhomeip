@@ -655,6 +655,17 @@
 #endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
 
 /**
+ * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+ *
+ * @brief This enables logging of changes to the underlying reference count of
+ * SecureSession objects.
+ *
+ */
+#ifndef CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+#define CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING 0
+#endif
+
+/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
@@ -687,6 +698,17 @@
 #ifndef CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
 #define CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS 2
 #endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
+
+/**
+ *  @def CHIP_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER

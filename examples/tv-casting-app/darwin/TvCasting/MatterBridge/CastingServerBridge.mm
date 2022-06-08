@@ -16,9 +16,44 @@
  */
 
 #import "CastingServerBridge.h"
+#import "CastingServer.h"
+
+#include <lib/support/CHIPMem.h>
+#include <platform/PlatformManager.h>
 
 @implementation CastingServerBridge
 
++ (CastingServerBridge *)getSharedInstance
+{
+    static CastingServerBridge * instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[self alloc] init];
+    });
+    return instance;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        CHIP_ERROR err = chip::Platform::MemoryInit();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MemoryInit failed: %s", ErrorStr(err));
+            return nil;
+        }
+
+        err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
+            return nil;
+        }
+
+        CastingServer::GetInstance()->Init();
+    }
+    return self;
+}
+
+// TBD: placeholder will be replaced with true CastingServer functions
 - (int)add:(int)a secondNum:(int)b
 {
     return a + b;

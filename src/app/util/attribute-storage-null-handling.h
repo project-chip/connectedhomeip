@@ -18,6 +18,8 @@
 #pragma once
 
 #include <lib/core/CHIPTLV.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/TypeTraits.h>
 
 #include <limits>
@@ -169,6 +171,15 @@ struct NumericAttributeTraits<BitFlags<T>>
     }
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+};
+
+template <typename T>
+struct NumericAttributeTraits<BitMask<T>> : public NumericAttributeTraits<BitFlags<T>>
+{
+    using StorageType = T;
+    using WorkingType = BitMask<T>;
+
+    static constexpr WorkingType StorageToWorking(StorageType storageValue) { return WorkingType(storageValue); }
 };
 
 template <>

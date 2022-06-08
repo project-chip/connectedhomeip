@@ -33,6 +33,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
+#include <platform/BuildTime.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
@@ -150,6 +151,200 @@ static void TestConfigurationMgr_HardwareVersion(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, hardwareVer == 1234);
 }
 
+static int SnprintfBuildDate(char * s, size_t n, uint16_t year, uint8_t month, uint8_t day)
+{
+    // Print the calendar date to a human readable string as would
+    // given from the __DATE__ macro.
+    const char * monthString = nullptr;
+    switch (month)
+    {
+    case 1:
+        monthString = "Jan";
+        break;
+    case 2:
+        monthString = "Feb";
+        break;
+    case 3:
+        monthString = "Mar";
+        break;
+    case 4:
+        monthString = "Apr";
+        break;
+    case 5:
+        monthString = "May";
+        break;
+    case 6:
+        monthString = "Jun";
+        break;
+    case 7:
+        monthString = "Jul";
+        break;
+    case 8:
+        monthString = "Aug";
+        break;
+    case 9:
+        monthString = "Sep";
+        break;
+    case 10:
+        monthString = "Oct";
+        break;
+    case 11:
+        monthString = "Nov";
+        break;
+    case 12:
+        monthString = "Dec";
+        break;
+    }
+    if (monthString == nullptr)
+    {
+        return -1;
+    }
+    return snprintf(s, n, "%s %2u %u", monthString, day, year);
+}
+
+static int SnprintfBuildDate(char * s, size_t n, System::Clock::Seconds32 chipEpochBuildTime)
+{
+    // Convert to a calendar date-time.
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    ChipEpochToCalendarTime(chipEpochBuildTime.count(), year, month, day, hour, minute, second);
+    return SnprintfBuildDate(s, n, year, month, day);
+}
+
+static int SnprintfBuildTimeOfDay(char * s, size_t n, uint8_t hour, uint8_t minute, uint8_t second)
+{
+    // Print the time of day to a human readable string as would
+    // given from the __TIME__ macro.
+    return snprintf(s, n, "%02u:%02u:%02u", hour, minute, second);
+}
+
+static int SnprintfBuildTimeOfDay(char * s, size_t n, System::Clock::Seconds32 chipEpochBuildTime)
+{
+    // Convert to a calendar date-time.
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    ChipEpochToCalendarTime(chipEpochBuildTime.count(), year, month, day, hour, minute, second);
+    return SnprintfBuildTimeOfDay(s, n, hour, minute, second);
+}
+
+static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void * inContext)
+{
+    // Read the firmware build time from the configuration manager.
+    // This is referenced to the CHIP epoch.
+    System::Clock::Seconds32 chipEpochTime;
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime) == CHIP_NO_ERROR);
+
+    // Override the hard-coded build time with the setter and verify operation.
+    System::Clock::Seconds32 overrideValue = System::Clock::Seconds32(rand());
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().SetFirmwareBuildChipEpochTime(overrideValue) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, overrideValue == chipEpochTime);
+
+    // Verify that the BuildTime.h parser can parse current CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE / TIME.
+    do
+    {
+        const char * date      = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
+        const char * timeOfDay = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+
+        // Check that strings look good.
+        NL_TEST_ASSERT(inSuite, !BUILD_DATE_IS_BAD(date));
+        NL_TEST_ASSERT(inSuite, !BUILD_TIME_IS_BAD(timeOfDay));
+        if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
+        {
+            break;
+        }
+
+        // Parse.
+        uint16_t year  = COMPUTE_BUILD_YEAR(date);
+        uint8_t month  = COMPUTE_BUILD_MONTH(date);
+        uint8_t day    = COMPUTE_BUILD_DAY(date);
+        uint8_t hour   = COMPUTE_BUILD_HOUR(timeOfDay);
+        uint8_t minute = COMPUTE_BUILD_MIN(timeOfDay);
+        uint8_t second = COMPUTE_BUILD_SEC(timeOfDay);
+
+        // Print the date to a string as would be given by the __DATE__ macro.
+        char parsedDate[14] = { 0 }; // strlen("Jan 000 00000") == 13
+        {
+            int printed;
+            printed = SnprintfBuildDate(parsedDate, sizeof(parsedDate), year, month, day);
+            NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(parsedDate)));
+        }
+
+        // Print the time of day to a straing as would be given by the __TIME__ macro.
+        char parsedTimeOfDay[12] = { 0 }; // strlen("000:000:000") == 11
+        {
+            int printed;
+            printed = SnprintfBuildTimeOfDay(parsedTimeOfDay, sizeof(parsedTimeOfDay), hour, minute, second);
+            NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(parsedTimeOfDay)));
+        }
+
+        // Verify match.
+        NL_TEST_ASSERT(inSuite, strcmp(date, parsedDate) == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(timeOfDay, parsedTimeOfDay) == 0);
+    } while (0);
+
+    // Generate random chip epoch times and verify that our BuildTime.h parser
+    // macros also work for these.
+    for (int i = 0; i < 10000; ++i)
+    {
+        char date[14]      = { 0 }; // strlen("Jan 000 00000") == 13
+        char timeOfDay[12] = { 0 }; // strlen("000:000:000") == 11
+
+        chipEpochTime = System::Clock::Seconds32(rand());
+
+        // rand() will only give us [0, 0x7FFFFFFF].  Give us coverage for
+        // times in the upper half of the chip epoch time range as well.
+        chipEpochTime = i % 2 ? chipEpochTime : System::Clock::Seconds32(chipEpochTime.count() | 0x80000000);
+
+        // Print the date to a string as would be given by the __DATE__ macro.
+        {
+            int printed;
+            printed = SnprintfBuildDate(date, sizeof(date), chipEpochTime);
+            NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(date)));
+        }
+
+        // Print the time of day to a straing as would be given by the __TIME__ macro.
+        {
+            int printed;
+            printed = SnprintfBuildTimeOfDay(timeOfDay, sizeof(timeOfDay), chipEpochTime);
+            NL_TEST_ASSERT(inSuite, printed > 0 && printed < static_cast<int>(sizeof(timeOfDay)));
+        }
+
+        // Check that strings look good.
+        NL_TEST_ASSERT(inSuite, !BUILD_DATE_IS_BAD(date));
+        NL_TEST_ASSERT(inSuite, !BUILD_TIME_IS_BAD(timeOfDay));
+        if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
+        {
+            continue;
+        }
+
+        // Convert from chip epoch seconds to calendar time.
+        uint16_t year;
+        uint8_t month;
+        uint8_t day;
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
+        ChipEpochToCalendarTime(chipEpochTime.count(), year, month, day, hour, minute, second);
+
+        // Verify that our BuildTime.h macros can correctly parse the date / time strings.
+        NL_TEST_ASSERT(inSuite, year == COMPUTE_BUILD_YEAR(date));
+        NL_TEST_ASSERT(inSuite, month == COMPUTE_BUILD_MONTH(date));
+        NL_TEST_ASSERT(inSuite, day == COMPUTE_BUILD_DAY(date));
+        NL_TEST_ASSERT(inSuite, hour == COMPUTE_BUILD_HOUR(timeOfDay));
+        NL_TEST_ASSERT(inSuite, minute == COMPUTE_BUILD_MIN(timeOfDay));
+        NL_TEST_ASSERT(inSuite, second == COMPUTE_BUILD_SEC(timeOfDay));
+    }
+}
+
 static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -223,6 +418,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::UniqueId", TestConfigurationMgr_UniqueId),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
+    NL_TEST_DEF("Test ConfigurationMgr::FirmwareBuildTime", TestConfigurationMgr_FirmwareBuildTime),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
     NL_TEST_DEF("Test ConfigurationMgr::GetFailSafeArmed", TestConfigurationMgr_GetFailSafeArmed),

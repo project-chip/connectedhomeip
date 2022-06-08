@@ -548,6 +548,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -760,8 +762,16 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster GroupKeyManagement = 63 {
@@ -783,10 +793,52 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster KeypadInput = 1289 {
@@ -1540,6 +1592,7 @@ client cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1640,6 +1693,7 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
@@ -1706,12 +1760,16 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -2024,8 +2082,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2145,6 +2203,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute testEventTriggersEnabled;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2280,6 +2339,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2304,8 +2365,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type videoplayer = 35;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2399,8 +2460,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type speaker = 34;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2436,8 +2497,8 @@ endpoint 2 {
     callback attribute clusterRevision default = 1;
   }
 }
-
 endpoint 3 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2485,8 +2546,8 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 4 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2517,8 +2578,8 @@ endpoint 4 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 5 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2537,6 +2598,7 @@ endpoint 5 {
     callback attribute application;
     ram      attribute status;
     ram      attribute applicationVersion;
+    callback attribute allowedVendorList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

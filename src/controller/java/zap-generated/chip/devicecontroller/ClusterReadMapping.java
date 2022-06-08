@@ -11762,6 +11762,34 @@ public class ClusterReadMapping {
             readWindowCoveringTypeCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readTypeAttribute", readWindowCoveringTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWindowCoveringPhysicalClosedLimitLiftCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWindowCoveringPhysicalClosedLimitLiftAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WindowCoveringCluster) cluster)
+                  .readPhysicalClosedLimitLiftAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWindowCoveringPhysicalClosedLimitLiftCommandParams);
+    readWindowCoveringInteractionInfo.put(
+        "readPhysicalClosedLimitLiftAttribute",
+        readWindowCoveringPhysicalClosedLimitLiftAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWindowCoveringPhysicalClosedLimitTiltCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWindowCoveringPhysicalClosedLimitTiltAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WindowCoveringCluster) cluster)
+                  .readPhysicalClosedLimitTiltAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWindowCoveringPhysicalClosedLimitTiltCommandParams);
+    readWindowCoveringInteractionInfo.put(
+        "readPhysicalClosedLimitTiltAttribute",
+        readWindowCoveringPhysicalClosedLimitTiltAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readWindowCoveringCurrentPositionLiftCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readWindowCoveringCurrentPositionLiftAttributeInteractionInfo =
@@ -11792,6 +11820,34 @@ public class ClusterReadMapping {
     readWindowCoveringInteractionInfo.put(
         "readCurrentPositionTiltAttribute",
         readWindowCoveringCurrentPositionTiltAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWindowCoveringNumberOfActuationsLiftCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWindowCoveringNumberOfActuationsLiftAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WindowCoveringCluster) cluster)
+                  .readNumberOfActuationsLiftAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWindowCoveringNumberOfActuationsLiftCommandParams);
+    readWindowCoveringInteractionInfo.put(
+        "readNumberOfActuationsLiftAttribute",
+        readWindowCoveringNumberOfActuationsLiftAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWindowCoveringNumberOfActuationsTiltCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWindowCoveringNumberOfActuationsTiltAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WindowCoveringCluster) cluster)
+                  .readNumberOfActuationsTiltAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWindowCoveringNumberOfActuationsTiltCommandParams);
+    readWindowCoveringInteractionInfo.put(
+        "readNumberOfActuationsTiltAttribute",
+        readWindowCoveringNumberOfActuationsTiltAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readWindowCoveringConfigStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readWindowCoveringConfigStatusAttributeInteractionInfo =

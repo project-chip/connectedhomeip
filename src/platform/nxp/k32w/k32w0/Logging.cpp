@@ -157,6 +157,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME lwip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * LwIP log output function.
  */
@@ -169,6 +170,7 @@ extern "C" void ENFORCE_FORMAT(1, 2) LwIPLog(const char * msg, ...)
     GenericLog(msg, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 

@@ -25,7 +25,7 @@
 #include "WiFiManager.h"
 
 namespace {
-const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
+static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
     switch (state)
     {
@@ -38,7 +38,7 @@ const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
     }
 }
 
-const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
+static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
 {
     switch (state)
     {
@@ -51,7 +51,7 @@ const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
     }
 }
 
-const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
+static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
 {
     switch (state)
     {
@@ -70,7 +70,7 @@ const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
     }
 }
 
-const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
+static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
 {
     switch (state)
     {
@@ -83,7 +83,7 @@ const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
     }
 }
 
-const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
+static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
 {
     switch (state)
     {
@@ -96,7 +96,7 @@ const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
     }
 }
 
-const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
+static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -170,7 +170,7 @@ void WiFiManager::_IPConflictCb(char * mac, wifi_manager_ip_conflict_state_e ipC
 
 void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
@@ -186,7 +186,7 @@ void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
 
 void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
@@ -202,7 +202,7 @@ void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
 
 void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop          = (GMainLoop *) userData;
+    auto loop                 = reinterpret_cast<GMainLoop *>(userData);
     wifi_manager_ap_h foundAp = nullptr;
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
@@ -225,11 +225,11 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 
 bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
 {
-    bool cbRet                   = true;
-    int wifiErr                  = WIFI_MANAGER_ERROR_NONE;
-    char * essid                 = nullptr;
-    bool isPassphraseRequired    = false;
-    wifi_manager_ap_h * clonedAp = (wifi_manager_ap_h *) userData;
+    bool cbRet                = true;
+    int wifiErr               = WIFI_MANAGER_ERROR_NONE;
+    char * essid              = nullptr;
+    bool isPassphraseRequired = false;
+    auto clonedAp             = reinterpret_cast<wifi_manager_ap_h *>(userData);
 
     wifiErr = wifi_manager_ap_get_essid(ap, &essid);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
@@ -262,7 +262,7 @@ exit:
 
 void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    GMainLoop * loop = (GMainLoop *) userData;
+    auto loop = reinterpret_cast<GMainLoop *>(userData);
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
@@ -665,8 +665,8 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     bool dbusAsyncErr         = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, kMaxWiFiSSIDLength + 1);
-    g_strlcpy(sInstance.mWiFiKey, key, kMaxWiFiKeyLength + 1);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
+    g_strlcpy(sInstance.mWiFiKey, key, sizeof(sInstance.mWiFiKey));
 
     wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
@@ -705,7 +705,7 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, kMaxWiFiSSIDLength + 1);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
 
     wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;

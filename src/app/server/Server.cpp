@@ -125,6 +125,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
 
+    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
@@ -255,6 +257,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
+            .certificateValidityPolicy = mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
@@ -266,8 +269,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err =
-        mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
+                                                    mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -345,9 +348,13 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
+
+    chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    mMessageCounterManager.Shutdown();
     CHIP_ERROR err = mExchangeMgr.Shutdown();
     if (err != CHIP_NO_ERROR)
     {
@@ -355,11 +362,10 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
-
+    mAccessControl.Finish();
+    Credentials::SetGroupDataProvider(nullptr);
     mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
-    mCASESessionManager.Shutdown();
-
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

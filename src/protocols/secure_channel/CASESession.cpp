@@ -147,9 +147,10 @@ void CASESession::Clear()
     // TODO we need to use the fabric table provided after Tennessee's PR.
     //mFabricTable->RemoveFabricDelegate(&mFabricDelegate);
 
-    mLocalNodeId = kUndefinedNodeId;
-    mPeerNodeId  = kUndefinedNodeId;
-    mFabricInfo  = nullptr;
+    mLocalNodeId  = kUndefinedNodeId;
+    mPeerNodeId   = kUndefinedNodeId;
+    mFabricsTable = nullptr;
+    mFabricIndex  = kUndefinedFabricIndex;
 }
 
 void CASESession::InvalidateIfPendingEstablishment()
@@ -162,7 +163,8 @@ void CASESession::InvalidateIfPendingEstablishment()
     AbortPendingEstablish(CHIP_ERROR_CANCELLED);
 }
 
-CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                             SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -181,6 +183,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    mValidContext.mValidityPolicy = policy;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -193,34 +196,40 @@ exit:
 CHIP_ERROR
 CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
                                            SessionResumptionStorage * sessionResumptionStorage,
-                                           SessionEstablishmentDelegate * delegate,
+                                           Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(sessionManager, delegate));
+    ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
 
     mRole                     = CryptoContext::SessionRole::kResponder;
     mFabricsTable             = fabrics;
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
 
-    ChipLogDetail(SecureChannel, "Waiting for Sigma1 msg");
+    ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
+                  mSecureSessionHolder.Get().Value()->AsSecureSession());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
-                                         ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                                         SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
+CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, FabricIndex fabricIndex,
+                                         NodeId peerNodeId, ExchangeContext * exchangeCtxt,
+                                         SessionResumptionStorage * sessionResumptionStorage,
+                                         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+                                         Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    FabricInfo * fabricInfo = nullptr;
 
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(fabricIndex == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex)) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(sessionManager, delegate);
+    err = Init(sessionManager, policy, delegate);
 
     mRole = CryptoContext::SessionRole::kInitiator;
 
@@ -232,16 +241,17 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
-    mFabricInfo               = fabric;
+    mFabricsTable             = fabricTable;
+    mFabricIndex              = fabricIndex;
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     mPeerNodeId  = peerNodeId;
-    mLocalNodeId = fabric->GetNodeId();
+    mLocalNodeId = fabricInfo->GetNodeId();
 
     ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
-                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
+                    static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
     err = SendSigma1();
     SuccessOrExit(err);
@@ -317,9 +327,8 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
 CHIP_ERROR CASESession::RecoverInitiatorIpk()
 {
     Credentials::GroupDataProvider::KeySet ipkKeySet;
-    FabricIndex fabricIndex = mFabricInfo->GetFabricIndex();
 
-    CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricIndex, ipkKeySet);
+    CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(mFabricIndex, ipkKeySet);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -366,6 +375,10 @@ CHIP_ERROR CASESession::SendSigma1()
     TLV::TLVType outerContainerType                    = TLV::kTLVType_NotSpecified;
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
+    // Lookup fabric info.
+    auto fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     // Validate that we have a session ID allocated.
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -386,16 +399,14 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId().Value()));
     // Generate a Destination Identifier based on the node we are attempting to reach
     {
-        ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
         // Obtain originator IPK matching the fabric where we are trying to open a session. mIPK
         // will be properly set thereafter.
         ReturnErrorOnFailure(RecoverInitiatorIpk());
 
-        FabricId fabricId = mFabricInfo->GetFabricId();
+        FabricId fabricId = fabricInfo->GetFabricId();
         uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
         Credentials::P256PublicKeySpan rootPubKeySpan(rootPubKeyBuf);
-        ReturnErrorOnFailure(mFabricInfo->GetRootPubkey(rootPubKeySpan));
+        ReturnErrorOnFailure(fabricInfo->GetRootPubkey(rootPubKeySpan));
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId,
@@ -416,7 +427,7 @@ CHIP_ERROR CASESession::SendSigma1()
     bool resuming = false;
     if (mSessionResumptionStorage != nullptr)
     {
-        CHIP_ERROR err = mSessionResumptionStorage->FindByScopedNodeId(mFabricInfo->GetScopedNodeIdForNode(mPeerNodeId),
+        CHIP_ERROR err = mSessionResumptionStorage->FindByScopedNodeId(fabricInfo->GetScopedNodeIdForNode(mPeerNodeId),
                                                                        mResumeResumptionId, mSharedSecret, mPeerCATs);
         if (err == CHIP_NO_ERROR)
         {
@@ -497,7 +508,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);
                 CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
-                mFabricInfo  = &fabricInfo;
+                mFabricIndex = fabricInfo.GetFabricIndex();
                 mLocalNodeId = nodeId;
                 break;
             }
@@ -515,8 +526,8 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
 CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                          ByteSpan initiatorRandom)
 {
-    if (mSessionResumptionStorage == nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mSessionResumptionStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     SessionResumptionStorage::ConstResumptionIdView resumptionIdSpan(resumptionId);
     ScopedNodeId node;
@@ -526,12 +537,12 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
     ReturnErrorOnFailure(
         ValidateSigmaResumeMIC(resume1MIC, initiatorRandom, resumptionId, ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce)));
 
-    mFabricInfo = mFabricsTable->FindFabricWithIndex(node.GetFabricIndex());
-    if (mFabricInfo == nullptr)
-        return CHIP_ERROR_INTERNAL;
+    auto fabricInfo = mFabricsTable->FindFabricWithIndex(node.GetFabricIndex());
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    mFabricIndex = node.GetFabricIndex();
     mPeerNodeId  = node.GetNodeId();
-    mLocalNodeId = mFabricInfo->GetNodeId();
+    mLocalNodeId = fabricInfo->GetNodeId();
 
     return CHIP_NO_ERROR;
 }
@@ -585,9 +596,9 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
-                        static_cast<unsigned>(mFabricInfo->GetFabricIndex()), ChipLogValueX64(mLocalNodeId));
+                        static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId));
 
-        // Side-effect of FindLocalNodeFromDestionationId success was that mFabricInfo/mLocalNodeId are now
+        // Side-effect of FindLocalNodeFromDestionationId success was that mFabricIndex/mLocalNodeId are now
         // set to the local fabric and associated NodeId that was targeted by the initiator.
     }
     else
@@ -678,14 +689,15 @@ CHIP_ERROR CASESession::SendSigma2()
     MATTER_TRACE_EVENT_SCOPE("SendSigma2", "CASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrReturnError(mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    auto fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ByteSpan icaCert;
-    ReturnErrorOnFailure(mFabricInfo->GetICACert(icaCert));
+    ReturnErrorOnFailure(fabricInfo->GetICACert(icaCert));
 
     ByteSpan nocCert;
-    ReturnErrorOnFailure(mFabricInfo->GetNOCCert(nocCert));
+    ReturnErrorOnFailure(fabricInfo->GetNOCCert(nocCert));
 
     // Fill in the random value
     uint8_t msg_rand[kSigmaParamRandomNumberSize];
@@ -721,11 +733,11 @@ CHIP_ERROR CASESession::SendSigma2()
                                           ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msg_R2_Signed.Get(), msg_r2_signed_len));
 
     // Generate a Signature
-    VerifyOrReturnError(mFabricInfo->GetOperationalKey() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricInfo->GetOperationalKey() != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     P256ECDSASignature tbsData2Signature;
     ReturnErrorOnFailure(
-        mFabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
+        fabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
 
     msg_R2_Signed.Free();
 
@@ -1039,7 +1051,8 @@ exit:
 CHIP_ERROR CASESession::SendSigma3()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    FabricInfo * fabricInfo = nullptr;
 
     MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferHandle msg_R3;
@@ -1062,10 +1075,12 @@ CHIP_ERROR CASESession::SendSigma3()
     ByteSpan icaCert;
     ByteSpan nocCert;
 
-    VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = mFabricInfo->GetICACert(icaCert));
-    SuccessOrExit(err = mFabricInfo->GetNOCCert(nocCert));
+    SuccessOrExit(err = fabricInfo->GetICACert(icaCert));
+    SuccessOrExit(err = fabricInfo->GetNOCCert(nocCert));
 
     // Prepare Sigma3 TBS Data Blob
     msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
@@ -1076,8 +1091,8 @@ CHIP_ERROR CASESession::SendSigma3()
                                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msg_R3_Signed.Get(), msg_r3_signed_len));
 
     // Generate a signature
-    VerifyOrExit(mFabricInfo->GetOperationalKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mFabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
+    VerifyOrExit(fabricInfo->GetOperationalKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = fabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
     SuccessOrExit(err);
 
     // Prepare Sigma3 TBE Data Blob
@@ -1423,15 +1438,17 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
                                              Crypto::P256PublicKey & peerPublicKey)
 {
-    ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mFabricsTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    auto fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
     PeerId peerId;
     FabricId peerNOCFabricId;
-    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerId, peerNOCFabricId, peerPublicKey));
+    ReturnErrorOnFailure(fabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerId, peerNOCFabricId, peerPublicKey));
 
-    VerifyOrReturnError(mFabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    VerifyOrReturnError(fabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     peerNodeId = peerId.GetNodeId();
 
@@ -1468,39 +1485,41 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::GetHardcodedTime()
-{
-    using namespace ASN1;
-    ASN1UniversalTime effectiveTime;
-
-    effectiveTime.Year   = 2022;
-    effectiveTime.Month  = 1;
-    effectiveTime.Day    = 1;
-    effectiveTime.Hour   = 10;
-    effectiveTime.Minute = 10;
-    effectiveTime.Second = 10;
-
-    return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
-}
-
 CHIP_ERROR CASESession::SetEffectiveTime()
 {
-    System::Clock::Milliseconds64 currentTimeMS;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+    System::Clock::Milliseconds64 currentUnixTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
 
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel,
-                     "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup "
-                     "failures. API error: %" CHIP_ERROR_FORMAT,
-                     err.Format());
-        // TODO: Remove use of hardcoded time during CASE setup
-        return GetHardcodedTime();
+        // If the system has given us a wall clock time, we must use it or
+        // fail.  Conversion failures here are therefore always an error.
+        System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+        ReturnErrorOnFailure(mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime));
     }
-
-    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
-    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
-
+    else
+    {
+        // If we don't have wall clock time, the spec dictates that we should
+        // fall back to Last Known Good Time.  Ultimately, the calling application's
+        // validity policy will determine whether this is permissible.
+        System::Clock::Seconds32 lastKnownGoodChipEpochTime;
+        ChipLogError(SecureChannel,
+                     "The device does not support GetClock_RealTimeMS() API: %" CHIP_ERROR_FORMAT
+                     ".  Falling back to Last Known Good UTC Time",
+                     err.Format());
+        VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // If we have no time available, the Validity Policy will
+            // determine what to do.
+            ChipLogError(SecureChannel, "Failed to retrieve Last Known Good UTC Time");
+        }
+        else
+        {
+            mValidContext.SetEffectiveTime<LastKnownGoodChipEpochTime>(lastKnownGoodChipEpochTime);
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -1669,6 +1688,15 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     CHIP_ERROR err                            = ValidateReceivedMessage(ec, payloadHeader, msg);
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
+
+#if CHIP_CONFIG_SLOW_CRYPTO
+    if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
+        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
+        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3)
+    {
+        SuccessOrExit(mExchangeCtxt->FlushAcks());
+    }
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
     // By default, CHIP_ERROR_INVALID_MESSAGE_TYPE is returned if in the current state
     // a message handler is not defined for the received message type.

@@ -78,3 +78,30 @@ config options for setting software version.
 Matter OTA image can also be generated using
 [ota_image_tool.py](https://github.com/project-chip/connectedhomeip/blob/master/src/app/ota_image_tool.py)
 script.
+
+## Using the RPC console
+
+Enable RPCs in the build using menuconfig:
+
+    $ idf.py menuconfig
+
+Enable the RPC library:
+
+    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+
+After flashing a build with RPCs enabled you can use the rpc console to send
+commands to the device.
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+-   Start the console
+
+```
+    chip-console --device /dev/ttyUSB0
+```
+
+-   From within the console you can then invoke rpcs:
+
+```
+    rpcs.chip.rpc.Device.TriggerOta()
+```

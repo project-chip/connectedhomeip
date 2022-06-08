@@ -47,19 +47,17 @@ tests:
               maxValue: 10000
 
     - label:
-          "1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"
+          "1b 1c: If (PA_LF & LF) TH reads CurrentPositionTiltPercentage from
+          DUT + assert CurrentPositionTiltPercent100ths/100 equals
+          CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONTILTPERCENTAGE
       response:
-          saveAs: attrCurrentPositionTiltPercentage
+          value: attrCurrentPositionTiltPercent100ths / 100
           constraints:
               minValue: 0
               maxValue: 100
-
-    ##- label: "1c: If (PA_TL & TL) TH assert CurrentPositionTiltPercent100ths/100 equals CurrentPositionTiltPercentage"
-    ##  PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
-    # TODO [TC_WNCV_4_4] WindowCovering Fix this arithmetic operation issue #15190
 
     ######## Command BadParams 1 #######
     ### Step 2x -> Verify the GoToTiltPercentage with a BadParam

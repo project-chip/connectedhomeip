@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include <BoltLockManager.h>
+#include <LockManager.h>
 #include <lib/shell/commands/Help.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -65,25 +65,25 @@ CHIP_ERROR AppCommandLockHandler(int argc, char * argv[])
 {
     if (argc == 0)
     {
-        streamer_printf(streamer_get(), "The lock is %s\n", BoltLockMgr().IsUnlocked() ? "unlocked" : "locked");
+        streamer_printf(streamer_get(), "The lock is %s\n", LockMgr().NextState() ? "unlocked" : "locked");
     }
     else if (strcmp(argv[0], "on") == 0)
     {
         streamer_printf(streamer_get(), "Lock ...\n");
-        BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_APP_CMD, BoltLockManager::LOCK_ACTION);
+        LockMgr().InitiateAction(LockManager::ACTOR_APP_CMD, LockManager::LOCK_ACTION);
     }
     else if (strcmp(argv[0], "off") == 0)
     {
         streamer_printf(streamer_get(), "Unlock ...\n");
-        BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_BUTTON, BoltLockManager::UNLOCK_ACTION);
+        LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, LockManager::UNLOCK_ACTION);
     }
     else if (strcmp(argv[0], "toggle") == 0)
     {
         streamer_printf(streamer_get(), "Toggling the lock ...\n");
-        if (BoltLockMgr().IsUnlocked())
-            BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_APP_CMD, BoltLockManager::LOCK_ACTION);
+        if (LockMgr().NextState())
+            LockMgr().InitiateAction(LockManager::ACTOR_APP_CMD, LockManager::LOCK_ACTION);
         else
-            BoltLockMgr().InitiateAction(BoltLockManager::ACTOR_BUTTON, BoltLockManager::UNLOCK_ACTION);
+            LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, LockManager::UNLOCK_ACTION);
     }
     else
     {

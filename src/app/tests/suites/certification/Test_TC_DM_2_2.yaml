@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.2. [TC-DM-2.2] Operational Credential Attributes
+name: 10.2.2. [TC-DM-2.2] Basic Information Cluster Events
 
 config:
     nodeId: 0x12344321

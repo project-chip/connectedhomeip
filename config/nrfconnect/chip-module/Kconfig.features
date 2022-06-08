@@ -93,6 +93,12 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 
 if SOC_SERIES_NRF53X
 
+# FLASH nop device is enabled to prevent bus faults when mcumgr tries to access
+# simulated partition with network core image data.
+config FLASH_NOP_DEVICE
+	bool
+	default y
+
 # Enable custom SMP request to erase settings partition.
 config MCUMGR_GRP_ZEPHYR_BASIC
 	bool

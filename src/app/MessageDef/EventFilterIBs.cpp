@@ -29,8 +29,7 @@ namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    size_t numEventFilters = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventFilterIBs =");
@@ -49,25 +48,18 @@ CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(eventFilter.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++numEventFilters;
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one event filter
-        if (numEventFilters > 0)
-        {
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 

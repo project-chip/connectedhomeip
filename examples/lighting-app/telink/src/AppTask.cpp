@@ -86,6 +86,8 @@ CHIP_ERROR AppTask::Init()
     LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
 
+    UpdateStatusLED();
+
     InitButtons();
 
     // Init lighting manager
@@ -108,6 +110,11 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    // Add CHIP event handler and start CHIP thread.
+    // Note that all the initialization code should happen prior to this point to avoid data races
+    // between the main and the CHIP threads.
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
     if (ret != CHIP_NO_ERROR)
@@ -139,37 +146,6 @@ CHIP_ERROR AppTask::StartApp()
         {
             DispatchEvent(&event);
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack.  Because the
-        // CHIP event loop is being run in a separate task, the stack must be locked
-        // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
-        // task is busy (e.g. with a long crypto operation).
-
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        if (sIsThreadProvisioned && sIsThreadEnabled)
-        {
-            if (sIsThreadAttached)
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else
-            {
-                sStatusLED.Blink(100, 100);
-            }
-        }
-        else
-        {
-            sStatusLED.Blink(50, 950);
         }
 
         sStatusLED.Animate();
@@ -279,6 +255,52 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
+    }
+}
+
+void AppTask::UpdateStatusLED()
+{
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        if (sIsThreadAttached)
+        {
+            sStatusLED.Blink(950, 50);
+        }
+        else
+        {
+            sStatusLED.Blink(100, 100);
+        }
+    }
+    else
+    {
+        sStatusLED.Blink(50, 950);
+    }
+}
+
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+        sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+        sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
+        break;
+    default:
+        break;
     }
 }
 

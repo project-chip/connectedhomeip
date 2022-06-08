@@ -442,6 +442,16 @@ size_t xPortGetMinimumEverFreeHeapSize(void)
 {
     return xMinimumEverFreeBytesRemaining;
 }
+
+void xPortResetHeapMinimumEverFreeHeapSize(void)
+{
+    taskENTER_CRITICAL();
+    {
+        xMinimumEverFreeBytesRemaining = xFreeBytesRemaining;
+    }
+    taskEXIT_CRITICAL();
+}
+
 /*-----------------------------------------------------------*/
 
 void vPortInitialiseBlocks(void)

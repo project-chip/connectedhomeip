@@ -1,0 +1,78 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 51.2.3. [TC-DGWIFI-2.3] Command received functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #issue #13645
+    # Also, ResetCounts may not work on some platforms yet?
+    # And on Linux since we don't have actual Wi-Fi these error out.
+    - label: "TH sends ResetCounts command to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "ResetCounts"
+
+    - label: "Reads BeaconLostCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BeaconLostCount"
+      response:
+          value: 0
+
+    - label: "Reads BeaconRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BeaconRxCount"
+      response:
+          value: 0
+
+    - label: "Reads PacketMulticastRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketMulticastRxCount"
+      response:
+          value: 0
+
+    - label: "Reads PacketMulticastTxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketMulticastTxCount"
+      response:
+          value: 0
+
+    - label: "Reads PacketUnicastRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketUnicastRxCount"
+      response:
+          value: 0
+
+    - label: "Reads PacketUnicastTxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketUnicastTxCount"
+      response:
+          value: 0

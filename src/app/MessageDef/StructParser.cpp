@@ -23,8 +23,7 @@ CHIP_ERROR StructParser::Init(const TLV::TLVReader & aReader)
     mReader.Init(aReader);
     VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    ReturnErrorOnFailure(CheckSchemaOrdering());
-    return CHIP_NO_ERROR;
+    return CheckSchemaOrdering();
 }
 
 CHIP_ERROR StructParser::CheckSchemaOrdering() const

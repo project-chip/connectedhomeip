@@ -67,7 +67,7 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
 {
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress, false);
 
-    ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricInfo->GetFabricIndex());
+    ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricIndex);
     auto sessionHandle =
         mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
     if (!sessionHandle.HasValue())
@@ -211,9 +211,9 @@ void OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & add
 
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
-    mCASEClient = mInitParams.clientPool->Allocate(
-        CASEClientInitParams{ mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.exchangeMgr,
-                              mFabricInfo, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
+        mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
+        mInitParams.exchangeMgr, mFabricTable, mFabricIndex, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
@@ -352,7 +352,7 @@ void OperationalDeviceProxy::OnSessionHang()
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy()
