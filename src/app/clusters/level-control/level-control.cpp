@@ -52,6 +52,8 @@
 
 #include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/PlatformManager.h>
+#include <platform/DeviceControlServer.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
@@ -129,14 +131,32 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint)
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
+typedef struct
+{
+    bool isActive;
+    chip::DeviceLayer::AsyncWorkFunct callback;
+    chip::EndpointId endpoint;
+} MatterEventContext;
+
+static MatterEventContext events[FIXED_ENDPOINT_COUNT];
+
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
-    emberAfScheduleServerTickExtended(endpoint, LevelControl::Id, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
+    events[endpoint].isActive = true;
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(delayMs),
+        [](chip::System::Layer *, void * callbackContext) {
+          auto eventContext = reinterpret_cast<MatterEventContext*>(callbackContext);
+          if (eventContext->callback && eventContext->isActive) {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(eventContext->callback,
+              reinterpret_cast<intptr_t>(&eventContext->endpoint));
+          }
+        }, &events[endpoint]);
 }
 
 static void deactivate(EndpointId endpoint)
 {
-    emberAfDeactivateServerTick(endpoint, LevelControl::Id);
+    events[endpoint].isActive = false;
 }
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
@@ -166,8 +186,10 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
+void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
 {
+    auto endpoint = *reinterpret_cast<EndpointId*>(endpointPtr);
+
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -1117,6 +1139,12 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
-void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint)
+{
+    VerifyOrDie(endpoint < FIXED_ENDPOINT_COUNT);
+    events[endpoint] = { .isActive = false,
+                         .callback = emberAfLevelControlClusterServerTickCallback,
+                         .endpoint = endpoint};
+}
 
 void MatterLevelControlPluginServerInitCallback() {}
