@@ -113,14 +113,6 @@ bool CheckForSuccess(GenericContext * context, int err, const char * func, bool 
     return true;
 }
 
-CHIP_ERROR UpdateTXTRecord(RegisterContext * rCtx, TextEntry * textEntries, size_t textEntrySize)
-{
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-
-    // TODO
-    return CHIP_NO_ERROR;
-}
-
 void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
 {
     auto rCtx = reinterpret_cast<RegisterContext *>(data);
@@ -545,7 +537,21 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
             });
         if (iServiceCtx != mRegisteredServices.end())
         {
-            return UpdateTXTRecord(iServiceCtx->get(), service.mTextEntries, service.mTextEntrySize);
+            ChipLogDetail(DeviceLayer, "DNSsd %s: Updating TXT records", __func__);
+            auto serviceHandle = iServiceCtx->get()->mServiceHandle;
+            for (size_t i = 0; i < service.mTextEntrySize; ++i)
+            {
+                TextEntry entry = service.mTextEntries[i];
+                VerifyOrReturnError(chip::CanCastTo<unsigned short>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
+                auto dataSize = static_cast<unsigned short>(entry.mDataSize);
+                int ret       = dnssd_service_add_txt_record(serviceHandle, entry.mKey, dataSize, entry.mData);
+                if (ret != DNSSD_ERROR_NONE)
+                {
+                    ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret);
+                    callback(context, nullptr, err = GetChipError(ret));
+                }
+            }
+            return err;
         }
     }
 
@@ -557,15 +563,16 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     }
 
     // Local service will be freed by the RegisterContext destructor
-    int ret = dnssd_create_local_service(type.c_str(), &serviceCtx->mServiceHandle);
+    int ret            = dnssd_create_local_service(type.c_str(), &serviceCtx->mServiceHandle);
+    auto serviceHandle = serviceCtx->mServiceHandle;
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  (ChipLogError(DeviceLayer, "dnssd_create_local_service() failed. ret: %d", ret), err = GetChipError(ret)));
 
-    ret = dnssd_service_set_name(serviceCtx->mServiceHandle, service.mName);
+    ret = dnssd_service_set_name(serviceHandle, service.mName);
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  (ChipLogError(DeviceLayer, "dnssd_service_set_name() failed. ret: %d", ret), err = GetChipError(ret)));
 
-    ret = dnssd_service_set_port(serviceCtx->mServiceHandle, service.mPort);
+    ret = dnssd_service_set_port(serviceHandle, service.mPort);
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  (ChipLogError(DeviceLayer, "dnssd_service_set_port() failed. ret: %d", ret), err = GetChipError(ret)));
 
@@ -574,7 +581,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
                      (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), err = CHIP_ERROR_INTERNAL));
-        ret = dnssd_service_set_interface(serviceCtx->mServiceHandle, iface);
+        ret = dnssd_service_set_interface(serviceHandle, iface);
         VerifyOrExit(ret == DNSSD_ERROR_NONE,
                      (ChipLogError(DeviceLayer, "dnssd_service_set_interface() failed. ret: %d", ret), err = GetChipError(ret)));
     }
@@ -583,8 +590,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     {
         TextEntry entry = service.mTextEntries[i];
         VerifyOrReturnError(chip::CanCastTo<unsigned short>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
-        ret = dnssd_service_add_txt_record(serviceCtx->mServiceHandle, entry.mKey, static_cast<unsigned short>(entry.mDataSize),
-                                           entry.mData);
+        ret = dnssd_service_add_txt_record(serviceHandle, entry.mKey, static_cast<unsigned short>(entry.mDataSize), entry.mData);
         VerifyOrExit(ret == DNSSD_ERROR_NONE,
                      (ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret), err = GetChipError(ret)));
     }
