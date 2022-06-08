@@ -28,7 +28,7 @@ network.
     -   [Notes](#detokenizer-notes)
     -   [Known issues](#detokenizer-known-issues)
 -   [Tinycrypt ECC operations](#tinycrypt)
-    -   [Building steps](#tinycryptbuildingsteps)
+    -   [Building steps](#tinycrypt-building-steps)
 -   [OTA](#ota)
 
     -   [Writing the SSBL](#ssbl)
@@ -309,7 +309,7 @@ unplug and plug the board and then rerun the script.
 
 ## Tinycrypt ECC operations
 
-<a name="tinycryptbuildingsteps"></a>
+<a name="tinycrypt-building-steps"></a>
 
 ### Building steps
 
@@ -318,8 +318,8 @@ Note: This solution is temporary.
 In order to use the tinycrypt ecc operations, use the following build arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled
-    (_mbedtls_use_tinycrypt=true_) and with the NXPmicro/mbedtls library
-    (_mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"_).
+    (_mbedtls_use_tinycrypt=true_) and with the `NXPmicro/mbedtls` library
+    (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
 
 To disable tinycrypt ecc operations, simply build without
 _mbedtls_use_tinycrypt=true_ and without _mbedtls_repo_.
