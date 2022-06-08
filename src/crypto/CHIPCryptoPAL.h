@@ -227,7 +227,8 @@ public:
 
     virtual bool Matches(const ECPKey<Sig> & other) const
     {
-        return (this->Length() == other.Length()) && IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
+        return (this->Length() == other.Length()) &&
+            IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
     }
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;

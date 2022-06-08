@@ -174,7 +174,7 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
 
     DefaultStorageKeyAllocator keyAlloc;
     uint16_t keySize = 0;
-    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), nullptr, keySize);
+    CHIP_ERROR err   = mStorage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), nullptr, keySize);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {

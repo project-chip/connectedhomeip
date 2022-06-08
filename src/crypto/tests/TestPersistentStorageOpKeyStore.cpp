@@ -18,6 +18,7 @@
 
 #include <inttypes.h>
 
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -25,7 +26,6 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <crypto/PersistentStorageOperationalKeystore.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -37,7 +37,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     TestPersistentStorageDelegate storageDelegate;
     PersistentStorageOperationalKeystore opKeystore;
 
-    FabricIndex kFabricIndex = 111;
+    FabricIndex kFabricIndex    = 111;
     FabricIndex kBadFabricIndex = kFabricIndex + 10;
 
     // Failure before Init
@@ -52,7 +52,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
 
     // Can generate a key and get a CSR
     uint8_t csrBuf[kMAX_CSR_Length];
-    MutableByteSpan csrSpan{csrBuf};
+    MutableByteSpan csrSpan{ csrBuf };
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
@@ -64,8 +64,8 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, csrPublicKey1.Matches(csrPublicKey1));
 
     // Can regenerate a second CSR and it has different PK
-    csrSpan = MutableByteSpan{csrBuf};
-    err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
+    csrSpan = MutableByteSpan{ csrBuf };
+    err     = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
 
@@ -75,12 +75,12 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !csrPublicKey1.Matches(csrPublicKey2));
 
     // Fail to generate CSR for invalid fabrics
-    csrSpan = MutableByteSpan{csrBuf};
-    err = opKeystore.NewOpKeypairForFabric(kUndefinedFabricIndex, csrSpan);
+    csrSpan = MutableByteSpan{ csrBuf };
+    err     = opKeystore.NewOpKeypairForFabric(kUndefinedFabricIndex, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    csrSpan = MutableByteSpan{csrBuf};
-    err = opKeystore.NewOpKeypairForFabric(kMaxValidFabricIndex + 1, csrSpan);
+    csrSpan = MutableByteSpan{ csrBuf };
+    err     = opKeystore.NewOpKeypairForFabric(kMaxValidFabricIndex + 1, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // No storage done by NewOpKeypairForFabric
@@ -104,10 +104,10 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
     NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
 
-    uint8_t message[] = {1, 2, 3, 4};
+    uint8_t message[] = { 1, 2, 3, 4 };
     P256ECDSASignature sig1;
     // Before successful activation, cannot sign
-    err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{message}, sig1);
+    err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message }, sig1);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Activating with matching fabricIndex and matching public key succeeds
@@ -122,11 +122,11 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
 
     // Can't sign for wrong fabric after activation
     P256ECDSASignature sig2;
-    err = opKeystore.SignWithOpKeypair(kBadFabricIndex, ByteSpan{message}, sig2);
+    err = opKeystore.SignWithOpKeypair(kBadFabricIndex, ByteSpan{ message }, sig2);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Can sign after activation
-    err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{message}, sig2);
+    err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message }, sig2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Signature matches pending key
@@ -147,7 +147,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     // Committing key resets pending state and adds storage
     DefaultStorageKeyAllocator keyAllocator;
     std::string opKeyStorageKey = keyAllocator.FabricOpKey(kFabricIndex);
-    err = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
+    err                         = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == false);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
@@ -155,8 +155,8 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
 
     // After committing, signing works with the key that was pending
     P256ECDSASignature sig3;
-    uint8_t message2[] = {10, 11, 12, 13};
-    err = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{message2}, sig3);
+    uint8_t message2[] = { 10, 11, 12, 13 };
+    err                = opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ message2 }, sig3);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = csrPublicKey2.ECDSA_validate_msg_signature(message2, sizeof(message2), sig3);
@@ -176,11 +176,9 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
+static const nlTest sTests[] = { NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
 
-    NL_TEST_SENTINEL()
-};
+                                 NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.
