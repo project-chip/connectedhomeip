@@ -144,8 +144,9 @@ protected:
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = (1u << 4),
 
-        /// When set, signifies that the message counter is valid.
-        /// The counter is valid once received a message with a request ack flag. It never flips to false.
+        /// When set, signifies that mPendingPeerAckMessageCounter is valid.
+        /// The counter is valid once we receive a message which requests an ack.
+        /// Once mPendingPeerAckMessageCounter is valid, it never stops being valid.
         kFlagAckMessageCounterIsValid = (1u << 5),
 
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
