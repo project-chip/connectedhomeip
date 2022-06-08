@@ -47,7 +47,7 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 
     echo "ARGS: ${ZAP_ARGS[@]}"
 
-    if [[ "${ZAP_ARGS[@]}" == *"all-clusters-app.zap"* ]]; then
+    if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
     else
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json"
