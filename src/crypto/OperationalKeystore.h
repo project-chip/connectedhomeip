@@ -18,9 +18,22 @@ public:
     /**
      * @brief Returns true if a pending operational key exists from a previous
      *        `NewOpKeypairForFabric` before any `CommitOpKeypairForFabric` or
-     *        `RevertOpKeypairForFabric`.
+     *        `RevertOpKeypairForFabric`. This returns true even if the key is
+     *        NOT ACTIVE (i.e after `NewOpKeypairForFabric` but before
+     *        `ActivateOpKeypairForFabric`).
      */
     virtual bool HasPendingOpKeypair() const = 0;
+
+    /**
+     * @brief Returns whether a usable operational key exists for the given fabric.
+     *
+     * Returns true even if the key is not persisted, such as if `ActivateOpKeypairForFabric`
+     * had been successfully called for a given fabric.
+     *
+     * @param fabricIndex - FabricIndex for which availability of keypair will be checked.
+     * @return true if there an active operational keypair for the given FabricIndex, false otherwise.
+     */
+    virtual bool HasOpKeypairForFabric(FabricIndex fabricIndex) const = 0;
 
     /**
      * @brief This initializes a new keypair for the given fabric and generates a CSR for it,

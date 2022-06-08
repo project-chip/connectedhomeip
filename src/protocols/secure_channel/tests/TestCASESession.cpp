@@ -93,6 +93,7 @@ public:
     }
 
     bool HasPendingOpKeypair() const override { return false; }
+    bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override { return mSingleFabricIndex != kUndefinedFabricIndex; }
 
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override
     {

@@ -112,7 +112,12 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
         // Load up the operational key structure from storage
         uint16_t size = static_cast<uint16_t>(buf.Capacity());
         DefaultStorageKeyAllocator keyAlloc;
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), buf.Bytes(), size));
+        CHIP_ERROR err = storage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), buf.Bytes(), size);
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            err = CHIP_ERROR_INVALID_FABRIC_INDEX;
+        }
+        ReturnErrorOnFailure(err);
         buf.SetLength(static_cast<size_t>(size));
 
         // Read-out the operational key TLV entry.
@@ -156,6 +161,38 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
 } // namespace
 
+bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
+{
+    VerifyOrReturnError(mStorage != nullptr, false);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);
+
+    // If there was a pending keypair, then there's really a usable key
+    if (mIsPendingKeypairActive && (fabricIndex == mPendingFabricIndex) && (mPendingKeypair != nullptr))
+    {
+        return true;
+    }
+
+    DefaultStorageKeyAllocator keyAlloc;
+    uint16_t keySize = 0;
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), nullptr, keySize);
+
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // Obviously not found
+        return false;
+    }
+    else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) && (keySize > 0))
+    {
+        // On found, we actually expect an "error", since we didn't want to read it out.
+        return true;
+    }
+    else
+    {
+        // On any other error, we consider the key not found
+        return false;
+    }
+}
+
 CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
                                                                        MutableByteSpan & outCertificateSigningRequest)
 {
@@ -193,9 +230,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::ActivateOpKeypairForFabric(Fabr
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Validate public key being activated matches last generated pending keypair
-    VerifyOrReturnError(mPendingKeypair->Pubkey().Length() == nocPublicKey.Length(), CHIP_ERROR_INVALID_PUBLIC_KEY);
-    VerifyOrReturnError(memcmp(mPendingKeypair->Pubkey().ConstBytes(), nocPublicKey.ConstBytes(), nocPublicKey.Length()) == 0,
-                        CHIP_ERROR_INVALID_PUBLIC_KEY);
+    VerifyOrReturnError(mPendingKeypair->Pubkey().Matches(nocPublicKey), CHIP_ERROR_INVALID_PUBLIC_KEY);
 
     mIsPendingKeypairActive = true;
 

@@ -1032,24 +1032,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
     return CHIP_NO_ERROR;
 }
 
-/**
- * This function implements constant time memcmp. It's good practice
- * to use constant time functions for cryptographic functions.
- */
-static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
-{
-    const uint8_t * A = (const uint8_t *) a;
-    const uint8_t * B = (const uint8_t *) b;
-    uint8_t diff      = 0;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        diff |= (A[i] ^ B[i]);
-    }
-
-    return diff;
-}
-
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
                                                     const uint8_t * in, size_t in_len)
 {
@@ -1063,7 +1045,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     SuccessOrExit(error = Mac(key, key_len, in, in_len, computed_mac_span));
     VerifyOrExit(computed_mac_span.size() == mac_len, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(constant_time_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(IsBufferContentEqualConstantTime(mac, computed_mac, kSHA256_Hash_Length), error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);

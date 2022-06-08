@@ -187,6 +187,31 @@ void ClearSecretData(uint8_t (&buf)[N])
     ClearSecretData(buf, N);
 }
 
+/**
+ * @brief Constant-time buffer comparison
+ *
+ * This function implements constant time memcmp. It's good practice
+ * to use constant time functions for cryptographic functions.
+ *
+ * @param a Pointer to first buffer
+ * @param b Pointer to Second buffer
+ * @param n Number of bytes to compare
+ * @return true if `n` first bytes of both buffers are equal, false otherwise
+ */
+inline bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
+{
+    const uint8_t * A = (const uint8_t *) a;
+    const uint8_t * B = (const uint8_t *) b;
+    uint8_t diff      = 0;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        diff |= (A[i] ^ B[i]);
+    }
+
+    return (diff == 0);
+}
+
 template <typename Sig>
 class ECPKey
 {
@@ -199,6 +224,11 @@ public:
     virtual operator uint8_t *()               = 0;
     virtual const uint8_t * ConstBytes() const = 0;
     virtual uint8_t * Bytes()                  = 0;
+
+    virtual bool Matches(const ECPKey<Sig> & other) const
+    {
+        return (this->Length() == other.Length()) && IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
+    }
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
     virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
