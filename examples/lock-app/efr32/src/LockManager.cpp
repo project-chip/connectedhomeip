@@ -242,7 +242,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     }
 
     user.userName       = chip::CharSpan(userInDb.userName.data(), userInDb.userName.size());
-    user.credentials    = chip::Span<const DlCredential>(mCredentials[adjustedUserIndex].Get(), mMaxCredentialsPerUser);
+    user.credentials    = chip::Span<const DlCredential>(mCredentials[adjustedUserIndex].Get(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
