@@ -626,7 +626,6 @@ IlluminanceMeasurement
 IM
 imager
 imagetool
-ImageURI
 imageUri
 img
 Impl
@@ -728,6 +727,7 @@ libglib
 libical
 libncurses
 libreadline
+libs
 libsdl
 libshell
 libssl
@@ -895,6 +895,7 @@ NVM
 NVS
 nwk
 NXP
+NXPmicro
 objcopy
 OccupancySensing
 OctetString
@@ -1278,6 +1279,8 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
+tinycrypt
+tinycryptbuildingsteps
 Tizen
 TKIP
 tlsr
