@@ -154,7 +154,7 @@ void TestMoveList(nlTestSuite * inSuite, void * inContext)
         // Test case 1: Move construct an empty list
         IntrusiveList<ListNode> listA;
         IntrusiveList<ListNode> listB(std::move(listA));
-        NL_TEST_ASSERT(inSuite, listA.Empty());
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
         NL_TEST_ASSERT(inSuite, listB.Empty());
     }
 
@@ -164,7 +164,7 @@ void TestMoveList(nlTestSuite * inSuite, void * inContext)
         listA.PushBack(&a);
 
         IntrusiveList<ListNode> listB(std::move(listA));
-        NL_TEST_ASSERT(inSuite, listA.Empty());
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
         NL_TEST_ASSERT(inSuite, listB.Contains(&a));
         listB.Remove(&a);
     }
@@ -174,7 +174,7 @@ void TestMoveList(nlTestSuite * inSuite, void * inContext)
         IntrusiveList<ListNode> listA;
         IntrusiveList<ListNode> listB;
         listB = std::move(listA);
-        NL_TEST_ASSERT(inSuite, listA.Empty());
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
         NL_TEST_ASSERT(inSuite, listB.Empty());
     }
 
@@ -185,7 +185,7 @@ void TestMoveList(nlTestSuite * inSuite, void * inContext)
 
         IntrusiveList<ListNode> listB;
         listB = std::move(listA);
-        NL_TEST_ASSERT(inSuite, listA.Empty());
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
         NL_TEST_ASSERT(inSuite, listB.Contains(&a));
         listB.Remove(&a);
     }
