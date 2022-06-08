@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 120
+        timeout-minutes: 135
 
         strategy:
             matrix:
