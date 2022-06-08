@@ -127,7 +127,7 @@ static int fw_update_begin(struct partition_entry *p)
 static int fw_update_data(struct partition_entry *p, const char *data, size_t datalen)
 {
     int32_t result;
- 
+
     result = mflash_drv_write(p->start, (uint32_t *)data, datalen);
     if (result != WM_SUCCESS)
     {
@@ -190,20 +190,20 @@ static void mw320_dev_reset(unsigned int delay_ms)
 	return;
 }
 // ============================================================================
-typedef struct _fw_update_param 
+typedef struct _fw_update_param
 {
 	// Accumulated size
 	uint32_t	pump_size;		// How many bytes has been written
 	uint32_t	p_start;		// Start address of the partition
 	img_sec_hdr ish;			// ish from downloaded firmware buffer
-	
+
 	//int hdr_size;
 	// Pointer to passive firmware
 	struct partition_entry part_arg;
-	
+
 	// Callback function to write the data
 	//data_fetch data_fetch_cb;
-	
+
 } fw_update_param_t;
 static fw_update_param_t	g_fmup_param;
 
@@ -214,18 +214,18 @@ fw_update_id_t mw320_fw_update_begin(void)
 {
     int error;
 	struct partition_entry *p;
-	
+
 	if (g_fmup_param.pump_size != 0) {
 		PRINTF("Warning, wt_addr is not 0. last fw_abort may be missing \r\n");
 	}
 	memset(&g_fmup_param, 0, sizeof(g_fmup_param));
-	
+
 	// ----------------------------------------------------
 	// Initialize the firmware update parameters
 	p = get_passive_firmware();
 	memcpy(&g_fmup_param.part_arg, p, sizeof(struct partition_entry));
 	g_fmup_param.p_start = p->start;
-	
+
 	// ----------------------------------------------------
 	// Erase the partition
 	error = fw_update_begin(&g_fmup_param.part_arg);
@@ -245,7 +245,7 @@ int mw320_fw_update_wrblock(fw_update_id_t fwup_id, unsigned char* pblock, unsig
 	unsigned int wr_size=0;		// How many bytes has been written
 	unsigned char* buf = pblock;
 	int error;
-	
+
 	if (pfwup_parm != &g_fmup_param) {
 		PRINTF("Incorrect fw update id \r\n");
 		return -WM_FAIL;
@@ -259,7 +259,7 @@ int mw320_fw_update_wrblock(fw_update_id_t fwup_id, unsigned char* pblock, unsig
 		//purge_stream_bytes(pfwup_parm->data_fetch_cb, blksize, pblock, FIRMWARE_UPDATE_BUF_SIZE);
 		return -WM_FAIL;
 	}
-	
+
 	// If it's the 1st block
 	if (pfwup_parm->p_start == pfwup_parm->part_arg.start) {
 		memcpy(&pfwup_parm->ish, buf, sizeof(img_sec_hdr));
@@ -281,8 +281,8 @@ int mw320_fw_update_wrblock(fw_update_id_t fwup_id, unsigned char* pblock, unsig
 		pfwup_parm->pump_size += chk_size;
 		buf += chk_size;
 	}
-	
-		
+
+
 	return WM_SUCCESS;
 }
 
@@ -296,21 +296,21 @@ int mw320_fw_update_end(fw_update_id_t fwup_id, int rst_delay_sec)
 {
 	fw_update_param_t	*pfwup_parm = (fw_update_param_t*)fwup_id;
 	int error;
-	
+
 	if (pfwup_parm != &g_fmup_param) {
 		PRINTF("Incorrect fw update id \r\n");
 		return -WM_FAIL;
 	}
-	
+
 	// Validate the firmware data in flash
 	PRINTF("Firmware verification start ... filesize = %d\r\n", pfwup_parm->pump_size);
 	if (pfwup_parm->ish.magic == SEC_FW_MAGIC_SIG) {
-		
+
         error = verify_load_firmware((pfwup_parm->p_start + SEC_FW_SIG_LEN), (pfwup_parm->pump_size - SEC_FW_SIG_LEN));
     } else {
         error = verify_load_firmware(pfwup_parm->p_start, pfwup_parm->pump_size);
     }
-	
+
 	if (error != WM_SUCCESS) {
 		PRINTF("FW verification fail! Keep the same firmware \r\n");
 		return -WM_FAIL;
@@ -318,15 +318,15 @@ int mw320_fw_update_end(fw_update_id_t fwup_id, int rst_delay_sec)
 	PRINTF("FW verification pass, switch the firmware partition \r\n");
 	// Restore the start
 	pfwup_parm->part_arg.start = pfwup_parm->p_start;
-	
+
 	// Switch the active partition to the new one
 	part_set_active_partition(&pfwup_parm->part_arg);
-	
+
 	// Reset the device if requested
 	if (rst_delay_sec > 0) {
 		mw320_dev_reset(rst_delay_sec*1000);
 	}
-	
+
 	return WM_SUCCESS;
 }
 
@@ -351,7 +351,7 @@ void mw320_fw_update_test(void)
 {
 	unsigned int wr_size=0;
 	int error;
-	
+
 	fw_update_id_t	fwupid = mw320_fw_update_begin();
 	while (wr_size < mw320_ota_len) {
 		unsigned int chk_size = ((mw320_ota_len-wr_size) < 1024)?(mw320_ota_len-wr_size):1024;
@@ -365,7 +365,7 @@ void mw320_fw_update_test(void)
 	if (error == WM_SUCCESS) {
 		mw320_fw_update_end(fwupid, -1);
 	}
-	
+
 	return;
 }
 #endif //MW320_OTA_TEST

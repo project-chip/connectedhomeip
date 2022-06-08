@@ -826,7 +826,7 @@ void demo_init(void)
 	network.ip.ipv4.addr_type = ADDR_TYPE_STATIC;
 
 	network.security.psk_len = strlen(psk);
-    strcpy(network.security.psk, psk);			
+    strcpy(network.security.psk, psk);
 	network.security.type = WLAN_SECURITY_WPA2;
 
 	network.role = WLAN_BSS_ROLE_UAP;
@@ -859,7 +859,7 @@ void demo_init(void)
         PRINTF("Error: unable to start network\r\n");
 	else
 		PRINTF("start uAP ssid: %s\r\n", network.ssid);
-	
+
 }
 #endif //0
 
