@@ -160,8 +160,6 @@ void CASESession::InvalidateIfPendingEstablishment()
     if (!IsSessionEstablishmentInProgress()) {
         return;
     }
-    // TODO Double check if there is maybe a more suitable CHIP_ERROR, some other options are
-    // CHIP_ERROR_CERT_EXPIRED, CHIP_ERROR_TRANSACTION_CANCELED, or CHIP_ERROR_INCORRECT_STATE
     AbortPendingEstablish(CHIP_ERROR_CANCELLED);
 }
 
