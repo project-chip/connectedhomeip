@@ -156,7 +156,9 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     return self;
 }
 
-- (instancetype)initForNewFabric:(CHIPDeviceControllerStartupParams *)params
+- (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
+                        keystore:(chip::Crypto::OperationalKeystore *)keystore
+                          params:(CHIPDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
         return nil;
@@ -187,14 +189,22 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         }
     }
 
+    _fabricTable = fabricTable;
+    _keystore = keystore;
+
     return self;
 }
 
-- (instancetype)initForExistingFabric:(FabricInfo *)fabric params:(CHIPDeviceControllerStartupParams *)params
+- (instancetype)initForExistingFabric:(FabricTable *)fabricTable
+                          fabricIndex:(FabricIndex)fabricIndex
+                             keystore:(chip::Crypto::OperationalKeystore *)keystore
+                               params:(CHIPDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
         return nil;
     }
+
+    FabricInfo * fabric = fabricTable->FindFabricWithIndex(fabricIndex);
 
     if (self.vendorId == nil) {
         self.vendorId = @(fabric->GetVendorId());
@@ -216,19 +226,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                 CHIP_LOG_ERROR("Failed to convert TLV NOC to DER X.509: %s", ErrorStr(err));
                 return nil;
             }
-            if (fabric->GetOperationalKey() == nullptr) {
+            if (!keystore->HasOpKeypairForFabric(fabric->GetFabricIndex())) {
                 CHIP_LOG_ERROR("No existing operational key for fabric");
-                return nil;
-            }
-            _serializedOperationalKeypair = new Crypto::P256SerializedKeypair();
-            if (_serializedOperationalKeypair == nullptr) {
-                CHIP_LOG_ERROR("Failed to allocate serialized keypair");
-                return nil;
-            }
-
-            err = fabric->GetOperationalKey()->Serialize(*_serializedOperationalKeypair);
-            if (err != CHIP_NO_ERROR) {
-                CHIP_LOG_ERROR("Failed to serialize operational keypair: %s", ErrorStr(err));
                 return nil;
             }
         }
@@ -298,6 +297,10 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
+    _fabricTable = fabricTable;
+    _fabricIndex.Emplace(fabricIndex);
+    _keystore = keystore;
+
     return self;
 }
 
@@ -329,11 +332,4 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     return YES;
 }
 
-- (void)dealloc
-{
-    if (_serializedOperationalKeypair != nullptr) {
-        delete _serializedOperationalKeypair;
-        _serializedOperationalKeypair = nullptr;
-    }
-}
 @end
