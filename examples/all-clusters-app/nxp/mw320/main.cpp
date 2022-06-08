@@ -202,7 +202,7 @@ void sw2_handle(bool frm_clk)
 	// Called regularlly from a thread every 500ms
 	run_times++;
 	if (click_cnt > 4) {
-		// More than 4 clicks within the last second => erase the saved paramters
+		// More than 4 clicks within the last second => erase the saved parameters
 		PRINTF("--> enough clicks (%d times) => resetting the saved parameters \r\n", click_cnt);
 		::erase_all_params();
 		DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(RUN_RST_LT_DELAY), rst_args_lt, nullptr);
@@ -942,7 +942,7 @@ void task_main(void *param)
         {
             assert(false);
         }
-        PRINTF("[%s]: wlan_init sucess \r\n", __FUNCTION__);
+        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
 
         result = wlan_start(wlan_event_callback);
         if (WM_SUCCESS != result)
@@ -1136,7 +1136,7 @@ void ShellCLIMain(void * pvParameter)
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
         wlan_init((const uint8_t *)(wififw + 2U), *(wififw + 1U));
-//        PRINTF("[%s]: wlan_init sucess \r\n", __FUNCTION__);
+//        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
 //		demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
@@ -1145,7 +1145,7 @@ void ShellCLIMain(void * pvParameter)
 //    std::string qrCodeText = createSetupPayload();
 //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
 
-    ConnectivityMgrImpl().ProvisionWiFiNetwork("nxp_matter_ces", "nxp12345");
+    ConnectivityMgrImpl().ProvisionWiFiNetwork("nxp_matter", "nxp12345");
 
 	// Run CHIP servers
 	run_update_chipsrv(chip_srv_all);
