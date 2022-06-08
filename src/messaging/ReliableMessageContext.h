@@ -67,8 +67,9 @@ public:
     }
 
     /**
-     * Check whether we have a valid message counter. The counter is valid once received a message with a request ack flag. It never
-     * flips to false.
+     * Check whether we have a mPendingPeerAckMessageCounter. The counter is
+     * valid once we receive a message which requests an ack. Once
+     * mPendingPeerAckMessageCounter is valid, it never stops being valid.
      */
     bool HasPiggybackAckPending() const;
 
