@@ -807,7 +807,7 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     // ==== Set counter value to max ====
     LocalSessionMessageCounter & counter = static_cast<LocalSessionMessageCounter &>(
         aliceToBobSession.Get().Value()->AsSecureSession()->GetSessionMessageCounter().GetLocalMessageCounter());
-    counter.TestSetCounter(LocalSessionMessageCounter::kMaxMessageCounter);
+    counter.TestSetCounter(LocalSessionMessageCounter::kMessageCounterMax - 1);
 
     // ==== Build a valid message with max counter value ====
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
