@@ -2062,14 +2062,15 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.operationalCert", "operationalCert",
                                                                   value.isMember("operationalCert")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operationalCert");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.operationalCert, value["operationalCert"]));

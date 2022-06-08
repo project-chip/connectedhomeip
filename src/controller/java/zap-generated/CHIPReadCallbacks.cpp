@@ -20142,11 +20142,11 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
         jobject newElement_0_fabricIndex;
-        std::string newElement_0_fabricIndexClassName     = "java/lang/Long";
-        std::string newElement_0_fabricIndexCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
         jobject newElement_0_operationalCert;
         jbyteArray newElement_0_operationalCertByteArray = env->NewByteArray(static_cast<jsize>(entry_0.operationalCert.size()));
         env->SetByteArrayRegion(newElement_0_operationalCertByteArray, 0, static_cast<jsize>(entry_0.operationalCert.size()),
@@ -20162,7 +20162,7 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
             return;
         }
         jmethodID testListStructOctetStructCtor =
-            env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Long;[B)V");
+            env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Integer;[B)V");
         if (testListStructOctetStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestListStructOctet constructor");

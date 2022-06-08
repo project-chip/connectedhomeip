@@ -1825,10 +1825,10 @@ public class ChipStructs {
   }
 
   public static class TestClusterClusterTestListStructOctet {
-    public Long fabricIndex;
+    public Integer fabricIndex;
     public byte[] operationalCert;
 
-    public TestClusterClusterTestListStructOctet(Long fabricIndex, byte[] operationalCert) {
+    public TestClusterClusterTestListStructOctet(Integer fabricIndex, byte[] operationalCert) {
       this.fabricIndex = fabricIndex;
       this.operationalCert = operationalCert;
     }

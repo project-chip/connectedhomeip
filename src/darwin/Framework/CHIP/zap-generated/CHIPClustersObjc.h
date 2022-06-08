@@ -15966,8 +15966,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeListStructOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
+- (void)readAttributeListStructOctetStringWithParams:(CHIPReadParams * _Nullable)params
+                                   completionHandler:
+                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value

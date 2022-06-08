@@ -543,7 +543,7 @@ typedef struct _TargetStruct
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
-    uint64_t fabricIndex;
+    chip::FabricIndex fabricIndex;
     chip::ByteSpan operationalCert;
 } TestListStructOctet;
 
