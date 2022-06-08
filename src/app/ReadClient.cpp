@@ -141,18 +141,31 @@ void ReadClient::Close(CHIP_ERROR aError)
 
     mpExchangeCtx = nullptr;
 
-    if (aError != CHIP_NO_ERROR)
+    if (IsReadType())
     {
-        if (ResubscribeIfNeeded())
+        if (aError != CHIP_NO_ERROR)
         {
-            ClearActiveSubscriptionState();
-            return;
+            mpCallback.OnError(aError);
         }
-        mpCallback.OnError(aError);
     }
-
-    if (mReadPrepareParams.mResubscribePolicy != nullptr)
+    else
     {
+        if (aError != CHIP_NO_ERROR)
+        {
+            uint32_t nextResubscribeMsec = 0;
+
+            if (ResubscribeIfNeeded(nextResubscribeMsec))
+            {
+                ChipLogProgress(DataManagement,
+                                "Will try to resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32
+                                "ms due to error %" CHIP_ERROR_FORMAT,
+                                mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, nextResubscribeMsec, aError.Format());
+                mpCallback.OnResubscriptionAttempt(aError, nextResubscribeMsec);
+                ClearActiveSubscriptionState();
+                return;
+            }
+            mpCallback.OnError(aError);
+        }
         StopResubscription();
     }
 
@@ -582,7 +595,7 @@ exit:
 
     if (!suppressResponse)
     {
-        bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
+        bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                                         : Protocols::InteractionModel::Status::InvalidSubscription,
                                    mpExchangeCtx, !noResponseExpected);
@@ -957,10 +970,11 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
     _this->mNumRetries++;
 }
 
-bool ReadClient::ResubscribeIfNeeded()
+bool ReadClient::ResubscribeIfNeeded(uint32_t & aNextResubscribeIntervalMsec)
 {
-    bool shouldResubscribe = true;
-    uint32_t intervalMsec  = 0;
+    bool shouldResubscribe       = true;
+    uint32_t intervalMsec        = 0;
+    aNextResubscribeIntervalMsec = 0;
     if (mReadPrepareParams.mResubscribePolicy == nullptr)
     {
         ChipLogDetail(DataManagement, "mResubscribePolicy is null");
@@ -980,10 +994,7 @@ bool ReadClient::ResubscribeIfNeeded()
         return false;
     }
 
-    ChipLogProgress(DataManagement,
-                    "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
-                    mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
-
+    aNextResubscribeIntervalMsec = intervalMsec;
     return true;
 }
 

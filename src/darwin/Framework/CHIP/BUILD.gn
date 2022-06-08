@@ -68,6 +68,8 @@ static_library("framework") {
     "CHIPSetupPayload.mm",
     "MTRCertificates.h",
     "MTRCertificates.mm",
+    "MTRMemory.h",
+    "MTRMemory.mm",
     "MatterControllerFactory.h",
     "MatterControllerFactory.mm",
     "MatterControllerFactory_Internal.h",

@@ -26,15 +26,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Switch {
 
 /**
  * @brief switch-server class
  */
-class Server
+class SwitchServer
 {
 public:
-    static Server & Instance();
+    static SwitchServer & Instance();
 
     /**
      * @brief
@@ -82,10 +81,9 @@ public:
     void OnMultiPressComplete(EndpointId endpoint, uint8_t newPosition, uint8_t count);
 
 private:
-    static Server instance;
+    static SwitchServer instance;
 };
 
-} // namespace Switch
 } // namespace Clusters
 } // namespace app
 } // namespace chip

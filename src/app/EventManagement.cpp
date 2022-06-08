@@ -123,14 +123,6 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
     mBytesWritten = 0;
-
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    CHIP_ERROR err = chip::System::Mutex::Init(mAccessLock);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "mutex init fails with error %s", ErrorStr(err));
-    }
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -347,9 +339,6 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    ScopedLock lock(sInstance);
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
@@ -408,17 +397,8 @@ void EventManagement::VendEventNumber()
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                      EventNumber & aEventNumber)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    {
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-        ScopedLock lock(sInstance);
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
-        VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
-        err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
-    }
-exit:
-    return err;
+    VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
+    return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }
 
 CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
@@ -721,10 +701,6 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectLi
     CircularEventBufferWrapper bufWrapper;
     EventLoadOutContext context(aWriter, PriorityLevel::Invalid, aEventMin);
 
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    ScopedLock lock(sInstance);
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
     context.mSubjectDescriptor     = aSubjectDescriptor;
     context.mpInterestedEventPaths = apEventPathList;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
@@ -800,10 +776,6 @@ CHIP_ERROR EventManagement::FabricRemoved(FabricIndex aFabricIndex)
     const bool recurse = false;
     TLVReader reader;
     CircularEventBufferWrapper bufWrapper;
-
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    ScopedLock lock(sInstance);
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     ReturnErrorOnFailure(GetEventReader(reader, PriorityLevel::Critical, &bufWrapper));
     CHIP_ERROR err = TLV::Utilities::Iterate(reader, FabricRemovedCB, &aFabricIndex, recurse);
@@ -925,10 +897,6 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
 
 void EventManagement::SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes) const
 {
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    ScopedLock lock(sInstance);
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
     aEventNumber              = mLastEventNumber;
     aInitialWrittenEventBytes = mBytesWritten;
 }

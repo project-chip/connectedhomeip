@@ -60,7 +60,8 @@ source_set("app-main") {
   ]
 
   if (chip_enable_transport_trace) {
-    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
   }
 
   public_configs = [ ":app-main-config" ]

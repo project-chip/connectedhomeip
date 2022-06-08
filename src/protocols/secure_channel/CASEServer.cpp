@@ -31,17 +31,19 @@ namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
                                                      FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+                                                     Credentials::CertificateValidityPolicy * certificateValidityPolicy,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(responderGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSessionManager           = sessionManager;
-    mSessionResumptionStorage = sessionResumptionStorage;
-    mFabrics                  = fabrics;
-    mExchangeManager          = exchangeManager;
-    mGroupDataProvider        = responderGroupDataProvider;
+    mSessionManager            = sessionManager;
+    mSessionResumptionStorage  = sessionResumptionStorage;
+    mCertificateValidityPolicy = certificateValidityPolicy;
+    mFabrics                   = fabrics;
+    mExchangeManager           = exchangeManager;
+    mGroupDataProvider         = responderGroupDataProvider;
 
     Cleanup();
     return CHIP_NO_ERROR;
@@ -53,9 +55,9 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 
     // Setup CASE state machine using the credentials for the current fabric.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
-    ReturnErrorOnFailure(
-        GetSession().ListenForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage, this,
-                                                   Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
+    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
+        *mSessionManager, mFabrics, mSessionResumptionStorage, mCertificateValidityPolicy, this,
+        Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());

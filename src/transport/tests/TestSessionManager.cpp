@@ -672,7 +672,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         SessionHolder session;
-        session.GrabPairing(handle.Value());
+        session.GrabPairingSession(handle.Value());
         sessionId1 = session->AsSecureSession()->GetLocalSessionId();
     }
 

@@ -31,11 +31,29 @@ public:
     IntrusiveListNodeBase() : mPrev(nullptr), mNext(nullptr) {}
     ~IntrusiveListNodeBase() { VerifyOrDie(!IsInList()); }
 
+    // Note: The copy construct/assignment is not provided because the list node state is not copyable.
+    //       The move construct/assignment is not provided because all modifications to the list shall go through the list object.
+    IntrusiveListNodeBase(const IntrusiveListNodeBase &) = delete;
+    IntrusiveListNodeBase & operator=(const IntrusiveListNodeBase &) = delete;
+    IntrusiveListNodeBase(IntrusiveListNodeBase &&)                  = delete;
+    IntrusiveListNodeBase & operator=(IntrusiveListNodeBase &&) = delete;
+
     bool IsInList() const { return (mPrev != nullptr && mNext != nullptr); }
 
 private:
     friend class IntrusiveListBase;
     IntrusiveListNodeBase(IntrusiveListNodeBase * prev, IntrusiveListNodeBase * next) : mPrev(prev), mNext(next) {}
+
+    void TakePlaceOf(const IntrusiveListNodeBase * that)
+    {
+        // prerequisite `that` is in a list
+        // `this` will take place of the position of `that`.
+        // `that` will be emptied by the caller after this function
+        mPrev        = that->mPrev;
+        mNext        = that->mNext;
+        mPrev->mNext = this;
+        mNext->mPrev = this;
+    }
 
     void Prepend(IntrusiveListNodeBase * node)
     {
@@ -195,6 +213,27 @@ protected:
         mNode.Remove();
     }
 
+    IntrusiveListBase(const IntrusiveListBase &) = delete;
+    IntrusiveListBase & operator=(const IntrusiveListBase &) = delete;
+
+    IntrusiveListBase(IntrusiveListBase && that) : mNode(&mNode, &mNode) { *this = std::move(that); }
+
+    IntrusiveListBase & operator=(IntrusiveListBase && that)
+    {
+        VerifyOrDie(Empty());
+        if (!that.Empty())
+        {
+            mNode.TakePlaceOf(&that.mNode);
+            that.mNode.mNext = &that.mNode;
+            that.mNode.mPrev = &that.mNode;
+        }
+        else
+        {
+            // Do nothing here if that is empty, because there is a prerequisite that `this` is empty.
+        }
+        return *this;
+    }
+
     ConstIteratorBase begin() const { return ConstIteratorBase(mNode.mNext); }
     ConstIteratorBase end() const { return ConstIteratorBase(&mNode); }
     IteratorBase begin() { return IteratorBase(mNode.mNext); }
@@ -206,6 +245,16 @@ protected:
     void InsertBefore(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Prepend(node); }
     void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Append(node); }
     void Remove(IntrusiveListNodeBase * node) { node->Remove(); }
+
+    /// @brief Replace an original node in list with a new node.
+    void Replace(IntrusiveListNodeBase * original, IntrusiveListNodeBase * replacement)
+    {
+        // VerifyOrDie(Contains(original)); This check is too heavy to do, but it shall hold
+        VerifyOrDie(!replacement->IsInList());
+        replacement->TakePlaceOf(original);
+        original->mPrev = nullptr;
+        original->mNext = nullptr;
+    }
 
     bool Contains(const IntrusiveListNodeBase * node) const
     {
@@ -269,6 +318,9 @@ public:
 
     IntrusiveList() : IntrusiveListBase() {}
 
+    IntrusiveList(IntrusiveList &&) = default;
+    IntrusiveList & operator=(IntrusiveList &&) = default;
+
     class ConstIterator : public IntrusiveListBase::ConstIteratorBase
     {
     public:
@@ -302,6 +354,7 @@ public:
     void InsertBefore(Iterator pos, T * value) { IntrusiveListBase::InsertBefore(pos, Hook::ToNode(value)); }
     void InsertAfter(Iterator pos, T * value) { IntrusiveListBase::InsertAfter(pos, Hook::ToNode(value)); }
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
+    void Replace(T * original, T * replacement) { IntrusiveListBase::Replace(Hook::ToNode(original), Hook::ToNode(replacement)); }
     bool Contains(const T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
 };
 

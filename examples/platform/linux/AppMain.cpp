@@ -63,6 +63,7 @@
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -100,10 +101,6 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-chip::trace::TraceStream * gTraceStream = nullptr;
-#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -113,69 +110,9 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-#if !defined(ENABLE_CHIP_SHELL)
-void OnSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
-    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
-    // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::kUnspecified;
-    switch (signum)
-    {
-    case SIGVTALRM:
-        bootReason = BootReasonType::kPowerOnReboot;
-        break;
-    case SIGALRM:
-        bootReason = BootReasonType::kBrownOutReset;
-        break;
-    case SIGILL:
-        bootReason = BootReasonType::kSoftwareWatchdogReset;
-        break;
-    case SIGTRAP:
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-        break;
-    case SIGIO:
-        bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        break;
-    case SIGINT:
-        bootReason = BootReasonType::kSoftwareReset;
-        break;
-    default:
-        IgnoreUnusedVariable(bootReason);
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    Server::GetInstance().DispatchShutDownAndStopEventLoop();
-}
-
-void SetupSignalHandlers()
-{
-    // sigaction is not used here because Tsan interceptors seems to
-    // never dispatch the signals on darwin.
-    signal(SIGALRM, OnSignalHandler);
-    signal(SIGVTALRM, OnSignalHandler);
-    signal(SIGILL, OnSignalHandler);
-    signal(SIGTRAP, OnSignalHandler);
-    signal(SIGTERM, OnSignalHandler);
-    signal(SIGIO, OnSignalHandler);
-    signal(SIGINT, OnSignalHandler);
-}
-#endif // !defined(ENABLE_CHIP_SHELL)
-
 void Cleanup()
 {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    if (gTraceStream != nullptr)
-    {
-        delete gTraceStream;
-        gTraceStream = nullptr;
-    }
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -277,17 +214,25 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
     {
         const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
-        gTraceStream               = new chip::trace::TraceStreamFile(traceFilename);
+        auto traceStream           = new chip::trace::TraceStreamFile(traceFilename);
+        chip::trace::AddTraceStream(traceStream);
     }
     else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
     {
-        gTraceStream = new chip::trace::TraceStreamLog();
+        auto traceStream = new chip::trace::TraceStreamLog();
+        chip::trace::AddTraceStream(traceStream);
+    }
+
+    if (LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled)
+    {
+        chip::trace::TraceDecoderOptions options;
+        options.mEnableProtocolInteractionModelResponse = false;
+
+        chip::trace::TraceDecoder * decoder = new chip::trace::TraceDecoder();
+        decoder->SetOptions(options);
+        chip::trace::AddTraceStream(decoder);
     }
     chip::trace::InitTrace();
-    if (gTraceStream != nullptr)
-    {
-        chip::trace::SetTraceStream(gTraceStream);
-    }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -374,10 +319,6 @@ void ChipLinuxAppMainLoop()
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
-#if !defined(ENABLE_CHIP_SHELL)
-    SetupSignalHandlers();
-#endif // !defined(ENABLE_CHIP_SHELL)
 
     ApplicationInit();
 

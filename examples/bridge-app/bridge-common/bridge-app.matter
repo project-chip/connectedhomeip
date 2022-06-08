@@ -1737,7 +1737,7 @@ endpoint 2 {
   server cluster LevelControl {
     persist  attribute currentLevel;
     ram      attribute remainingTime;
-    ram      attribute minLevel;
+    ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute currentFrequency;
     ram      attribute minFrequency;
