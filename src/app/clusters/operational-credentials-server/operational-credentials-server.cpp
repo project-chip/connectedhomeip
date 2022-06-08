@@ -348,8 +348,8 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 
 void CommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
-    // THIS IS DEFERRED. The let the General Commissioning server actually
-    // commit he fabric table much before this deferred event loop event occurs.
+    // THIS IS DEFERRED. The General Commissioning server actually
+    // commits the fabric table much before this deferred event loop event occurs.
     ChipLogProgress(Zcl, "OpCreds: Commissioning Complete");
 }
 
