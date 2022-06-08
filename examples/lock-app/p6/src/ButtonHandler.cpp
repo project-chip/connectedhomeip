@@ -89,8 +89,8 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
         buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
         break;
     case APP_LOCK_BUTTON:
-	    buttonevent = cyhal_gpio_read(APP_LOCK_BUTTON);
-	    break;
+        buttonevent = cyhal_gpio_read(APP_LOCK_BUTTON);
+        break;
     default:
         P6_LOG("Unhandled TimerID: %d", timerId);
         break;
