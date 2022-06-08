@@ -769,17 +769,5 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     return Resolve(interfaceId.GetPlatformInterface(), regtype.c_str(), service->mName, callback, context);
 }
 
-void GetDnssdTimeout(timeval & timeout)
-{
-    // Do nothing
-    // Tizen DNS-SD API adds I/O events to GMainContext, so MainLoop::AsyncRequest will be used for DNS-SD operations
-}
-
-void HandleDnssdTimeout()
-{
-    // Do nothing
-    // Tizen DNS-SD API adds I/O events to GMainContext, so MainLoop::AsyncRequest will be used for DNS-SD operations
-}
-
 } // namespace Dnssd
 } // namespace chip
