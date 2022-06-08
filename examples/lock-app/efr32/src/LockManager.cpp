@@ -89,9 +89,6 @@ bool LockManager::ReadConfigValues()
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials[0].Get()),
                                     sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser, outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_TotalCredentials, reinterpret_cast<uint8_t *>(mTotalCredentialsPerUser),
-                                    sizeof(mTotalCredentialsPerUser), outLen);
-
     return true;
 }
 
