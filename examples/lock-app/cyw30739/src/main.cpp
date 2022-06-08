@@ -21,6 +21,7 @@
 #include <AppShellCommands.h>
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
+#include <DeviceInfoProviderImpl.h>
 #include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -53,6 +54,7 @@ using namespace ::chip::Shell;
 
 wiced_bool_t syncClusterToButtonAction = false;
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
@@ -169,6 +171,8 @@ void InitApp(intptr_t args)
     chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
