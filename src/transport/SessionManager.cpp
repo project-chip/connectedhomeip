@@ -387,6 +387,17 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
+void SessionManager::ReleaseSessionForNodeExceptOne(const ScopedNodeId & node, const SessionHandle & stay)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetPeer() == node && session != stay->AsSecureSession())
+        {
+            session->MarkForRemoval();
+        }
+        return Loop::Continue;
+    });
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {

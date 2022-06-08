@@ -176,6 +176,9 @@ public:
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
 
+    // This API is used by UpdateNOC command, to invalid all sessions except the given one.
+    void ReleaseSessionForNodeExceptOne(const ScopedNodeId & node, const SessionHandle & stay);
+
     /**
      * @brief
      *   Return the System Layer pointer used by current SessionManager.
