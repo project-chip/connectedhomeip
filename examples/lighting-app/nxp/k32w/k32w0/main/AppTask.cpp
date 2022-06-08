@@ -184,27 +184,11 @@ CHIP_ERROR AppTask::Init()
     return err;
 }
 
-void LockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
-}
-
-void UnlockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
-}
-
 void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    // Init ZCL Data Model and start server
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
 }
 

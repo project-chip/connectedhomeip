@@ -1,7 +1,7 @@
 # CHIP K32W061 Lighting Example Application
 
 The Project CHIP K32W061 Lighting Example demonstrates how to remotely control a
-light bulb. The light bulb is simulated using one of the LEDs from the expansion
+light bulb. The Light Bulb is simulated using one of the LEDs from the expansion
 board. It uses buttons to test turn on/turn off of the light bulb. You can use
 this example as a reference for creating your own application.
 
