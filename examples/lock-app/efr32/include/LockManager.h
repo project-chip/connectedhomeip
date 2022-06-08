@@ -110,9 +110,12 @@ private:
     uint8_t mMaxCredentialsPerUser;
     uint16_t mMaxUsers;
 
+    // Only for storing in nvm flash
+    uint16_t currentNumberOfCredentialsPerUser[DOOR_LOCK_MAX_USERS];
+
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[MAX_CREDENTIALS][DOOR_LOCK_MAX_CREDENTIAL_SIZE];
-    chip::Platform::ScopedMemoryBuffer<DlCredential> mCredentials[MAX_CREDENTIAL_PER_USER];
+    chip::Platform::ScopedMemoryBufferWithSize<DlCredential> mCredentials[MAX_CREDENTIAL_PER_USER];
     size_t mTotalCredentialsPerUser[ArraySize(mLockUsers)];
 
     static LockManager sLock;
