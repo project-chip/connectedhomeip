@@ -116,7 +116,7 @@ protected:
      *
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId sessionEvictionHint = ScopedNodeId());
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint = ScopedNodeId());
 
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
 

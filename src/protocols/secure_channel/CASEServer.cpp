@@ -48,7 +48,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     // Set up the group state provider that persists across all handshakes.
     GetSession().SetGroupDataProvider(mGroupDataProvider);
 
-    Cleanup();
+    PrepareForSessionEstablishment();
 
     return CHIP_NO_ERROR;
 }
@@ -88,13 +88,13 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Cleanup();
+        PrepareForSessionEstablishment();
     }
 
     return err;
 }
 
-void CASEServer::Cleanup(ScopedNodeId previouslyEstablishedPeer)
+void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
     // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
     // https://github.com/project-chip/connectedhomeip/issues/8342
@@ -116,7 +116,7 @@ void CASEServer::Cleanup(ScopedNodeId previouslyEstablishedPeer)
     // however will render this node deaf to future handshake requests, so it's better to die here to raise attention to the problem
     // / facilitate recovery.
     //
-    // TODO: Once session eviction is actually in place, this call should NEVER fail and if so, is a logic bug.
+    // TODO(#17568): Once session eviction is actually in place, this call should NEVER fail and if so, is a logic bug.
     // Dying here on failure is even more appropriate then.
     //
     VerifyOrDie(GetSession().PrepareForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage,
@@ -146,13 +146,13 @@ void CASEServer::Cleanup(ScopedNodeId previouslyEstablishedPeer)
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    Cleanup();
+    PrepareForSessionEstablishment();
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
-    Cleanup(session->GetPeer());
+    PrepareForSessionEstablishment(session->GetPeer());
 }
 } // namespace chip

@@ -23,7 +23,7 @@
 
 namespace chip {
 
-CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, ScopedNodeId sessionEvictionHint)
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint)
 {
     auto handle = sessionManager.AllocateSession(GetSecureSessionType(), sessionEvictionHint);
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);

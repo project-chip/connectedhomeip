@@ -196,7 +196,7 @@ private:
      *
      */
     CHIP_ERROR Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
-                    SessionEstablishmentDelegate * delegate, ScopedNodeId sessionEvictionHint);
+                    SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

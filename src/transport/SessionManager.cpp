@@ -387,7 +387,8 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType, ScopedNodeId sessionEvictionHint)
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
+                                                        const ScopedNodeId & sessionEvictionHint)
 {
     //
     // This is currently not being utilized yet but will be once session eviction logic is added.

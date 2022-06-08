@@ -31,12 +31,23 @@ class CASEServer : public SessionEstablishmentDelegate,
 {
 public:
     CASEServer() {}
-    ~CASEServer() override
+    ~CASEServer() override { Shutdown(); }
+
+    /*
+     * This method will shutdown this object, releasing the strong reference to the pinned SecureSession object.
+     * It will also unregister the unsolicited handler and clear out the session object (which will release the weak
+     * reference through the underlying SessionHolder).
+     *
+     */
+    void Shutdown()
     {
         if (mExchangeManager != nullptr)
         {
             mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
         }
+
+        GetSession().Clear();
+        mPinnedSecureSession.ClearValue();
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
@@ -94,7 +105,7 @@ private:
      * should be set to the scoped node-id of the peer associated with that session.
      *
      */
-    void Cleanup(ScopedNodeId previouslyEstablishedPeer = ScopedNodeId());
+    void PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer = ScopedNodeId());
 };
 
 } // namespace chip

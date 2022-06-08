@@ -151,7 +151,7 @@ void CASESession::Clear()
 }
 
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
-                             SessionEstablishmentDelegate * delegate, ScopedNodeId sessionEvictionHint)
+                             SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

@@ -339,6 +339,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     if (mCASEServer != nullptr)
     {
+        mCASEServer->Shutdown();
         chip::Platform::Delete(mCASEServer);
         mCASEServer = nullptr;
     }

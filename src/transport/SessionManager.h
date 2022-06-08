@@ -167,7 +167,8 @@ public:
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType, ScopedNodeId sessionEvictionHint);
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
+                                            const ScopedNodeId & sessionEvictionHint);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
