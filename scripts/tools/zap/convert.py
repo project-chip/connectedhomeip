@@ -66,6 +66,7 @@ def runArgumentsParser():
 
     return zap_file
 
+
 def detectZclFile(zapFile):
     print(f"Searching for zcl file from {zapFile}")
 
@@ -83,6 +84,7 @@ def detectZclFile(zapFile):
             path = package["path"]
 
     return getFilePath(path)
+
 
 def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
