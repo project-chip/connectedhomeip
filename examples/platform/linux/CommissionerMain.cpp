@@ -136,6 +136,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
     // No need to explicitly set the UDC port since we will use default
+    ChipLogProgress(Support, " ----- UDC listening on port %d", udcListenPort);
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(udcListenPort));
 
     // Initialize device attestation verifier

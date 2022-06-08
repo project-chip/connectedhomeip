@@ -27,7 +27,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <algorithm>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -115,7 +114,6 @@ public:
     static void CheckConsumeHead(nlTestSuite * inSuite, void * inContext);
     static void CheckConsume(nlTestSuite * inSuite, void * inContext);
     static void CheckEnsureReservedSize(nlTestSuite * inSuite, void * inContext);
-    static void CheckGetReserve(nlTestSuite * inSuite, void * inContext);
     static void CheckAlignPayload(nlTestSuite * inSuite, void * inContext);
     static void CheckNext(nlTestSuite * inSuite, void * inContext);
     static void CheckLast(nlTestSuite * inSuite, void * inContext);
@@ -138,18 +136,8 @@ public:
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
-        if (buffer)
-        {
-            const uint16_t reserved_offset = PacketBuffer::kStructureSize;
-            const uint16_t payload_offset =
-                static_cast<uint16_t>(reinterpret_cast<const char *>(buffer->payload) - reinterpret_cast<const char *>(buffer));
-            printf("%s res@%-4u#%-4u pay@%-4u#%-4u %p next=%p ref=%u\n", tag, reserved_offset, payload_offset - reserved_offset,
-                   payload_offset, buffer->len, buffer, buffer->next, buffer->ref);
-        }
-        else
-        {
-            printf("%s NULL\n", tag);
-        }
+        printf("%s %p ref=%u len=%-4u next=%p\n", tag, buffer, buffer ? buffer->ref : 0, buffer ? buffer->len : 0,
+               buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
 
@@ -174,9 +162,9 @@ private:
     static void PrintHandle(const char * tag, const BufferConfiguration & config) { PrintHandle(tag, config.handle); }
     static void PrintConfig(const char * tag, const BufferConfiguration & config)
     {
-        printf("%s res@%-4u#%-4u pay@%-4zu#%-4u (config)\n", tag, PacketBuffer::kStructureSize, config.reserved_size,
-               config.payload_ptr - config.start_buffer, config.init_len);
-        PrintHandle(tag, config.handle);
+        printf("%s pay=%-4zu len=%-4u res=%-4u:", tag, config.payload_ptr - config.start_buffer, config.init_len,
+               config.reserved_size);
+        PrintHandle("", config.handle);
     }
 
     PacketBufferTest(TestContext * context);
@@ -1155,139 +1143,6 @@ void PacketBufferTest::CheckEnsureReservedSize(nlTestSuite * inSuite, void * inC
 }
 
 /**
- *  Test PacketBuffer::GetReserve() function.
- *
- *  Description: This tests the private implementation version of GetReserve(),
- *  since we can't iterate over types. The tested configurations are custom
- *  for this test, since the usual ones don't cover the relevant boundary conditions.
- */
-void PacketBufferTest::CheckGetReserve(nlTestSuite * inSuite, void * inContext)
-{
-    struct TestContext * const theContext = static_cast<struct TestContext *>(inContext);
-    PacketBufferTest * const test         = theContext->test;
-    NL_TEST_ASSERT(inSuite, test->mContext == theContext);
-
-    uint8_t payloads[2 * kBlockSize];
-    for (size_t i = 1; i < sizeof(payloads); ++i)
-    {
-        payloads[i] = static_cast<uint8_t>(random());
-    }
-
-    constexpr uint16_t kMax = PacketBuffer::kMaxSizeWithoutReserve;
-
-    // clang-format off
-    const struct Instance
-    {
-        // PacketBuffer initialization:
-        struct {
-            uint16_t reserve_length;
-            uint16_t payload_length;
-        } init;
-        // GetReserve():
-        struct {
-            uint16_t length;    // Must be a multiple of alignment.
-            uint16_t alignment; // Must be a power of 2.
-        } request;
-        // Expected result:
-        struct {
-            bool success;
-            uint16_t motion;
-        } expect;
-    } instances[] = {
-        // PacketBuffer         GetReserve
-        // Reserve Payload      Length   Align      Expect
-        {  {    1,      1},     {   1,      1},     { true,     0 } },  // Fits without moving payload.
-        {  {    0,      1},     {   1,      1},     { true,     1 } },  // Fits by moving payload 1 byte.
-        {  {    0,   kMax},     {   1,      1},     { false,    0 } },  // No space to move payload.
-        {  {   16,      1},     {  16,      8},     { true,     0 } },  // Fits without moving payload.
-        {  {    9,      1},     {   8,      8},     { true,     0 } },  // Fits without moving payload.
-        {  {    9,      1},     {  16,      8},     { true,     7 } },  // Fits by moving payload 7 bytes.
-    };
-    // clang-format on
-
-    for (auto & instance : instances)
-    {
-        BufferConfiguration config(instance.init.reserve_length);
-        test->PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
-
-        uint8_t * payload_start = config.handle->Start();
-        memcpy(payload_start, payloads, instance.init.payload_length);
-        config.handle->SetDataLength(instance.init.payload_length);
-        uint16_t available_payload_length = config.handle->AvailableDataLength();
-
-        // Check that the packet was initialized correctly.
-        NL_TEST_ASSERT(inSuite, config.handle->ReservedSize() == instance.init.reserve_length);
-        NL_TEST_ASSERT(inSuite, config.handle->TotalLength() == instance.init.payload_length);
-
-        const uint8_t * const reserve =
-            config.handle->GetReserve(instance.request.length, static_cast<uint16_t>(instance.request.alignment - 1));
-        if (instance.expect.success)
-        {
-            NL_TEST_ASSERT(inSuite, reserve != nullptr);
-
-            // Verify that the payload is intact.
-            NL_TEST_ASSERT(inSuite, config.handle->TotalLength() == instance.init.payload_length);
-            NL_TEST_ASSERT(inSuite, memcmp(config.handle->Start(), payloads, instance.init.payload_length) == 0);
-
-            // Verify that the payload was moved or not.
-            NL_TEST_ASSERT(inSuite, payload_start + instance.expect.motion == config.handle->Start());
-            NL_TEST_ASSERT(inSuite, available_payload_length - instance.expect.motion == config.handle->AvailableDataLength());
-        }
-        else
-        {
-            NL_TEST_ASSERT(inSuite, reserve == nullptr);
-        }
-    }
-
-    // Check the case that the packet buffer starts so close to the end of memory that adding the requested length would overflow
-    // and result in a pointer that incorrectly appears to be before the payload start.
-    //
-    // NB: White-box test! This relies on knowing that the implementation of GetReserve() returns without dereferencing the
-    // pointer in this case.
-    // NB: Implementation-defined test! Merely creating an invalid pointer is allowed to fail (but is NOT ‘undefined behavior’),
-    // although it does not on any currently common platform.
-    PacketBuffer * badPointer = reinterpret_cast<PacketBuffer *>(static_cast<uintptr_t>(-PacketBuffer::kStructureSize - 1));
-    NL_TEST_ASSERT(inSuite, badPointer->GetReserve(1, 1) == nullptr);
-
-    // Check the case that the packet buffer starts so close to the end of memory that the requested alignment would overflow
-    // and result in a pointer that incorrectly appears to be before the payload start.
-    //
-    // NB: White-box test! This relies on knowing that the implementation of GetReserve() returns without dereferencing the
-    // pointer in this case.
-    // NB: Implementation-defined test! Merely creating an invalid pointer is allowed to fail (but is NOT ‘undefined behavior’),
-    // although it does not on any currently common platform.
-    badPointer = reinterpret_cast<PacketBuffer *>(static_cast<uintptr_t>(-PacketBuffer::kStructureSize - 2));
-    NL_TEST_ASSERT(inSuite, badPointer->GetReserve(1, 2) == nullptr);
-
-    // Check the case that the requested alignment is greater than PacketBuffer alignment, so that, depending on the actual
-    // location of the PacketBuffer, the returned pointer may or may not be able to be located immediately after the header.
-    //
-    // NB: White-box test! This can't happen with heap-allocated buffers, since heap allocation returns a maximally aligned
-    // pointer, so we need to allocate and set up the PacketBuffer internal state manually. We construct a pair of packet
-    // buffers pb[] such that one of the two is aligned to (2*alignof(PacketBuffer)) and the other is not.
-    constexpr size_t kHeadersPerBlock    = (PacketBuffer::kBlockSize + sizeof(PacketBuffer) - 1) / sizeof(PacketBuffer);
-    constexpr size_t kOddHeadersPerBlock = (kHeadersPerBlock % 2) == 0 ? kHeadersPerBlock + 1 : kHeadersPerBlock;
-    NL_TEST_ASSERT(inSuite, kOddHeadersPerBlock > 2);
-    PacketBuffer holder[2 * kOddHeadersPerBlock + 1];
-    PacketBuffer * pb[2] = { &holder[0], &holder[kOddHeadersPerBlock] };
-
-    constexpr size_t kBigAlignment = 2 * alignof(PacketBuffer);
-    for (int i = 0; i < 2; ++i)
-    {
-        pb[i]->next    = nullptr;
-        pb[i]->payload = reinterpret_cast<uint8_t *>(pb[i]) + 2 * sizeof(PacketBuffer) + 1;
-        pb[i]->tot_len = pb[i]->len = 1;
-        pb[i]->ref                  = 0;
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
-        pb[i]->alloc_size = kHeadersPerBlock * sizeof(PacketBuffer);
-#endif
-        const uint8_t * const reserve = pb[i]->GetReserve(1, kBigAlignment - 1);
-        NL_TEST_ASSERT(inSuite, reserve != nullptr);
-        NL_TEST_ASSERT(inSuite, (reinterpret_cast<uintptr_t>(reserve) % kBigAlignment) == 0);
-    }
-}
-
-/**
  *  Test PacketBuffer::AlignPayload() function.
  *
  *  Description: For every buffer-configuration from inContext, create a
@@ -2132,7 +1987,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("PacketBuffer::ConsumeHead",            PacketBufferTest::CheckConsumeHead),
     NL_TEST_DEF("PacketBuffer::Consume",                PacketBufferTest::CheckConsume),
     NL_TEST_DEF("PacketBuffer::EnsureReservedSize",     PacketBufferTest::CheckEnsureReservedSize),
-    NL_TEST_DEF("PacketBuffer::GetReserve",             PacketBufferTest::CheckGetReserve),
     NL_TEST_DEF("PacketBuffer::AlignPayload",           PacketBufferTest::CheckAlignPayload),
     NL_TEST_DEF("PacketBuffer::Next",                   PacketBufferTest::CheckNext),
     NL_TEST_DEF("PacketBuffer::Last",                   PacketBufferTest::CheckLast),

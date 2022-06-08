@@ -36,7 +36,6 @@
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
-#include <system/SystemMutex.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
@@ -228,18 +227,6 @@ public:
                                       MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static void DestroyEventManagement();
-
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    class ScopedLock
-    {
-    public:
-        ScopedLock(EventManagement & aEventManagement) : mEventManagement(aEventManagement) { mEventManagement.mAccessLock.Lock(); }
-        ~ScopedLock() { mEventManagement.mAccessLock.Unlock(); }
-
-    private:
-        EventManagement & mEventManagement;
-    };
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     /**
      * @brief
@@ -523,9 +510,6 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    System::Mutex mAccessLock;
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     // The counter we're going to use for event numbers.
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
