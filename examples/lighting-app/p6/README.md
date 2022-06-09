@@ -13,6 +13,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
         -   [Commissioning over BLE](#commissioning-over-ble)
             -   [Notes](#notes)
         -   [Cluster control](#cluster-control)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -134,3 +135,9 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
     Press `USER_BTN1` on the board to toggle between Light ON and OFF states.
     Light ON and OFF can be observed with 'LED9' on the board. This LED is
     configured with `LIGHT_LED` in `include/AppConfig.h`.
+
+## OTA Software Update
+
+For the description of Software Update process with infineon P6 example
+applications see
+[Infineon P6 OTA Software Update](../../../docs/guides/infineon_p6_software_update.md)
