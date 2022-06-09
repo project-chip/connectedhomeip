@@ -5,17 +5,20 @@
     "type": "object",
     "required": [
         "sn",
+        "vendor_id",
+        "product_id",
+        "vendor_name",
+        "product_name",
         "date",
         "hw_ver",
         "hw_ver_str",
-        "rd_uid",
         "dac_cert",
         "dac_key",
         "pai_cert",
-        "cd",
         "spake2_it",
         "spake2_salt",
-        "spake2_verifier"
+        "spake2_verifier",
+        "discriminator"
     ],
     "properties": {
         "sn": {
@@ -23,12 +26,32 @@
             "type": "string",
             "maxLength": 32
         },
-        "date": {
-            "description": "Manufacturing date according to ISO 8601 in notation YYYYMMDD",
+        "vendor_id": {
+            "description": "Vendor Identifier",
+            "type": "integer",
+            "minimum": 0,
+            "maximum":  65524
+        },
+        "product_id": {
+            "description": "Product Identifier",
+            "type": "integer",
+            "minimum": 1, 
+            "maximum":  65535
+        },
+        "vendor_name": {
+            "description": "human-readable vendor name",
             "type": "string",
-            "minLength": 8,
-            "maxLength": 8,
-            "pattern": "[0-9]{4}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}"
+            "maxLength": 32
+        },
+        "product_name": {
+            "description": "human-readable product name",
+            "type": "string",
+            "maxLength": 32
+        },
+        "date": {
+            "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
+            "type": "string",
+            "format": "date"
         },
         "hw_ver": {
             "description": "Hardware version - integer",
@@ -58,10 +81,6 @@
         },
         "pai_cert": {
             "description": "PAI certificate in hex-string format",
-            "type": "string"
-        },
-        "cd": {
-            "description": "Certificate Declaration in hex-string format",
             "type": "string"
         },
         "passcode": {
