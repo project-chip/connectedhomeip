@@ -18,7 +18,7 @@ RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   avahi-daemon=0.7-4ubuntu7.1 \
   avahi-utils=0.7-4ubuntu7.1 \
-  ca-certificates=20210119~20.04.2 \
+  ca-certificates=20211016~20.04.1 \
   dhcpcd5=7.1.0-2build1 \
   gdb=9.2-0ubuntu1~20.04.1 \
   git=1:2.25.1-1ubuntu3.4 \
