@@ -458,7 +458,21 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, msgFlags, GetReliableMessageContext()));
+    if (mDispatch.IsReliableTransmissionAllowed() && !IsGroupExchangeContext())
+    {
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+            payloadHeader.GetAckMessageCounter().HasValue())
+        {
+            HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+        }
+
+        if (payloadHeader.NeedsAck())
+        {
+            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+
+            HandleNeedsAck(messageCounter, msgFlags);
+        }
+    }
 
     if (IsAckPending() && !mDelegate)
     {
@@ -487,7 +501,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // is implicitly that response.
     SetResponseExpected(false);
 
-    if (mDelegate != nullptr)
+    // Don't send messages on to our delegate if our dispatch does not allow
+    // those messages.
+    if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
     {
         return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
