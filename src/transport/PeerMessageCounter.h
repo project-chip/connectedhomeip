@@ -32,7 +32,8 @@ namespace Transport {
 class PeerMessageCounter
 {
 public:
-    static constexpr size_t kChallengeSize = 8;
+    static constexpr size_t kChallengeSize      = 8;
+    static constexpr uint32_t kInitialSyncValue = 0;
 
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }

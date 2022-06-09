@@ -28,7 +28,7 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
+class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}

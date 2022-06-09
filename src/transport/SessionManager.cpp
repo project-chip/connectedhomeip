@@ -187,7 +187,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
 
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
-        uint32_t messageCounter  = counter.Value();
+        uint32_t messageCounter;
+        ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));
         packetHeader
             .SetMessageCounter(messageCounter)         //
             .SetSessionId(session->GetPeerSessionId()) //
@@ -201,7 +202,6 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId);
 
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
-        ReturnErrorOnFailure(counter.Advance());
 
 #if CHIP_PROGRESS_LOGGING
         destination = session->GetPeerNodeId();
@@ -211,8 +211,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
         MessageCounter & counter = mGlobalUnencryptedMessageCounter;
-        uint32_t messageCounter  = counter.Value();
-        ReturnErrorOnFailure(counter.Advance());
+        uint32_t messageCounter;
+        ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));
         packetHeader.SetMessageCounter(messageCounter);
         Transport::UnauthenticatedSession * session = sessionHandle->AsUnauthenticatedSession();
         switch (session->GetSessionRole())
@@ -408,7 +408,7 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
 }
@@ -675,7 +675,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
-    chip::Transport::PeerMessageCounter * counter = nullptr;
+    Transport::PeerMessageCounter * counter = nullptr;
 
     if (CHIP_NO_ERROR ==
         mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),

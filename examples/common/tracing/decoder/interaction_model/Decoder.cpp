@@ -135,7 +135,7 @@ CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode)
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     if (decode)
     {
-        app::InvokeRequestMessage::Parser parser;
+        app::StatusResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
         return parser.CheckSchemaValidity();
     }

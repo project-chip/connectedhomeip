@@ -25,26 +25,84 @@ namespace chip {
 
 class IntrusiveListBase;
 
-class IntrusiveListNodeBase
+enum class IntrusiveMode
+{
+    // Strict mode features
+    //
+    //   Node constructor puts the hook in a well-known default state.
+    //
+    //   Node destructor checks if the hook is in the well-known default state.
+    //   If not, an assertion is raised.
+    //
+    //   Every time an object is inserted in the intrusive container, the
+    //   container checks if the hook is in the well-known default state. If
+    //   not, an assertion is raised.
+    //
+    //   Every time an object is being erased from the intrusive container, the
+    //   container puts the erased object in the well-known default state.
+    //
+    // Note: The strict mode works similar as safe mode for Boost.Intrusive
+    //
+    Strict,
+
+    // Auto-unlink mode features
+    //
+    //   When the destructor of the node is called, the hook checks if the node
+    //   is inserted in a container. If so, the hook removes the node from the
+    //   container.
+    //
+    //   The hook has a member function called unlink() that can be used to
+    //   unlink the node from the container at any time, without having any
+    //   reference to the container, if the user wants to do so.
+    //
+    // This auto-unlink feature is useful in certain applications but it must
+    // be used very carefully:
+    //
+    //   If several threads are using the same container the destructor of the
+    //   auto-unlink hook will be called without any thread synchronization so
+    //   removing the object is thread-unsafe. Container contents change
+    //   silently without modifying the container directly. This can lead to
+    //   surprising effects.
+    //
+    // These auto-unlink hooks have also strict-mode properties:
+    //
+    //   Node constructors put the hook in a well-known default state.
+    //
+    //   Every time an object is inserted in the intrusive container, the
+    //   container checks if the hook is in the well-known default state. If
+    //   not, an assertion is raised.
+    //
+    //   Every time an object is erased from an intrusive container, the
+    //   container puts the erased object in the well-known default state.
+    //
+    // Note: The strict mode works similar as auto-unlink mode for
+    // Boost.Intrusive
+    //
+    AutoUnlink,
+};
+
+class IntrusiveListNodePrivateBase
 {
 public:
-    IntrusiveListNodeBase() : mPrev(nullptr), mNext(nullptr) {}
-    ~IntrusiveListNodeBase() { VerifyOrDie(!IsInList()); }
+    IntrusiveListNodePrivateBase() : mPrev(nullptr), mNext(nullptr) {}
+    ~IntrusiveListNodePrivateBase() { VerifyOrDie(!IsInList()); }
 
     // Note: The copy construct/assignment is not provided because the list node state is not copyable.
     //       The move construct/assignment is not provided because all modifications to the list shall go through the list object.
-    IntrusiveListNodeBase(const IntrusiveListNodeBase &) = delete;
-    IntrusiveListNodeBase & operator=(const IntrusiveListNodeBase &) = delete;
-    IntrusiveListNodeBase(IntrusiveListNodeBase &&)                  = delete;
-    IntrusiveListNodeBase & operator=(IntrusiveListNodeBase &&) = delete;
+    IntrusiveListNodePrivateBase(const IntrusiveListNodePrivateBase &) = delete;
+    IntrusiveListNodePrivateBase & operator=(const IntrusiveListNodePrivateBase &) = delete;
+    IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase &&)                  = delete;
+    IntrusiveListNodePrivateBase & operator=(IntrusiveListNodePrivateBase &&) = delete;
 
     bool IsInList() const { return (mPrev != nullptr && mNext != nullptr); }
 
 private:
     friend class IntrusiveListBase;
-    IntrusiveListNodeBase(IntrusiveListNodeBase * prev, IntrusiveListNodeBase * next) : mPrev(prev), mNext(next) {}
+    IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase * prev, IntrusiveListNodePrivateBase * next) :
+        mPrev(prev), mNext(next)
+    {}
 
-    void TakePlaceOf(const IntrusiveListNodeBase * that)
+    void TakePlaceOf(const IntrusiveListNodePrivateBase * that)
     {
         // prerequisite `that` is in a list
         // `this` will take place of the position of `that`.
@@ -55,7 +113,7 @@ private:
         mNext->mPrev = this;
     }
 
-    void Prepend(IntrusiveListNodeBase * node)
+    void Prepend(IntrusiveListNodePrivateBase * node)
     {
         VerifyOrDie(IsInList());
         VerifyOrDie(!node->IsInList());
@@ -65,7 +123,7 @@ private:
         mPrev        = node;
     }
 
-    void Append(IntrusiveListNodeBase * node)
+    void Append(IntrusiveListNodePrivateBase * node)
     {
         VerifyOrDie(IsInList());
         VerifyOrDie(!node->IsInList());
@@ -75,6 +133,7 @@ private:
         mNext        = node;
     }
 
+protected:
     void Remove()
     {
         VerifyOrDie(IsInList());
@@ -84,11 +143,31 @@ private:
         mNext        = nullptr;
     }
 
-    IntrusiveListNodeBase * mPrev;
-    IntrusiveListNodeBase * mNext;
+private:
+    IntrusiveListNodePrivateBase * mPrev;
+    IntrusiveListNodePrivateBase * mNext;
 };
 
-// non template part of IntrusiveList
+// Strict mode implementation
+template <IntrusiveMode Mode = IntrusiveMode::Strict>
+class IntrusiveListNodeBase : public IntrusiveListNodePrivateBase
+{
+};
+
+// Partial specialization implementation for auto-unlink mode.
+template <>
+class IntrusiveListNodeBase<IntrusiveMode::AutoUnlink> : public IntrusiveListNodePrivateBase
+{
+public:
+    ~IntrusiveListNodeBase() { Unlink(); }
+    void Unlink()
+    {
+        if (IsInList())
+            Remove();
+    }
+};
+
+// Non-template part of IntrusiveList. It appears that for list structure, both mode can share same implementation.
 class IntrusiveListBase
 {
 public:
@@ -96,9 +175,9 @@ public:
     {
     private:
         friend class IntrusiveListBase;
-        ConstIteratorBase(const IntrusiveListNodeBase * cur) : mCurrent(cur) {}
+        ConstIteratorBase(const IntrusiveListNodePrivateBase * cur) : mCurrent(cur) {}
 
-        const IntrusiveListNodeBase & operator*() { return *mCurrent; }
+        const IntrusiveListNodePrivateBase & operator*() { return *mCurrent; }
 
     public:
         using difference_type   = std::ptrdiff_t;
@@ -139,16 +218,16 @@ public:
         }
 
     protected:
-        const IntrusiveListNodeBase * mCurrent;
+        const IntrusiveListNodePrivateBase * mCurrent;
     };
 
     class IteratorBase
     {
     private:
         friend class IntrusiveListBase;
-        IteratorBase(IntrusiveListNodeBase * cur) : mCurrent(cur) {}
+        IteratorBase(IntrusiveListNodePrivateBase * cur) : mCurrent(cur) {}
 
-        IntrusiveListNodeBase & operator*() { return *mCurrent; }
+        IntrusiveListNodePrivateBase & operator*() { return *mCurrent; }
 
     public:
         using difference_type   = std::ptrdiff_t;
@@ -189,7 +268,7 @@ public:
         }
 
     protected:
-        IntrusiveListNodeBase * mCurrent;
+        IntrusiveListNodePrivateBase * mCurrent;
     };
 
     bool Empty() const { return mNode.mNext == &mNode; }
@@ -239,15 +318,15 @@ protected:
     IteratorBase begin() { return IteratorBase(mNode.mNext); }
     IteratorBase end() { return IteratorBase(&mNode); }
 
-    void PushFront(IntrusiveListNodeBase * node) { mNode.Append(node); }
-    void PushBack(IntrusiveListNodeBase * node) { mNode.Prepend(node); }
+    void PushFront(IntrusiveListNodePrivateBase * node) { mNode.Append(node); }
+    void PushBack(IntrusiveListNodePrivateBase * node) { mNode.Prepend(node); }
 
-    void InsertBefore(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Prepend(node); }
-    void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Append(node); }
-    void Remove(IntrusiveListNodeBase * node) { node->Remove(); }
+    void InsertBefore(IteratorBase pos, IntrusiveListNodePrivateBase * node) { pos.mCurrent->Prepend(node); }
+    void InsertAfter(IteratorBase pos, IntrusiveListNodePrivateBase * node) { pos.mCurrent->Append(node); }
+    void Remove(IntrusiveListNodePrivateBase * node) { node->Remove(); }
 
     /// @brief Replace an original node in list with a new node.
-    void Replace(IntrusiveListNodeBase * original, IntrusiveListNodeBase * replacement)
+    void Replace(IntrusiveListNodePrivateBase * original, IntrusiveListNodePrivateBase * replacement)
     {
         // VerifyOrDie(Contains(original)); This check is too heavy to do, but it shall hold
         VerifyOrDie(!replacement->IsInList());
@@ -256,7 +335,7 @@ protected:
         original->mNext = nullptr;
     }
 
-    bool Contains(const IntrusiveListNodeBase * node) const
+    bool Contains(const IntrusiveListNodePrivateBase * node) const
     {
         for (auto & iter : *this)
         {
@@ -267,24 +346,30 @@ protected:
     }
 
 private:
-    IntrusiveListNodeBase mNode;
+    IntrusiveListNodePrivateBase mNode;
 };
 
 /// The hook converts between node object T and IntrusiveListNodeBase
 ///
 /// When using this hook, the node type (T) MUST inherit from IntrusiveListNodeBase.
 ///
-template <typename T>
+template <typename T, IntrusiveMode Mode>
 class IntrusiveListBaseHook
 {
 public:
-    static_assert(std::is_base_of<IntrusiveListNodeBase, T>::value, "T must be derived from IntrusiveListNodeBase");
+    static_assert(std::is_base_of<IntrusiveListNodeBase<Mode>, T>::value, "T must be derived from IntrusiveListNodeBase");
 
-    static T * ToObject(IntrusiveListNodeBase * node) { return static_cast<T *>(node); }
-    static const T * ToObject(const IntrusiveListNodeBase * node) { return static_cast<T *>(node); }
+    static T * ToObject(IntrusiveListNodePrivateBase * node) { return static_cast<T *>(node); }
+    static const T * ToObject(const IntrusiveListNodePrivateBase * node) { return static_cast<T *>(node); }
 
-    static IntrusiveListNodeBase * ToNode(T * object) { return static_cast<IntrusiveListNodeBase *>(object); }
-    static const IntrusiveListNodeBase * ToNode(const T * object) { return static_cast<const IntrusiveListNodeBase *>(object); }
+    static T * ToObject(IntrusiveListNodeBase<Mode> * node) { return static_cast<T *>(node); }
+    static const T * ToObject(const IntrusiveListNodeBase<Mode> * node) { return static_cast<T *>(node); }
+
+    static IntrusiveListNodeBase<Mode> * ToNode(T * object) { return static_cast<IntrusiveListNodeBase<Mode> *>(object); }
+    static const IntrusiveListNodeBase<Mode> * ToNode(const T * object)
+    {
+        return static_cast<const IntrusiveListNodeBase<Mode> *>(object);
+    }
 };
 
 /// A double-linked list where the data is stored together with the previous/next pointers for cache efficiency / and compactness.
@@ -310,12 +395,10 @@ public:
 ///     assert(list.Contains(&a)  && list.Contains(&b) && !list.Contains(&c));
 ///     list.Remove(&a);
 ///     list.Remove(&b);
-template <typename T, typename Hook = IntrusiveListBaseHook<T>>
+template <typename T, IntrusiveMode Mode = IntrusiveMode::Strict, typename Hook = IntrusiveListBaseHook<T, Mode>>
 class IntrusiveList : public IntrusiveListBase
 {
 public:
-    static_assert(std::is_base_of<IntrusiveListNodeBase, T>::value, "T must derive from IntrusiveListNodeBase");
-
     IntrusiveList() : IntrusiveListBase() {}
 
     IntrusiveList(IntrusiveList &&) = default;
