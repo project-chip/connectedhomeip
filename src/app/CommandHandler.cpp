@@ -64,15 +64,24 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                  System::PacketBufferHandle && payload, bool isTimedInvoke)
+Protocols::InteractionModel::Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                                           const PayloadHeader & payloadHeader,
+                                                                           System::PacketBufferHandle && payload,
+                                                                           bool isTimedInvoke)
 {
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
     System::PacketBufferHandle response;
-    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrReturnError(apExchangeContext != nullptr, Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError(mState == State::Idle, Protocols::InteractionModel::Status::Failure);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
-    mpExchangeCtx = ec;
+    mpExchangeCtx = apExchangeContext;
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    //
+    mpExchangeCtx->SetDelegate(this);
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     // TODO: This is broken!  If something under here returns error, we will try
@@ -80,13 +89,16 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     // response too.  Figure out at what point it's our responsibility to
     // handler errors vs our caller's.
     Handle workHandle(this);
-    mpExchangeCtx->WillSendMessage();
-    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload), isTimedInvoke));
 
-    return CHIP_NO_ERROR;
+    status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
+    if (status == Protocols::InteractionModel::Status::Success && mPendingWork > 1)
+    {
+        mpExchangeCtx->WillSendMessage();
+    }
+    return status;
 }
 
-CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
+Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -94,37 +106,19 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
+    VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
+    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
 #endif
-    ReturnErrorOnFailure(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse));
-    ReturnErrorOnFailure(invokeRequestMessage.GetTimedRequest(&mTimedRequest));
-    ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
 
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    if (mTimedRequest != isTimedInvoke)
-    {
-        // The message thinks it should be part of a timed interaction but it's
-        // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
-        err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
-                                   /* aExpectResponse = */ false);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            // We have to manually close the exchange, because we called
-            // WillSendMessage already.
-            mpExchangeCtx->Close();
-        }
-
-        // Null out the (now-closed) exchange, so that when we try to
-        // SendCommandResponse() later (when our holdoff count drops to 0) it
-        // just fails and we don't double-respond.
-        mpExchangeCtx = nullptr;
-        return err;
-    }
-
+    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Protocols::InteractionModel::Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
     {
@@ -132,22 +126,25 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         // IM Engine will send a status response.
         size_t commandCount = 0;
         TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
-        VerifyOrReturnError(commandCount == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        VerifyOrReturnError(commandCount == 1, Protocols::InteractionModel::Status::Failure);
     }
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(),
+                            Protocols::InteractionModel::Status::InvalidAction);
         CommandDataIB::Parser commandData;
-        ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+        VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR,
+                            Protocols::InteractionModel::Status::InvalidAction);
 
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
-            ReturnErrorOnFailure(ProcessGroupCommandDataIB(commandData));
+            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR,
+                                Protocols::InteractionModel::Status::Failure);
         }
         else
         {
-            ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
+            VerifyOrReturnError(ProcessCommandDataIB(commandData) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
         }
     }
 
@@ -156,8 +153,35 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(err);
-    return invokeRequestMessage.ExitContainer();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+    return Protocols::InteractionModel::Status::Success;
+}
+
+CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                             System::PacketBufferHandle && aPayload)
+{
+    ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+    return OnUnknownMsgType();
+}
+
+CHIP_ERROR CommandHandler::OnUnknownMsgType()
+{
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err =
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
+    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
+    {
+        // We have to manually close the exchange, because we called
+        // WillSendMessage already.
+        mpExchangeCtx->Close();
+    }
+    // Null out the (now-closed) exchange, so that when we try to
+    // SendCommandResponse() later (when our holdoff count drops to 0) it
+    // just fails and we don't double-respond.
+    mpExchangeCtx = nullptr;
+
+    return err;
 }
 
 void CommandHandler::Close()
@@ -204,6 +228,11 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
+    if (mpExchangeCtx == nullptr)
+    {
+        Close();
+        return;
+    }
     if (mpExchangeCtx->IsGroupExchangeContext())
     {
         mpExchangeCtx->Close();
@@ -633,7 +662,7 @@ const char * CommandHandler::GetStateStr() const
 void CommandHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
 }
 
 void CommandHandler::Abort()

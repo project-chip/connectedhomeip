@@ -46,7 +46,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler
+class CommandHandler : public Messaging::ExchangeDelegate
 {
 public:
     /*
@@ -146,15 +146,15 @@ public:
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
+    Protocols::InteractionModel::Status OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                                               System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
@@ -232,6 +232,12 @@ public:
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
+
+    // ExchangeDelegate
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override {}
+    CHIP_ERROR OnUnknownMsgType();
 
     enum class State
     {
