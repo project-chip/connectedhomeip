@@ -89,6 +89,7 @@ struct BrowseContext : public GenericContext
 
 struct ResolveContext : public GenericContext
 {
+    DnssdTizen * mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t mInterfaceId;
@@ -99,7 +100,8 @@ struct ResolveContext : public GenericContext
     dnssd_service_h mServiceHandle = 0;
     bool mIsResolving              = false;
 
-    ResolveContext(const char * rType, const char * rName, uint32_t interfaceId, DnssdResolveCallback callback, void * context);
+    ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
+                   void * context);
     ~ResolveContext() override;
 };
 
@@ -108,7 +110,6 @@ class DnssdTizen
 public:
     DnssdTizen(const DnssdTizen &) = delete;
     DnssdTizen & operator=(const DnssdTizen &) = delete;
-    ~DnssdTizen();
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
     CHIP_ERROR Shutdown();
@@ -123,9 +124,6 @@ public:
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
 
-    CHIP_ERROR Add(ResolveContext * context, dnssd_service_h service);
-    CHIP_ERROR Remove(GenericContext * context);
-
     CHIP_ERROR RemoveContext(GenericContext * context);
 
     static DnssdTizen & GetInstance() { return sInstance; }
@@ -135,8 +133,8 @@ private:
     static DnssdTizen sInstance;
 
     std::mutex mMutex;
-    std::vector<GenericContext *> mContexts;
     std::set<std::shared_ptr<BrowseContext>> mBrowseContexts;
+    std::set<std::shared_ptr<ResolveContext>> mResolveContexts;
     std::set<std::shared_ptr<RegisterContext>> mRegisteredServices;
 };
 

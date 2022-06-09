@@ -72,49 +72,6 @@ CHIP_ERROR GetChipError(int dnssdError)
     }
 }
 
-void RemoveContext(GenericContext * context)
-{
-    if (DnssdTizen::GetInstance().Remove(context) == CHIP_ERROR_KEY_NOT_FOUND)
-    {
-        chip::Platform::Delete(context);
-    }
-}
-
-bool CheckForSuccess(GenericContext * context, int err, const char * func, bool useCallback = false)
-{
-    if (context == nullptr)
-    {
-        ChipLogError(DeviceLayer, "DNSsd %s (context is null)", func);
-        return false;
-    }
-
-    if (err != DNSSD_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "DNSsd %s Err(%d)", func, err);
-        if (useCallback)
-        {
-            switch (context->mContextType)
-            {
-            case ContextType::Register:
-                break;
-            case ContextType::Browse: {
-                BrowseContext * bCtx = reinterpret_cast<BrowseContext *>(context);
-                bCtx->mCallback(bCtx->mCbContext, nullptr, 0, CHIP_ERROR_INTERNAL);
-                break;
-            }
-            case ContextType::Resolve: {
-                ResolveContext * rCtx = reinterpret_cast<ResolveContext *>(context);
-                rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                break;
-            }
-            }
-        }
-        RemoveContext(context);
-        return false;
-    }
-    return true;
-}
-
 void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
 {
     auto rCtx = reinterpret_cast<RegisterContext *>(data);
@@ -269,11 +226,6 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
-void StopResolve(ResolveContext * context)
-{
-    DnssdTizen::GetInstance().Remove(context);
-}
-
 void ConvertTxtRecords(unsigned short txtLen, uint8_t * txtRecord, std::vector<TextEntry> & textEntries)
 {
     if (txtLen <= 1)
@@ -323,11 +275,6 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<ResolveContext *>(data);
 
-    g_main_loop_quit(rCtx->mMainLoop);
-
-    dnssd_cancel_resolve_service(service);
-    VerifyOrReturn(CheckForSuccess(rCtx, result, __func__, true));
-
     char * name           = nullptr;
     char * ipv4           = nullptr;
     char * ipv6           = nullptr;
@@ -335,57 +282,71 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     unsigned short txtLen = 0;
     uint8_t * txtRecord   = nullptr;
     std::vector<TextEntry> textEntries;
-    DnssdService mdnsService = {};
-    chip::Inet::IPAddress ipStr;
-    bool validIP = false;
+    DnssdService dnssdService = {};
+    chip::Inet::IPAddress ipAddr;
 
-    int ret = dnssd_service_get_name(service, &name);
-    VerifyOrExit(CheckForSuccess(rCtx, ret, __func__, true), );
+    // In fact, if cancel resolve fails, we can not do anything about it
+    int ret = dnssd_cancel_resolve_service(service);
+
+    g_main_loop_quit(rCtx->mMainLoop);
+
+    ret = result;
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret));
+
+    ret = dnssd_service_get_name(service, &name);
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
+
+    chip::Platform::CopyString(dnssdService.mName, name);
+    g_free(name);
 
     ret = dnssd_service_get_ip(service, &ipv4, &ipv6);
-    VerifyOrExit(CheckForSuccess(rCtx, ret, __func__, true), );
-
-    ret = dnssd_service_get_port(service, &port);
-    VerifyOrExit(CheckForSuccess(rCtx, ret, __func__, true), );
-
-    ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
-    ConvertTxtRecords(txtLen, txtRecord, textEntries);
-    g_free(txtRecord);
-
-    mdnsService.mPort          = (uint16_t) port;
-    mdnsService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
-    mdnsService.mTextEntrySize = textEntries.empty() ? 0 : textEntries.size();
-    g_strlcpy(mdnsService.mName, name, sizeof(mdnsService.mName));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_ip() failed. ret: %d", ret));
 
     // If both IPv4 and IPv6 are set, IPv6 address has higher priority.
     if (ipv6 != nullptr)
     {
-        validIP = (chip::Inet::IPAddress::FromString(ipv6, ipStr) && ipStr.Type() == chip::Inet::IPAddressType::kIPv6);
+        if (!chip::Inet::IPAddress::FromString(ipv6, ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv6)
+        {
+            ret = DNSSD_ERROR_OPERATION_FAILED;
+        }
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (ipv4 != nullptr)
     {
-        validIP = (chip::Inet::IPAddress::FromString(ipv4, ipStr) && ipStr.Type() == chip::Inet::IPAddressType::kIPv4);
+        if (!chip::Inet::IPAddress::FromString(ipv4, ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv4)
+        {
+            ret = DNSSD_ERROR_OPERATION_FAILED;
+        }
     }
 #endif
 
-    ChipLogDetail(DeviceLayer, "DNSsd %s ipv4: %s, ipv6: %s, valid: %d", __func__, ipv4, ipv6, validIP);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, ipv4, ipv6, ret);
 
-    if (validIP)
-    {
-        rCtx->mCallback(rCtx->mCbContext, &mdnsService, chip::Span<chip::Inet::IPAddress>(&ipStr, 1), CHIP_NO_ERROR);
-        StopResolve(rCtx);
-    }
-    else
-    {
-        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-        RemoveContext(rCtx);
-    }
-
-exit:
-    g_free(name);
     g_free(ipv4);
     g_free(ipv6);
+
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, );
+
+    ret = dnssd_service_get_port(service, &port);
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_port() failed. ret: %d", ret));
+
+    ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
+
+    ConvertTxtRecords(txtLen, txtRecord, textEntries);
+    g_free(txtRecord);
+
+    dnssdService.mPort          = static_cast<uint16_t>(port);
+    dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
+    dnssdService.mTextEntrySize = textEntries.empty() ? 0 : textEntries.size();
+
+    rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    rCtx->mInstance->RemoveContext(rCtx);
+    return;
+
+exit:
+    rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    rCtx->mInstance->RemoveContext(rCtx);
 }
 
 gboolean ResolveAsync(GMainLoop * mainLoop, gpointer userData)
@@ -396,49 +357,11 @@ gboolean ResolveAsync(GMainLoop * mainLoop, gpointer userData)
     rCtx->mMainLoop = mainLoop;
 
     int ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
-    VerifyOrReturnError(CheckForSuccess(rCtx, ret, __func__), false);
+    VerifyOrReturnError(ret == DNSSD_ERROR_NONE,
+                        (ChipLogError(DeviceLayer, "dnssd_resolve_service() failed. ret: %d", ret), false));
 
     rCtx->mIsResolving = true;
-
     return true;
-}
-
-CHIP_ERROR Resolve(uint32_t interfaceId, const char * type, const char * name, DnssdResolveCallback callback, void * context)
-{
-    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
-
-    ResolveContext * rCtx = chip::Platform::New<ResolveContext>(type, name, interfaceId, callback, context);
-
-    dnssd_service_h service;
-    int ret;
-
-    if (interfaceId == 0)
-    {
-        ret = dnssd_create_remote_service(type, name, nullptr, &service);
-    }
-    else
-    {
-        char iface[IF_NAMESIZE + 1] = {
-            0,
-        };
-        if (interfaceId > 0 && if_indextoname(interfaceId, iface) == nullptr)
-        {
-            ChipLogError(DeviceLayer, "if_indextoname() fails. errno: %d", errno);
-            return CHIP_ERROR_INTERNAL;
-        }
-        ret = dnssd_create_remote_service(type, name, iface, &service);
-    }
-
-    VerifyOrReturnError(CheckForSuccess(rCtx, ret, __func__, true), CHIP_ERROR_INTERNAL);
-
-    DnssdTizen::GetInstance().Add(rCtx, service);
-    if (MainLoop::Instance().AsyncRequest(ResolveAsync, rCtx) == false)
-    {
-        chip::Platform::Delete(rCtx);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -495,12 +418,13 @@ BrowseContext::~BrowseContext()
     }
 }
 
-ResolveContext::ResolveContext(const char * rType, const char * rName, uint32_t interfaceId, DnssdResolveCallback callback,
-                               void * context) :
+ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
+                               DnssdResolveCallback callback, void * context) :
     GenericContext(ContextType::Resolve)
 {
-    Platform::CopyString(mName, rName);
-    Platform::CopyString(mType, rType);
+    mInstance = instance;
+    Platform::CopyString(mName, name);
+    Platform::CopyString(mType, type);
     mInterfaceId = interfaceId;
 
     mCallback  = callback;
@@ -618,7 +542,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
 
 exit:
     if (err != CHIP_NO_ERROR)
-    {
+    { // Notify caller about error
         callback(context, nullptr, err);
         UnregisterService(serviceHandle);
     }
@@ -664,7 +588,7 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, 
 
 exit:
     if (err != CHIP_NO_ERROR)
-    {
+    { // Notify caller about error
         callback(context, nullptr, 0, err);
         RemoveContext(browseCtx.get());
     }
@@ -674,49 +598,55 @@ exit:
 CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                                void * context)
 {
-    std::string regtype = GetFullType(browseResult.mType, browseResult.mProtocol);
-    return ::Resolve(interface.GetPlatformInterface(), regtype.c_str(), browseResult.mName, callback, context);
-}
+    std::string fullType = GetFullType(browseResult.mType, browseResult.mProtocol);
+    auto interfaceId     = interface.GetPlatformInterface();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    bool ok              = false;
+    int ret;
 
-DnssdTizen::~DnssdTizen()
-{
-    auto iter = mContexts.cbegin();
-    while (iter != mContexts.cend())
-    {
-        chip::Platform::Delete(*iter);
-        mContexts.erase(iter);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, browseResult.mName, fullType.c_str(),
+                  interfaceId);
+
+    auto resolveCtx = std::make_shared<ResolveContext>(this, browseResult.mName, fullType.c_str(), interfaceId, callback, context);
+
+    { // Add created context to local register
+        std::lock_guard<std::mutex> lock(mMutex);
+        mResolveContexts.emplace(resolveCtx);
     }
-}
 
-CHIP_ERROR DnssdTizen::Add(ResolveContext * context, dnssd_service_h service)
-{
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    context->mServiceHandle = service;
-    mContexts.push_back(context);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DnssdTizen::Remove(GenericContext * context)
-{
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    auto iter = mContexts.cbegin();
-    while (iter != mContexts.end())
+    if (interfaceId == 0)
     {
-        if (*iter == context)
-        {
-            chip::Platform::Delete(*iter);
-            mContexts.erase(iter);
-            return CHIP_NO_ERROR;
-        }
-        ++iter;
+        ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, nullptr, &resolveCtx->mServiceHandle);
     }
-    return CHIP_ERROR_KEY_NOT_FOUND;
+    else
+    {
+        char iface[IF_NAMESIZE + 1] = "";
+        VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
+                     (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), err = CHIP_ERROR_INTERNAL));
+        ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, iface, &resolveCtx->mServiceHandle);
+    }
+
+    VerifyOrExit(ret == DNSSD_ERROR_NONE,
+                 (ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed. ret: %d", ret), err = GetChipError(ret)));
+
+    ok = MainLoop::Instance().AsyncRequest(ResolveAsync, resolveCtx.get());
+    VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    { // Notify caller about error
+        callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
+        RemoveContext(resolveCtx.get());
+    }
+    return err;
 }
 
 CHIP_ERROR DnssdTizen::RemoveContext(GenericContext * context)
 {
     mBrowseContexts.erase(
         std::find_if(mBrowseContexts.begin(), mBrowseContexts.end(), [context](const auto & ctx) { return ctx.get() == context; }));
+    mResolveContexts.erase(std::find_if(mResolveContexts.begin(), mResolveContexts.end(),
+                                        [context](const auto & ctx) { return ctx.get() == context; }));
     return CHIP_NO_ERROR;
 }
 
