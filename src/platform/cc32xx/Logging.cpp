@@ -83,7 +83,7 @@ namespace DeviceLayer {
 /**
  * Called whenever a log message is emitted.
  *
- * Can be overriden by the device logging file
+ * Can be overridden by the device logging file
  */
 void __attribute__((weak)) OnLogOutput(void) {}
 
