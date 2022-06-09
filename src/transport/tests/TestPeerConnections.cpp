@@ -99,9 +99,9 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
     // If not using a heap, we can fill the SecureSessionTable
     for (int i = 2; i < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE; ++i)
     {
-        sessions[i] =
-            connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, static_cast<uint16_t>(i + 6u), kLocalNodeId,
-                                                      kCasePeer2NodeId, kPeer2CATs, 3, kFabricIndex, GetLocalMRPConfig());
+        sessions[i] = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE,
+                                                                static_cast<uint16_t>(static_cast<uint16_t>(i) + 6u), kLocalNodeId,
+                                                                kCasePeer2NodeId, kPeer2CATs, 3, kFabricIndex, GetLocalMRPConfig());
         NL_TEST_ASSERT(inSuite, sessions[i].HasValue());
     }
 
