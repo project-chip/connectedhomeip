@@ -136,8 +136,14 @@ CHIP_ERROR GetStats(Stats & stats)
 
     stats.free = sysHeapStats.free_bytes;
     stats.used = sysHeapStats.allocated_bytes;
+    stats.maxUsed = sysHeapStats.max_allocated_bytes;
 
     return CHIP_NO_ERROR;
+}
+
+void ResetMaxStats()
+{
+    (void) sys_heap_runtime_stats_reset_max(&sHeap);
 }
 
 #endif // CONFIG_SYS_HEAP_RUNTIME_STATS
