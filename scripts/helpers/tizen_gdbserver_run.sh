@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SDB="${TIZEN_SDK_ROOT}/tools/sdb"
+SDB="$TIZEN_SDK_ROOT/tools/sdb"
 PORT=9999
 RESULT_MODE="debug"
 
@@ -37,18 +37,18 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [ -z $APP_NAME ]; then
+if [ -z "$APP_NAME" ]; then
     help
 fi
 
-if [ $($SDB devices | wc -l) -le 1 ]; then
+if [ "$("$SDB" devices | wc -l)" -le 1 ]; then
     echo "No device connected"
     exit 1
 fi
 
-$SDB shell "/usr/bin/app_launcher -s \"$APP_NAME\" \
+"$SDB" shell "/usr/bin/app_launcher -s \"$APP_NAME\" \
     __AUL_SDK__ $RESULT_MODE \
     __DLP_DEBUG_ARG__ :$PORT \
-    __DLP_GDBSERVER_PATH__ ${SDK_TOOLS_PATH}/gdbserver/gdbserver \
+    __DLP_GDBSERVER_PATH__ $SDK_TOOLS_PATH/gdbserver/gdbserver \
     $APP_ARGS \
     "
