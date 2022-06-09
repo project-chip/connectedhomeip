@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace app {
+using Status = Protocols::InteractionModel::Status;
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
@@ -116,9 +117,12 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-    SuccessOrExit(err);
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    bool suppressErrorStatusResponse = false;
+    CHIP_ERROR statusError           = CHIP_NO_ERROR;
+    SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    suppressErrorStatusResponse = true;
+    SuccessOrExit(err = statusError);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:
@@ -163,6 +167,10 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (!suppressErrorStatusResponse)
+        {
+            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
     }
 
@@ -253,7 +261,8 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        err = OnUnknownMsgType();
     }
     return err;
 }
@@ -265,12 +274,12 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
             GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
 }
 
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                         System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnUnknownMsgType()
 {
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    CHIP_ERROR err =
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     Close();
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    return err;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)

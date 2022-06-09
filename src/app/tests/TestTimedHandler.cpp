@@ -68,7 +68,12 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
         mLastMessageWasStatus = aPayloadHeader.HasMessageType(MsgType::StatusResponse);
         if (mLastMessageWasStatus)
         {
-            mError = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+            CHIP_ERROR statusError = CHIP_NO_ERROR;
+            mError                 = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            if (mError == CHIP_NO_ERROR)
+            {
+                mError = statusError;
+            }
         }
         if (mKeepExchangeOpen)
         {
