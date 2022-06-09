@@ -116,6 +116,7 @@ RUN set -x \
     -A 'libcynara-commons-*.armv7l.rpm' \
     -A 'libdns_sd-*.armv7l.rpm' \
     -A 'libjson-glib-*.armv7l.rpm' \
+    -A 'libsessiond-0*.armv7l.rpm' \
     -A 'libsystemd-*.armv7l.rpm' \
     -A 'libtzplatform-config-*.armv7l.rpm' \
     -A 'parcel-0*.armv7l.rpm' \
@@ -136,9 +137,8 @@ RUN set -x \
     && unrpm *.rpm \
     && cp -rf lib usr $TIZEN_SDK_SYSROOT \
     # Fix some symbolic links
-    && ln -sf libcap.so.2 $TIZEN_SDK_SYSROOT/usr/lib/libcap.so \
-    && ln -sf libdns_sd.so.878.70.2 $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so \
-    && ln -sf libdns_sd.so.878.70.2 $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so.878 \
+    && ln -sf libcap.so.2 $TIZEN_SDK_SYSROOT/lib/libcap.so \
+    && ln -sf $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so.*.*.* $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so \
     && ln -sf openssl1.1.pc $TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc \
     # Cleanup
     && rm -rf /tmp/workdir \
