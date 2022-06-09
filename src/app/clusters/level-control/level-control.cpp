@@ -145,7 +145,6 @@ static void schedule(EndpointId endpoint, uint32_t delayMs)
         ChipLogError(Zcl, "Maximum number of concurrent level transitions reached");
         return;
     }
-    ChipLogError(Zcl, "Allocated endpoint %d", endpoint);
 
     DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(delayMs),
@@ -163,7 +162,6 @@ static void deactivate(EndpointId endpoint)
         if (*entry == endpoint)
         {
             eventEndpoints.ReleaseObject(entry);
-            ChipLogError(Zcl, "Released endpoint %d", endpoint);
             return Loop::Break;
         }
         return Loop::Continue;
