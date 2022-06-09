@@ -24,8 +24,8 @@
 #pragma once
 
 #include <messaging/Flags.h>
-#include <transport/SessionManager.h>
 #include <protocols/Protocols.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
