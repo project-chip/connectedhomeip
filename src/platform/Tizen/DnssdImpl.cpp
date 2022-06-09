@@ -151,50 +151,39 @@ gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
-void OnBrowseAdd(BrowseContext * context, dnssd_service_h service, const char * type, const char * name, uint32_t interfaceId)
+void OnBrowseAdd(BrowseContext * context, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s", __func__, type, name);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, name, type, interfaceId);
 
     char * tokens  = strdup(type);
     char * regtype = strtok(tokens, ".");
-    chip::Inet::InterfaceId platformInterface(interfaceId);
 
-    DnssdService mdnsService = {};
-    g_strlcpy(mdnsService.mType, regtype, sizeof(mdnsService.mType));
-    g_strlcpy(mdnsService.mName, name, sizeof(mdnsService.mName));
-    mdnsService.mProtocol  = context->mProtocol;
-    mdnsService.mInterface = platformInterface;
+    DnssdService dnssdService = {};
+    chip::Platform::CopyString(dnssdService.mName, name);
+    chip::Platform::CopyString(dnssdService.mType, regtype);
+    dnssdService.mProtocol  = context->mProtocol;
+    dnssdService.mInterface = chip::Inet::InterfaceId(interfaceId);
 
-    context->mServices.push_back(mdnsService);
+    context->mServices.push_back(dnssdService);
+
     free(tokens);
-
-    dnssd_destroy_remote_service(service);
 }
 
-void OnBrowseRemove(BrowseContext * context, dnssd_service_h service, const char * type, const char * name, uint32_t interfaceId)
+void OnBrowseRemove(BrowseContext * context, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
-
-    auto it = std::remove_if(
-        context->mServices.begin(), context->mServices.end(), [name, type, interfaceId](const DnssdService & mdnsService) {
-            return strcmp(name, mdnsService.mName) == 0 && type == GetFullType(mdnsService.mType, mdnsService.mProtocol) &&
-                interfaceId == mdnsService.mInterface.GetPlatformInterface();
-        });
-
-    context->mServices.erase(it);
-
-    dnssd_destroy_remote_service(service);
-}
-
-void StopBrowse(BrowseContext * context)
-{
-    DnssdTizen::GetInstance().Remove(context);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, name, type, interfaceId);
+    context->mServices.erase(std::remove_if(
+        context->mServices.begin(), context->mServices.end(), [name, type, interfaceId](const DnssdService & service) {
+            return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
+                interfaceId == service.mInterface.GetPlatformInterface();
+        }));
 }
 
 void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto bCtx = reinterpret_cast<BrowseContext *>(data);
+    int ret;
 
     // Always stop browsing
     g_main_loop_quit(bCtx->mMainLoop);
@@ -204,27 +193,29 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     char * ifaceName     = nullptr;
     uint32_t interfaceId = 0;
 
-    int ret = dnssd_service_get_type(service, &type);
-    VerifyOrExit(CheckForSuccess(bCtx, ret, __func__, true), );
+    ret = dnssd_service_get_type(service, &type);
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_type() failed. ret: %d", ret));
 
     ret = dnssd_service_get_name(service, &name);
-    VerifyOrExit(CheckForSuccess(bCtx, ret, __func__, true), );
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
     ret = dnssd_service_get_interface(service, &ifaceName);
-    VerifyOrExit(CheckForSuccess(bCtx, ret, __func__, true), );
-    interfaceId = if_nametoindex(ifaceName);
-    VerifyOrExit(interfaceId > 0, );
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
 
-    ChipLogDetail(DeviceLayer, "DNSsd %s type: %s, name: %s, interfaceId: %u", __func__, type, name, interfaceId);
+    interfaceId = if_nametoindex(ifaceName);
+    VerifyOrExit(interfaceId > 0,
+                 (ChipLogError(DeviceLayer, "if_nametoindex() failed. errno: %d", errno), ret = DNSSD_ERROR_OPERATION_FAILED));
 
     if (state == DNSSD_SERVICE_STATE_AVAILABLE)
     {
-        OnBrowseAdd(bCtx, service, type, name, interfaceId);
+        OnBrowseAdd(bCtx, type, name, interfaceId);
     }
     else
     {
-        OnBrowseRemove(bCtx, service, type, name, interfaceId);
+        OnBrowseRemove(bCtx, type, name, interfaceId);
     }
+
+    dnssd_destroy_remote_service(service);
 
     // For now, there is no way to wait for multiple services to be found.
     // Darwin implementation just checks if kDNSServiceFlagsMoreComing is set or not,
@@ -232,11 +223,16 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     // (In many cases, kDNSServiceFlagsMoreComing is not set)
     bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
 
-    // Darwin and Linux implementations stop browsing when a Browse Callback is invoked.
-    // I'm not sure if it is a proper operation.
-    StopBrowse(bCtx);
-
 exit:
+
+    if (ret != DNSSD_ERROR_NONE)
+    {
+        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, GetChipError(ret));
+    }
+
+    // After this point, the context might be no longer valid
+    bCtx->mInstance->RemoveContext(bCtx);
+
     g_free(type);
     g_free(name);
     g_free(ifaceName);
@@ -246,47 +242,31 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
-    auto * bCtx     = reinterpret_cast<BrowseContext *>(userData);
-    bCtx->mMainLoop = mainLoop;
-
-    uint32_t interfaceId = bCtx->mInterfaceId;
+    auto * bCtx      = reinterpret_cast<BrowseContext *>(userData);
+    auto interfaceId = bCtx->mInterfaceId;
+    bCtx->mMainLoop  = mainLoop;
     int ret;
-    dnssd_browser_h browser;
+
     if (interfaceId == 0)
     {
-        ret = dnssd_browse_service(bCtx->mType, nullptr, &browser, OnBrowse, bCtx);
+        ret = dnssd_browse_service(bCtx->mType, nullptr, &bCtx->mBrowserHandle, OnBrowse, bCtx);
     }
     else
     {
-        char iface[IF_NAMESIZE + 1] = {
-            0,
-        };
-        if (interfaceId > 0 && if_indextoname(interfaceId, iface) == nullptr)
-        {
-            ChipLogError(DeviceLayer, "if_indextoname() fails. errno: %d", errno);
-            return false;
-        }
-        ret = dnssd_browse_service(bCtx->mType, iface, &browser, OnBrowse, bCtx);
+        char iface[IF_NAMESIZE + 1] = "";
+        VerifyOrReturnError(if_indextoname(interfaceId, iface) != nullptr,
+                            (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), false));
+        ret = dnssd_browse_service(bCtx->mType, iface, &bCtx->mBrowserHandle, OnBrowse, bCtx);
     }
 
-    VerifyOrReturnError(CheckForSuccess(bCtx, ret, __func__, true), false);
-    bCtx->mIsBrowsing = true;
-    DnssdTizen::GetInstance().Add(bCtx, browser);
-
-    return true;
-}
-
-CHIP_ERROR Browse(uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol, DnssdBrowseCallback callback,
-                  void * context)
-{
-    BrowseContext * bCtx = chip::Platform::New<BrowseContext>(protocol, type, interfaceId, callback, context);
-    if (MainLoop::Instance().AsyncRequest(BrowseAsync, bCtx) == false)
+    if (ret != DNSSD_ERROR_NONE)
     {
-        chip::Platform::Delete(bCtx);
-        return CHIP_ERROR_INTERNAL;
+        ChipLogError(DeviceLayer, "dnssd_browse_service() failed. ret: %d", ret);
+        return false;
     }
 
-    return CHIP_NO_ERROR;
+    bCtx->mIsBrowsing = true;
+    return true;
 }
 
 void StopResolve(ResolveContext * context)
@@ -494,12 +474,13 @@ RegisterContext::~RegisterContext()
     }
 }
 
-BrowseContext::BrowseContext(DnssdServiceProtocol cbContextProtocol, const char * bType, uint32_t interfaceId,
+BrowseContext::BrowseContext(DnssdTizen * instance, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
                              DnssdBrowseCallback callback, void * context) :
     GenericContext(ContextType::Browse)
 {
-    mProtocol = cbContextProtocol;
-    Platform::CopyString(mType, bType);
+    mInstance = instance;
+    Platform::CopyString(mType, type);
+    mProtocol    = protocol;
     mInterfaceId = interfaceId;
 
     mCallback  = callback;
@@ -556,20 +537,20 @@ CHIP_ERROR DnssdTizen::Shutdown()
 
 CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context)
 {
-    std::string type = GetFullType(service.mType, service.mProtocol);
-    auto interfaceId = service.mInterface.GetPlatformInterface();
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    bool ok          = false;
+    std::string fullType = GetFullType(service.mType, service.mProtocol);
+    auto interfaceId     = service.mInterface.GetPlatformInterface();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    bool ok              = false;
 
-    ChipLogProgress(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u, port: %u", __func__, service.mName, type.c_str(),
-                    interfaceId, service.mPort);
+    ChipLogProgress(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u, port: %u", __func__, service.mName,
+                    fullType.c_str(), interfaceId, service.mPort);
 
     { // If the service was already registered, update it
         std::lock_guard<std::mutex> lock(mMutex);
 
-        auto iServiceCtx =
-            std::find_if(mRegisteredServices.begin(), mRegisteredServices.end(), [type, service, interfaceId](const auto & ctx) {
-                return (strcmp(ctx->mName, service.mName) == 0 && strcmp(ctx->mType, type.c_str()) == 0 &&
+        auto iServiceCtx = std::find_if(
+            mRegisteredServices.begin(), mRegisteredServices.end(), [fullType, service, interfaceId](const auto & ctx) {
+                return (strcmp(ctx->mName, service.mName) == 0 && strcmp(ctx->mType, fullType.c_str()) == 0 &&
                         ctx->mPort == service.mPort && ctx->mInterfaceId == interfaceId);
             });
         if (iServiceCtx != mRegisteredServices.end())
@@ -592,7 +573,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
         }
     }
 
-    auto serviceCtx = std::make_shared<RegisterContext>(this, type.c_str(), service, callback, context);
+    auto serviceCtx = std::make_shared<RegisterContext>(this, fullType.c_str(), service, callback, context);
 
     { // Add context to registered services list
         std::lock_guard<std::mutex> lock(mMutex);
@@ -600,7 +581,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     }
 
     // Local service will be freed by the RegisterContext destructor
-    int ret            = dnssd_create_local_service(type.c_str(), &serviceCtx->mServiceHandle);
+    int ret            = dnssd_create_local_service(fullType.c_str(), &serviceCtx->mServiceHandle);
     auto serviceHandle = serviceCtx->mServiceHandle;
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  (ChipLogError(DeviceLayer, "dnssd_create_local_service() failed. ret: %d", ret), err = GetChipError(ret)));
@@ -666,8 +647,28 @@ CHIP_ERROR DnssdTizen::UnregisterAllServices()
 CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                               chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
 {
-    std::string regtype = GetFullType(type, protocol);
-    return ::Browse(interface.GetPlatformInterface(), regtype.c_str(), protocol, callback, context);
+    std::string fullType = GetFullType(type, protocol);
+    auto interfaceId     = interface.GetPlatformInterface();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    bool ok              = false;
+
+    auto browseCtx = std::make_shared<BrowseContext>(this, fullType.c_str(), protocol, interfaceId, callback, context);
+
+    { // Add created context to local register
+        std::lock_guard<std::mutex> lock(mMutex);
+        mBrowseContexts.emplace(browseCtx);
+    }
+
+    ok = MainLoop::Instance().AsyncRequest(BrowseAsync, browseCtx.get());
+    VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        callback(context, nullptr, 0, err);
+        RemoveContext(browseCtx.get());
+    }
+    return err;
 }
 
 CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -685,15 +686,6 @@ DnssdTizen::~DnssdTizen()
         chip::Platform::Delete(*iter);
         mContexts.erase(iter);
     }
-}
-
-CHIP_ERROR DnssdTizen::Add(BrowseContext * context, dnssd_browser_h browser)
-{
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(browser != 0, CHIP_ERROR_INVALID_ARGUMENT);
-    context->mBrowserHandle = browser;
-    mContexts.push_back(context);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DnssdTizen::Add(ResolveContext * context, dnssd_service_h service)
@@ -719,6 +711,13 @@ CHIP_ERROR DnssdTizen::Remove(GenericContext * context)
         ++iter;
     }
     return CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+CHIP_ERROR DnssdTizen::RemoveContext(GenericContext * context)
+{
+    mBrowseContexts.erase(
+        std::find_if(mBrowseContexts.begin(), mBrowseContexts.end(), [context](const auto & ctx) { return ctx.get() == context; }));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)

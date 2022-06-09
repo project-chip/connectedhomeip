@@ -70,8 +70,9 @@ struct RegisterContext : public GenericContext
 
 struct BrowseContext : public GenericContext
 {
-    DnssdServiceProtocol mProtocol;
+    DnssdTizen * mInstance;
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
+    DnssdServiceProtocol mProtocol;
     uint32_t mInterfaceId;
 
     DnssdBrowseCallback mCallback;
@@ -81,8 +82,8 @@ struct BrowseContext : public GenericContext
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
-    BrowseContext(DnssdServiceProtocol cbContextProtocol, const char * bType, uint32_t interfaceId, DnssdBrowseCallback callback,
-                  void * context);
+    BrowseContext(DnssdTizen * instance, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
+                  DnssdBrowseCallback callback, void * context);
     ~BrowseContext() override;
 };
 
@@ -122,9 +123,10 @@ public:
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
 
-    CHIP_ERROR Add(BrowseContext * context, dnssd_browser_h browser);
     CHIP_ERROR Add(ResolveContext * context, dnssd_service_h service);
     CHIP_ERROR Remove(GenericContext * context);
+
+    CHIP_ERROR RemoveContext(GenericContext * context);
 
     static DnssdTizen & GetInstance() { return sInstance; }
 
@@ -134,6 +136,7 @@ private:
 
     std::mutex mMutex;
     std::vector<GenericContext *> mContexts;
+    std::set<std::shared_ptr<BrowseContext>> mBrowseContexts;
     std::set<std::shared_ptr<RegisterContext>> mRegisteredServices;
 };
 
