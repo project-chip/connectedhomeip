@@ -145,7 +145,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         uint8_t i = 0;
         for (auto & item : valueBuf)
         {
-            item.fabricIndex = i;
+            item.member1 = i;
             i++;
         }
 
@@ -328,7 +328,7 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
         while (iter.Next())
         {
             auto & item = iter.GetValue();
-            NL_TEST_ASSERT(apSuite, item.fabricIndex == i);
+            NL_TEST_ASSERT(apSuite, item.member1 == i);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == 4);

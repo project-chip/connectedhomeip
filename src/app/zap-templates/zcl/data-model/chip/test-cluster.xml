@@ -18,8 +18,8 @@ limitations under the License.
   <domain name="CHIP"/>
   <struct name="TestListStructOctet">
     <cluster code="0xFFF1FC05"/>
-    <item name="fabricIndex" type="INT64U"/>
-    <item name="operationalCert" type="OCTET_STRING" length="32"/>
+    <item name="member1" type="INT64U"/>
+    <item name="member2" type="OCTET_STRING" length="32"/>
   </struct>
 
   <struct name="TestFabricScoped">

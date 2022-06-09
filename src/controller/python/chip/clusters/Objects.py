@@ -38145,12 +38145,12 @@ class TestCluster(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="operationalCert", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="member1", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="member2", Tag=1, Type=bytes),
                     ])
 
-            fabricIndex: 'uint' = 0
-            operationalCert: 'bytes' = b""
+            member1: 'uint' = 0
+            member2: 'bytes' = b""
 
 
 
