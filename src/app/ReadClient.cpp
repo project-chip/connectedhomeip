@@ -422,6 +422,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else
     {
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
 

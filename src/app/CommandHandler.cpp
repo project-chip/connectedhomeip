@@ -74,6 +74,11 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     // Exchange Manager for unsolicited InvokeCommand Requests.
     mpExchangeCtx = ec;
 
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    //
+    mpExchangeCtx->SetDelegate(this);
+
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     // TODO: This is broken!  If something under here returns error, we will try
     // to SendCommandResponse(), and then our caller will try to send a status
@@ -111,11 +116,15 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
                                    /* aExpectResponse = */ false);
 
-        if (err != CHIP_NO_ERROR)
+        if (mpExchangeCtx != nullptr)
         {
-            // We have to manually close the exchange, because we called
-            // WillSendMessage already.
-            mpExchangeCtx->Close();
+            mpExchangeCtx->SetDelegate(nullptr);
+            if (err != CHIP_NO_ERROR)
+            {
+                // We have to manually close the exchange, because we called
+                // WillSendMessage already.
+                mpExchangeCtx->Close();
+            }
         }
 
         // Null out the (now-closed) exchange, so that when we try to
@@ -158,6 +167,19 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     ReturnErrorOnFailure(err);
     return invokeRequestMessage.ExitContainer();
+}
+
+CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                           System::PacketBufferHandle && aPayload)
+{
+    ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+    StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    Close();
+    return CHIP_NO_ERROR;
+}
+
+void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+{
 }
 
 void CommandHandler::Close()

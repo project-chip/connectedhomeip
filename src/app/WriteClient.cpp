@@ -480,6 +480,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else
     {
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
 
@@ -492,7 +493,7 @@ exit:
         }
     }
 
-    if (mState != State::AwaitingResponse)
+    if (mState != State::AwaitingResponse || err != CHIP_NO_ERROR)
     {
         Close();
     }

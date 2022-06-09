@@ -46,7 +46,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler
+class CommandHandler: public Messaging::ExchangeDelegate
 {
 public:
     /*
@@ -232,6 +232,11 @@ public:
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
+
+    // ExchangeDelegate
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     enum class State
     {

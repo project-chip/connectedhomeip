@@ -138,9 +138,14 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
                        "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
+
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        {
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }

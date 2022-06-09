@@ -143,6 +143,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
     else
     {
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
 
@@ -155,7 +156,7 @@ exit:
         }
     }
 
-    if (mState != State::CommandSent)
+    if (mState != State::CommandSent || err != CHIP_NO_ERROR)
     {
         Close();
     }
