@@ -161,6 +161,30 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
     return count;
 }
 
+CommandHandler * InteractionModelEngine::ActiveCommandHandlerAt(unsigned int aIndex)
+{
+    if (aIndex >= mCommandHandlerObjs.Allocated())
+    {
+        return nullptr;
+    }
+
+    unsigned int i       = 0;
+    CommandHandler * ret = nullptr;
+
+    mCommandHandlerObjs.ForEachActiveObject([aIndex, &i, &ret](CommandHandler * handler) {
+        if (i == aIndex)
+        {
+            ret = handler;
+            return Loop::Break;
+        }
+
+        i++;
+        return Loop::Continue;
+    });
+
+    return ret;
+}
+
 ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
 {
     if (aIndex >= mReadHandlers.Allocated())
@@ -261,22 +285,19 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
     mReadHandlers.ReleaseObject(&apReadObj);
 }
 
-CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                          const PayloadHeader & aPayloadHeader,
-                                                          System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                                          Protocols::InteractionModel::Status & aStatus)
+Protocols::InteractionModel::Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                                                   const PayloadHeader & aPayloadHeader,
+                                                                                   System::PacketBufferHandle && aPayload,
+                                                                                   bool aIsTimedInvoke)
 {
     CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
-        aStatus = Status::Busy;
-        return CHIP_ERROR_NO_MEMORY;
+        return Protocols::InteractionModel::Status::Busy;
     }
-    ReturnErrorOnFailure(
-        commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke));
-    aStatus = Status::Success;
-    return CHIP_NO_ERROR;
+
+    return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -549,7 +570,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-        OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false, status);
+        status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ false);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
@@ -573,9 +594,14 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     {
         OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
     }
+    else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
+    {
+        return StatusResponse::ProcessStatusResponse(std::move(aPayload));
+    }
     else
     {
         ChipLogProgress(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+        status = Protocols::InteractionModel::Status::InvalidAction;
     }
 
     if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
@@ -1331,8 +1357,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
 
-    Status status = Status::Failure;
-    OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true, status);
+    Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
         StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
