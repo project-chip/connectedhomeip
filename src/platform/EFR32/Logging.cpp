@@ -133,10 +133,13 @@ extern "C" void efr32Log(const char * aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
+    TickType_t now;
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
-    strcpy(formattedMsg, LOG_EFR32);
+    // strcat(formattedMsg, LOG_EFR32);
+    now = xTaskGetTickCount();
+    snprintf(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE, "[%ld] %s", now, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
     size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
 
