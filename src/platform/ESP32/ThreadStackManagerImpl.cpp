@@ -91,24 +91,5 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
     // Intentionally empty.
 }
 
-void ThreadStackManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_OnPlatformEvent(event);
-
-    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
-    {
-        const bool isAttached = IsThreadAttached();
-        VerifyOrReturn(isAttached != mIsAttached);
-        ChipDeviceEvent attachEvent;
-        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
-        attachEvent.ThreadConnectivityChange.Result = isAttached ? kConnectivity_Established : kConnectivity_Lost;
-
-        CHIP_ERROR error = PlatformMgr().PostEvent(&attachEvent);
-        VerifyOrReturn(error == CHIP_NO_ERROR,
-                       ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
-        mIsAttached = isAttached;
-    }
-}
-
 } // namespace DeviceLayer
 } // namespace chip

@@ -209,41 +209,38 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             }
         }
 #endif
-        Impl()->LockThreadStack();
 
-#if CHIP_DETAIL_LOGGING
-
-        LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
-
-#endif // CHIP_DETAIL_LOGGING
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.RoleChanged || event->ThreadStateChange.AddressChanged)
+        bool isThreadAttached = Impl()->_IsThreadAttached();
+        // Avoid sending muliple events if the attachement state didn't change (Child->router or disable->Detached)
+        if (event->ThreadStateChange.RoleChanged && (isThreadAttached != mIsAttached))
         {
-            bool isInterfaceUp;
-            isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
-            // Post an event signaling the change in Thread interface connectivity state.
+            ChipDeviceEvent attachEvent;
+            attachEvent.Clear();
+            attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+            attachEvent.ThreadConnectivityChange.Result = (isThreadAttached) ? kConnectivity_Established : kConnectivity_Lost;
+            CHIP_ERROR status                           = PlatformMgr().PostEvent(&attachEvent);
+            if (status == CHIP_NO_ERROR)
             {
-                ChipDeviceEvent event;
-                event.Clear();
-                event.Type                            = DeviceEventType::kThreadConnectivityChange;
-                event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-                CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
-                if (status != CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
-                }
+                mIsAttached = isThreadAttached;
             }
-
-            // Refresh Multicast listening
-            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            else
             {
-                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-                Server::GetInstance().RejoinExistingMulticastGroups();
+                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
+        {
+            // Refresh Multicast listening
+            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+            Server::GetInstance().RejoinExistingMulticastGroups();
+        }
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        Impl()->UnlockThreadStack();
+
+#if CHIP_DETAIL_LOGGING
+        LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+#endif // CHIP_DETAIL_LOGGING
     }
 }
 

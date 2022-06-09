@@ -67,15 +67,12 @@ protected:
     void _ProcessThreadActivity();
     void _OnCHIPoBLEAdvertisingStart();
     void _OnCHIPoBLEAdvertisingStop();
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
 private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     static ThreadStackManagerImpl sInstance;
     ThreadStackManagerImpl() = default;
-
-    bool mIsAttached = false;
 };
 
 /**
