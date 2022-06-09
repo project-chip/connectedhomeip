@@ -235,12 +235,11 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ctx.DrainAndServiceIO();
 
     auto & loopback = ctx.GetLoopback();
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 1);
+    // There should have been two message sent: Sigma1 and an ack.
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
 
-    // Clear pending packet in CRMP
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = context->GetReliableMessageContext();
-    rm->ClearRetransTable(rc);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
