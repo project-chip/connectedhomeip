@@ -35,7 +35,7 @@ RUN apt-get -fy install git vim emacs sudo \
     wget curl telnet \
     docker.io \
     iputils-ping net-tools \
-    libncurses5 \ 
+    libncurses5 \
     libpython2.7
 
 RUN groupadd -g $USER_GID $USERNAME
