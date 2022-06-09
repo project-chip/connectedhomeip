@@ -308,6 +308,7 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
                                          System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, /* aExpectResponse = */ false);
     Close();
     return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
