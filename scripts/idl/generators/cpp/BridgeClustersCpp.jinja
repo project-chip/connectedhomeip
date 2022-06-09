@@ -1,0 +1,120 @@
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+
+#include <new>
+
+namespace clusters {
+{% for struct in structs %}
+struct {{struct.name}}
+{
+  {%-   for field in struct.fields %}
+  {{field | getField(cluster, idl)}} {{field.name}};
+  {%-  endfor  %}
+};
+{%- endfor %}
+
+{%- for cluster in clusters %}
+{%-   if cluster | dynamicCluster(idl) %}
+struct {{cluster.name}}Cluster : public CommonCluster
+{
+  {%   for struct in cluster.structs %}
+  struct {{struct.name}}
+  {
+    {%-     for field in struct.fields %}
+    {{field | getField(cluster, idl)}} {{field.name}};
+    {%-    endfor  %}
+  };
+  {%-   endfor %}
+
+
+  static constexpr chip::ClusterId kClusterId = ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID;
+
+  chip::ClusterId GetClusterId() override { return kClusterId; }
+
+  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  {
+    switch(am->attributeId) {
+  {%  for attr in cluster.attributes -%}
+  {%    if attr.is_readable %}
+    case {{attr.definition.code}}:
+      return m{{attr.definition.name | capitalcase}}.Read(am, buffer, maxReadLength);
+  {%-    endif %}
+  {%-  endfor  %}
+    default:
+      return EMBER_ZCL_STATUS_FAILURE;
+    }
+  }
+
+  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
+  {
+    switch(am->attributeId) {
+  {%  for attr in cluster.attributes -%}
+  {%    if attr.is_writable %}
+    case {{attr.definition.code}}:
+      return m{{attr.definition.name | capitalcase}}.WriteFromMatter(am, buffer, this);
+  {%-    endif %}
+  {%-  endfor  %}
+    default:
+      return EMBER_ZCL_STATUS_FAILURE;
+    }
+  }
+
+  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
+  {
+    switch(attributeId) {
+  {%  for attr in cluster.attributes %}
+    case {{attr.definition.code}}:
+      m{{attr.definition.name | capitalcase}}.WriteFromBridge(buffer, this);
+      break;
+  {%-  endfor  %}
+    }
+  }
+
+  template<typename T>
+  void AddAllAttributes(T *list)
+  {
+  {%  for attr in cluster.attributes %}
+    list->Add(m{{attr.definition.name | capitalcase}});
+  {%-  endfor  %}
+  }
+
+  chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
+  {
+    return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
+  }
+
+{%  for attr in cluster.attributes %}
+  Attribute<{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
+{%-  endfor  %}
+
+  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+{%  for attr in cluster.attributes %}
+    { {{attr.definition.code}},  {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}}, ZAP_EMPTY_DEFAULT() },
+{%-  endfor  %}
+  };
+};
+{%-   endif %}
+{%- endfor %}
+
+struct ClusterInfo
+{
+  chip::ClusterId id;
+  const char *name;
+  uint16_t size;
+  CommonCluster* (*ctor)(void*);
+} const kKnownClusters[] = {
+{% for cluster in clusters %}
+{%-   if cluster | dynamicCluster(idl) %}
+  {
+    ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID,
+    "{{cluster.name}}",
+    sizeof({{cluster.name}}Cluster),
+    [](void *mem) -> CommonCluster* {
+      return new(mem) {{cluster.name}}Cluster();
+    },
+  },
+{%-   endif %}
+{%- endfor %}
+};
+
+}

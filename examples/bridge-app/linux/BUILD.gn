@@ -12,29 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
+action("chip-bridge-codegen") {
+  script = "${chip_root}/scripts/codegen.py"
+  sources = [ "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter" ]
+  outputs = [ "$target_gen_dir/cpp/BridgeClustersImpl.h" ]
+
+  args = [
+    "--generator", "cpp",
+    "--output-dir", rebase_path(target_gen_dir, root_build_dir),
+    rebase_path("${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter", root_build_dir)
+  ]
+  deps = [
+    "${chip_root}/scripts/idl",
+  ]
+}
+
 executable("chip-bridge-app") {
   sources = [
     "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
+    "Clusters.cpp",
     "Device.cpp",
+    "DynamicDevice.cpp",
+    "UserInputBackend.cpp",
     "include/Device.h",
     "main.cpp",
   ]
 
   deps = [
+    ":chip-bridge-codegen",
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [ "include", target_gen_dir ]
 
   output_dir = root_out_dir
 }

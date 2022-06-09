@@ -25,6 +25,7 @@ pw_python_package("idl") {
     "matter_grammar.lark",
 
     # Templates used for generation
+    "generators/cpp/BridgeClustersCpp.jinja",
     "generators/java/ChipClustersCpp.jinja",
     "generators/java/ChipClustersRead.jinja",
 
@@ -56,6 +57,7 @@ pw_python_package("idl") {
     "generators/__init__.py",
     "generators/filters.py",
     "generators/java/__init__.py",
+    "generators/cpp/__init__.py",
     "generators/types.py",
     "matter_idl_parser.py",
     "matter_idl_types.py",
