@@ -379,8 +379,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            // Post event for demonstration purposes, we must ensure that the 
-            // LogEvent is called in the right context which is the Matter mainloop 
+            // Post event for demonstration purposes, we must ensure that the
+            // LogEvent is called in the right context which is the Matter mainloop
             // thru ScheduleWork()
             chip::DeviceLayer::PlatformMgr().ScheduleWork(sAppTask.PostEvents, reinterpret_cast<intptr_t>(nullptr));
 
