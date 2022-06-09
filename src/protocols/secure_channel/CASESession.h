@@ -72,7 +72,7 @@ public:
      *   Initialize using configured fabrics and wait for session establishment requests.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabrics                       Table of fabrics that are currently configured on the device
+     * @param fabricTable                   Table of fabrics that are currently configured on the device
      * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
@@ -177,7 +177,7 @@ private:
         CASESessionFabricDelegate(CASESession * caseSession)
         :  mCASESession(caseSession) {}
 
-        void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;
@@ -194,6 +194,13 @@ private:
         {
             (void) fabricTable;
             (void) fabricIndex;
+        }
+
+        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+            mCASESession->InvalidateIfPendingEstablishment();
         }
 
     private:

@@ -390,15 +390,8 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        // TODO We likely want to do the same thing regardless of fabricDeleted. For
-        // now bailing out early when only update.
-        if (!fabricDeleted)
-        {
-            return;
-        }
-
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
@@ -465,6 +458,9 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
                         ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
+
+    // This is triggered by operation credential server so there is nothing additional that we need to do.
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;

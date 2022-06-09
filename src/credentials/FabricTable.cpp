@@ -696,19 +696,6 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return AddNewFabricInner(newFabric, outputIndex);
 }
 
-void FabricTable::NotifyDelegatesOfFabricChange(FabricIndex fabricIndex, bool fabricDeleted)
-{
-    FabricTable::Delegate * delegate = mDelegateListRoot;
-    while (delegate)
-    {
-        // It is possible that delegate will remove itself from the list in OnFabricHasChanged,
-        // so we grab the next delegate in the list now.
-        FabricTable::Delegate * nextDelegate = delegate->next;
-        delegate->OnFabricHasChanged(*this, fabricIndex, fabricDeleted);
-        delegate = nextDelegate;
-    }
-}
-
 /*
  * A validation policy we can pass into VerifyCredentials to extract the
  * latest NotBefore time in the certificate chain without having to load the
@@ -752,7 +739,15 @@ CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFa
     // validity policy will see this condition and can act appropriately.
     mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
 
-    NotifyDelegatesOfFabricChange(fabricIndex, false /* fabricDeleted */);
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in OnFabricNOCUpdated,
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricNOCUpdated(*this, fabricIndex);
+        delegate = nextDelegate;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -856,11 +851,19 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         else
         {
             mFabricCount--;
-            ChipLogProgress(FabricProvisioning, "Fabric (0x%x) deleted. Calling OnFabricHasChanged",
+            ChipLogProgress(FabricProvisioning, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
                             static_cast<unsigned>(fabricIndex));
         }
 
-        NotifyDelegatesOfFabricChange(fabricIndex, true /* fabricDeleted */);
+        FabricTable::Delegate * delegate = mDelegateListRoot;
+        while (delegate)
+        {
+            // It is possible that delegate will remove itself from the list in OnFabricDeletedFromStorage,
+            // so we grab the next delegate in the list now.
+            FabricTable::Delegate * nextDelegate = delegate->next;
+            delegate->OnFabricDeletedFromStorage(*this, fabricIndex);
+            delegate = nextDelegate;
+        }
     }
     return CHIP_NO_ERROR;
 }

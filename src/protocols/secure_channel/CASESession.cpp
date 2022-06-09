@@ -157,7 +157,8 @@ void CASESession::Clear()
 
 void CASESession::InvalidateIfPendingEstablishment()
 {
-    if (!IsSessionEstablishmentInProgress()) {
+    if (!IsSessionEstablishmentInProgress())
+    {
         return;
     }
     AbortPendingEstablish(CHIP_ERROR_CANCELLED);

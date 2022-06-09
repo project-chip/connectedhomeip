@@ -173,16 +173,9 @@ public:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-
-            // TODO We likely want to do the same thing regardless of fabricDeleted. For
-            // now bailing out early when only update.
-            if (!fabricDeleted)
-            {
-                return;
-            }
 
             if (mSessionManager != nullptr)
             {
@@ -201,6 +194,12 @@ public:
         }
 
         void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
+        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;

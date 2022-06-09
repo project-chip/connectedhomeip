@@ -55,13 +55,8 @@ DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricHasChanged(FabricTable & fabricTable, FabricIndex fabricIndex, bool fabricDeleted) override
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        if (!fabricDeleted)
-        {
-            return;
-        }
-
         for (auto endpointId : EnabledEndpointsWithServerCluster(chip::app::Clusters::DoorLock::Id))
         {
             if (!DoorLockServer::Instance().OnFabricRemoved(endpointId, fabricIndex))
@@ -78,6 +73,9 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 
     // Intentionally left blank
     void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override {}
+
+    // Intentionally left blank
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 static DoorLockClusterFabricDelegate gFabricDelegate;
 
