@@ -462,7 +462,7 @@ def main(argv: Sequence[str]) -> None:
     if options.do_run_zap:
         flush_print("Running ZAP script to generate artifacts")
         shell.run_cmd(f"mkdir -p {gen_dir}/")
-        shell.run_cmd(f"rm {gen_dir}/*")
+        shell.run_cmd(f"rm {gen_dir}/* || true")
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
         # af-gen-event.h is not generated
@@ -538,9 +538,9 @@ def main(argv: Sequence[str]) -> None:
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.do_clean:
-                shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+                shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig || true")
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
-                shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
+                shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build || true")
                 shell.run_cmd("idf.py fullclean")
             shell.run_cmd("idf.py build")
         elif options.build_target == "nrfconnect":
@@ -555,7 +555,7 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "silabs-thread":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             if options.do_clean:
-                shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
+                shell.run_cmd(f"rm -rf out/{options.sample_device_type_name} || true")
             shell.run_cmd(
                 f"""{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh ./ out/{options.sample_device_type_name} BRD4186A \'sample_name=\"{options.sample_device_type_name}\"\' enable_openthread_cli=true chip_build_libshell=true \'{'import("//with_pw_rpc.gni")' if options.do_rpc else ""}\'""")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -575,7 +575,7 @@ def main(argv: Sequence[str]) -> None:
                         sample_name = "{options.sample_device_type_name}"
                         """))
             if options.do_clean:
-                shell.run_cmd(f"rm -rf out")
+                shell.run_cmd(f"rm -rf out || true")
             if options.do_rpc:
                 shell.run_cmd("gn gen out --args='import(\"//with_pw_rpc.gni\")'")
             else:
