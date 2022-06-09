@@ -97,6 +97,8 @@ public:
         }
     }
 
+    void StepDrainAndServiceIO() { mIOContext.DriveIO(); }
+
 private:
     Test::IOContext mIOContext;
     TransportMgr<LoopbackTransport> mTransportManager;
