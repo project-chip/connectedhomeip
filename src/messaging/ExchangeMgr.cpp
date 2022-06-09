@@ -376,12 +376,15 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
     });
 }
 
-void ExchangeManager::AbortExchangeForNodeExceptOne(const ScopedNodeId & node, ExchangeContext * stay)
+void ExchangeManager::AbortExchangeForNodeExceptOne(const ScopedNodeId & node, ExchangeContext * exception)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec != stay && ec->HasSessionHandle() && ec->GetSessionHandle()->GetPeer() == node)
+        if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetPeer() == node)
         {
-            ec->Abort();
+            if (ec == exception)
+                ec->SetAutoReleaseSession();
+            else
+                ec->Abort();
         }
         return Loop::Continue;
     });
