@@ -29,7 +29,7 @@ namespace chip {
 
 void GlobalUnencryptedMessageCounter::Init()
 {
-    mValue = Crypto::GetRandU32();
+    mLastUsedValue = Crypto::GetRandU32();
 }
 
 } // namespace chip
