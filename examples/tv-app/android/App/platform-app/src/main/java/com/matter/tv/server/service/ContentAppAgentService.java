@@ -11,7 +11,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
-
 import java.util.concurrent.TimeUnit;
 
 public class ContentAppAgentService extends Service {
@@ -55,7 +54,8 @@ public class ContentAppAgentService extends Service {
     return null;
   }
 
-  public static String sendCommand(Context context, String packageName, int clusterId, int commandId, String payload) {
+  public static String sendCommand(
+      Context context, String packageName, int clusterId, int commandId, String payload) {
     Intent in = new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND);
     Bundle extras = new Bundle();
     extras.putByteArray(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, payload.getBytes());
@@ -76,7 +76,7 @@ public class ContentAppAgentService extends Service {
     if (response == null) {
       response = "";
     }
-    Log.d( TAG,"Response " + response + " being returned for message " + messageId);
+    Log.d(TAG, "Response " + response + " being returned for message " + messageId);
     return response;
   }
 
@@ -93,9 +93,10 @@ public class ContentAppAgentService extends Service {
   @Override
   public int onStartCommand(final Intent intent, final int flags, final int startId) {
     if (intent != null && ACTION_MATTER_RESPONSE.equals(intent.getAction())) {
-      String response = new String(intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD));
+      String response =
+          new String(intent.getByteArrayExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD));
       int messageId = intent.getIntExtra(EXTRA_RESPONSE_ID, Integer.MAX_VALUE);
-      Log.d( TAG,"Response " + response + " received for message " + messageId);
+      Log.d(TAG, "Response " + response + " received for message " + messageId);
       responseRegistry.receivedMessageResponse(messageId, response);
     }
     return START_NOT_STICKY;
