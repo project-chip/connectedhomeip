@@ -187,11 +187,9 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
         // On found, we actually expect an "error", since we didn't want to read it out.
         return true;
     }
-    else
-    {
-        // On any other error, we consider the key not found
-        return false;
-    }
+
+    // On any other error, we consider the key not found
+    return false;
 }
 
 CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,

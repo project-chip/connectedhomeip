@@ -794,6 +794,12 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     if (mOperationalKeystore != nullptr)
     {
         opKeyErr = mOperationalKeystore->RemoveOpKeypairForFabric(fabricIndex);
+        // Not having found data is not an error, we may just have gotten here
+        // on a fail-safe expiry after `RevertPendingFabricData`.
+        if (opKeyErr == CHIP_ERROR_INVALID_FABRIC_INDEX)
+        {
+            opKeyErr = CHIP_NO_ERROR;
+        }
     }
 
     if (!fabricIsInitialized)
@@ -805,10 +811,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 
     // TODO: The error chain below can cause partial state storage. We must refactor.
     ReturnErrorOnFailure(err);
-    if (opKeyErr != CHIP_ERROR_INVALID_FABRIC_INDEX)
-    {
-        ReturnErrorOnFailure(opKeyErr);
-    }
+    ReturnErrorOnFailure(opKeyErr);
 
     // Since fabricIsInitialized was true, fabric is not null.
     fabric->Reset();
@@ -1161,10 +1164,8 @@ CHIP_ERROR FabricTable::SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan mess
     {
         return mOperationalKeystore->SignWithOpKeypair(fabricIndex, message, outSignature);
     }
-    else
-    {
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
+
+    return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 bool FabricTable::HasPendingOperationalKey() const
