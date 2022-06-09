@@ -182,6 +182,11 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
                                                    LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
+    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasAny())
+    {
+        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation;
+    }
+
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
@@ -289,7 +294,6 @@ void ChipLinuxAppMainLoop()
     // use a different service port to make testing possible with other sample devices running on same host
     initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-    ;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
