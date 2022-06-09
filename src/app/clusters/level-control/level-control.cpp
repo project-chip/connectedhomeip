@@ -133,24 +133,21 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 
 void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 
-static void timerCallback(chip::System::Layer*, void* callbackContext) {
-      chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
-                                                    reinterpret_cast<intptr_t>(callbackContext));
+static void timerCallback(chip::System::Layer *, void * callbackContext)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
+                                                  reinterpret_cast<intptr_t>(callbackContext));
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
-    DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(delayMs),
-        timerCallback,
-        reinterpret_cast<void*>(endpoint));
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(endpoint));
 }
 
 static void deactivate(EndpointId endpoint)
 {
-    DeviceLayer::SystemLayer().CancelTimer(
-        timerCallback,
-        reinterpret_cast<void*>(endpoint));
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(endpoint));
 }
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
