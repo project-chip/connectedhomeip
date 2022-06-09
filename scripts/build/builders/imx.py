@@ -90,20 +90,20 @@ class IMXBuilder(GnBuilder):
                     sdk_target_sysroot = line[len(r'export SDKTARGETSYSROOT='):]
                 if re.match(r'export CC=', line):
                     # remove the quotation marks, replace a shell env
-                    cc = line[len(r'export CC=')+1 : -1]
+                    cc = line[len(r'export CC=')+1: -1]
                     cc = cc.replace('$SDKTARGETSYSROOT', sdk_target_sysroot)
                 if re.match(r'export CXX=', line):
                     # remove the quotation marks, replace a shell env
-                    cxx = line[len(r'export CXX=')+1 : -1]
+                    cxx = line[len(r'export CXX=')+1: -1]
                     cxx = cxx.replace('$SDKTARGETSYSROOT', sdk_target_sysroot)
                 if re.match(r'export ARCH=', line):
                     target_cpu = line[len(r'export ARCH='):]
-                    if target_cpu=='arm64':
+                    if target_cpu == 'arm64':
                         arm_arch = 'armv8-a'
-                    elif target_cpu=='arm':
+                    elif target_cpu == 'arm':
                         arm_arch = 'armv7ve'
                 if re.match(r'export CROSS_COMPILE=', line):
-                    cross_compile=line[len(r'export CROSS_COMPILE='):-1]
+                    cross_compile = line[len(r'export CROSS_COMPILE='):-1]
                     print(cross_compile)
 
         args = [
@@ -116,11 +116,11 @@ class IMXBuilder(GnBuilder):
             'sysroot="%s"' % sdk_target_sysroot,
             'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
             'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                cc),
+                                                                            cc),
             'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                cxx),
+                                                                             cxx),
             'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s-ar"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                cross_compile),
+                                                                               cross_compile),
         ]
 
         if self.release:
