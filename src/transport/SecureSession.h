@@ -144,6 +144,9 @@ public:
     /// @brief Mark as pending removal, all holders to this session will be cleared, and disallow future grab
     void MarkForRemoval();
 
+    // Used by UpdateNOC command to prevent any new exchange created on the session.
+    void MarkForInactive();
+
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "secure"; };
@@ -249,6 +252,11 @@ private:
         // grab this session, when all SessionHandles go out of scope, the
         // session object will be released automatically.
         kPendingRemoval = 3,
+
+        // For UpdateNOC command, the session still functional, but it can't
+        // yield any new exchanges, the last exchange running UpdateNOC command
+        // will close the session soon.
+        kInactive = 4,
     };
 
     friend class SecureSessionDeleter;

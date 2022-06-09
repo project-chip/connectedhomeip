@@ -121,8 +121,13 @@ public:
     /// Determine whether this exchange is requesting Sleepy End Device active mode
     bool IsRequestingActiveMode() const;
 
+
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
+
+    // For UpdateNOC command, I'm the last exchange, I must release the session when finishing my work.
+    void SetAutoReleaseSession();
+    bool IsAutoReleaseSession();
 
     /**
      * Get the reliable message manager that corresponds to this reliable
@@ -162,8 +167,12 @@ protected:
         /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
         kFlagActiveMode = (1u << 8),
 
+
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
         kFlagEphemeralExchange = (1u << 9),
+
+        /// When set, automatically release the session when finishing its work. Used by UpdateNOC command
+        kFlagAutoReleaseSession = (1u << 10),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -243,6 +252,16 @@ inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 inline bool ReliableMessageContext::IsEphemeralExchange() const
 {
     return mFlags.Has(Flags::kFlagEphemeralExchange);
+}
+
+inline void ReliableMessageContext::SetAutoReleaseSession()
+{
+    mFlags.Set(Flags::kFlagAutoReleaseSession, true);
+}
+
+inline bool ReliableMessageContext::IsAutoReleaseSession()
+{
+    return mFlags.Has(Flags::kFlagAutoReleaseSession);
 }
 
 } // namespace Messaging
