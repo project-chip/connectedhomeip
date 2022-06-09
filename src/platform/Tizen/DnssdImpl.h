@@ -46,6 +46,7 @@ struct GenericContext
     GMainLoop * mMainLoop = nullptr;
 
     explicit GenericContext(ContextType contextType) : mContextType(contextType) {}
+    virtual ~GenericContext() = default;
 };
 
 struct RegisterContext : public GenericContext
@@ -64,7 +65,7 @@ struct RegisterContext : public GenericContext
 
     RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
                     void * context);
-    ~RegisterContext();
+    ~RegisterContext() override;
 };
 
 struct BrowseContext : public GenericContext
@@ -82,6 +83,7 @@ struct BrowseContext : public GenericContext
 
     BrowseContext(DnssdServiceProtocol cbContextProtocol, const char * bType, uint32_t interfaceId, DnssdBrowseCallback callback,
                   void * context);
+    ~BrowseContext() override;
 };
 
 struct ResolveContext : public GenericContext
@@ -97,6 +99,7 @@ struct ResolveContext : public GenericContext
     bool mIsResolving              = false;
 
     ResolveContext(const char * rType, const char * rName, uint32_t interfaceId, DnssdResolveCallback callback, void * context);
+    ~ResolveContext() override;
 };
 
 class DnssdTizen
@@ -128,8 +131,6 @@ public:
 private:
     DnssdTizen() = default;
     static DnssdTizen sInstance;
-
-    void Delete(GenericContext * context);
 
     std::mutex mMutex;
     std::vector<GenericContext *> mContexts;

@@ -484,12 +484,12 @@ RegisterContext::RegisterContext(DnssdTizen * instance, const char * type, const
 
 RegisterContext::~RegisterContext()
 {
+    if (mIsRegistered)
+    {
+        dnssd_deregister_local_service(mServiceHandle);
+    }
     if (mServiceHandle != 0)
     {
-        if (mIsRegistered)
-        {
-            dnssd_deregister_local_service(mServiceHandle);
-        }
         dnssd_destroy_local_service(mServiceHandle);
     }
 }
@@ -506,6 +506,14 @@ BrowseContext::BrowseContext(DnssdServiceProtocol cbContextProtocol, const char 
     mCbContext = context;
 }
 
+BrowseContext::~BrowseContext()
+{
+    if (mIsBrowsing)
+    {
+        dnssd_cancel_browse_service(mBrowserHandle);
+    }
+}
+
 ResolveContext::ResolveContext(const char * rType, const char * rName, uint32_t interfaceId, DnssdResolveCallback callback,
                                void * context) :
     GenericContext(ContextType::Resolve)
@@ -516,6 +524,14 @@ ResolveContext::ResolveContext(const char * rType, const char * rName, uint32_t 
 
     mCallback  = callback;
     mCbContext = context;
+}
+
+ResolveContext::~ResolveContext()
+{
+    if (mIsResolving)
+    {
+        dnssd_cancel_resolve_service(mServiceHandle);
+    }
 }
 
 CHIP_ERROR DnssdTizen::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
@@ -661,41 +677,12 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     return ::Resolve(interface.GetPlatformInterface(), regtype.c_str(), browseResult.mName, callback, context);
 }
 
-void DnssdTizen::Delete(GenericContext * context)
-{
-    switch (context->mContextType)
-    {
-    case ContextType::Register:
-        break;
-    case ContextType::Browse: {
-        BrowseContext * bCtx = reinterpret_cast<BrowseContext *>(context);
-        if (bCtx->mIsBrowsing)
-        {
-            dnssd_cancel_browse_service(bCtx->mBrowserHandle);
-            bCtx->mIsBrowsing = false;
-        }
-        break;
-    }
-    case ContextType::Resolve: {
-        ResolveContext * rCtx = reinterpret_cast<ResolveContext *>(context);
-        if (rCtx->mIsResolving)
-        {
-            dnssd_cancel_resolve_service(rCtx->mServiceHandle);
-            rCtx->mIsResolving = false;
-        }
-        break;
-    }
-    }
-
-    chip::Platform::Delete(context);
-}
-
 DnssdTizen::~DnssdTizen()
 {
     auto iter = mContexts.cbegin();
     while (iter != mContexts.cend())
     {
-        Delete(*iter);
+        chip::Platform::Delete(*iter);
         mContexts.erase(iter);
     }
 }
@@ -725,7 +712,7 @@ CHIP_ERROR DnssdTizen::Remove(GenericContext * context)
     {
         if (*iter == context)
         {
-            Delete(*iter);
+            chip::Platform::Delete(*iter);
             mContexts.erase(iter);
             return CHIP_NO_ERROR;
         }
