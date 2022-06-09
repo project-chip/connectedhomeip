@@ -123,8 +123,6 @@ endif()
 if (TARGET mbedtls)
     get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
-    get_target_common_compile_flags(CHIP_MBEDTLS_CONFIG_CFLAGS mbedtls-config)
-    list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CONFIG_CFLAGS})
 endif()
 
 if (TARGET iotsdk-ip-network-api)
