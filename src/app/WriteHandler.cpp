@@ -83,7 +83,7 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
                                                System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!packet.IsNull(), Status::Failure);
+    VerifyOrReturnError(!packet.IsNull(), Status::ResourceExhausted);
 
     System::PacketBufferTLVWriter messageWriter;
     messageWriter.Init(std::move(packet));
@@ -134,15 +134,19 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrDieWithMsg(apExchangeContext == mpExchangeCtx, DataManagement,
-                       "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
+
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        {
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
+        }
         Close();
-        return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        return err;
     }
 
     Status status =
@@ -155,12 +159,12 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
             Close();
         }
     }
-    else if (status != Protocols::InteractionModel::Status::Success)
+    else
     {
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
         Close();
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
