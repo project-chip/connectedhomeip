@@ -23,6 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -66,6 +67,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     }
 
     return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+
+    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(CanCastTo<BootReasonType>(reason), CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
