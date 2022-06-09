@@ -80,7 +80,7 @@ target_link_libraries(lwipcore
 get_target_property(lwip-cmsis-port_SOURCE_DIR lwip-cmsis-port SOURCE_DIR)
 target_include_directories(lwipopts
     INTERFACE
-        lwip-config
+        ${OPEN_IOT_SDK_CONFIG}/lwip
 )
 
 # provide method to use for tracing by the lwip port (optional)
@@ -101,7 +101,7 @@ target_link_libraries(lwip-cmsis-port PUBLIC iotsdk-emac-factory)
 
 target_include_directories(mbedtls-config
     INTERFACE
-        mbedtls-config
+        ${OPEN_IOT_SDK_CONFIG}/mbedtls
 )
 
 target_compile_definitions(mbedtls-config
