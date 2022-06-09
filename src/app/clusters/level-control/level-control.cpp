@@ -212,7 +212,8 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
         }
         return Loop::Continue;
     });
-    if (!foundActiveEvent) {
+    if (!foundActiveEvent)
+    {
         return;
     }
 
