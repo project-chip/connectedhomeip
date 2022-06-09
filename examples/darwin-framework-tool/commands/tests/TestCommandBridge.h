@@ -190,20 +190,14 @@ public:
         Exit("Unexpected deletion of pairing");
     }
 
-    void PairingComplete(chip::NodeId nodeId, NSError * _Nullable error)
+    void PairingComplete(chip::NodeId nodeId)
     {
-        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-        if (err != CHIP_NO_ERROR) {
-            Exit("Pairing completed with error", err);
-            return;
-        }
-
         CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
         [controller commissionDevice:nodeId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
-        err = [CHIPError errorToCHIPErrorCode:commissionError];
+        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:commissionError];
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
             return;
@@ -460,7 +454,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (_active) {
-        _commandBridge->PairingComplete(_deviceId, error);
+        if (error != nil) {
+            _active = NO;
+            NSLog(@"Pairing complete with error");
+            CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+            _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
+        } else {
+            _commandBridge->PairingComplete(_deviceId);
+        }
     }
 }
 

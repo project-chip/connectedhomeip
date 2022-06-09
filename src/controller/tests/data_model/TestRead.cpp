@@ -208,6 +208,7 @@ public:
     static void TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext);
@@ -1423,6 +1424,69 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+// After client initiated subscription request, test expire session so that subscription fails to establish, and trigger the timeout
+// error. Client would automatically try to resubscribe and bump the value for numResubscriptionAttemptedCalls.
+void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    responseDirective                        = kSendDataError;
+    uint32_t numSubscriptionEstablishedCalls = 0, numResubscriptionAttemptedCalls = 0;
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);
+        onFailureCbInvoked = true;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    auto onSubscriptionAttemptedCb = [&numResubscriptionAttemptedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                        uint32_t aNextResubscribeIntervalMsec) {
+        numResubscriptionAttemptedCalls++;
+    };
+
+    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20, onSubscriptionEstablishedCb,
+        onSubscriptionAttemptedCb, false, true);
+
+    ctx.ExpireSessionAliceToBob();
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+
+    ctx.ExpireSessionBobToAlice();
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   !onSuccessCbInvoked && !onFailureCbInvoked && numSubscriptionEstablishedCalls == 0 &&
+                       numResubscriptionAttemptedCalls == 1);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+
+    //
+    // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
+    // can function correctly.
+    //
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                        = *static_cast<TestContext *>(apContext);
@@ -1467,7 +1531,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
-                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
@@ -1484,7 +1548,6 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
-
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
@@ -1530,7 +1593,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     NL_TEST_ASSERT(apSuite,
                    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                       onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
 
@@ -1545,8 +1608,6 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
@@ -1603,7 +1664,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
     NL_TEST_ASSERT(apSuite,
                    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                       onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
 
@@ -1708,7 +1769,7 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
 
     aCtx.DrainAndServiceIO();
@@ -1797,7 +1858,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
@@ -1813,7 +1874,6 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
-
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -2555,6 +2615,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
+    NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),

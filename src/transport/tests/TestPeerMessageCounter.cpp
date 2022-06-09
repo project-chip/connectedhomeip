@@ -187,7 +187,7 @@ void UnicastSmallStepTest(nlTestSuite * inSuite, void * inContext)
         for (uint32_t k = 1; k <= 2 * CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k++)
         {
             chip::Transport::PeerMessageCounter counter;
-            counter.SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+            counter.SetCounter(chip::Transport::PeerMessageCounter::kInitialSyncValue);
             if (counter.VerifyEncryptedUnicast(n) == CHIP_NO_ERROR)
             {
                 // Act like we got this counter value on the wire.
@@ -259,7 +259,7 @@ void UnicastLargeStepTest(nlTestSuite * inSuite, void * inContext)
         for (uint32_t k = (static_cast<uint32_t>(1 << 31) - 5); k <= (static_cast<uint32_t>(1 << 31) - 1); k++)
         {
             chip::Transport::PeerMessageCounter counter;
-            counter.SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+            counter.SetCounter(chip::Transport::PeerMessageCounter::kInitialSyncValue);
             if (counter.VerifyEncryptedUnicast(n) == CHIP_NO_ERROR)
             {
                 // Act like we got this counter value on the wire.

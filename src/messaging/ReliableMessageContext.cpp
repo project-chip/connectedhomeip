@@ -103,10 +103,6 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
 
 {
-    // Skip processing ack if drop ack debug is enabled.
-    if (ShouldDropAckDebug())
-        return CHIP_NO_ERROR;
-
     CHIP_ERROR err = HandleNeedsAckInner(messageCounter, messageFlags);
 
     // Schedule next physical wakeup on function exit
