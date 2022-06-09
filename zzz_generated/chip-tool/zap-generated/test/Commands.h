@@ -22226,7 +22226,7 @@ public:
 
     ~Test_TC_MF_1_9Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(550)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -22597,7 +22597,7 @@ public:
 
     ~Test_TC_MF_1_10Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(550)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
