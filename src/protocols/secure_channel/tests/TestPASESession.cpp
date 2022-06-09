@@ -180,7 +180,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     // There should have been two messages sent: PBKDFParamRequest and an ack.
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     loopback.Reset();

@@ -238,7 +238,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     // There should have been two message sent: Sigma1 and an ack.
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
