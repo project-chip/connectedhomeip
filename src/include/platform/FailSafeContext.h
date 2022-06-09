@@ -100,8 +100,8 @@ private:
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
     // The fact of whether a CSR occurred at all is stored elsewhere.
-    bool mIsCsrRequestForUpdateNoc         = false;
-    FabricIndex mFabricIndex               = kUndefinedFabricIndex;
+    bool mIsCsrRequestForUpdateNoc = false;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 

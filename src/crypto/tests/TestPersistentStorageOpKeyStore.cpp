@@ -86,7 +86,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     // Cannot NewOpKeypair for a different fabric if one already pending
     uint8_t badCsrBuf[kMAX_CSR_Length];
     MutableByteSpan badCsrSpan = MutableByteSpan{ badCsrBuf };
-    err = opKeystore.NewOpKeypairForFabric(kBadFabricIndex, badCsrSpan);
+    err                        = opKeystore.NewOpKeypairForFabric(kBadFabricIndex, badCsrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
 
