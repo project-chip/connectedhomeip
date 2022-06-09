@@ -199,6 +199,23 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
 {
     auto endpoint = *reinterpret_cast<EndpointId *>(endpointPtr);
 
+    // This will be called regardless as a result of ScheduleWork
+    // regardless of the event being canceld by deactivate
+    // Thus this checks if there's still an active event for that endpoint
+
+    bool foundActiveEvent = false;
+    eventEndpoints.ForEachActiveObject([&](auto * entry) {
+        if (*entry == endpoint)
+        {
+            foundActiveEvent = true;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+    if (!foundActiveEvent) {
+        return;
+    }
+
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
