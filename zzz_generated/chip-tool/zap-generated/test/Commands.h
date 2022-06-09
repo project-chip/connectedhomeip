@@ -17957,18 +17957,18 @@ private:
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
@@ -17985,13 +17985,13 @@ private:
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the global attribute: GeneratedCommandList");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
         case 7: {
@@ -18343,12 +18343,12 @@ private:
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id, AccountLogin::Attributes::ClusterRevision::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Attributes::ClusterRevision::Id,
                                  true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id, AccountLogin::Attributes::AttributeList::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
@@ -18365,13 +18365,13 @@ private:
         case 4: {
             LogStep(4, "Read the global attribute: AcceptedCommandList");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id,
                                  AccountLogin::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Read the global attribute: GeneratedCommandList");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id,
                                  AccountLogin::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
         case 6: {
@@ -20862,43 +20862,43 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the VendorName attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorName::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorName::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the VendorID attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorID::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorID::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads the ApplicationName attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationName::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads the ProductID attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id, ApplicationBasic::Attributes::ProductID::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::ProductID::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads the Application attribute");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::Application::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Reads the Status attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id, ApplicationBasic::Attributes::Status::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::Status::Id,
                                  true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Reads the ApplicationVersion attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationVersion::Id, true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Reads the AllowedVendorList attribute");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AllowedVendorList::Id, true, chip::NullOptional);
         }
         }

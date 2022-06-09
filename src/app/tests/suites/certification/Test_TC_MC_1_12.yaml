@@ -19,7 +19,8 @@ name:
 config:
     nodeId: 0x12344321
     cluster: "Account Login"
-    endpoint: 1
+    # Default endpoint is 3, since that's where tv-app has this cluster.
+    endpoint: 3
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
