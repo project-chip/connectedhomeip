@@ -127,6 +127,8 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
+static constexpr System::Clock::Timeout kAdvertiseTimeout =
+    System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 System::Clock::Timestamp mAdvertiseStartTime;
@@ -378,6 +380,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
 
@@ -391,6 +394,22 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
+{
+    static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
+}
+
+void BLEManagerImpl::HandleAdvertisementTimer()
+{
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
+
+    if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
+    {
+        mFlags.Set(Flags::kAdvertisingEnabled, 0);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    }
 }
 
 void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
@@ -663,13 +682,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        adv_int_min = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
-        adv_int_max = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        adv_int_min     = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        adv_int_max     = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
     }
     else
     {
-        adv_int_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        adv_int_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        adv_int_min     = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        adv_int_max     = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
     le_adv_set_param(GAP_PARAM_ADV_INTERVAL_MIN, sizeof(adv_int_min), &adv_int_min);
     le_adv_set_param(GAP_PARAM_ADV_INTERVAL_MAX, sizeof(adv_int_max), &adv_int_max);
