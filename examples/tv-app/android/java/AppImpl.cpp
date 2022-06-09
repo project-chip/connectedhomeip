@@ -21,19 +21,19 @@
 
 #include "AppImpl.h"
 
+#include "ContentAppCommandDelegate.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/InteractionModelEngine.h>
 #include <app/CommandHandler.h>
+#include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <jni.h>
-#include "ContentAppCommandDelegate.h"
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/shell/Commands.h>
@@ -394,7 +394,7 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
             CommandResponseHelper<LaunchResponseType> helper(&commandHandler, commandPath);
             chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type branding;
             app->GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
-                                                              CharSpan::fromCharString("Temp Display"), branding);
+                                                               CharSpan::fromCharString("Temp Display"), branding);
         }
     }
 }
@@ -413,7 +413,8 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     ChipLogProgress(AppServer, "Starting registration of command handler delegates");
     for (size_t i = 0; i < ArraySize(contentAppClusters); i++)
     {
-        ContentAppCommandDelegate * delegate = new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
+        ContentAppCommandDelegate * delegate =
+            new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
         chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(delegate);
         ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
     }

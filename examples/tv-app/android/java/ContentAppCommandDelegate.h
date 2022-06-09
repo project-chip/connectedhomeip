@@ -22,12 +22,11 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/CommandHandlerInterface.h>
 #include <jni.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
-#include <app/CommandHandlerInterface.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-
 
 namespace chip {
 namespace AppPlatform {
@@ -63,8 +62,8 @@ public:
     const char * sendCommand(chip::EndpointId epID, std::string commandPayload);
 
 private:
-
-    void InitializeJNIObjects(jobject manager) {
+    void InitializeJNIObjects(jobject manager)
+    {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
 

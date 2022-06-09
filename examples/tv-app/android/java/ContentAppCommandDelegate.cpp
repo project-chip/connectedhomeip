@@ -22,20 +22,20 @@
 
 #include "ContentAppCommandDelegate.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandlerInterface.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <app/CommandHandlerInterface.h>
-#include <zap-generated/endpoint_config.h>
 #include <lib/support/jsontlv/TlvJson.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include <zap-generated/endpoint_config.h>
 
 namespace chip {
 namespace AppPlatform {
 
 using CommandHandlerInterface = chip::app::CommandHandlerInterface;
-using LaunchResponseType        = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
 const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
 {
@@ -64,14 +64,16 @@ const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::
 
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
 {
-    if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT) {
+    if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
+    {
         TLV::TLVReader readerForJson;
         readerForJson.Init(handlerContext.mPayload);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
         Json::Value json;
         err = TlvToJson(readerForJson, json);
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             // TODO : Add an interface to let the apps know a message came but there was a serialization error.
             handlerContext.SetCommandNotHandled();
             return;
@@ -80,12 +82,13 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         UtfString jsonString(env, JsonToString(json).c_str());
 
-        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s", JsonToString(json).c_str());
+        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s",
+                        JsonToString(json).c_str());
 
-        jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
-                                                    static_cast<jint>(handlerContext.mRequestPath.mClusterId),
-                                                    static_cast<jint>(handlerContext.mRequestPath.mCommandId),
-                                                    jsonString.jniValue());
+        jstring resp = (jstring) env->CallObjectMethod(
+            mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
+            static_cast<jint>(handlerContext.mRequestPath.mClusterId), static_cast<jint>(handlerContext.mRequestPath.mCommandId),
+            jsonString.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
@@ -97,12 +100,15 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         const char * respStr = env->GetStringUTFChars(resp, 0);
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr);
         FormatResponseData(handlerContext, respStr);
-    } else {
+    }
+    else
+    {
         handlerContext.SetCommandNotHandled();
     }
 }
 
-void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response) {
+void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
+{
     Json::Reader reader;
     Json::Value resJson;
     reader.parse(response, resJson);
@@ -112,11 +118,15 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     {
     case app::Clusters::ContentLauncher::Id: {
         LaunchResponseType launchResponse;
-        if (value["0"].empty()) {
+        if (value["0"].empty())
+        {
             launchResponse.status = chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
-        } else {
-            launchResponse.status  = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value["0"].asInt());
-            if (!value["1"].empty()) {
+        }
+        else
+        {
+            launchResponse.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value["0"].asInt());
+            if (!value["1"].empty())
+            {
                 launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value["1"].asCString()));
             }
         }
