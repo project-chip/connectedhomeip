@@ -28,6 +28,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Try to unlock the door without PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to unlock the door without a PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
