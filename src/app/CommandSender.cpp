@@ -115,6 +115,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    bool suppressErrorStatusResponse = false;
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
@@ -138,7 +139,8 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+        suppressErrorStatusResponse = true;
+        err                         = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else
@@ -147,15 +149,28 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
 exit:
-    if (mpCallback != nullptr)
+    return NotifyResult(err, apExchangeContext, suppressErrorStatusResponse);
+}
+
+CHIP_ERROR CommandSender::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+                                       bool aSuppressErrorStatusResponse)
+{
+    CHIP_ERROR err = aError;
+    if (aError != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
+        if (!aSuppressErrorStatusResponse)
         {
-            mpCallback->OnError(this, err);
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
+        }
+
+        if (mpCallback != nullptr)
+        {
+            mpCallback->OnError(this, aError);
         }
     }
 
-    if (mState != State::CommandSent)
+    if (mState != State::CommandSent || aError != CHIP_NO_ERROR)
     {
         Close();
     }
@@ -437,7 +452,7 @@ const char * CommandSender::GetStateStr() const
 void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "Command Sender moving to [%10.10s]", GetStateStr());
 }
 
 void CommandSender::Abort()

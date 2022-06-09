@@ -378,7 +378,8 @@ private:
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-
+    CHIP_ERROR NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+                                        bool aSuppressErrorStatusResponse);
     /*
      * Checks if we should re-subscribe based on the specified re-subscription policy. If we should, re-subscription is scheduled
      * aNextResubscribeIntervalMsec is updated accordingly, and true is returned.

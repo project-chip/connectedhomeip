@@ -147,7 +147,12 @@ public:
     uint32_t GetNumActiveWriteHandlers() const;
 
     /**
-     * Returns the handler at a particular index within the active handler list.
+     * Returns the handler at a particular index within the active coomand handler list.
+     */
+    CommandHandler * ActiveCommandHandlerAt(unsigned int aIndex);
+
+    /**
+     * Returns the handler at a particular index within the active read handler list.
      */
     ReadHandler * ActiveHandlerAt(unsigned int aIndex);
 
@@ -347,9 +352,9 @@ private:
      * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
      * expected to set it to success if it does not want an automatic status response message to be sent.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                      Protocols::InteractionModel::Status & aStatus);
+    Protocols::InteractionModel::Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                               const PayloadHeader & aPayloadHeader,
+                                                               System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;

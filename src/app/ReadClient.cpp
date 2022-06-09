@@ -394,8 +394,8 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    bool suppressErrorStatusResponse = false;
     VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -405,7 +405,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeResponse))
     {
-        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
 
         // Forget the context as SUBSCRIBE RESPONSE is the last message in SUBSCRIBE transaction and
@@ -416,8 +415,8 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+        suppressErrorStatusResponse = true;
+        err                         = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else
@@ -426,9 +425,25 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
+    return NotifyResult(err, apExchangeContext, suppressErrorStatusResponse);
+}
+
+CHIP_ERROR ReadClient::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+                                     bool aSuppressErrorStatusResponse)
+{
+    CHIP_ERROR err = aError;
+    if (aError != CHIP_NO_ERROR)
     {
-        Close(err);
+        if (!aSuppressErrorStatusResponse)
+        {
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
+        }
+    }
+
+    if ((!IsSubscriptionType() && !mPendingMoreChunks) || aError != CHIP_NO_ERROR)
+    {
+        Close(aError);
     }
 
     return err;
@@ -588,7 +603,7 @@ exit:
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                                        : Protocols::InteractionModel::Status::Failure,
                                    mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))

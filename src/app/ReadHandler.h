@@ -385,8 +385,7 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnUnknownMsgType();
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;

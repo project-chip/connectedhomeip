@@ -184,6 +184,13 @@ public:
     // using this function is recommended.
     void SetResponseTimeout(Timeout timeout);
 
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
@@ -202,13 +209,6 @@ private:
      *  @return Returns 'true' if response expected, else 'false'.
      */
     bool IsResponseExpected() const;
-
-    /**
-     * Determine whether we are expecting our consumer to send a message on
-     * this exchange (i.e. WillSendMessage was called and the message has not
-     * yet been sent).
-     */
-    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
