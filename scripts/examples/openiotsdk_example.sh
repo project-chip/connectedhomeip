@@ -51,6 +51,7 @@ TOOLCHAIN=arm-none-eabi-gcc
 DEBUG=false
 EXAMPLE=""
 FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
+GDB_PLUGIN="${FAST_MODEL_PLUGINS_PATH}/GDBRemoteConnection.so"
 
 function build_with_cmake {
     CMAKE="$(which cmake)"
@@ -113,7 +114,7 @@ function run_fvp {
     OPTIONS="-C mps3_board.visualisation.disable-visualisation=1 -C mps3_board.smsc_91c111.enabled=1 -C mps3_board.hostbridge.userNetworking=1 -C cpu0.semihosting-enable=1 -C mps3_board.telnetterminal0.start_telnet=0 -C mps3_board.uart0.out_file="-"  -C mps3_board.uart0.unbuffered_output=1 --stat  -C mps3_board.DISABLE_GATING=1"
 
     if $DEBUG; then
-        OPTIONS="${OPTIONS} -I"
+        OPTIONS="${OPTIONS} --allow-debug-plugin --plugin $GDB_PLUGIN"
     fi
 
     $FVP_BIN $OPTIONS --application $EXAMPLE_EXE_PATH
