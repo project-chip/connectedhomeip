@@ -636,16 +636,18 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
     commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
 
     GenerateInvokeRequest(apSuite, apContext, commandDatabuf, true /*aNeedCommandData*/, /* aIsTimedRequest = */ false);
-    err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
 
     ChipLogDetail(DataManagement, "###################################### %s", err.AsString());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::Success);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     // Use some invalid endpoint / cluster / command.
@@ -655,7 +657,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     // TODO: Need to find a way to get the response instead of only check if a function on key path is called.
     // We should not reach CommandDispatch if requested command does not exist.
     chip::isCommandDispatched = false;
-    err                       = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
     NL_TEST_ASSERT(apSuite, !chip::isCommandDispatched);
 }
 
@@ -667,7 +669,6 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
     {
         for (auto transactionIsTimed : allBooleans)
         {
-            CHIP_ERROR err = CHIP_NO_ERROR;
             app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -676,8 +677,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
-            err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
     }

@@ -115,6 +115,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    bool suppressErrorStatusResponse = false;
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
@@ -138,24 +139,26 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
+        suppressErrorStatusResponse = true;
         err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
-    else
-    {
-        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
-    }
 
 exit:
-    if (mpCallback != nullptr)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
+        if (!suppressErrorStatusResponse)
+        {
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
+
+        if (mpCallback != nullptr)
         {
             mpCallback->OnError(this, err);
         }
     }
 
-    if (mState != State::CommandSent)
+    if (mState != State::CommandSent || err != CHIP_NO_ERROR)
     {
         Close();
     }

@@ -441,6 +441,7 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
+    bool suppressErrorStatusResponse = true;
     if (mState == State::AwaitingResponse &&
         // We had sent the last chunk of data, and received all responses
         mChunks.IsNull())
@@ -475,24 +476,32 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
+        suppressErrorStatusResponse = true;
         err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else
     {
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
 
 exit:
-    if (mpCallback != nullptr)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
+        if (!suppressErrorStatusResponse)
+        {
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
+
+        if (mpCallback != nullptr)
         {
             mpCallback->OnError(this, err);
         }
     }
 
-    if (mState != State::AwaitingResponse)
+
+    if (mState != State::AwaitingResponse || err != CHIP_NO_ERROR)
     {
         Close();
     }

@@ -308,9 +308,16 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    Close();
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+    CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
+    {
+        // We have to manually close the exchange, because we called
+        // WillSendMessage already.
+        mpExchangeCtx->Close();
+    }
+    mpExchangeCtx = nullptr;
+    return err;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
