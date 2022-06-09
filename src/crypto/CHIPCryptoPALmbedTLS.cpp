@@ -703,11 +703,11 @@ void ClearSecretData(uint8_t * buf, size_t len)
 int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
 {
     size_t i;
-    volatile const unsigned char *A = (volatile const unsigned char *) a;
-    volatile const unsigned char *B = (volatile const unsigned char *) b;
-    volatile unsigned char diff = 0;
+    volatile const unsigned char * A = (volatile const unsigned char *) a;
+    volatile const unsigned char * B = (volatile const unsigned char *) b;
+    volatile unsigned char diff      = 0;
 
-    for( i = 0; i < n; i++ )
+    for (i = 0; i < n; i++)
     {
         /* Read volatile data in order before computing diff.
          * This avoids IAR compiler warning:
@@ -716,7 +716,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
         diff |= x ^ y;
     }
 
-    return( (int)diff );
+    return ((int) diff);
 }
 
 bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
