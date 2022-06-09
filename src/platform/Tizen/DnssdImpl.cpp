@@ -86,7 +86,7 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
         ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, result);
         rCtx->mCallback(rCtx->mCbContext, nullptr, GetChipError(result));
         // After this point, the context might be no longer valid
-        rCtx->mInstance->UnregisterService(rCtx->mServiceHandle);
+        rCtx->mInstance->RemoveContext(rCtx);
         return;
     }
 
@@ -373,9 +373,8 @@ DnssdTizen DnssdTizen::sInstance;
 
 RegisterContext::RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service,
                                  DnssdPublishCallback callback, void * context) :
-    GenericContext(ContextType::Register)
+    GenericContext(ContextType::Register, instance)
 {
-    mInstance = instance;
     Platform::CopyString(mName, service.mName);
     Platform::CopyString(mType, type);
     mInterfaceId = service.mInterface.GetPlatformInterface();
@@ -399,9 +398,8 @@ RegisterContext::~RegisterContext()
 
 BrowseContext::BrowseContext(DnssdTizen * instance, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
                              DnssdBrowseCallback callback, void * context) :
-    GenericContext(ContextType::Browse)
+    GenericContext(ContextType::Browse, instance)
 {
-    mInstance = instance;
     Platform::CopyString(mType, type);
     mProtocol    = protocol;
     mInterfaceId = interfaceId;
@@ -420,9 +418,8 @@ BrowseContext::~BrowseContext()
 
 ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
                                DnssdResolveCallback callback, void * context) :
-    GenericContext(ContextType::Resolve)
+    GenericContext(ContextType::Resolve, instance)
 {
-    mInstance = instance;
     Platform::CopyString(mName, name);
     Platform::CopyString(mType, type);
     mInterfaceId = interfaceId;
@@ -472,15 +469,17 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     { // If the service was already registered, update it
         std::lock_guard<std::mutex> lock(mMutex);
 
-        auto iServiceCtx = std::find_if(
-            mRegisteredServices.begin(), mRegisteredServices.end(), [fullType, service, interfaceId](const auto & ctx) {
-                return (strcmp(ctx->mName, service.mName) == 0 && strcmp(ctx->mType, fullType.c_str()) == 0 &&
-                        ctx->mPort == service.mPort && ctx->mInterfaceId == interfaceId);
-            });
-        if (iServiceCtx != mRegisteredServices.end())
+        auto iServiceCtx = std::find_if(mContexts.begin(), mContexts.end(), [fullType, service, interfaceId](const auto & ctx) {
+            VerifyOrReturnError(ctx->mContextType == ContextType::Register, false);
+            auto * rCtx = static_cast<RegisterContext *>(ctx.get());
+            return strcmp(rCtx->mName, service.mName) == 0 && strcmp(rCtx->mType, fullType.c_str()) == 0 &&
+                rCtx->mPort == service.mPort && rCtx->mInterfaceId == interfaceId;
+        });
+        if (iServiceCtx != mContexts.end())
         {
             ChipLogDetail(DeviceLayer, "DNSsd %s: Updating TXT records", __func__);
-            auto serviceHandle = iServiceCtx->get()->mServiceHandle;
+            auto serviceHandle = static_cast<RegisterContext *>(iServiceCtx->get())->mServiceHandle;
+
             for (size_t i = 0; i < service.mTextEntrySize; ++i)
             {
                 TextEntry entry = service.mTextEntries[i];
@@ -493,16 +492,12 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                     callback(context, nullptr, err = GetChipError(ret));
                 }
             }
+
             return err;
         }
     }
 
-    auto serviceCtx = std::make_shared<RegisterContext>(this, fullType.c_str(), service, callback, context);
-
-    { // Add context to registered services list
-        std::lock_guard<std::mutex> lock(mMutex);
-        mRegisteredServices.emplace(serviceCtx);
-    }
+    auto serviceCtx = CreateRegisterContext(fullType.c_str(), service, callback, context);
 
     // Local service will be freed by the RegisterContext destructor
     int ret            = dnssd_create_local_service(fullType.c_str(), &serviceCtx->mServiceHandle);
@@ -537,34 +532,33 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                      (ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret), err = GetChipError(ret)));
     }
 
-    ok = MainLoop::Instance().AsyncRequest(RegisterAsync, serviceCtx.get());
+    ok = MainLoop::Instance().AsyncRequest(RegisterAsync, serviceCtx);
     VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
         callback(context, nullptr, err);
-        UnregisterService(serviceHandle);
+        RemoveContext(serviceCtx);
     }
     return err;
 }
 
-CHIP_ERROR DnssdTizen::UnregisterService(dnssd_service_h serviceHandle)
+CHIP_ERROR DnssdTizen::UnregisterAllServices()
 {
     std::lock_guard<std::mutex> lock(mMutex);
 
-    auto iServiceCtx = std::find_if(mRegisteredServices.begin(), mRegisteredServices.end(),
-                                    [serviceHandle](const auto & ctx) { return ctx->mServiceHandle == serviceHandle; });
-    VerifyOrReturnError(iServiceCtx != mRegisteredServices.end(), CHIP_ERROR_NOT_FOUND);
+    unsigned int numServices = 0;
+    for (auto it = mContexts.begin(); it != mContexts.end(); it++)
+    {
+        if ((*it)->mContextType == ContextType::Register)
+        {
+            mContexts.erase(it--);
+            numServices++;
+        }
+    }
 
-    mRegisteredServices.erase(iServiceCtx);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DnssdTizen::UnregisterAllServices()
-{
-    ChipLogDetail(DeviceLayer, "DNSsd %s: %zu", __func__, mRegisteredServices.size());
-    mRegisteredServices.clear();
+    ChipLogDetail(DeviceLayer, "DNSsd %s: %u", __func__, numServices);
     return CHIP_NO_ERROR;
 }
 
@@ -574,23 +568,17 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, 
     std::string fullType = GetFullType(type, protocol);
     auto interfaceId     = interface.GetPlatformInterface();
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    bool ok              = false;
 
-    auto browseCtx = std::make_shared<BrowseContext>(this, fullType.c_str(), protocol, interfaceId, callback, context);
+    auto browseCtx = CreateBrowseContext(fullType.c_str(), protocol, interfaceId, callback, context);
 
-    { // Add created context to local register
-        std::lock_guard<std::mutex> lock(mMutex);
-        mBrowseContexts.emplace(browseCtx);
-    }
-
-    ok = MainLoop::Instance().AsyncRequest(BrowseAsync, browseCtx.get());
+    bool ok = MainLoop::Instance().AsyncRequest(BrowseAsync, browseCtx);
     VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
         callback(context, nullptr, 0, err);
-        RemoveContext(browseCtx.get());
+        RemoveContext(browseCtx);
     }
     return err;
 }
@@ -607,12 +595,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, browseResult.mName, fullType.c_str(),
                   interfaceId);
 
-    auto resolveCtx = std::make_shared<ResolveContext>(this, browseResult.mName, fullType.c_str(), interfaceId, callback, context);
-
-    { // Add created context to local register
-        std::lock_guard<std::mutex> lock(mMutex);
-        mResolveContexts.emplace(resolveCtx);
-    }
+    auto resolveCtx = CreateResolveContext(browseResult.mName, fullType.c_str(), interfaceId, callback, context);
 
     if (interfaceId == 0)
     {
@@ -629,24 +612,58 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  (ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed. ret: %d", ret), err = GetChipError(ret)));
 
-    ok = MainLoop::Instance().AsyncRequest(ResolveAsync, resolveCtx.get());
+    ok = MainLoop::Instance().AsyncRequest(ResolveAsync, resolveCtx);
     VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
         callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
-        RemoveContext(resolveCtx.get());
+        RemoveContext(resolveCtx);
     }
     return err;
 }
 
+RegisterContext * DnssdTizen::CreateRegisterContext(const char * type, const DnssdService & service, DnssdPublishCallback callback,
+                                                    void * context)
+{
+    auto ctx    = std::make_unique<RegisterContext>(this, type, service, callback, context);
+    auto ctxPtr = ctx.get();
+
+    std::lock_guard<std::mutex> lock(mMutex);
+    mContexts.emplace(std::move(ctx));
+
+    return ctxPtr;
+}
+
+BrowseContext * DnssdTizen::CreateBrowseContext(const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
+                                                DnssdBrowseCallback callback, void * context)
+{
+    auto ctx    = std::make_unique<BrowseContext>(this, type, protocol, interfaceId, callback, context);
+    auto ctxPtr = ctx.get();
+
+    std::lock_guard<std::mutex> lock(mMutex);
+    mContexts.emplace(std::move(ctx));
+
+    return ctxPtr;
+}
+
+ResolveContext * DnssdTizen::CreateResolveContext(const char * name, const char * type, uint32_t interfaceId,
+                                                  DnssdResolveCallback callback, void * context)
+{
+    auto ctx    = std::make_unique<ResolveContext>(this, name, type, interfaceId, callback, context);
+    auto ctxPtr = ctx.get();
+
+    std::lock_guard<std::mutex> lock(mMutex);
+    mContexts.emplace(std::move(ctx));
+
+    return ctxPtr;
+}
+
 CHIP_ERROR DnssdTizen::RemoveContext(GenericContext * context)
 {
-    mBrowseContexts.erase(
-        std::find_if(mBrowseContexts.begin(), mBrowseContexts.end(), [context](const auto & ctx) { return ctx.get() == context; }));
-    mResolveContexts.erase(std::find_if(mResolveContexts.begin(), mResolveContexts.end(),
-                                        [context](const auto & ctx) { return ctx.get() == context; }));
+    std::lock_guard<std::mutex> lock(mMutex);
+    mContexts.erase(std::find_if(mContexts.begin(), mContexts.end(), [context](const auto & ctx) { return ctx.get() == context; }));
     return CHIP_NO_ERROR;
 }
 
