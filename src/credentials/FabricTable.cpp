@@ -802,8 +802,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         // chose to return.
         return CHIP_ERROR_NOT_FOUND;
     }
+
+    // TODO: The error chain below can cause partial state storage. We must refactor.
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(opKeyErr);
+    if (opKeyErr != CHIP_ERROR_INVALID_FABRIC_INDEX)
+    {
+        ReturnErrorOnFailure(opKeyErr);
+    }
 
     // Since fabricIsInitialized was true, fabric is not null.
     fabric->Reset();
@@ -1255,6 +1260,11 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
 void FabricTable::RevertPendingFabricData()
 {
+    if (mIsPendingFabricDataPresent)
+    {
+        ChipLogError(FabricProvisioning, "Reverting pending fabric data for fabric 0x%u", static_cast<unsigned>(mFabricIndexWithPendingState));
+    }
+
     mIsPendingFabricDataPresent  = false;
     mFabricIndexWithPendingState = kUndefinedFabricIndex;
 

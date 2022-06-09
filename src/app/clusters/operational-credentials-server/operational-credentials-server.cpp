@@ -350,6 +350,7 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
         FailSafeCleanup(event);
     }
 }
