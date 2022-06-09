@@ -15,25 +15,25 @@ POSITIONAL_ARGS=()
 APP_ARGS=""
 while [[ $# -gt 0 ]]; do
     case $1 in
-    --app-name)
-        APP_NAME="$2"
-        shift
-        shift
-        ;;
-    --help)
-        help
-        shift
-        ;;
-    --)
-        shift
-        APP_ARGS=$@
-        break
-        ;;
-    *)
-        echo "Unknown option $1"
-        help
-        exit 1
-        ;;
+        --app-name)
+            APP_NAME="$2"
+            shift
+            shift
+            ;;
+        --help)
+            help
+            shift
+            ;;
+        --)
+            shift
+            APP_ARGS=$@
+            break
+            ;;
+        *)
+            echo "Unknown option $1"
+            help
+            exit 1
+            ;;
     esac
 done
 
