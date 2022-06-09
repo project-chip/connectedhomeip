@@ -35,17 +35,20 @@ class DnssdTizen;
 
 enum class ContextType
 {
+    Register,
     Browse,
     Resolve,
 };
 
 struct GenericContext
 {
-    ContextType contextType;
-    void * context;
+    ContextType mContextType;
+    GMainLoop * mMainLoop = nullptr;
+
+    explicit GenericContext(ContextType contextType) : mContextType(contextType) {}
 };
 
-struct RegisterContext
+struct RegisterContext : public GenericContext
 {
     DnssdTizen * mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
@@ -54,11 +57,10 @@ struct RegisterContext
     uint16_t mPort;
 
     DnssdPublishCallback mCallback;
-    void * mCallbackContext;
+    void * mCbContext;
 
     dnssd_service_h mServiceHandle = 0;
     bool mIsRegistered             = false;
-    void * mContext                = nullptr;
 
     RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
                     void * context);
@@ -67,49 +69,34 @@ struct RegisterContext
 
 struct BrowseContext : public GenericContext
 {
-    dnssd_browser_h browser;
-    char type[kDnssdTypeAndProtocolMaxSize + 1];
-    uint32_t interfaceId;
+    DnssdServiceProtocol mProtocol;
+    char mType[kDnssdTypeAndProtocolMaxSize + 1];
+    uint32_t mInterfaceId;
 
-    std::vector<DnssdService> services;
-    DnssdServiceProtocol protocol;
-    bool isBrowsing;
-    DnssdBrowseCallback callback;
-    void * cbContext;
+    DnssdBrowseCallback mCallback;
+    void * mCbContext;
 
-    BrowseContext(DnssdServiceProtocol cbContextProtocol, const char * bType, uint32_t ifId, DnssdBrowseCallback cb, void * cbCtx)
-    {
-        contextType = ContextType::Browse;
-        protocol    = cbContextProtocol;
-        callback    = cb;
-        cbContext   = cbCtx;
-        browser     = 0;
-        g_strlcpy(type, bType, sizeof(type));
-        interfaceId = ifId;
-        isBrowsing  = false;
-    }
+    dnssd_browser_h mBrowserHandle = 0;
+    std::vector<DnssdService> mServices;
+    bool mIsBrowsing = false;
+
+    BrowseContext(DnssdServiceProtocol cbContextProtocol, const char * bType, uint32_t interfaceId, DnssdBrowseCallback callback,
+                  void * context);
 };
 
 struct ResolveContext : public GenericContext
 {
-    dnssd_service_h service;
-    char type[kDnssdTypeAndProtocolMaxSize + 1];
-    char name[Common::kInstanceNameMaxLength + 1];
-    uint32_t interfaceId;
-    bool isResolving;
-    DnssdResolveCallback callback;
-    void * cbContext;
+    char mName[Common::kInstanceNameMaxLength + 1];
+    char mType[kDnssdTypeAndProtocolMaxSize + 1];
+    uint32_t mInterfaceId;
 
-    ResolveContext(const char * rType, const char * rName, uint32_t interface, DnssdResolveCallback cb, void * cbCtx)
-    {
-        contextType = ContextType::Resolve;
-        g_strlcpy(type, rType, sizeof(type));
-        g_strlcpy(name, rName, sizeof(name));
-        interfaceId = interface;
-        isResolving = false;
-        callback    = cb;
-        cbContext   = cbCtx;
-    }
+    DnssdResolveCallback mCallback;
+    void * mCbContext;
+
+    dnssd_service_h mServiceHandle = 0;
+    bool mIsResolving              = false;
+
+    ResolveContext(const char * rType, const char * rName, uint32_t interfaceId, DnssdResolveCallback callback, void * context);
 };
 
 class DnssdTizen
