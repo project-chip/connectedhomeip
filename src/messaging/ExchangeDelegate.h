@@ -100,7 +100,7 @@ public:
      *   Release() on the exchange at some point.  The usual way this happens is
      *   that the consumer tries to send its message, that fails, and the
      *   consumer calls Close() on the exchange.  Calling Close() after an
-     *   OnExchangeClosing() notification is allowed.
+     *   OnExchangeClosing() notification is allowed in this situation.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
