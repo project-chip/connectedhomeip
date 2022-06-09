@@ -312,7 +312,6 @@ customizations
 cvfJ
 cxx
 CY
-cypressprogrammer
 CYW
 DAC
 dadbdcdddedf
@@ -619,7 +618,6 @@ idx
 ifconfig
 ifdef
 ifdefs
-ifx
 IGMP
 ignoreApplyUpdate
 ignoreQueryImage
@@ -1181,7 +1179,6 @@ softap
 SoftDevice
 softmmu
 SoftwareDiagnostics
-softwaretools
 SoftwareVersion
 softwareVersionStr
 SoftwareVersionString

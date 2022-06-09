@@ -30,8 +30,7 @@ option to the build script.
           $ ./examples/<example directory>/p6/ota_update_build.sh
 
 *   Additionally a pre-compiled bootloader must be flashed to the board using
-    Cypress Programmer
-    (https://softwaretools.infineon.com/tools/com.ifx.tb.tool.cypressprogrammer).
+    [Cypress Programmer](https://softwaretools.infineon.com/tools/com.ifx.tb.tool.cypressprogrammer).
     This image can be found at:
 
           $ ./third_party/p6/p6_sdk/ota/matter-psoc6-mcuboot-bootloader.hex
