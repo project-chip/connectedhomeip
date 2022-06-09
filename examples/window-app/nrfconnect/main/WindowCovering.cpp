@@ -35,8 +35,7 @@ using namespace chip::app::Clusters::WindowCovering;
 
 static const struct pwm_dt_spec sLiftPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 static const struct pwm_dt_spec sTiltPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
-static k_timer sLiftTimer;
-static k_timer sTiltTimer;
+
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
 
 WindowCovering::WindowCovering()
@@ -51,24 +50,6 @@ WindowCovering::WindowCovering()
     if (mTiltIndicator.Init(&sTiltPwmDevice, 0, 255) != 0)
     {
         LOG_ERR("Cannot initialize the tilt indicator");
-    }
-
-    k_timer_init(&sLiftTimer, MoveTimerTimeoutCallback, nullptr);
-    k_timer_init(&sTiltTimer, MoveTimerTimeoutCallback, nullptr);
-}
-
-void WindowCovering::MoveTimerTimeoutCallback(k_timer * aTimer)
-{
-    if (!aTimer)
-        return;
-
-    if (aTimer == &sLiftTimer)
-    {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(DriveCurrentLiftPosition);
-    }
-    else if (aTimer == &sTiltTimer)
-    {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(DriveCurrentTiltPosition);
     }
 }
 
@@ -162,14 +143,29 @@ bool WindowCovering::TargetCompleted(MoveType aMoveType, NPercent100ths aCurrent
 
 void WindowCovering::StartTimer(MoveType aMoveType, uint32_t aTimeoutMs)
 {
-    if (aMoveType == MoveType::LIFT)
+    MoveType * moveType = chip::Platform::New<MoveType>();
+    VerifyOrReturn(moveType != nullptr);
+
+    *moveType = aMoveType;
+    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutMs), MoveTimerTimeoutCallback,
+                                                       reinterpret_cast<void *>(moveType));
+}
+
+void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState)
+{
+    MoveType * moveType = reinterpret_cast<MoveType *>(appState);
+    VerifyOrReturn(moveType != nullptr);
+
+    if (*moveType == MoveType::LIFT)
     {
-        k_timer_start(&sLiftTimer, K_MSEC(sMoveTimeoutMs), K_NO_WAIT);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
     }
-    else if (aMoveType == MoveType::TILT)
+    else if (*moveType == MoveType::TILT)
     {
-        k_timer_start(&sTiltTimer, K_MSEC(sMoveTimeoutMs), K_NO_WAIT);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
     }
+
+    chip::Platform::Delete(moveType);
 }
 
 void WindowCovering::DriveCurrentTiltPosition(intptr_t)
