@@ -336,7 +336,7 @@
             "type": "pickString",
             "id": "openiotsdkApp",
             "description": "What Open IoT SDK application do you want to use?",
-            "options": ["shell"],
+            "options": ["shell", "unit-tests"],
             "default": "shell"
         },
         {
