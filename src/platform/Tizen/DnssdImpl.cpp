@@ -626,6 +626,20 @@ CHIP_ERROR DnssdTizen::UnregisterAllServices()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                              chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+{
+    std::string regtype = GetFullType(type, protocol);
+    return ::Browse(interface.GetPlatformInterface(), regtype.c_str(), protocol, callback, context);
+}
+
+CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                               void * context)
+{
+    std::string regtype = GetFullType(browseResult.mType, browseResult.mProtocol);
+    return ::Resolve(interface.GetPlatformInterface(), regtype.c_str(), browseResult.mName, callback, context);
+}
+
 void DnssdTizen::Delete(GenericContext * context)
 {
     switch (context->contextType)
@@ -746,27 +760,23 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interfaceId, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
 {
     VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(protocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    std::string regtype = GetFullType(type, protocol);
-
-    return Browse(interfaceId.GetPlatformInterface(), regtype.c_str(), protocol, callback, context);
+    return DnssdTizen::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
 }
 
-CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interfaceId, DnssdResolveCallback callback,
+CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
-    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(browseResult != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSupportedProtocol(browseResult->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    std::string regtype = GetFullType(service->mType, service->mProtocol);
-
-    return Resolve(interfaceId.GetPlatformInterface(), regtype.c_str(), service->mName, callback, context);
+    return DnssdTizen::GetInstance().Resolve(*browseResult, interface, callback, context);
 }
 
 } // namespace Dnssd

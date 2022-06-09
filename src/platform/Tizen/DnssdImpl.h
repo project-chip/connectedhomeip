@@ -126,6 +126,12 @@ public:
     CHIP_ERROR UnregisterService(dnssd_service_h serviceHandle);
     CHIP_ERROR UnregisterAllServices();
 
+    CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                      chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
+
+    CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                       void * context);
+
     CHIP_ERROR Add(BrowseContext * context, dnssd_browser_h browser);
     CHIP_ERROR Add(ResolveContext * context, dnssd_service_h service);
     CHIP_ERROR Remove(GenericContext * context);
