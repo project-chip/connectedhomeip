@@ -111,6 +111,20 @@ requests to start sending the update packages.
 An OTA Requestor is a node that wants to download a new firmware image and sends
 requests to an OTA Provider to start the update process.
 
+#### Simple Management Protocol
+
+Simple Management Protocol (SMP) is a basic transfer encoding that is used for
+device management purposes, including application image management. SMP supports
+using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
+
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
+
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to enable SMP and use it for the DFU purpose in this
+example.
+
 #### Bootloader
 
 MCUboot is a secure bootloader used for swapping firmware images of different
@@ -393,6 +407,14 @@ For example, use the following command for `nrf52840dk_nrf52840`:
 ### Building with Device Firmware Upgrade support
 
 Support for DFU using Matter OTA is enabled by default.
+
+To enable DFU over Bluetooth LE, run the following command with _build-target_
+replaced with the build target name of the Nordic Semiconductor kit you are
+using (for example `nrf52840dk_nrf52840`):
+
+    ```
+    $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
+    ```
 
 To completely disable support for DFU, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor

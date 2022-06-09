@@ -676,6 +676,9 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleSubscriptionEstablished, subscriptionId)
 
+    def handleResubscriptionAttempted(self, terminationCause, nextResubscribeIntervalMsec):
+        print("would resubscribe with error " + str(terminationCause) + " in " + str(nextResubscribeIntervalMsec))
+
     def _handleReportBegin(self):
         pass
 
@@ -743,6 +746,7 @@ class AsyncWriteTransaction:
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
 _OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32)
+_OnResubscriptionAttemptedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32, c_uint32)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint64, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
@@ -773,6 +777,11 @@ def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint
 @_OnSubscriptionEstablishedCallbackFunct
 def _OnSubscriptionEstablishedCallback(closure, subscriptionId):
     closure.handleSubscriptionEstablished(subscriptionId)
+
+
+@_OnResubscriptionAttemptedCallbackFunct
+def _OnResubscriptionAttemptedCallback(closure, terminationCause, nextResubscribeIntervalMsec):
+    closure.handleResubscriptionAttempted(terminationCause, nextResubscribeIntervalMsec)
 
 
 @_OnReadErrorCallbackFunct
@@ -985,13 +994,13 @@ def Init():
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_Read.restype = c_uint32
         setter.Set('pychip_ReadClient_InitCallbacks', None, [
-                   _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct, _OnSubscriptionEstablishedCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
+                   _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct, _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
                    _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
-        _OnReadAttributeDataCallback, _OnReadEventDataCallback, _OnSubscriptionEstablishedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
+        _OnReadAttributeDataCallback, _OnReadEventDataCallback, _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
         _OnReportBeginCallback, _OnReportEndCallback)
 
     _BuildAttributeIndex()

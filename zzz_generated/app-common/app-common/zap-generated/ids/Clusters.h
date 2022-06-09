@@ -355,9 +355,6 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
-namespace TestCluster {
-static constexpr ClusterId Id = 0x0000050F;
-} // namespace TestCluster
 namespace Messaging {
 static constexpr ClusterId Id = 0x00000703;
 } // namespace Messaging
@@ -376,6 +373,9 @@ static constexpr ClusterId Id = 0x00000B03;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
+namespace TestCluster {
+static constexpr ClusterId Id = 0xFFF1FC05;
+} // namespace TestCluster
 
 } // namespace Clusters
 } // namespace app

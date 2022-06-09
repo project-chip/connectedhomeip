@@ -352,9 +352,6 @@ static constexpr chip::ClusterId ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
 // Definitions for cluster: Account Login
 static constexpr chip::ClusterId ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
 
-// Definitions for cluster: Test Cluster
-static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0x050F;
-
 // Definitions for cluster: Messaging
 static constexpr chip::ClusterId ZCL_MESSAGING_CLUSTER_ID = 0x0703;
 
@@ -372,3 +369,6 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
+
+// Definitions for cluster: Test Cluster
+static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0xFFF1FC05;

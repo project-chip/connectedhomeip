@@ -66,7 +66,7 @@ limitations under the License.
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Group Key Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="AdministratorCommissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Administrator Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false">
                 <requireAttribute>ACTIVE_LOCALE</requireAttribute>
@@ -2017,7 +2017,7 @@ limitations under the License.
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="TV Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>

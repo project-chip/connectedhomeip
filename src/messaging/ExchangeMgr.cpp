@@ -111,8 +111,12 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
-    // Disallow creating exchange on an inactive session
-    VerifyOrReturnError(session->IsActiveSession(), nullptr);
+    if (!session->IsActiveSession())
+    {
+        // Disallow creating exchange on an inactive session
+        ChipLogError(ExchangeManager, "NewContext failed: session inactive");
+        return nullptr;
+    }
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 

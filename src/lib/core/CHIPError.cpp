@@ -437,6 +437,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED.AsInteger():
         desc = "DRBG entropy source failed to generate entropy data";
         break;
+    case CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED.AsInteger():
+        desc = "Message counter exhausted";
+        break;
     case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         desc = "Trying to add a NOC for a fabric that already exists";
         break;

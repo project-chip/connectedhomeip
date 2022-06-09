@@ -17,13 +17,13 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <struct name="TestListStructOctet">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="fabricIndex" type="INT64U"/>
     <item name="operationalCert" type="OCTET_STRING" length="32"/>
   </struct>
 
   <struct name="TestFabricScoped">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item fieldId="1" name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
     <item fieldId="2" name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
     <item fieldId="3" name="nullableFabricSensitiveInt8u" type="INT8U" isNullable="true" isFabricSensitive="true"/>
@@ -35,7 +35,7 @@ limitations under the License.
   </struct>
 
   <enum name="SimpleEnum" type="ENUM8">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="Unspecified" value="0x00"/>
     <item name="ValueA" value="0x01"/>
     <item name="ValueB" value="0x02"/>
@@ -43,14 +43,14 @@ limitations under the License.
   </enum>
 
   <bitmap name="SimpleBitmap" type="BITMAP8">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <field name="ValueA" mask="0x1"/>
     <field name="ValueB" mask="0x2"/>
     <field name="ValueC" mask="0x4"/>
   </bitmap>
 
   <struct name="SimpleStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleEnum" optional="false"/>
@@ -62,14 +62,14 @@ limitations under the License.
   </struct>
 
   <struct name="NestedStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleStruct" optional="false"/>
   </struct>
 
   <struct name="NestedStructList">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleStruct" optional="false"/>
@@ -80,13 +80,13 @@ limitations under the License.
   </struct>
 
   <struct name="DoubleNestedStructList">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="NestedStructList" array="true" optional="false"/>
   </struct>
 
 
   <struct name="NullablesAndOptionalsStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="NullableInt" type="INT16U" isNullable="true"/>
     <item name="OptionalInt" type="INT16U" optional="true"/>
     <item name="NullableOptionalInt" type="INT16U" isNullable="true"
@@ -106,7 +106,7 @@ limitations under the License.
   </struct>
 
     <bitmap name="Bitmap8MaskMap" type="BITMAP8">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -114,7 +114,7 @@ limitations under the License.
     </bitmap>
 
     <bitmap name="Bitmap16MaskMap" type="BITMAP16">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -122,7 +122,7 @@ limitations under the License.
     </bitmap>
 
     <bitmap name="Bitmap32MaskMap" type="BITMAP32">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -130,7 +130,7 @@ limitations under the License.
     </bitmap>
     
     <bitmap name="Bitmap64MaskMap" type="BITMAP64">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -140,7 +140,7 @@ limitations under the License.
   <cluster>
     <domain>CHIP</domain>
     <name>Test Cluster</name>
-    <code>0x050F</code>
+    <code>0xFFF1FC05</code>
     <define>TEST_CLUSTER</define>
     <description>The Test Cluster is meant to validate the generated code</description>
     <!-- Base data types -->
