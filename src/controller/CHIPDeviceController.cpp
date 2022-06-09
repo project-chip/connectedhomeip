@@ -290,12 +290,13 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 }
 
 CHIP_ERROR DeviceController::GetPeerAddressInterfaceAndPort(PeerId peerId, Inet::IPAddress & addr, Inet::InterfaceId & iface,
-                                                            uint16_t & port) {
+                                                            uint16_t & port)
+{
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
     ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(peerId, peerAddr));
-    addr = peerAddr.GetIPAddress();
-    port = peerAddr.GetPort();
+    addr  = peerAddr.GetIPAddress();
+    port  = peerAddr.GetPort();
     iface = peerAddr.GetInterface();
     return CHIP_NO_ERROR;
 }
