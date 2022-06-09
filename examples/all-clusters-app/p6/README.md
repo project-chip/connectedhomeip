@@ -136,7 +136,6 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
           sudo btmgmt -i hci0 power on
           ```
 
-
 ## OTA Software Update
 
 For the description of Software Update process with infineon P6 example
