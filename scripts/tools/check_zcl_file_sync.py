@@ -28,9 +28,10 @@ import sys
 import os
 import difflib
 
+
 def main():
     if len(sys.argv) != 2:
-        print('Please pass CHIP_ROOT as an argument (and only chip root)');
+        print('Please pass CHIP_ROOT as an argument (and only chip root)')
         return 1
 
     base_name = os.path.join(sys.argv[1], "src", "app", "zap-templates", "zcl", "zcl.json")
