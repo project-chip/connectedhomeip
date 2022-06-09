@@ -698,9 +698,30 @@ void ClearSecretData(uint8_t * buf, size_t len)
     mbedtls_platform_zeroize(buf, len);
 }
 
+// THE BELOW IS FROM `third_party/openthread/repo/third_party/mbedtls/repo/library/constant_time.c` since
+// mbedtls_ct_memcmp is not available on Linux somehow :(
+int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
+{
+    size_t i;
+    volatile const unsigned char *A = (volatile const unsigned char *) a;
+    volatile const unsigned char *B = (volatile const unsigned char *) b;
+    volatile unsigned char diff = 0;
+
+    for( i = 0; i < n; i++ )
+    {
+        /* Read volatile data in order before computing diff.
+         * This avoids IAR compiler warning:
+         * 'the order of volatile accesses is undefined ..' */
+        unsigned char x = A[i], y = B[i];
+        diff |= x ^ y;
+    }
+
+    return( (int)diff );
+}
+
 bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
 {
-    return mbedtls_ct_memcmp(a, b, n) == 0;
+    return mbedtls_ct_memcmp_copy(a, b, n) == 0;
 }
 
 CHIP_ERROR P256Keypair::Initialize()

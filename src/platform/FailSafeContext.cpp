@@ -62,7 +62,11 @@ void FailSafeContext::FailSafeTimerExpired()
 
 void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
 {
+    // Not armed, but busy so cannot rearm (via General Commissioning cluster) until the flushing
+    // via `HandleDisarmFailSafe` path is complete.
+    // TODO: This is hacky and we need to remove all this event pushing business, to keep all fail-safe logic-only.
     mFailSafeBusy = true;
+    mFailSafeArmed = false;
 
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
