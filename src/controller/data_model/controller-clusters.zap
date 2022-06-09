@@ -17368,7 +17368,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 1295,
+          "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "client",
@@ -17556,7 +17556,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 1295,
+          "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "server",

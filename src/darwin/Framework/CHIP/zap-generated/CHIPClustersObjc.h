@@ -22702,47 +22702,6 @@ typedef NS_ENUM(uint8_t, CHIPApplicationBasicApplicationStatus) {
     CHIPApplicationBasicApplicationStatusActiveVisibleNotFocus = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, CHIPTestClusterSimple) {
-    CHIPTestClusterSimpleUnspecified = 0x00,
-    CHIPTestClusterSimpleValueA = 0x01,
-    CHIPTestClusterSimpleValueB = 0x02,
-    CHIPTestClusterSimpleValueC = 0x03,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPTestClusterBitmap16MaskMap) {
-    CHIPTestClusterBitmap16MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap16MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap16MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
-};
-
-typedef NS_OPTIONS(uint32_t, CHIPTestClusterBitmap32MaskMap) {
-    CHIPTestClusterBitmap32MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap32MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap32MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
-};
-
-typedef NS_OPTIONS(uint64_t, CHIPTestClusterBitmap64MaskMap) {
-    CHIPTestClusterBitmap64MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap64MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap64MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPTestClusterBitmap8MaskMap) {
-    CHIPTestClusterBitmap8MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap8MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap8MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap8MaskMapMaskVal4 = 0x40,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPTestClusterSimpleBitmap) {
-    CHIPTestClusterSimpleBitmapValueA = 0x1,
-    CHIPTestClusterSimpleBitmapValueB = 0x2,
-    CHIPTestClusterSimpleBitmapValueC = 0x4,
-};
-
 typedef NS_ENUM(uint8_t, CHIPMessagingEventId) {
     CHIPMessagingEventIdMeterCoverRemoved = 0x00,
     CHIPMessagingEventIdMeterCoverClosed = 0x01,
@@ -22884,6 +22843,47 @@ typedef NS_OPTIONS(uint32_t, CHIPApplianceEventsAndAlertAlertStructure) {
     CHIPApplianceEventsAndAlertAlertStructureAlertId = 0xFF,
     CHIPApplianceEventsAndAlertAlertStructureCategory = 0xF00,
     CHIPApplianceEventsAndAlertAlertStructurePresenceRecovery = 0x3000,
+};
+
+typedef NS_ENUM(uint8_t, CHIPTestClusterSimple) {
+    CHIPTestClusterSimpleUnspecified = 0x00,
+    CHIPTestClusterSimpleValueA = 0x01,
+    CHIPTestClusterSimpleValueB = 0x02,
+    CHIPTestClusterSimpleValueC = 0x03,
+};
+
+typedef NS_OPTIONS(uint16_t, CHIPTestClusterBitmap16MaskMap) {
+    CHIPTestClusterBitmap16MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap16MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap16MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPTestClusterBitmap32MaskMap) {
+    CHIPTestClusterBitmap32MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap32MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap32MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
+};
+
+typedef NS_OPTIONS(uint64_t, CHIPTestClusterBitmap64MaskMap) {
+    CHIPTestClusterBitmap64MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap64MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap64MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPTestClusterBitmap8MaskMap) {
+    CHIPTestClusterBitmap8MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap8MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap8MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap8MaskMapMaskVal4 = 0x40,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPTestClusterSimpleBitmap) {
+    CHIPTestClusterSimpleBitmapValueA = 0x1,
+    CHIPTestClusterSimpleBitmapValueB = 0x2,
+    CHIPTestClusterSimpleBitmapValueC = 0x4,
 };
 
 NS_ASSUME_NONNULL_END

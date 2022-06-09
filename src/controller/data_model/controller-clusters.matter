@@ -3475,7 +3475,7 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-client cluster TestCluster = 1295 {
+client cluster TestCluster = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -4404,8 +4404,8 @@ endpoint 1 {
   binding cluster ApplicationLauncher;
   binding cluster ApplicationBasic;
   binding cluster AccountLogin;
-  binding cluster TestCluster;
   binding cluster ElectricalMeasurement;
+  binding cluster TestCluster;
 }
 
 
