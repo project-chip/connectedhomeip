@@ -174,7 +174,7 @@ private:
     class CASESessionFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
-        CASESessionFabricDelegate(CASESession * caseSession) :  mCASESession(caseSession) {}
+        CASESessionFabricDelegate(CASESession * caseSession) : mCASESession(caseSession) {}
 
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {

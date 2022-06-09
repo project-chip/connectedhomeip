@@ -191,20 +191,24 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
-    CASESession pairing;
     FabricTable fabrics;
+    // In normal operation scope of FabricTable outlives CASESession. Without this scoping we hit
+    // ASAN test issue since FabricTable is not normally on the stack.
+    {
+        CASESession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
+        NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
 
-    pairing.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate) == CHIP_NO_ERROR);
+        pairing.SetGroupDataProvider(&gDeviceGroupDataProvider);
+        NL_TEST_ASSERT(inSuite,
+                       pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr) ==
+                           CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite,
+                       pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate) ==
+                           CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite,
+                       pairing.ListenForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate) == CHIP_NO_ERROR);
+    }
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
