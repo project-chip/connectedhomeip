@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,22 @@
  *
  */
 
-#include "commands/common/Commands.h"
-#include "commands/interactive/Commands.h"
-#include "commands/pairing/Commands.h"
-#include "commands/storage/Commands.h"
+#pragma once
 
-#include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
+#include "../common/CHIPCommandBridge.h"
+#include <commands/common/Command.h>
 
-int main(int argc, const char * argv[])
+#include "InteractiveCommands.h"
+
+void registerCommandsInteractive(Commands & commands)
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsInteractive(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
+    const char * clusterName = "interactive";
+
+    commands_list clusterCommands = {
+#if CONFIG_USE_INTERACTIVE_MODE
+        make_unique<InteractiveStartCommand>(&commands),
+#endif // CONFIG_USE_INTERACTIVE_MODE
+    };
+
+    commands.Register(clusterName, clusterCommands);
 }

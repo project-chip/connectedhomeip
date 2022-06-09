@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,25 @@
  *
  */
 
+#pragma once
+
+#include "../common/CHIPCommandBridge.h"
 #include "commands/common/Commands.h"
-#include "commands/interactive/Commands.h"
-#include "commands/pairing/Commands.h"
-#include "commands/storage/Commands.h"
 
-#include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
+#include "InteractiveCommands.h"
 
-int main(int argc, const char * argv[])
+class Commands;
+
+class InteractiveStartCommand : public CHIPCommandBridge
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsInteractive(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
-}
+public:
+    InteractiveStartCommand(Commands * commandsHandler) : CHIPCommandBridge("start"), mHandler(commandsHandler) {}
+
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+
+private:
+    bool ParseCommand(char * command);
+    Commands * mHandler = nullptr;
+};

@@ -221,8 +221,9 @@ public:
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval] 
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval] 
-                                            params:params
-                                subscriptionEstablished: nullptr reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+                                                 params:params
+                                subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
+                                reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         if (error || !mWait){
             SetCommandExitStatus(error);
