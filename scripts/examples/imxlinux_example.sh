@@ -30,10 +30,10 @@ if [ "$IMX_SDK_ROOT" = "" ]; then
 fi
 env
 
-entries=`ls $IMX_SDK_ROOT`
-for entry in $entries
+entries=`ls "$IMX_SDK_ROOT"`
+for entry in "$entries"
 do
-    if [ "$(echo $entry | grep -E "^environment-setup-")" != "" ]; then
+    if [ "$(echo "$entry" | grep -E "^environment-setup-")" != "" ]; then
         env_setup_script=$entry
         break
     fi
@@ -42,25 +42,25 @@ done
 
 while read line
 do
-    if [ "$(echo $line | grep -E "^export SDKTARGETSYSROOT=")" != "" ]; then
+    if [ "$(echo "$line" | grep -E "^export SDKTARGETSYSROOT=")" != "" ]; then
         sdk_target_sysroot=${line#"export SDKTARGETSYSROOT="}
     fi
 
-    if [ "$(echo $line | grep -E "^export CC=")" != "" ]; then
+    if [ "$(echo "$line" | grep -E "^export CC=")" != "" ]; then
         cc=${line#"export CC="}
         cc=${cc#"\""}
         cc=${cc%"\""}
         cc=${cc/"\$SDKTARGETSYSROOT"/$sdk_target_sysroot}
     fi
 
-    if [ "$(echo $line | grep -E "^export CXX=")" != "" ]; then
+    if [ "$(echo "$line" | grep -E "^export CXX=")" != "" ]; then
         cxx=${line#"export CXX="}
         cxx=${cxx#"\""}
         cxx=${cxx%"\""}
         cxx=${cxx/"\$SDKTARGETSYSROOT"/$sdk_target_sysroot}
     fi
 
-    if [ "$(echo $line | grep -E "^export ARCH=")" != "" ]; then
+    if [ "$(echo "$line" | grep -E "^export ARCH=")" != "" ]; then
         target_cpu=${line#"export ARCH="}
 
         if [ "$target_cpu" = "arm64" ]; then
@@ -70,11 +70,11 @@ do
         fi
     fi
 
-    if [ "$(echo $line | grep -E "^export CROSS_COMPILE=")" != "" ]; then
+    if [ "$(echo "$line" | grep -E "^export CROSS_COMPILE=")" != "" ]; then
         cross_compile=${line#"export CROSS_COMPILE="}
         cross_compile=${cross_compile%"-"}
     fi
-done < $IMX_SDK_ROOT/$env_setup_script
+done < "$IMX_SDK_ROOT/$env_setup_script"
 
 
 release_build=true
