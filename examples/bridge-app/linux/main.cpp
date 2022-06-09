@@ -660,7 +660,7 @@ void * bridge_polling_thread(void * context)
         usleep(POLL_INTERVAL_MS * 1000);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int main(int argc, char * argv[])
@@ -754,7 +754,7 @@ int main(int argc, char * argv[])
 
     {
         pthread_t poll_thread;
-        int res = pthread_create(&poll_thread, NULL, bridge_polling_thread, NULL);
+        int res = pthread_create(&poll_thread, nullptr, bridge_polling_thread, nullptr);
         if (res)
         {
             printf("Error creating polling thread: %d\n", res);
