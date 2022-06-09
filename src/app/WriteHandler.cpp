@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 
 using namespace Protocols::InteractionModel;
-
+using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
 CHIP_ERROR WriteHandler::Init()
@@ -63,7 +63,7 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
                                                System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!packet.IsNull(), Status::Failure);
+    VerifyOrReturnError(!packet.IsNull(), Status::ResourceExhausted);
 
     System::PacketBufferTLVWriter messageWriter;
     messageWriter.Init(std::move(packet));
@@ -116,11 +116,13 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
                        "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
+
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         Close();
-        return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        return err;
     }
 
     Status status =
@@ -133,12 +135,12 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
             Close();
         }
     }
-    else if (status != Protocols::InteractionModel::Status::Success)
+    else
     {
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
         Close();
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -312,7 +314,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             // it with Busy status code.
             (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
         {
-            err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
+            err = AddStatus(dataAttributePath, StatusIB(Status::Busy));
             continue;
         }
 
@@ -612,20 +614,18 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Status aStatus)
 {
     return AddStatus(aPath, StatusIB(aStatus));
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Success, aClusterStatus));
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificFailure(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
@@ -684,7 +684,7 @@ const char * WriteHandler::GetStateStr() const
 void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
+    ChipLogDetail(DataManagement, "IM WriteHandler moving to [%s]", GetStateStr());
 }
 
 void WriteHandler::ClearState()

@@ -120,6 +120,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    bool suppressErrorStatusResponse = false;
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
@@ -130,7 +131,18 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
     if (mState == State::AwaitingTimedStatus)
     {
-        err = HandleTimedStatus(aPayloadHeader, std::move(aPayload));
+        if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        {
+            CHIP_ERROR statusError = CHIP_NO_ERROR;
+            SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+            suppressErrorStatusResponse = true;
+            SuccessOrExit(err = statusError);
+            err = SendInvokeRequest();
+        }
+        else
+        {
+            err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+        }
         // Skip all other processing here (which is for the response to the
         // invoke request), no matter whether err is success or not.
         goto exit;
@@ -143,8 +155,10 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-        SuccessOrExit(err);
+        CHIP_ERROR statusError = CHIP_NO_ERROR;
+        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+        SuccessOrExit(err = statusError);
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
     else
     {
@@ -152,11 +166,22 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
 exit:
-    if (mpCallback != nullptr)
+    ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    return err;
+}
+
+void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+                                           bool aSuppressErrorStatusResponse)
+{
+    if (aError != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
+        if (!aSuppressErrorStatusResponse)
         {
-            mpCallback->OnError(this, err);
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+            if (mpCallback != nullptr)
+            {
+                mpCallback->OnError(this, aError);
+            }
         }
     }
 
@@ -164,9 +189,6 @@ exit:
     {
         Close();
     }
-    // Else we got a response to a Timed Request and just sent the invoke.
-
-    return err;
 }
 
 CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload)
@@ -369,13 +391,6 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
-{
-    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload)));
-
-    return SendInvokeRequest();
-}
-
 CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
 {
     ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false));
@@ -430,7 +445,7 @@ const char * CommandSender::GetStateStr() const
 void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "Command Sender moving to [%10.10s]", GetStateStr());
 }
 
 } // namespace app
