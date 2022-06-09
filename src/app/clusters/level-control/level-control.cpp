@@ -131,14 +131,17 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint)
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-constexpr uint8_t levelControlMaxSimultaneousTimers = FIXED_ENDPOINT_COUNT; // for now using FIXED_ENDPOINT_COUNT. In the future we could use larger numbers or heap allocation to accommodate dynamic endpoints
+constexpr uint8_t levelControlMaxSimultaneousTimers =
+    FIXED_ENDPOINT_COUNT; // for now using FIXED_ENDPOINT_COUNT. In the future we could use larger numbers or heap allocation to
+                          // accommodate dynamic endpoints
 static BitMapObjectPool<EndpointId, levelControlMaxSimultaneousTimers> eventEndpoints;
 void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
     auto eventEndpoint = eventEndpoints.CreateObject(endpoint);
-    if(eventEndpoint == nullptr) {
+    if (eventEndpoint == nullptr)
+    {
         ChipLogError(Zcl, "Maximum number of concurrent level transitions reached");
         return;
     }
@@ -147,7 +150,7 @@ static void schedule(EndpointId endpoint, uint32_t delayMs)
     DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(delayMs),
         [](chip::System::Layer *, void * callbackContext) {
-            auto endpoint = reinterpret_cast<EndpointId*>(callbackContext);
+            auto endpoint = reinterpret_cast<EndpointId *>(callbackContext);
             chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
                                                           reinterpret_cast<intptr_t>(endpoint));
         },
@@ -1158,6 +1161,6 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
-void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) { }
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
 
 void MatterLevelControlPluginServerInitCallback() {}
