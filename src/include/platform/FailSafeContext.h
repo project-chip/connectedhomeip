@@ -99,6 +99,7 @@ private:
     bool mAddNocCommandHasBeenInvoked      = false;
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
+    // The fact of whether a CSR occurred at all is stored elsewhere.
     bool mIsCsrRequestForUpdateNoc         = false;
     FabricIndex mFabricIndex               = kUndefinedFabricIndex;
 

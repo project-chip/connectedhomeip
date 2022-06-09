@@ -57,7 +57,6 @@ void FailSafeContext::FailSafeTimerExpired()
     }
 
     ChipLogProgress(FailSafe, "Fail-safe timer expired");
-    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
     ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
 }
 
@@ -194,6 +193,9 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     {
         return;
     }
+
+    // Cancel the timer since we force its action
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
 
     FailSafeTimerExpired();
 }

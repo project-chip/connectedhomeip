@@ -586,7 +586,9 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric, Credentials::Certif
 
     if (operationalKey != nullptr)
     {
-        // Verify that public key in NOC matches public key generated provided by controller init.
+        // Verify that public key in NOC matches public key of the provided keypair.
+        // When operational key is not injected (e.g. when mOperationalKeystore != nullptr)
+        // the check is done by the keystore in `ActivatePendingOperationalKey`.
         VerifyOrReturnError(operationalKey->Pubkey().Length() == pubkey.Length(), CHIP_ERROR_INVALID_PUBLIC_KEY);
         VerifyOrReturnError(memcmp(operationalKey->Pubkey().ConstBytes(), pubkey.ConstBytes(), pubkey.Length()) == 0,
                             CHIP_ERROR_INVALID_PUBLIC_KEY);
@@ -901,11 +903,6 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 
 CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage, OperationalKeystore * operationalKeystore)
 {
-    if (operationalKeystore == nullptr)
-    {
-        ChipLogError(FabricProvisioning,
-                     "*** WARNING: No operational keystore provided: all FabricInfo must have Set*OperationalKey() called. ***");
-    }
     mOperationalKeystore = operationalKeystore;
     return Init(storage);
 }
@@ -1188,7 +1185,7 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
         // Fabric udpate case (e.g. UpdateNOC): we already know the fabric index
         mFabricIndexWithPendingState = fabricIndex.Value();
     }
-    else if ((mFabricCount < kMaxValidFabricIndex) && mNextAvailableFabricIndex.HasValue())
+    else if (mNextAvailableFabricIndex.HasValue())
     {
         // Fabric addition case (e.g. AddNOC): we need to allocate for the next pending fabric index
         mFabricIndexWithPendingState = mNextAvailableFabricIndex.Value();
@@ -1262,7 +1259,7 @@ void FabricTable::RevertPendingFabricData()
     mFabricIndexWithPendingState = kUndefinedFabricIndex;
 
     VerifyOrReturn(mOperationalKeystore != nullptr);
-    mOperationalKeystore->RevertPendingKeypairs();
+    mOperationalKeystore->RevertPendingKeypair();
 }
 
 } // namespace chip

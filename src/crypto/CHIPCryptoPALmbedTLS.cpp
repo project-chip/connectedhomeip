@@ -26,6 +26,7 @@
 
 #include <mbedtls/bignum.h>
 #include <mbedtls/ccm.h>
+#include <mbedtls/constant_time.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
@@ -695,6 +696,11 @@ exit:
 void ClearSecretData(uint8_t * buf, size_t len)
 {
     mbedtls_platform_zeroize(buf, len);
+}
+
+bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
+{
+    return mbedtls_ct_memcmp(a, b, n) == 0;
 }
 
 CHIP_ERROR P256Keypair::Initialize()

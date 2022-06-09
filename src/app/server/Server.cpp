@@ -157,10 +157,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
-    InitFailSafe();
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler(&mExchangeMgr);
+
+    // Clean-up previously standing fail-safes
+    InitFailSafe();
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())

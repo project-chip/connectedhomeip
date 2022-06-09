@@ -40,11 +40,25 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     FabricIndex kFabricIndex    = 111;
     FabricIndex kBadFabricIndex = static_cast<FabricIndex>(kFabricIndex + 10u);
 
-    // Failure before Init
+    // Failure before Init of ActivateOpKeypairForFabric
     P256PublicKey placeHolderPublicKey;
     CHIP_ERROR err = opKeystore.ActivateOpKeypairForFabric(kFabricIndex, placeHolderPublicKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
+
+    // Failure before Init of NewOpKeypairForFabric
+    uint8_t unusedCsrBuf[kMAX_CSR_Length];
+    MutableByteSpan unusedCsrSpan{ unusedCsrBuf };
+    err = opKeystore.NewOpKeypairForFabric(kFabricIndex, unusedCsrSpan);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    // Failure before Init of CommitOpKeypairForFabric
+    err = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    // Failure before Init of RemoveOpKeypairForFabric
+    err = opKeystore.RemoveOpKeypairForFabric(kFabricIndex);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // Success after Init
     err = opKeystore.Init(&storageDelegate);
@@ -67,6 +81,13 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     csrSpan = MutableByteSpan{ csrBuf };
     err     = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
+
+    // Cannot NewOpKeypair for a different fabric if one already pending
+    uint8_t badCsrBuf[kMAX_CSR_Length];
+    MutableByteSpan badCsrSpan = MutableByteSpan{ badCsrBuf };
+    err = opKeystore.NewOpKeypairForFabric(kBadFabricIndex, badCsrSpan);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_FABRIC_INDEX);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == true);
 
     P256PublicKey csrPublicKey2;

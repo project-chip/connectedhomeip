@@ -78,7 +78,7 @@ public:
     CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override;
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
-    void RevertPendingKeypairs() override;
+    void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
 

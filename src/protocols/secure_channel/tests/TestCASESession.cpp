@@ -108,7 +108,7 @@ public:
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    void RevertPendingKeypairs() override {}
+    void RevertPendingKeypair() override {}
 
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override
@@ -213,8 +213,6 @@ CHIP_ERROR InitCredentialSets()
 
     gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
     ReturnErrorOnFailure(gDeviceFabrics.Init(&gDeviceStorageDelegate, &gDeviceOperationalKeystore));
-
-    // ReturnErrorOnFailure(deviceFabric.SetOperationalKeypair(&opKey));
 
     ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
     ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));

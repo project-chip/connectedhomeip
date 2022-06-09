@@ -68,14 +68,13 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
     ReturnErrorOnFailure(writer.Put(kOpKeyVersionTag, kOpKeyVersion));
 
-    // P256SerializedKeypair has RAII secret clearing
-    Crypto::P256SerializedKeypair serializedOpKey;
-    ReturnErrorOnFailure(keypair->Serialize(serializedOpKey));
+    {
+        // P256SerializedKeypair has RAII secret clearing
+        Crypto::P256SerializedKeypair serializedOpKey;
+        ReturnErrorOnFailure(keypair->Serialize(serializedOpKey));
 
-    ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
-
-    // We are done with the serialized key, it is in the TLV now, let's clean this temp buffer ASAP.
-    Crypto::ClearSecretData(serializedOpKey.Bytes(), serializedOpKey.Length());
+        ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+    }
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
@@ -98,6 +97,8 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (storage != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use RAII scoping for the transient keypair, to make sure it doesn't get leaked on any error paths.
+    // Key is put in heap since signature is a costly stack operation and P256Keypair is
+    // a costly class depending on the backend.
     auto transientOperationalKeypair = Platform::MakeUnique<P256Keypair>();
     if (!transientOperationalKeypair)
     {
@@ -198,13 +199,15 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    // If a key is pending, we cannot generate for a different fabric index until we commit or revert.
+    if ((mPendingFabricIndex != kUndefinedFabricIndex) && (fabricIndex != mPendingFabricIndex))
+    {
+        return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    }
     VerifyOrReturnError(outCertificateSigningRequest.size() >= Crypto::kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Replace previous pending keypair, if any was previously allocated
     ResetPendingKey();
-
-    // Until ActivateOpKeypairForFabric, the new key is just pending in memory.
-    mPendingFabricIndex = kUndefinedFabricIndex;
 
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -212,9 +215,11 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     mPendingKeypair->Initialize();
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
-
-    // No need to free the mPendingKeypair on failure, it may be OK and other paths will clean it.
-    ReturnErrorOnFailure(err);
+    if (err != CHIP_NO_ERROR)
+    {
+        ResetPendingKey();
+        return err;
+    }
 
     outCertificateSigningRequest.reduce_size(csrLength);
     mPendingFabricIndex = fabricIndex;
@@ -261,7 +266,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::RemoveOpKeypairForFabric(Fabric
     // Remove pending state if matching
     if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
     {
-        RevertPendingKeypairs();
+        RevertPendingKeypair();
     }
 
     DefaultStorageKeyAllocator keyAlloc;
@@ -274,7 +279,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::RemoveOpKeypairForFabric(Fabric
     return err;
 }
 
-void PersistentStorageOperationalKeystore::RevertPendingKeypairs()
+void PersistentStorageOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(mStorage != nullptr);
 

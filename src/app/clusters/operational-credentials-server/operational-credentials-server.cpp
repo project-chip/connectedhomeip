@@ -346,22 +346,11 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     }
 }
 
-void CommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
-{
-    // THIS IS DEFERRED. The General Commissioning server actually
-    // commits the fabric table much before this deferred event loop event occurs.
-    ChipLogProgress(Zcl, "OpCreds: Commissioning Complete");
-}
-
 void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         FailSafeCleanup(event);
-    }
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
-    {
-        CommissioningComplete(event);
     }
 }
 
@@ -1106,7 +1095,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
 
-    // If current fabric is not available, command was invoked over PASE which is not legal
+    // If current fabric is not available, command was invoked over PASE which is not legal if IsForUpdateNOC is true.
     VerifyOrExit(!isForUpdateNoc || (fabricInfo != nullptr), finalStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
@@ -1114,7 +1103,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
-        size_t csrLength           = Crypto::kMAX_CSR_Length;
+        constexpr size_t csrLength = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
         Platform::ScopedMemoryBuffer<uint8_t> csr;

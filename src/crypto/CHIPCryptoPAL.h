@@ -198,19 +198,7 @@ void ClearSecretData(uint8_t (&buf)[N])
  * @param n Number of bytes to compare
  * @return true if `n` first bytes of both buffers are equal, false otherwise
  */
-inline bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
-{
-    const uint8_t * A = (const uint8_t *) a;
-    const uint8_t * B = (const uint8_t *) b;
-    uint8_t diff      = 0;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        diff |= (A[i] ^ B[i]);
-    }
-
-    return (diff == 0);
-}
+bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n);
 
 template <typename Sig>
 class ECPKey
