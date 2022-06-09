@@ -205,9 +205,6 @@ static_library("system") {
 
   if (chip_system_config_use_sockets) {
     sources += [ "SocketEvents.h" ]
-    if (chip_system_config_event_loop == "Libevent") {
-      libs = [ "event" ]
-    }
   }
 
   if (chip_with_nlfaultinjection) {
