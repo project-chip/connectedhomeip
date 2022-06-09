@@ -293,7 +293,8 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        err = OnUnknownMsgType();
     }
     return err;
 }
@@ -305,12 +306,20 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
             GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
 }
 
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                         System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnUnknownMsgType()
 {
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err =
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
+    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
+    {
+        // We have to manually close the exchange, because we called
+        // WillSendMessage already.
+        mpExchangeCtx->Close();
+    }
+    mpExchangeCtx = nullptr;
     Close();
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    return err;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
