@@ -167,7 +167,31 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 180000
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 18000
 
     - label: "TH_CR1 re-opens new commissioning window on DUT_CE"
       identity: "alpha"
@@ -229,7 +253,31 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 180000
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 18000
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"
