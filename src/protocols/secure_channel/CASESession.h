@@ -174,8 +174,7 @@ private:
     class CASESessionFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
-        CASESessionFabricDelegate(CASESession * caseSession)
-        :  mCASESession(caseSession) {}
+        CASESessionFabricDelegate(CASESession * caseSession) :  mCASESession(caseSession) {}
 
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
@@ -297,7 +296,7 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
-    CASESessionFabricDelegate mFabricDelegate{this};
+    CASESessionFabricDelegate mFabricDelegate{ this };
     State mState;
 };
 
