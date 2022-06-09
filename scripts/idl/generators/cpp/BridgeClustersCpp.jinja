@@ -17,7 +17,7 @@ struct {{struct.name}}
 {%-   if cluster | dynamicCluster(idl) %}
 struct {{cluster.name}}Cluster : public CommonCluster
 {
-  {%   for struct in cluster.structs %}
+  {%-   for struct in cluster.structs %}
   struct {{struct.name}}
   {
     {%-     for field in struct.fields %}
@@ -34,8 +34,8 @@ struct {{cluster.name}}Cluster : public CommonCluster
   EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
   {
     switch(am->attributeId) {
-  {%  for attr in cluster.attributes -%}
-  {%    if attr.is_readable %}
+  {%-  for attr in cluster.attributes -%}
+  {%-    if attr.is_readable %}
     case {{attr.definition.code}}:
       return m{{attr.definition.name | capitalcase}}.Read(am, buffer, maxReadLength);
   {%-    endif %}
@@ -48,8 +48,8 @@ struct {{cluster.name}}Cluster : public CommonCluster
   EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
   {
     switch(am->attributeId) {
-  {%  for attr in cluster.attributes -%}
-  {%    if attr.is_writable %}
+  {%-  for attr in cluster.attributes -%}
+  {%-    if attr.is_writable %}
     case {{attr.definition.code}}:
       return m{{attr.definition.name | capitalcase}}.WriteFromMatter(am, buffer, this);
   {%-    endif %}
@@ -62,7 +62,7 @@ struct {{cluster.name}}Cluster : public CommonCluster
   void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
   {
     switch(attributeId) {
-  {%  for attr in cluster.attributes %}
+  {%-  for attr in cluster.attributes %}
     case {{attr.definition.code}}:
       m{{attr.definition.name | capitalcase}}.WriteFromBridge(buffer, this);
       break;
@@ -73,7 +73,7 @@ struct {{cluster.name}}Cluster : public CommonCluster
   template<typename T>
   void AddAllAttributes(T *list)
   {
-  {%  for attr in cluster.attributes %}
+  {%-  for attr in cluster.attributes %}
     list->Add(m{{attr.definition.name | capitalcase}});
   {%-  endfor  %}
   }
@@ -88,8 +88,8 @@ struct {{cluster.name}}Cluster : public CommonCluster
 {%-  endfor  %}
 
   static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-{%  for attr in cluster.attributes %}
-    { {{attr.definition.code}},  {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}}, ZAP_EMPTY_DEFAULT() },
+{%-  for attr in cluster.attributes %}
+    { {{attr.definition.code}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
 {%-  endfor  %}
   };
 };

@@ -93,6 +93,8 @@ private:
     std::vector<chip::DataVersion> mVersions;
 
     std::vector<EmberAfDeviceType> mDeviceTypes;
+
+    std::list<std::vector<EmberAfAttributeMetadata>> mAttribStorage;
 };
 
 class DynamicSwitchDevice : public DynamicDeviceImpl

@@ -33,6 +33,7 @@ static constexpr uint16_t ZCL_ON_OFF_CLUSTER_REVISION               = 4;
 static constexpr uint16_t ZCL_SWITCH_CLUSTER_REVISION               = 1;
 static constexpr uint16_t ZCL_LEVEL_CONTROL_CLUSTER_REVISION        = 1;
 
+// This is the interface to cluster implementations, providing access to manipulate attributes.
 class ClusterImpl
 {
 public:
@@ -46,6 +47,47 @@ public:
     virtual chip::Span<const EmberAfAttributeMetadata> GetAllAttributes()                                                    = 0;
 };
 
+// This provides a wrapper for an arbitrary-sized little-endian value that is Bytes bytes long
+// and represented logically by type T. Code can read/write it as native, or access the little-
+// endian byte array. Byte arrays also eliminate padding bytes.
+template <typename T, size_t Bytes>
+struct LittleEndian
+{
+    LittleEndian(T value = 0) { *this = value; }
+
+#if (BIGENDIAN_CPU)
+    operator T() const
+    {
+        T ret = 0;
+        for (size_t i = 0; i < Bytes; i++)
+            ret |= static_cast<T>(mBytes[i]) << (8u * i);
+        return ret;
+    }
+    void operator=(T v)
+    {
+        for (auto & b : mBytes)
+        {
+            b = v & 0xFF;
+            v >>= 8;
+        }
+    }
+#else
+    operator T() const
+    {
+        T ret = 0;
+        memcpy(&ret, mBytes, Bytes);
+        return ret;
+    }
+    void operator=(T v) { memcpy(mBytes, &v, Bytes); }
+#endif // BIGENDIAN_CPU
+
+    uint8_t mBytes[Bytes];
+};
+
+// *Type classes are used by code generation to specialize storage for a particular underlying type.
+
+// This provides storage for a primitive binary type, eg uintN_t, float, double
+// Values in ValueType are native, values in byte buffers are LE.
 template <typename T, size_t Bytes, EmberAfAttributeType AfType>
 struct PrimitiveType
 {
@@ -56,7 +98,7 @@ struct PrimitiveType
     typedef T ValueType;
 
     PrimitiveType() = default;
-    PrimitiveType(T initial) : mValue(initial) {}
+    PrimitiveType(ValueType initial) : mValue(initial) {}
 
     EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
     {
@@ -85,17 +127,54 @@ struct PrimitiveType
         return true;
     }
 
+    ValueType Peek() const { return mValue; }
+
+    uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
+
+private:
+    LittleEndian<ValueType, Bytes> mValue;
+    static_assert(std::is_standard_layout<LittleEndian<T, Bytes>>::value, "PrimitiveType not standard layout!");
+};
+
+// This provides access to a struct. It is similar to PrimitiveType except it is assumed
+// that each member handes its own endianness, instead of the whole type.
+template <typename T>
+struct StructType
+{
+    static constexpr EmberAfAttributeType kMatterType = ZCL_STRUCT_ATTRIBUTE_TYPE;
+    static constexpr uint16_t kMaxSize                = sizeof(T);
+    typedef const uint8_t * ValueType;
+
+    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
+    {
+        if (sz != kMaxSize)
+            return EMBER_ZCL_STATUS_FAILURE;
+        memcpy(buffer, &mValue, kMaxSize);
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    bool Equal(const uint8_t * buffer) const { return !memcmp(buffer, &mValue, kMaxSize); }
+
+    void Write(const uint8_t * buffer) { memcpy(&mValue, buffer, kMaxSize); }
+
+    bool TryWrite(const uint8_t * buffer)
+    {
+        if (Equal(buffer))
+            return false;
+        Write(buffer);
+        return true;
+    }
+
     const ValueType & Peek() const { return mValue; }
 
     uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
 
 private:
-    ValueType mValue;
+    static_assert(std::is_standard_layout<T>::value, "StructType not standard layout!");
+    T mValue;
 };
 
-template <typename T>
-using StructType = PrimitiveType<T, sizeof(T), ZCL_STRUCT_ATTRIBUTE_TYPE>;
-
+// This provides storage for short and long octet and char strings
 template <size_t Bytes, EmberAfAttributeType AfType>
 struct OctetString
 {
@@ -112,19 +191,26 @@ struct OctetString
         // There should be at least enough space to hold the size
         if (kIsLong && sz < 2)
             return EMBER_ZCL_STATUS_FAILURE;
-        memcpy(buffer, mValue, sz < kMaxSize ? sz : kMaxSize);
+        if (kIsLong)
+        {
+            emberAfCopyLongString(buffer, mValue, sz);
+        }
+        else
+        {
+            emberAfCopyString(buffer, mValue, sz);
+        }
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    bool Equal(const uint8_t * buffer)
-    {
-        uint16_t newsz = GetSize(buffer);
-        if (newsz != GetSize(mValue))
-            return false;
-        return memcmp(buffer, mValue, newsz);
-    }
+    bool Equal(const uint8_t * buffer) { return !memcmp(buffer, &mValue, kMaxSize); }
 
-    void Write(const uint8_t * buffer) { memcpy(mValue, buffer, GetSize(buffer)); }
+    void Write(const uint8_t * buffer)
+    {
+        if (kIsLong)
+            emberAfCopyLongString(buffer, mValue, kMaxSize);
+        else
+            emberAfCopyString(buffer, mValue, kMaxSize);
+    }
 
     bool TryWrite(const uint8_t * newV)
     {
@@ -141,28 +227,66 @@ struct OctetString
 private:
     uint16_t GetSize(const uint8_t * buf)
     {
-        if (!kIsLong)
-            return *buf + 1;
-        uint16_t sz;
-        memcpy(&sz, buf, 2);
-        return sz + 2;
+        if (kIsLong)
+            return emberAfLongStringLength(buf);
+        return emberAfStringLength(buf);
     }
-    uint8_t mValue[Bytes];
+    uint8_t mValue[kMaxSize];
 };
 
+// This allows for an array of up to MaxElements of a specified type. It assumes that T
+// handles endian-ness.
 template <size_t MaxElements, typename T>
 struct ArrayType
 {
     static constexpr EmberAfAttributeType kMatterType = ZCL_ARRAY_ATTRIBUTE_TYPE;
     struct Data
     {
-        uint16_t length;
+        LittleEndian<uint16_t, 2> length;
         T array[MaxElements];
     };
     // We need this to be standard layout to get a reliable byte view.
+    static_assert(std::is_standard_layout<T>::value, "Array element not standard layout!");
     static_assert(std::is_standard_layout<Data>::value, "Array of elements not standard layout!");
 
+    static constexpr uint16_t kMaxSize = sizeof(Data);
+    typedef const uint8_t * ValueType;
+
+    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
+    {
+        // There should be at least enough space to hold the size
+        if (sz < 2)
+            return EMBER_ZCL_STATUS_FAILURE;
+        memcpy(buffer, &mValue, std::min(sz, kMaxSize));
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    bool Equal(const uint8_t * buffer)
+    {
+        uint16_t newsz = GetSize(buffer);
+        if (newsz != GetSize(GetBytes()))
+            return false;
+        return !memcmp(buffer, &mValue, newsz);
+    }
+
+    void Write(const uint8_t * buffer) { memcpy(GetBytes(), buffer, std::min(GetSize(buffer), kMaxSize)); }
+
+    bool TryWrite(const uint8_t * newV)
+    {
+        if (Equal(newV))
+            return false;
+        Write(newV);
+        return true;
+    }
+
+    ValueType Peek() const { return GetBytes(); }
+
+    uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
+    const uint8_t * GetBytes() const { return reinterpret_cast<const uint8_t *>(&mValue); }
+
 private:
+    uint16_t GetSize(const uint8_t * buf) { return static_cast<uint16_t>(2 + sizeof(T) * mValue.length); }
+
     Data mValue;
 };
 
@@ -171,6 +295,8 @@ struct CommonCluster;
 typedef std::function<EmberAfStatus(CommonCluster *, chip::EndpointId, chip::ClusterId, chip::AttributeId, const uint8_t *)>
     PropagateWriteCB;
 
+// This is the base type of all generated clusters, providing the backend access to
+// implementation details.
 struct CommonCluster : public ClusterImpl
 {
     void SetEndpointId(chip::EndpointId id) override { mEndpoint = id; }
@@ -188,6 +314,9 @@ protected:
     PropagateWriteCB * mCallback = nullptr;
 };
 
+// This is used by code generation to provide specific attributes. Type should be one of
+// PrimitiveType, OctetString, ArrayType, etc to provide storage and any type-specific
+// functionality. This class provides all non-type-specific matter logic
 template <chip::AttributeId id, EmberAfAttributeMask mask, typename Type>
 struct Attribute
 {
@@ -203,6 +332,9 @@ struct Attribute
 
     bool IsAttribute(const EmberAfAttributeMetadata * attributeMetadata) const { return attributeMetadata->attributeId == kId; }
     bool IsAttribute(chip::AttributeId attrId) const { return attrId == kId; }
+
+    // Read up to maxReadLength bytes. Strings must read at least the length, primitive types
+    // must read all bytes.
     EmberAfStatus Read(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength) const
     {
         // Length of 0 means read everything

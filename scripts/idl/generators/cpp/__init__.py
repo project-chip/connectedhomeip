@@ -13,22 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command, DataType, Struct
-from idl import matter_idl_types
-from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext
-from typing import Union, List, Set
-
 import enum
 import logging
 import re
 
+from idl.generators import CodeGenerator, GeneratorStorage
+from idl.matter_idl_types import (Idl, ClusterSide, Field, Attribute, Cluster,
+    FieldAttribute, Command, DataType, Struct)
+from idl import matter_idl_types
+from idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
+    IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext)
+from typing import Union, List, Set
 
-def CamelToConst(Str):
-    return re.sub("([a-z])([A-Z])", lambda y: y.group(1) + "_" + y.group(2), Str).upper()
+def camel_to_const(s):
+    return re.sub("([a-z])([A-Z])", lambda y: y.group(1) + "_" + y.group(2), s).upper()
 
 
-def CreateLookupContext(idl: Idl, cluster: Cluster) -> TypeLookupContext:
+def create_lookup_context(idl: Idl, cluster: Cluster) -> TypeLookupContext:
     """
     A filter to mark a lookup context to be within a specific cluster.
 
@@ -39,12 +40,12 @@ def CreateLookupContext(idl: Idl, cluster: Cluster) -> TypeLookupContext:
     return TypeLookupContext(idl, cluster)
 
 
-def GetFieldInfo(definition: Field, cluster: Cluster, idl: Idl, list):
-    context = CreateLookupContext(idl, cluster)
+def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
+    context = create_lookup_context(idl, cluster)
     actual = ParseDataType(definition.data_type, context)
 
     orig = actual
-    isEnum = type(actual) == IdlEnumType
+    is_enum = type(actual) == IdlEnumType
 
     if type(actual) == IdlEnumType:
         actual = actual.base_type
@@ -52,15 +53,17 @@ def GetFieldInfo(definition: Field, cluster: Cluster, idl: Idl, list):
         actual = actual.base_type
 
     if type(actual) == BasicString:
-        return 'OctetString', 'char', actual.max_length, 'ZCL_%s_ATTRIBUTE_TYPE' % orig.idl_name.upper()
+        return 'OctetString', 'char', actual.max_length, \
+            'ZCL_%s_ATTRIBUTE_TYPE' % orig.idl_name.upper()
 
     if type(actual) == BasicInteger:
         name = orig.idl_name.upper()
-        if isEnum:
+        if is_enum:
             name = actual.idl_name.upper()
-        if actual.is_signed:
-            return "PrimitiveType", "int%d_t" % actual.power_of_two_bits, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
-        return "PrimitiveType", "uint%d_t" % actual.power_of_two_bits, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
+        ty = "int%d_t" % actual.power_of_two_bits
+        if not actual.is_signed:
+            ty = "u" + ty
+        return "PrimitiveType", ty, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
     if type(actual) == FundamentalType:
         if actual == FundamentalType.BOOL:
             return "PrimitiveType", "bool", 1, "ZCL_BOOLEAN_ATTRIBUTE_TYPE"
@@ -71,17 +74,24 @@ def GetFieldInfo(definition: Field, cluster: Cluster, idl: Idl, list):
         logging.warn('Unknown fundamental type: %r' % actual)
         return None
     if type(actual) == IdlType:
-        return 'StructType', actual.idl_name, 'sizeof(%s)' % actual.idl_name, 'ZCL_STRUCT_ATTRIBUTE_TYPE'
+        return 'StructType', actual.idl_name, 'sizeof(%s)' % actual.idl_name, \
+            'ZCL_STRUCT_ATTRIBUTE_TYPE'
     logging.warn('Unknown type: %r' % actual)
+    return None
 
+def get_array_count(attr: Attribute):
+    # TBD how to determine array lengths?
+    return 1
 
-def GetRawSizeAndType(attr: Attribute, cluster: Cluster, idl: Idl, list=False):
-    container, cType, size, matterType = GetFieldInfo(attr.definition, cluster, idl, list)
+def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
+    container, cType, size, matterType = get_field_info(attr.definition, cluster, idl)
+    if attr.definition.is_list:
+        return 'ZCL_ARRAY_ATTRIBUTE_TYPE, {} * {} + 2'.format(size, get_array_count(attr))
     return '{}, {}'.format(matterType, size)
 
 
-def GetFieldType(definition: Field, cluster: Cluster, idl: Idl, list=False):
-    container, cType, size, matterType = GetFieldInfo(definition, cluster, idl, list)
+def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
+    container, cType, size, matterType = get_field_info(definition, cluster, idl)
     if container == 'StructType':
         return 'StructType<{}>'.format(cType)
     if container == 'OctetString':
@@ -89,17 +99,21 @@ def GetFieldType(definition: Field, cluster: Cluster, idl: Idl, list=False):
     return '{}<{}, {}, {}>'.format(container, cType, size, matterType)
 
 
-def GetAttrType(attr: Attribute, cluster: Cluster, idl: Idl):
-    return GetFieldType(attr.definition, cluster, idl, attr.definition.is_list)
+def get_attr_type(attr: Attribute, cluster: Cluster, idl: Idl):
+    decl = get_field_type(attr.definition, cluster, idl)
+    if attr.definition.is_list:
+        count = get_array_count(attr)
+        return 'ArrayType<{}, {}>'.format(count, decl)
+    return decl
 
 
-def GetAttrInit(attr: Attribute, cluster: Cluster, idl: Idl):
+def get_attr_init(attr: Attribute, cluster: Cluster, idl: Idl):
     if attr.definition.name == 'clusterRevision':
-        return ' = ZCL_' + CamelToConst(cluster.name) + '_CLUSTER_REVISION'
+        return ' = ZCL_' + camel_to_const(cluster.name) + '_CLUSTER_REVISION'
     return ''
 
 
-def GetAttrMask(attr: Attribute, cluster: Cluster, idl: Idl):
+def get_attr_mask(attr: Attribute, cluster: Cluster, idl: Idl):
     masks = []
     if attr.is_writable:
         masks.append('ATTRIBUTE_MASK_WRITABLE')
@@ -108,14 +122,17 @@ def GetAttrMask(attr: Attribute, cluster: Cluster, idl: Idl):
     return '0'
 
 
-def GetDynamicEndpoint(idl: Idl):
+def get_dynamic_endpoint(idl: Idl):
     for ep in idl.endpoints:
         if ep.number == 1:
             return ep
 
 
-def IsDynamicCluster(cluster: Cluster, idl: Idl):
-    for c in GetDynamicEndpoint(idl).server_clusters:
+def is_dynamic_cluster(cluster: Cluster, idl: Idl):
+    ep = get_dynamic_endpoint(idl)
+    if not ep:
+        return True
+    for c in ep.server_clusters:
         if cluster.name == c.name:
             return True
     return False
@@ -133,15 +150,15 @@ class CppGenerator(CodeGenerator):
         """
         super().__init__(storage, idl)
 
-        self.jinja_env.filters['getType'] = GetAttrType
-        self.jinja_env.filters['getRawSizeAndType'] = GetRawSizeAndType
-        self.jinja_env.filters['getField'] = GetFieldType
-        self.jinja_env.filters['getMask'] = GetAttrMask
-        self.jinja_env.filters['getInit'] = GetAttrInit
-        self.jinja_env.filters['dynamicCluster'] = IsDynamicCluster
+        self.jinja_env.filters['getType'] = get_attr_type
+        self.jinja_env.filters['getRawSizeAndType'] = get_raw_size_and_type
+        self.jinja_env.filters['getField'] = get_field_type
+        self.jinja_env.filters['getMask'] = get_attr_mask
+        self.jinja_env.filters['getInit'] = get_attr_init
+        self.jinja_env.filters['dynamicCluster'] = is_dynamic_cluster
         # constcase will transform ID to I_D which is not what we want
         # instead make the requirement a transition from lower to upper
-        self.jinja_env.filters['cameltoconst'] = CamelToConst
+        self.jinja_env.filters['cameltoconst'] = camel_to_const
 
     def internal_render_all(self):
         """
