@@ -382,14 +382,17 @@ void ExchangeContext::OnSessionReleased()
         // don't let NotifyResponseTimeout close us.
         NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
         Abort();
-    } else {
+    }
+    else
+    {
         // Either we're expecting a send or we are in our "just allocated, first
         // send has not happened yet" state.
         //
         // Just mark ourselves as closed.  The consumer is responsible for
         // releasing us.  See documentation for
         // ExchangeDelegate::OnExchangeClosing.
-        if (IsSendExpected()) {
+        if (IsSendExpected())
+        {
             mFlags.Clear(Flags::kFlagWillSendMessage);
         }
         DoClose(true /* clearRetransTable */);
@@ -442,7 +445,8 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
         delegate->OnResponseTimeout(this);
     }
 
-    if (aCloseIfNeeded) {
+    if (aCloseIfNeeded)
+    {
         MessageHandled();
     }
 }
