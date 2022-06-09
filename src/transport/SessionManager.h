@@ -177,7 +177,8 @@ public:
     void ExpireAllPASEPairings();
 
     // This API is used by UpdateNOC command, to invalid all sessions except the given one.
-    void ReleaseSessionForNodeExceptOne(const ScopedNodeId & node, const SessionHandle & stay);
+    void ReleaseSessionForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & exception);
+    void ReleaseSessionForNodeExceptOne(const ScopedNodeId & node, const SessionHandle & exception);
 
     /**
      * @brief
