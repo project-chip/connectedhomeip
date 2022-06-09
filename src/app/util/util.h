@@ -74,8 +74,7 @@
 // Cluster name structure
 typedef struct
 {
-    uint16_t id;
-    uint16_t mfgCode;
+    chip::ClusterId id;
     const char * name;
 } EmberAfClusterName;
 

@@ -105,7 +105,7 @@ constexpr size_t kMaxOperationalRecords = 6;
 /// Represents an allocated operational responder.
 ///
 /// Wraps a QueryResponderAllocator.
-class OperationalQueryAllocator : public chip::IntrusiveListNodeBase
+class OperationalQueryAllocator : public chip::IntrusiveListNodeBase<>
 {
 public:
     using Allocator = QueryResponderAllocator<kMaxOperationalRecords>;

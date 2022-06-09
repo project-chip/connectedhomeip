@@ -170,7 +170,6 @@ enum ClusterType {
     ZCL_APPLICATION_LAUNCHER_CLUSTER_ID = 0x050C;
     ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
     ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
-    ZCL_TEST_CLUSTER_ID = 0x050F;
     ZCL_MESSAGING_CLUSTER_ID = 0x0703;
     ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID = 0x0B00;
     ZCL_METER_IDENTIFICATION_CLUSTER_ID = 0x0B01;
@@ -180,6 +179,13 @@ enum ClusterType {
     ZCL_BINDING_CLUSTER_ID = 0xF000;
     ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
     ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
+
+    // NOTE: This is a large number that becomes negative as a 32-bit integer.
+    //
+    // Protobuf documentation states:
+    //   Enumerator constants must be in the range of a 32-bit integer. Since enum values
+    //   use varint encoding on the wire, negative values are inefficient and thus not recommended.
+    ZCL_TEST_CLUSTER_ID = -918523; // 0xFFF1FC05;
 }
 
 

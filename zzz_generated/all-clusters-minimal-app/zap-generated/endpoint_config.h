@@ -2121,7 +2121,7 @@
     },\
   { \
       /* Endpoint: 1, Cluster: Test Cluster (server) */ \
-      .clusterId = 0x0000050F,  \
+      .clusterId = 0xFFF1FC05,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(323), \
       .attributeCount = 82, \
       .clusterSize = 2289, \

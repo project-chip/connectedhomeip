@@ -28,11 +28,13 @@ class CASEClient;
 
 struct CASEClientInitParams
 {
-    SessionManager * sessionManager                     = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage = nullptr;
-    Messaging::ExchangeManager * exchangeMgr            = nullptr;
-    FabricInfo * fabricInfo                             = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
+    SessionManager * sessionManager                                    = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
+    FabricTable * fabricTable                                          = nullptr;
+    FabricIndex fabricIndex                                            = kUndefinedFabricIndex;
+    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 };

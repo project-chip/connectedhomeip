@@ -3042,7 +3042,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster TestCluster = 1295 {
+server cluster TestCluster = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -4229,7 +4229,7 @@ endpoint 1 {
   server cluster LevelControl {
     persist  attribute currentLevel default = 0xFE;
     ram      attribute remainingTime;
-    ram      attribute minLevel;
+    ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute currentFrequency;
     ram      attribute minFrequency;
@@ -4365,7 +4365,7 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type;
+    ram      attribute type default = 0x08;
     ram      attribute physicalClosedLimitLift default = 0xFFFF;
     ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift default = 0x7FFF;
@@ -4682,6 +4682,22 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster ElectricalMeasurement {
+    ram      attribute measurementType;
+    ram      attribute totalActivePower;
+    ram      attribute rmsVoltage default = 0xffff;
+    ram      attribute rmsVoltageMin default = 0x8000;
+    ram      attribute rmsVoltageMax default = 0x8000;
+    ram      attribute rmsCurrent default = 0xffff;
+    ram      attribute rmsCurrentMin default = 0xffff;
+    ram      attribute rmsCurrentMax default = 0xffff;
+    ram      attribute activePower default = 0xffff;
+    ram      attribute activePowerMin default = 0xffff;
+    ram      attribute activePowerMax default = 0xffff;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
   server cluster TestCluster {
     ram      attribute boolean;
     ram      attribute bitmap8;
@@ -4765,22 +4781,6 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt16s default = -100;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster ElectricalMeasurement {
-    ram      attribute measurementType;
-    ram      attribute totalActivePower;
-    ram      attribute rmsVoltage default = 0xffff;
-    ram      attribute rmsVoltageMin default = 0x8000;
-    ram      attribute rmsVoltageMax default = 0x8000;
-    ram      attribute rmsCurrent default = 0xffff;
-    ram      attribute rmsCurrentMin default = 0xffff;
-    ram      attribute rmsCurrentMax default = 0xffff;
-    ram      attribute activePower default = 0xffff;
-    ram      attribute activePowerMin default = 0xffff;
-    ram      attribute activePowerMax default = 0xffff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
   }
 }
 endpoint 2 {

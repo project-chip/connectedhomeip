@@ -2385,10 +2385,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr_t context)
 {
-    auto * dnsResult            = reinterpret_cast<DnsResult *>(context);
-    Inet::IPAddress * ipAddress = &(dnsResult->mMdnsService.mAddress.Value());
-    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), Span<Inet::IPAddress>(ipAddress, 1),
-                                             dnsResult->error);
+    DnsResult * dnsResult         = reinterpret_cast<DnsResult *>(context);
+    Dnssd::DnssdService & service = dnsResult->mMdnsService;
+    Span<Inet::IPAddress> ipAddrs;
+
+    if (service.mAddress.HasValue())
+    {
+        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+    }
+
+    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &service, ipAddrs, dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 

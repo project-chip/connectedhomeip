@@ -1893,7 +1893,7 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type;
+    ram      attribute type default = 0x08;
     ram      attribute physicalClosedLimitLift default = 0xFFFF;
     ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift;
@@ -1939,7 +1939,7 @@ endpoint 2 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type;
+    ram      attribute type default = 0x08;
     ram      attribute physicalClosedLimitLift default = 0xFFFF;
     ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift;

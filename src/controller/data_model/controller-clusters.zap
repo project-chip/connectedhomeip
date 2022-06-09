@@ -1311,7 +1311,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x00",
+              "defaultValue": "0x01",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -17368,7 +17368,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 1295,
+          "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "client",
@@ -17556,7 +17556,7 @@
         },
         {
           "name": "Test Cluster",
-          "code": 1295,
+          "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "server",

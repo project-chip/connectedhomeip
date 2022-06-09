@@ -1854,7 +1854,7 @@ client cluster TargetNavigator = 1285 {
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
-server cluster TestCluster = 1295 {
+server cluster TestCluster = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
