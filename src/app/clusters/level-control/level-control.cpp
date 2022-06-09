@@ -131,34 +131,40 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint)
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-typedef struct
-{
-    bool isActive;
-    chip::DeviceLayer::AsyncWorkFunct callback;
-    chip::EndpointId endpoint;
-} MatterEventContext;
-
-static MatterEventContext events[FIXED_ENDPOINT_COUNT];
+constexpr uint8_t levelControlMaxSimultaneousTimers = FIXED_ENDPOINT_COUNT; // for now using FIXED_ENDPOINT_COUNT. In the future we could use larger numbers or heap allocation to accommodate dynamic endpoints
+static BitMapObjectPool<EndpointId, levelControlMaxSimultaneousTimers> eventEndpoints;
+void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
-    events[endpoint].isActive = true;
+    auto eventEndpoint = eventEndpoints.CreateObject(endpoint);
+    if(eventEndpoint == nullptr) {
+        ChipLogError(Zcl, "Maximum number of concurrent level transitions reached");
+        return;
+    }
+    ChipLogError(Zcl, "Allocated endpoint %d", endpoint);
+
     DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(delayMs),
         [](chip::System::Layer *, void * callbackContext) {
-            auto eventContext = reinterpret_cast<MatterEventContext *>(callbackContext);
-            if (eventContext->callback && eventContext->isActive)
-            {
-                chip::DeviceLayer::PlatformMgr().ScheduleWork(eventContext->callback,
-                                                              reinterpret_cast<intptr_t>(&eventContext->endpoint));
-            }
+            auto endpoint = reinterpret_cast<EndpointId*>(callbackContext);
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
+                                                          reinterpret_cast<intptr_t>(endpoint));
         },
-        &events[endpoint]);
+        eventEndpoint);
 }
 
 static void deactivate(EndpointId endpoint)
 {
-    events[endpoint].isActive = false;
+    eventEndpoints.ForEachActiveObject([&](auto * entry) {
+        if (*entry == endpoint)
+        {
+            eventEndpoints.ReleaseObject(entry);
+            ChipLogError(Zcl, "Released endpoint %d", endpoint);
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
 }
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
@@ -198,6 +204,7 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
 
     if (state == nullptr)
     {
+        deactivate(endpoint);
         return;
     }
 
@@ -209,6 +216,7 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
         writeRemainingTime(endpoint, 0);
+        deactivate(endpoint);
         return;
     }
 
@@ -241,6 +249,7 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
     {
         emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
         writeRemainingTime(endpoint, 0);
+        deactivate(endpoint);
         return;
     }
 
@@ -295,8 +304,11 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr)
     else
     {
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
+        deactivate(endpoint); // clears pool of previous transition before starting another one in the same endpoint
         schedule(endpoint, state->eventDurationMs);
     }
+
+    deactivate(endpoint);
 }
 
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
@@ -1146,10 +1158,6 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
-void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint)
-{
-    VerifyOrDie(endpoint < FIXED_ENDPOINT_COUNT);
-    events[endpoint] = { .isActive = false, .callback = emberAfLevelControlClusterServerTickCallback, .endpoint = endpoint };
-}
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) { }
 
 void MatterLevelControlPluginServerInitCallback() {}
