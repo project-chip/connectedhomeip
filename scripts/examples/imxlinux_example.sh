@@ -30,18 +30,15 @@ if [ "$IMX_SDK_ROOT" = "" ]; then
 fi
 env
 
-entries=`ls "$IMX_SDK_ROOT"`
-for entry in "$entries"
-do
+entries=$(ls "$IMX_SDK_ROOT")
+for entry in "$entries"; do
     if [ "$(echo "$entry" | grep -E "^environment-setup-")" != "" ]; then
         env_setup_script=$entry
         break
     fi
 done
 
-
-while read line
-do
+while read line; do
     if [ "$(echo "$line" | grep -E "^export SDKTARGETSYSROOT=")" != "" ]; then
         sdk_target_sysroot=${line#"export SDKTARGETSYSROOT="}
     fi
@@ -74,8 +71,7 @@ do
         cross_compile=${line#"export CROSS_COMPILE="}
         cross_compile=${cross_compile%"-"}
     fi
-done < "$IMX_SDK_ROOT/$env_setup_script"
-
+done <"$IMX_SDK_ROOT/$env_setup_script"
 
 release_build=true
 if [ "$3" = "debug" ]; then
@@ -83,7 +79,7 @@ if [ "$3" = "debug" ]; then
 fi
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-    gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
 sysroot=\"$sdk_target_sysroot\"
