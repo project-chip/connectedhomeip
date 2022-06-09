@@ -26,7 +26,6 @@
 
 #include <mbedtls/bignum.h>
 #include <mbedtls/ccm.h>
-#include <mbedtls/constant_time.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
