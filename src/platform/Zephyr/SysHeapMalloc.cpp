@@ -134,8 +134,8 @@ CHIP_ERROR GetStats(Stats & stats)
     sys_heap_runtime_stats sysHeapStats;
     ReturnErrorOnFailure(System::MapErrorZephyr(sys_heap_runtime_stats_get(&sHeap, &sysHeapStats)));
 
-    stats.free = sysHeapStats.free_bytes;
-    stats.used = sysHeapStats.allocated_bytes;
+    stats.free    = sysHeapStats.free_bytes;
+    stats.used    = sysHeapStats.allocated_bytes;
     stats.maxUsed = sysHeapStats.max_allocated_bytes;
 
     return CHIP_NO_ERROR;
