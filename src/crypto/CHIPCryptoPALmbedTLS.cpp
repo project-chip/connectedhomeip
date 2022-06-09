@@ -509,7 +509,7 @@ static int uecc_rng_wrapper(uint8_t * dest, unsigned int size)
 
 static int uECC_is_rng_set(void)
 {
-	return (uecc_rng_wrapper == uECC_get_rng()) ? 1 : 0;
+    return (uecc_rng_wrapper == uECC_get_rng()) ? 1 : 0;
 }
 
 #endif
@@ -665,7 +665,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
 
     const uint8_t * public_key = *this;
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     result = uECC_verify(public_key + 1, hash, hash_length, Uint8::to_const_uchar(signature.ConstBytes()));
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 
@@ -738,7 +738,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     result = uECC_shared_secret(remote_public_key.ConstBytes() + 1, keypair->private_key, Uint8::to_uchar(out_secret));
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
@@ -809,15 +809,15 @@ CHIP_ERROR P256Keypair::Initialize()
     Clear();
 
     mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
-    if(!uECC_is_rng_set())
+    if (!uECC_is_rng_set())
     {
-    	uECC_set_rng(&uecc_rng_wrapper);
+        uECC_set_rng(&uecc_rng_wrapper);
     }
 
     result = uECC_make_key(keypair->public_key, keypair->private_key);
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     Uint8::to_uchar(mPublicKey)[0] = 0x04;
     memcpy(Uint8::to_uchar(mPublicKey) + 1, keypair->public_key, 2 * NUM_ECC_BYTES);
 
@@ -929,12 +929,12 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     Clear();
 
     mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
-    if(!uECC_is_rng_set())
+    if (!uECC_is_rng_set())
     {
-    	uECC_set_rng(&uecc_rng_wrapper);
+        uECC_set_rng(&uecc_rng_wrapper);
     }
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     memcpy(keypair->public_key, Uint8::to_uchar(input) + 1, 2 * NUM_ECC_BYTES);
     memcpy(keypair->private_key, Uint8::to_uchar(input) + mPublicKey.Length(), NUM_ECC_BYTES);
 
@@ -992,8 +992,8 @@ void P256Keypair::Clear()
     if (mInitialized)
     {
 #if defined(MBEDTLS_USE_TINYCRYPT)
-    	mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
-    	memset(keypair, 0, sizeof(mbedtls_uecc_keypair));
+        mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
+        memset(keypair, 0, sizeof(mbedtls_uecc_keypair));
         mInitialized = false;
 #else
         mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
@@ -1011,7 +1011,7 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
+    int result       = 0;
     size_t out_length;
 
     mbedtls_x509write_csr csr;
@@ -1019,7 +1019,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     mbedtls_pk_context pk;
     pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
-    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_ctx) = to_keypair(&mKeypair);
+    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_ctx)  = to_keypair(&mKeypair);
     VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -1039,7 +1039,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     VerifyOrExit(CanCastTo<size_t>(result), error = CHIP_ERROR_INTERNAL);
 
     out_length = static_cast<size_t>(result);
-    result = 0;
+    result     = 0;
     VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
 
     if (csr_length != out_length)
@@ -1182,9 +1182,9 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
     G = curve_G;
 
-    if(!uECC_is_rng_set())
+    if (!uECC_is_rng_set())
     {
-    	uECC_set_rng(&uecc_rng_wrapper);
+        uECC_set_rng(&uecc_rng_wrapper);
     }
 #else
     mbedtls_ecp_group_init(&context->curve);
@@ -1404,7 +1404,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t i
 #if defined(MBEDTLS_USE_TINYCRYPT)
     uint8_t tmp[2 * NUM_ECC_BYTES];
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     memcpy(tmp, in + 1, 2 * NUM_ECC_BYTES);
 
     uECC_vli_bytesToNative((uECC_word_t *) R, tmp, NUM_ECC_BYTES);
@@ -1426,7 +1426,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * o
     memset(out, 0, out_len);
 
 #if defined(MBEDTLS_USE_TINYCRYPT)
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     out[0] = 0x04;
     uECC_vli_nativeToBytes(out + 1, NUM_ECC_BYTES, (uECC_word_t *) R);
     uECC_vli_nativeToBytes(out + NUM_ECC_BYTES + 1, NUM_ECC_BYTES, (uECC_word_t *) R + NUM_ECC_WORDS);
@@ -1544,7 +1544,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     result = EccPoint_mult_safer(L_tmp, curve_G, w1_bn);
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    //Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
     Lout[0] = 0x04;
     uECC_vli_nativeToBytes(Lout + 1, NUM_ECC_BYTES, L_tmp);
     uECC_vli_nativeToBytes(Lout + NUM_ECC_BYTES + 1, NUM_ECC_BYTES, L_tmp + NUM_ECC_WORDS);
