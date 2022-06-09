@@ -387,6 +387,20 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
+void SessionManager::ReleaseSessionForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & exception)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetPeer().GetFabricIndex() == fabricIndex)
+        {
+            if (session == exception->AsSecureSession())
+                session->MarkForInactive();
+            else
+                session->MarkForRemoval();
+        }
+        return Loop::Continue;
+    });
+}
+
 void SessionManager::ReleaseSessionForNodeExceptOne(const ScopedNodeId & node, const SessionHandle & exception)
 {
     mSecureSessions.ForEachSession([&](auto session) {

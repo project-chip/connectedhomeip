@@ -376,6 +376,20 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
     });
 }
 
+void ExchangeManager::AbortExchangeForFabricExceptOne(FabricIndex fabricIndex, ExchangeContext * exception)
+{
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetPeer().GetFabricIndex() == fabricIndex)
+        {
+            if (ec == exception)
+                ec->SetAutoReleaseSession();
+            else
+                ec->Abort();
+        }
+        return Loop::Continue;
+    });
+}
+
 void ExchangeManager::AbortExchangeForNodeExceptOne(const ScopedNodeId & node, ExchangeContext * exception)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
