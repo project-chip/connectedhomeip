@@ -12,13 +12,15 @@ Once programmed, the dongle can be used for
 
 ## Requirements
 
-You need to set up the [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+You need to set up the
+[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 to build and program the OpenThread Radio Co-Processor to the nRF52840 Dongle.
-Read the [nRF Connect SDK Getting started](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/getting_started.html)
+Read the
+[nRF Connect SDK Getting started](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/getting_started.html)
 documentation for more information.
 
 ## Building and programming the RCP firmware onto an nRF52840 Dongle
 
-After you set up the nRF Connect SDK, follow the steps
-in the [Configuring a radio co-processor](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_thread_tools.html#configuring-a-radio-co-processor)
+After you set up the nRF Connect SDK, follow the steps in the
+[Configuring a radio co-processor](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_thread_tools.html#configuring-a-radio-co-processor)
 section for the nRF52840 Dongle (USB transport).
