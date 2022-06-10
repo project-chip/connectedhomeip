@@ -371,6 +371,8 @@ void ExchangeContext::OnSessionReleased()
         return;
     }
 
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount without worrying about use-after-free.
     ExchangeHandle ref(*this);
 
     if (IsResponseExpected())
@@ -378,11 +380,25 @@ void ExchangeContext::OnSessionReleased()
         // If we're waiting on a response, we now know it's never going to show up
         // and we should notify our delegate accordingly.
         CancelResponseTimer();
-        SetResponseExpected(false);
-        NotifyResponseTimeout();
+        // We want to Abort, not just Close, so that RMP bits are cleared, so
+        // don't let NotifyResponseTimeout close us.
+        NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
+        Abort();
     }
-
-    DoClose(true /* clearRetransTable */);
+    else
+    {
+        // Either we're expecting a send or we are in our "just allocated, first
+        // send has not happened yet" state.
+        //
+        // Just mark ourselves as closed.  The consumer is responsible for
+        // releasing us.  See documentation for
+        // ExchangeDelegate::OnExchangeClosing.
+        if (IsSendExpected())
+        {
+            mFlags.Clear(Flags::kFlagWillSendMessage);
+        }
+        DoClose(true /* clearRetransTable */);
+    }
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -416,10 +432,10 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    ec->NotifyResponseTimeout();
+    ec->NotifyResponseTimeout(/* aCloseIfNeeded = */ true);
 }
 
-void ExchangeContext::NotifyResponseTimeout()
+void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
@@ -431,7 +447,10 @@ void ExchangeContext::NotifyResponseTimeout()
         delegate->OnResponseTimeout(this);
     }
 
-    MessageHandled();
+    if (aCloseIfNeeded)
+    {
+        MessageHandled();
+    }
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
