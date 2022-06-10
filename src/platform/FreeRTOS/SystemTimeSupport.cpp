@@ -122,12 +122,14 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
     // TODO(19081): This platform does not properly error out if wall clock has
     //              not been set.  For now, short circuit this.
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#if 0
     if (sBootTimeUS == 0)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)

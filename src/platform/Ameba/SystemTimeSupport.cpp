@@ -65,6 +65,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
     // TODO(19081): This platform does not properly error out if wall clock has
     //              not been set.  For now, short circuit this.
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#if 0
     time_t seconds;
     struct rtkTimeVal tv;
 
@@ -81,6 +82,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
     curTime = Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
