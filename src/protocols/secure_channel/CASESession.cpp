@@ -210,7 +210,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(sessionManager, policy, delegate, ScopedNodeId(peerNodeId, fabricIndex));
+    err = Init(sessionManager, policy, delegate, peerScopedNodeId);
 
     mRole = CryptoContext::SessionRole::kInitiator;
 

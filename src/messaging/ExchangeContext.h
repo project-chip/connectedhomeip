@@ -66,7 +66,7 @@ public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                    ExchangeDelegate * delegate);
+                    ExchangeDelegate * delegate, bool isEphemeralExchange = false);
 
     ~ExchangeContext() override;
 
@@ -153,8 +153,6 @@ public:
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
-
-    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
     SessionHandle GetSessionHandle() const
     {
@@ -273,6 +271,8 @@ private:
      * exchange nor other component requests the active mode.
      */
     void UpdateSEDIntervalMode(bool activeMode);
+
+    static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 };
 
 } // namespace Messaging
