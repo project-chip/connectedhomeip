@@ -208,7 +208,7 @@
         {
             "label": "Connect to device (Tizen)",
             "type": "shell",
-            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "command": "sdb",
             "args": ["connect", "${env:TIZEN_TARGET_DEVICE}:26101"],
             "problemMatcher": [],
             "runOptions": {
@@ -218,7 +218,7 @@
         {
             "label": "Install LightingApp (Tizen)",
             "type": "shell",
-            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
+            "command": "sdb",
             "args": [
                 "install",
                 "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
