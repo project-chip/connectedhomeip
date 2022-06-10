@@ -310,11 +310,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
-        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
+        // Make sure the exchange stays alive through the code below even if we
+        // close it before calling HandleMessage.
+        ExchangeHandle ref(*ec);
+
+        // Ignore encryption-required mismatches for emphemeral exchanges,
+        // because those never have delegates anyway.
+        if (matchingUMH != nullptr && ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
         {
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            // We want to still to do MRP processing for this message, but we do
+            // not want to deliver it to the application.  Just close the
+            // exchange (which will notify the delegate, null it out, etc), then
+            // go ahead and call HandleMessage() on it to do the MRP
+            // processing.null out the delegate on the exchange, pretend to
+            // matchingUMH that exchange creation failed, so it cleans up the
+            // delegate, then tell the exchagne to handle the message.
+            ChipLogProgress(ExchangeManager, "OnMessageReceived encryption mismatch");
             ec->Close();
-            return;
         }
 
         CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
