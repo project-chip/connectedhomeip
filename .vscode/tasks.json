@@ -209,7 +209,7 @@
             "label": "Connect to device (Tizen)",
             "type": "shell",
             "command": "sdb",
-            "args": ["connect", "${env:TIZEN_TARGET_DEVICE}:26101"],
+            "args": ["connect", "${input:tizenTargetDeviceAddress}:26101"],
             "problemMatcher": [],
             "runOptions": {
                 "reevaluateOnRerun": false
@@ -236,6 +236,8 @@
                 "${workspaceFolder}/scripts/helpers/tizen_gdbserver_run.sh",
                 "--app-name",
                 "org.tizen.matter.example.lighting",
+                "--target",
+                "${input:tizenTargetDeviceAddressSdb}:26101",
                 "--",
                 "vendor-id 65521 product-id 32769 discriminator 42 passcode 1234"
             ],
@@ -437,6 +439,21 @@
                 "telink-tlsr9518adk80d-light-switch",
                 "tizen-arm-light"
             ]
+        },
+        {
+            "type": "promptString",
+            "id": "tizenTargetDeviceAddress",
+            "description": "Enter the target device address"
+        },
+        {
+            "id": "tizenTargetDeviceAddressSdb",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "sdb devices | grep -v \"List of devices attached\" | cut -f1 | cut -d \":\" -f1",
+                "fieldSeparator": "\n",
+                "description": "Select target device"
+            }
         }
     ]
 }
