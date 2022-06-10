@@ -66,8 +66,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
       "${efr32_sdk_root}/platform/bootloader",
       "${efr32_sdk_root}/platform/bootloader/config",
+      "${efr32_sdk_root}/platform/bootloader/config/s2/btl_interface",
       "${efr32_sdk_root}/platform/bootloader/api",
-      "${efr32_sdk_root}/platform/CMSIS/Include",
+      "${efr32_sdk_root}/platform/CMSIS/Core/Include",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Include",
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/driver/button/inc",
@@ -118,6 +119,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/config/",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/inc",
+      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/inc/public",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Include",
@@ -150,6 +152,7 @@ template("efr32_sdk") {
       "MBEDTLS_THREADING_C=1",
       "MBEDTLS_THREADING_ALT=1",
       "SL_THREADING_ALT=1",
+      "SL_COMPONENT_CATALOG_PRESENT",
 
       #"__STACK_SIZE=0",
     ]
@@ -257,7 +260,7 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG24/GCC/binapploader.o",
+        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libapploader.a",
         "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
@@ -287,6 +290,10 @@ template("efr32_sdk") {
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
     ]
+
+    if (efr32_family == "efr32mg24") {
+      cflags += [ "-mcmse" ]
+    }
 
     if (defined(invoker.use_rs911x)) {
       if (invoker.use_rs911x == true) {
@@ -353,6 +360,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
+      "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aesni.c",
@@ -367,6 +375,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/cipher.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/cipher_wrap.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/cmac.c",
+      "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/constant_time.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/ctr_drbg.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/debug.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/des.c",
@@ -468,6 +477,8 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/sl_event_handler.c",
       "${sdk_support_root}/matter/efr32/sl_simple_button_instances.c",
       "${sdk_support_root}/matter/efr32/sl_simple_led_instances.c",
+      "${sdk_support_root}/matter/efr32/sli_bt_advertiser_config.c",
+      "${sdk_support_root}/matter/efr32/sli_bt_connection_config.c",
     ]
 
     if (defined(invoker.enable_sleepy_device)) {
@@ -543,7 +554,7 @@ template("efr32_sdk") {
 
     if (efr32_family == "efr32mg12") {
       sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/startup_efr32mg12p.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
@@ -553,7 +564,7 @@ template("efr32_sdk") {
       ]
     } else if (efr32_family == "efr32mg21") {
       sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/GCC/startup_efr32mg21.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/startup_efr32mg21.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Source/system_efr32mg21.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rf_path/sl_rail_util_rf_path.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
@@ -593,7 +604,7 @@ template("efr32_sdk") {
       ]
     } else if (efr32_family == "efr32mg24") {
       sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/GCC/startup_efr32mg24.c",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/startup_efr32mg24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
