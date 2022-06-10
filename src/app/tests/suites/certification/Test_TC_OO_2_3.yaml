@@ -17,7 +17,7 @@ name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
 config:
     nodeId: 0x12344321
     cluster: "On/Off"
-    timeout: 300
+    timeout: 350
     endpoint: 1
 
 tests:
