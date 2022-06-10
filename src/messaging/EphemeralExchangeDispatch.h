@@ -29,17 +29,17 @@
 namespace chip {
 namespace Messaging {
 
-class StandaloneExchangeDispatch : public ExchangeMessageDispatch
+class EphemeralExchangeDispatch : public ExchangeMessageDispatch
 {
 public:
     static ExchangeMessageDispatch & Instance()
     {
-        static StandaloneExchangeDispatch instance;
+        static EphemeralExchangeDispatch instance;
         return instance;
     }
 
-    StandaloneExchangeDispatch() {}
-    ~StandaloneExchangeDispatch() override {}
+    EphemeralExchangeDispatch() {}
+    ~EphemeralExchangeDispatch() override {}
 
 protected:
     bool MessagePermitted(Protocols::Id protocol, uint8_t type) override

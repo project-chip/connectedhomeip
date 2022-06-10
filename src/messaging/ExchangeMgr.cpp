@@ -310,6 +310,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
             ec->Close();
+            ReplyStandaloneAck(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
         }
 
@@ -322,14 +323,21 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         return;
     }
 
-    // If we need to send a StandaloneAck, create a StandaloneExchange for the purpose to send the StandaloneAck
+    ReplyStandaloneAck(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
+    return;
+}
+
+void ExchangeManager::ReplyStandaloneAck(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                         const SessionHandle & session, MessageFlags msgFlags, System::PacketBufferHandle && msgBuf)
+{
+    // If we need to send a StandaloneAck, create a EphemeralExchange for the purpose to send the StandaloneAck
     if (payloadHeader.NeedsAck())
     {
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
         // If rcvd msg is not from initiator then this exchange is created as Initiator.
-        // Create a StandaloneExchange to generate a StandaloneAck
+        // Create a EphemeralExchange to generate a StandaloneAck
         ExchangeContext * ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(),
-                                                         nullptr, true /* IsStandaloneExchange */);
+                                                         nullptr, true /* IsEphemeralExchange */);
 
         if (ec == nullptr)
         {
@@ -344,7 +352,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         // close it before calling HandleMessage.
         ExchangeHandle ref(*ec);
 
-        // No need to verify packet encryption type, the StandaloneExchange can handle both secure and insecure messages.
+        // No need to verify packet encryption type, the EphemeralExchange can handle both secure and insecure messages.
 
         CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
