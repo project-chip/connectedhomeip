@@ -154,6 +154,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
 protected:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mFabricFiltered;
