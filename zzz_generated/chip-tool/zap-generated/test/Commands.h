@@ -26338,7 +26338,7 @@ public:
 
     ~Test_TC_OO_2_3Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(300)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(350)); }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
