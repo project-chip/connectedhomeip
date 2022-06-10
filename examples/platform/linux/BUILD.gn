@@ -39,6 +39,8 @@ source_set("app-main") {
     "LinuxCommissionableDataProvider.h",
     "Options.cpp",
     "Options.h",
+    "testing/CustomCSRResponse.cpp",
+    "testing/CustomCSRResponse.h",
   ]
 
   defines = []

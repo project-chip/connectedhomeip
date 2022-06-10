@@ -39,29 +39,36 @@ LinuxDeviceOptions gDeviceOptions;
 // Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
-    kDeviceOption_BleDevice                 = 0x1000,
-    kDeviceOption_WiFi                      = 0x1001,
-    kDeviceOption_Thread                    = 0x1002,
-    kDeviceOption_Version                   = 0x1003,
-    kDeviceOption_VendorID                  = 0x1004,
-    kDeviceOption_ProductID                 = 0x1005,
-    kDeviceOption_CustomFlow                = 0x1006,
-    kDeviceOption_Capabilities              = 0x1007,
-    kDeviceOption_Discriminator             = 0x1008,
-    kDeviceOption_Passcode                  = 0x1009,
-    kDeviceOption_SecuredDevicePort         = 0x100a,
-    kDeviceOption_SecuredCommissionerPort   = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort = 0x100c,
-    kDeviceOption_Command                   = 0x100d,
-    kDeviceOption_PICS                      = 0x100e,
-    kDeviceOption_KVS                       = 0x100f,
-    kDeviceOption_InterfaceId               = 0x1010,
-    kDeviceOption_Spake2pVerifierBase64     = 0x1011,
-    kDeviceOption_Spake2pSaltBase64         = 0x1012,
-    kDeviceOption_Spake2pIterations         = 0x1013,
-    kDeviceOption_TraceFile                 = 0x1014,
-    kDeviceOption_TraceLog                  = 0x1015,
-    kDeviceOption_TraceDecode               = 0x1016,
+    kDeviceOption_BleDevice                             = 0x1000,
+    kDeviceOption_WiFi                                  = 0x1001,
+    kDeviceOption_Thread                                = 0x1002,
+    kDeviceOption_Version                               = 0x1003,
+    kDeviceOption_VendorID                              = 0x1004,
+    kDeviceOption_ProductID                             = 0x1005,
+    kDeviceOption_CustomFlow                            = 0x1006,
+    kDeviceOption_Capabilities                          = 0x1007,
+    kDeviceOption_Discriminator                         = 0x1008,
+    kDeviceOption_Passcode                              = 0x1009,
+    kDeviceOption_SecuredDevicePort                     = 0x100a,
+    kDeviceOption_SecuredCommissionerPort               = 0x100b,
+    kDeviceOption_UnsecuredCommissionerPort             = 0x100c,
+    kDeviceOption_Command                               = 0x100d,
+    kDeviceOption_PICS                                  = 0x100e,
+    kDeviceOption_KVS                                   = 0x100f,
+    kDeviceOption_InterfaceId                           = 0x1010,
+    kDeviceOption_Spake2pVerifierBase64                 = 0x1011,
+    kDeviceOption_Spake2pSaltBase64                     = 0x1012,
+    kDeviceOption_Spake2pIterations                     = 0x1013,
+    kDeviceOption_TraceFile                             = 0x1014,
+    kDeviceOption_TraceLog                              = 0x1015,
+    kDeviceOption_TraceDecode                           = 0x1016,
+    kOptionCSRResponseCSRIncorrectType                  = 0x1017,
+    kOptionCSRResponseCSRNonceIncorrectType             = 0x1018,
+    kOptionCSRResponseCSRNonceTooLong                   = 0x1019,
+    kOptionCSRResponseCSRNonceInvalid                   = 0x101a,
+    kOptionCSRResponseNOCSRElementsTooLong              = 0x101b,
+    kOptionCSRResponseAttestationSignatureIncorrectType = 0x101c,
+    kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -98,6 +105,13 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
+    { "cert_error_csr_nonce_incorrect_type", kNoArgument, kOptionCSRResponseCSRNonceIncorrectType },
+    { "cert_error_csr_nonce_too_long", kNoArgument, kOptionCSRResponseCSRNonceTooLong },
+    { "cert_error_csr_nonce_invalid", kNoArgument, kOptionCSRResponseCSRNonceInvalid },
+    { "cert_error_nocsrelements_too_long", kNoArgument, kOptionCSRResponseNOCSRElementsTooLong },
+    { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
+    { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     {}
 };
 
@@ -183,6 +197,20 @@ const char * sDeviceOptionHelp =
     "  --trace_decode <1/0>\n"
     "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    "  --cert_error_csr_incorrect_type\n"
+    "       Configure the CSRResponse to be built with an invalid CSR type.\n"
+    "  --cert_error_csr_nonce_incorrect_type\n"
+    "       Configure the CSRResponse to be built with an invalid CSRNonce type.\n"
+    "  --cert_error_csr_nonce_too_long\n"
+    "       Configure the CSRResponse to be built with a CSRNonce that is longer than expected.\n"
+    "  --cert_error_csr_nonce_invalid\n"
+    "       Configure the CSRResponse to be built with a CSRNonce that does not match the CSRNonce from the CSRRequest.\n"
+    "  --cert_error_nocsrelements_too_long\n"
+    "       Configure the CSRResponse to contains an NOCSRElements larger than the allowed RESP_MAX.\n"
+    "  --cert_error_attestation_signature_incorrect_type\n"
+    "       Configure the CSRResponse to be build with an invalid AttestationSignature type.\n"
+    "  --cert_error_attestation_signature_invalid\n"
+    "       Configure the CSRResponse to be build with an AttestationSignature that does not match what is expected.\n"
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -385,6 +413,28 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    case kOptionCSRResponseCSRIncorrectType:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrIncorrectType = true;
+        break;
+    case kOptionCSRResponseCSRNonceIncorrectType:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrNonceIncorrectType = true;
+        break;
+    case kOptionCSRResponseCSRNonceTooLong:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrNonceTooLong = true;
+        break;
+    case kOptionCSRResponseCSRNonceInvalid:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrNonceInvalid = true;
+        break;
+    case kOptionCSRResponseNOCSRElementsTooLong:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.nocsrElementsTooLong = true;
+        break;
+    case kOptionCSRResponseAttestationSignatureIncorrectType:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.attestationSignatureIncorrectType = true;
+        break;
+    case kOptionCSRResponseAttestationSignatureInvalid:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.attestationSignatureInvalid = true;
+        break;
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
