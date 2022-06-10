@@ -76,8 +76,8 @@ bridgednode_temperaturesensor_onofflight_onoffpluginunit_MI9DSdkH8H
     used. This still gives us a sufficiently low probability of collision (~1.2
     x 10^-8). 2) `_` and `-` are replaced in the base64 encoding because they
     have other uses in the naming. 3) Platform specific information is omitted
-    from the hash. E.g. the networking_commissioning cluster is excluded. This is
-    to make the hashes platform agnostic.
+    from the hash. E.g. the networking_commissioning cluster is excluded. This
+    is to make the hashes platform agnostic.
 
 ### Sample App Build Naming Convention
 
