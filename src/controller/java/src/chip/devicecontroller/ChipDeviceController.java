@@ -314,12 +314,18 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
-  public boolean openPairingWindowCallback(long devicePtr, int duration, OpenCommissioningCallback callback) {
+  public boolean openPairingWindowCallback(
+      long devicePtr, int duration, OpenCommissioningCallback callback) {
     return openPairingWindowCallback(deviceControllerPtr, devicePtr, duration, callback);
   }
 
   public boolean openPairingWindowWithPINCallback(
-      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode, OpenCommissioningCallback callback) {
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
@@ -472,7 +478,8 @@ public class ChipDeviceController {
       int discriminator,
       long setupPinCode);
 
-  private native boolean openPairingWindowCallback(long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
+  private native boolean openPairingWindowCallback(
+      long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
 
   private native boolean openPairingWindowWithPINCallback(
       long deviceControllerPtr,

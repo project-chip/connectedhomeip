@@ -18,7 +18,7 @@
 package chip.devicecontroller;
 
 public interface OpenCommissioningCallback {
-    public void onError(int status, long deviceId);
+  public void onError(int status, long deviceId);
 
-    public void onSuccess(long deviceId, String manualPairingCode, String qrCode);
+  public void onSuccess(long deviceId, String manualPairingCode, String qrCode);
 }
