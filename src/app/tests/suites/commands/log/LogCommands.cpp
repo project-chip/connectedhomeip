@@ -34,7 +34,7 @@ CHIP_ERROR LogCommands::UserPrompt(const char * identity,
     {
         std::string line;
         std::getline(std::cin, line);
-        if (line != value.expectedValue.Value().data())
+        if (line != std::string(value.expectedValue.Value().data(), value.expectedValue.Value().size()))
         {
             return ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT);
         }
