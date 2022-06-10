@@ -133,10 +133,10 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 
 void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 
-static void timerCallback(chip::System::Layer *, void * callbackContext)
+static void timerCallback(System::Layer *, void * callbackContext)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
-                                                  reinterpret_cast<intptr_t>(callbackContext));
+    DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
+                                            reinterpret_cast<intptr_t>(callbackContext));
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
@@ -523,7 +523,6 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
 static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
                                         uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel)
 {
-
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
