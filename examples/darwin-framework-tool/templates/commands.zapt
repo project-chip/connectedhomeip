@@ -56,7 +56,7 @@ public:
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--)
         {
-            [cluster {{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:params completionHandler:{{else}}CompletionHandler:{{/if}}
+            [cluster {{asLowerCamelCase name}}WithParams:params completionHandler:
             {{#if hasSpecificResponse}}
                 ^(CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
