@@ -12,6 +12,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
         -   [Setting up chip-tool](#setting-up-chip-tool)
         -   [Commissioning over BLE](#commissioning-over-ble)
             -   [Notes](#notes)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -134,3 +135,9 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
           sudo btmgmt -i hci0 bredr off
           sudo btmgmt -i hci0 power on
           ```
+
+## OTA Software Update
+
+For the description of Software Update process with infineon P6 example
+applications see
+[Infineon P6 OTA Software Update](../../../docs/guides/infineon_p6_software_update.md)
