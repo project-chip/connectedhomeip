@@ -182,7 +182,7 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
         // Obviously not found
         return false;
     }
-    else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) && (keySize > 0))
+    if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) && (keySize > 0))
     {
         // On found, we actually expect an "error", since we didn't want to read it out.
         return true;

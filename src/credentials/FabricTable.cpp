@@ -1160,7 +1160,7 @@ CHIP_ERROR FabricTable::SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan mess
         // Legacy case of manually injected FabricInfo: delegate to FabricInfo directly
         return fabricInfo->SignWithOpKeypair(message, outSignature);
     }
-    else if (mOperationalKeystore != nullptr)
+    if (mOperationalKeystore != nullptr)
     {
         return mOperationalKeystore->SignWithOpKeypair(fabricIndex, message, outSignature);
     }
