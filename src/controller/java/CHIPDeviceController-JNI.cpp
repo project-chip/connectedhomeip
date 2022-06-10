@@ -1030,7 +1030,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     jmethodID getEndpointIdMethod  = nullptr;
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getEventIdMethod = nullptr;
-	
+
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
         env, eventPath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
