@@ -236,9 +236,10 @@ private:
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
+     * response.  If aCloseIfNeeded is true, check whether the exchange needs to
+     * be closed.
      */
-    void NotifyResponseTimeout();
+    void NotifyResponseTimeout(bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 
