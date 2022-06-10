@@ -388,17 +388,34 @@ template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mpScanCallback = callback;
-    CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
-                                                         0,          /* default value `kScanDurationDefault` = 300 ms. */
-                                                         _OnNetworkScanFinished, this));
-    if (err != CHIP_NO_ERROR)
+
+    Impl()->LockThreadStack();
+
+    // Ensure that IPv6 interface is up when MLE Discovery is performed.
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    error = MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
+                                                OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
+                                                _OnNetworkScanFinished, this));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    if (error != CHIP_NO_ERROR)
     {
         mpScanCallback = nullptr;
     }
-    return err;
+
+    return error;
 }
 
 template <class ImplClass>
@@ -412,6 +429,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 {
     if (aResult == nullptr) // scan completed
     {
+        // If Thread scanning was done before commissioning, turn off the IPv6 interface.
+        if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
+        {
+            otIp6SetEnabled(mOTInst, false);
+        }
+
         if (mpScanCallback != nullptr)
         {
             DeviceLayer::SystemLayer().ScheduleLambda([this]() {
