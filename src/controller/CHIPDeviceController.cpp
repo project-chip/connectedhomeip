@@ -152,11 +152,18 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     Credentials::P256PublicKeySpan rootPublicKey;
     FabricId fabricId;
 
+    // There are three possibilities here in terms of what happens with our
+    // operational key:
+    // 1) We have an externally owned operational keypair.
+    // 2) We have an operational keypair that the fabric table should clone via
+    //    serialize/deserialize.
+    // 3) We have no keypair at all, and the fabric table has been initialized
+    //    with a key store.
     if (params.hasExternallyOwnedOperationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
     }
-    else
+    else if (params.operationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
     }

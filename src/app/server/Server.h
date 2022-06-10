@@ -33,6 +33,8 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/OperationalKeystore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
@@ -112,6 +114,8 @@ struct ServerInitParams
     // Optional. Support test event triggers when provided. Must be initialized before being
     // provided.
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
+    // Operational keystore with access to the operational keys: MUST be injected.
+    Crypto::OperationalKeystore * operationalKeystore = nullptr;
 };
 
 /**
@@ -161,6 +165,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+        static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
@@ -168,17 +173,30 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         static chip::app::DefaultAclStorage sAclStorage;
 
         // KVS-based persistent storage delegate injection
-        chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-        ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-        this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+        if (persistentStorageDelegate == nullptr)
+        {
+            chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
+                DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
+            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+        }
+
+        // PersistentStorageDelegate "software-based" operational key access injection
+        if (this->operationalKeystore == nullptr)
+        {
+            // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
+            //          for examples and for now.
+            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+        }
 
         // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(&sKvsPersistenStorageDelegate);
+        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(&sKvsPersistenStorageDelegate));
+        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
         this->sessionResumptionStorage = &sSessionResumptionStorage;
 #else
         this->sessionResumptionStorage = nullptr;
@@ -251,6 +269,8 @@ public:
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
+    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -267,6 +287,8 @@ private:
     Server() = default;
 
     static Server sServer;
+
+    void InitFailSafe();
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -407,6 +429,7 @@ private:
     app::AclStorage * mAclStorage;
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
+    Crypto::OperationalKeystore * mOperationalKeystore;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

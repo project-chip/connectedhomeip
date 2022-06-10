@@ -34,6 +34,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -93,9 +94,8 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabricTable                   The fabric table to be used for connecting with the peer
-     * @param fabricIndex                   The index of the fabric to be used for connecting with the peer
-     * @param peerNodeId                    Node id of the peer node
+     * @param fabricTable                   The fabric table that contains a fabric in common with the peer
+     * @param peerScopedNodeId              Node to which we want to establish a session
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
      * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
@@ -103,7 +103,7 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, FabricIndex fabricIndex, NodeId peerNodeId,
+    EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                      Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
