@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    54.3.1. [TC-DIAGLOG-3.1] Diagnostic Logs Cluster Commands Checks[DUT Client]
+name: 55.3.1. [TC-DLOG-3.1] Diagnostic Logs Cluster Commands Checks[DUT-Client]
 
 config:
     nodeId: 0x12344321

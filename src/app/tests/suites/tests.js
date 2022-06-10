@@ -71,6 +71,7 @@ function getManualTests() {
     'Test_TC_GR_1_1',
     'Test_TC_GR_2_1',
     'Test_TC_GR_2_2',
+    'Test_TC_GR_2_3',
     'Test_TC_GR_3_1',
     'Test_TC_GR_3_2',
   ];
@@ -132,10 +133,10 @@ function getManualTests() {
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_DIAGLOG_1_1',
-    'Test_TC_DIAGLOG_2_1',
-    'Test_TC_DIAGLOG_2_2',
-    'Test_TC_DIAGLOG_3_1',
+    'Test_TC_DLOG_1_1',
+    'Test_TC_DLOG_2_1',
+    'Test_TC_DLOG_2_2',
+    'Test_TC_DLOG_3_1',
   ];
 
   const Descriptor = [
@@ -151,9 +152,9 @@ function getManualTests() {
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_2_2',
-    'Test_TC_GC_2_3',
-    'Test_TC_GC_2_4',
+    'Test_TC_CGEN_2_2',
+    'Test_TC_CGEN_2_3',
+    'Test_TC_CGEN_2_4',
   ];
 
   const GeneralDiagnostics = [
@@ -182,6 +183,7 @@ function getManualTests() {
     'Test_TC_IDM_3_2',
     'Test_TC_IDM_4_1',
     'Test_TC_IDM_4_2',
+    'Test_TC_IDM_4_3',
     'Test_TC_IDM_5_1',
     'Test_TC_IDM_5_2',
     'Test_TC_IDM_6_1',
@@ -217,6 +219,8 @@ function getManualTests() {
     'Test_TC_MC_10_7',
     'Test_TC_MC_11_1',
     'Test_TC_MC_11_2',
+    'Test_TC_MC_12_1',
+    'Test_TC_MC_12_2',
   ];
 
   const MultipleFabrics = [
@@ -264,6 +268,7 @@ function getManualTests() {
     'Test_TC_SU_2_5',
     'Test_TC_SU_2_6',
     'Test_TC_SU_2_7',
+    'Test_TC_SU_2_8',
     'Test_TC_SU_3_1',
     'Test_TC_SU_3_2',
     'Test_TC_SU_3_3',
@@ -346,6 +351,7 @@ function getManualTests() {
   ];
 
   const DoorLock = [
+    'Test_TC_DL_1_1',
     'Test_TC_DL_2_1',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_8',
@@ -359,13 +365,14 @@ function getManualTests() {
   ];
 
   const LocalizationConfiguration = [
-    'Test_TC_LO_1_1',
-    'Test_TC_LO_2_1',
-    'Test_TC_LO_3_1',
+    'Test_TC_LCFG_1_1',
+    'Test_TC_LCFG_2_1',
+    'Test_TC_LCFG_3_1',
   ];
 
   const LevelControl = [
     'Test_TC_LVL_2_3',
+    'Test_TC_LVL_8_1',
   ];
 
   const OnOff = [
@@ -426,6 +433,17 @@ function getManualTests() {
     'Test_TC_UL_2_2',
   ];
 
+  const FixedLabel = [
+    'Test_TC_FLABEL_1_1',
+    'Test_TC_FLABEL_2_1',
+    'Test_TC_FLABEL_2_2',
+  ];
+
+  const Binding = [
+    'Test_TC_BIND_1_1',
+    'Test_TC_BIND_2_1',
+  ];
+
   const tests = [
     DeviceDiscovery,
     Groups,
@@ -471,6 +489,8 @@ function getManualTests() {
     Actions,
     TimeFormatLocalization,
     UnitLocalization,
+    FixedLabel,
+    Binding,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
@@ -542,8 +562,8 @@ function getTests() {
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_1',
-    'Test_TC_GC_2_1',
+    'Test_TC_CGEN_1_1',
+    'Test_TC_CGEN_2_1',
   ];
 
   const Identify = [

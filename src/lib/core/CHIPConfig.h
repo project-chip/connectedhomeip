@@ -644,15 +644,21 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+ * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
  *
- * @brief Define the size of the pool used for tracking CHIP
- * Peer connections. This defines maximum number of concurrent
- * device connections across all supported transports.
+ * @brief Defines the size of the pool used for tracking the state of
+ * secure sessions. This controls the maximum number of concurrent
+ * established secure sessions across all supported transports.
+ *
+ * This is sized to cover the sum of the following:
+ *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
+ *  - 1 reserved slot for CASEServer as a responder.
+ *  - 1 reserved slot for PASE.
+ *
  */
-#ifndef CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE 16
-#endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
+#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 
 /**
  * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING

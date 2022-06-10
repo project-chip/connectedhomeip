@@ -755,8 +755,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTestClusterClusterTestListStructOctet : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
-@property (strong, nonatomic) NSData * _Nonnull operationalCert;
+@property (strong, nonatomic) NSNumber * _Nonnull member1;
+@property (strong, nonatomic) NSData * _Nonnull member2;
 - (instancetype)init;
 @end
 

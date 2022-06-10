@@ -39,6 +39,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <pthread.h>
+#include <sys/ioctl.h>
+
 #include "CommissionableInit.h"
 #include "Device.h"
 #include <app/server/Server.h>
@@ -57,9 +60,6 @@ namespace {
 const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
-const int kFixedLabelAttributeArraySize = 254;
-// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-const int kFixedLabelElementsOctetStringSize = 16;
 
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
@@ -85,10 +85,6 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT_SWITCH 0x0103
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_ROOT_NODE 0x0016
-// (taken from chip-devices.xml)
-#define DEVICE_TYPE_BRIDGE 0x000e
-// (taken from chip-devices.xml)
 #define DEVICE_TYPE_POWER_SOURCE 0x0011
 
 // Device Version for dynamic endpoints:
@@ -100,7 +96,6 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 //   - On/Off
 //   - Descriptor
 //   - Bridged Device Basic
-//   - Fixed Label
 
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
@@ -121,11 +116,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSi
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Fixed Label cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(fixedLabelAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0), /* label list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
 // Declare Cluster List for Bridged Light endpoint
 // TODO: It's not clear whether it would be better to get the command lists from
 // the ZAP config on our last fixed endpoint instead.
@@ -142,15 +132,22 @@ constexpr CommandId onOffIncomingCommands[] = {
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
 DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, fixedLabelAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr,
+                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+
+DeviceOnOff Light1("Light 1", "Office");
+DeviceOnOff Light2("Light 2", "Office");
+
+DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
+DeviceSwitch Switch2("Switch 2", "Office",
+                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
+                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
+                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
 
 // ---------------------------------------------------------------------------
 //
@@ -158,7 +155,6 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
 //   - Switch
 //   - Descriptor
 //   - Bridged Device Basic
-//   - Fixed Label
 
 // Declare Switch cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchAttrs)
@@ -182,17 +178,12 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_NODE_LABEL_ATTRIBUTE_ID, CHAR_STRING, kNodeLabelSi
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Fixed Label cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(switchFixedLabelAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0), /* label list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
 // Declare Cluster List for Bridged Switch endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedSwitchClusters)
 DECLARE_DYNAMIC_CLUSTER(ZCL_SWITCH_CLUSTER_ID, switchAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, switchDescriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, switchBridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, switchFixedLabelAttrs, nullptr, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, switchBridgedDeviceBasicAttrs, nullptr,
+                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Switch endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
@@ -309,24 +300,6 @@ int RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length,
-                      const EmberAfAttributeMetadata * am)
-{
-    char zclOctetStrBuf[kFixedLabelElementsOctetStringSize];
-    _LabelStruct labelStruct;
-
-    // TODO: This size is obviously wrong.  See
-    // https://github.com/project-chip/connectedhomeip/issues/10743
-    labelStruct.label = CharSpan(label, kFixedLabelElementsOctetStringSize);
-
-    strncpy(zclOctetStrBuf, value, sizeof(zclOctetStrBuf));
-    // TODO: This size is obviously wrong.  See
-    // https://github.com/project-chip/connectedhomeip/issues/10743
-    labelStruct.value = CharSpan(&zclOctetStrBuf[0], sizeof(zclOctetStrBuf));
-
-    // TODO: Need to set up an AttributeAccessInterface to handle the lists here.
-}
-
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
@@ -343,19 +316,6 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         MakeZclCharString(zclNameSpan, dev->GetName());
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
-    }
-
-    if (itemChangedMask & Device::kChanged_Location)
-    {
-        uint8_t buffer[kFixedLabelAttributeArraySize];
-        EmberAfAttributeMetadata am = { .attributeId  = ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                        .size         = kFixedLabelAttributeArraySize,
-                                        .defaultValue = static_cast<uint32_t>(0) };
-
-        EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
-
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                               ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 
@@ -495,25 +455,6 @@ EmberAfStatus HandleWriteOnOffAttribute(DeviceOnOff * dev, chip::AttributeId att
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, const EmberAfAttributeMetadata * am, uint8_t * buffer,
-                                            uint16_t maxReadLength)
-{
-    if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
-    {
-        EncodeFixedLabel("room", dev->GetLocation(), buffer, maxReadLength, am);
-    }
-    else if ((am->attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_FIXED_LABEL_CLUSTER_REVISION;
-    }
-    else
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     if ((attributeId == ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID) && (maxReadLength == 1))
@@ -599,10 +540,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         {
             ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == ZCL_FIXED_LABEL_CLUSTER_ID)
-        {
-            ret = HandleReadFixedLabelAttribute(dev, attributeMetadata, buffer, maxReadLength);
-        }
         else if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
@@ -646,9 +583,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
 void ApplicationInit() {}
 
-const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-                                                      { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
-
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
@@ -661,35 +595,86 @@ const EmberAfDeviceType gComposedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF
 
 const EmberAfDeviceType gComposedPowerSourceDeviceTypes[] = { { DEVICE_TYPE_POWER_SOURCE, DEVICE_VERSION_DEFAULT } };
 
+#define POLL_INTERVAL_MS (100)
+uint8_t poll_prescale = 0;
+
+bool kbhit()
+{
+    int byteswaiting;
+    ioctl(0, FIONREAD, &byteswaiting);
+    return byteswaiting > 0;
+}
+
+void * bridge_polling_thread(void * context)
+{
+    bool light1_added = true;
+    bool light2_added = false;
+    while (1)
+    {
+        if (kbhit())
+        {
+            int ch = getchar();
+            if (ch == '2' && light2_added == false)
+            {
+                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight2DataVersions), 1);
+                light2_added = true;
+            }
+            else if (ch == '4' && light1_added == true)
+            {
+                RemoveDeviceEndpoint(&Light1);
+                light1_added = false;
+            }
+            if (ch == '5' && light1_added == false)
+            {
+                AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight1DataVersions), 1);
+                light1_added = true;
+            }
+            if (ch == 'b')
+            {
+                if (light1_added)
+                {
+                    Light1.SetName("Light 1b");
+                }
+                if (light2_added)
+                {
+                    Light2.SetName("Light 2b");
+                }
+            }
+            if (ch == 'c')
+            {
+                if (light1_added)
+                {
+                    Light1.Toggle();
+                }
+                if (light2_added)
+                {
+                    Light2.Toggle();
+                }
+            }
+            continue;
+        }
+
+        // Sleep to avoid tight loop reading commands
+        usleep(POLL_INTERVAL_MS * 1000);
+    }
+
+    return nullptr;
+}
+
 int main(int argc, char * argv[])
 {
     // Clear out the device database
     memset(gDevices, 0, sizeof(gDevices));
 
-    // Create Mock Devices
-
-    // Define 4 lights
-    DeviceOnOff Light1("Light 1", "Office");
-    DeviceOnOff Light2("Light 2", "Office");
-    DeviceOnOff Light3("Light 3", "Office");
-    DeviceOnOff Light4("Light 4", "Den");
+    // Setup Mock Devices
 
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     Light1.SetReachable(true);
     Light2.SetReachable(true);
-    Light3.SetReachable(true);
-    Light4.SetReachable(true);
-
-    // Define 2 switches
-    DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
-    DeviceSwitch Switch2("Switch 2", "Office",
-                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
-                             EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
-                             EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
 
     Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
     Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
@@ -746,40 +731,19 @@ int main(int argc, char * argv[])
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
-    //
-    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
-    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
-    //
-    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
-
-    // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
+    // Add light 1 -> will be mapped to ZCL endpoints 3
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions));
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
-    AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions));
+                      Span<DataVersion>(gLight1DataVersions), 1);
 
-    // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
-    RemoveDeviceEndpoint(&Light2);
-
-    // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions));
-
-    // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
-
-    // Add switch 1..2 --> will be mapped to ZCL endpoints 7,8
+    // Add switch 1..2 --> will be mapped to ZCL endpoints 4,5
     AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch1DataVersions));
+                      Span<DataVersion>(gSwitch1DataVersions), 1);
     AddDeviceEndpoint(&Switch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
-                      Span<DataVersion>(gSwitch2DataVersions));
+                      Span<DataVersion>(gSwitch2DataVersions), 1);
 
     // Add composed Device with two buttons and a power source
     AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
-                      Span<DataVersion>(gComposedDeviceDataVersions));
+                      Span<DataVersion>(gComposedDeviceDataVersions), 1);
     AddDeviceEndpoint(&ComposedSwitch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),
                       Span<DataVersion>(gComposedSwitch1DataVersions), ComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedSwitch2, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gComposedSwitchDeviceTypes),
@@ -787,6 +751,16 @@ int main(int argc, char * argv[])
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
+
+    {
+        pthread_t poll_thread;
+        int res = pthread_create(&poll_thread, nullptr, bridge_polling_thread, nullptr);
+        if (res)
+        {
+            printf("Error creating polling thread: %d\n", res);
+            exit(1);
+        }
+    }
 
     // Run CHIP
 

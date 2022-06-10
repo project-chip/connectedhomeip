@@ -270,40 +270,33 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         return;
     }
 
-    // If we found a handler or we need to send an ack, create an exchange to
-    // handle the message.
-    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
+    // If we found a handler, create an exchange to handle the message.
+    if (matchingUMH != nullptr)
     {
         ExchangeDelegate * delegate = nullptr;
 
         // Fetch delegate from the handler
-        if (matchingUMH != nullptr)
+        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+        if (err != CHIP_NO_ERROR)
         {
-            CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
-            if (err != CHIP_NO_ERROR)
-            {
-                // Using same error message for all errors to reduce code size.
-                ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
-                return;
-            }
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+            SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
+            return;
         }
 
-        // If rcvd msg is from initiator then this exchange is created as not Initiator.
-        // If rcvd msg is not from initiator then this exchange is created as Initiator.
-        // Note that if matchingUMH is not null then rcvd msg if from initiator.
-        // TODO: Figure out which channel to use for the received message
-        ExchangeContext * ec =
-            mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
+        ExchangeContext * ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, delegate);
 
         if (ec == nullptr)
         {
-            if (matchingUMH != nullptr && delegate != nullptr)
+            if (delegate != nullptr)
             {
                 matchingUMH->Handler->OnExchangeCreationFailed(delegate);
             }
 
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            // No resource for creating new exchange, SendStandaloneAckIfNeeded probably also fails, so do not try it here
             return;
         }
 
@@ -314,16 +307,57 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
             ec->Close();
+            SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
         }
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
+        err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
         }
+        return;
     }
+
+    SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
+    return;
+}
+
+void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                const SessionHandle & session, MessageFlags msgFlags,
+                                                System::PacketBufferHandle && msgBuf)
+{
+    // If we need to send a StandaloneAck, create a EphemeralExchange for the purpose to send the StandaloneAck
+    if (!payloadHeader.NeedsAck())
+        return;
+
+    // If rcvd msg is from initiator then this exchange is created as not Initiator.
+    // If rcvd msg is not from initiator then this exchange is created as Initiator.
+    // Create a EphemeralExchange to generate a StandaloneAck
+    ExchangeContext * ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(),
+                                                     nullptr, true /* IsEphemeralExchange */);
+
+    if (ec == nullptr)
+    {
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+        return;
+    }
+
+    ChipLogDetail(ExchangeManager, "Generating StandaloneAck via exchange: " ChipLogFormatExchange, ChipLogValueExchange(ec));
+
+    // No need to verify packet encryption type, the EphemeralExchange can handle both secure and insecure messages.
+
+    CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
+    if (err != CHIP_NO_ERROR)
+    {
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+    }
+
+    // The exchange should be closed inside HandleMessage function. So don't bother close it here.
+    return;
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

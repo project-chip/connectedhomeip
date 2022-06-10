@@ -36,6 +36,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -48,6 +49,7 @@ static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter contro
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
+static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 
 @interface MatterControllerFactory ()
 
@@ -58,9 +60,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
-@property (readonly) chip::TestPersistentStorageDelegate * groupStorageDelegate;
-@property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
+@property (readonly) TestPersistentStorageDelegate * groupStorageDelegate;
+@property (readonly) Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) NSMutableArray<CHIPDeviceController *> * controllers;
+@property (readonly) PersistentStorageOperationalKeystore * keystore;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
@@ -158,6 +161,12 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         _attestationTrustStoreBridge = nullptr;
     }
 
+    if (_keystore) {
+        _keystore->Finish();
+        delete _keystore;
+        _keystore = nullptr;
+    }
+
     if (_persistentStorageDelegateBridge) {
         delete _persistentStorageDelegateBridge;
         _persistentStorageDelegateBridge = nullptr;
@@ -186,6 +195,19 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             return;
         }
 
+        // TODO: Allow passing a different keystore implementation via startupParams.
+        _keystore = new PersistentStorageOperationalKeystore();
+        if (_keystore == nullptr) {
+            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            return;
+        }
+
+        CHIP_ERROR errorCode = _keystore->Init(_persistentStorageDelegateBridge);
+        if (errorCode != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            return;
+        }
+
         // Initialize device attestation verifier
         if (startupParams.paaCerts) {
             _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge(startupParams.paaCerts);
@@ -210,7 +232,8 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
-        CHIP_ERROR errorCode = _controllerFactory->Init(params);
+        params.operationalKeystore = _keystore;
+        errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
@@ -266,8 +289,8 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     }
 
     __block CHIPDeviceControllerStartupParamsInternal * params = nil;
+    __block FabricTable fabricTable;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricTable fabricTable;
         FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
@@ -293,7 +316,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             }
         }
 
-        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabric params:startupParams];
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForExistingFabric:&fabricTable
+                                                                              fabricIndex:fabric->GetFabricIndex()
+                                                                                 keystore:_keystore
+                                                                                   params:startupParams];
     });
 
     if (params == nil) {
@@ -334,8 +360,8 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     }
 
     __block CHIPDeviceControllerStartupParamsInternal * params = nil;
+    __block FabricTable fabricTable;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricTable fabricTable;
         FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
@@ -348,7 +374,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             return;
         }
 
-        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:startupParams];
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:&fabricTable
+                                                                            keystore:_keystore
+                                                                              params:startupParams];
     });
 
     if (params == nil) {
@@ -397,7 +425,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
                     params:(CHIPDeviceControllerStartupParams *)params
                     fabric:(FabricInfo * _Nullable * _Nonnull)fabric
 {
-    CHIP_ERROR err = fabricTable.Init(_persistentStorageDelegateBridge);
+    CHIP_ERROR err = fabricTable.Init(_persistentStorageDelegateBridge, _keystore);
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
         return NO;

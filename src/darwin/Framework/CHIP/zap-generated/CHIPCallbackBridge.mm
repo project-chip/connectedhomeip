@@ -9308,9 +9308,8 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
             auto & entry_0 = iter_0.GetValue();
             CHIPTestClusterClusterTestListStructOctet * newElement_0;
             newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
-            newElement_0.fabricIndex = [NSNumber numberWithUnsignedLongLong:entry_0.fabricIndex];
-            newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data()
-                                                          length:entry_0.operationalCert.size()];
+            newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
+            newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();

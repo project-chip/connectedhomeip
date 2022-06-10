@@ -73,6 +73,7 @@ public:
 
     bool IsOn();
     void SetOnOff(bool aOn);
+    void Toggle();
 
     using DeviceCallback_fn = std::function<void(DeviceOnOff *, DeviceOnOff::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB);
