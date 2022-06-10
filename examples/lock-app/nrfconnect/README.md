@@ -16,8 +16,8 @@ Semiconductor's nRF Connect SDK, and supports remote access and control of a
 simulated door lock over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network.
-The device works as a Thread Sleepy End Device.
+into an existing Matter network and can be controlled by this network. The
+device works as a Thread Sleepy End Device.
 
 <hr>
 
