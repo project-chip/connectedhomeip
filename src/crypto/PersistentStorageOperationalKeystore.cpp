@@ -297,10 +297,8 @@ CHIP_ERROR PersistentStorageOperationalKeystore::SignWithOpKeypair(FabricIndex f
         // We have an override key: sign with it!
         return mPendingKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
     }
-    else
-    {
-        return SignWithStoredOpKey(fabricIndex, mStorage, message, outSignature);
-    }
+
+    return SignWithStoredOpKey(fabricIndex, mStorage, message, outSignature);
 }
 
 } // namespace chip
