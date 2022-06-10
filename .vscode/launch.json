@@ -397,7 +397,7 @@
             "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gdb",
             "additionalSOLibSearchPath": "${env:TIZEN_ROOTFS}",
             "preLaunchTask": "Launch LightingApp with gdbserver attached (Tizen)",
-            "miDebuggerServerAddress": "${input:tizenTargetDeviceAddressSdb}:9999",
+            "miDebuggerServerAddress": "localhost:9999",
             "linux": {
                 "MIMode": "gdb"
             },
@@ -457,16 +457,6 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
-        },
-        {
-            "id": "tizenTargetDeviceAddressSdb",
-            "type": "command",
-            "command": "shellCommand.execute",
-            "args": {
-                "command": "sdb devices | grep -v \"List of devices attached\" | cut -f1 | cut -d \":\" -f1",
-                "fieldSeparator": "\n",
-                "description": "Select target device"
-            }
         }
     ]
 }

@@ -220,6 +220,8 @@
             "type": "shell",
             "command": "sdb",
             "args": [
+                "-s",
+                "${input:tizenTargetDeviceAddressSdb}",
                 "install",
                 "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
             ],
@@ -237,7 +239,7 @@
                 "--app-name",
                 "org.tizen.matter.example.lighting",
                 "--target",
-                "${input:tizenTargetDeviceAddressSdb}:26101",
+                "${input:tizenTargetDeviceAddressSdb}",
                 "--",
                 "vendor-id 65521 product-id 32769 discriminator 42 passcode 1234"
             ],
@@ -450,7 +452,7 @@
             "type": "command",
             "command": "shellCommand.execute",
             "args": {
-                "command": "sdb devices | grep -v \"List of devices attached\" | cut -f1 | cut -d \":\" -f1",
+                "command": "sdb devices | grep -v \"List of devices attached\" | cut -f1",
                 "fieldSeparator": "\n",
                 "description": "Select target device"
             }

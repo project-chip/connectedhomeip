@@ -73,8 +73,14 @@ $APP_ARGS \
 
 if [ -z "$TARGET_DEVICE" ]; then
     sdb root on
+    sdb shell "mkdir -p /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver \
+        ln -sf /usr/bin/gdbserver /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver "
     sdb shell "$CMD"
+    sdb forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 else
     sdb -s "$TARGET_DEVICE" root on
+    sdb -s "$TARGET_DEVICE" shell "mkdir -p /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver && \
+        ln -sf /usr/bin/gdbserver /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver"
     sdb -s "$TARGET_DEVICE" shell "$CMD"
+    sdb -s "$TARGET_DEVICE" forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 fi
