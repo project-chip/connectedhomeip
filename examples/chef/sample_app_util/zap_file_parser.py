@@ -273,7 +273,7 @@ def generate_metadata(
             # The network commissioning cluster contains platform specific details
             # such as how the platform will be commissioned to the matter fabric.
             if (not include_platform_specific_info and
-                str(cluster["code"]) == _NETWORK_COMMISSIONING_CODE):
+                    str(cluster["code"]) == _NETWORK_COMMISSIONING_CODE):
                 continue
             if not cluster["enabled"]:
                 continue
