@@ -377,7 +377,8 @@ public class ChipDeviceController {
   }
 
   /** Read the given event path. */
-  public void readEventPath(ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+  public void readEventPath(
+      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
     readEventPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, eventPaths);
   }
