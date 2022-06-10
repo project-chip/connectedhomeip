@@ -18,25 +18,17 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Open IoT SDK platform.
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
  *
  */
 
 #pragma once
 
-#include <stdint.h>
+// Enable support functions for parsing command-line arguments
+#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
-// ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_POSIX_LOCKING 0
-#define CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING 0
-#define CHIP_SYSTEM_CONFIG_MBED_LOCKING 0
-#define CHIP_SYSTEM_CONFIG_NO_LOCKING 0
-#define CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING 1
-
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#ifndef CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
-#define CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME 0
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
-
-// ========== Platform-specific Configuration Overrides =========
+#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
+#define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1

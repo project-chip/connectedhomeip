@@ -34,6 +34,7 @@ Options:
 
 Examples:
     shell
+    unit-tests
 EOF
 }
 
@@ -97,7 +98,12 @@ function run_fvp {
         exit 1
     fi
 
-    EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    if [[ "$EXAMPLE" != "unit-tests" ]]; then
+        EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    else
+        EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE.elf"
+    fi
+
     # Check if executable file exists
     if ! [ -f "$EXAMPLE_EXE_PATH" ]; then
         echo "Error: $EXAMPLE_EXE_PATH does not exist." >&2
@@ -163,7 +169,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 case "$1" in
-shell)
+shell | unit-tests)
     EXAMPLE=$1
     ;;
 *)
@@ -183,7 +189,13 @@ build | run | build-run) ;;
 esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
-EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
+
+if [[ "$EXAMPLE" != "unit-tests" ]]; then
+    EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
+else
+    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/$EXAMPLE"
+fi
+
 if [ -z "${BUILD_PATH}" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
 fi

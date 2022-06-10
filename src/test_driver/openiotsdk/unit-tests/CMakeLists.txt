@@ -25,14 +25,13 @@ FetchContent_Declare(iotsdk-toolchains
 )
 FetchContent_MakeAvailable(iotsdk-toolchains)
 
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
-get_filename_component(SHELL_COMMON ${CHIP_ROOT}/examples/shell/shell_common REALPATH)
+get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 get_filename_component(OPEN_IOT_SDK_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/sdk REALPATH)
 get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/storage REALPATH)
 get_filename_component(OPEN_IOT_SDK_TOOLCHAIN ${CHIP_ROOT}/third_party/open-iot-sdk/toolchain REALPATH)
 get_filename_component(OPEN_IOT_SDK_CONFIG ${CHIP_ROOT}/config/openiotsdk REALPATH)
 
-set(APP_TARGET chip-openiotsdk-shell-example)
+set(APP_TARGET chip-openiotsdk-unit-tests)
 set(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
 project(${APP_TARGET} LANGUAGES C CXX ASM)
@@ -114,15 +113,13 @@ add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
 
 # CHIP configuration
 set(CONFIG_CHIP_PROJECT_CONFIG main/include/CHIPProjectConfig.h)
-set(CONFIG_CHIP_BUILD_TESTS NO)
+set(CONFIG_CHIP_LIB_TESTS YES)
 set(CONFIG_CHIP_LIB_SHELL NO)
 
 add_subdirectory(${OPEN_IOT_SDK_CONFIG} ./chip_build)
 
 target_include_directories(${APP_TARGET} PRIVATE
                            main/include
-                           ${MBED_COMMON}/util/include
-                           ${SHELL_COMMON}/include
                            freertos-config
 )
 
@@ -148,6 +145,9 @@ target_link_libraries(${APP_TARGET}
     $<$<TARGET_EXISTS:mdh-arm-an552-mps3>:mdh-arm-corstone-300-startup>
     $<$<TARGET_EXISTS:mdh-arm-an552-mps3>:mdh-arm-an552-mps3-linker>
 )
+
+# Link the *whole-archives* to keep the static test objects.
+target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/libCHIP_tests_custom.a" -Wl,--no-whole-archive)
 
 target_link_options(${APP_TARGET}
     PRIVATE

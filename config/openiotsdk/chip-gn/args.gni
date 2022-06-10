@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 
 chip_device_platform = "openiotsdk"
 
+chip_build_tests = false
+
 chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_device_project_config_include = ""

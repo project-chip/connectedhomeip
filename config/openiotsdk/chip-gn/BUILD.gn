@@ -12,17 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/lib/lib.gni")
+
+if (chip_build_tests) {
+  import("${chip_root}/build/chip/chip_test_group.gni")
+
+  chip_test_group("tests_custom") {
+      deps = [
+        "${chip_root}/src/access/tests",
+        # "${chip_root}/src/crypto/tests",
+        # "${chip_root}/src/inet/tests",
+        # "${chip_root}/src/lib/asn1/tests",
+        #"${chip_root}/src/lib/core/tests",
+        # "${chip_root}/src/messaging/tests",
+        # "${chip_root}/src/protocols/bdx/tests",
+        # "${chip_root}/src/protocols/user_directed_commissioning/tests",
+        # "${chip_root}/src/transport/retransmit/tests",
+        # "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+        # "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+        # "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+        # "${chip_root}/src/lib/dnssd/tests",
+        # "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests",
+        # "${chip_root}/src/setup_payload/tests",
+        # "${chip_root}/src/transport/raw/tests",
+        # "${chip_root}/src/app/tests",
+        # "${chip_root}/src/credentials/tests",
+        #"${chip_root}/src/lib/support/tests",
+        # "${chip_root}/src/protocols/secure_channel/tests",
+        # "${chip_root}/src/system/tests",
+        # "${chip_root}/src/transport/tests",
+        # "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+        #"${chip_root}/src/platform/tests",
+        # "${chip_root}/src/controller/tests",
+        # "${chip_root}/src/controller/tests/data_model",
+        # "${chip_root}/src/lib/shell/tests",
+    ]
+
+    build_monolithic_library = true
+    output_name = "libCHIP_tests_custom"
+    output_dir = "${root_out_dir}/lib"
+  }
+}
 
 group("openiotsdk") {
   deps = [ "${chip_root}/src/lib" ]
 
   if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
+    deps += [ ":tests_custom" ]
   }
 }
 

@@ -78,3 +78,9 @@ jobs:
                     openiotsdk release shell \
                     examples/shell/openiotsdk/build/chip-openiotsdk-shell-example.elf \
                     /tmp/bloat_reports/
+
+            - name: Build unit tests
+              if: github.event_name == 'push' || steps.changed_paths.outputs.openiotsdk == 'true'
+              timeout-minutes: 20
+              run: |
+                  scripts/examples/openiotsdk_example.sh unit-tests
