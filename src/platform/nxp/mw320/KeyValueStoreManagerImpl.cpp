@@ -48,20 +48,32 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     uint32_t read_size = kMaxKeyValueBytes;
     uint8_t buf[kMaxKeyValueBytes];
 
+    VerifyOrReturnError(read_bytes_size != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // 1. Casting away the "const" because of the difference of the interface definition. The API won't change the value
+    // 2. read_size is always less than kMaxKeyValueBytes
+    ret = ::get_saved_wifi_network((char *) key, buf, &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    if ((value == nullptr) && (value_size == 0) && (offset_bytes == 0))
+    {
+        *read_bytes_size = read_size;
+        return CHIP_NO_ERROR;
+    }
+
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(value_size != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Casting away the "const" because of the difference of the interface definition. The API won't change the value
-    ret = ::get_saved_wifi_network((char *) key, buf, &read_size);
-    VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    VerifyOrReturnError(read_size <= kMaxKeyValueBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
-
     size_t copy_size = std::min(value_size, (size_t)(read_size - offset_bytes));
-    if (read_bytes_size != nullptr)
-    {
-        *read_bytes_size = copy_size;
-    }
     ::memcpy(value, &buf[offset_bytes], copy_size);
+
+    *read_bytes_size = copy_size;
+
+    if ((read_size - offset_bytes) > value_size)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
     return CHIP_NO_ERROR;
 }
 
