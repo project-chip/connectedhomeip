@@ -136,7 +136,7 @@ void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 static void timerCallback(System::Layer *, void * callbackContext)
 {
     DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
-                                                  reinterpret_cast<intptr_t>(callbackContext));
+                                            reinterpret_cast<intptr_t>(callbackContext));
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
