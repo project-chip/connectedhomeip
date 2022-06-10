@@ -76,10 +76,8 @@ static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
                                          std::vector<app::AttributePathParams> & outAttributePathParamsList);
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
-static CHIP_ERROR ParseEventPathList(jobject eventPathList,
-                                         std::vector<app::EventPathParams> & outEventPathParamsList);
-static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId,
-                                     EventId & outEventId);
+static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
+static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 
 namespace {
@@ -875,10 +873,10 @@ JNI_METHOD(void, subscribeToEventPath)
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
 
     app::ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mMinIntervalFloorSeconds     = minInterval;
-    params.mMaxIntervalCeilingSeconds   = maxInterval;
-    params.mpEventPathParamsList        = eventPathParamsList.data();
-    params.mEventPathParamsListSize     = eventPathParamsList.size();
+    params.mMinIntervalFloorSeconds   = minInterval;
+    params.mMaxIntervalCeilingSeconds = maxInterval;
+    params.mpEventPathParamsList      = eventPathParamsList.data();
+    params.mEventPathParamsListSize   = eventPathParamsList.size();
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
@@ -1022,21 +1020,20 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId,
-                              EventId & outEventId)
+CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId)
 {
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    jmethodID getEndpointIdMethod  = nullptr;
-    jmethodID getClusterIdMethod   = nullptr;
-    jmethodID getEventIdMethod = nullptr;
+    jmethodID getEndpointIdMethod = nullptr;
+    jmethodID getClusterIdMethod  = nullptr;
+    jmethodID getEventIdMethod    = nullptr;
 
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
         env, eventPath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
         env, eventPath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, eventPath, "getEventId", "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId",
+                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
 
     jobject endpointIdObj = env->CallObjectMethod(eventPath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1052,9 +1049,9 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     uint32_t eventId = 0;
     ReturnErrorOnFailure(GetChipPathIdValue(eventIdObj, kInvalidEventId, eventId));
 
-    outEndpointId  = static_cast<EndpointId>(endpointId);
-    outClusterId   = static_cast<ClusterId>(clusterId);
-    outEventId = static_cast<EventId>(eventId);
+    outEndpointId = static_cast<EndpointId>(endpointId);
+    outClusterId  = static_cast<ClusterId>(clusterId);
+    outEventId    = static_cast<EventId>(eventId);
 
     return CHIP_NO_ERROR;
 }
