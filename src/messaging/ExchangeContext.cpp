@@ -39,6 +39,7 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/EphemeralExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -290,8 +291,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 }
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                                 ExchangeDelegate * delegate) :
-    mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance()),
+                                 ExchangeDelegate * delegate, bool isEphemeralExchange) :
+    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
     mSession(*this)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
@@ -300,6 +301,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mExchangeId  = ExchangeId;
     mSession.Grab(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
+    mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
     mDelegate = delegate;
 
     SetAckPending(false);
@@ -494,6 +496,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
+    if (IsEphemeralExchange())
+    {
+        // The EphemeralExchange has done its job, since StandaloneAck is sent in previous FlushAcks() call.
+        return CHIP_NO_ERROR;
+    }
+
     // Since we got the response, cancel the response timer.
     CancelResponseTimer();
 
@@ -525,6 +533,17 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate)
+{
+    if (isEphemeralExchange)
+        return EphemeralExchangeDispatch::Instance();
+
+    if (delegate != nullptr)
+        return delegate->GetMessageDispatch();
+
+    return ApplicationExchangeDispatch::Instance();
 }
 
 } // namespace Messaging

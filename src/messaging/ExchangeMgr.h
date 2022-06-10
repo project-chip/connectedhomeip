@@ -240,6 +240,8 @@ private:
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
+    void SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                   const SessionHandle & session, MessageFlags msgFlags, System::PacketBufferHandle && msgBuf);
 };
 
 } // namespace Messaging
