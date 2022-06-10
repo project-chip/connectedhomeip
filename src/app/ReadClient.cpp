@@ -91,12 +91,12 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
 
 void ReadClient::ClearActiveSubscriptionState()
 {
-    mIsInitialReport           = true;
-    mIsPrimingReports          = true;
-    mPendingMoreChunks         = false;
-    mMinIntervalFloorSeconds   = 0;
-    mMaxInterval = 0;
-    mSubscriptionId            = 0;
+    mIsInitialReport         = true;
+    mIsPrimingReports        = true;
+    mPendingMoreChunks       = false;
+    mMinIntervalFloorSeconds = 0;
+    mMaxInterval             = 0;
+    mSubscriptionId          = 0;
     MoveToState(ClientState::Idle);
 }
 
@@ -754,8 +754,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    System::Clock::Timeout timeout =
-        System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(DataManagement,
                     "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
@@ -824,8 +823,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ChipLogProgress(DataManagement,
                     "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mFabricIndex,
-                    ChipLogValueX64(mPeerNodeId));
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mFabricIndex, ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 

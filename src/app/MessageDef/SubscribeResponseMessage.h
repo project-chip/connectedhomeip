@@ -31,8 +31,8 @@ namespace app {
 namespace SubscribeResponseMessage {
 enum class Tag : uint8_t
 {
-    kSubscriptionId            = 0,
-    kMaxInterval = 2,
+    kSubscriptionId = 0,
+    kMaxInterval    = 2,
 };
 
 class Parser : public MessageParser

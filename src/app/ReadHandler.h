@@ -45,7 +45,7 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
-//https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
+// https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
 constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
 
 namespace chip {
@@ -183,8 +183,7 @@ public:
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <=
-                                std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
+        VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
@@ -434,9 +433,9 @@ private:
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mSubscriptionStartGeneration = 0;
 
-    SubscriptionId mSubscriptionId      = 0;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxInterval = 0;
+    SubscriptionId mSubscriptionId    = 0;
+    uint16_t mMinIntervalFloorSeconds = 0;
+    uint16_t mMaxInterval             = 0;
 
     EventNumber mEventMin = 0;
 

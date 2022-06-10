@@ -1343,7 +1343,7 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
 
     SubscribeResponseMessage::Parser subscribeResponseParser;
     chip::SubscriptionId subscriptionId = 0;
-    uint16_t maxInterval  = 0;
+    uint16_t maxInterval                = 0;
     err                                 = subscribeResponseParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK

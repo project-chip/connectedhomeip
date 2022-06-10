@@ -53,8 +53,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kMaxInterval):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMaxInterval))),
-                                CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMaxInterval))), CHIP_ERROR_INVALID_TLV_TAG);
             tagPresenceMask |= (1 << to_underlying(Tag::kMaxInterval));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
@@ -78,9 +77,8 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t requiredFields =
-            (1 << to_underlying(Tag::kSubscriptionId)) | (1 << to_underlying(Tag::kMaxInterval));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
+        const uint16_t requiredFields = (1 << to_underlying(Tag::kSubscriptionId)) | (1 << to_underlying(Tag::kMaxInterval));
+        err                           = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR
                                                                    : CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
     }
     ReturnErrorOnFailure(err);
@@ -107,8 +105,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::Subscript
     return *this;
 }
 
-SubscribeResponseMessage::Builder &
-SubscribeResponseMessage::Builder::MaxInterval(const uint16_t aMaxInterval)
+SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::MaxInterval(const uint16_t aMaxInterval)
 {
     if (mError == CHIP_NO_ERROR)
     {
