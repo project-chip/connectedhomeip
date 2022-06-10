@@ -133,9 +133,9 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 
 void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
 
-static void timerCallback(chip::System::Layer *, void * callbackContext)
+static void timerCallback(System::Layer *, void * callbackContext)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
+    DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
                                                   reinterpret_cast<intptr_t>(callbackContext));
 }
 
