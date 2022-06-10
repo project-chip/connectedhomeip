@@ -123,7 +123,6 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             continue;
                         }
 
-
                         if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
