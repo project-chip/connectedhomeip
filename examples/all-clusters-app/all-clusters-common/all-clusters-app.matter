@@ -3431,11 +3431,15 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
   readonly attribute enum8 thermostatRunningMode = 30;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetpointRaiseLowerRequest {
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
+  }
+
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
 server cluster ThermostatUserInterfaceConfiguration = 516 {
@@ -4445,10 +4449,7 @@ endpoint 1 {
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     ram      attribute thermostatRunningMode;
-    ram      attribute startOfWeek;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x002b;
+    ram      attribute featureMap default = 0x0023;
     ram      attribute clusterRevision default = 5;
   }
 
