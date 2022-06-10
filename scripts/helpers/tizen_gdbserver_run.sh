@@ -64,13 +64,17 @@ if [ "$(sdb devices | wc -l)" -le 1 ]; then
     exit 1
 fi
 
-if [ -n "$TARGET_DEVICE" ]; then
-    TARGET_FLAG="-s $TARGET_DEVICE"
-fi
+CMD="/usr/bin/app_launcher -s \"$APP_NAME\"  \
+__AUL_SDK__ $RESULT_MODE \
+__DLP_DEBUG_ARG__ :$GDBSERVER_PORT \
+__DLP_GDBSERVER_PATH__ $SDK_TOOLS_PATH/gdbserver/gdbserver \
+$APP_ARGS \
+"
 
-sdb "$TARGET_FLAG" shell "/usr/bin/app_launcher -s \"$APP_NAME\"  \
-    __AUL_SDK__ $RESULT_MODE \
-    __DLP_DEBUG_ARG__ :$GDBSERVER_PORT \
-    __DLP_GDBSERVER_PATH__ $SDK_TOOLS_PATH/gdbserver/gdbserver \
-    $APP_ARGS \
-    "
+if [ -z "$TARGET_DEVICE" ]; then
+    sdb root on
+    sdb shell "$CMD"
+else
+    sdb -s "$TARGET_DEVICE" root on
+    sdb -s "$TARGET_DEVICE" shell "$CMD"
+fi
