@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,9 @@
  *   limitations under the License.
  *
  */
-package chip.platform;
+package chip.devicecontroller;
 
-import java.util.Map;
-
-/** Interface for communicating with the CHIP mDNS stack. */
-public interface ChipMdnsCallback {
-  void handleServiceResolve(
-      String instanceName,
-      String serviceType,
-      String hostName,
-      String address,
-      int port,
-      Map<String, byte[]> textEntries,
-      long callbackHandle,
-      long contextHandle);
-
-  void handleServiceBrowse(
-      String[] instanceName, String serviceType, long callbackHandle, long contextHandle);
+public class DiscoveredDevice {
+  public long discriminator;
+  public String ipAddress;
 }

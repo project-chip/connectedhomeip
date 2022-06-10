@@ -292,6 +292,18 @@ public class ChipDeviceController {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
+  /**
+   * Get commmissionible Node. Commmissionible Node results are able to get using {@link
+   * ChipDeviceController.getDiscoveredDevice}.
+   */
+  public void discoverCommissionableNodes() {
+    discoverCommissionableNodes(deviceControllerPtr);
+  }
+
+  public DiscoveredDevice getDiscoveredDevice(int idx) {
+    return getDiscoveredDevice(deviceControllerPtr, idx);
+  }
+
   public boolean openPairingWindow(long devicePtr, int duration) {
     return openPairingWindow(deviceControllerPtr, devicePtr, duration);
   }
@@ -435,6 +447,10 @@ public class ChipDeviceController {
   private native long getCompressedFabricId(long deviceControllerPtr);
 
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
+
+  private native void discoverCommissionableNodes(long deviceControllerPtr);
+
+  private native DiscoveredDevice getDiscoveredDevice(long deviceControllerPtr, int idx);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long devicePtr, int duration);
 
