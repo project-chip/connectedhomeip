@@ -55,7 +55,7 @@ public:
             setupPasscode = mPasscodeOverride.value();
             return CHIP_NO_ERROR;
         }
-        else if (mCommissionableDataProvider)
+        if (mCommissionableDataProvider)
         {
             return mCommissionableDataProvider->GetSetupPasscode(setupPasscode);
         }
@@ -82,7 +82,7 @@ public:
             setupDiscriminator = mDiscriminatorOverride.value();
             return CHIP_NO_ERROR;
         }
-        else if (mCommissionableDataProvider)
+        if (mCommissionableDataProvider)
         {
             return mCommissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
         }
@@ -104,7 +104,7 @@ public:
             iterationCount = mIterationCountOverride.value();
             return CHIP_NO_ERROR;
         }
-        else if (mCommissionableDataProvider)
+        if (mCommissionableDataProvider)
         {
             return mCommissionableDataProvider->GetSpake2pIterationCount(iterationCount);
         }
@@ -131,7 +131,7 @@ public:
             saltBuf.reduce_size(mSaltOverride.value().size());
             return CHIP_NO_ERROR;
         }
-        else if (mCommissionableDataProvider)
+        if (mCommissionableDataProvider)
         {
             return mCommissionableDataProvider->GetSpake2pSalt(saltBuf);
         }
@@ -164,7 +164,7 @@ public:
             verifierBuf.reduce_size(mVerifierOverride.value().size());
             return CHIP_NO_ERROR;
         }
-        else if (mCommissionableDataProvider)
+        if (mCommissionableDataProvider)
         {
             return mCommissionableDataProvider->GetSpake2pVerifier(verifierBuf, outVerifierLen);
         }
