@@ -62,8 +62,8 @@ configuration from it. Some actions required before establishing full
 communication are described below.
 
 The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
-The device works as a Thread Synchronized Sleepy End Device.
+performing over-the-air Device Firmware Upgrade using Bluetooth LE. The device
+works as a Thread Synchronized Sleepy End Device.
 
 ### Bluetooth LE advertising
 
