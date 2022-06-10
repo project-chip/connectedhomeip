@@ -270,22 +270,18 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         return;
     }
 
-    // If we found a handler or we need to send an ack, create an exchange to
-    // handle the message.
-    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
+    // If we found a handler, create an exchange to handle the message.
+    if (matchingUMH != nullptr)
     {
         ExchangeDelegate * delegate = nullptr;
 
         // Fetch delegate from the handler
-        if (matchingUMH != nullptr)
+        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+        if (err != CHIP_NO_ERROR)
         {
-            CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
-            if (err != CHIP_NO_ERROR)
-            {
-                // Using same error message for all errors to reduce code size.
-                ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
-                return;
-            }
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+            return;
         }
 
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
@@ -297,7 +293,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         if (ec == nullptr)
         {
-            if (matchingUMH != nullptr && delegate != nullptr)
+            if (delegate != nullptr)
             {
                 matchingUMH->Handler->OnExchangeCreationFailed(delegate);
             }
@@ -310,24 +306,45 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
+        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            ec->Close();
+            return;
+        }
+
+        err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
+        if (err != CHIP_NO_ERROR)
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        }
+        return;
+    }
+
+    // If we need to send a StandaloneAck, create a StandaloneExchange for the purpose to send the StandaloneAck
+    if (payloadHeader.NeedsAck())
+    {
+        // If rcvd msg is from initiator then this exchange is created as not Initiator.
+        // If rcvd msg is not from initiator then this exchange is created as Initiator.
+        // Create a StandaloneExchange to generate a StandaloneAck
+        ExchangeContext * ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(),
+                                                         nullptr, true /* IsStandaloneExchange */);
+
+        if (ec == nullptr)
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            return;
+        }
+
+        ChipLogDetail(ExchangeManager, "Generating StandaloneAck via exchange: " ChipLogFormatExchange, ChipLogValueExchange(ec));
+
         // Make sure the exchange stays alive through the code below even if we
         // close it before calling HandleMessage.
         ExchangeHandle ref(*ec);
 
-        // Ignore encryption-required mismatches for emphemeral exchanges,
-        // because those never have delegates anyway.
-        if (matchingUMH != nullptr && ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
-        {
-            // We want to still to do MRP processing for this message, but we do
-            // not want to deliver it to the application.  Just close the
-            // exchange (which will notify the delegate, null it out, etc), then
-            // go ahead and call HandleMessage() on it to do the MRP
-            // processing.null out the delegate on the exchange, pretend to
-            // matchingUMH that exchange creation failed, so it cleans up the
-            // delegate, then tell the exchagne to handle the message.
-            ChipLogProgress(ExchangeManager, "OnMessageReceived encryption mismatch");
-            ec->Close();
-        }
+        // No need to verify packet encryption type, the StandaloneExchange can handle both secure and insecure messages.
 
         CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
@@ -335,6 +352,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
         }
+
+        // The exchange should be closed inside HandleMessage function. So don't bother close it here.
+        return;
     }
 }
 
