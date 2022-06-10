@@ -63,15 +63,14 @@ CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoi
 {
     std::vector<EndpointListInfo> infoList = GetEndpointListInfo(endpoint);
 
-    CHIP_ERROR err =  aEncoder.EncodeList([&endpoint, &infoList](const auto & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, &infoList](const auto & encoder) -> CHIP_ERROR {
         for (auto info : infoList)
         {
             BridgedActions::Structs::EndpointListStruct::Type endpointListStruct = {
-                info.GetEndpointListId(),
-                CharSpan::fromCharString(info.GetName().c_str()),
-                info.GetType(),
-                DataModel::List<chip::EndpointId>(info.GetEndpointListData(), info.GetEndpointListSize()) };
-           ReturnErrorOnFailure(encoder.Encode(endpointListStruct));
+                info.GetEndpointListId(), CharSpan::fromCharString(info.GetName().c_str()), info.GetType(),
+                DataModel::List<chip::EndpointId>(info.GetEndpointListData(), info.GetEndpointListSize())
+            };
+            ReturnErrorOnFailure(encoder.Encode(endpointListStruct));
         }
         return CHIP_NO_ERROR;
     });

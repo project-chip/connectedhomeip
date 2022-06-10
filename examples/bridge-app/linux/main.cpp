@@ -66,7 +66,7 @@ const int kDescriptorAttributeArraySize = 254;
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
-std::vector<Room*> gRooms;
+std::vector<Room *> gRooms;
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================

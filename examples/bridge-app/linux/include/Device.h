@@ -31,7 +31,7 @@ using namespace chip::app::Clusters::BridgedActions;
 class Device
 {
 public:
-    static const int kDeviceNameSize     = 32;
+    static const int kDeviceNameSize = 32;
 
     enum Changed_t
     {

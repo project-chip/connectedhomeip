@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::BridgedActions;
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
     strncpy(mName, szDeviceName, sizeof(mName));
-    mLocation = szLocation;
+    mLocation   = szLocation;
     mReachable  = false;
     mEndpointId = 0;
 }
@@ -237,15 +237,16 @@ void DevicePowerSource::SetDescription(std::string aDescription)
 EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type)
 {
     mEndpointListId = endpointListId;
-    mName = name;
-    mType = type;
+    mName           = name;
+    mType           = type;
 }
 
-EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type, chip::EndpointId endpointId)
+EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type,
+                                   chip::EndpointId endpointId)
 {
     mEndpointListId = endpointListId;
-    mName = name;
-    mType = type;
+    mName           = name;
+    mType           = type;
     mEndpoints.push_back(endpointId);
 }
 
@@ -256,8 +257,8 @@ void EndpointListInfo::AddEndpointId(chip::EndpointId endpointId)
 
 Room::Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type, bool isVisible)
 {
-    mName = name;
+    mName           = name;
     mEndpointListId = endpointListId;
-    mType = type;
-    mIsVisible = isVisible;
+    mType           = type;
+    mIsVisible      = isVisible;
 }
