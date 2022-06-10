@@ -46,7 +46,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler: public Messaging::ExchangeDelegate
+class CommandHandler : public Messaging::ExchangeDelegate
 {
 public:
     /*

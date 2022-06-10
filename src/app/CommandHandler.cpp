@@ -170,7 +170,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
 }
 
 CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                           System::PacketBufferHandle && aPayload)
+                                             System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
     StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
@@ -178,9 +178,7 @@ CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExch
     return CHIP_NO_ERROR;
 }
 
-void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
-{
-}
+void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) {}
 
 void CommandHandler::Close()
 {
