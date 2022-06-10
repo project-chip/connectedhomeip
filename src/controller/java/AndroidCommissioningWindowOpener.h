@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <jni.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <jni.h>
 
 namespace chip {
 namespace Controller {
@@ -33,13 +33,14 @@ class AndroidCommissioningWindowOpener : private CommissioningWindowOpener
 public:
     // Takes the same arguments as CommissioningWindowOpener::OpenBasicCommissioningWindow except without the
     // callback.
-    static CHIP_ERROR OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
-                                                   System::Clock::Seconds16 timeout, jobject jcallback);
+    static CHIP_ERROR OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId, System::Clock::Seconds16 timeout,
+                                                   jobject jcallback);
     // Takes the same arguments as CommissioningWindowOpener::OpenCommissioningWindow except without the
     // callback.
     static CHIP_ERROR OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, System::Clock::Seconds16 timeout,
                                               uint32_t iteration, uint16_t discriminator, Optional<uint32_t> setupPIN,
-                                              Optional<ByteSpan> salt, jobject jcallback, SetupPayload & payload, bool readVIDPIDAttributes = false);
+                                              Optional<ByteSpan> salt, jobject jcallback, SetupPayload & payload,
+                                              bool readVIDPIDAttributes = false);
 
 private:
     AndroidCommissioningWindowOpener(DeviceController * controller, jobject javaCallbackObject);
