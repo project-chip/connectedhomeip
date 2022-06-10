@@ -31,9 +31,9 @@ using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
 namespace {
-    jmethodID sOnSuccessMethod = nullptr;
-    jmethodID sOnErrorMethod = nullptr;
-}
+jmethodID sOnSuccessMethod = nullptr;
+jmethodID sOnErrorMethod   = nullptr;
+} // namespace
 namespace chip {
 namespace Controller {
 
@@ -41,21 +41,19 @@ AndroidCommissioningWindowOpener::AndroidCommissioningWindowOpener(DeviceControl
     CommissioningWindowOpener(controller), mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
     mOnOpenBasicCommissioningWindowCallback(OnOpenBasicCommissioningWindowResponse, this)
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env  = JniReferences::GetInstance().GetEnvForCurrentThread();
     mJavaCallback = env->NewGlobalRef(jCallbackObject);
 
     jclass callbackClass = env->GetObjectClass(jCallbackObject);
 
-    sOnSuccessMethod =
-        env->GetMethodID(callbackClass, "onSuccess", "(JLjava/lang/String;Ljava/lang/String;)V");
+    sOnSuccessMethod = env->GetMethodID(callbackClass, "onSuccess", "(JLjava/lang/String;Ljava/lang/String;)V");
     if (sOnSuccessMethod == nullptr)
     {
         ChipLogError(Controller, "Failed to access callback 'onSuccess' method");
         env->ExceptionClear();
     }
 
-    sOnErrorMethod =
-        env->GetMethodID(callbackClass, "onError", "(IJ)V");
+    sOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(IJ)V");
     if (sOnErrorMethod == nullptr)
     {
         ChipLogError(Controller, "Failed to access callback 'onError' method");
@@ -63,14 +61,15 @@ AndroidCommissioningWindowOpener::AndroidCommissioningWindowOpener(DeviceControl
     }
 }
 
-AndroidCommissioningWindowOpener::~AndroidCommissioningWindowOpener() {
+AndroidCommissioningWindowOpener::~AndroidCommissioningWindowOpener()
+{
     ChipLogError(Controller, "Delete AndroidCommissioningWindowOpener");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     env->DeleteGlobalRef(mJavaCallback);
 }
 
 CHIP_ERROR AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
-                                                                       Seconds16 timeout, jobject jcallback)
+                                                                          Seconds16 timeout, jobject jcallback)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AndroidCommissioningWindowOpener(controller, jcallback);
@@ -89,10 +88,11 @@ CHIP_ERROR AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(Device
     return err;
 }
 
-CHIP_ERROR AndroidCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, Seconds16 timeout,
-                                                                  uint32_t iteration, uint16_t discriminator,
-                                                                  Optional<uint32_t> setupPIN, Optional<ByteSpan> salt, jobject jcallback,
-                                                                  SetupPayload & payload, bool readVIDPIDAttributes)
+CHIP_ERROR AndroidCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId,
+                                                                     Seconds16 timeout, uint32_t iteration, uint16_t discriminator,
+                                                                     Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                                                     jobject jcallback, SetupPayload & payload,
+                                                                     bool readVIDPIDAttributes)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AndroidCommissioningWindowOpener(controller, jcallback);
@@ -113,27 +113,34 @@ CHIP_ERROR AndroidCommissioningWindowOpener::OpenCommissioningWindow(DeviceContr
 }
 
 void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status,
-                                                                      chip::SetupPayload payload)
+                                                                         chip::SetupPayload payload)
 {
-    auto * self = static_cast<AndroidCommissioningWindowOpener *>(context);
+    auto * self    = static_cast<AndroidCommissioningWindowOpener *>(context);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (status == CHIP_NO_ERROR) {
+    if (status == CHIP_NO_ERROR)
+    {
         std::string QRCode;
         std::string manualPairingCode;
 
         err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
         err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
-        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr) {
+        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr)
+        {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             UtfString jManualPairingCode(env, manualPairingCode.c_str());
             UtfString jQRCode(env, QRCode.c_str());
-            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(), jQRCode.jniValue());
+            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
+                                jQRCode.jniValue());
         }
-    } else {
-        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr) {
+    }
+    else
+    {
+        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr)
+        {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()), static_cast<jlong>(deviceId));
+            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()),
+                                static_cast<jlong>(deviceId));
         }
     }
     delete self;
@@ -142,22 +149,28 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
 void AndroidCommissioningWindowOpener::OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status)
 {
     auto * self = static_cast<AndroidCommissioningWindowOpener *>(context);
-    if (status == CHIP_NO_ERROR) {
-        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr) {
+    if (status == CHIP_NO_ERROR)
+    {
+        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr)
+        {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             UtfString jManualPairingCode(env, "");
             UtfString jQRCode(env, "");
-            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(), jQRCode.jniValue());
+            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
+                                jQRCode.jniValue());
         }
-    } else {
-        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr) {
+    }
+    else
+    {
+        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr)
+        {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()), static_cast<jlong>(deviceId));
+            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()),
+                                static_cast<jlong>(deviceId));
         }
     }
     delete self;
 }
-
 
 } // namespace Controller
 } // namespace chip

@@ -679,7 +679,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     return true;
 }
 
-JNI_METHOD(jboolean, openPairingWindowCallback)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jobject jcallback)
+JNI_METHOD(jboolean, openPairingWindowCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jobject jcallback)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -694,7 +695,7 @@ JNI_METHOD(jboolean, openPairingWindowCallback)(JNIEnv * env, jobject self, jlon
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     err = AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
-                                                                      System::Clock::Seconds16(duration), jcallback);
+                                                                         System::Clock::Seconds16(duration), jcallback);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -706,7 +707,8 @@ JNI_METHOD(jboolean, openPairingWindowCallback)(JNIEnv * env, jobject self, jlon
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode, jobject jcallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
+ jobject jcallback)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
