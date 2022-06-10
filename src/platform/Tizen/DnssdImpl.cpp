@@ -90,7 +90,6 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
         return;
     }
 
-    rCtx->mIsRegistered = true;
     rCtx->mCallback(rCtx->mCbContext, rCtx->mType, CHIP_NO_ERROR);
 }
 
@@ -105,6 +104,7 @@ gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
     VerifyOrReturnError(ret == DNSSD_ERROR_NONE,
                         (ChipLogError(DeviceLayer, "dnssd_register_local_service() failed. ret: %d", ret), false));
 
+    rCtx->mIsRegistered = true;
     return true;
 }
 
