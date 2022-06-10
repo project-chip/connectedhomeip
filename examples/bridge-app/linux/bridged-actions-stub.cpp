@@ -24,6 +24,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "Device.h"
+#include "main.h"
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -58,8 +61,21 @@ CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
+    std::vector<EndpointListInfo> infoList = GetEndpointListInfo(endpoint);
+
+    CHIP_ERROR err =  aEncoder.EncodeList([&endpoint, &infoList](const auto & encoder) -> CHIP_ERROR {
+        for (auto info : infoList)
+        {
+            BridgedActions::Structs::EndpointListStruct::Type endpointListStruct = {
+                info.GetEndpointListId(),
+                CharSpan::fromCharString(info.GetName().c_str()),
+                info.GetType(),
+                DataModel::List<chip::EndpointId>(info.GetEndpointListData(), info.GetEndpointListSize()) };
+           ReturnErrorOnFailure(encoder.Encode(endpointListStruct));
+        }
+        return CHIP_NO_ERROR;
+    });
+    return err;
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
