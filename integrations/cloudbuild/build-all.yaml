@@ -18,7 +18,7 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*' --skip-target-glob '*-tests' build
+              --target-glob '*' --skip-target-glob '{tizen-*,*-tests}' build
               --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
