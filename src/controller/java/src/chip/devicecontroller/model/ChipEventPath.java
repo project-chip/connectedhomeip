@@ -61,11 +61,7 @@ public class ChipEventPath {
   @Override
   public String toString() {
     return String.format(
-        Locale.ENGLISH,
-        "Endpoint %s, cluster %s, event %s",
-        endpointId,
-        clusterId,
-        eventId);
+        Locale.ENGLISH, "Endpoint %s, cluster %s, event %s", endpointId, clusterId, eventId);
   }
 
   public static ChipEventPath newInstance(
