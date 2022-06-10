@@ -117,6 +117,13 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             continue;
                         }
 
+                        if (ConnectivityManagerImpl::GetWiFiIfName() == nullptr)
+                        {
+                            ChipLogDetail(DeviceLayer, "WiFi device not init. Ignore IP update event");
+                            continue;
+                        }
+
+
                         if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
