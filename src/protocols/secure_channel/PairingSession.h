@@ -63,11 +63,27 @@ public:
         return localSessionId;
     }
 
+    /**
+     * Copy the underlying session (if present) into a SessionHandle that a caller can use to
+     * obtain a reference to the session.
+     */
+    Optional<SessionHandle> CopySecureSession()
+    {
+        if (mSecureSessionHolder)
+        {
+            VerifyOrDie(mSecureSessionHolder->GetSessionType() == Transport::Session::SessionType::kSecure);
+            return MakeOptional<SessionHandle>(*mSecureSessionHolder->AsSecureSession());
+        }
+
+        return Optional<SessionHandle>::Missing();
+    }
+
     uint16_t GetPeerSessionId() const
     {
         VerifyOrDie(mPeerSessionId.HasValue());
         return mPeerSessionId.Value();
     }
+
     bool IsValidPeerSessionId() const { return mPeerSessionId.HasValue(); }
 
     /**
@@ -93,10 +109,14 @@ protected:
      * Allocate a secure session object from the passed session manager for the
      * pending session establishment operation.
      *
-     * @param sessionManager session manager from which to allocate a secure session object
+     * @param sessionManager        Session manager from which to allocate a secure session object
+     * @param sessionEvictionHint   If we're either establishing or just finished establishing a session to a peer in either
+     * initiator or responder roles, the node id of that peer should be provided in this argument. Else, it should be initialized to
+     * a default-constructed ScopedNodeId().
+     *
      * @return CHIP_ERROR The outcome of the allocation attempt
      */
-    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
+    CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint = ScopedNodeId());
 
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
 

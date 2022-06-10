@@ -75,12 +75,17 @@ public:
      * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
+     * @param previouslyEstablishedPeer     If a session had previously been established successfully to a peer, this should
+     *                                      be set to its scoped node-id. Else, this should be initialized to a
+     *                                      default-constructed ScopedNodeId().
+     * @param mrpConfig                     MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(
+    CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+        ScopedNodeId previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -181,8 +186,17 @@ private:
         kFinishedViaResume = 7,
     };
 
+    /*
+     * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be
+     * notified of any further progress on this session.
+     *
+     * If we're either establishing or finished establishing a session to a peer in either initiator or responder
+     * roles, the node id of that peer should be provided in sessionEvictionHint. Else, it should be initialized
+     * to a default-constructed ScopedNodeId().
+     *
+     */
     CHIP_ERROR Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
-                    SessionEstablishmentDelegate * delegate);
+                    SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();

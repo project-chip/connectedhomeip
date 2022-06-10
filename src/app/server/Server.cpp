@@ -348,6 +348,7 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();

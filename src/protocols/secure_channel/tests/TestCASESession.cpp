@@ -198,13 +198,14 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     pairing.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr) ==
+                   pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId()) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate) ==
+                   pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId()) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.ListenForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate) == CHIP_NO_ERROR);
+                   pairing.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId()) ==
+                       CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -283,9 +284,9 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 
     pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.ListenForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
-                                                                  &delegateAccessory,
-                                                                  MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
+                   pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateAccessory, ScopedNodeId(),
+                                                                   MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01,
                                                         contextCommissioner, nullptr, nullptr, &delegateCommissioner,
@@ -847,6 +848,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
  */
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
+    gPairingServer.Shutdown();
     gCommissionerStorageDelegate.ClearStorage();
     gDeviceStorageDelegate.ClearStorage();
     gCommissionerFabrics.DeleteAllFabrics();
