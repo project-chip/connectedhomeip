@@ -53,7 +53,7 @@ public:
     virtual Type GetType() const                           = 0;
     virtual CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) = 0; /** Advance the counter, and feed the new counter to fetch */
 
-    // Note: this function must be called after Crypto is initialized. It can not be call from global variable constructor.
+    // Note: this function must be called after Crypto is initialized. It can not be called from global variable constructor.
     static uint32_t GetDefaultInitialValuePredecessor() { return Crypto::GetRandU32() & kMessageCounterRandomInitMask; }
 };
 
