@@ -311,6 +311,13 @@ public:
             response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
         }
 
+        if (DeviceLayer::ConfigurationMgr().GetSoftwareVersionString(response.software_version_string,
+                                                                     sizeof(response.software_version_string)) != CHIP_NO_ERROR)
+        {
+            snprintf(response.software_version_string, sizeof(response.software_version_string),
+                     CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        }
+
         uint32_t code;
         if (DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(code) == CHIP_NO_ERROR)
         {
@@ -325,7 +332,7 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
