@@ -41,10 +41,14 @@ public:
      */
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
 
-    CHIP_ERROR DisarmFailSafe();
+    /**
+     * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete
+     */
+    void DisarmFailSafe();
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
     CHIP_ERROR SetUpdateNocCommandInvoked();
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
+    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
 
     /**
      * @brief
@@ -74,6 +78,7 @@ public:
     bool AddNocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked; }
     bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
     bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
+    bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
 
     FabricIndex GetFabricIndex() const
     {
@@ -94,7 +99,9 @@ private:
     bool mAddNocCommandHasBeenInvoked      = false;
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
-    FabricIndex mFabricIndex               = kUndefinedFabricIndex;
+    // The fact of whether a CSR occurred at all is stored elsewhere.
+    bool mIsCsrRequestForUpdateNoc = false;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
@@ -125,6 +132,8 @@ private:
         mAddNocCommandHasBeenInvoked      = false;
         mUpdateNocCommandHasBeenInvoked   = false;
         mAddTrustedRootCertHasBeenInvoked = false;
+        mFailSafeBusy                     = false;
+        mIsCsrRequestForUpdateNoc         = false;
     }
 
     void FailSafeTimerExpired();

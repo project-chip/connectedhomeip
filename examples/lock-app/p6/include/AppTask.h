@@ -50,6 +50,7 @@ public:
 
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     void UpdateClusterState(void);
+    void InitOTARequestor();
 
 private:
     friend AppTask & GetAppTask(void);

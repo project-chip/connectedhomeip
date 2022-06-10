@@ -125,6 +125,8 @@ void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
+void InteractionModel::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) {}
+
 /////////// WriteClient Callback Interface /////////
 void InteractionModel::OnResponse(const WriteClient * client, const ConcreteDataAttributePath & path, StatusIB status)
 {

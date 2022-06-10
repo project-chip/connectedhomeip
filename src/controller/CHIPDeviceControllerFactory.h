@@ -77,16 +77,18 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage and group data provider here should be removed.
-// We're blocked because of the need to support !CHIP_DEVICE_LAYER
+// TODO everything other than the fabric storage, group data provider and OperationalKeystore
+//  here should be removed. We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
-    System::Layer * systemLayer                                   = nullptr;
-    PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider            = nullptr;
-    Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
-    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    FabricTable * fabricTable                                     = nullptr;
+    System::Layer * systemLayer                                        = nullptr;
+    PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
+    Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
+    FabricTable * fabricTable                                          = nullptr;
+    OperationalKeystore * operationalKeystore                          = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -212,6 +214,7 @@ private:
     uint16_t mListenPort;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore    = nullptr;
     bool mEnableServerInteractions                        = false;
 };
 

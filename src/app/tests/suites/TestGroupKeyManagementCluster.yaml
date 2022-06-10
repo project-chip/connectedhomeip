@@ -223,6 +223,35 @@ tests:
                         EpochStartTime2: 2110002,
                     }
 
+    - label: "Remove Group 1"
+      cluster: "Groups"
+      endpoint: 1
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "Read GroupTable 2"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+              ]
+
     - label: "Remove All"
       cluster: "Groups"
       endpoint: 1

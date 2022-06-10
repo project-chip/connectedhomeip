@@ -34,7 +34,8 @@ def get_identity():
             "No valid identity has been found. Application will run without entitlements.")
         exit(0)
 
-    identity = re.search(r'\b[0-9a-fA-F]{40}\b', command_result)
+    command_result = command_result.replace("\\n", "\n")
+    identity = re.search(r'\b[0-9a-fA-F]{40}\b(?![^\n]*\(CSSMERR_TP_CERT_EXPIRED\))', command_result)
     if identity is None:
         print(
             "No valid identity has been found. Application will run without entitlements.")

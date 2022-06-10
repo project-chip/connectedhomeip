@@ -41,6 +41,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -124,13 +125,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
+    mOperationalKeystore      = initParams.operationalKeystore;
+
+    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    err = mFabrics.Init(mDeviceStorage);
+    err = mFabrics.Init(mDeviceStorage, mOperationalKeystore);
     SuccessOrExit(err);
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
@@ -155,6 +159,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler(&mExchangeMgr);
+
+    // Clean-up previously standing fail-safes
+    InitFailSafe();
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -255,6 +262,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
+            .certificateValidityPolicy = mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
@@ -266,8 +274,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err =
-        mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
+    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
+                                                    mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -292,6 +300,39 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
+}
+
+void Server::InitFailSafe()
+{
+    bool failSafeArmed = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
+    // which the fail-safe timer was armed.
+    if (DeviceLayer::ConfigurationMgr().GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    {
+        FabricIndex fabricIndex;
+        bool addNocCommandInvoked;
+        bool updateNocCommandInvoked;
+
+        ChipLogProgress(AppServer, "Detected fail-safe armed on reboot");
+
+        err = DeviceLayer::FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(
+                fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        }
+        else
+        {
+            // This should not happen, but we should not fail system init based on it!
+            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!",
+                         err.Format());
+            (void) DeviceLayer::ConfigurationMgr().SetFailSafeArmed(false);
+            err = CHIP_NO_ERROR;
+        }
+    }
 }
 
 void Server::RejoinExistingMulticastGroups()
@@ -345,6 +386,7 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();

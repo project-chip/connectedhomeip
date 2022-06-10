@@ -132,7 +132,7 @@ class MockSessionEstablishmentExchangeDispatch : public Messaging::ApplicationEx
 public:
     bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
 
-    bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
+    bool MessagePermitted(Protocols::Id protocol, uint8_t type) override { return true; }
 
     bool IsEncryptionRequired() const override { return mRequireEncryption; }
 

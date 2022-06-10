@@ -190,20 +190,14 @@ public:
         Exit("Unexpected deletion of pairing");
     }
 
-    void PairingComplete(chip::NodeId nodeId, NSError * _Nullable error)
+    void PairingComplete(chip::NodeId nodeId)
     {
-        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-        if (err != CHIP_NO_ERROR) {
-            Exit("Pairing completed with error", err);
-            return;
-        }
-
         CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
         [controller commissionDevice:nodeId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
-        err = [CHIPError errorToCHIPErrorCode:commissionError];
+        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:commissionError];
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
             return;
@@ -325,6 +319,38 @@ protected:
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
     }
 
+    using ConstraintsChecker::CheckConstraintMinValue;
+
+    // Used when the minValue is a saved variable, since ConstraintsChecker does
+    // not expect Core Foundation types.
+    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected longLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    using ConstraintsChecker::CheckConstraintMaxValue;
+
+    // Used when the maxValue is a saved variable, since ConstraintsChecker does
+    // not expect Core Foundation types.
+    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected longLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
     bool CheckValueAsString(const char * _Nonnull itemName, const id _Nonnull current, const NSString * _Nonnull expected)
     {
         NSString * data = current;
@@ -428,7 +454,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (_active) {
-        _commandBridge->PairingComplete(_deviceId, error);
+        if (error != nil) {
+            _active = NO;
+            NSLog(@"Pairing complete with error");
+            CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+            _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
+        } else {
+            _commandBridge->PairingComplete(_deviceId);
+        }
     }
 }
 

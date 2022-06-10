@@ -27,3 +27,48 @@ source_set("trace_handlers") {
 
   public_configs = [ ":default_config" ]
 }
+
+source_set("trace_handlers_decoder") {
+  sources = [
+    "TraceDecoder.cpp",
+    "TraceHandlers.cpp",
+    "decoder/TraceDecoderProtocols.cpp",
+    "decoder/bdx/Decoder.cpp",
+    "decoder/echo/Decoder.cpp",
+    "decoder/interaction_model/Decoder.cpp",
+    "decoder/interaction_model/DecoderCustomLog.cpp",
+    "decoder/logging/Log.cpp",
+    "decoder/logging/ToCertificateString.cpp",
+    "decoder/secure_channel/Decoder.cpp",
+    "decoder/udc/Decoder.cpp",
+  ]
+
+  public_configs = [ ":default_config" ]
+
+  deps = [ "${chip_root}/src/lib" ]
+  public_deps = [ "${chip_root}/third_party/jsoncpp" ]
+}
+
+executable("chip-trace-decoder") {
+  sources = [
+    "TraceDecoder.cpp",
+    "TraceDecoderArgumentParser.cpp",
+    "decoder/TraceDecoderProtocols.cpp",
+    "decoder/bdx/Decoder.cpp",
+    "decoder/echo/Decoder.cpp",
+    "decoder/interaction_model/Decoder.cpp",
+    "decoder/interaction_model/DecoderCustomLog.cpp",
+    "decoder/logging/Log.cpp",
+    "decoder/logging/ToCertificateString.cpp",
+    "decoder/secure_channel/Decoder.cpp",
+    "decoder/udc/Decoder.cpp",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+}

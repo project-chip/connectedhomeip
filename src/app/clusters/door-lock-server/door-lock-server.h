@@ -168,6 +168,11 @@ public:
 
     inline bool SupportsSchedules(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kAccessSchedules); }
 
+    inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
+    {
+        return HasFeature(endpointId, DoorLockFeature::kCredentialsOTA);
+    }
+
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]

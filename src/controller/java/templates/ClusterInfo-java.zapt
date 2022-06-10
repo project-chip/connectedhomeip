@@ -307,7 +307,7 @@ public class ClusterInfoMapping {
      {{#chip_cluster_command_arguments}}
      {{#if_is_struct type}}
      {{else}}
-       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaType type null parent.parent.name removeGenericType=true}}.class);
+       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaType type null parent.parent.name removeGenericType=true}}.class, {{asJavaType type null parent.parent.name underlyingType=true}}.class);
        {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
      {{#not_last}} {{/not_last}}
      {{/if_is_struct}}

@@ -29,18 +29,18 @@
 namespace chip {
 
 /**
- * MessageCounter represents a local message counter. There are 3 types
- * of message counter
+ * MessageCounter represents a local message counter. There are 2 types of message counter
  *
  * 1. Global unencrypted message counter
- * 2. Global encrypted message counter
- * 3. Session message counter
+ * 2. Secure session message counter
  *
  * There will be separate implementations for each type
  */
 class MessageCounter
 {
 public:
+    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
+
     enum Type : uint8_t
     {
         GlobalUnencrypted,
@@ -50,53 +50,62 @@ public:
 
     virtual ~MessageCounter() = default;
 
-    virtual Type GetType() const   = 0;
-    virtual uint32_t Value() const = 0; /** Get current value */
-    virtual CHIP_ERROR Advance()   = 0; /** Advance the counter */
+    virtual Type GetType() const                           = 0;
+    virtual CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) = 0; /** Advance the counter, and feed the new counter to fetch */
+
+    // Note: this function must be called after Crypto is initialized. It can not be called from global variable constructor.
+    static uint32_t GetDefaultInitialValuePredecessor() { return Crypto::GetRandU32() & kMessageCounterRandomInitMask; }
 };
 
 class GlobalUnencryptedMessageCounter : public MessageCounter
 {
 public:
-    GlobalUnencryptedMessageCounter() : mValue(0) {}
+    GlobalUnencryptedMessageCounter() : mLastUsedValue(0) {}
 
-    void Init();
+    void Init() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
 
     Type GetType() const override { return GlobalUnencrypted; }
-    uint32_t Value() const override { return mValue; }
-    CHIP_ERROR Advance() override
+    CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override
     {
-        ++mValue;
+        fetch = ++mLastUsedValue;
         return CHIP_NO_ERROR;
     }
 
 private:
-    uint32_t mValue;
+    uint32_t mLastUsedValue;
 };
 
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialSyncValue             = 0;          ///< Used for initializing peer counter
-    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
+    static constexpr uint32_t kMessageCounterMax = 0xFFFFFFFF;
 
     /**
      * Initialize a local message counter with random value between [1, 2^28]. This increases the difficulty of traffic analysis
      * attacks by making it harder to determine how long a particular session has been open. The initial counter is always 1 or
      * higher to guarantee first message is always greater than initial peer counter set to 0.
+     *
+     * The mLastUsedValue is the predecessor of the initial value, it will be advanced before using, so don't need to add 1 here.
      */
-    LocalSessionMessageCounter() { mValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1; }
+    LocalSessionMessageCounter() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
 
     Type GetType() const override { return Session; }
-    uint32_t Value() const override { return mValue; }
-    CHIP_ERROR Advance() override
+    CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override
     {
-        ++mValue;
+        if (mLastUsedValue == kMessageCounterMax)
+        {
+            return CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED;
+        }
+
+        fetch = ++mLastUsedValue;
         return CHIP_NO_ERROR;
     }
 
+    // Test-only function to set the counter value
+    void TestSetCounter(uint32_t value) { mLastUsedValue = value; }
+
 private:
-    uint32_t mValue;
+    uint32_t mLastUsedValue;
 };
 
 } // namespace chip

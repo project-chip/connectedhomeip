@@ -1449,13 +1449,17 @@ public class ChipStructs {
 
   public static class SoftwareDiagnosticsClusterThreadMetrics {
     public Long id;
-    public String name;
-    public Long stackFreeCurrent;
-    public Long stackFreeMinimum;
-    public Long stackSize;
+    public Optional<String> name;
+    public Optional<Long> stackFreeCurrent;
+    public Optional<Long> stackFreeMinimum;
+    public Optional<Long> stackSize;
 
     public SoftwareDiagnosticsClusterThreadMetrics(
-        Long id, String name, Long stackFreeCurrent, Long stackFreeMinimum, Long stackSize) {
+        Long id,
+        Optional<String> name,
+        Optional<Long> stackFreeCurrent,
+        Optional<Long> stackFreeMinimum,
+        Optional<Long> stackSize) {
       this.id = id;
       this.name = name;
       this.stackFreeCurrent = stackFreeCurrent;
@@ -1821,23 +1825,23 @@ public class ChipStructs {
   }
 
   public static class TestClusterClusterTestListStructOctet {
-    public Long fabricIndex;
-    public byte[] operationalCert;
+    public Long member1;
+    public byte[] member2;
 
-    public TestClusterClusterTestListStructOctet(Long fabricIndex, byte[] operationalCert) {
-      this.fabricIndex = fabricIndex;
-      this.operationalCert = operationalCert;
+    public TestClusterClusterTestListStructOctet(Long member1, byte[] member2) {
+      this.member1 = member1;
+      this.member2 = member2;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("TestClusterClusterTestListStructOctet {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
+      output.append("\tmember1: ");
+      output.append(member1);
       output.append("\n");
-      output.append("\toperationalCert: ");
-      output.append(Arrays.toString(operationalCert));
+      output.append("\tmember2: ");
+      output.append(Arrays.toString(member2));
       output.append("\n");
       output.append("}\n");
       return output.toString();

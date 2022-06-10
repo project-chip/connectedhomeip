@@ -82,16 +82,17 @@ struct DeviceControllerSystemStateParams
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
-    DeviceTransportMgr * transportMgr                             = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage           = nullptr;
-    SessionManager * sessionMgr                                   = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                      = nullptr;
-    secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    CASEServer * caseServer                                       = nullptr;
-    CASESessionManager * caseSessionManager                       = nullptr;
-    OperationalDevicePool * operationalDevicePool                 = nullptr;
-    CASEClientPool * caseClientPool                               = nullptr;
-    FabricTable::Delegate * fabricTableDelegate                   = nullptr;
+    DeviceTransportMgr * transportMgr                                  = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    SessionManager * sessionMgr                                        = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
+    secure_channel::MessageCounterManager * messageCounterManager      = nullptr;
+    CASEServer * caseServer                                            = nullptr;
+    CASESessionManager * caseSessionManager                            = nullptr;
+    OperationalDevicePool * operationalDevicePool                      = nullptr;
+    CASEClientPool * caseClientPool                                    = nullptr;
+    FabricTable::Delegate * fabricTableDelegate                        = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
