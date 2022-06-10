@@ -116,6 +116,6 @@ which run in parallel.
 These jobs use a platform-specific image with base `chip-build`.
 
 The build jobs call chef with the options `--ci -t <PLATFORM>`. The `--ci`
-option will execute builds for all devices specified in `_CI_ALLOW_LIST` defined
-in `chef.py` (so long as these devices are also in `/devices`) on the specified
-platform.
+option will execute builds for all devices specified in
+`cicd_config["ci_allow_list"]` defined in `chef.py` (so long as these devices
+are also in `/devices`) on the specified platform.

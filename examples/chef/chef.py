@@ -40,8 +40,8 @@ _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswit
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
 _CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
-_CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
-_CI_ALLOW_LIST = ["lighting-app"]
+_CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
+_CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -116,11 +116,12 @@ def check_zap() -> str:
 
 
 def generate_device_manifest(
-        write_manifest_file: bool = False) -> Dict[str, Any]:
-    """Produces dictionary containing md5 of device dir zap files.
+        write_manifest_files: bool = False) -> Dict[str, Any]:
+    """Produces dictionary containing md5 of device dir zap files
+    and zap commit.
 
     Args:
-        write_manifest_file: Serialize manifest in tree.
+        write_manifest_files: Serialize digests in tree.
     Returns:
         Dict containing MD5 of device dir zap files.
     """
@@ -135,7 +136,7 @@ def generate_device_manifest(
         device_file_md5 = hashlib.md5(device_file_data).hexdigest()
         devices_manifest[device_name] = device_file_md5
         flush_print(f"Current digest for {device_name} : {device_file_md5}")
-        if write_manifest_file:
+        if write_manifest_files:
             device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
             device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
             with open(device_zzz_md5_file, "w+") as md5_file:
@@ -149,12 +150,6 @@ def generate_device_manifest(
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         config = json.loads(config_file.read())
-    for platform_name, platform_config in config.items():
-        has_build_dir = "build_dir" in platform_config
-        has_plat_label = "platform_label" in platform_config
-        if not has_build_dir or not has_plat_label:
-            flush_print(f"{platform_name} CICD config missing build_dir or platform_label")
-            exit(1)
     return config
 
 
@@ -168,9 +163,116 @@ def flush_print(
         with_border: Add boarder above and below to_print.
     """
     if with_border:
-        border = ('-' * 64) + '\n'
+        border = ('-' * len(to_print)) + '\n'
         to_print = f"{border}{to_print}\n{border}"
     print(to_print, flush=True)
+
+
+def unwrap_cmd(cmd: str) -> str:
+    """Dedent and replace new line with space."""
+    return textwrap.dedent(cmd).replace("\n", " ")
+
+
+def bundle(platform: str, device_name: str) -> None:
+    """Filters files from the build output folder for CD.
+    Clears the staging dir.
+    Calls bundle_{platform}(device_name).
+    exit(1) for missing bundle_{platform}.
+
+    Args:
+        platform: The platform to bundle.
+        device_name: The example to bundle.
+    """
+    flush_print(f"Bundling {platform}", with_border=True)
+    flush_print(f"Cleaning {_CD_STAGING_DIR}")
+    shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
+    os.mkdir(_CD_STAGING_DIR)
+    bundler_name = f"bundle_{platform}"
+    if bundler_name in globals():
+        flush_print(f"Found {bundler_name}")
+        globals()[bundler_name](device_name)
+    else:
+        flush_print(f"No bundle function for {platform}!")
+        exit(1)
+
+
+#
+# Per-platform bundle functions
+#
+
+
+def bundle_linux(device_name: str) -> None:
+    linux_root = os.path.join(_CHEF_SCRIPT_PATH,
+                              "linux",
+                              "out")
+    map_file_name = f"{device_name}.map"
+    src_item = os.path.join(linux_root, device_name)
+    dest_item = os.path.join(_CD_STAGING_DIR, device_name)
+    shutil.copy(src_item, dest_item)
+    src_item = os.path.join(linux_root, map_file_name)
+    dest_item = os.path.join(_CD_STAGING_DIR, map_file_name)
+    shutil.copy(src_item, dest_item)
+
+
+def bundle_nrfconnect(device_name: str) -> None:
+    zephyr_exts = ["elf", "map", "hex"]
+    script_files = ["firmware_utils.py",
+                    "nrfconnect_firmware_utils.py"]
+    nrf_root = os.path.join(_CHEF_SCRIPT_PATH,
+                            "nrfconnect",
+                            "build",
+                            "zephyr")
+    scripts_root = os.path.join(_REPO_BASE_PATH,
+                                "scripts",
+                                "flashing")
+    gen_script_path = os.path.join(scripts_root,
+                                   "gen_flashing_script.py")
+    sub_dir = os.path.join(_CD_STAGING_DIR, device_name)
+    os.mkdir(sub_dir)
+    for zephyr_ext in zephyr_exts:
+        input_base = f"zephyr.{zephyr_ext}"
+        output_base = f"{device_name}.{zephyr_ext}"
+        src_item = os.path.join(nrf_root, input_base)
+        if zephyr_ext == "hex":
+            dest_item = os.path.join(sub_dir, output_base)
+        else:
+            dest_item = os.path.join(_CD_STAGING_DIR, output_base)
+        shutil.copy(src_item, dest_item)
+    for script_file in script_files:
+        src_item = os.path.join(scripts_root, script_file)
+        dest_item = os.path.join(sub_dir, script_file)
+        shutil.copy(src_item, dest_item)
+    shell.run_cmd(f"cd {sub_dir}")
+    command = f"""\
+    python3 {gen_script_path} nrfconnect
+    --output {device_name}.flash.py
+    --application {device_name}.hex"""
+    shell.run_cmd(unwrap_cmd(command))
+
+
+def bundle_esp32(device_name: str) -> None:
+    """Reference example for bundle_{platform}
+    functions, which should copy/move files from a build
+    output dir into _CD_STAGING_DIR to be archived.
+
+    Args:
+        device_name: The device to bundle.
+    """
+    esp_root = os.path.join(_CHEF_SCRIPT_PATH,
+                            "esp32",
+                            "build")
+    manifest_file = os.path.join(esp_root,
+                                 "chip-shell.flashbundle.txt")
+    with open(manifest_file) as manifest:
+        for item in manifest:
+            item = item.replace("\n", "")
+            if os.sep in item:
+                new_dir = item[:item.rindex(os.sep)]
+                new_dir = os.path.join(_CD_STAGING_DIR, new_dir)
+                os.makedirs(new_dir, exist_ok=True)
+            src_item = os.path.join(esp_root, item)
+            dest_item = os.path.join(_CD_STAGING_DIR, item)
+            shutil.copy(src_item, dest_item)
 
 
 def main(argv: Sequence[str]) -> None:
@@ -280,7 +382,8 @@ def main(argv: Sequence[str]) -> None:
           cd ../../..
           ./examples/chef/chef.py --generate_zzz
           git add examples/chef/zzz_generated
-        Ensure you are running with the latest version of ZAP from master!""")
+        Ensure you are running with the latest version of ZAP from master!
+        """)
         ci_manifest = generate_device_manifest()
         current_zap = ci_manifest["zap_commit"]
         for device, device_md5 in ci_manifest["devices"].items():
@@ -316,12 +419,11 @@ def main(argv: Sequence[str]) -> None:
     if options.do_bootstrap_zap:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
-            install_deps_cmd = textwrap.dedent("""\
+            install_deps_cmd = """\
             sudo apt-get install node node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
-            libjpeg9-dev libgif-dev node-typescript""")
-            install_deps_cmd = install_deps_cmd.replace("\n", " ")
-            shell.run_cmd(install_deps_cmd)
+            libjpeg9-dev libgif-dev node-typescript"""
+            shell.run_cmd(unwrap_cmd(install_deps_cmd))
         if sys.platform == "darwin":
             flush_print("Installation of ZAP OS packages not supported on MacOS")
         if sys.platform == "win32":
@@ -352,11 +454,12 @@ def main(argv: Sequence[str]) -> None:
                                           device_name,
                                           "zap-generated")
             os.makedirs(device_out_dir)
-            shell.run_cmd(textwrap.dedent(f"""\
-            {_REPO_BASE_PATH}/scripts/tools/zap/generate.py \
-            {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""))
+            command = f"""\
+            {_REPO_BASE_PATH}/scripts/tools/zap/generate.py
+            {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""
+            shell.run_cmd(unwrap_cmd(command))
             shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
-        generate_device_manifest(write_manifest_file=True)
+        generate_device_manifest(write_manifest_files=True)
         exit(0)
 
     #
@@ -364,18 +467,18 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.ci:
-        for device_name in [d for d in _DEVICE_LIST if d in _CI_ALLOW_LIST]:
+        for device_name in [d for d in _DEVICE_LIST if d in cicd_config["ci_allow_list"]]:
             if options.build_target == "nrfconnect":
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
-            # TODO call per-platform bundle function for extra validation
+            bundle(options.build_target, device_name)
         exit(0)
 
     #
-    # Build all
+    # CD
     #
 
     if options.build_all:
@@ -383,22 +486,42 @@ def main(argv: Sequence[str]) -> None:
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
         os.makedirs(archive_prefix, exist_ok=True)
+        failed_builds = []
         for device_name in _DEVICE_LIST:
-            for platform, platform_meta in cicd_config.items():
-                directory = platform_meta['build_dir']
-                label = platform_meta['platform_label']
-                output_dir = os.path.join(_CHEF_SCRIPT_PATH, directory)
+            for platform, label in cicd_config["cd_platforms"].items():
                 command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
                 flush_print(f"Building {command}", with_border=True)
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
-                shell.run_cmd(command)
-                # TODO Needs to call per-platform bundle function
+                try:
+                    shell.run_cmd(command)
+                except RuntimeError as build_fail_error:
+                    failed_builds.append((device_name, platform, "build"))
+                    flush_print(str(build_fail_error))
+                    break
+                try:
+                    bundle(platform, device_name)
+                except FileNotFoundError as bundle_fail_error:
+                    failed_builds.append((device_name, platform, "bundle"))
+                    flush_print(str(bundle_fail_error))
+                    break
                 archive_name = f"{label}-{device_name}"
                 archive_full_name = archive_prefix + archive_name + archive_suffix
                 flush_print(f"Adding build output to archive {archive_full_name}")
+                if os.path.exists(archive_full_name):
+                    os.remove(archive_full_name)
                 with tarfile.open(archive_full_name, "w:gz") as tar:
-                    tar.add(output_dir, arcname=".")
+                    tar.add(_CD_STAGING_DIR, arcname=".")
+        if len(failed_builds) == 0:
+            flush_print("No build failures", with_border=True)
+        else:
+            flush_print("Logging build failures", with_border=True)
+            for failed_build in failed_builds:
+                fail_log = f"""\
+                Device: {failed_build[0]},
+                Platform: {failed_build[1]},
+                Phase: {failed_build[2]}"""
+                flush_print(unwrap_cmd(fail_log))
         exit(0)
 
     #
