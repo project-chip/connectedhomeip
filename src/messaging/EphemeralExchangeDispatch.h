@@ -14,13 +14,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines Application Channel class. The object of this
- *      class can be used by CHIP data model cluster applications to send
- *      and receive messages. The messages are encrypted using session keys.
- */
-
 #pragma once
 
 #include <messaging/ExchangeMessageDispatch.h>
@@ -46,7 +39,7 @@ protected:
     {
         // Only permit StandaloneAck
         return (protocol == Protocols::SecureChannel::Id &&
-                type == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck));
+                type == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck));
     }
 
     bool IsEncryptionRequired() const override
