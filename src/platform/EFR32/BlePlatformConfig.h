@@ -26,7 +26,6 @@
 #pragma once
 
 #include "sl_bt_api.h"
-//#include "bg_errorcodes.h"
 
 // ==================== Platform Adaptations ====================
 
