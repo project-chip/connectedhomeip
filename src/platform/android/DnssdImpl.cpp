@@ -210,10 +210,10 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     sResolverObject      = env->NewGlobalRef(resolverObject);
-    sBrowserObject      = env->NewGlobalRef(browserObject);
+    sBrowserObject       = env->NewGlobalRef(browserObject);
     sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
     jclass resolverClass = env->GetObjectClass(sResolverObject);
-    jclass browserClass   = env->GetObjectClass(browserObject);
+    jclass browserClass  = env->GetObjectClass(browserObject);
     sMdnsCallbackClass   = env->GetObjectClass(sMdnsCallbackObject);
 
     VerifyOrReturn(browserClass != nullptr, ChipLogError(Discovery, "Failed to get Browse Java class"));
