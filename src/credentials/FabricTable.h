@@ -189,7 +189,7 @@ public:
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks).
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are
-    // not trying to change FabricID with UpdateNOC. If set to kUndefinedFabricIndex, we are doing an add and
+    // not trying to change FabricID with UpdateNOC. If set to kUndefinedFabricId, we are doing AddNOC and
     // we don't need to check match to pre-existing fabric.
     static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
                                                FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
@@ -514,7 +514,7 @@ public:
      * The keypair is temporary and becomes usable for `SignWithOpKeypair` only after either
      * `ActivatePendingOperationalKey` is called. It is destroyed if
      * `RevertPendingFabricData` is called before `CommitPendingFabricData`.
-     *  If a pending keypair already existed, it is replaced by this call.
+     *  If a pending keypair for the provided fabricIndex (if present) already existed, it is replaced by this call.
      *
      *  Only one pending operational keypair is supported at a time.
      *
