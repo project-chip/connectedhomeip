@@ -290,7 +290,7 @@ public:
         VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
-        aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
+        aMaxIntervalCeilingSeconds = mMaxInterval;
 
         return CHIP_NO_ERROR;
     }
@@ -413,16 +413,16 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback & mpCallback;
-    ClientState mState                  = ClientState::Idle;
-    bool mIsInitialReport               = true;
-    bool mIsPrimingReports              = true;
-    bool mPendingMoreChunks             = false;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
-    SubscriptionId mSubscriptionId      = 0;
-    NodeId mPeerNodeId                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex            = kUndefinedFabricIndex;
-    InteractionType mInteractionType    = InteractionType::Read;
+    ClientState mState                = ClientState::Idle;
+    bool mIsInitialReport             = true;
+    bool mIsPrimingReports            = true;
+    bool mPendingMoreChunks           = false;
+    uint16_t mMinIntervalFloorSeconds = 0;
+    uint16_t mMaxInterval             = 0;
+    SubscriptionId mSubscriptionId    = 0;
+    NodeId mPeerNodeId                = kUndefinedNodeId;
+    FabricIndex mFabricIndex          = kUndefinedFabricIndex;
+    InteractionType mInteractionType  = InteractionType::Read;
     Timestamp mEventTimestamp;
     bool mSawAttributeReportsInCurrentReport = false;
 
