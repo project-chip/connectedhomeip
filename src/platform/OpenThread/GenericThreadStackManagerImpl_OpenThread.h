@@ -151,7 +151,7 @@ private:
 
     otInstance * mOTInst;
     uint64_t mOverrunCount = 0;
-    bool mIsAttached       = 0;
+    bool mIsAttached       = false;
 
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
@@ -219,7 +219,7 @@ private:
     static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                     Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
     static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
-                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
+                                                                    Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
