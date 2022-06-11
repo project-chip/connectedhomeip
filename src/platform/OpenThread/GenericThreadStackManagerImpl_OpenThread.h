@@ -151,6 +151,7 @@ private:
 
     otInstance * mOTInst;
     uint64_t mOverrunCount = 0;
+    bool mIsAttached       = false;
 
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
