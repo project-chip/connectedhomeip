@@ -52,7 +52,7 @@ void LEDWidget::DoSet(bool state)
 {
     bool stateChange = (mState != state);
     mState           = state;
-    
+
     if (stateChange)
     {
         gpio_write(&gpio_led, state);
