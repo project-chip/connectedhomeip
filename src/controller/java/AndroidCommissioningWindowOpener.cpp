@@ -111,11 +111,10 @@ CHIP_ERROR AndroidCommissioningWindowOpener::OpenCommissioningWindow(DeviceContr
 void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status,
                                                                          chip::SetupPayload payload)
 {
-    auto * self    = static_cast<AndroidCommissioningWindowOpener *>(context);
+    auto * self  = static_cast<AndroidCommissioningWindowOpener *>(context);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    VerifyOrExit(self->mJavaCallback != nullptr,
-                ChipLogError(Controller, "mJavaCallback is not allocated."));
+    VerifyOrExit(self->mJavaCallback != nullptr, ChipLogError(Controller, "mJavaCallback is not allocated."));
 
     if (status == CHIP_NO_ERROR)
     {
@@ -129,8 +128,8 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
         {
             UtfString jManualPairingCode(env, manualPairingCode.c_str());
             UtfString jQRCode(env, QRCode.c_str());
-            env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
-                                jQRCode.jniValue());
+            env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId),
+                                jManualPairingCode.jniValue(), jQRCode.jniValue());
         }
     }
     else
@@ -158,8 +157,8 @@ void AndroidCommissioningWindowOpener::OnOpenBasicCommissioningWindowResponse(vo
             {
                 UtfString jManualPairingCode(env, "");
                 UtfString jQRCode(env, "");
-                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
-                                    jQRCode.jniValue());
+                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId),
+                                    jManualPairingCode.jniValue(), jQRCode.jniValue());
             }
         }
         else
