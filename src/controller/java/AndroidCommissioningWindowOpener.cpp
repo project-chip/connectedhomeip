@@ -141,7 +141,7 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
                                 static_cast<jlong>(deviceId));
         }
     }
-exit:    
+exit:
     delete self;
 }
 
