@@ -30,10 +30,6 @@
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
-namespace {
-jmethodID sOnSuccessMethod = nullptr;
-jmethodID sOnErrorMethod   = nullptr;
-} // namespace
 namespace chip {
 namespace Controller {
 
@@ -46,15 +42,15 @@ AndroidCommissioningWindowOpener::AndroidCommissioningWindowOpener(DeviceControl
 
     jclass callbackClass = env->GetObjectClass(jCallbackObject);
 
-    sOnSuccessMethod = env->GetMethodID(callbackClass, "onSuccess", "(JLjava/lang/String;Ljava/lang/String;)V");
-    if (sOnSuccessMethod == nullptr)
+    mOnSuccessMethod = env->GetMethodID(callbackClass, "onSuccess", "(JLjava/lang/String;Ljava/lang/String;)V");
+    if (mOnSuccessMethod == nullptr)
     {
         ChipLogError(Controller, "Failed to access callback 'onSuccess' method");
         env->ExceptionClear();
     }
 
-    sOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(IJ)V");
-    if (sOnErrorMethod == nullptr)
+    mOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(IJ)V");
+    if (mOnErrorMethod == nullptr)
     {
         ChipLogError(Controller, "Failed to access callback 'onError' method");
         env->ExceptionClear();
@@ -116,59 +112,66 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
                                                                          chip::SetupPayload payload)
 {
     auto * self    = static_cast<AndroidCommissioningWindowOpener *>(context);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    VerifyOrExit(self->mJavaCallback != nullptr,
+                ChipLogError(Controller, "mJavaCallback is not allocated."));
 
     if (status == CHIP_NO_ERROR)
     {
         std::string QRCode;
         std::string manualPairingCode;
 
-        err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
-        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr)
+        SuccessOrExit(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
+        SuccessOrExit(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
+
+        if (self->mOnSuccessMethod != nullptr)
         {
-            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             UtfString jManualPairingCode(env, manualPairingCode.c_str());
             UtfString jQRCode(env, QRCode.c_str());
-            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
+            env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
                                 jQRCode.jniValue());
         }
     }
     else
     {
-        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr)
+        if (self->mOnErrorMethod != nullptr)
         {
-            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()),
+            env->CallVoidMethod(self->mJavaCallback, self->mOnErrorMethod, static_cast<jint>(status.GetValue()),
                                 static_cast<jlong>(deviceId));
         }
     }
+exit:    
     delete self;
 }
 
 void AndroidCommissioningWindowOpener::OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status)
 {
     auto * self = static_cast<AndroidCommissioningWindowOpener *>(context);
-    if (status == CHIP_NO_ERROR)
+
+    if (self->mJavaCallback != nullptr)
     {
-        if (self->mJavaCallback != nullptr && sOnSuccessMethod != nullptr)
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (status == CHIP_NO_ERROR)
         {
-            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            UtfString jManualPairingCode(env, "");
-            UtfString jQRCode(env, "");
-            env->CallVoidMethod(self->mJavaCallback, sOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
-                                jQRCode.jniValue());
+            if (self->mOnSuccessMethod != nullptr)
+            {
+                UtfString jManualPairingCode(env, "");
+                UtfString jQRCode(env, "");
+                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(deviceId), jManualPairingCode.jniValue(),
+                                    jQRCode.jniValue());
+            }
+        }
+        else
+        {
+            if (self->mOnErrorMethod != nullptr)
+            {
+                env->CallVoidMethod(self->mJavaCallback, self->mOnErrorMethod, static_cast<jint>(status.GetValue()),
+                                    static_cast<jlong>(deviceId));
+            }
         }
     }
-    else
-    {
-        if (self->mJavaCallback != nullptr && sOnErrorMethod != nullptr)
-        {
-            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            env->CallVoidMethod(self->mJavaCallback, sOnErrorMethod, static_cast<jint>(status.GetValue()),
-                                static_cast<jlong>(deviceId));
-        }
-    }
+
     delete self;
 }
 
