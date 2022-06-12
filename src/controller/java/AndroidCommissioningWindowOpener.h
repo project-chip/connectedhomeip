@@ -53,6 +53,8 @@ private:
     chip::Callback::Callback<chip::Controller::OnOpenBasicCommissioningWindow> mOnOpenBasicCommissioningWindowCallback;
 
     jobject mJavaCallback;
+    jmethodID mOnSuccessMethod = nullptr;
+    jmethodID mOnErrorMethod   = nullptr;
 };
 
 } // Namespace Controller
