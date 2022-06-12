@@ -128,19 +128,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
-{
-    wiced_result_t result;
-    wiced_hal_delete_nvram(PLATFORM_NVRAM_ID_ENTRY_INFO_STRING, &result);
-    if (result == WICED_SUCCESS)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    ChipLogError(DeviceLayer, "%s wiced_hal_delete_nvram %u", __func__, result);
-    return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-}
-
 bool KeyValueStoreManagerImpl::KeyEntry::IsMatchKey(const char * key)
 {
     return mIsValid && strncmp(mKey, key, sizeof(mKey)) == 0;

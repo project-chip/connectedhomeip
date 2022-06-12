@@ -29,6 +29,8 @@ chip_crypto = "mbedtls"
 chip_device_platform = "cyw30739"
 chip_mdns = "platform"
 
+# Trying to fit into the available flash by disabling optional logging for now
+chip_detail_logging = false
 chip_enable_openthread = true
 
 lwip_platform = "cyw30739"

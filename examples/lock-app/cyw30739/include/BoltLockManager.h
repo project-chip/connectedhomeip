@@ -1,6 +1,5 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -16,28 +15,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
+#include <chip_lock.h>
 #include <lib/core/CHIPError.h>
+#include <wiced_timer.h>
 
-class LightingManager
+class BoltLockManager
 {
 public:
     enum Action_t
     {
-        ON_ACTION = 0,
-        OFF_ACTION,
-        LEVEL_ACTION,
+        LOCK_ACTION = 0,
+        UNLOCK_ACTION,
 
         INVALID_ACTION
     } Action;
 
     enum State_t
     {
-        kState_OffInitiated = 0,
-        kState_OffCompleted,
-        kState_OnInitiated,
-        kState_OnCompleted,
+        kState_LockingInitiated = 0,
+        kState_LockingCompleted,
+        kState_UnlockingInitiated,
+        kState_UnlockingCompleted,
     } State;
 
     enum Actor_t
@@ -48,28 +49,38 @@ public:
     } Actor;
 
     CHIP_ERROR Init();
-    bool IsLightOn();
+    bool IsUnlocked();
+    void EnableAutoRelock(bool aOn);
+    void SetAutoLockDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
-    bool InitiateAction(Actor_t aActor, Action_t aAction, uint8_t vallue);
+    bool InitiateAction(int32_t aActor, Action_t aAction);
 
-    typedef void (*Callback_fn_initiated)(Actor_t, Action_t, uint8_t);
+    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
-    void WriteClusterState(uint8_t value);
-    void WriteClusterLevel(uint8_t value);
-
-    friend LightingManager & LightMgr(void);
+    friend BoltLockManager & BoltLockMgr(void);
     State_t mState;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    static LightingManager sLight;
+    bool mAutoRelock;
+    uint32_t mAutoLockDuration;
+    bool mAutoLockTimerArmed;
+
+    void CancelTimer(void);
+    void StartTimer(uint32_t aTimeoutMs);
+
+    static void TimerEventHandler(WICED_TIMER_PARAM_TYPE cb_params);
+    static int AutoReLockTimerEventHandler(void * aEvent);
+    static int ActuatorMovementTimerEventHandler(void * aEvent);
+
+    static BoltLockManager sLock;
 };
 
-inline LightingManager & LightMgr(void)
+inline BoltLockManager & BoltLockMgr(void)
 {
-    return LightingManager::sLight;
+    return BoltLockManager::sLock;
 }

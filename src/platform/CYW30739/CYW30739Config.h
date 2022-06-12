@@ -32,11 +32,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-constexpr inline uint32_t CYW30739ConfigKey(uint8_t keyBaseOffset, uint8_t id)
-{
-    return static_cast<uint32_t>(keyBaseOffset) << 8 | id;
-}
-
 /**
  * Provides functions and definitions for accessing device configuration information.
  */
@@ -45,45 +40,36 @@ class CYW30739Config
 public:
     using Key = uint32_t;
 
-    static constexpr uint8_t kChipFactory_KeyBase = 0x00;
-    static constexpr uint8_t kChipConfig_KeyBase  = 0x01;
-
     // Key definitions for well-known keys.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum             = CYW30739ConfigKey(kChipFactory_KeyBase, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId           = CYW30739ConfigKey(kChipFactory_KeyBase, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert         = CYW30739ConfigKey(kChipFactory_KeyBase, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey   = CYW30739ConfigKey(kChipFactory_KeyBase, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate     = CYW30739ConfigKey(kChipFactory_KeyBase, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode          = CYW30739ConfigKey(kChipFactory_KeyBase, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts     = CYW30739ConfigKey(kChipFactory_KeyBase, 0x06);
-    static constexpr Key kConfigKey_SetupDiscriminator    = CYW30739ConfigKey(kChipFactory_KeyBase, 0x07);
-    static constexpr Key kConfigKey_Spake2pIterationCount = CYW30739ConfigKey(kChipFactory_KeyBase, 0x08);
-    static constexpr Key kConfigKey_Spake2pSalt           = CYW30739ConfigKey(kChipFactory_KeyBase, 0x09);
-    static constexpr Key kConfigKey_Spake2pVerifier       = CYW30739ConfigKey(kChipFactory_KeyBase, 0x0a);
+    static constexpr Key kConfigKey_SerialNum             = 0;
+    static constexpr Key kConfigKey_MfrDeviceId           = 1;
+    static constexpr Key kConfigKey_MfrDeviceCert         = 2;
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = 3;
+    static constexpr Key kConfigKey_ManufacturingDate     = 4;
+    static constexpr Key kConfigKey_SetupPinCode          = 5;
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = 6;
+    static constexpr Key kConfigKey_SetupDiscriminator    = 7;
+    static constexpr Key kConfigKey_Spake2pIterationCount = 8;
+    static constexpr Key kConfigKey_Spake2pSalt           = 9;
+    static constexpr Key kConfigKey_Spake2pVerifier       = 10;
     // CHIP Config Keys
-    static constexpr Key kConfigKey_ServiceConfig      = CYW30739ConfigKey(kChipConfig_KeyBase, 0x00);
-    static constexpr Key kConfigKey_PairedAccountId    = CYW30739ConfigKey(kChipConfig_KeyBase, 0x01);
-    static constexpr Key kConfigKey_ServiceId          = CYW30739ConfigKey(kChipConfig_KeyBase, 0x02);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId = CYW30739ConfigKey(kChipConfig_KeyBase, 0x03);
-    static constexpr Key kConfigKey_FailSafeArmed      = CYW30739ConfigKey(kChipConfig_KeyBase, 0x04);
-    static constexpr Key kConfigKey_GroupKey           = CYW30739ConfigKey(kChipConfig_KeyBase, 0x05);
-    static constexpr Key kConfigKey_HardwareVersion    = CYW30739ConfigKey(kChipConfig_KeyBase, 0x06);
-    static constexpr Key kConfigKey_RegulatoryLocation = CYW30739ConfigKey(kChipConfig_KeyBase, 0x07);
-    static constexpr Key kConfigKey_CountryCode        = CYW30739ConfigKey(kChipConfig_KeyBase, 0x08);
-    static constexpr Key kConfigKey_RebootCount        = CYW30739ConfigKey(kChipConfig_KeyBase, 0x09);
-    static constexpr Key kConfigKey_UniqueId           = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0a);
-    static constexpr Key kConfigKey_LockUser           = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0b);
-    static constexpr Key kConfigKey_Credential         = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0c);
-    static constexpr Key kConfigKey_LockUserName       = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0d);
-    static constexpr Key kConfigKey_CredentialData     = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0e);
-    static constexpr Key kConfigKey_UserCredentials    = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0f);
+    static constexpr Key kConfigKey_ServiceConfig      = 9;
+    static constexpr Key kConfigKey_PairedAccountId    = 10;
+    static constexpr Key kConfigKey_ServiceId          = 11;
+    static constexpr Key kConfigKey_LastUsedEpochKeyId = 13;
+    static constexpr Key kConfigKey_FailSafeArmed      = 14;
+    static constexpr Key kConfigKey_GroupKey           = 15;
+    static constexpr Key kConfigKey_HardwareVersion    = 16;
+    static constexpr Key kConfigKey_RegulatoryLocation = 17;
+    static constexpr Key kConfigKey_CountryCode        = 18;
+    static constexpr Key kConfigKey_HourFormat         = 20;
+    static constexpr Key kConfigKey_CalendarType       = 21;
+    static constexpr Key kConfigKey_UniqueId           = 23;
 
     // Set key id limits for each group.
-    static constexpr Key kMinConfigKey_ChipFactory = CYW30739ConfigKey(kChipFactory_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_ChipFactory = CYW30739ConfigKey(kChipFactory_KeyBase, 0x0a);
-    static constexpr Key kMinConfigKey_ChipConfig  = CYW30739ConfigKey(kChipConfig_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_ChipConfig  = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0f);
+    static constexpr Key kConfigKey_Base = kConfigKey_SerialNum;
+    static constexpr Key kConfigKey_Max  = kConfigKey_UniqueId;
 
     static CHIP_ERROR Init(void);
 
@@ -93,8 +79,7 @@ public:
 
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
-    template <typename T>
-    static CHIP_ERROR WriteConfigValue(Key key, T val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);

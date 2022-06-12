@@ -63,10 +63,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
             return;
         }
         break;
-    case Identify::Id:
-        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributePath.mClusterId), type, *value, size);
-        return;
     default:
         printf("Unhandled cluster ID: 0x%04lx\n", attributePath.mClusterId);
         return;

@@ -25,7 +25,6 @@
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
-#include <lib/support/CHIPPlatformMemory.h>
 #include <lwip/ip.h>
 #include <openthread-system.h>
 #include <wiced_platform.h>
@@ -101,16 +100,6 @@ void ThreadStackManagerImpl::ThreadTaskMain(uint32_t arg)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
-{
-    return CHIPPlatformMemoryCalloc(aNum, aSize);
-}
-
-extern "C" void otPlatFree(void * aPtr)
-{
-    CHIPPlatformMemoryFree(aPtr);
-}
 
 /* A wrapper for the GenericThreadStackManagerImpl_OpenThread_LwIP implementation. */
 err_t tcpip_input(struct pbuf * p, struct netif * inp)
