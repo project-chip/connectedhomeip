@@ -249,11 +249,11 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
                        pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId()) ==
                            CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
-                       pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId()) ==
-                           CHIP_ERROR_INVALID_ARGUMENT);
+                       pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate,
+                                                              ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
-                       pairing.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId()) ==
-                           CHIP_NO_ERROR);
+                       pairing.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate,
+                                                              ScopedNodeId()) == CHIP_NO_ERROR);
     }
 }
 
