@@ -333,31 +333,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
-{
-    sessionHandle->AsSecureSession()->MarkForRemoval();
-}
-
 void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
         {
-            session->MarkForRemoval();
-        }
-        return Loop::Continue;
-    });
-}
-
-void SessionManager::ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node)
-{
-    mSecureSessions.ForEachSession([&](auto session) {
-        if ((session->GetPeer() == node) && session->IsActiveSession() &&
-            (session->GetSecureSessionType() == SecureSession::Type::kCASE))
-        {
-            ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId,
-                          static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -369,7 +350,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetFabricIndex() == fabric)
         {
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -381,21 +362,15 @@ void SessionManager::ExpireAllPASEPairings()
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
-                                                        const ScopedNodeId & sessionEvictionHint)
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint)
 {
-    //
-    // This is currently not being utilized yet but will be once session eviction logic is added.
-    //
-    (void) sessionEvictionHint;
-
-    return mSecureSessions.CreateNewSecureSession(secureSessionType);
+    return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }
 
 CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,

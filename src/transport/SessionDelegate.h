@@ -45,7 +45,8 @@ public:
 
     /**
      * @brief
-     *   Called when a session is releasing
+     *   Called when a session is releasing. Callees SHALL NOT make synchronous calls into SessionManager to allocate a new session.
+     *   If they desire to do so, it MUST be done asynchronously.
      */
     virtual void OnSessionReleased() = 0;
 

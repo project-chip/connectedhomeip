@@ -167,12 +167,9 @@ public:
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
-                                            const ScopedNodeId & sessionEvictionHint);
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint);
 
-    void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
-    void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
 
