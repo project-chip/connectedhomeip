@@ -461,8 +461,8 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_run_zap:
         flush_print("Running ZAP script to generate artifacts")
-        shell.run_cmd(f"mkdir -p {gen_dir}/")
-        shell.run_cmd(f"rm {gen_dir}/*")
+        shell.run_cmd(f"rm -rf {gen_dir}")
+        shell.run_cmd(f"mkdir -p {gen_dir}")
         shell.run_cmd(
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
         # af-gen-event.h is not generated

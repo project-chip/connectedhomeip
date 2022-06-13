@@ -98,9 +98,10 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     (void) infoLen;
 
 #warning                                                                                                                           \
-    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
+    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
     ChipLogError(SecureChannel,
-                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  "
+                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
+                 "and NodeID=0 in NONCE. "
                  "Node can only communicate with other nodes built with this flag set.");
 
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
@@ -137,7 +138,11 @@ CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uin
 
     bbuf.Put8(securityFlags);
     bbuf.Put32(messageCounter);
+#if CHIP_CONFIG_SECURITY_TEST_MODE
+    bbuf.Put64(0); // Simplifies decryption of CASE sessions when in TEST_MODE.
+#else
     bbuf.Put64(nodeId);
+#endif
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
