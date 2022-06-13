@@ -748,9 +748,15 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_NO_ERROR;
     }
 
+    chip::Credentials::FabricTable * fabricTable = _cppCommissioner->GetFabricTable();
+    if (!fabricTable) {
+        // Surprising as well!
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     chip::Credentials::P256PublicKey ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(ourFabric->FetchRootPubkey(ourRootPublicKey));
-    ReturnErrorOnFailure(fabric->FetchRootPubkey(otherRootPublicKey));
+    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
+    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(fabric->GetFabricIndex(), otherRootPublicKey));
 
     *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
     return CHIP_NO_ERROR;
