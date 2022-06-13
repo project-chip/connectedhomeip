@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <vector>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BridgedActions;

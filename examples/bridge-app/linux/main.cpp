@@ -49,6 +49,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
