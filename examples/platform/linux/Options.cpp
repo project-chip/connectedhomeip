@@ -69,6 +69,7 @@ enum
     kOptionCSRResponseNOCSRElementsTooLong              = 0x101b,
     kOptionCSRResponseAttestationSignatureIncorrectType = 0x101c,
     kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
+    kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -106,6 +107,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
+    { "cert_error_csr_existing_keypair", kNoArgument, kOptionCSRResponseCSRExistingKeyPair },
     { "cert_error_csr_nonce_incorrect_type", kNoArgument, kOptionCSRResponseCSRNonceIncorrectType },
     { "cert_error_csr_nonce_too_long", kNoArgument, kOptionCSRResponseCSRNonceTooLong },
     { "cert_error_csr_nonce_invalid", kNoArgument, kOptionCSRResponseCSRNonceInvalid },
@@ -199,6 +201,8 @@ const char * sDeviceOptionHelp =
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "  --cert_error_csr_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSR type.\n"
+    "  --cert_error_csr_existing_keypair\n"
+    "       Configure the CSRResponse to be built with a CSR where the keypair already exists.\n"
     "  --cert_error_csr_nonce_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSRNonce type.\n"
     "  --cert_error_csr_nonce_too_long\n"
@@ -416,6 +420,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kOptionCSRResponseCSRIncorrectType:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrIncorrectType = true;
+        break;
+    case kOptionCSRResponseCSRExistingKeyPair:
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair = true;
         break;
     case kOptionCSRResponseCSRNonceIncorrectType:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrNonceIncorrectType = true;

@@ -21,6 +21,7 @@ namespace chip {
 struct CSRResponseOptions
 {
     bool csrIncorrectType                  = false;
+    bool csrExistingKeyPair                = false;
     bool csrNonceIncorrectType             = false;
     bool csrNonceTooLong                   = false;
     bool csrNonceInvalid                   = false;
