@@ -33,8 +33,6 @@ mw320_sdk("sdk") {
   ]
 
   sources = [
-    #    "${examples_plat_dir}/app/project_include/CHIPProjectConfig.h",
-    #    "${examples_plat_dir}/app/project_include/FreeRTOSConfig.h",
     "include/CHIPProjectConfig.h",
     "include/FreeRTOSConfig.h",
   ]
@@ -73,12 +71,7 @@ mw320_executable("shell_mw320") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
-
-    #"${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "binding-handler.cpp",
-
-    #"${examples_plat_dir}/app/project_include/CHIPProjectConfig.h",
-    #"${examples_plat_dir}/app/project_include/FreeRTOSConfig.h",
     "include/CHIPProjectConfig.h",
     "include/FreeRTOSConfig.h",
     "main.cpp",

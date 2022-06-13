@@ -83,7 +83,6 @@
  *
  * 0xFE00: SDK Sample Lock Resource
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xFE00
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
 
 /**

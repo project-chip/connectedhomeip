@@ -90,26 +90,11 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
         };
         // Note: Need to change using toggle command since sSwitchOnOffState won't be changed if not triggerred from the switch
         // command (SwitchCommandHandler)
-#if 0
-        if (sSwitchOnOffState)
-        {
-            Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, onCommand, onSuccess, onFailure);
-        }
-        else
-        {
-            Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, offCommand, onSuccess, onFailure);
-        }
-#else
         {
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
                                              binding.remote, toggleCommand, onSuccess, onFailure);
         }
-#endif // 0|1
     }
 }
 
