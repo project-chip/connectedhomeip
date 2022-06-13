@@ -130,8 +130,9 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     auto i = 0;
     for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++, i++)
     {
-        ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lld", i, session->mSession,
-                      session->mSession->GetStateStr(), session->mSession->GetLastActivityTime().count());
+        ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lu", i, session->mSession,
+                      session->mSession->GetStateStr(),
+                      static_cast<unsigned long>(session->mSession->GetLastActivityTime().count()));
     }
 #endif
 
