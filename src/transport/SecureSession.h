@@ -159,8 +159,8 @@ public:
 
     /*
      * This marks a previously active session as defunct to temporarily prevent it from being used with
-     * new exchanges to send or receive messages on this session. This should be called when there is suspicion of 
-     * a loss-of-sync with the session state on the associated peer. This could arise if there is evidence 
+     * new exchanges to send or receive messages on this session. This should be called when there is suspicion of
+     * a loss-of-sync with the session state on the associated peer. This could arise if there is evidence
      * of transport failure.
      *
      * If messages are received thereafter on this session, the session SHALL be put back into the Active state.
@@ -277,7 +277,7 @@ private:
 
         //
         // The session is active, ready for use. When transitioning to this state, the
-        // reference count is incremented by 1 in Activate, and will subsequently be decremented 
+        // reference count is incremented by 1 in Activate, and will subsequently be decremented
         // by 1 when MarkForEviction is called. This ensures the session remains resident
         // and active for future use even if there currently are no references to it.
         //
@@ -292,10 +292,10 @@ private:
         // Transitioning to this state does not detach any existing SessionHolders.
         //
         kDefunct = 4,
-       
-        // 
+
+        //
         // The session has been marked for eviction and is pending  deallocation. All SessionHolders would have already
-        // been detached in a previous call to MarkForEviction. Future SessionHolders will not be able to attach to 
+        // been detached in a previous call to MarkForEviction. Future SessionHolders will not be able to attach to
         // this session.
         //
         // When all SessionHandles go out of scope, the session will be released automatically.

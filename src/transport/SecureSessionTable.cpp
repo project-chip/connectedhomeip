@@ -89,9 +89,9 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
 {
     VerifyOrDieWithMsg(!mRunningEvictionLogic, SecureChannel, "EvictAndAllocate isn't re-entrant, yet someone called us while we're already running");
     mRunningEvictionLogic = true;
-    
+
     ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId, (uint8_t)secureSessionType);
-    
+
     VerifyOrDie(mEntries.Allocated() <= CHIP_CONFIG_SECURE_SESSION_POOL_SIZE);
 
     //
@@ -108,7 +108,7 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
         index++;
         return Loop::Continue;
     });
-    
+
     auto sortableSessionSpan = Span<SortableSession>(sortableSessions.Get(), CHIP_CONFIG_SECURE_SESSION_POOL_SIZE);
     EvictionPolicyContext policyContext(sortableSessionSpan, sessionEvictionHint);
 
@@ -116,13 +116,13 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
     ChipLogProgress(SecureChannel, "Sorted sessions for eviction...");
 
     auto numSessions = mEntries.Allocated();
-    
+
 #if CHIP_DETAIL_LOGGING
     ChipLogDetail(SecureChannel, "Sorted Eviction Candidates (ranked from best candidate to worst):");
     auto i = 0;
     for (auto *session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++, i++) {
         ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lld",
-                     i, session->mSession, session->mSession->GetStateStr(), session->mSession->GetLastActivityTime().count()); 
+                     i, session->mSession, session->mSession->GetStateStr(), session->mSession->GetLastActivityTime().count());
     }
 #endif
 
@@ -132,7 +132,7 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
         }
 
         ChipLogProgress(SecureChannel, "Candidate Session[%p] - Attempting to evict...", session->mSession);
-        
+
         auto prevCount = mEntries.Allocated();
 
         //
@@ -146,7 +146,7 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
         // See #19495.
         //
         session->mSession->MarkForEviction();
-        
+
         auto newCount = mEntries.Allocated();
 
         if (newCount < prevCount) {

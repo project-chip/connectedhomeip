@@ -58,7 +58,7 @@ void SecureSession::MoveToState(State targetState)
         mState = targetState;
     }
 }
-    
+
 void SecureSession::MarkAsDefunct()
 {
     ChipLogDetail(Inet, "SecureSession[%p]: MarkAsDefunct Type:%d LSID:%d", this, to_underlying(mSecureSessionType),

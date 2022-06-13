@@ -317,7 +317,7 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 CHIP_ERROR OperationalDeviceProxy::Disconnect()
 {
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
-    
+
     if (mSecureSession)
     {
         //

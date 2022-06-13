@@ -153,7 +153,7 @@ private:
             mSessionEvictionHint = sessionEvictionHint;
         }
 
-        friend class SecureSessionTable;        
+        friend class SecureSessionTable;
         Span<SortableSession> mSessionList;
         ScopedNodeId mSessionEvictionHint;
     };
@@ -169,7 +169,7 @@ private:
      *    of anything else.
      *
      */
-    void DefaultEvictionPolicy(EvictionPolicyContext &evictionContext); 
+    void DefaultEvictionPolicy(EvictionPolicyContext &evictionContext);
 
     /**
      *
@@ -177,7 +177,7 @@ private:
      *
      */
     SecureSession* EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint);
-    
+
     /**
      * Find an available session ID that is unused in the secure session table.
      *
