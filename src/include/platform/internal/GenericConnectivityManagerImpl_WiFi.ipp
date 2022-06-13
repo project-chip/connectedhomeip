@@ -27,6 +27,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#include <platform/Linux/GlibTypeDeleter.h>
 
 namespace chip {
 namespace DeviceLayer {
