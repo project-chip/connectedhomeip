@@ -42,7 +42,10 @@ public class MatterCommandReceiver extends BroadcastReceiver {
         if (pendingIntent != null) {
           final Intent responseIntent =
               new Intent()
-                  .putExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD, "{\"value\":{\"0\":1, \"1\":\"custom response from content app\"}}".getBytes());
+                  .putExtra(
+                      MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD,
+                      "{\"value\":{\"0\":1, \"1\":\"custom response from content app\"}}"
+                          .getBytes());
           try {
             pendingIntent.send(context, 0, responseIntent);
           } catch (final PendingIntent.CanceledException ex) {

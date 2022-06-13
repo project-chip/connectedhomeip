@@ -23,7 +23,8 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
       if (app.getEndpointId() == endpointId) {
         Log.d(
             TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
-        return ContentAppAgentService.sendCommand(context, app.getAppName(), clusterId, commandId, commandPayload);
+        return ContentAppAgentService.sendCommand(
+            context, app.getAppName(), clusterId, commandId, commandPayload);
       }
     }
     return "Success";
