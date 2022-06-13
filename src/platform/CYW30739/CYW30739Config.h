@@ -78,7 +78,7 @@ public:
     static constexpr Key kConfigKey_LockUserName       = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0d);
     static constexpr Key kConfigKey_CredentialData     = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0e);
     static constexpr Key kConfigKey_UserCredentials    = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0f);
-    static constexpr Key kConfigKey_BootReason        = CYW30739ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_BootReason         = CYW30739ConfigKey(kChipConfig_KeyBase, 0x10);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = CYW30739ConfigKey(kChipFactory_KeyBase, 0x00);
