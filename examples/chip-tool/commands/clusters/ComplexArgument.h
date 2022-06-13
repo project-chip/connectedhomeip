@@ -26,6 +26,8 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
 
+#include "JsonParser.h"
+
 constexpr uint8_t kMaxLabelLength = 100;
 
 class ComplexArgumentParser
@@ -314,57 +316,8 @@ public:
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
-        Json::Reader reader;
-        if (!reader.parse(json, value))
+        if (!JsonParser::ParseComplexArgument(label, json, value))
         {
-            std::vector<Json::Reader::StructuredError> errors = reader.getStructuredErrors();
-            ChipLogError(chipTool, "Error parsing JSON for %s:", label);
-            for (auto & error : errors)
-            {
-                ChipLogError(chipTool, "  %s", error.message.c_str());
-                ptrdiff_t error_start   = error.offset_start;
-                ptrdiff_t error_end     = error.offset_limit;
-                const char * sourceText = json;
-                // The whole JSON string might be too long to fit in our log
-                // messages.  Just include 30 chars before the error.
-                constexpr ptrdiff_t kMaxContext = 30;
-                std::string errorMsg;
-                if (error_start > kMaxContext)
-                {
-                    sourceText += (error_start - kMaxContext);
-                    error_end   = kMaxContext + (error_end - error_start);
-                    error_start = kMaxContext;
-                    ChipLogError(chipTool, "... %s", sourceText);
-                    // Add markers corresponding to the "... " above.
-                    errorMsg += "----";
-                }
-                else
-                {
-                    ChipLogError(chipTool, "%s", sourceText);
-                }
-                for (ptrdiff_t i = 0; i < error_start; ++i)
-                {
-                    errorMsg += "-";
-                }
-                errorMsg += "^";
-                if (error_start + 1 < error_end)
-                {
-                    for (ptrdiff_t i = error_start + 1; i < error_end; ++i)
-                    {
-                        errorMsg += "-";
-                    }
-                    errorMsg += "^";
-                }
-                ChipLogError(chipTool, "%s", errorMsg.c_str());
-
-                if (error.message == "Missing ',' or '}' in object declaration" && error.offset_start > 0 &&
-                    json[error.offset_start - 1] == '0' && (json[error.offset_start] == 'x' || json[error.offset_start] == 'X'))
-                {
-                    ChipLogError(chipTool,
-                                 "NOTE: JSON does not allow hex syntax beginning with 0x for numbers.  Try putting the hex number "
-                                 "in quotes (like {\"name\": \"0x100\"}).");
-                }
-            }
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
