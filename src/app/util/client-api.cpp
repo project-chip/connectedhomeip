@@ -210,7 +210,8 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // The destination buffer must be at least as large as the running total
         // plus the length of the integer value (if applicable) plus the length of
         // the data (if applicable).
-        if (bufferLen < bytes + dataLen + valueLen)
+        // Fix #19351 - Cast up to larger type during summation to prevent integer overflow issues.
+        if (bufferLen < (size_t) bytes + (size_t) dataLen + (size_t) valueLen)
         {
             emberAfDebugPrintln("ERR: Buffer too short for %d bytes for format '%c'", dataLen + valueLen, cmd);
             return 0;
