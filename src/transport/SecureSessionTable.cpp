@@ -46,10 +46,8 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSessionForTest(Secure
             {
                 return Optional<SessionHandle>::Missing();
             }
-            else
-            {
-                (void) fabricIndex;
-            }
+
+            (void) fabricIndex;
         }
     }
 
@@ -108,7 +106,12 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     // without affecting the sessions in the table itself.
     //
     Platform::ScopedMemoryBufferWithSize<SortableSession> sortableSessions;
-    sortableSessions.Calloc(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE);
+    sortableSessions.Calloc(mEntries.Allocated());
+    if (!sortableSessions)
+    {
+        VerifyOrDieWithMsg(true, SecureChannel, "We couldn't allocate a session!");
+        return nullptr;
+    }
 
     int index = 0;
     ForEachSession([&index, &sortableSessions](auto session) {
@@ -117,7 +120,7 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
         return Loop::Continue;
     });
 
-    auto sortableSessionSpan = Span<SortableSession>(sortableSessions.Get(), CHIP_CONFIG_SECURE_SESSION_POOL_SIZE);
+    auto sortableSessionSpan = Span<SortableSession>(sortableSessions.Get(), mEntries.Allocated());
     EvictionPolicyContext policyContext(sortableSessionSpan, sessionEvictionHint);
 
     DefaultEvictionPolicy(policyContext);
