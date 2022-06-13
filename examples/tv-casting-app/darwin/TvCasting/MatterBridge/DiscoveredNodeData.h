@@ -36,7 +36,7 @@
 
 @property uint16_t pairingHint;
 
-@property uint8_t * rotatingId;
+@property const uint8_t * rotatingId;
 
 @property size_t rotatingIdLen;
 
@@ -51,8 +51,6 @@
 @property NSMutableArray * ipAddresses;
 
 @property size_t numIPs;
-
-- (DiscoveredNodeData *)initWithChipDiscoveredNodeData:(void *)chipDiscoveredNodedata;
 
 - (DiscoveredNodeData *)initWithDeviceName:(NSString *)deviceName vendorId:(uint16_t)vendorId productId:(uint16_t)productId;
 

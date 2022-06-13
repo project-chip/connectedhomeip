@@ -19,29 +19,30 @@
 import Foundation
 
 class CommissioningViewModel: ObservableObject {
-    @Published var udcRequestSent: Bool = false;
+    @Published var udcRequestSent: Bool?;
     
-    @Published var commisisoningWindowOpened: Bool = false;
+    @Published var commisisoningWindowOpened: Bool?;
     
     func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
         // TBD: Call openBasicCommissioningWindow() and get Onboarding payload
         
-        // Send User directed commissioning request if a commissioner was selected
+        // Send User directed commissioning request if a commissioner with a known IP addr was selected
         if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
         {
-            Task {
-                await sendUserDirectedCommissioningRequest(selectedCommissioner: selectedCommissioner)
-            }
+            sendUserDirectedCommissioningRequest(selectedCommissioner: selectedCommissioner)
         }
     }
     
-    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) async {
+    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {
         let ipAddress: String = selectedCommissioner!.ipAddresses[0] as! String
         let port: UInt16 = selectedCommissioner!.port
         let platformInterface: UInt32 = selectedCommissioner!.platformInterface
         
-        DispatchQueue.main.async {
-            self.udcRequestSent = CastingServerBridge.getSharedInstance().sendUserDirectedCommissioningRequest(ipAddress, commissionerPort: port, platformInterface: platformInterface)
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
+            castingServerBridge.sendUserDirectedCommissioningRequest(ipAddress, commissionerPort: port, platformInterface: platformInterface, clientQueue: DispatchQueue.main, udcRequestSentHandler: { (result: Bool) -> () in
+                self.udcRequestSent = result
+            })
         }
     }
 }

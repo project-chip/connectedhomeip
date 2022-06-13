@@ -16,28 +16,51 @@
  */
 
 import Foundation
+import os.log
 
 class CommissionerDiscoveryViewModel: ObservableObject {
+    let Log = Logger(subsystem: "com.matter.casting",
+                     category: "CommissionerDiscoveryViewModel")
+    
     @Published var commissioners: [DiscoveredNodeData] = []
+    
+    @Published var discoveryRequestStatus: Bool?;
+    
     func discoverAndUpdate() {
-        if(commissioners.isEmpty) {
-            CastingServerBridge.getSharedInstance().discoverCommissioners()
-            Task {
-                try? await Task.sleep(nanoseconds: 5_000_000_000)  // Wait for commissioners to respond
-                await updateCommissioners()
-            }
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
+            castingServerBridge.discoverCommissioners(DispatchQueue.main, discoveryRequestSentHandler:  { (result: Bool) -> () in
+                self.discoveryRequestStatus = result
+            })
+        }
+        
+        Task {
+            try? await Task.sleep(nanoseconds: 5_000_000_000)  // Wait for commissioners to respond
+            updateCommissioners()
         }
     }
     
-    private func updateCommissioners() async {
-        var i: Int32 = 0
-        while(CastingServerBridge.getSharedInstance().getDiscoveredCommissioner(i) != nil)
+    private func updateCommissioners() {
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            let commissioner = CastingServerBridge.getSharedInstance().getDiscoveredCommissioner(i)!
-            DispatchQueue.main.async {
-                self.commissioners.append(commissioner)
-            }
-            i += 1
+            var i: Int32 = 0
+            var commissioner: DiscoveredNodeData?;
+            repeat {
+                castingServerBridge.getDiscoveredCommissioner(i, clientQueue: DispatchQueue.main, discoveredCommissionerHandler: { (result: DiscoveredNodeData?) -> () in
+                    commissioner = result;
+                    if(commissioner != nil){
+                        if(self.commissioners.contains(commissioner!))
+                        {
+                            self.Log.info("Skipping previously discovered commissioner \(commissioner!.description)")
+                        }
+                        else
+                        {
+                            self.commissioners.append(commissioner!)
+                        }
+                    }
+                })
+                i += 1
+            } while(commissioner != nil)
         }
     }
 }

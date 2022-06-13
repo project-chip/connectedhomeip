@@ -23,15 +23,20 @@
 
 @interface CastingServerBridge : NSObject
 
-+ (CastingServerBridge *)getSharedInstance;
++ (CastingServerBridge * _Nullable)getSharedInstance;
 
-- (bool)discoverCommissioners;
+- (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
+    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler;
 
-- (DiscoveredNodeData *)getDiscoveredCommissioner:(int)index;
+- (void)getDiscoveredCommissioner:(int)index
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nullable))discoveredCommissionerHandler;
 
-- (bool)sendUserDirectedCommissioningRequest:(NSString *)commissionerIpAddress
+- (void)sendUserDirectedCommissioningRequest:(NSString * _Nonnull)commissionerIpAddress
                             commissionerPort:(uint16_t)commissionerPort
-                           platformInterface:(unsigned int)platformInterface;
+                           platformInterface:(unsigned int)platformInterface
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                       udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler;
 
 @end
 

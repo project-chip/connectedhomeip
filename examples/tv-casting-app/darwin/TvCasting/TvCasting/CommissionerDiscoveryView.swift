@@ -32,27 +32,44 @@ struct CommissionerDiscoveryView: View {
                 destination: CommissioningView(_selectedCommissioner: nil),
                 label: {
                     Text("Skip to manual commissioning >>")
+                        .frame(width: 300, height: 30, alignment: .center)
+                        .border(Color.black, width: 1)
                 }
             ).background(Color.blue)
                 .foregroundColor(Color.white)
                 .padding()
             
-            Text("Select a commissioner TV...")
+            Button("Discover commissioners", action: viewModel.discoverAndUpdate)
+                .frame(width: 200, height: 30, alignment: .center)
+                .border(Color.black, width: 1)
+                .background(Color.blue)
+                .foregroundColor(Color.white)
+                .padding()
             
-            ForEach(viewModel.commissioners) { commissioner in
-                NavigationLink(
-                    destination: CommissioningView(_selectedCommissioner: commissioner),
-                    label: {
-                        Text(commissioner.description)
-                    }
-                ).background(Color.blue)
+            if(viewModel.discoveryRequestStatus == false)
+            {
+                Text("Failed to send discovery request")
+            }
+            else if(!viewModel.commissioners.isEmpty)
+            {
+                Text("Select a commissioner TV...")
+                ForEach(viewModel.commissioners) { commissioner in
+                    NavigationLink(
+                        destination: CommissioningView(_selectedCommissioner: commissioner),
+                        label: {
+                            Text(commissioner.description)
+                        }
+                    )
+                    .frame(width: 350, height: 50, alignment: .center)
+                    .border(Color.black, width: 1)
+                    .background(Color.blue)
                     .foregroundColor(Color.white)
                     .padding(1)
+                }
             }
         }
         .navigationTitle("TV Discovery")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
-        .onAppear(perform: viewModel.discoverAndUpdate)
     }
 }
 

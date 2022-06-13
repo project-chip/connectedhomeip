@@ -22,41 +22,6 @@
 
 @implementation DiscoveredNodeData
 
-- (DiscoveredNodeData *)initWithChipDiscoveredNodeData:(void *)chipDiscoveredNodedata
-{
-    self = [super init];
-    if (self) {
-        chip::Dnssd::DiscoveredNodeData * data = (chip::Dnssd::DiscoveredNodeData *) chipDiscoveredNodedata;
-
-        // from CommissionNodeData
-        _deviceType = data->commissionData.deviceType;
-        _vendorId = data->commissionData.vendorId;
-        _productId = data->commissionData.productId;
-        _longDiscriminator = data->commissionData.longDiscriminator;
-        _commissioningMode = data->commissionData.commissioningMode;
-        _pairingHint = data->commissionData.pairingHint;
-        _deviceName = [NSString stringWithCString:data->commissionData.deviceName encoding:NSASCIIStringEncoding];
-        _rotatingIdLen = data->commissionData.rotatingIdLen;
-        _rotatingId = data->commissionData.rotatingId;
-        _instanceName = [NSString stringWithCString:data->commissionData.instanceName encoding:NSASCIIStringEncoding];
-
-        // from CommonResolutionData
-        _port = data->resolutionData.port;
-        _hostName = [NSString stringWithCString:data->resolutionData.hostName encoding:NSASCIIStringEncoding];
-        _platformInterface = data->resolutionData.interfaceId.GetPlatformInterface();
-        _numIPs = data->resolutionData.numIPs;
-        if (data->resolutionData.numIPs > 0) {
-            _ipAddresses = [NSMutableArray new];
-        }
-        for (int i = 0; i < data->resolutionData.numIPs; i++) {
-            char addrCString[chip::Inet::IPAddress::kMaxStringLength];
-            data->resolutionData.ipAddress->ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
-            _ipAddresses[i] = [NSString stringWithCString:addrCString encoding:NSASCIIStringEncoding];
-        }
-    }
-    return self;
-}
-
 - (DiscoveredNodeData *)initWithDeviceName:(NSString *)deviceName vendorId:(uint16_t)vendorId productId:(uint16_t)productId
 {
     self = [super init];
@@ -71,6 +36,38 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d", _deviceName, _productId, _vendorId];
+}
+
+- (BOOL)isEqualToDiscoveredNodeData:(DiscoveredNodeData *)other
+{
+    return [self.instanceName isEqualToString:other.instanceName];
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (other == nil) {
+        return NO;
+    }
+
+    if (self == other) {
+        return YES;
+    }
+
+    if (![other isKindOfClass:[DiscoveredNodeData class]]) {
+        return NO;
+    }
+
+    return [self isEqualToDiscoveredNodeData:(DiscoveredNodeData *) other];
+}
+
+- (NSUInteger)hash
+{
+    const NSUInteger prime = 31;
+    NSUInteger result = 1;
+
+    result = prime * result + [self.instanceName hash];
+
+    return result;
 }
 
 @end

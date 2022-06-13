@@ -29,22 +29,35 @@ struct CommissioningView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if(viewModel.commisisoningWindowOpened) {
+            if(viewModel.commisisoningWindowOpened == true) {
                 Text("Commissioning window opened.")
                 
-                if(viewModel.udcRequestSent) {
-                    Text("Complete commissioning on " + (selectedCommissioner?.deviceName)!)
+                if(self.selectedCommissioner != nil)
+                {
+                    if(viewModel.udcRequestSent == true)
+                    {
+                        Text("Complete commissioning on " + (selectedCommissioner?.deviceName)!)
+                    }
+                    else if(viewModel.udcRequestSent == false) {
+                        Text("Could not send user directed commissioning request to " + (selectedCommissioner?.deviceName)! + "! Complete commissioning manually!")
+                            .foregroundColor(Color.red)
+                    }
                 }
                 else{
-                    Text("Complete commissioning with a commissioner manually")
+                    Text("Complete commissioning with a commissioner manually!")
                 }
                 
                 // TBD: actual values
                 Text("Onboarding PIN: ")
+                    .padding()
+                    .border(Color.black, width: 1)
                 Text("Discriminator: ")
+                    .padding()
+                    .border(Color.black, width: 1)
             }
-            else {
+            else if(viewModel.commisisoningWindowOpened == false) {
                 Text("Failed to open Commissioning window!")
+                    .foregroundColor(Color.red)
             }
         }
         .navigationTitle("Commissioning...")

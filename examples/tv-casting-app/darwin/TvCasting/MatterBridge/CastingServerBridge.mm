@@ -18,12 +18,21 @@
 #import "CastingServerBridge.h"
 #import "CastingServer.h"
 
+#import "DiscoveredNodeDataConverter.hpp"
+
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
+@interface CastingServerBridge ()
+
+// queue used to serialize all work performed by the CastingServerBridge
+@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
+
+@end
+
 @implementation CastingServerBridge
 
-+ (CastingServerBridge *)getSharedInstance
++ (CastingServerBridge * _Nullable)getSharedInstance
 {
     static CastingServerBridge * instance = nil;
     static dispatch_once_t onceToken;
@@ -61,6 +70,8 @@
             return nil;
         }
 
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
         chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
         CastingServer::GetInstance()->Init();
@@ -68,52 +79,78 @@
     return self;
 }
 
-- (bool)discoverCommissioners
+- (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
+    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().discoverCommissioners() called");
-    CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-    return true;
+    dispatch_async(_chipWorkQueue, ^{
+        bool discoveryRequestStatus = true;
+        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
+            discoveryRequestStatus = false;
+        }
+
+        dispatch_async(clientQueue, ^{
+            discoveryRequestSentHandler(discoveryRequestStatus);
+        });
+    });
 }
 
-- (DiscoveredNodeData *)getDiscoveredCommissioner:(int)index
+- (void)getDiscoveredCommissioner:(int)index
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nullable))discoveredCommissionerHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().getDiscoveredCommissioner() called");
 
-    DiscoveredNodeData * commissioner = nil;
-    const chip::Dnssd::DiscoveredNodeData * chipDiscoveredNodeData = CastingServer::GetInstance()->GetDiscoveredCommissioner(index);
-    if (chipDiscoveredNodeData != nullptr) {
-        commissioner = [[DiscoveredNodeData alloc] initWithChipDiscoveredNodeData:(void *) chipDiscoveredNodeData];
-    }
-    return commissioner;
+    dispatch_async(_chipWorkQueue, ^{
+        DiscoveredNodeData * commissioner = nil;
+        const chip::Dnssd::DiscoveredNodeData * chipDiscoveredNodeData
+            = CastingServer::GetInstance()->GetDiscoveredCommissioner(index);
+        if (chipDiscoveredNodeData != nullptr) {
+            commissioner = [DiscoveredNodeDataConverter convertToObjC:chipDiscoveredNodeData];
+        }
+
+        dispatch_async(clientQueue, ^{
+            discoveredCommissionerHandler(commissioner);
+        });
+    });
 }
 
-- (bool)sendUserDirectedCommissioningRequest:(NSString *)commissionerIpAddress
+- (void)sendUserDirectedCommissioningRequest:(NSString * _Nonnull)commissionerIpAddress
                             commissionerPort:(uint16_t)commissionerPort
                            platformInterface:(unsigned int)platformInterface
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                       udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler
 {
     ChipLogProgress(
         AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with port %d", commissionerPort);
-    chip::Inet::IPAddress commissionerAddrInet;
-    if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
-        ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to parse IP address");
-        return false;
-    }
 
-    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId(platformInterface);
+    dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        bool udcRequestStatus;
+        chip::Inet::IPAddress commissionerAddrInet;
+        if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
+            ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to parse IP address");
+            udcRequestStatus = false;
+        } else {
+            chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId(platformInterface);
 
-    chip::Transport::PeerAddress commissionerPeerAddress
-        = chip::Transport::PeerAddress::UDP(commissionerAddrInet, commissionerPort, interfaceId);
+            chip::Transport::PeerAddress commissionerPeerAddress
+                = chip::Transport::PeerAddress::UDP(commissionerAddrInet, commissionerPort, interfaceId);
 
-    CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(commissionerPeerAddress);
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(
-            AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-    return true;
+            CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(commissionerPeerAddress);
+            if (err != CHIP_NO_ERROR) {
+                ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: %" CHIP_ERROR_FORMAT,
+                    err.Format());
+                udcRequestStatus = false;
+            } else {
+                udcRequestStatus = true;
+            }
+        }
+
+        dispatch_async(clientQueue, ^{
+            udcRequestSentHandler(udcRequestStatus);
+        });
+    });
 }
 @end
