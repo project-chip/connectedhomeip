@@ -53,7 +53,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
     chip_use_transitional_device_instance_info_provider =
-        chip_device_platform != "linux" && chip_device_platform != "android" && chip_device_platform != "darwin" && chip_device_platform != "webos" && chip_device_platform != "tizen"
+        chip_device_platform != "linux" && chip_device_platform != "android" &&
+        chip_device_platform != "darwin" && chip_device_platform != "webos" &&
+        chip_device_platform != "tizen"
 
     # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
