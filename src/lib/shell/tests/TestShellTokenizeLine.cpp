@@ -62,11 +62,7 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
         .argv = (const char *[]){ "leading", "space" },
         .argc = 2,
     },
-    {
-        .line = "trailing space ",
-        .argv = (const char *[]){ "trailing", "space", "" },
-        .argc = 3
-    },
+    { .line = "trailing space ", .argv = (const char *[]){ "trailing", "space", "" }, .argc = 3 },
     {
         .line = "no_space",
         .argv = (const char *[]){ "no_space" },
@@ -84,8 +80,14 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
     },
     {
         .line = "hey 1 2 3 4 5 6 7 max out",
-        .argv = (const char *[]){ "hey", "1", "2", "3", },
-        .argc = TEST_SHELL_MAX_TOKENS-1,
+        .argv =
+            (const char *[]){
+                "hey",
+                "1",
+                "2",
+                "3",
+            },
+        .argc = TEST_SHELL_MAX_TOKENS - 1,
     },
 };
 
