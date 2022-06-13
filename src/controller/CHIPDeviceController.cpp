@@ -176,7 +176,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
     ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(chipCertSpan, rootPublicKeySpan));
-    Crypto::P256PublicKey rootPublicKey{rootPublicKeySpan};
+    Crypto::P256PublicKey rootPublicKey{ rootPublicKeySpan };
 
     if (params.controllerICAC.empty())
     {

@@ -132,8 +132,8 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
             Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
             uint8_t nocBuf[kMaxCHIPCertLength];
             uint8_t icacBuf[kMaxCHIPCertLength];
-            MutableByteSpan nocSpan{nocBuf};
-            MutableByteSpan icacSpan{icacBuf};
+            MutableByteSpan nocSpan{ nocBuf };
+            MutableByteSpan icacSpan{ icacBuf };
             FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
             noc.fabricIndex = fabricIndex;
@@ -189,7 +189,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
             Crypto::P256PublicKey pubKey;
             ReturnErrorOnFailure(fabricTable.GetRootPubkey(fabricIndex, pubKey));
-            fabricDescriptor.rootPublicKey = ByteSpan{pubKey.ConstBytes(), pubKey.Length()};
+            fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
         }
@@ -207,9 +207,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
         for (auto & fabricInfo : fabricTable)
         {
             uint8_t certBuf[kMaxCHIPCertLength];
-            MutableByteSpan cert{certBuf};
+            MutableByteSpan cert{ certBuf };
             ReturnErrorOnFailure(fabricTable.GetRootCert(fabricInfo.GetFabricIndex(), cert));
-            ReturnErrorOnFailure(encoder.Encode(ByteSpan{cert}));
+            ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
         }
 
         return CHIP_NO_ERROR;
@@ -881,7 +881,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // credentials and set by following SetFabricInfo() call.
     {
         uint8_t rcacBuf[kMaxCHIPCertLength];
-        MutableByteSpan rcac{rcacBuf};
+        MutableByteSpan rcac{ rcacBuf };
 
         err = fabricTable.GetRootCert(fabricIndex, rcac);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));

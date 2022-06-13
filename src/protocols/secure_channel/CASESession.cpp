@@ -383,7 +383,7 @@ CHIP_ERROR CASESession::SendSigma1()
         FabricId fabricId = fabricInfo->GetFabricId();
         Crypto::P256PublicKey rootPubKey;
         ReturnErrorOnFailure(mFabricsTable->GetRootPubkey(mFabricIndex, rootPubKey));
-        Credentials::P256PublicKeySpan rootPubKeySpan{rootPubKey.ConstBytes()};
+        Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId,
@@ -459,7 +459,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         NodeId nodeId     = fabricInfo.GetNodeId();
         Crypto::P256PublicKey rootPubKey;
         ReturnErrorOnFailure(mFabricsTable->GetRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey));
-        Credentials::P256PublicKeySpan rootPubKeySpan{rootPubKey.ConstBytes()};
+        Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
@@ -674,10 +674,10 @@ CHIP_ERROR CASESession::SendSigma2()
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     VerifyOrReturnError(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
 
-    MutableByteSpan icaCert{icacBuf.Get(), kMaxCHIPCertLength};
+    MutableByteSpan icaCert{ icacBuf.Get(), kMaxCHIPCertLength };
     ReturnErrorOnFailure(mFabricsTable->GetICACert(mFabricIndex, icaCert));
 
-    MutableByteSpan nocCert{nocBuf.Get(), kMaxCHIPCertLength};
+    MutableByteSpan nocCert{ nocBuf.Get(), kMaxCHIPCertLength };
     ReturnErrorOnFailure(mFabricsTable->GetNOCCert(mFabricIndex, nocCert));
 
     // Fill in the random value
@@ -1039,7 +1039,7 @@ exit:
 CHIP_ERROR CASESession::SendSigma3()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferHandle msg_R3;
@@ -1066,10 +1066,10 @@ CHIP_ERROR CASESession::SendSigma3()
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
     VerifyOrExit(icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
-    icaCert = MutableByteSpan{icacBuf.Get(), kMaxCHIPCertLength};
+    icaCert = MutableByteSpan{ icacBuf.Get(), kMaxCHIPCertLength };
 
     VerifyOrExit(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
-    nocCert = MutableByteSpan{nocBuf.Get(), kMaxCHIPCertLength};
+    nocCert = MutableByteSpan{ nocBuf.Get(), kMaxCHIPCertLength };
 
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 

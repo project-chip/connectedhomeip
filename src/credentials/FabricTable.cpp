@@ -464,7 +464,7 @@ FabricTable::~FabricTable()
     }
 }
 
-FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey &  rootPubKey, FabricId fabricId)
+FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId)
 {
     for (auto & fabric : mStates)
     {
@@ -700,7 +700,7 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     FabricId fabricId;
     {
         uint8_t nocBuf[kMaxCHIPCertLength];
-        MutableByteSpan nocSpan{nocBuf};
+        MutableByteSpan nocSpan{ nocBuf };
         ReturnErrorOnFailure(newFabric.GetNOCCert(nocSpan));
         NodeId unused;
         ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &unused, &fabricId));
@@ -1018,7 +1018,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
         }
         {
             uint8_t rcacBuf[kMaxCHIPCertLength];
-            MutableByteSpan rcacSpan{rcacBuf};
+            MutableByteSpan rcacSpan{ rcacBuf };
             SuccessOrExit(err = fabric.GetRootCert(rcacSpan));
             chip::System::Clock::Seconds32 rcacNotBefore;
             SuccessOrExit(err = Credentials::ExtractNotBeforeFromChipCert(rcacSpan, rcacNotBefore));
@@ -1026,7 +1026,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
         }
         {
             uint8_t icacBuf[kMaxCHIPCertLength];
-            MutableByteSpan icacSpan{icacBuf};
+            MutableByteSpan icacSpan{ icacBuf };
             SuccessOrExit(err = fabric.GetICACert(icacSpan));
             if (!icacSpan.empty())
             {
@@ -1037,7 +1037,7 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
         }
         {
             uint8_t nocBuf[kMaxCHIPCertLength];
-            MutableByteSpan nocSpan{nocBuf};
+            MutableByteSpan nocSpan{ nocBuf };
             SuccessOrExit(err = fabric.GetNOCCert(nocSpan));
             chip::System::Clock::Seconds32 nocNotBefore;
             ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(nocSpan, nocNotBefore));
