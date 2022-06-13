@@ -748,13 +748,19 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_NO_ERROR;
     }
 
-    chip::Credentials::FabricTable * fabricTable = _cppCommissioner->GetFabricTable();
+    // "fabric" comes from a different fabric table for the moment, but it's a
+    // fabric table that is: (1) readonly, (2) has stack lifetime, and (3) uses
+    // the same storage as _cppCommissioner->GetFabricTable(), so it turns out
+    // that in practice they have the same fabric indices and this logic is OK.
+    //
+    // TODO: stop relying on that.
+    const chip::FabricTable * fabricTable = _cppCommissioner->GetFabricTable();
     if (!fabricTable) {
         // Surprising as well!
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    chip::Credentials::P256PublicKey ourRootPublicKey, otherRootPublicKey;
+    chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
     ReturnErrorOnFailure(fabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
     ReturnErrorOnFailure(fabricTable->FetchRootPubkey(fabric->GetFabricIndex(), otherRootPublicKey));
 
