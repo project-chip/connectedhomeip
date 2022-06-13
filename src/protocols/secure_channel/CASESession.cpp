@@ -189,7 +189,6 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR
 CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
                                             SessionResumptionStorage * sessionResumptionStorage,
