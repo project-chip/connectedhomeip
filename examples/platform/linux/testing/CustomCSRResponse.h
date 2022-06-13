@@ -30,7 +30,7 @@ struct CSRResponseOptions
     bool nocsrElementsTooLong              = false;
     bool attestationSignatureIncorrectType = false;
     bool attestationSignatureInvalid       = false;
-    CustomCSRResponseOperationalKeyStore operationalKeyStore;
+    CustomCSRResponseOperationalKeyStore badCsrOperationalKeyStoreForTest;
 };
 
 } // namespace chip

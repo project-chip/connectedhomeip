@@ -147,9 +147,9 @@ namespace DataModel {
 template <>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const CSRResponse::Type & responseData)
 {
-    auto tag1    = TLV::ContextTag(to_underlying(CSRResponse::Fields::kNOCSRElements));
-    auto tag2    = TLV::ContextTag(to_underlying(CSRResponse::Fields::kAttestationSignature));
-    auto options = LinuxDeviceOptions::GetInstance().mCSRResponseOptions;
+    auto tag1      = TLV::ContextTag(to_underlying(CSRResponse::Fields::kNOCSRElements));
+    auto tag2      = TLV::ContextTag(to_underlying(CSRResponse::Fields::kAttestationSignature));
+    auto & options = LinuxDeviceOptions::GetInstance().mCSRResponseOptions;
 
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
