@@ -25,12 +25,182 @@
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
+#include "platform/CommissionableDataProvider.h"
 #include "platform/ConfigurationManager.h"
 #include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
 
 namespace chip {
 namespace rpc {
+
+namespace Internal {
+// This class supports changing the commissionable data provider values at
+// runtime using the RPCs.
+// This class is LazyInit after getting or setting any of it's values. After
+// this the class wraps the original CommissionableDataProvider, returning the
+// original values for anything which has not been overwritten.
+//
+// NOTE: Values written do not persist across a reboot.
+class CommissionableDataProviderRpcWrapper : public DeviceLayer::CommissionableDataProvider
+{
+public:
+    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override
+    {
+        LazyInit();
+        if (mPasscodeOverride.has_value())
+        {
+            setupPasscode = mPasscodeOverride.value();
+            return CHIP_NO_ERROR;
+        }
+        if (mCommissionableDataProvider)
+        {
+            return mCommissionableDataProvider->GetSetupPasscode(setupPasscode);
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // NOTE: Changing the passcode will not change the verifier or anything else
+    // this just changes the value returned from GetSetupPasscode.
+    // Using this is completely optional, and only really useful for test
+    // automation which can read the configured passcode for commissioning
+    // after it is changed.
+    CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override
+    {
+        LazyInit();
+        mPasscodeOverride = setupPasscode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override
+    {
+        LazyInit();
+        if (mDiscriminatorOverride.has_value())
+        {
+            setupDiscriminator = mDiscriminatorOverride.value();
+            return CHIP_NO_ERROR;
+        }
+        if (mCommissionableDataProvider)
+        {
+            return mCommissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override
+    {
+        LazyInit();
+        mDiscriminatorOverride = setupDiscriminator;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override
+    {
+        LazyInit();
+        if (mIterationCountOverride.has_value())
+        {
+            iterationCount = mIterationCountOverride.value();
+            return CHIP_NO_ERROR;
+        }
+        if (mCommissionableDataProvider)
+        {
+            return mCommissionableDataProvider->GetSpake2pIterationCount(iterationCount);
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    CHIP_ERROR SetSpake2pIterationCount(uint32_t iterationCount)
+    {
+        LazyInit();
+        mIterationCountOverride = iterationCount;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override
+    {
+        LazyInit();
+        if (mSaltOverride.has_value())
+        {
+            if (mSaltOverride.value().size() > saltBuf.size())
+            {
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
+            std::copy(mSaltOverride.value().begin(), mSaltOverride.value().end(), saltBuf.begin());
+            saltBuf.reduce_size(mSaltOverride.value().size());
+            return CHIP_NO_ERROR;
+        }
+        if (mCommissionableDataProvider)
+        {
+            return mCommissionableDataProvider->GetSpake2pSalt(saltBuf);
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    CHIP_ERROR SetSpake2pSalt(ByteSpan saltBuf)
+    {
+        LazyInit();
+        if (sizeof(mSaltBuf) < saltBuf.size())
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        std::copy(saltBuf.begin(), saltBuf.end(), mSaltBuf);
+        mSaltOverride = ByteSpan(mSaltBuf, saltBuf.size());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & outVerifierLen) override
+    {
+        LazyInit();
+        if (mVerifierOverride.has_value())
+        {
+            outVerifierLen = mVerifierOverride.value().size();
+            if (mVerifierOverride.value().size() > verifierBuf.size())
+            {
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
+            std::copy(mVerifierOverride.value().begin(), mVerifierOverride.value().end(), verifierBuf.begin());
+            verifierBuf.reduce_size(mVerifierOverride.value().size());
+            return CHIP_NO_ERROR;
+        }
+        if (mCommissionableDataProvider)
+        {
+            return mCommissionableDataProvider->GetSpake2pVerifier(verifierBuf, outVerifierLen);
+        }
+
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    CHIP_ERROR SetSpake2pVerifier(ByteSpan verifierBuf)
+    {
+        LazyInit();
+        if (sizeof(mVerifierBuf) < verifierBuf.size())
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        std::copy(verifierBuf.begin(), verifierBuf.end(), mVerifierBuf);
+        mVerifierOverride = ByteSpan(mVerifierBuf, verifierBuf.size());
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    std::optional<uint16_t> mDiscriminatorOverride;
+    std::optional<uint32_t> mPasscodeOverride;
+    Spake2pVerifierSerialized mVerifierBuf;
+    std::optional<ByteSpan> mVerifierOverride;
+    uint8_t mSaltBuf[kSpake2p_Max_PBKDF_Salt_Length];
+    std::optional<ByteSpan> mSaltOverride;
+    std::optional<uint32_t> mIterationCountOverride;
+    DeviceLayer::CommissionableDataProvider * mCommissionableDataProvider = nullptr;
+
+    void LazyInit()
+    {
+        if (!mCommissionableDataProvider)
+        {
+            mCommissionableDataProvider = DeviceLayer::GetCommissionableDataProvider();
+            DeviceLayer::SetCommissionableDataProvider(this);
+        }
+    }
+};
+} // namespace Internal
 
 class Device : public pw_rpc::nanopb::Device::Service<Device>
 {
@@ -157,15 +327,65 @@ public:
         return pw::OkStatus();
     }
 
+    virtual pw::Status GetSpakeInfo(const pw_protobuf_Empty & request, chip_rpc_SpakeInfo & response)
+    {
+        size_t serializedVerifierLen = 0;
+        MutableByteSpan verifierSpan{ response.verifier.bytes };
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSpake2pVerifier(verifierSpan, serializedVerifierLen) == CHIP_NO_ERROR)
+        {
+            response.verifier.size = verifierSpan.size();
+            response.has_verifier  = true;
+        }
+
+        MutableByteSpan saltSpan{ response.salt.bytes };
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSpake2pSalt(saltSpan) == CHIP_NO_ERROR)
+        {
+            response.salt.size = saltSpan.size();
+            response.has_salt  = true;
+        }
+
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSpake2pIterationCount(response.iteration_count) == CHIP_NO_ERROR)
+        {
+            response.has_iteration_count = true;
+        }
+
+        return pw::OkStatus();
+    }
+
+    virtual pw::Status SetSpakeInfo(const chip_rpc_SpakeInfo & request, pw_protobuf_Empty & response)
+    {
+        if (request.has_salt)
+        {
+            mCommissionableDataProvider.SetSpake2pSalt(ByteSpan(request.salt.bytes, request.salt.size));
+        }
+        if (request.has_iteration_count)
+        {
+            mCommissionableDataProvider.SetSpake2pIterationCount(request.iteration_count);
+        }
+        if (request.has_verifier)
+        {
+            mCommissionableDataProvider.SetSpake2pVerifier(ByteSpan(request.verifier.bytes, request.verifier.size));
+        }
+        return pw::OkStatus();
+    }
+
+    // NOTE: Changing the passcode will not change the verifier or anything else
+    // this just changes the value returned from GetSetupPasscode.
+    // Using this is completely optional, and only really useful for test
+    // automation which can read the configured passcode for commissioning
+    // after it is changed.
     virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
-        if (DeviceLayer::GetCommissionableDataProvider()->SetSetupPasscode(request.code) != CHIP_NO_ERROR ||
-            DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+        if (mCommissionableDataProvider.SetSetupPasscode(request.code) != CHIP_NO_ERROR ||
+            mCommissionableDataProvider.SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
         {
             return pw::Status::Unknown();
         }
         return pw::OkStatus();
     }
+
+private:
+    Internal::CommissionableDataProviderRpcWrapper mCommissionableDataProvider;
 };
 
 } // namespace rpc
