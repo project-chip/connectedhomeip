@@ -650,10 +650,15 @@
  * secure sessions. This controls the maximum number of concurrent
  * established secure sessions across all supported transports.
  *
- * This is sized to cover the sum of the following:
+ * This is sized by default to cover the sum of the following:
  *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
  *  - 1 reserved slot for CASEServer as a responder.
  *  - 1 reserved slot for PASE.
+ *
+ *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
+ *  Due to the use of an LRU-scheme to manage sessions, the actual active
+ *  size of the pool will grow up to the value of this define,
+ *  after which, it will remain at or around this size indefinitely.
  *
  */
 #ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE

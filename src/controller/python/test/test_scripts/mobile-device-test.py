@@ -157,6 +157,8 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
     ethernet_commissioning(test, discriminator, setup_pin, address,
                            device_nodeid)
 
+    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
+
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=device_nodeid),
               "Failed to resolve nodeid")
