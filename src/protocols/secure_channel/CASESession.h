@@ -61,6 +61,19 @@ class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
                                public PairingSession
 {
 public:
+    // Public so it is accessible to unit test
+    enum class State : uint8_t
+    {
+        kInitialized       = 0,
+        kSentSigma1        = 1,
+        kSentSigma2        = 2,
+        kSentSigma3        = 3,
+        kSentSigma1Resume  = 4,
+        kSentSigma2Resume  = 5,
+        kFinished          = 6,
+        kFinishedViaResume = 7,
+    };
+
     ~CASESession() override;
 
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
@@ -173,7 +186,11 @@ public:
      **/
     void Clear();
 
-    void InvalidateIfPendingEstablishment();
+    void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
 private:
     class CASESessionFabricDelegate final : public chip::FabricTable::Delegate
@@ -184,8 +201,7 @@ private:
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            (void) fabricIndex;
-            mCASESession->InvalidateIfPendingEstablishment();
+            mCASESession->InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
         }
 
         void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
@@ -203,24 +219,11 @@ private:
         void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            (void) fabricIndex;
-            mCASESession->InvalidateIfPendingEstablishment();
+            mCASESession->InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
         }
 
     private:
         CASESession * mCASESession;
-    };
-
-    enum class State : uint8_t
-    {
-        kInitialized       = 0,
-        kSentSigma1        = 1,
-        kSentSigma2        = 2,
-        kSentSigma3        = 3,
-        kSentSigma1Resume  = 4,
-        kSentSigma2Resume  = 5,
-        kFinished          = 6,
-        kFinishedViaResume = 7,
     };
 
     /*
@@ -312,6 +315,10 @@ private:
 
     CASESessionFabricDelegate mFabricDelegate{ this };
     State mState;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 };
 
 } // namespace chip

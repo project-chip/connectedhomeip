@@ -155,8 +155,12 @@ void CASESession::Clear()
     mFabricIndex  = kUndefinedFabricIndex;
 }
 
-void CASESession::InvalidateIfPendingEstablishment()
+void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex)
 {
+    if (mFabricIndex != fabricIndex)
+    {
+        return;
+    }
     if (!IsSessionEstablishmentInProgress())
     {
         return;
@@ -276,14 +280,14 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
     AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
 }
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
-    // Discard the exchange so that Clear() doesn't try closing it.  The
-    // exchange will handle that.
-    DiscardExchange();
     Clear();
     // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablishmentError(err);
@@ -1692,6 +1696,22 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (mStopHandshakeAtState.HasValue() && mState == mStopHandshakeAtState.Value())
+    {
+        mStopHandshakeAtState = Optional<State>::Missing();
+        // For testing purposes we are trying to stop a successful CASESession from happening by dropping part of the
+        // handshake in the middle. We are trying to keep both sides of the CASESession establishment in an active
+        // pending state. In order to keep this side open we have to tell the exchange context that we will send an
+        // async message.
+        //
+        // Should you need to resume the CASESession you could theortically pass along msg to a callback that gets
+        // registered when setting mStopHandshakeAtState.
+        mExchangeCtxt->WillSendMessage();
+        return CHIP_NO_ERROR;
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
 #if CHIP_CONFIG_SLOW_CRYPTO
     if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
@@ -1788,6 +1808,9 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
+        // Discard the exchange so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        DiscardExchange();
         AbortPendingEstablish(err);
     }
     return err;

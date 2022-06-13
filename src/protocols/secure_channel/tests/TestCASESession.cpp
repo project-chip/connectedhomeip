@@ -254,6 +254,7 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        pairing.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId()) ==
                            CHIP_NO_ERROR);
+    }
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -827,6 +828,76 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
     }
 }
 
+static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, void * inContext)
+{
+    SessionManager sessionManager;
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingAccessory;
+    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(System::Clock::Milliseconds32(360000),
+                                                               System::Clock::Milliseconds32(100000));
+    ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(System::Clock::Milliseconds32(5000),
+                                                                 System::Clock::Milliseconds32(300));
+
+    auto & loopback            = ctx.GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    NL_TEST_ASSERT(inSuite,
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
+
+    pairingCommissioner.SetStopSigmaHandshakeAt(MakeOptional(CASESession::State::kSentSigma1));
+
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateAccessory, ScopedNodeId(),
+                                                                   MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
+
+    gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                        nullptr, nullptr, &delegateCommissioner,
+                                                        MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+
+    gCommissionerFabrics.SendUpdateFabricNotificationForTest(gCommissionerFabricIndex);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
+
+    gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
+    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(300));
+    //    NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout ==
+    //    System::Clock::Milliseconds32(360000)); NL_TEST_ASSERT(inSuite,
+    //                   pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(100000));
+}
+
 // Test Suite
 
 /**
@@ -842,6 +913,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
     NL_TEST_DEF("DestinationId", CASE_DestinationIdTest),
     NL_TEST_DEF("SessionResumptionStorage", CASE_SessionResumptionStorage),
+    NL_TEST_DEF("InvalidatePendingSessionEstablishment", CASE_InvalidatePendingSessionEstablishment),
 
     NL_TEST_SENTINEL()
 };

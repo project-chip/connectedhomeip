@@ -710,6 +710,20 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
+CHIP_ERROR FabricTable::SendFabricUpdateNOC(FabricIndex fabricIndex)
+{
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in OnFabricNOCUpdated,
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricNOCUpdated(*this, fabricIndex);
+        delegate = nextDelegate;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFabricInfo)
 {
     FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
@@ -723,15 +737,8 @@ CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFa
     // validity policy will see this condition and can act appropriately.
     mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
 
-    FabricTable::Delegate * delegate = mDelegateListRoot;
-    while (delegate)
-    {
-        // It is possible that delegate will remove itself from the list in OnFabricNOCUpdated,
-        // so we grab the next delegate in the list now.
-        FabricTable::Delegate * nextDelegate = delegate->next;
-        delegate->OnFabricNOCUpdated(*this, fabricIndex);
-        delegate = nextDelegate;
-    }
+    SendFabricUpdateNOC(fabricIndex);
+
     return CHIP_NO_ERROR;
 }
 

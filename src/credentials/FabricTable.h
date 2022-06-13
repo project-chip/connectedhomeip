@@ -429,6 +429,10 @@ public:
      */
     CHIP_ERROR UpdateFabric(FabricIndex fabricIndex, FabricInfo & fabricInfo);
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { SendFabricUpdateNOC(fabricIndex); }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
@@ -613,6 +617,8 @@ private:
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
 
     CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
+
+    CHIP_ERROR SendFabricUpdateNOC(FabricIndex fabricIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage               = nullptr;
