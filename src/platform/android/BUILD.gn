@@ -36,6 +36,8 @@ static_library("android") {
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CHIPP256KeypairBridge.cpp",
+    "CHIPP256KeypairBridge.h",
     "CommissionableDataProviderImpl.cpp",
     "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
