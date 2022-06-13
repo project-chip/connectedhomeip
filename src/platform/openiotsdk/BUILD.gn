@@ -21,6 +21,7 @@ assert(chip_device_platform == "openiotsdk")
 static_library("openiotsdk") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "arch.c",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -45,7 +46,7 @@ static_library("openiotsdk") {
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
+    "SystemTimeSupport.h"
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
