@@ -1,6 +1,9 @@
 #!/bin/bash
 
+set -e
+
 GDBSERVER_DEFAULT_PORT=9999
+GDBSERVER_TARGET_PATH="/opt/usr/home/owner/share/tmp/sdk_tools/gdbserver"
 RESULT_MODE="debug"
 
 function help() {
@@ -14,6 +17,11 @@ Options:
     --gdbserver-port PORT - gdbserver port, if not specified, defaults to $GDBSERVER_DEFAULT_PORT
     --target DEVICE - device to debug app, if not specified and one device are conneted it will be used
     APP_ARGUMENTS - arguments to pass to debugged app
+
+Requirements:
+    gdbserver has to be installed on the target device in the $GDBSERVER_TARGET_PATH path.
+    If it is installed on device by rpm it is necessary to create link by:
+    'ln -sf /usr/bin/gdbserver $GDBSERVER_TARGET_PATH/gdbserver'.
 EOF
 }
 
@@ -59,8 +67,30 @@ if [ -z "$GDBSERVER_PORT" ]; then
     GDBSERVER_PORT=$GDBSERVER_DEFAULT_PORT
 fi
 
-if [ "$(sdb devices | wc -l)" -le 1 ]; then
+SDB_DEVICES=$(sdb devices | grep -cv 'List of devices attached')
+
+if [ "$SDB_DEVICES" -eq 0 ]; then
     echo "No device connected"
+    exit 1
+elif [ "$SDB_DEVICES" -gt 1 ]; then
+    if [ -z "$TARGET_DEVICE" ]; then
+        echo "More than one device connected, please specify target device."
+        help
+        exit 1
+    fi
+fi
+
+if [ -z "$TARGET_DEVICE" ]; then
+    sdb -s "$TARGET_DEVICE" root on
+    GDBSERVER_FOUND=$(sdb shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo \"gdb not found\"" | tr -d '\r')
+else
+    sdb -s "$TARGET_DEVICE" root on
+    GDBSERVER_FOUND=$(sdb -s "$TARGET_DEVICE" shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo \"gdb not found\"" | tr -d '\r')
+fi
+
+if [ "$GDBSERVER_FOUND" == "gdb not found" ]; then
+    echo "Gdbserver not found on target device in path $GDBSERVER_TARGET_PATH"
+    help
     exit 1
 fi
 
@@ -71,17 +101,9 @@ $APP_ARGS \
 "
 
 if [ -z "$TARGET_DEVICE" ]; then
-    sdb root on
-    sdb shell "[ ! -e /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver ] && \
-        mkdir -p /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver && \
-        ln -sf /usr/bin/gdbserver /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver "
     sdb shell "$CMD"
     sdb forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 else
-    sdb -s "$TARGET_DEVICE" root on
-    sdb -s "$TARGET_DEVICE" shell "[ ! -e /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver ] && \
-        mkdir -p /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver && \
-        ln -sf /usr/bin/gdbserver /opt/usr/home/owner/share/tmp/sdk_tools/gdbserver/gdbserver"
     sdb -s "$TARGET_DEVICE" shell "$CMD"
     sdb -s "$TARGET_DEVICE" forward tcp:"$GDBSERVER_PORT" tcp:"$GDBSERVER_PORT"
 fi
