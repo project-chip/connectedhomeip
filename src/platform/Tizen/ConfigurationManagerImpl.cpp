@@ -30,6 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 #include <platform/Tizen/PosixConfig.h>
 #include <platform/Tizen/WiFiManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
@@ -52,6 +53,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init(void)
     error = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(error);
 
+#if !CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    static DeviceInstanceInfoProviderImpl sDeviceInstanceInfoProvider;
+    SetDeviceInstanceInfoProvider(&sDeviceInstanceInfoProvider);
+#endif
+
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
     {
         error = StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
@@ -68,16 +74,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init(void)
 
 exit:
     return error;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)

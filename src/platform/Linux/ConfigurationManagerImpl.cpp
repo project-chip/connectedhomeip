@@ -34,6 +34,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Linux/DeviceInstanceInfoProviderImpl.h>
 #include <platform/Linux/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
@@ -66,6 +67,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);
+
+#if !CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    static DeviceInstanceInfoProviderImpl sDeviceInstanceInfoProvider;
+    SetDeviceInstanceInfoProvider(&sDeviceInstanceInfoProvider);
+#endif
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
     {
@@ -325,16 +331,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting (not implemented)");
     // TODO(#742): restart CHIP exe
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)

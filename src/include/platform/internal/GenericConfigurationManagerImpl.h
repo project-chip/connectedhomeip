@@ -64,10 +64,6 @@ public:
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
     CHIP_ERROR Init() override;
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;

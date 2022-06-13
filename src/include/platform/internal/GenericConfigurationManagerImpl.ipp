@@ -36,10 +36,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/BuildTime.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/BuildTime.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -72,6 +72,10 @@ public:
         mGenericConfigManager(configManager)
     {}
 
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
@@ -81,6 +85,37 @@ public:
 private:
     GenericConfigurationManagerImpl<ConfigClass> & mGenericConfigManager;
 };
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetVendorId(uint16_t & vendorId)
+{
+    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetProductId(uint16_t & productId)
+{
+    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetVendorName(char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetProductName(char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+
+    return CHIP_NO_ERROR;
+}
 
 template <class ConfigClass>
 CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
@@ -109,10 +144,6 @@ CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char *
 template <class ConfigClass>
 CHIP_ERROR LegacyDeviceInstanceInfoProvider<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-#if CHIP_DEVICE_LAYER_TARGET_FAKE
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
-
     CHIP_ERROR err;
     enum
     {
@@ -148,7 +179,6 @@ exit:
         ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
     }
     return err;
-#endif
 }
 
 template <class ConfigClass>
@@ -421,20 +451,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
-{
-    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
-{
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint32_t & softwareVer)
 {
     softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
@@ -462,7 +478,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpo
     const char * date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
     const char * time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
     uint32_t seconds;
-    auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date), COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);
+    auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date),
+                                        COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);
     if (good)
     {
         chipEpochTime = chip::System::Clock::Seconds32(seconds);
@@ -501,22 +518,6 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorName(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductName(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
     return CHIP_NO_ERROR;
 }
 
@@ -754,11 +755,11 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
 
     deviceIdInfo.Init();
 
-    err = GetVendorId(id);
+    err = GetDeviceInstanceInfoProvider()->GetVendorId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetVendorId(id);
 
-    err = GetProductId(id);
+    err = GetDeviceInstanceInfoProvider()->GetProductId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
@@ -856,7 +857,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 
     {
         uint16_t vendorId;
-        if (GetVendorId(vendorId) != CHIP_NO_ERROR)
+        if (deviceInstanceInfoProvider->GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
             vendorId = 0;
         }
@@ -865,7 +866,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 
     {
         uint16_t productId;
-        if (GetProductId(productId) != CHIP_NO_ERROR)
+        if (deviceInstanceInfoProvider->GetProductId(productId) != CHIP_NO_ERROR)
         {
             productId = 0;
         }

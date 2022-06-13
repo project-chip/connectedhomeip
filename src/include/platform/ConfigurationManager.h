@@ -85,10 +85,6 @@ public:
         kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
-    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                           = 0;
-    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                    = 0;
-    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                          = 0;
-    virtual CHIP_ERROR GetProductId(uint16_t & productId)                                  = 0;
     virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                           = 0;
     virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                             = 0;
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                           = 0;
