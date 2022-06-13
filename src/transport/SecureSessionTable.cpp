@@ -24,10 +24,11 @@
 namespace chip {
 namespace Transport {
 
-Optional<SessionHandle> SecureSessionTable::CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
-                                                          NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
-                                                          uint16_t peerSessionId, FabricIndex fabricIndex,
-                                                          const ReliableMessageProtocolConfig & config)
+Optional<SessionHandle> SecureSessionTable::CreateNewSecureSessionForTest(SecureSession::Type secureSessionType,
+                                                                          uint16_t localSessionId, NodeId localNodeId,
+                                                                          NodeId peerNodeId, CATValues peerCATs,
+                                                                          uint16_t peerSessionId, FabricIndex fabricIndex,
+                                                                          const ReliableMessageProtocolConfig & config)
 {
     if (secureSessionType == SecureSession::Type::kCASE)
     {
@@ -57,12 +58,13 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSessionForTest(Secure
     return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
 }
 
-Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession::Type secureSessionType, ScopedNodeId sessionEvictionHint)
+Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession::Type secureSessionType,
+                                                                   ScopedNodeId sessionEvictionHint)
 {
     Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
     SecureSession * allocated  = nullptr;
 
-    auto sessionId             = FindUnusedSessionId();
+    auto sessionId = FindUnusedSessionId();
     VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
 
     //
@@ -70,27 +72,33 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession
     // to run the eviction algorithm to get a free slot. We shall ALWAYS be guaranteed to evict
     // an existing session in the table in normal operating circumstances.
     //
-    if (mEntries.Allocated() < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE) {
+    if (mEntries.Allocated() < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE)
+    {
         allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
         VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
     }
-    else {
+    else
+    {
         allocated = EvictAndAllocate(sessionId.Value(), secureSessionType, sessionEvictionHint);
     }
 
-    rv = MakeOptional<SessionHandle>(*allocated);
-    mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1) : static_cast<uint16_t>(sessionId.Value() + 1);
+    rv             = MakeOptional<SessionHandle>(*allocated);
+    mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
+                                                        : static_cast<uint16_t>(sessionId.Value() + 1);
 
 exit:
     return rv;
 }
 
-SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint)
+SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType,
+                                                     const ScopedNodeId & sessionEvictionHint)
 {
-    VerifyOrDieWithMsg(!mRunningEvictionLogic, SecureChannel, "EvictAndAllocate isn't re-entrant, yet someone called us while we're already running");
+    VerifyOrDieWithMsg(!mRunningEvictionLogic, SecureChannel,
+                       "EvictAndAllocate isn't re-entrant, yet someone called us while we're already running");
     mRunningEvictionLogic = true;
 
-    ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId, (uint8_t)secureSessionType);
+    ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId,
+                    (uint8_t) secureSessionType);
 
     VerifyOrDie(mEntries.Allocated() <= CHIP_CONFIG_SECURE_SESSION_POOL_SIZE);
 
@@ -120,14 +128,17 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
 #if CHIP_DETAIL_LOGGING
     ChipLogDetail(SecureChannel, "Sorted Eviction Candidates (ranked from best candidate to worst):");
     auto i = 0;
-    for (auto *session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++, i++) {
-        ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lld",
-                     i, session->mSession, session->mSession->GetStateStr(), session->mSession->GetLastActivityTime().count());
+    for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++, i++)
+    {
+        ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lld", i, session->mSession,
+                      session->mSession->GetStateStr(), session->mSession->GetLastActivityTime().count());
     }
 #endif
 
-    for (auto *session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++) {
-        if (session->mSession->IsPendingEviction()) {
+    for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++)
+    {
+        if (session->mSession->IsPendingEviction())
+        {
             continue;
         }
 
@@ -136,12 +147,13 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
         auto prevCount = mEntries.Allocated();
 
         //
-        // SessionHolders act like weak-refs on a session, but since they do still add to the ref-count of a SecureSession, we cannot actually
-        // tell whether there are truly any strong-refs (SessionHandles) on this session because if we did, we'd avoid evicting it since it's
-        // pointless to do so.
+        // SessionHolders act like weak-refs on a session, but since they do still add to the ref-count of a SecureSession, we
+        // cannot actually tell whether there are truly any strong-refs (SessionHandles) on this session because if we did, we'd
+        // avoid evicting it since it's pointless to do so.
         //
-        // However, we don't actually have SessionHolders implemented correctly as weak-refs, requiring us to go ahead and 'try' to evict it,
-        // and see if it still remains in the table. If it does, we have to try the next one. If it doesn't, we know we've earned a free spot.
+        // However, we don't actually have SessionHolders implemented correctly as weak-refs, requiring us to go ahead and 'try' to
+        // evict it, and see if it still remains in the table. If it does, we have to try the next one. If it doesn't, we know we've
+        // earned a free spot.
         //
         // See #19495.
         //
@@ -149,10 +161,11 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
 
         auto newCount = mEntries.Allocated();
 
-        if (newCount < prevCount) {
+        if (newCount < prevCount)
+        {
             ChipLogProgress(SecureChannel, "Successfully evicted a session!");
             mRunningEvictionLogic = false;
-            auto *retSession  = mEntries.CreateObject(*this, secureSessionType, localSessionId);
+            auto * retSession     = mEntries.CreateObject(*this, secureSessionType, localSessionId);
             VerifyOrDie(session != nullptr);
             return retSession;
         }
@@ -163,19 +176,22 @@ SecureSession* SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Sec
     return nullptr;
 }
 
-void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext &evictionContext)
+void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext & evictionContext)
 {
-    evictionContext.Sort([](const auto &a, const auto &b) {
+    evictionContext.Sort([](const auto & a, const auto & b) {
         int aStateScore = 0, bStateScore = 0;
 
-        auto assignStateScore = [](auto &score, const auto &session) {
-            if (session.IsDefunct()) {
+        auto assignStateScore = [](auto & score, const auto & session) {
+            if (session.IsDefunct())
+            {
                 score = 2;
             }
-            else if (session.IsActiveSession()) {
+            else if (session.IsActiveSession())
+            {
                 score = 1;
             }
-            else {
+            else
+            {
                 score = 0;
             }
         };

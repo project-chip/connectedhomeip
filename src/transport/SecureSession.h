@@ -71,8 +71,8 @@ public:
                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                   const ReliableMessageProtocolConfig & config) :
         mTable(table),
-        mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
-        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
+        mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId), mPeerCATs(peerCATs),
+        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
     {
         MoveToState(State::kActive);
         Retain(); // Put the test session in Active state. This ref is released inside MarkForRemoval
@@ -145,7 +145,7 @@ public:
     bool IsEstablishing() const { return mState == State::kEstablishing; }
     bool IsPendingEviction() const { return mState == State::kPendingEviction; }
     bool IsDefunct() const { return mState == State::kDefunct; }
-    const char *GetStateStr() const { return StateToString(mState); }
+    const char * GetStateStr() const { return StateToString(mState); }
 
     /*
      * This marks the session for eviction. It will first detach all SessionHolders attached to this
@@ -241,7 +241,8 @@ public:
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
 
-        if (mState == State::kDefunct) {
+        if (mState == State::kDefunct)
+        {
             MoveToState(State::kActive);
         }
     }
@@ -303,7 +304,7 @@ private:
         kPendingEviction = 3,
     };
 
-    const char *StateToString(State state) const;
+    const char * StateToString(State state) const;
     void MoveToState(State targetState);
 
     friend class SecureSessionDeleter;

@@ -239,7 +239,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     //
     // If the session isn't active, we shouldn't proceed any further.
     //
-    if (!session->IsActiveSession()) {
+    if (!session->IsActiveSession())
+    {
         ChipLogError(ExchangeManager, "OnMessageReceived failed due to receiving a message on an in-active session");
         return;
     }

@@ -104,18 +104,20 @@ private:
      * another instance of it.
      *
      */
-    struct SortableSession {
+    struct SortableSession
+    {
     public:
-        void swap(SortableSession &other) {
+        void swap(SortableSession & other)
+        {
             SortableSession tmp(other);
             other.mSession = mSession;
-            mSession = tmp.mSession;
+            mSession       = tmp.mSession;
         }
 
         const Transport::SecureSession * operator->() const { return mSession; }
 
     private:
-        SecureSession *mSession;
+        SecureSession * mSession;
         friend class SecureSessionTable;
     };
 
@@ -127,7 +129,8 @@ private:
      * to get the list of sessions sorted in the desired order.
      *
      */
-    class EvictionPolicyContext {
+    class EvictionPolicyContext
+    {
     public:
         /*
          * Called by the policy implementor to sort the list of sessions given a comparator
@@ -141,15 +144,17 @@ private:
          *
          */
         template <typename CompareFunc>
-        void Sort(CompareFunc func) {
+        void Sort(CompareFunc func)
+        {
             std::sort(mSessionList.begin(), mSessionList.begin() + mSessionList.size(), func);
         }
 
-        const ScopedNodeId& GetSessionEvictionHint() const { return mSessionEvictionHint; }
+        const ScopedNodeId & GetSessionEvictionHint() const { return mSessionEvictionHint; }
 
     private:
-        EvictionPolicyContext(Span<SortableSession> sessionList, ScopedNodeId sessionEvictionHint) {
-            mSessionList = sessionList;
+        EvictionPolicyContext(Span<SortableSession> sessionList, ScopedNodeId sessionEvictionHint)
+        {
+            mSessionList         = sessionList;
             mSessionEvictionHint = sessionEvictionHint;
         }
 
@@ -169,14 +174,15 @@ private:
      *    of anything else.
      *
      */
-    void DefaultEvictionPolicy(EvictionPolicyContext &evictionContext);
+    void DefaultEvictionPolicy(EvictionPolicyContext & evictionContext);
 
     /**
      *
      * Evicts a session from the session table using the DefaultEvictionPolicy implementation.
      *
      */
-    SecureSession* EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint);
+    SecureSession * EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType,
+                                     const ScopedNodeId & sessionEvictionHint);
 
     /**
      * Find an available session ID that is unused in the secure session table.

@@ -368,7 +368,8 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType, const ScopedNodeId & sessionEvictionHint)
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
+                                                        const ScopedNodeId & sessionEvictionHint)
 {
     return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }

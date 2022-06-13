@@ -26,35 +26,38 @@ void SecureSessionDeleter::Release(SecureSession * entry)
     entry->mTable.ReleaseSession(entry);
 }
 
-const char *SecureSession::StateToString(State state) const
+const char * SecureSession::StateToString(State state) const
 {
-    switch (state) {
-        case State::kEstablishing:
-            return "kEstablishing";
-            break;
+    switch (state)
+    {
+    case State::kEstablishing:
+        return "kEstablishing";
+        break;
 
-        case State::kActive:
-            return "kActive";
-            break;
+    case State::kActive:
+        return "kActive";
+        break;
 
-        case State::kDefunct:
-            return "kDefunct";
-            break;
+    case State::kDefunct:
+        return "kDefunct";
+        break;
 
-        case State::kPendingEviction:
-            return "kPendingEviction";
-            break;
+    case State::kPendingEviction:
+        return "kPendingEviction";
+        break;
 
-        default:
-            return "???";
-            break;
+    default:
+        return "???";
+        break;
     }
 }
 
 void SecureSession::MoveToState(State targetState)
 {
-    if (mState != targetState) {
-        ChipLogProgress(SecureChannel, "SecureSession[%p]: Moving from state '%s' --> '%s'", this, StateToString(mState), StateToString(targetState));
+    if (mState != targetState)
+    {
+        ChipLogProgress(SecureChannel, "SecureSession[%p]: Moving from state '%s' --> '%s'", this, StateToString(mState),
+                        StateToString(targetState));
         mState = targetState;
     }
 }

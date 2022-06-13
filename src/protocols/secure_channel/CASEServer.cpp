@@ -108,9 +108,9 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
     // active, this will have no effect (the session will remain in the session table).
     //
     // If we previously held a session still in the pairing state, it means PairingSession was owning that session. Since it
-    // gave up its reference by the time we got here, releasing the pinned session here will actually result in it being de-allocated
-    // since no one else is holding onto this session. This will mean that when we get to allocating a session below, we'll at
-    // least have one free session available in the session table, and won't need to evict an arbitrary session.
+    // gave up its reference by the time we got here, releasing the pinned session here will actually result in it being
+    // de-allocated since no one else is holding onto this session. This will mean that when we get to allocating a session below,
+    // we'll at least have one free session available in the session table, and won't need to evict an arbitrary session.
     //
     mPinnedSecureSession.ClearValue();
 
@@ -162,11 +162,12 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     // We're not allowed to call methods that will eventually result in calling SessionManager::AllocateSecureSession
     // from a SessionDelegate::OnSessionReleased callback. Schedule the preparation as an async work item.
     //
-    mSessionManager->SystemLayer()->ScheduleWork([](auto *systemLayer, auto *appState) {
-        CASEServer *_this = static_cast<CASEServer *>(appState);
-        _this->PrepareForSessionEstablishment();
-    },
-    this);
+    mSessionManager->SystemLayer()->ScheduleWork(
+        [](auto * systemLayer, auto * appState) {
+            CASEServer * _this = static_cast<CASEServer *>(appState);
+            _this->PrepareForSessionEstablishment();
+        },
+        this);
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
