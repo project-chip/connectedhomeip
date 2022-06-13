@@ -1,0 +1,88 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 20.6.6. [TC-IDM-8.1] Fabric scoped Test Cases. DUT as the server.
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Send a Read Request Message from RC1 and RC2 to read the ACL
+          attribute, which is a fabric scoped list, from the DUT. Fabric
+          filtered should be set to false."
+      verification: |
+          Verify that the number of entries returned by the DUT for both the reads are same. Verify that the response to RC1 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values. Verify that the response to RC2 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values.
+      disabled: true
+
+    - label:
+          "Use Access control cluster to verify this test case. Send a
+          fabric-filtered Read Request Message from each of RC1 and RC2 to read
+          the ACL attribute, which is a fabric scoped list, from the DUT. From
+          RC1 send a Write Request message to the DUT to write to an entry in
+          the fabric scoped list associated with its own fabric. Send a
+          fabric-filtered Read Request Message from each of RC1 and RC2 to read
+          the fabric scoped list from the DUT."
+      verification: |
+          Verify that the data received from DUT after the second read request from RC2 is same as the data received after the first read request from RC2. Verify that the data received from the DUT after the second read request from RC1 has the correct modifications to the data.
+      disabled: true
+
+    - label:
+          "Send a Read Request Message to the DUT from RC1 and RC2 to read the
+          fabric scoped list 'Fabrics' from OperationalCredentialsCluster.
+          Fabric filtered should be set to false. RC1 sends an Invoke
+          command(UpdateFabricLabel) to update the label of its fabric. Send a
+          non-filtered Read Request Message from RC1 and RC2 to read the fabric
+          scoped list from the DUT."
+      verification: |
+          Verify that the label only for the fabric on which RC1 and DUT are present is updated. Verify that the label for the other fabric RC2 is on is not modified.
+      disabled: true
+
+    - label:
+          "Activate the subscription between RC1 and DUT for an attribute1 whose
+          value is a list of structs which contain some fabric-sensitive data
+          Activate the subscription between RC2 and DUT for the same attribute1
+          whose value is a list of structs which contain some fabric-sensitive
+          data. Modify attribute1 on the DUT."
+      verification: |
+          Verify that the DUT sends a response to RC1 and RC2 with the modified attribute values. Verify that the response to RC1 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values. Verify that the response to RC2 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values.
+      disabled: true
+
+    - label:
+          "Activate the subscription between RC1 and DUT for an Event1 which is
+          fabric sensitive Activate the subscription between RC2 and DUT for the
+          same Event1 which is fabric sensitive. Trigger Event1 on DUT on the
+          fabric where RC1 is present."
+      verification: |
+          Verify that the DUT sends a response to RC1 and not RC2.
+      disabled: true
+
+    - label:
+          "RC1 sends Subscribe Request Message to DUT with EventRequests set to
+          path where an event in the path is fabric-sensitive and the associated
+          fabric does not match the accessing fabric."
+      verification: |
+          Verify that the DUT sends a Report Data Message with no entry for that event in EventReports list.
+      disabled: true
+
+    - label:
+          "RC1 sends Read Request Message to DUT with EventRequests set to path
+          where an event in the path is fabric-sensitive and the associated
+          fabric does not match the accessing fabric."
+      verification: |
+          Verify that the DUT sends a Report Data Message with no entry for that event in EventReports list.
+      disabled: true
