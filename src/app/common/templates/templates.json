@@ -13,6 +13,18 @@
         {
             "name": "header",
             "path": "../../zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "cluster_objects_struct",
+            "path": "../../zap-templates/partials/cluster-objects-struct.zapt"
+        },
+        {
+            "name": "cluster_objects_field_init",
+            "path": "../../zap-templates/partials/cluster-objects-field-init.zapt"
+        },
+        {
+            "name": "cluster_objects_attribute_typeinfo",
+            "path": "../../zap-templates/partials/cluster-objects-attribute-typeinfo.zapt"
         }
     ],
     "templates": [
@@ -97,6 +109,11 @@
             "output": "ids/Commands.h"
         },
         {
+            "path": "../../zap-templates/templates/app/ids/Events.zapt",
+            "name": "Events Ids header",
+            "output": "ids/Events.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/cluster-objects.zapt",
             "name": "Cluster objects header for Interaction Model",
             "output": "cluster-objects.h"
@@ -105,6 +122,11 @@
             "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
             "name": "Cluster objects header for Interaction Model",
             "output": "cluster-objects.cpp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums.zapt",
+            "name": "Enum and bitmap definitions for clusters",
+            "output": "cluster-enums.h"
         }
     ]
 }

@@ -82,15 +82,6 @@ ti_simplelink_executable("persistent_storage") {
     "-Wconversion",
   ]
 
-  ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-L${ti_simplelink_sdk_root}/source",
-    "-T" + rebase_path(ldscript, root_build_dir),
-  ]
-
   output_dir = root_out_dir
 }
 

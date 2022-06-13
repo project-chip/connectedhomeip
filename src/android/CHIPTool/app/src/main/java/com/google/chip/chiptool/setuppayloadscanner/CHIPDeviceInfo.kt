@@ -31,10 +31,12 @@ data class CHIPDeviceInfo(
   val productId: Int = 0,
   val discriminator: Int = 0,
   val setupPinCode: Long = 0L,
+  var commissioningFlow: Int = 0,
   val optionalQrCodeInfoMap: Map<Int, QrCodeInfo> = mapOf(),
   val discoveryCapabilities: Set<DiscoveryCapability> = setOf(),
   val ipAddress: String? = null,
-) : Parcelable {
+
+  ) : Parcelable {
 
   companion object {
     fun fromSetupPayload(setupPayload: SetupPayload): CHIPDeviceInfo {
@@ -44,6 +46,7 @@ data class CHIPDeviceInfo(
         setupPayload.productId,
         setupPayload.discriminator,
         setupPayload.setupPinCode,
+        setupPayload.commissioningFlow,
         setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->
           QrCodeInfo(
             info.tag,
@@ -52,7 +55,7 @@ data class CHIPDeviceInfo(
             info.int32
           )
         },
-        setupPayload.discoveryCapabilities
+        setupPayload.discoveryCapabilities,
       )
     }
   }

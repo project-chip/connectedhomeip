@@ -25,6 +25,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #define CHIP_SHELL_MAX_BUFFER_SIZE 128
 
@@ -33,96 +34,150 @@ using chip::DeviceLayer::ConfigurationMgr;
 namespace chip {
 namespace Shell {
 
-static CHIP_ERROR GetOnboardingQRCode(bool printHeader)
+static CHIP_ERROR GetOnboardingQRCode(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string QRCode;
+
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (printHeader)
     {
         streamer_printf(sout, "QRCode:            ");
     }
-    ReturnErrorOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
-    streamer_printf(sout, "%s\r\n", QRCode.c_str());
+    ReturnErrorOnFailure(GetQRCode(QRCode, aRendezvousFlags));
+    streamer_printf(sout, "%s\r\n", QRCode.data());
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR GetOnboardingQRCodeUrl(bool printHeader)
+static CHIP_ERROR GetOnboardingQRCodeUrl(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string QRCode;
+
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (printHeader)
     {
-        streamer_printf(sout, "QRCodeUrl:          ");
+        streamer_printf(sout, "QRCodeUrl:         ");
     }
-    ReturnErrorOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
+    ReturnErrorOnFailure(GetQRCode(QRCode, aRendezvousFlags));
 
-    char qrCodeBuffer[CHIP_SHELL_MAX_BUFFER_SIZE];
+    char qrCodeUrlBuffer[CHIP_SHELL_MAX_BUFFER_SIZE];
 
-    ReturnErrorOnFailure(GetQRCodeUrl(qrCodeBuffer, sizeof(qrCodeBuffer), QRCode));
-    streamer_printf(sout, "%s\r\n", qrCodeBuffer);
+    ReturnErrorOnFailure(GetQRCodeUrl(qrCodeUrlBuffer, sizeof(qrCodeUrlBuffer), QRCode));
+    streamer_printf(sout, "%s\r\n", qrCodeUrlBuffer);
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader)
+static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string manualPairingCode;
+
+    // Create buffer for manual pariting code that can fit max size + check digit + null terminator.
+    char manualPairingCodeBuffer[chip::kManualSetupLongCodeCharLength + 1];
+    chip::MutableCharSpan manualPairingCode(manualPairingCodeBuffer);
 
     if (printHeader)
     {
-        streamer_printf(sout, "ManualPairingCode:  ");
+        streamer_printf(sout, "ManualPairingCode: ");
     }
-    ReturnErrorOnFailure(
-        GetManualPairingCode(manualPairingCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
-    streamer_printf(sout, "%s\r\n", manualPairingCode.c_str());
+    ReturnErrorOnFailure(GetManualPairingCode(manualPairingCode, aRendezvousFlags));
+    streamer_printf(sout, "%s\r\n", manualPairingCode.data());
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR PrintAllOnboardingCodes()
+static CHIP_ERROR PrintAllOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    ReturnErrorOnFailure(GetOnboardingQRCode(true));
-    ReturnErrorOnFailure(GetOnboardingQRCodeUrl(true));
-    ReturnErrorOnFailure(GetOnboardingManualPairingCode(true));
+    ReturnErrorOnFailure(GetOnboardingQRCode(true, aRendezvousFlags));
+    ReturnErrorOnFailure(GetOnboardingQRCodeUrl(true, aRendezvousFlags));
+    ReturnErrorOnFailure(GetOnboardingManualPairingCode(true, aRendezvousFlags));
 
     return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformationFlags * aRendezvousFlags)
+{
+    if (str == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (aRendezvousFlags == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (strcmp(str, "none") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kNone;
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(str, "softap") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kSoftAP;
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(str, "ble") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kBLE;
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(str, "onnetwork") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 {
-    if (argc == 0)
-    {
-        return PrintAllOnboardingCodes();
-    }
+    chip::RendezvousInformationFlags aRendezvousFlags;
 
-    if (strcmp(argv[0], "qrcode") == 0)
-    {
-        return GetOnboardingQRCode(false);
-    }
-    else if (strcmp(argv[0], "qrcodeurl") == 0)
-    {
-        return GetOnboardingQRCodeUrl(false);
-    }
-    else if (strcmp(argv[0], "manualpairingcode") == 0)
-    {
-        return GetOnboardingManualPairingCode(false);
-    }
-    else
+    if (argc == 0)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    CHIP_ERROR err = RendezvousStringToFlag(argv[0], &aRendezvousFlags);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    if (argc == 1)
+    {
+        return PrintAllOnboardingCodes(aRendezvousFlags);
+    }
+
+    if (strcmp(argv[1], "qrcode") == 0)
+    {
+        return GetOnboardingQRCode(false, aRendezvousFlags);
+    }
+    if (strcmp(argv[1], "qrcodeurl") == 0)
+    {
+        return GetOnboardingQRCodeUrl(false, aRendezvousFlags);
+    }
+    if (strcmp(argv[1], "manualpairingcode") == 0)
+    {
+        return GetOnboardingManualPairingCode(false, aRendezvousFlags);
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterOnboardingCodesCommands()
 {
 
-    static const shell_command_t sDeviceComand = { &OnboardingHandler, "onboardingcodes",
-                                                   "Dump device onboarding codes. Usage: onboardingcodes [param_name]" };
+    static const shell_command_t sDeviceComand = {
+        &OnboardingHandler, "onboardingcodes",
+        "Dump device onboarding codes. Usage: onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]"
+    };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
 }
 
 } // namespace Shell

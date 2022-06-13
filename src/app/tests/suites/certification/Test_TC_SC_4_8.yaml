@@ -1,0 +1,69 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
+    commissioned to the same fabric [DUT - Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission TH1 to DUTs Fabric"
+      verification: |
+          1. Provision the device using 1st controller chip-tool  on the raspi (use above instructions)
+
+
+          " On first controller, using administratorcommissioningg chip tool open commissioning window.
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+      disabled: true
+
+    - label: "Commission TH2 to DUTs Fabric"
+      verification: |
+          Using your DUT Controller connect to the accessory.
+
+          Below is the example when using chip tool as controller
+          ./chip-tool pairing onnetwork 1 20202021
+
+          Verify you got below message
+          Device commissioning completed with success
+      disabled: true
+
+    - label: "Send RemoveFabric from DUT to TH1 and comission DUT to TH1 again"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
+          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
+          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 1
+          [1651571274.155215][10562:10567] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Send RemoveFabric from DUT to TH2 and comission DUT to TH2 again"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabrics 2 2 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
+          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
+          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 2
+          [1651571274.155215][10562:10567] CHIP:TOO:    }
+      disabled: true

@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a User-Directed Commissioning unsolicitied
+ *      This file defines objects for a User-Directed Commissioning unsolicited
  *      initiator (client) and recipient (server).
  *
  */
@@ -42,7 +42,7 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 // Cache contains 16 clients. This may need to be tweaked.
-constexpr size_t kMaxUDCClients = 16;
+constexpr uint8_t kMaxUDCClients = 16;
 
 /**
  * User Directed Commissioning Protocol Message Types
@@ -79,10 +79,10 @@ public:
      * commission the given node, and obtain the setup code to allow commissioning to proceed,
      * and then invoke commissioning on the given Node (using CHIP Device Controller, for example)
      *
-     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *  @param[in]    state           The state for the UDC Client.
      *
      */
-    virtual void OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData) = 0;
+    virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
 
     virtual ~UserConfirmationProvider() = default;
 };
@@ -115,7 +115,7 @@ public:
      *
      */
 
-    CHIP_ERROR EncodeUDCMessage(System::PacketBufferHandle && payload);
+    CHIP_ERROR EncodeUDCMessage(const System::PacketBufferHandle & payload);
 };
 
 class DLL_EXPORT UserDirectedCommissioningServer : public TransportMgrDelegate
@@ -183,7 +183,13 @@ public:
      * Get the cache of UDC Clients
      *
      */
-    UDCClients<kMaxUDCClients> GetUDCClients() { return mUdcClients; }
+    UDCClients<kMaxUDCClients> & GetUDCClients() { return mUdcClients; }
+
+    /**
+     * Print the cache of UDC Clients
+     *
+     */
+    void PrintUDCClients();
 
 private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;

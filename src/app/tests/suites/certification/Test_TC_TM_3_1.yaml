@@ -1,0 +1,80 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 6.3.1. [TC-TM-3.1] Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT reads all supported mandatory attributes from TH once at a time
+          in a manufacturer specific order"
+      verification: |
+          chip-tool temperaturemeasurement read measured-value 12345 1
+
+          verify that you see something like this:
+
+          [1643288740.653361][12907:12912] CHIP:DMG:  }
+          [1643288740.653441][12907:12912] CHIP:DMG:
+          [1643288740.653497][12907:12912] CHIP:DMG:  Data = 2420,
+          [1643288740.653546][12907:12912] CHIP:DMG:  },
+          chip-tool temperaturemeasurement read min-measured-value 12345 1
+
+          verify that you see something like this:
+
+          [1643288902.528399][12918:12923] CHIP:DMG:  }
+          [1643288902.528491][12918:12923] CHIP:DMG:
+          [1643288902.528577][12918:12923] CHIP:DMG:  Data = -4000,
+          [1643288902.528663][12918:12923] CHIP:DMG:  },
+          chip-tool temperaturemeasurement read max-measured-value 12345 1
+
+          verify that you see something like this:
+
+          [1643289012.569725][12931:12936] CHIP:DMG:  }
+          [1643289012.569805][12931:12936] CHIP:DMG:
+          [1643289012.569883][12931:12936] CHIP:DMG:  Data = 8500,
+          [1643289012.569957][12931:12936] CHIP:DMG:  },
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH once at a time in
+          a manufacturer specific order"
+      verification: |
+          chip-tool temperaturemeasurement read max-measured-value 12345 1
+
+          verify that you see something like this:
+
+          [1643289012.569725][12931:12936] CHIP:DMG:  }
+          [1643289012.569805][12931:12936] CHIP:DMG:
+          [1643289012.569883][12931:12936] CHIP:DMG:  Data = 120,
+          [1643289012.569957][12931:12936] CHIP:DMG:  },
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          no writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          no writable attributes
+      disabled: true

@@ -22,7 +22,7 @@ interface or standalone execution:
 usage: efr32_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
                                [--verify_application] [--reset] [--skip_reset]
                                [--commander FILE] [--device DEVICE]
-                               [--serialno SERIAL]
+                               [--serialno SERIAL] [--ip ADDRESS]
 
 Flash EFR32 device
 
@@ -36,6 +36,8 @@ configuration:
                         Device family or platform to target
   --serialno SERIAL, -s SERIAL
                         Serial number of device to flash
+  --ip ADDRESS, -a ADDRESS
+                        Ip Address of the targeted flasher
 
 operations:
   --erase               Erase device
@@ -90,6 +92,14 @@ EFR32_OPTIONS = {
                 'metavar': 'SERIAL'
             },
         },
+        'ip': {
+            'help': 'Ip Address of the probe connected to the target',
+            'default': None,
+            'alias': ['-a'],
+            'argparse': {
+                'metavar': 'ADDRESS'
+            },
+        },
     },
 }
 
@@ -102,7 +112,8 @@ class Flasher(firmware_utils.Flasher):
         self.define_options(EFR32_OPTIONS)
 
     # Common command line arguments for commander device subcommands.
-    DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {'optional': 'device'}]
+    DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {
+        'optional': 'ip'}, {'optional': 'device'}]
 
     def erase(self):
         """Perform `commander device masserase`."""
@@ -142,8 +153,8 @@ class Flasher(firmware_utils.Flasher):
             if self.erase().err:
                 return self
 
-        application = self.optional_file(self.option.application)
-        if application:
+        if self.option.application:
+            application = self.option.application
             if self.flash(application).err:
                 return self
             if self.option.verify_application:

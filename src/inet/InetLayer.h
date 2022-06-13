@@ -17,281 +17,122 @@
  */
 
 /**
- *    @file
- *      This file defines classes for abstracting access to and
- *      interactions with a platform- and system-specific Internet
- *      Protocol stack which, as of this implementation, may be either
- *      BSD/POSIX Sockets, LwIP or Network.framework.
- *
- *      Major abstractions provided are:
- *
- *        * Timers
- *        * Domain Name System (DNS) resolution
- *        * TCP network transport
- *        * UDP network transport
- *        * Raw network transport
- *
- *      For BSD/POSIX Sockets, event readiness notification is handled
- *      via file descriptors and a traditional poll / select
- *      implementation on the platform adaptation.
- *
- *      For LwIP, event readiness notification is handled via events /
- *      messages and platform- and system-specific hooks for the event
- *      / message system.
- *
+ * Provides access to UDP (and optionally TCP) EndPointManager.
  */
 
 #pragma once
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
-#include <inet/InetConfig.h>
-
-#include <inet/IANAConstants.h>
-#include <inet/IPAddress.h>
-#include <inet/IPPrefix.h>
 #include <inet/InetError.h>
-#include <inet/InetInterface.h>
-#include <inet/InetLayerBasis.h>
-#include <inet/InetLayerEvents.h>
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include <inet/DNSResolver.h>
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <inet/TCPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-#include <inet/UDPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#include <inet/AsyncDNSResolverSockets.h>
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ObjectLifeCycle.h>
+#include <lib/support/Pool.h>
+#include <platform/LockTracker.h>
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
-
-#include <lib/support/DLLUtil.h>
-
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-#include <pthread.h>
-#include <semaphore.h>
-#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-
-#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#if defined(ESP_PLATFORM)
-#include "freertos/FreeRTOS.h"
-#else
-#include <FreeRTOS.h>
-#endif
-#include <semphr.h>
-#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
 
 #include <stdint.h>
 
 namespace chip {
 namespace Inet {
 
-class InetLayer;
+/**
+ * Template providing traits for EndPoint types used by EndPointManager.
+ *
+ * Instances must define:
+ *      static constexpr const char * kName;
+ *      static constexpr int kSystemStatsKey;
+ */
+template <class EndPointType>
+struct EndPointProperties;
 
 /**
- *  @class InetLayer
- *
- *  @brief
- *    This provides access to Internet services, including timers,
- *    Domain Name System (DNS) resolution, TCP network transport, UDP
- *    network transport, and raw network transport, for a single
- *    thread.
- *
- *    For BSD/POSIX Sockets, event readiness notification is handled
- *    via file descriptors and a traditional poll / select
- *    implementation on the platform adaptation.
- *
- *    For LwIP, event readiness notification is handle via events /
- *    messages and platform- and system-specific hooks for the event /
- *    message system.
- *
+ * Manage creating, deletion, and iteration of Inet::EndPoint types.
  */
-class DLL_EXPORT InetLayer
+template <class EndPointType>
+class EndPointManager
 {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    friend class DNSResolver;
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    friend class AsyncDNSResolverSockets;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    friend class TCPEndPoint;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    friend class UDPEndPoint;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
 public:
-    /**
-     *  The current state of the InetLayer object.
-     *
-     */
-    volatile enum {
-        kState_NotInitialized     = 0, /**< Not initialized state. */
-        kState_Initialized        = 1, /**< Initialized state. */
-        kState_ShutdownInProgress = 2, /**< State where Shutdown has been triggered. */
-    } State;                           /**< [READ-ONLY] Current state. */
+    using EndPoint        = EndPointType;
+    using EndPointVisitor = Loop (*)(EndPoint *);
 
-    InetLayer();
+    EndPointManager() {}
+    virtual ~EndPointManager() { VerifyOrDie(mLayerState.Destroy()); }
 
-    CHIP_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
-
-    // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
-    CHIP_ERROR Shutdown();
-
-    chip::System::Layer * SystemLayer() const { return mSystemLayer; }
-
-    // End Points
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    CHIP_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-    // DNS Resolution
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-
-    typedef DNSResolver::OnResolveCompleteFunct DNSResolveCompleteFunct;
-
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
-                                  IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
-                                  DNSResolveCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
-                                  DNSResolveCompleteFunct onComplete, void * appState);
-    void CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState);
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-    CHIP_ERROR GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId);
-
-    CHIP_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
-    bool MatchLocalIPv6Subnet(const IPAddress & addr);
-
-    static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
-
-    void * GetPlatformData();
-    void SetPlatformData(void * aPlatformData);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
-
-    static chip::System::LayerLwIP::EventHandlerDelegate sInetEventHandlerDelegate;
-
-    // In some implementations, there may be a shared event / message
-    // queue for the InetLayer used by other system events / messages.
-    //
-    // If the length of that queue is considerably longer than the
-    // number of packet buffers available, it may lead to buffer
-    // exhaustion. As a result, using the queue itself to implement
-    // backpressure is insufficient, and we need an external mechanism
-    // to prevent buffer starvation in the rest of the system and
-    // getting into deadlock situations.
-
-    // For both UDP and raw network transport traffic we can easily
-    // drop incoming packets without impacting the correctness of
-    // higher level protocols.
-
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS
-    inline static bool IsDroppableEvent(chip::System::EventType type)
+    CHIP_ERROR Init(System::Layer & systemLayer)
     {
-        return
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-            type == kInetEvent_UDPDataReceived ||
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-            false;
+        RegisterLayerErrorFormatter();
+        VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(systemLayer.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        mSystemLayer = &systemLayer;
+        mLayerState.SetInitialized();
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR InitQueueLimiter(void);
-    bool CanEnqueueDroppableEvent(void);
-    void DroppableEventDequeued(void);
+    CHIP_ERROR Shutdown()
+    {
+        // Return to uninitialized state to permit re-initialization.
+        VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        mSystemLayer = nullptr;
+        return CHIP_NO_ERROR;
+    }
 
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-    volatile int32_t mDroppableEvents;
-#elif CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    sem_t mDroppableEvents;
-#elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
-    StaticSemaphore_t mDroppableEventsObj;
-#endif // (configSUPPORT_STATIC_ALLOCATION == 1)
-    SemaphoreHandle_t mDroppableEvents;
-#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+    System::Layer & SystemLayer() const { return *mSystemLayer; }
 
-#else  // !INET_CONFIG_MAX_DROPPABLE_EVENTS
+    CHIP_ERROR NewEndPoint(EndPoint ** retEndPoint)
+    {
+        assertChipStackLockedByCurrentThread();
+        VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    inline static bool IsDroppableEvent(chip::System::EventType aType) { return false; }
+        *retEndPoint = CreateEndPoint();
+        if (*retEndPoint == nullptr)
+        {
+            ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::kName);
+            return CHIP_ERROR_ENDPOINT_POOL_FULL;
+        }
 
-    inline CHIP_ERROR InitQueueLimiter(void) { return CHIP_NO_ERROR; }
-    inline bool CanEnqueueDroppableEvent(void) { return true; }
-    inline void DroppableEventDequeued(void) { return; }
-#endif // !INET_CONFIG_MAX_DROPPABLE_EVENTS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+        SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
+        return CHIP_NO_ERROR;
+    }
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
+    void DeleteEndPoint(EndPoint * endPoint)
+    {
+        SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
+        ReleaseEndPoint(endPoint);
+    }
+
+    virtual EndPoint * CreateEndPoint()                         = 0;
+    virtual void ReleaseEndPoint(EndPoint * endPoint)           = 0;
+    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
-    void * mContext;
-    void * mPlatformData;
-    chip::System::Layer * mSystemLayer;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    AsyncDNSResolverSockets mAsyncDNSResolver;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    bool IsIdleTimerRunning();
+    ObjectLifeCycle mLayerState;
+    System::Layer * mSystemLayer;
 };
 
-/**
- *  @class IPPacketInfo
- *
- *  @brief
- *     Information about an incoming/outgoing message/connection.
- *
- *   @warning
- *     Do not alter the contents of this class without first reading and understanding
- *     the code/comments in IPEndPointBasis::GetPacketInfo().
- */
-class IPPacketInfo
+template <typename EndPointImpl>
+class EndPointManagerImplPool : public EndPointManager<typename EndPointImpl::EndPoint>
 {
 public:
-    IPAddress SrcAddress;  /**< The source IPAddress in the packet. */
-    IPAddress DestAddress; /**< The destination IPAddress in the packet. */
-    InterfaceId Interface; /**< The interface identifier for the connection. */
-    uint16_t SrcPort;      /**< The source port in the packet. */
-    uint16_t DestPort;     /**< The destination port in the packet. */
+    using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
+    using EndPoint = typename EndPointImpl::EndPoint;
 
-    void Clear();
+    EndPointManagerImplPool()           = default;
+    ~EndPointManagerImplPool() override = default;
+
+    EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
+    {
+        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
+    }
+
+private:
+    ObjectPool<EndPointImpl, EndPointProperties<EndPoint>::kNumEndPoints> sEndPointPool;
 };
+
+class TCPEndPoint;
+class UDPEndPoint;
 
 } // namespace Inet
 } // namespace chip

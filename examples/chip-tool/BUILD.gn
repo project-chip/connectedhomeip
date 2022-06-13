@@ -16,48 +16,105 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/chip-tool/chip-tool.gni")
+import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
 
-declare_args() {
-  # Use a separate eventloop for CHIP tasks
-  config_use_separate_eventloop = true
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/app-common/app-common",
+    "${chip_root}/zzz_generated/chip-tool",
+    "${chip_root}/src/lib",
+  ]
+
+  defines = [
+    "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
+    "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  if (config_use_interactive_mode) {
+    libs = [ "readline" ]
+  }
 }
 
-executable("chip-tool") {
+static_library("chip-tool-utils") {
   sources = [
+    "${chip_root}/src/app/tests/suites/include/ConstraintsChecker.h",
+    "${chip_root}/src/app/tests/suites/include/ValueChecker.h",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
+    "commands/common/CredentialIssuerCommands.h",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
+
+    # TODO - enable CommissionedListCommand once DNS Cache is implemented
+    #    "commands/pairing/CommissionedListCommand.cpp",
+    #    "commands/pairing/CommissionedListCommand.h",
+    "commands/pairing/OpenCommissioningWindowCommand.cpp",
+    "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
+    "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
-    "commands/reporting/ReportingCommand.cpp",
-    "commands/tests/TestCommand.cpp",
+    "commands/payload/SetupPayloadVerhoeff.cpp",
+    "commands/storage/StorageManagementCommand.cpp",
     "config/PersistentStorage.cpp",
-    "main.cpp",
   ]
 
-  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+  if (config_use_interactive_mode) {
+    sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+  }
 
-  deps = [
+  if (config_enable_yaml_tests) {
+    sources += [ "commands/tests/TestCommand.cpp" ]
+  }
+
+  public_deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/commands/commissioner",
+    "${chip_root}/src/app/tests/suites/commands/delay",
+    "${chip_root}/src/app/tests/suites/commands/discovery",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/app/tests/suites/commands/log",
+    "${chip_root}/src/app/tests/suites/commands/system",
+    "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
-  cflags = [ "-Wconversion" ]
+  public_configs = [ ":config" ]
 
-  include_dirs = [
-    ".",
-    "${chip_root}/zzz_generated/chip-tool",
-  ]
+  if (chip_enable_transport_trace) {
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
 
   output_dir = root_out_dir
+}
+
+executable("chip-tool") {
+  sources = [ "main.cpp" ]
+
+  deps = [ ":chip-tool-utils" ]
+
+  output_dir = root_out_dir
+}
+
+group("default") {
+  deps = [ ":chip-tool" ]
 }

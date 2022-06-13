@@ -28,20 +28,19 @@
 
 #pragma once
 
-#include "inet/IPEndPointBasis.h"
-#include <inet/IPAddress.h>
+#include <inet/InetConfig.h>
 
+#include <inet/EndPointBasis.h>
+#include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
+#include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
+struct otInstance;
 
 namespace chip {
 namespace Inet {
-
-class InetLayer;
-class IPPacketInfo;
 
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
@@ -51,12 +50,71 @@ class IPPacketInfo;
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
+class DLL_EXPORT UDPEndPoint : public EndPointBasis<UDPEndPoint>
 {
-    friend class InetLayer;
-
 public:
-    UDPEndPoint() = default;
+    UDPEndPoint(const UDPEndPoint &) = delete;
+    UDPEndPoint(UDPEndPoint &&)      = delete;
+    UDPEndPoint & operator=(const UDPEndPoint &) = delete;
+    UDPEndPoint & operator=(UDPEndPoint &&) = delete;
+
+    /**
+     * Type of message text reception event handling function.
+     *
+     * @param[in]   endPoint    The endpoint associated with the event.
+     * @param[in]   msg         The message text received.
+     * @param[in]   pktInfo     The packet's IP information.
+     *
+     *  Provide a function of this type to the \c OnMessageReceived delegate
+     *  member to process message text reception events on \c endPoint where
+     *  \c msg is the message text received from the sender at \c senderAddr.
+     */
+    using OnMessageReceivedFunct = void (*)(UDPEndPoint * endPoint, chip::System::PacketBufferHandle && msg,
+                                            const IPPacketInfo * pktInfo);
+
+    /**
+     * Type of reception error event handling function.
+     *
+     * @param[in]   endPoint    The endpoint associated with the event.
+     * @param[in]   err         The reason for the error.
+     * @param[in]   pktInfo     The packet's IP information.
+     *
+     *  Provide a function of this type to the \c OnReceiveError delegate
+     *  member to process reception error events on \c endPoint. The \c err
+     *  argument provides specific detail about the type of the error.
+     */
+    using OnReceiveErrorFunct = void (*)(UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+
+    /**
+     * Set whether IP multicast traffic should be looped back.
+     */
+    virtual CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) = 0;
+
+    /**
+     * Join an IP multicast group.
+     *
+     *  @param[in]   aInterfaceId   The indicator of the network interface to add to the multicast group.
+     *  @param[in]   aAddress       The multicast group to add the interface to.
+     *
+     *  @retval  CHIP_NO_ERROR                  Success: multicast group removed.
+     *  @retval  INET_ERROR_UNKNOWN_INTERFACE   Unknown network interface, \c aInterfaceId.
+     *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE  \c aAddress is not \c kIPv4 or \c kIPv6 or is not multicast.
+     *  @retval  other                          Another system or platform error.
+     */
+    CHIP_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
+
+    /**
+     * Leave an IP multicast group.
+     *
+     *  @param[in]   aInterfaceId   The indicator of the network interface to remove from the multicast group.
+     *  @param[in]   aAddress       The multicast group to remove the interface from.
+     *
+     *  @retval  CHIP_NO_ERROR                  Success: multicast group removed
+     *  @retval  INET_ERROR_UNKNOWN_INTERFACE   Unknown network interface, \c aInterfaceId
+     *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE  \c aAddress is not \c kIPv4 or \c kIPv6 or is not multicast.
+     *  @retval  other                          Another system or platform error
+     */
+    CHIP_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
     /**
      * Bind the endpoint to an interface IP address.
@@ -78,7 +136,7 @@ public:
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE   \c addrType is \c IPAddressType::kAny, or not equal to the type of \c addr.
      * @retval  other                           Another system or platform error
      */
-    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId = InterfaceId::Null());
 
     /**
      * Bind the endpoint to a network interface.
@@ -100,12 +158,13 @@ public:
 
     /**
      * Get the bound interface on this endpoint.
-     *
-     * @return InterfaceId   The bound interface id.
      */
-    InterfaceId GetBoundInterface();
+    virtual InterfaceId GetBoundInterface() const = 0;
 
-    uint16_t GetBoundPort();
+    /**
+     * Get the bound port on this endpoint.
+     */
+    virtual uint16_t GetBoundPort() const = 0;
 
     /**
      * Prepare the endpoint to receive UDP messages.
@@ -146,7 +205,7 @@ public:
      * @retval  other                               Another system or platform error.
      */
     CHIP_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg,
-                      InterfaceId intfId = INET_NULL_INTERFACEID);
+                      InterfaceId intfId = InterfaceId::Null());
 
     /**
      * Send a UDP message to a specified destination.
@@ -181,47 +240,70 @@ public:
     /**
      * Close the endpoint and recycle its memory.
      *
-     *  Invokes the \c Close method, then invokes the <tt>InetLayerBasis::Release</tt> method to return the object to its
+     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Release</tt> method to return the object to its
      *  memory pool.
      *
      *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
      */
-    void Free();
+    virtual void Free() = 0;
 
-private:
-    UDPEndPoint(const UDPEndPoint &) = delete;
+    /**
+     * Set Network Native Parameters (optional)
+     *
+     * Some networking stack requires additionnal parameters
+     */
+    virtual inline void SetNativeParams(void * params) { (void) params; }
 
-    static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
+protected:
+    UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
+        EndPointBasis(endPointManager), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
+    {}
 
-    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId);
-    CHIP_ERROR BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId);
-    CHIP_ERROR ListenImpl();
-    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg);
-    void CloseImpl();
+    virtual ~UDPEndPoint() = default;
 
-    void Init(InetLayer * inetLayer);
+    /**
+     * Basic dynamic state of the underlying endpoint.
+     *
+     *  Objects are initialized in the "ready" state, proceed to the "bound"
+     *  state after binding to a local interface address, then proceed to the
+     *  "listening" state when they have continuations registered for handling
+     *  events for reception of ICMP messages.
+     */
+    enum class State : uint8_t
+    {
+        kReady     = 0, /**< Endpoint initialized, but not open. */
+        kBound     = 1, /**< Endpoint bound, but not listening. */
+        kListening = 2, /**< Endpoint receiving datagrams. */
+        kClosed    = 3  /**< Endpoint closed, ready for release. */
+    } mState;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    void HandleDataReceived(chip::System::PacketBufferHandle && msg);
-    CHIP_ERROR GetPCB(IPAddressType addrType4);
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port);
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    /** The endpoint's message reception event handling function delegate. */
+    OnMessageReceivedFunct OnMessageReceived;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    uint16_t mBoundPort;
+    /** The endpoint's receive error event handling function delegate. */
+    OnReceiveErrorFunct OnReceiveError;
 
-    CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO(System::SocketEvents events);
-    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
+    /*
+     * Implementation helpers for shared methods.
+     */
+#if INET_CONFIG_ENABLE_IPV4
+    virtual CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) = 0;
+#endif // INET_CONFIG_ENABLE_IPV4
+    virtual CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) = 0;
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    virtual CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId) = 0;
+    virtual CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId)                                  = 0;
+    virtual CHIP_ERROR ListenImpl()                                                                                           = 0;
+    virtual CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg)                     = 0;
+    virtual void CloseImpl()                                                                                                  = 0;
+};
+
+template <>
+struct EndPointProperties<UDPEndPoint>
+{
+    static constexpr const char * kName   = "UDP";
+    static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_UDP_ENDPOINTS;
+    static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumUDPEps;
 };
 
 } // namespace Inet

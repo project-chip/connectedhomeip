@@ -17,88 +17,65 @@
  */
 
 #include "AppTask.h"
-#include "Rpc.h"
 
-#include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 
-#include <kernel.h>
+#include <zephyr/logging/log.h>
 
-#ifdef CONFIG_USB
-#include <usb/usb_device.h>
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
 #endif
 
-LOG_MODULE_REGISTER(app);
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+#include <zephyr/drivers/uart.h>
+#include <zephyr/usb/usb_device.h>
+#endif
+
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
 
-int main(void)
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+static int InitUSB()
 {
-#ifdef CONFIG_CHIP_PW_RPC
-    chip::rpc::Init();
-#endif
+    int err = usb_enable(nullptr);
 
-    int ret        = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#ifdef CONFIG_USB
-    ret = usb_enable(nullptr);
-    if (ret)
+    if (err)
     {
         LOG_ERR("Failed to initialize USB device");
-        err = chip::System::MapErrorZephyr(ret);
-        goto exit;
+        return err;
     }
+
+    const struct device * dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    uint32_t dtr              = 0;
+
+    while (!dtr)
+    {
+        uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
+        k_sleep(K_MSEC(100));
+    }
+
+    return 0;
+}
 #endif
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
+int main()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
+
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+    err = System::MapErrorZephyr(InitUSB());
+#endif
+
+    if (err == CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
-        goto exit;
+        err = GetAppTask().StartApp();
     }
 
-    LOG_INF("Init CHIP stack");
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
-        goto exit;
-    }
-
-    LOG_INF("Starting CHIP task");
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
-        goto exit;
-    }
-
-    LOG_INF("Init Thread stack");
-    err = ThreadStackMgr().InitThreadStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
-        goto exit;
-    }
-
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
-        goto exit;
-    }
-
-    ret = GetAppTask().StartApp();
-    if (ret != 0)
-    {
-        err = chip::System::MapErrorZephyr(ret);
-    }
-
-exit:
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }

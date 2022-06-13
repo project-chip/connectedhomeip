@@ -37,6 +37,7 @@ void TestTxt(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
 
     TxtResourceRecord record(kName, kData);
     record.SetTtl(128);
@@ -44,7 +45,7 @@ void TestTxt(nlTestSuite * inSuite, void * inContext)
 
     header.Clear();
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, output));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);

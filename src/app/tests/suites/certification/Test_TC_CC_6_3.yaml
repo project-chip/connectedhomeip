@@ -16,10 +16,19 @@ name:
     27.2.14. [TC-CC-6.3] Color Temperature Step functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -32,63 +41,153 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: 100
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Step up color temperature command"
       command: "StepColorTemperature"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 50
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 5
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 100
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label: "Read current color temprature"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label: "Read current color temprature"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Step down color temperature command"
       command: "StepColorTemperature"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 3
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 50
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 5
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 100
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label: "Read current color temprature"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label: "Read current color temprature"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

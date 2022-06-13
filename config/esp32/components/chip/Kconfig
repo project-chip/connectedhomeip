@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -47,6 +47,16 @@ menu "CHIP Core"
                 A Binding object is used to configure how the local device communicates with
                 a remote entity, be it a cloud service, a mobile application, or another device.
 
+        config MAX_FABRICS
+            int "Max Fabrics"
+            range 5 255
+            default 5
+            help
+                The maxinum number of fabrics the device can participate in.
+
+                Each fabric can provision the device with its unique operational credentials and
+                manage its own access control lists.
+
         config MAX_PEER_NODES
             int "Max Peer Nodes"
             range 0 65535
@@ -66,17 +76,6 @@ menu "CHIP Core"
                 Applications or protocol libraries acting as a CHIP server register unsolicited
                 message handlers with the CHIP message layer to direct incoming messages to
                 their code.
-
-        config RMP_TIMER_DEFAULT_PERIOD_SHIFT
-            int "Default WRMP Timer Tick Interval Shift (ms)"
-            range 0 16
-            default 6
-            help
-                The default interval shift, in milliseconds (e.g. 6 bits shift
-                = 64ms), at which items in the WRMP pending message list are
-                processed for the purpose of retransmission or timeout.
-
-                This value can be overridden by the application at runtime.
 
         config ENABLE_PW_RPC
             bool "Enable Pigweed RPC library"
@@ -102,6 +101,12 @@ menu "CHIP Core"
             default "n"
             help
                 Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
+
+        config BUILD_CHIP_TESTS
+            bool "Build CHIP tests"
+            default "y"
+            help
+                Build CHIP test binaries.
 
         # TODO: add log level selection
 
@@ -160,6 +165,12 @@ menu "CHIP Core"
             help
                 The maximum number of simultaneously timers in the CHIP System Layer.
 
+        config ENABLE_OTA_REQUESTOR
+            bool "Enable OTA Requestor"
+            default n
+            help
+                Enable this option to enable OTA Requestor for example
+
     endmenu # "System Options"
 
     menu "Security Options"
@@ -170,125 +181,6 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active session keys.
-
-        config DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
-            int "Default Security Session Establishment Timeout (ms)"
-            range 0 65535
-            default 30000
-            help
-                The default amount of time, in milliseconds, after which an in-progess
-                session establishment will fail due to a timeout.
-
-                This value can be overridden by the application at runtime.
-
-        config DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
-            int "Default Security Session Idle Timeout (ms)"
-            range 0 65535
-            default 15000
-            help
-                The default minimum amount of time, in milliseconds, that an unreserved
-                and idle security session will be allowed to exist before being destroyed.
-                In practice, unreserved idle sessions can exist for up to twice this value.
-
-                This value can be overridden by the application at runtime.
-
-        menu "Protocols"
-
-            config ENABLE_PASE_INITIATOR
-                bool "Enable PASE Initiator"
-                default n
-                help
-                    Enable support for initiating PASE security sessions with a remote node.
-
-                    This feature is rarely needed in device applications of CHIP.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_PASE_RESPONDER
-                bool "Enable PASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote node to initiate
-                    a PASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_CASE_INITIATOR
-                bool "Enable CASE Initiator"
-                default y
-                help
-                    Enable support for initiating CASE security sessions with a remote node.
-
-                    This feature is necessary to support interacting with CHIP cloud services.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-            config ENABLE_CASE_RESPONDER
-                bool "Enable CASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote note to initiate
-                    a CASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-        endmenu # "Protocols"
-
-        menu "Group Keys"
-
-            config USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                bool "Enable Group Keys for CHIP Message Encryption"
-                default y
-                help
-                    Enable the use of application group keys for CHIP message encryption.
-
-            config MAX_CACHED_MSG_ENC_APP_KEYS
-                int "Group Key Cache Size"
-                range 0 255
-                default 5
-                depends on USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                help
-                    The size of the cache (in number of keys) used to store derived application
-                    group encryption keys.
-
-                    This value is only meaningful when group keys are enabled for CHIP message
-                    encryption.
-
-            config MAX_APPLICATION_EPOCH_KEYS
-                int "Max Application Epoch Keys"
-                range 0 8
-                default 4
-                help
-                    The maximum number of simultaneously supported application epoch keys.
-
-                    (Epoch keys are a kind of symmetric key that gets mixed together with
-                    other key material to form a group encryption key which can be used
-                    for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the maximum number of epoch keys that
-                    can be simultaneously provisioned on the local CHIP node.  The
-                    maximum supported value is 8, however, in most cases only two such
-                    keys will exist at any given point in time.
-
-            config MAX_APPLICATION_GROUPS
-                int "Max Application Master Keys"
-                range 0 255
-                default 4
-                help
-                    The maximum number of simultaneously supported application group master keys.
-
-                    (Application group master keys are a kind of symmetric key that gets mixed
-                    together with other key material to form a group encryption key which can
-                    be used for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the number of CHIP application groups
-                    in which the local CHIP device will be a member.
-
-        endmenu # "Group Keys"
 
         menu "Debugging"
 
@@ -311,12 +203,6 @@ menu "CHIP Core"
 
                     WARNING: This option makes it possible to circumvent basic CHIP security functionality.
                     Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
-
-            config DEBUG_CERT_VALIDATION
-                bool "Enable Certificate Validation Debugging"
-                default n
-                help
-                    Enable support for debugging output from certificate validation.
 
         endmenu # "Debugging"
 
@@ -367,6 +253,18 @@ menu "CHIP Device Layer"
             help
                 The size (in bytes) of the service directory cache.  This limits the maximum size of the directory
                 that can be returned in response to a service directory query.
+        
+        config ENABLE_EXTENDED_DISCOVERY
+            bool "Enable Extended discovery Support"
+            default n
+            help
+                Enables support for Extended Discovery.
+
+        config ENABLE_COMMISSIONABLE_DEVICE_TYPE
+            bool "Enable Device type in commissionable node discovery."
+            default n
+            help
+                Enables or Disables the support for Commissionable Device Type.
 
     endmenu
 
@@ -375,47 +273,66 @@ menu "CHIP Device Layer"
         config DEVICE_VENDOR_ID
             hex "Device Vendor Id"
             range 1 0xFFFE
-            default 0x235A
+            default 0xFFF1
             help
                 The device vendor id (in hex). This a CHIP-assigned id for the organization responsible for producing the device.
-                Defaults to CHIP (0x235A).
+                Defaults to test VID 0xFFF1.
 
         config DEVICE_PRODUCT_ID
             hex "Device Product Id"
             range 1 0xFFFE
-            default 0xFEFF
+            default 0x8000
             help
                 The device product id (in hex).  This is a unique id assigned by the device vendor to identify the product or device type.
                 Defaults to a CHIP-assigned id designating a non-production or test "product".
 
-        config DEFAULT_DEVICE_PRODUCT_REVISION
-            int "Default Device Product Revision"
+        config DEFAULT_DEVICE_HARDWARE_VERSION
+            int "Default Device Hardware Version"
             range 0 65535
             default 0
             help
-                The default device product revision.
+                The default device hardware version.
 
-                Product revisions are specific to a particular device vendor and product id, and typically
-                correspond to a revision of the physical device, a change to its packaging, and/or a change
+                Hardware versions are specific to a particular device vendor and product id, and typically
+                correspond to a version of the physical device, a change to its packaging, and/or a change
                 to its marketing presentation. This value is generally *not* incremented for device software
-                revisions.
+                versions.
 
-                This is a default value which is used when a product revision has not been stored in device
+                This is a default value which is used when a hardware version has not been stored in device
                 persistent storage (e.g. by a factory provisioning process).
 
-        config DEVICE_FIRMWARE_REVISION
-            string "Device Firmware Revision"
-            default ""
+        config DEVICE_SOFTWARE_VERSION
+            string "Device Software Version String"
+            default "v1.0"
             help
-                A string identifying the firmware revision running on the device.
+                A string identifying the software version running on the device.
+
+        config DEVICE_SOFTWARE_VERSION_NUMBER
+            int "Device Software Version Number"
+            default 1
+            help
+                Software version number running on the device.
+
+        config DEVICE_TYPE
+            int "Default Device type"
+            default 0
+            help
+                The default device type.
 
     endmenu
 
     menu "WiFi Station Options"
 
+        config ENABLE_WIFI_STATION
+            bool "Enable CHIP WIFI STATION"
+            default y
+            help
+                Enables WiFi station for CHIP.
+
         config DEFAULT_WIFI_SSID
             string "Default WiFi SSID"
             default ""
+            depends on ENABLE_WIFI_STATION
             help
                 The SSID of network to connect to if no WiFi station configuration exists in NV storage
                 at the time the device boots.
@@ -425,6 +342,7 @@ menu "CHIP Device Layer"
         config DEFAULT_WIFI_PASSWORD
             string "Default WiFi Password"
             default ""
+            depends on ENABLE_WIFI_STATION
             help
                 The password for the default WiFi network.
 
@@ -434,6 +352,7 @@ menu "CHIP Device Layer"
             int "WiFi Station Interface Reconnect Interval (ms)"
             range 0 65535
             default 5000
+            depends on ENABLE_WIFI_STATION
             help
                 The interval at which the CHIP platform will attempt to reconnect to the configured WiFi network (in milliseconds).
 
@@ -441,6 +360,7 @@ menu "CHIP Device Layer"
             int "Max ScanNetworks Results"
             range 0 65535
             default 10
+            depends on ENABLE_WIFI_STATION
             help
                 The maximum number of networks to return as a result of a CHIP NetworkProvisioning:ScanNetworks request.
 
@@ -448,6 +368,7 @@ menu "CHIP Device Layer"
             int "WiFi Scan Completion Timeout (ms)"
             range 0 65535
             default 10000
+            depends on ENABLE_WIFI_STATION
             help
                 The amount of time (in milliseconds) after which the CHIP platform will timeout a WiFi scan
                 operation that hasn't completed.  A value of 0 will disable the timeout logic.
@@ -456,6 +377,7 @@ menu "CHIP Device Layer"
             int "WiFi Connectivity Timeout (ms)"
             range 0 65535
             default 30000
+            depends on ENABLE_WIFI_STATION
             help
                 The amount of time (in milliseconds) to wait for Internet connectivity to be established on
                 the device's WiFi station interface during a Network Provisioning TestConnectivity operation.
@@ -464,9 +386,16 @@ menu "CHIP Device Layer"
 
     menu "WiFi AP Options"
 
+        config ENABLE_WIFI_AP
+            bool "Enable CHIP WIFI AP"
+            default y
+            help
+                Enables WiFi AP for CHIP.
+
         config WIFI_AP_SSID_PREFIX
             string "WiFi AP SSID Prefix"
             default "MATTER-"
+            depends on ENABLE_WIFI_AP
             help
                 A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
                 consists of the final two bytes of the device's primary WiFi MAC address in hex.
@@ -475,6 +404,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Channel"
             range 1 14
             default 1
+            depends on ENABLE_WIFI_AP
             help
                 The WiFi channel number to be used by the soft-AP.
 
@@ -482,6 +412,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Max Allowed Stations"
             range 1 10
             default 4
+            depends on ENABLE_WIFI_AP
             help
                 The maximum number of stations allowed to connect to the soft-AP.
 
@@ -489,6 +420,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Beacon Interval (ms)"
             range 100 60000
             default 100
+            depends on ENABLE_WIFI_AP
             help
                 The beacon interval (in milliseconds) for the WiFi soft-AP.
 
@@ -496,6 +428,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Idle Timeout (ms)"
             range 0 600000
             default 120000
+            depends on ENABLE_WIFI_AP
             help
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
                 if it has been idle.
@@ -576,6 +509,23 @@ menu "CHIP Device Layer"
             help
                 Automatically disable CHIP-over-BLE (WoBLE) advertising when the device transitions
                 to a fully provisioned state.
+
+        config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
+	    bool "Disable and DeInit BLE on commissioning complete"
+	    default y
+	    help 
+                Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
+    endmenu
+
+    menu "CHIP Thread Options"
+        visible if OPENTHREAD_ENABLED
+
+        config THREAD_TASK_STACK_SIZE
+            int "Thread task stack size"
+            default 5120
+            depends on OPENTHREAD_ENABLED
+            help
+                Stack size of Thread task.
 
     endmenu
 
@@ -670,22 +620,26 @@ menu "CHIP Device Layer"
                 Setting this to y will cause the commissioner to send commissioning commands to the
                 various clusters after establishing a PASE session.
 
+        config ENABLE_ROTATING_DEVICE_ID
+            depends on ENABLE_CHIPOBLE
+            bool "Enable Rotating Device Identifier Support"
+            default n
+
+        config ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Factory Data Provider"
+            default n
+            help
+                If this option is enabled, then ESP32 implementation of CommissionableDataProvider and
+                DeviceAttestationCredentialsProvider is used. Otherwise, the test-mode CommissionableDataProvider
+                and Example DeviceAttestationCredentialsProvider is used. ESP32 implementation reads factory data from
+                nvs partition. Factory partition can be configured using CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+                option, default is "nvs".
+
     endmenu
 
 
 
     menu "Testing Options"
-
-        config ENABLE_TEST_DEVICE_IDENTITY
-            int "Use Test Device Identity"
-            range 0 256
-            default 1
-            help
-                Enables the use of a hard-coded CHIP device id and credentials if no device id is
-                found in CHIP NV storage.  The value specifies which of 256 identities, numbered 1
-                through 256, is to be used.  A value of 0 disables use of a test identity.
-
-                This option is for testing only and should not be enabled in production releases.
 
         config USE_TEST_SERIAL_NUMBER
             string "Use Test Serial Number"
@@ -699,29 +653,14 @@ menu "CHIP Device Layer"
 
                 This option is for testing only and should not be enabled in production releases.
 
-        config USE_TEST_SETUP_PIN_CODE
-            int "Use Test Setup Pin Code"
-            range 0 99999999
-            default 20202021
+        config ENABLE_TEST_SETUP_PARAMS
+            bool "Enable Test Setup Parameters"
+            default y
             help
-                Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
+                Enable use of test setup parameters for testing purposes only.
 
-                Note that any decimal integer number between 00000000 and 99999999 can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SETUP_DISCRIMINATOR
-            hex "Use Test Setup discriminator"
-            range 0x000 0xFFF
-            default 0xF00
-            help
-                Specifies a hard-coded device discriminator to be used if none is found in CHIP NV storage.
-                Setting the value to 0x0 disables the feature.
-
-                Note that any integer number between 0x000 and 0xFFF can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
+                WARNING: This option makes it possible to circumvent basic chip security functionality.
+                Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
         config ENABLE_FIXED_TUNNEL_SERVER
             bool "Use Fixed Tunnel Server"
@@ -820,6 +759,71 @@ menu "CHIP Device Layer"
 
                 When size is set to 0, the debug event buffer and all support
                 for the debug level events are disabled.
+
+
+	config CHIP_ENABLE_SCHEMA_CHECK
+	   bool "Enable Schema Check"
+	   default y
+	   help
+	     If enabled, it checks incoming messages are following the expected schema,
+             and incoming message payloads are logged in detail.
+	     To see detailed logging please set default log level to Debug.
+	     (Component config --> Log output --> Default log verbosity --> Debug)
+
+    endmenu
+
+    menu "Matter OTA Image"
+
+        config CHIP_OTA_IMAGE_BUILD
+            bool "Generate Matter OTA image"
+            help
+              Enable building OTA (Over-the-air update) image which includes Matter OTA header.
+
+        config CHIP_OTA_IMAGE_EXTRA_ARGS
+            string "OTA image creator extra arguments"
+            depends on CHIP_OTA_IMAGE_BUILD
+            help
+              ota_image_tool.py is used to create the OTA image.
+              Mandatory arguments(Version, VersionString, VID, PID) are picked up from the config options.
+              This option allows us to pass optional arguments(MinApplicableSoftwareVersion, MaxApplicableSoftwareVersion,
+              and ReleaseNotesURL) to the ota_image_tool.py script.
+              eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
+
+    endmenu
+
+    menu "External Platform"
+        config CHIP_ENABLE_EXTERNAL_PLATFORM
+            bool "Enable external platform layer"
+            default n
+            help
+                Use external platform layer to override the default ESP32 platform in Matter SDK.
+
+        config CHIP_EXTERNAL_PLATFORM_DIR
+            string "The external platform directory"
+            depends on CHIP_ENABLE_EXTERNAL_PLATFORM
+            help
+                The directory of the external platform.
+
+    endmenu
+
+    menu "Matter Manufacturing Options"
+        config CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
+            string "chip-factory namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-factory" namespace.
+
+        config CHIP_CONFIG_NAMESPACE_PARTITION_LABEL
+            string "chip-config namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-config" namespace.
+
+        config CHIP_COUNTERS_NAMESPACE_PARTITION_LABEL
+            string "chip-counters namespace partition label"
+            default "nvs"
+            help
+                Label of the partition to store key-values in the "chip-counters" namespace.
 
     endmenu
 

@@ -16,28 +16,88 @@ name: Doxygen
 
 on:
     push:
+        paths:
+            - "**.do[xc]"
+            - "**.c[cs]?"
+            - "**.cxx"
+            - "**.cpp"
+            - "**.c++"
+            - "**.ii"
+            - "**.ixx"
+            - "**.ipp"
+            - "**.i++"
+            - "**.inl"
+            - "**.[hH]"
+            - "**.hh"
+            - "**.HH"
+            - "**.hxx"
+            - "**.hpp"
+            - "**.h++"
+            - "**.mm"
+            - "**.txt"
+            - "**.[ido]dl"
+            - "**.java"
+            - "**.d"
+            - "**.php[45]?"
+            - "**.inc"
+            - "**.phtml"
+            - "**.[mM]"
     pull_request:
+        paths:
+            - "**.do[xc]"
+            - "**.c[cs]?"
+            - "**.cxx"
+            - "**.cpp"
+            - "**.c++"
+            - "**.ii"
+            - "**.ixx"
+            - "**.ipp"
+            - "**.i++"
+            - "**.inl"
+            - "**.[hH]"
+            - "**.hh"
+            - "**.HH"
+            - "**.hxx"
+            - "**.hpp"
+            - "**.h++"
+            - "**.mm"
+            - "**.txt"
+            - "**.[ido]dl"
+            - "**.java"
+            - "**.d"
+            - "**.php[45]?"
+            - "**.inc"
+            - "**.phtml"
+            - "**.[mM]"
     workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     doxygen:
         name: Build Doxygen
         timeout-minutes: 5
 
         runs-on: ubuntu-20.04
+        container:
+            image: connectedhomeip/chip-build-doxygen:0.5.77
+
         if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: "Print Actor"
               run: echo ${{github.actor}}
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Generate
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name

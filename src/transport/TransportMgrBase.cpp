@@ -50,6 +50,11 @@ void TransportMgrBase::Close()
     mTransport      = nullptr;
 }
 
+CHIP_ERROR TransportMgrBase::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
+{
+    return mTransport->MulticastGroupJoinLeave(address, join);
+}
+
 void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     if (msg->HasChainedBuffer())

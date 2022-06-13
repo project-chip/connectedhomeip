@@ -15,10 +15,19 @@
 name: 27.2.19. [TC-CC-8.1] StopMoveStep functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -30,156 +39,335 @@ tests:
       response:
           value: 1
 
-    - label: "Color Loop Set Command - Set all Attributs"
-      command: "ColorLoopSet"
+    - label: "Move hue up command"
+      command: "MoveHue"
       arguments:
           values:
-              - name: "updateFlags"
-                value: 14
-              - name: "action"
-                value: 0
-              - name: "direction"
+              - name: "MoveMode"
                 value: 1
-              - name: "time"
+              - name: "Rate"
+                value: 50
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads CurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Stop Move Step command"
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads CurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
                 value: 100
-              - name: "startHue"
-                value: 500
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
 
-    - label: "Check ColorLoopDirection Value"
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          attribute"
       command: "readAttribute"
-      attribute: "color loop direction"
+      attribute: "CurrentHue"
       response:
-          value: 1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
-    - label: "Check ColorLoopTime Value"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          value: 100
-
-    - label: "Check ColorLoopStartEnhancedHue Value"
-      command: "readAttribute"
-      attribute: "color loop start enhanced hue"
-      response:
-          value: 500
-
-    - label: "Check ColorLoopActive Value"
-      command: "readAttribute"
-      attribute: "color loop active"
-      response:
-          value: 0
-
-    - label: "Color Loop Set Command - Start Color Loop"
-      command: "ColorLoopSet"
+    - label: "Move saturation up command"
+      command: "MoveSaturation"
       arguments:
           values:
-              - name: "updateFlags"
+              - name: "MoveMode"
                 value: 1
-              - name: "action"
-                value: 1
-              - name: "direction"
+              - name: "Rate"
+                value: 5
+              - name: "OptionsMask"
                 value: 0
-              - name: "time"
-                value: 0
-              - name: "startHue"
-                value: 0
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label: "Check ColorLoopActive Value"
+    - label:
+          "Check Saturation attribute value matched the value sent by the last
+          command"
       command: "readAttribute"
-      attribute: "color loop active"
+      attribute: "CurrentSaturation"
       response:
-          value: 1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
-    - label: "Check EnhancedCurrentHue attribute value changed to a Higher Hue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: 500
-
-    - label: "Color Loop Set Command - Set direction and time while running"
-      command: "ColorLoopSet"
+    - label: "Stop Move Step command"
+      command: "StopMoveStep"
       arguments:
           values:
-              - name: "updateFlags"
-                value: 6
-              - name: "action"
+              - name: "OptionsMask"
                 value: 0
-              - name: "direction"
-                value: 0
-              - name: "time"
-                value: 3500
-              - name: "startHue"
-                value: 0
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
-    - label: "Check EnhancedCurrentHue attribute value changed to a lower Hue"
-      disabled: true
+    - label: "Reads CurrentSaturation attribute from DUT."
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "CurrentSaturation"
       response:
-          value: 500
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
-    - label: "Check ColorLoopDirection Value"
-      command: "readAttribute"
-      attribute: "color loop direction"
-      response:
-          value: 0
-
-    - label: "Check ColorLoopTime Value"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          value: 3500
-
-    - label: "Color Loop Set Command - Set direction while running"
-      command: "ColorLoopSet"
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "updateFlags"
-                value: 2
-              - name: "action"
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Check Saturation attribute value matched the value sent by the last
+          attribute"
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Move Color command"
+      command: "MoveColor"
+      arguments:
+          values:
+              - name: "rateX"
+                value: 15
+              - name: "rateY"
+                value: 20
+              - name: "OptionsMask"
                 value: 0
-              - name: "direction"
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentX"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Stop Move Step command"
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentX"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Check current x attribute value matched the value sent by the last
+          attribute"
+      command: "readAttribute"
+      attribute: "CurrentX"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Check current y attribute value matched the value sent by the last
+          attribute"
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Move up color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "MoveMode"
                 value: 1
-              - name: "time"
+              - name: "Rate"
+                value: 10
+              - name: "ColorTemperatureMinimumMireds"
+                value: 1
+              - name: "ColorTemperatureMaximumMireds"
+                value: 255
+              - name: "OptionsMask"
                 value: 0
-              - name: "startHue"
-                value: 0
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
-    - label: "Check EnhancedCurrentHue attribute value changed to a Higher Hue"
-      disabled: true
+    - label: "Reads current color temprature from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "ColorTemperature"
       response:
-          value: 500
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Check ColorLoopDirection Value"
+    - label: "Stop Move Step command"
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads current color temprature from DUT"
       command: "readAttribute"
-      attribute: "color loop direction"
+      attribute: "ColorTemperature"
       response:
-          value: 1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Reads current color attribute value matched the value sent by the
+          last attribute"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Enhanced Move Hue Up command"
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 50
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads EnhancedCurrentHue attribute value from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Stop Move Step command"
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Reads EnhancedCurrentHue attribute value from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last attribute"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

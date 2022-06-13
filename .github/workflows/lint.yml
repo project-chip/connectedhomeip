@@ -23,21 +23,73 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-  code-lints:
-    runs-on: ubuntu-latest
-    if: github.actor != 'restyled-io[bot]'
+    code-lints:
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Check broken links
-        # On-push disabled until the job can run fully green
-        # At that point the step should be enabled.
-        if: github.event_name == 'workflow_dispatch'
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        steps:
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
-      # git grep exits with 0 if it finds a match, but we want
-      # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
-      # to avoid our grep regexp matching itself.
-      - name: Check for incorrect error use in VerifyOrExit
-        run: |
-          git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+            - name: Check broken links
+              # On-push disabled until the job can run fully green
+              # At that point the step should be enabled.
+              if: github.event_name == 'workflow_dispatch'
+              uses: gaurav-nelson/github-action-markdown-link-check@v1
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for incorrect error use in VerifyOrExit
+              if: always()
+              run: |
+                  git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of PRI*8, which are not supported on some libcs.
+              if: always()
+              run: |
+                  git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+                  
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of PRI*16, which are not supported on some libcs.
+              if: always()
+              run: |
+                  git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+                  
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of %zu, which are not supported on some libcs.
+              if: always()
+              run: |
+                  git grep -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # Comments like '{{! ... }}' should be used in zap files
+            - name: Do not allow TODO in generated files
+              if: always()
+              run: |
+                  git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 1 || exit 0
+
+            - name: Check for disallowed include files
+              if: always()
+              run: scripts/tools/check_includes.sh
+
+            - name: Check for zcl.json and extension sync status
+              if: always()
+              run: scripts/tools/check_zcl_file_sync.py .
+
+            - name: Ensure all PICS are set for tests (to true or false)
+              if: always()
+              run: |
+                  scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml

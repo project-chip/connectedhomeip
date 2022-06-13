@@ -37,3 +37,9 @@ arm_toolchain("efr32_window_app") {
     import("${chip_root}/examples/window-app/efr32/args.gni")
   }
 }
+arm_toolchain("rs911x_lock_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lock-app/rs911x/args.gni")
+  }
+}

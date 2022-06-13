@@ -20,35 +20,6 @@ class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 public:
     {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
     ~{{asUpperCamelCase name}}Cluster() {}
-    {{#chip_cluster_commands}}
-    {{#first}}
-
-    // Cluster Commands
-    {{/first}}
-    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
-    {{/chip_cluster_commands}}
-
-    // Cluster Attributes
-    {{#chip_server_cluster_attributes}}
-    CHIP_ERROR ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_attributes}}
-    {{#if isWritableAttribute}}
-    CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
-    {{/if}}
-    {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_attributes}}
-    {{#if isReportableAttribute}}
-    CHIP_ERROR SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback);
-    {{/if}}
-    {{/chip_server_cluster_attributes}}
-    {{#chip_cluster_commands}}
-    {{#first}}
-
-private:
-    {{/first}}
-    {{/chip_cluster_commands}}
 };
 
 {{/chip_client_clusters}}

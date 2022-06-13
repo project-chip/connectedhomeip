@@ -31,11 +31,11 @@ Usage: gh_sizes.py ‹platform› ‹config› ‹target› ‹binary› [‹out
 This script also expects certain environment variables, which can be set in a
 github workflow as follows:
 
-  env:
-    BUILD_TYPE: nrfconnect
-    GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-    GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-    GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+    - name: Set up environment for size reports
+      if: ${{ !env.ACT }}
+      env:
+        GH_CONTEXT: ${{ toJson(github) }}
+      run: gh_sizes_environment.py "${GH_CONTEXT}"
 
 Default output file is {platform}-{configname}-{buildname}-sizes.json in the
 binary's directory. This file has the form:
@@ -51,11 +51,16 @@ binary's directory. This file has the form:
     "parent": "20796f752061726520746f6f20636c6f73652e0a",
     "pr": 12345,
     "by": "section",
+    "ref": "refs/pull/12345/merge"
     "frames": {
         "section": [
           {"section": ".bss", "size": 260496},
           {"section": ".data", "size": 1648},
           {"section": ".text", "size": 740236}
+        ],
+        "wr": [
+          {"wr": 0, "size": 262144},
+          {"wr": 1, "size": 74023}
         ]
     }
   }
@@ -68,12 +73,14 @@ import os
 import pathlib
 import sys
 
+import numpy as np  # type: ignore
+
 import memdf.collect
 import memdf.report
 import memdf.select
 import memdf.util
 
-from memdf import Config, ConfigDescription, DFs, SectionDF
+from memdf import Config, ConfigDescription, DFs, SectionDF, SegmentDF
 
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')
 
@@ -98,10 +105,17 @@ CONFIG: ConfigDescription = {
         'metavar': 'HASH',
         'default': os.environ.get('GH_EVENT_PARENT'),
     },
+    'ref': {
+        'help': 'Target ref',
+        'metavar': 'REF',
+        'default': os.environ.get('GH_EVENT_REF'),
+    },
     'timestamp': {
         'help': 'Build timestamp',
         'metavar': 'TIME',
-        'default': int(datetime.datetime.now().timestamp()),
+        'default': int(float(
+            os.environ.get('GH_EVENT_TIMESTAMP')
+            or datetime.datetime.now().timestamp())),
     },
 }
 
@@ -163,29 +177,48 @@ def main(argv):
         config.put('output.metadata.time', config['timestamp'])
         config.put('output.metadata.input', binary)
         config.put('output.metadata.by', 'section')
-        for key in ['event', 'hash', 'parent', 'pr']:
+        for key in ['event', 'hash', 'parent', 'pr', 'ref']:
             if value := config[key]:
                 config.putl(['output', 'metadata', key], value)
 
         collected: DFs = memdf.collect.collect_files(config, [binary])
 
+        # Aggregate loaded segments, by writable (flash) or not (RAM).
+        segments = collected[SegmentDF.name]
+        segments['segment'] = segments.index
+        segments['wr'] = ((segments['flags'] & 2) != 0).convert_dtypes(
+            convert_boolean=False, convert_integer=True)
+        segment_summary = segments[segments['type'] == 'PT_LOAD'][[
+            'wr', 'size'
+        ]].groupby('wr').aggregate(np.sum).reset_index().astype(
+            {'size': np.int64})
+        segment_summary.attrs['name'] = "wr"
+
         sections = collected[SectionDF.name]
-        section_summary = sections[['section',
-                                    'size']].sort_values(by='section')
+        sections = sections.join(on='segment',
+                                 how='left',
+                                 other=segments,
+                                 rsuffix='-segment')
+        section_summary = sections[['section', 'size',
+                                    'wr']].sort_values(by='section')
         section_summary.attrs['name'] = "section"
 
         summaries = {
             'section': section_summary,
+            'memory': segment_summary,
         }
 
         # Write configured (json) report to the output file.
         memdf.report.write_dfs(config, summaries)
 
         # Write text report to stdout.
-        memdf.report.write_dfs(config, summaries, sys.stdout, 'simple')
+        memdf.report.write_dfs(config,
+                               summaries,
+                               sys.stdout,
+                               'simple',
+                               floatfmt='.0f')
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

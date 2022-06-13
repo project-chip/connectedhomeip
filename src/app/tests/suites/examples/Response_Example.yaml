@@ -1,0 +1,8 @@
+tests:
+    - label: "Examples Test Step 1"
+      cluster: "ExampleCluster"
+      command: "ExamplesCommand"
+      response: # Validates the response variables of the commands
+          values:
+              - name: "exampleResponseVariable"
+                value: 1

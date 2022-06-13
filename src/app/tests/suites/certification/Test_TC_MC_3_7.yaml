@@ -1,0 +1,82 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 18.4.3. [TC-MC-3.7] Launch Application Verification
+
+config:
+    nodeId: 0x12344321
+    cluster: "Application Launcher"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue 17969
+    - label: "Launch an app with the provided a application ID"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "Data"
+                value: "Hello World"
+              - name: "application"
+                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
+      response:
+          values:
+              - name: "Status"
+                value: 1
+              - name: "Data"
+                value: "Hello World"
+
+    - label:
+          "TH sends a LaunchApp command to DUT to launch an app which is not
+          available"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "data"
+                value: "Hello World"
+              - name: "application"
+                value:
+                    { catalogVendorId: 1234, applicationId: "NonAvailableApp" }
+      response:
+          values:
+              - name: "Status"
+                value: 1
+              - name: "Data"
+                value: "Hello World"
+
+    - label: "Launch an app with the provided a application ID"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "data"
+                value: "Hello World"
+              - name: "application"
+                value:
+                    { catalogVendorId: 1234, applicationId: "HelloWorldApp2" }
+      response:
+          values:
+              - name: "Status"
+                value: 2
+              - name: "Data"
+                value: "Hello World"

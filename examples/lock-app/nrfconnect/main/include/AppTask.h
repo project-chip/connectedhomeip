@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include "LEDWidget.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,24 +34,25 @@ struct k_timer;
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(AppEvent * event);
-    void UpdateClusterState();
+    void UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void LockStateChanged(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);

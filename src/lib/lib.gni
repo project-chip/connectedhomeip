@@ -15,4 +15,9 @@
 declare_args() {
   # Enable libshell support.
   chip_build_libshell = false
+
+  # Enable building the DefaultDeviceAttestationVerifier. When making
+  # a Commissioner or Administrator that employs different or more complex
+  # logic, this should be set to false.
+  chip_build_default_attestation_verifier = true
 }

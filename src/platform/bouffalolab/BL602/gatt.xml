@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Google LLC.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ -->
+
+<!--Custom BLE GATT-->
+<gatt gatt_caching="true" generic_attribute_service="true" header="gatt_db.h" name="Custom BLE GATT" out="gatt_db.c" prefix="gattdb_">
+
+  <!--Generic Access-->
+  <service advertise="false" name="Generic Access" requirement="mandatory" sourceId="org.bluetooth.service.generic_access" type="primary" uuid="1800">
+    <informativeText>Abstract: The generic_access service contains generic information about the device. All available Characteristics are readonly. </informativeText>
+
+    <!--Device Name-->
+    <characteristic id="device_name" name="Device Name" sourceId="org.bluetooth.characteristic.gap.device_name" uuid="2A00">
+      <informativeText/>
+      <value length="13" type="utf-8" variable_length="false">Empty Example</value>
+      <properties read="true" read_requirement="optional" write="true" write_requirement="optional"/>
+    </characteristic>
+
+    <!--Appearance-->
+    <characteristic name="Appearance" sourceId="org.bluetooth.characteristic.gap.appearance" uuid="2A01">
+      <informativeText>Abstract: The external appearance of this device. The values are composed of a category (10-bits) and sub-categories (6-bits). </informativeText>
+      <value length="2" type="hex" variable_length="false">0000</value>
+      <properties const="true" const_requirement="optional" read="true" read_requirement="optional"/>
+    </characteristic>
+  </service>
+
+  <!--Device Information-->
+  <service advertise="false" name="Device Information" requirement="mandatory" sourceId="org.bluetooth.service.device_information" type="primary" uuid="180A">
+    <informativeText>Abstract: The Device Information Service exposes manufacturer and/or vendor information about a device. Summary: This service exposes manufacturer information about a device. The Device Information Service is instantiated as a Primary Service. Only one instance of the Device Information Service is exposed on a device. </informativeText>
+
+    <!--Manufacturer Name String-->
+    <characteristic name="Manufacturer Name String" sourceId="org.bluetooth.characteristic.manufacturer_name_string" uuid="2A29">
+      <informativeText>Abstract: The value of this characteristic is a UTF-8 string representing the name of the manufacturer of the device. </informativeText>
+      <value length="12" type="utf-8" variable_length="false">Bouffalolab</value>
+      <properties const="true" const_requirement="optional" read="true" read_requirement="optional"/>
+    </characteristic>
+
+    <!--Model Number String-->
+    <characteristic name="Model Number String" sourceId="org.bluetooth.characteristic.model_number_string" uuid="2A24">
+      <informativeText>Abstract: The value of this characteristic is a UTF-8 string representing the model number assigned by the device vendor. </informativeText>
+      <value length="10" type="utf-8" variable_length="false">Blue Gecko</value>
+      <properties const="true" const_requirement="optional" read="true" read_requirement="optional"/>
+    </characteristic>
+
+    <!--System ID-->
+    <characteristic name="System ID" sourceId="org.bluetooth.characteristic.system_id" uuid="2A23">
+      <informativeText>Abstract: The SYSTEM ID characteristic consists of a structure with two fields. The first field are the LSOs and the second field contains the MSOs.       This is a 64-bit structure which consists of a 40-bit manufacturer-defined identifier concatenated with a 24 bit unique Organizationally Unique Identifier (OUI). The OUI is issued by the IEEE Registration Authority (http://standards.ieee.org/regauth/index.html) and is required to be used in accordance with IEEE Standard 802-2001.6 while the least significant 40 bits are manufacturer defined.       If System ID generated based on a Bluetooth Device Address, it is required to be done as follows. System ID and the Bluetooth Device Address have a very similar structure: a Bluetooth Device Address is 48 bits in length and consists of a 24 bit Company Assigned Identifier (manufacturer defined identifier) concatenated with a 24 bit Company Identifier (OUI). In order to encapsulate a Bluetooth Device Address as System ID, the Company Identifier is concatenated with 0xFFFE followed by the Company Assigned Identifier of the Bluetooth Address. For more guidelines related to EUI-64, refer to http://standards.ieee.org/develop/regauth/tut/eui64.pdf. Examples: If the system ID is based of a Bluetooth Device Address with a Company Identifier (OUI) is 0x123456 and the Company Assigned Identifier is 0x9ABCDE, then the System Identifier is required to be 0x123456FFFE9ABCDE. </informativeText>
+      <value length="6" type="hex" variable_length="false">000102030405</value>
+      <properties const="true" const_requirement="optional" read="true" read_requirement="optional"/>
+    </characteristic>
+  </service>
+
+  <!--Bouffalolab OTA-->
+  <service advertise="false" name="Bouffalolab OTA" requirement="mandatory" sourceId="com.silabs.service.ota" type="primary" uuid="1D14D6EE-FD63-4FA1-BFA4-8F47B42119F0">
+    <informativeText>Abstract: The Bouffalolab OTA Service enables over-the-air firmware update of the device. </informativeText>
+
+    <!--Bouffalolab OTA Control-->
+    <characteristic id="ota_control" name="Bouffalolab OTA Control" sourceId="com.silabs.characteristic.ota_control" uuid="F7BF3564-FB6D-4E53-88A4-5E37E0326063">
+      <informativeText>Abstract: Bouffalolab OTA Control. </informativeText>
+      <value length="1" type="user" variable_length="false"/>
+      <properties write="true" write_requirement="optional"/>
+    </characteristic>
+  </service>
+
+  <!--CHIPoBLE-->
+  <service advertise="false" name="CHIPoBLE" requirement="mandatory" sourceId="custom.type" type="primary" uuid="fff6">
+    <informativeText>Custom service</informativeText>
+
+    <!--CHIPoBLEChar_Rx-->
+    <characteristic id="CHIPoBLEChar_Rx" name="CHIPoBLEChar_Rx" sourceId="custom.type" uuid="18EE2EF5-263D-4559-959F-4F9C429F9D11">
+      <informativeText>Custom characteristic</informativeText>
+      <value length="247" type="hex" variable_length="true">0x00</value>
+      <properties read="true" read_requirement="optional" write="true" write_requirement="optional"/>
+    </characteristic>
+
+    <!--CHIPoBLEChar_Tx-->
+    <characteristic id="CHIPoBLEChar_Tx" name="CHIPoBLEChar_Tx" sourceId="custom.type" uuid="18EE2EF5-263D-4559-959F-4F9C429F9D12">
+      <informativeText>Custom characteristic</informativeText>
+      <value length="247" type="hex" variable_length="true">0x00</value>
+      <properties indicate="true" indicate_requirement="optional" read="true" read_requirement="optional" write="true" write_no_response="true" write_no_response_requirement="optional" write_requirement="optional"/>
+    </characteristic>
+  </service>
+</gatt>

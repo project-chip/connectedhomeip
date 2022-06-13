@@ -16,13 +16,19 @@
  *    limitations under the License.
  */
 
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "Options.h"
 
 #include <app/server/OnboardingCodesUtil.h>
-#include <platform/CHIPDeviceLayer.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/Base64.h>
+
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -45,7 +51,17 @@ enum
     kDeviceOption_Passcode                  = 0x1009,
     kDeviceOption_SecuredDevicePort         = 0x100a,
     kDeviceOption_SecuredCommissionerPort   = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort = 0x100c
+    kDeviceOption_UnsecuredCommissionerPort = 0x100c,
+    kDeviceOption_Command                   = 0x100d,
+    kDeviceOption_PICS                      = 0x100e,
+    kDeviceOption_KVS                       = 0x100f,
+    kDeviceOption_InterfaceId               = 0x1010,
+    kDeviceOption_Spake2pVerifierBase64     = 0x1011,
+    kDeviceOption_Spake2pSaltBase64         = 0x1012,
+    kDeviceOption_Spake2pIterations         = 0x1013,
+    kDeviceOption_TraceFile                 = 0x1014,
+    kDeviceOption_TraceLog                  = 0x1015,
+    kDeviceOption_TraceDecode               = 0x1016,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -67,9 +83,21 @@ OptionDef sDeviceOptionDefs[] = {
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
     { "passcode", kArgumentRequired, kDeviceOption_Passcode },
+    { "spake2p-verifier-base64", kArgumentRequired, kDeviceOption_Spake2pVerifierBase64 },
+    { "spake2p-salt-base64", kArgumentRequired, kDeviceOption_Spake2pSaltBase64 },
+    { "spake2p-iterations", kArgumentRequired, kDeviceOption_Spake2pIterations },
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+    { "command", kArgumentRequired, kDeviceOption_Command },
+    { "PICS", kArgumentRequired, kDeviceOption_PICS },
+    { "KVS", kArgumentRequired, kDeviceOption_KVS },
+    { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
+    { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
+    { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     {}
 };
 
@@ -108,7 +136,22 @@ const char * sDeviceOptionHelp =
     "       A 12-bit unsigned integer match the value which a device advertises during commissioning.\n"
     "\n"
     "  --passcode <passcode>\n"
-    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning.\n"
+    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning. \n"
+    "       If not provided to compute a verifier, the --spake2p-verifier-base64 must be provided. \n"
+    "\n"
+    "  --spake2p-verifier-base64 <PASE verifier as base64>\n"
+    "       A raw concatenation of 'W0' and 'L' (67 bytes) as base64 to override the verifier\n"
+    "       auto-computed from the passcode, if provided.\n"
+    "\n"
+    "  --spake2p-salt-base64 <PASE salt as base64>\n"
+    "       16-32 bytes of salt to use for the PASE verifier, as base64. If omitted, will be generated\n"
+    "       randomly. If a --spake2p-verifier-base64 is passed, it must match against the salt otherwise\n"
+    "       failure will arise.\n"
+    "\n"
+    "  --spake2p-iterations <PASE PBKDF iterations>\n"
+    "       Number of PBKDF iterations to use. If omitted, will be 1000. If a --spake2p-verifier-base64 is\n"
+    "       passed, the iteration counts must match that used to generate the verifier otherwise failure will\n"
+    "       arise.\n"
     "\n"
     "  --secured-device-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
@@ -119,7 +162,49 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
+    "\n"
+    "  --command <command-name>\n"
+    "       A name for a command to execute during startup.\n"
+    "\n"
+    "  --PICS <filepath>\n"
+    "       A file containing PICS items.\n"
+    "\n"
+    "  --KVS <filepath>\n"
+    "       A file to store Key Value Store items.\n"
+    "\n"
+    "  --interface-id <interface>\n"
+    "       A interface id to advertise on.\n"
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    "\n"
+    "  --trace_file <file>\n"
+    "       Output trace data to the provided file.\n"
+    "  --trace_log <1/0>\n"
+    "       A value of 1 enables traces to go to the log, 0 disables this (default 0).\n"
+    "  --trace_decode <1/0>\n"
+    "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n";
+
+bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
+{
+    size_t maxBase64Size = BASE64_ENCODED_LEN(maxSize);
+    outVector.resize(maxSize);
+
+    size_t argLen = strlen(arg);
+    if (argLen > maxBase64Size)
+    {
+        return false;
+    }
+
+    size_t decodedLen = chip::Base64Decode32(arg, argLen, reinterpret_cast<uint8_t *>(outVector.data()));
+    if (decodedLen == 0)
+    {
+        return false;
+    }
+
+    outVector.resize(decodedLen);
+    return true;
+}
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -164,13 +249,95 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
         break;
 
-    case kDeviceOption_Discriminator:
-        LinuxDeviceOptions::GetInstance().payload.discriminator = static_cast<uint16_t>(atoi(aValue));
+    case kDeviceOption_Discriminator: {
+        uint16_t value = static_cast<uint16_t>(atoi(aValue));
+        if (value >= 4096)
+        {
+            PrintArgError("%s: invalid value specified for discriminator: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().discriminator.SetValue(value);
+        }
         break;
+    }
 
     case kDeviceOption_Passcode:
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
+
+    case kDeviceOption_Spake2pSaltBase64: {
+        constexpr size_t kMaxSize = chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length;
+        std::vector<uint8_t> saltVector;
+
+        bool success = Base64ArgToVector(aValue, kMaxSize, saltVector);
+
+        if (!success)
+        {
+            PrintArgError("%s: ERROR: Base64 format for argument %s was invalid\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+
+        if ((saltVector.size() < chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length) ||
+            (saltVector.size() > chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length))
+        {
+            PrintArgError("%s: ERROR: argument %s not in range [%u, %u]\n", aProgram, aName,
+                          chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length, chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pSalt.SetValue(std::move(saltVector));
+        break;
+    }
+
+    case kDeviceOption_Spake2pVerifierBase64: {
+        constexpr size_t kMaxSize = chip::Crypto::kSpake2p_VerifierSerialized_Length;
+        std::vector<uint8_t> serializedVerifier;
+
+        bool success = Base64ArgToVector(aValue, kMaxSize, serializedVerifier);
+
+        if (!success)
+        {
+            PrintArgError("%s: ERROR: Base64 format for argument %s was invalid\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+
+        if (serializedVerifier.size() != chip::Crypto::kSpake2p_VerifierSerialized_Length)
+        {
+            PrintArgError("%s: ERROR: argument %s should contain base64 for a %u bytes octet string \n", aProgram, aName,
+                          chip::Crypto::kSpake2p_VerifierSerialized_Length);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pVerifier.SetValue(std::move(serializedVerifier));
+        break;
+    }
+
+    case kDeviceOption_Spake2pIterations: {
+        errno              = 0;
+        uint32_t iterCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if (errno == ERANGE)
+        {
+            PrintArgError("%s: ERROR: argument %s was not parsable as an integer\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+        if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations) || (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
+        {
+            PrintArgError("%s: ERROR: argument %s not in range [%u, %u]\n", aProgram, aName,
+                          chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pIterations = iterCount;
+        break;
+    }
 
     case kDeviceOption_SecuredDevicePort:
         LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
@@ -184,6 +351,41 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
 
+    case kDeviceOption_Command:
+        LinuxDeviceOptions::GetInstance().command = aValue;
+        break;
+
+    case kDeviceOption_PICS:
+        LinuxDeviceOptions::GetInstance().PICS = aValue;
+        break;
+
+    case kDeviceOption_KVS:
+        LinuxDeviceOptions::GetInstance().KVS = aValue;
+        break;
+
+    case kDeviceOption_InterfaceId:
+        LinuxDeviceOptions::GetInstance().interfaceId =
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
+        break;
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    case kDeviceOption_TraceFile:
+        LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
+        break;
+    case kDeviceOption_TraceLog:
+        if (atoi(aValue) != 0)
+        {
+            LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
+        }
+        break;
+    case kDeviceOption_TraceDecode:
+        if (atoi(aValue) != 0)
+        {
+            LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled = true;
+        }
+        break;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -195,16 +397,24 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS", sDeviceOptionHelp };
 
-OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr };
+OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
-CHIP_ERROR ParseArguments(int argc, char * argv[])
+CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptions)
 {
+    // Index 0 is for the general Linux options
+    uint8_t optionSetIndex = 1;
+    if (customOptions != nullptr)
+    {
+        // If there are custom options, include it during arg parsing
+        sLinuxDeviceOptionSets[optionSetIndex++] = customOptions;
+    }
+
     char usage[kAppUsageLength];
     snprintf(usage, kAppUsageLength, "Usage: %s [options]", argv[0]);
 
     HelpOptions helpOptions(argv[0], usage, "1.0");
-    sLinuxDeviceOptionSets[1] = &helpOptions;
+    sLinuxDeviceOptionSets[optionSetIndex] = &helpOptions;
 
     if (!ParseArgs(argv[0], argc, argv, sLinuxDeviceOptionSets))
     {
@@ -215,5 +425,9 @@ CHIP_ERROR ParseArguments(int argc, char * argv[])
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
+    if (gDeviceOptions.dacProvider == nullptr)
+    {
+        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+    }
     return gDeviceOptions;
 }

@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-chip_device_platform = "nrfconnect"
-
-chip_inet_config_enable_ipv4 = false
+declare_args() {
+  chip_malloc_sys_heap = false
+}

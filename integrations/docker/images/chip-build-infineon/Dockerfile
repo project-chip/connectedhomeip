@@ -9,18 +9,18 @@ RUN apt update -y \
 
 # ------------------------------------------------------------------------------
 # Download and extract ModusToolbox 2.3
-RUN curl --fail --location --silent --show-error http://dlm.cypress.com.edgesuite.net/akdlm/downloadmanager/software/ModusToolbox/ModusToolbox_2.3/ModusToolbox_2.3.0.4276-linux-install.tar.gz -o /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz \
- && tar -C /opt -zxf /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz \
- && rm /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz
+RUN curl --fail --location --silent --show-error https://download.cypress.com/downloadmanager/software/ModusToolbox/ModusToolbox_2.4/ModusToolbox_2.4.0.5972-linux-install.tar.gz -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
+ && tar -C /opt -zxf /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
+ && rm /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz
 
 # ------------------------------------------------------------------------------
 # Execute post-build scripts
-RUN /opt/ModusToolbox/tools_2.3/modus-shell/postinstall
+RUN /opt/ModusToolbox/tools_2.4/modus-shell/postinstall
 
 # NOTE: udev rules are NOT installed:
-#   /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
+#   /opt/ModusToolbox/tools_2.4/fw-loader/udev_rules/install_rules.sh
 # because docker containers do not support udev
 
 # ------------------------------------------------------------------------------
 # Set environment variable required by ModusToolbox application makefiles
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"

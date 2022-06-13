@@ -46,12 +46,7 @@ class IPPrefix
 {
 public:
     IPPrefix() = default;
-
-    /**
-     *  Copy constructor for the IPPrefix class.
-     *
-     */
-    IPPrefix(const IPPrefix & other) = default;
+    IPPrefix(const IPAddress & ipAddress, uint8_t length) : IPAddr(ipAddress), Length(length) {}
 
     /** An IPv6 or IPv4 address. */
     IPAddress IPAddr;
@@ -62,14 +57,14 @@ public:
      * @details
      *  Note well: this field is public, and it is an invariant of this class
      *  that <tt>Length <= 32</tt> where the type of \c IPAddr is
-     *  \c kIPAddressType_IPv4 and <tt>Length <= 128</tt> where the type of
-     *  \c IPAddr is \c kIPAddressType_IPv6.
+     *  \c IPAddressType::kIPv4 and <tt>Length <= 128</tt> where the type of
+     *  \c IPAddr is \c IPAddressType::kIPv6.
      */
     uint8_t Length;
 
     /**
      * A distinguished object where the type of \c IPAddr is
-     * \c kIPAddressType_Any and <tt>Length == 0</tt>.
+     * \c IPAddressType::kAny and <tt>Length == 0</tt>.
      */
     static IPPrefix Zero;
 
@@ -78,7 +73,7 @@ public:
      *
      * @details
      *  Note well: a prefix is not equivalent to \c Zero if the type of
-     *  \c IPAddr is not \c kIPAddressType_Any.
+     *  \c IPAddr is not \c IPAddressType::kAny.
      *
      * @return  \c true if equivalent to \c Zero, else \c false.
      */
@@ -105,15 +100,6 @@ public:
      * @return  \c false if equivalent, else \c false.
      */
     bool operator!=(const IPPrefix & other) const;
-
-    /**
-     * @brief   Conventional assignment operator.
-     *
-     * @param[in]   other   the prefix to copy.
-     *
-     * @return  a reference to this object.
-     */
-    IPPrefix & operator=(const IPPrefix & other);
 
     /**
      * @brief   Test if an address matches the prefix.

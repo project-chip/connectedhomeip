@@ -1,0 +1,135 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 19.8.1. [TC-IDM-6.1] Events Read Interaction from TH to DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to a
+          specific event from a specific cluster on a specific endpoint on a
+          specific node i.e. [Node = Specific, Endpoint = Specific, Cluster =
+          Specific, Event = Specific]."
+      verification: |
+          First launch DUT and do commissioning with TH and kill DUT by passing pid
+          Then read the event by id
+          ./chip-tool softwarediagnostics read-by-id 0x0 1 0
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to all
+          events from a specific cluster on a specific endpoint on a specific
+          node i.e. [Node = Specific, Endpoint = Specific, Cluster = Specific,
+          Event = Wildcard]."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool any read-event-by-id 0x0036 0x0FFFFFFFF 1 0
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to all
+          events from all clusters on a specific endpoint on a specific node
+          i.e. [Node = Specific, Endpoint = Specific, Cluster = Wildcard, Event
+          = Wildcard]."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to a
+          specific event from a specific cluster on all endpoints on a specific
+          node i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
+          Event = Specific]."
+      verification: |
+          First launch DUT and do commissioning with TH and kill DUT by passing pid
+          Then read the event by id
+          ./chip-tool softwarediagnostics read-by-id 0x0 1 0xFFFF
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to all
+          events from a specific cluster on all endpoints on a specific node
+          i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific, Event
+          = Wildcard]."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool any read-event-by-id 0x0033 0x0FFFFFFFF 1 0xFFFF
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to all
+          events from all clusters on all endpoints on a specific node i.e.
+          [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
+          Wildcard]."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to path
+          which indicates a cluster event that is not supported."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to path
+          which requires a privilege that is not granted for the cluster in the
+          path."
+      verification: |
+          Unsupported in TE8 - Out of scope
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to
+          Wildcard path where reading an event in the path requires a privilege
+          that is not granted for the cluster in the path."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventRequests set to path
+          where an event in the path is fabric-sensitive and the associated
+          fabric does not match the accessing fabric."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventFilterIB Node
+          information field matching the node indicated in the path and EventMin
+          field."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Read Request Message to DUT with EventFilterIB Node
+          information field matching the node indicated in the path and the
+          event number is less than the EventMin field."
+      verification: |
+
+      disabled: true

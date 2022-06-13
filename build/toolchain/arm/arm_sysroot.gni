@@ -1,0 +1,57 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/arm.gni")
+
+assert(arm_arch != "", "Must specify arm_arch to configure clang for ARM")
+
+_script_flags = [
+  "--gn-scope",
+  "--cflags",
+  "--ldflags",
+  "--",
+]
+
+if (arm_arch != "") {
+  _script_flags += [ "-march=${arm_arch}" ]
+}
+if (arm_cpu != "") {
+  _script_flags += [ "-mcpu=${arm_cpu}" ]
+}
+if (arm_tune != "") {
+  _script_flags += [ "-mtune=${arm_tune}" ]
+}
+if (arm_abi != "") {
+  _script_flags += [ "-mabi=${arm_abi}" ]
+}
+if (arm_fpu != "") {
+  _script_flags += [ "-mfpu=${arm_fpu}" ]
+}
+if (arm_float_abi != "") {
+  _script_flags += [ "-mfloat-abi=${arm_float_abi}" ]
+}
+if (arm_use_thumb) {
+  _script_flags += [ "-mthumb" ]
+}
+
+_arm_flags =
+    exec_script("$dir_pw_toolchain/py/pw_toolchain/clang_arm_toolchain.py",
+                _script_flags,
+                "scope")
+
+runtime_library_cflags = _arm_flags.cflags
+runtime_library_ldflags = _arm_flags.cflags + _arm_flags.ldflags

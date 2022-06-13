@@ -3,13 +3,14 @@
 There are following Apps on Android
 
 -   CHIPTool - Android CHIPTool is an application for Android for commissioning
-    and controlling CHIP accessory devices. It offers the following features: -
-    Scan a CHIP QR code and display payload information to the user - Read the
-    NFC tag containing CHIP onboarding information - Commission a CHIP device -
-    Send echo requests to the CHIP echo server - Send on/off cluster requests to
-    a CHIP device
+    and controlling Matter accessory devices. It offers the following features:
+    -   Scan a Matter QR code and display payload information to the user
+    -   Read the NFC tag containing Matter onboarding information
+    -   Commission a Matter device
+    -   Send echo requests to the Matter echo server
+    -   Send on/off cluster requests to a Matter device
 -   CHIPTest
-    -   Android CHIPTest is an application for Android for running CHIP's unit
+    -   Android CHIPTest is an application for Android for running Matter's unit
         tests
 
 <hr>
@@ -17,9 +18,11 @@ There are following Apps on Android
 -   [Source files](#source)
 -   [Requirements for building](#requirements)
     -   [ABIs and TARGET_CPU](#abi)
+    -   [Gradle & JDK Version](#jdk)
 -   [Preparing for build](#preparing)
 -   [Building Android CHIPTool from scripts](#building-scripts)
 -   [Building Android CHIPTool from Android Studio](#building-studio)
+-   [Building Android CHIPTest from scripts](#building-chiptest-scripts)
 
 <hr>
 
@@ -55,15 +58,29 @@ architecture:
 | x86         | x86        |
 | x86_64      | x64        |
 
+<a name="jdk"></a>
+
+### Gradle & JDK Version
+
+We are using Gradle 7.1.1 for all android project which does not support Java 17
+(https://docs.gradle.org/current/userguide/compatibility.html) while the default
+JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
+
+Using JDK bundled with Android Studio will help with that.
+
+```shell
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+
 <hr>
 
 <a name="preparing"></a>
 
 ## Preparing for build
 
-Complete the following steps to prepare the CHIP build:
+Complete the following steps to prepare the Matter build:
 
-1. Check out the CHIP repository.
+1. Check out the Matter repository.
 
 2. Run bootstrap (**only required first time**)
 
@@ -76,11 +93,7 @@ Complete the following steps to prepare the CHIP build:
 
 <a name="building-scripts"></a>
 
-## Building Android CHIPTool
-
-<a name="chiptool_scripts_build"></a>
-
-### From scripts
+## Building Android CHIPTool from scripts
 
 This is the simplest option. In the command line, run the following command from
 the top CHIP directory:
@@ -100,17 +113,17 @@ adb install out/android-$TARGET_CPU-chip-tool/outputs/apk/debug/app-debug.apk
 ```
 
 You can use Android Studio to edit the Android CHIPTool app itself and run it
-after build_examples.py, but you will not be able to edit CHIP Android code from
-`src/controller/java`, or other CHIP C++ code within Android Studio.
+after build_examples.py, but you will not be able to edit Matter Android code
+from `src/controller/java`, or other Matter C++ code within Android Studio.
 
 <a name="building-studio"></a>
 
-### From Android Studio
+## Building Android CHIPTool from Android Studio
 
-This option allows Android Studio to build the core CHIP code from source, which
-allows us to directly edit core CHIP code in-IDE.
+This option allows Android Studio to build the core Matter code from source,
+which allows us to directly edit core Matter code in-IDE.
 
-1. In the command line, run the following command from the top CHIP directory:
+1. In the command line, run the following command from the top Matter directory:
 
     ```shell
     TARGET_CPU=arm64 ./scripts/examples/android_app_ide.sh
@@ -118,9 +131,9 @@ allows us to directly edit core CHIP code in-IDE.
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir`
-   point to the appropriate output directory (e.g.
-   `../../../../out/android_arm64`) in
+2. Modify the `matterSdkSourceBuild` variable to true, `matterBuildSrcDir` point
+   to the appropriate output directory (e.g. `../../../../out/android_arm64`),
+   and `matterSourceBuildAbiFilters` to the desired ABIs in
    [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
 3) Open the project in Android Studio and run **Sync Project with Gradle
@@ -149,11 +162,12 @@ or
 (cd src/android/CHIPTool && ./gradlew installDebug)
 ```
 
-## Building Android CHIPTest
+<a name="building-chiptest-scripts"></a>
 
-### From scripts
+## Building Android CHIPTest from scripts
 
-The steps are similar with [CHIPTool scripts build](#chiptool_scripts_build)
+Currently, the CHIPTest can only be built from scripts. The steps are similar to
+[building CHIPTool from scripts](#building-scripts).
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build
@@ -162,7 +176,3 @@ The steps are similar with [CHIPTool scripts build](#chiptool_scripts_build)
 You can modify the `matterUTestLib` variable to the test lib in
 [src/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTest/gradle.properties)
 to change target to test.
-
-### From Android Studio
-
-Not supported yet

@@ -37,8 +37,9 @@ namespace chip {
 
 void LaunchShell()
 {
+    chip::Shell::Engine::Root().Init();
 #if CONFIG_HEAP_TRACING_STANDALONE || CONFIG_HEAP_TASK_TRACKING
-    RegisterHeapTraceCommands();
+    idf::chip::RegisterHeapTraceCommands();
 #endif // CONFIG_HEAP_TRACING_STANDALONE || CONFIG_HEAP_TASK_TRACKING
     xTaskCreate(&MatterShellTask, "chip_cli", 2048, NULL, 5, NULL);
 }

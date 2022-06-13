@@ -38,7 +38,10 @@
  * GLOBAL VARIABLES
  */
 // CHIPoBLE GATT Profile Service UUID
-const uint8 chipOBleServUUID[ATT_UUID_SIZE] = { CHIPOBLEPROFILE_SERV_UUID_BASE128(CHIPOBLE_SERV_UUID) };
+const uint8 chipOBleServUUID[ATT_BT_UUID_SIZE] = {
+    // 0xF6, 0xFF
+    LO_UINT16(CHIPOBLE_SERV_UUID), HI_UINT16(CHIPOBLE_SERV_UUID)
+};
 
 // CHIPoBLE Tx characteristic UUID
 const uint8 chipOBleProfileTxCharUUID[ATT_UUID_SIZE] = {
@@ -56,27 +59,27 @@ const uint8 chipOBleProfileRxCharUUID[ATT_UUID_SIZE] = {
  * Profile Attributes - variables
  */
 
-//  Remote Display Profile Service attribute
-static const gattAttrType_t chipoBleProfile = { ATT_UUID_SIZE, chipOBleServUUID };
+// CHIPoBLE GATT Profile Service attribute
+static const gattAttrType_t chipoBleProfile = { ATT_BT_UUID_SIZE, chipOBleServUUID };
 
-// ChipOBLE Tx Characteristic Properties
+// CHIPoBLE Tx Characteristic Properties
 static uint8_t chipOBleProfileTxCharProps = GATT_PROP_READ | GATT_PROP_NOTIFY;
 
-// ChipOBLE Tx Characteristic Value
+// CHIPoBLE Tx Characteristic Value
 static uint8_t chipOBleProfileTxCharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
 
-// ChipOBLE Tx Characteristic User Description
+// CHIPoBLE Tx Characteristic User Description
 static uint8_t chipOBleProfileTxdDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE Tx Char";
 
 static gattCharCfg_t * chipOBleProfileTxStateDataConfig;
 
-// ChipOBLE Rx Characteristic Properties
+// CHIPoBLE Rx Characteristic Properties
 static uint8_t chipOBleProfileRxCharProps = GATT_PROP_WRITE;
 
-// ChipOBLE Rx Characteristic Value
+// CHIPoBLE Rx Characteristic Value
 static uint8_t chipOBleProfileRxCharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
 
-// ChipOBLE Rx Characteristic User Description
+// CHIPoBLE Rx Characteristic User Description
 static uint8_t chipOBleProfileRxdDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE Rx Char";
 
 /*********************************************************************

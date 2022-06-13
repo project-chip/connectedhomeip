@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,10 +22,6 @@
  */
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
-
-#define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
-
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
@@ -53,22 +49,12 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-
-// Increase session idle timeout in stand-alone builds for the convenience of developers.
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
 
 #define CHIP_CONFIG_ENABLE_UPDATE 1
-
-#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
-
-#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 
 #define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
-
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 1
 
 /* TODO: Ideally, these #defines should be enabled by default for Linux
  AND the python tool would provide runtime options to enable/disable them */

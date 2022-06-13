@@ -17,14 +17,15 @@
 
 #import <Foundation/Foundation.h>
 
+#include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPError : NSObject
 + (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
-+ (nullable NSError *)errorForZCLErrorCode:(uint8_t)errorCode;
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)errorCode;
++ (nullable NSError *)errorForIMStatus:(const chip::app::StatusIB &)status;
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;
 @end
 
 NS_ASSUME_NONNULL_END

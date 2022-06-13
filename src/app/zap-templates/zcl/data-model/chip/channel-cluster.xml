@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Channel</name>
+    <code>0x0504</code>
+    <define>CHANNEL_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for controlling the current Channel on a device.</description>
+    <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="ARRAY" entryType="ChannelInfo" length="254"                    writable="false" optional="true">ChannelList</attribute>
+    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfo"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
+    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
+
+    <command source="client" code="0x00" name="ChangeChannel" response="ChangeChannelResponse" optional="true">
+      <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
+      <arg name="match" type="CHAR_STRING"/>
+    </command>
+
+    <command source="client" code="0x02" name="ChangeChannelByNumber" optional="false">
+      <description>Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.</description>
+      <arg name="majorNumber" type="INT16U"/>
+      <arg name="minorNumber" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x03" name="SkipChannel" optional="false">
+      <description>This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.</description>
+      <arg name="count" type="INT16U"/>
+    </command>
+
+    <command source="server" code="0x01" name="ChangeChannelResponse" optional="true">
+      <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
+      <arg name="status" type="ChannelStatusEnum"/>
+      <arg name="data"   type="CHAR_STRING" optional="true"/>
+    </command>
+
+  </cluster>
+
+  <struct name="ChannelInfo">
+    <cluster code="0x0504"/>
+    <item name="majorNumber"       type="INT16U"/>
+    <item name="minorNumber"       type="INT16U"/>
+    <item name="name"              type="CHAR_STRING" optional="true" length="32"/>
+    <item name="callSign"          type="CHAR_STRING" optional="true" length="32"/>
+    <item name="affiliateCallSign" type="CHAR_STRING" optional="true" length="32"/>
+  </struct>
+
+  <struct name="LineupInfo">
+    <cluster code="0x0504"/>
+    <item name="operatorName"   type="CHAR_STRING"/>
+    <item name="lineupName"     type="CHAR_STRING" default="" optional="true"/>
+    <item name="postalCode"     type="CHAR_STRING" default="" optional="true"/>
+    <item name="lineupInfoType" type="LineupInfoTypeEnum"/>
+  </struct>
+
+  <enum name="LineupInfoTypeEnum" type="ENUM8">
+    <cluster code="0x0504"/>
+    <item name="Mso" value="0x00"/>
+  </enum>
+
+  <enum name="ChannelStatusEnum" type="ENUM8">
+    <cluster code="0x0504"/>
+    <item name="Success" value="0x00"/>
+    <item name="MultipleMatches" value="0x01"/>
+    <item name="NoMatches" value="0x02"/>
+  </enum>
+
+  <bitmap name="ChannelFeature" type="BITMAP32">
+    <cluster code="0x0504"/>
+    <field name="ChannelList" mask="0x1"/>
+    <field name="LineupInfo"  mask="0x2"/>
+  </bitmap>
+
+</configurator>

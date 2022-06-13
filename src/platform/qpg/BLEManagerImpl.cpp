@@ -27,6 +27,7 @@
 
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 #include <lib/support/CodeUtils.h>
@@ -53,6 +54,7 @@ namespace {
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;
+StaticTimer_t sbleAdvTimeoutTimerBuffer;
 
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
 const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
@@ -94,12 +96,24 @@ CHIP_ERROR BLEManagerImpl::_Init()
     qvCHIP_BleInit(&appCbacks);
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    sbleAdvTimeoutTimer = xTimerCreateStatic("BleAdvTimer",             // Just a text name, not used by the RTOS kernel
+                                             1,                         // == default timer period (mS)
+                                             false,                     // no timer reload (==one-shot)
+                                             (void *) this,             // init timer id = ble obj context
+                                             BleAdvTimeoutHandler,      // timer callback handler
+                                             &sbleAdvTimeoutTimerBuffer // static buffer for timer
+
+    );
+
+#else
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
                                        1,                   // == default timer period (mS)
                                        false,               // no timer reload (==one-shot)
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
     );
+#endif
     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -430,9 +444,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     CHIP_ERROR err;
-    uint8_t index               = 0;
-    uint8_t mDeviceNameLength   = 0;
-    uint8_t mDeviceIdInfoLength = 0;
+    uint8_t index              = 0;
+    uint8_t deviceNameLength   = 0;
+    uint8_t deviceIdInfoLength = 0;
 
     char deviceName[kMaxDeviceNameLength + 1];
     uint8_t advDataBuf[kMaxAdvertisementDataSetSize];
@@ -446,15 +460,18 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        uint16_t discriminator;
+        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+
+        snprintf(deviceName, sizeof(deviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
 
         deviceName[kMaxDeviceNameLength] = 0;
         err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
         SuccessOrExit(err);
     }
 
-    mDeviceNameLength   = static_cast<uint8_t>(strlen(mDeviceName));
-    mDeviceIdInfoLength = sizeof(mDeviceIdInfo);
+    deviceNameLength   = static_cast<uint8_t>(strlen(deviceName));
+    deviceIdInfoLength = sizeof(mDeviceIdInfo);
 
     // Check sizes
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");
@@ -467,20 +484,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advDataBuf[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
     advDataBuf[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
 
-    advDataBuf[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
-    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
+    advDataBuf[index++] = static_cast<uint8_t>(deviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
+    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                        // AD type : Service Data
+    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                           // AD value
     advDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
-    memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
-    index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
+    memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, deviceIdInfoLength); // AD value
+    index = static_cast<uint8_t>(index + deviceIdInfoLength);
 
-    // TODO remove device name issue #10221
-    advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
-    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
-    index = static_cast<uint8_t>(index + mDeviceNameLength);
-
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, mAdvDataBuf);
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, advDataBuf);
 
     // Fill in scan response data
     index                    = 0;
@@ -489,7 +500,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
+    VerifyOrExit(index + (deviceNameLength + 2) <= kMaxAdvertisementDataSetSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    scanRespDataBuf[index++] = static_cast<uint8_t>(deviceNameLength + 1); // length
+    scanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                    // AD type : name
+    memcpy(&scanRespDataBuf[index], deviceName, deviceNameLength);         // AD value
+    index = static_cast<uint8_t>(index + deviceNameLength);
+
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, scanRespDataBuf);
 
 exit:
     return err;
@@ -916,8 +934,8 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     {
         /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-        sInstance.StopAdvertising();
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
+        sInstance.StopAdvertising();
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {

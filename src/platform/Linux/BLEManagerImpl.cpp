@@ -28,6 +28,7 @@
 #include <lib/support/SafeInt.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include <cassert>
 #include <type_traits>
@@ -46,8 +47,8 @@ namespace Internal {
 
 namespace {
 
-static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-static constexpr unsigned kConnectTimeoutMs           = 10000;
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(10);
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -90,6 +91,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 exit:
     return err;
+}
+
+CHIP_ERROR BLEManagerImpl::_Shutdown()
+{
+    // ensure scan resources are cleared (e.g. timeout timers)
+    mDeviceScanner.reset();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
@@ -167,7 +176,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     else
     {
         uint16_t discriminator;
-        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
         mFlags.Clear(Flags::kUseCustomDeviceName);
@@ -702,7 +711,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    CHIP_ERROR err = mDeviceScanner->StartScan(kNewConnectionScanTimeoutMs);
+    CHIP_ERROR err = mDeviceScanner->StartScan(kNewConnectionScanTimeout);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
@@ -803,7 +812,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeoutMs, HandleConnectTimeout, mpEndpoint);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
     mDeviceScanner->StopScan();
 
     ConnectDevice(device, mpEndpoint);

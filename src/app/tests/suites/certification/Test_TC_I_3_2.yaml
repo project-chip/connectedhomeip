@@ -1,0 +1,137 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 57.3.2. [TC-I-3.2] Functionality with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT issues an Identify command to the Test Harness, with the
+          IdentifyTime argument set to 0x003C (60 seconds) or a reasonable time
+          that is supported by the DUT."
+      verification: |
+          On TestHarnes (all-cluster-app) a received Identify command with f.e. 60 as IdentifyTime looks like this:
+
+          [1646010972.583498][33190:33190] CHIP:EM: Handling via exchange: 60250r, Delegate: 0xaaaace1730c8
+          [1646010972.583578][33190:33190] CHIP:DMG: InvokeRequestMessage =
+          [1646010972.583611][33190:33190] CHIP:DMG: {
+          [1646010972.583636][33190:33190] CHIP:DMG:         suppressResponse = false,
+          [1646010972.583663][33190:33190] CHIP:DMG:         timedRequest = false,
+          [1646010972.583687][33190:33190] CHIP:DMG:         InvokeRequests =
+          [1646010972.583718][33190:33190] CHIP:DMG:         [
+          [1646010972.583742][33190:33190] CHIP:DMG:                 CommandDataIB =
+          [1646010972.583773][33190:33190] CHIP:DMG:                 {
+          [1646010972.583798][33190:33190] CHIP:DMG:                         CommandPathIB =
+          [1646010972.583835][33190:33190] CHIP:DMG:                         {
+          [1646010972.583868][33190:33190] CHIP:DMG:                                 EndpointId = 0x1,
+          [1646010972.583905][33190:33190] CHIP:DMG:                                 ClusterId = 0x3,
+          [1646010972.583941][33190:33190] CHIP:DMG:                                 CommandId = 0x0,
+          [1646010972.583976][33190:33190] CHIP:DMG:                         },
+          [1646010972.584008][33190:33190] CHIP:DMG:
+          [1646010972.584037][33190:33190] CHIP:DMG:                         CommandData =
+          [1646010972.584071][33190:33190] CHIP:DMG:                         {
+          [1646010972.584106][33190:33190] CHIP:DMG:                                 0x0 = 60,
+          [1646010972.584140][33190:33190] CHIP:DMG:                         },
+          [1646010972.584172][33190:33190] CHIP:DMG:                 },
+          [1646010972.584204][33190:33190] CHIP:DMG:
+          [1646010972.584227][33190:33190] CHIP:DMG:         ],
+          [1646010972.584257][33190:33190] CHIP:DMG:
+          [1646010972.584281][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646010972.584304][33190:33190] CHIP:DMG: },
+          [1646010972.584359][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
+          [1646010972.584430][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0000
+          [1646010972.584474][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to d4fdf424
+      disabled: true
+
+    - label:
+          "DUT issues an Identify command to the Test Harness, with the
+          IdentifyTime argument set to 0x0000 (Stop)."
+      verification: |
+          On TestHarnes (all-cluster-app) a received Identify command with an IdentifyTime of 0 looks like this:
+
+          [1646011311.206353][33190:33190] CHIP:EM: Handling via exchange: 12024r, Delegate: 0xaaaace1730c8
+          [1646011311.206436][33190:33190] CHIP:DMG: InvokeRequestMessage =
+          [1646011311.206462][33190:33190] CHIP:DMG: {
+          [1646011311.206483][33190:33190] CHIP:DMG: 	suppressResponse = false,
+          [1646011311.206514][33190:33190] CHIP:DMG: 	timedRequest = false,
+          [1646011311.206544][33190:33190] CHIP:DMG: 	InvokeRequests =
+          [1646011311.206575][33190:33190] CHIP:DMG: 	[
+          [1646011311.206599][33190:33190] CHIP:DMG: 		CommandDataIB =
+          [1646011311.206628][33190:33190] CHIP:DMG: 		{
+          [1646011311.206656][33190:33190] CHIP:DMG: 			CommandPathIB =
+          [1646011311.206687][33190:33190] CHIP:DMG: 			{
+          [1646011311.206719][33190:33190] CHIP:DMG: 				EndpointId = 0x1,
+          [1646011311.206754][33190:33190] CHIP:DMG: 				ClusterId = 0x3,
+          [1646011311.206786][33190:33190] CHIP:DMG: 				CommandId = 0x0,
+          [1646011311.206815][33190:33190] CHIP:DMG: 			},
+          [1646011311.206848][33190:33190] CHIP:DMG:
+          [1646011311.206875][33190:33190] CHIP:DMG: 			CommandData =
+          [1646011311.206906][33190:33190] CHIP:DMG: 			{
+          [1646011311.206937][33190:33190] CHIP:DMG: 				0x0 = 0,
+          [1646011311.206970][33190:33190] CHIP:DMG: 			},
+          [1646011311.207000][33190:33190] CHIP:DMG: 		},
+          [1646011311.207032][33190:33190] CHIP:DMG:
+          [1646011311.207055][33190:33190] CHIP:DMG: 	],
+          [1646011311.207085][33190:33190] CHIP:DMG:
+          [1646011311.207108][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
+          [1646011311.207133][33190:33190] CHIP:DMG: },
+          [1646011311.207188][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
+          [1646011311.207295][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0000
+          [1646011311.207342][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to d4fdf4a5
+          [1646011311.207377][33190:33190] CHIP:ZCL: OnIdentifyStop
+      disabled: true
+
+    - label:
+          "DUT sends a TriggerEffect command to the Test Harness, with any
+          supported EffectIdentifier argument and EffectVariant set to 0 ."
+      verification: |
+          On TestHarnes (all-cluster-app) a received Identify command with f.e. 1 as EffectIdentifier looks like this:
+
+          [1646011549.034604][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3605482 on exchange 36067r
+          [1646011549.034646][33190:33190] CHIP:EM: Handling via exchange: 36067r, Delegate: 0xaaaace1730c8
+          [1646011549.034790][33190:33190] CHIP:DMG: InvokeRequestMessage =
+          [1646011549.034821][33190:33190] CHIP:DMG: {
+          [1646011549.034841][33190:33190] CHIP:DMG:         suppressResponse = false,
+          [1646011549.034865][33190:33190] CHIP:DMG:         timedRequest = false,
+          [1646011549.034891][33190:33190] CHIP:DMG:         InvokeRequests =
+          [1646011549.034923][33190:33190] CHIP:DMG:         [
+          [1646011549.034948][33190:33190] CHIP:DMG:                 CommandDataIB =
+          [1646011549.034976][33190:33190] CHIP:DMG:                 {
+          [1646011549.035001][33190:33190] CHIP:DMG:                         CommandPathIB =
+          [1646011549.035033][33190:33190] CHIP:DMG:                         {
+          [1646011549.035066][33190:33190] CHIP:DMG:                                 EndpointId = 0x1,
+          [1646011549.035103][33190:33190] CHIP:DMG:                                 ClusterId = 0x3,
+          [1646011549.035139][33190:33190] CHIP:DMG:                                 CommandId = 0x40,
+          [1646011549.035173][33190:33190] CHIP:DMG:                         },
+          [1646011549.035205][33190:33190] CHIP:DMG:
+          [1646011549.035588][33190:33190] CHIP:DMG:                         CommandData =
+          [1646011549.035632][33190:33190] CHIP:DMG:                         {
+          [1646011549.035668][33190:33190] CHIP:DMG:                                 0x0 = 1,
+          [1646011549.035706][33190:33190] CHIP:DMG:                                 0x1 = 0,
+          [1646011549.035741][33190:33190] CHIP:DMG:                         },
+          [1646011549.035773][33190:33190] CHIP:DMG:                 },
+          [1646011549.035806][33190:33190] CHIP:DMG:
+          [1646011549.035832][33190:33190] CHIP:DMG:         ],
+          [1646011549.035866][33190:33190] CHIP:DMG:
+          [1646011549.035890][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646011549.035915][33190:33190] CHIP:DMG: },
+          [1646011549.035975][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
+          [1646011549.036017][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0040
+          [1646011549.036052][33190:33190] CHIP:ZCL: RX identify:trigger effect 0x1 variant 0x0
+      disabled: true

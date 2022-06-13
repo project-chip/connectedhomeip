@@ -25,6 +25,8 @@ source_set("commands") {
     "Meta.cpp",
   ]
 
+  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+
   if (chip_device_platform != "none") {
     sources += [
       "Config.cpp",
@@ -45,11 +47,16 @@ source_set("commands") {
     sources += [ "NFC.cpp" ]
   }
 
-  if (chip_mdns != "none" && chip_device_platform != "none") {
+  if (chip_device_platform != "none") {
     sources += [ "Dns.cpp" ]
   }
 
-  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+  if (chip_enable_ota_requestor && chip_device_platform != "none" &&
+      chip_device_platform != "linux" && chip_device_platform != "darwin") {
+    #TODO: the ota commands in shell should use the interfaces in /src/app/clusters/ota-requestor
+    sources += [ "Ota.cpp" ]
+    configs += [ "${chip_root}/src/controller:config" ]
+  }
 
   if (chip_device_platform != "none") {
     public_deps += [ "${chip_root}/src/app/server" ]

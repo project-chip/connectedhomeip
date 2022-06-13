@@ -110,9 +110,11 @@ void LivenessEventGenerator::Generate(void)
 
 CHIP_ERROR LivenessEventGenerator::WriteEvent(chip::TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = aWriter.Put(kLivenessDeviceStatus, mStatus);
-    return err;
+    chip::TLV::TLVType dataContainerType;
+    ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
+                                                chip::TLV::kTLVType_Structure, dataContainerType));
+    ReturnErrorOnFailure(aWriter.Put(kLivenessDeviceStatus, mStatus));
+    return aWriter.EndContainer(dataContainerType);
 }
 
 chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId,
@@ -121,10 +123,10 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
 {
     chip::app::EventManagement & logManager = chip::app::EventManagement::GetInstance();
     chip::EventNumber number                = 0;
-    chip::app::EventSchema schema           = { aNodeId, aEndpointId, kTestClusterId, aEventId, aPriorityLevel };
     chip::app::EventOptions options;
-    mStatus               = static_cast<int32_t>(aStatus);
-    options.mpEventSchema = &schema;
+    options.mPath     = { aEndpointId, kTestClusterId, aEventId };
+    options.mPriority = aPriorityLevel;
+    mStatus           = static_cast<int32_t>(aStatus);
     logManager.LogEvent(this, options, number);
     return number;
 }
@@ -154,7 +156,8 @@ CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExc
         mEventsLeft = mpEventGenerator->GetNumStates();
 
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(mTimeBetweenEvents, HandleNextEvent, this);
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(mTimeBetweenEvents),
+                                                                      HandleNextEvent, this);
 
     return err;
 }
@@ -173,7 +176,8 @@ void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer
         generator->mEventsLeft--;
         if ((generator->mEventWraparound) || (generator->mEventsLeft > 0))
         {
-            apSystemLayer->StartTimer(generator->mTimeBetweenEvents, HandleNextEvent, generator);
+            apSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(generator->mTimeBetweenEvents), HandleNextEvent,
+                                      generator);
         }
     }
 }
@@ -186,7 +190,7 @@ void MockEventGeneratorImpl::SetEventGeneratorStop()
     // This helps quit the standalone app in an orderly way without
     // spurious leaked timers.
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(0, HandleNextEvent, this);
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::kZero, HandleNextEvent, this);
 }
 
 bool MockEventGeneratorImpl::IsEventGeneratorStopped()
@@ -197,8 +201,6 @@ bool MockEventGeneratorImpl::IsEventGeneratorStopped()
         gEventIsStopped = false;
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }

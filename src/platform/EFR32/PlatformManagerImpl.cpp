@@ -24,10 +24,15 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/EFR32/DiagnosticDataProviderImpl.h>
+#include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
@@ -42,11 +47,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    err = Internal::EFR32Config::Init();
+    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -57,43 +69,98 @@ exit:
     return err;
 }
 
-/*
- * The following Heap stats are compiled values done by the FreeRTOS Heap4 implementation.
- * See /examples/platform/efr32/heap_4_silabs.c
- * It keeps track of the number of calls to allocate and free memory as well as the
- * number of free bytes remaining, but says nothing about fragmentation.
- */
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    size_t freeHeapSize = xPortGetFreeHeapSize();
-    currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
-    return CHIP_NO_ERROR;
-}
+    uint64_t upTime = 0;
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+}
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
 {
-    // Calculate the Heap used based on Total heap - Free heap
-    int64_t heapUsed = (configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize());
+    ChipDeviceEvent event;
+    memset(&event, 0, sizeof(event));
+    event.Type                              = DeviceEventType::kWFXSystemEvent;
+    event.Platform.WFXSystemEvent.eventBase = eventBase;
 
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(heapUsed >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    currentHeapUsed = static_cast<uint64_t>(heapUsed);
-    return CHIP_NO_ERROR;
+    if (eventBase == WIFI_EVENT)
+    {
+        switch (eventData->header.id)
+        {
+        case SL_WFX_STARTUP_IND_ID:
+            memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+            break;
+        case SL_WFX_CONNECT_IND_ID:
+            memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+            break;
+        case SL_WFX_DISCONNECT_IND_ID:
+            memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+            break;
+        // case SL_WFX_RECEIVED_IND_ID:
+        //     memcpy(&event.Platform.WFXSystemEvent.data.receivedEvent, eventData,
+        //            sizeof(event.Platform.WFXSystemEvent.data.receivedEvent));
+        //     break;
+        // case SL_WFX_GENERIC_IND_ID:
+        //     memcpy(&event.Platform.WFXSystemEvent.data.genericEvent, eventData,
+        //            sizeof(event.Platform.WFXSystemEvent.data.genericEvent));
+        //     break;
+        // case SL_WFX_EXCEPTION_IND_ID:
+        //     memcpy(&event.Platform.WFXSystemEvent.data.exceptionEvent, eventData,
+        //            sizeof(event.Platform.WFXSystemEvent.data.exceptionEvent));
+        //     break;
+        // case SL_WFX_ERROR_IND_ID:
+        //     memcpy(&event.Platform.WFXSystemEvent.data.errorEvent, eventData,
+        //            sizeof(event.Platform.WFXSystemEvent.data.errorEvent));
+        //     break;
+        default:
+            break;
+        }
+    }
+    else if (eventBase == IP_EVENT)
+    {
+        switch (eventData->header.id)
+        {
+        case IP_EVENT_STA_GOT_IP:
+            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+            break;
+        case IP_EVENT_GOT_IP6:
+            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+            break;
+        case IP_EVENT_STA_LOST_IP:
+            memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
+                   sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+            break;
+        default:
+            break;
+        }
+    }
+
+    (void) sInstance.PostEvent(&event);
 }
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    // FreeRTOS records the lowest amount of available heap during runtime
-    // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
-    int64_t HighestHeapUsageRecorded = (configTOTAL_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize());
-
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(HighestHeapUsageRecorded >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    currentHeapHighWatermark = static_cast<uint64_t>(HighestHeapUsageRecorded);
-
-    return CHIP_NO_ERROR;
-}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

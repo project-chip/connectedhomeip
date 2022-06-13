@@ -37,6 +37,7 @@ namespace chip {
  *   An interface for managing a counter as an integer value.
  */
 
+template <typename T>
 class Counter
 {
 public:
@@ -57,7 +58,7 @@ public:
      *
      *  @return The current value of the counter.
      */
-    virtual uint32_t GetValue() = 0;
+    virtual T GetValue() = 0;
 };
 
 /**
@@ -67,11 +68,12 @@ public:
  *   A class for managing a monotonically-increasing counter as an integer value.
  */
 
-class MonotonicallyIncreasingCounter : public Counter
+template <typename T>
+class MonotonicallyIncreasingCounter : public Counter<T>
 {
 public:
-    MonotonicallyIncreasingCounter();
-    ~MonotonicallyIncreasingCounter() override;
+    MonotonicallyIncreasingCounter() : mCounterValue(0) {}
+    ~MonotonicallyIncreasingCounter() override{};
 
     /**
      *  @brief
@@ -81,7 +83,14 @@ public:
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(uint32_t aStartValue);
+    CHIP_ERROR Init(T aStartValue)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        mCounterValue = aStartValue;
+
+        return err;
+    }
 
     /**
      *  @brief
@@ -89,7 +98,14 @@ public:
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Advance() override;
+    CHIP_ERROR Advance() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        mCounterValue++;
+
+        return err;
+    }
 
     /**
      *  @brief
@@ -97,10 +113,10 @@ public:
      *
      *  @return The current value of the counter.
      */
-    uint32_t GetValue() override;
+    T GetValue() override { return mCounterValue; }
 
 protected:
-    uint32_t mCounterValue;
+    T mCounterValue;
 };
 
 } // namespace chip

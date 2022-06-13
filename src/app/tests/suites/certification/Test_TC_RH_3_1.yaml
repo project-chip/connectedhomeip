@@ -1,0 +1,74 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 9.3.1. [TC-RH-3.1] Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT reads all supported mandatory attributes from TH once at a time
+          in a manufacturer specific order"
+      verification: |
+          On TestHarnes (all-cluster-app) a received read of MeasuredValue (id 0) looks like this:
+
+          [1646098758.912225][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:15745149 on exchange 3055r
+          [1646098758.912345][33190:33190] CHIP:EM: Handling via exchange: 3055r, Delegate: 0xaaaace1730c8
+          [1646098758.912702][33190:33190] CHIP:IM: Received Read request
+          [1646098758.912785][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646098758.912821][33190:33190] CHIP:DMG: {
+          [1646098758.912847][33190:33190] CHIP:DMG: 	AttributePathIBs =
+          [1646098758.912879][33190:33190] CHIP:DMG: 	[
+          [1646098758.912909][33190:33190] CHIP:DMG: 		AttributePathIB =
+          [1646098758.912949][33190:33190] CHIP:DMG: 		{
+          [1646098758.912985][33190:33190] CHIP:DMG: 			Endpoint = 0x1,
+          [1646098758.913021][33190:33190] CHIP:DMG: 			Cluster = 0x405,
+          [1646098758.913060][33190:33190] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1646098758.913099][33190:33190] CHIP:DMG: 		}
+          [1646098758.913134][33190:33190] CHIP:DMG:
+          [1646098758.913167][33190:33190] CHIP:DMG: 	],
+          [1646098758.913201][33190:33190] CHIP:DMG:
+          [1646098758.913233][33190:33190] CHIP:DMG: 	isFabricFiltered = false,
+          [1646098758.913264][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
+          [1646098758.913292][33190:33190] CHIP:DMG: },
+          [1646098758.913367][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646098758.913768][33190:33190] CHIP:DMG: <RE:Run> Cluster 405, Attribute 0 is dirty
+          [1646098758.913817][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_0405 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646098758.913854][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0405 e=1 p=v
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH once at a time in
+          a manufacturer specific order"
+      verification: |
+          see above
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          no writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          no writable attributes
+      disabled: true

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -42,9 +42,11 @@ namespace Internal {
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
+#define STR_EXPAND(tok) #tok
+
 // Note: An external mbed parameter could be useful so an application can put
 // chip NVS values in a single place
-#define CHIP_CONFIG_KV_STORE_PARTITION "/kv/"
+#define CHIP_CONFIG_KV_STORE_PARTITION STR_EXPAND(MBED_CONF_STORAGE_DEFAULT_KV)
 
 // NVS namespaces used to store device configuration information.
 #define CHIP_CONFIG_FACTORY_PREFIX "chip-factory-"
@@ -53,34 +55,41 @@ namespace Internal {
 
 #define FACTORY_KEY(key) CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_FACTORY_PREFIX key
 #define CONFIG_KEY(key) CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_CONFIG_PREFIX key
+#define COUNTER_KEY(key) CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_COUNTER_PREFIX key
 
 const char MbedConfig::kConfigNamespace_ChipFactory[]  = CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_FACTORY_PREFIX;
 const char MbedConfig::kConfigNamespace_ChipConfig[]   = CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_CONFIG_PREFIX;
 const char MbedConfig::kConfigNamespace_ChipCounters[] = CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_COUNTER_PREFIX;
 
 // Keys stored in the chip-factory namespace
-const MbedConfig::Key MbedConfig::kConfigKey_SerialNum           = { FACTORY_KEY("serial-num") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceId         = { FACTORY_KEY("device-id") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceCert       = { FACTORY_KEY("device-cert") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceICACerts   = { FACTORY_KEY("device-ca-certs") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDevicePrivateKey = { FACTORY_KEY("device-key") };
-const MbedConfig::Key MbedConfig::kConfigKey_ProductRevision     = { FACTORY_KEY("product-rev") };
-const MbedConfig::Key MbedConfig::kConfigKey_ManufacturingDate   = { FACTORY_KEY("mfg-date") };
-const MbedConfig::Key MbedConfig::kConfigKey_SetupPinCode        = { FACTORY_KEY("pin-code") };
-const MbedConfig::Key MbedConfig::kConfigKey_SetupDiscriminator  = { FACTORY_KEY("discriminator") };
+const MbedConfig::Key MbedConfig::kConfigKey_SerialNum             = { FACTORY_KEY("serial-num") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceId           = { FACTORY_KEY("device-id") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceCert         = { FACTORY_KEY("device-cert") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceICACerts     = { FACTORY_KEY("device-ca-certs") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDevicePrivateKey   = { FACTORY_KEY("device-key") };
+const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersion       = { FACTORY_KEY("hardware-ver") };
+const MbedConfig::Key MbedConfig::kConfigKey_ManufacturingDate     = { FACTORY_KEY("mfg-date") };
+const MbedConfig::Key MbedConfig::kConfigKey_SetupPinCode          = { FACTORY_KEY("pin-code") };
+const MbedConfig::Key MbedConfig::kConfigKey_SetupDiscriminator    = { FACTORY_KEY("discriminator") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pIterationCount = { FACTORY_KEY("iteration-count") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pSalt           = { FACTORY_KEY("salt") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pVerifier       = { FACTORY_KEY("verifier") };
 
 // Keys stored in the chip-config namespace
-const MbedConfig::Key MbedConfig::kConfigKey_FabricId           = { CONFIG_KEY("fabric-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_ServiceConfig      = { CONFIG_KEY("service-config") };
 const MbedConfig::Key MbedConfig::kConfigKey_PairedAccountId    = { CONFIG_KEY("account-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_ServiceId          = { CONFIG_KEY("service-id") };
-const MbedConfig::Key MbedConfig::kConfigKey_GroupKeyIndex      = { CONFIG_KEY("group-key-index") };
 const MbedConfig::Key MbedConfig::kConfigKey_LastUsedEpochKeyId = { CONFIG_KEY("last-ek-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_FailSafeArmed      = { CONFIG_KEY("fail-safe-armed") };
 const MbedConfig::Key MbedConfig::kConfigKey_WiFiStationSecType = { CONFIG_KEY("sta-sec-type") };
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
-const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb         = { CONFIG_KEY("breadcrumb") };
+const MbedConfig::Key MbedConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };
+
+// Keys stored in the Chip-counters namespace
+const MbedConfig::Key MbedConfig::kCounterKey_RebootCount           = { COUNTER_KEY("reboot-count") };
+const MbedConfig::Key MbedConfig::kCounterKey_UpTime                = { COUNTER_KEY("up-time") };
+const MbedConfig::Key MbedConfig::kCounterKey_TotalOperationalHours = { COUNTER_KEY("total-hours") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {
@@ -174,11 +183,23 @@ CHIP_ERROR MbedConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    int err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    kv_info_t info;
 
+    int err = kv_get_info(key, &info);
     if (err != MBED_SUCCESS)
     {
         return CHIP_ERROR_INTERNAL;
+    }
+
+    err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    if (err != MBED_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (bufSize < info.size)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     return CHIP_NO_ERROR;

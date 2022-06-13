@@ -6,7 +6,6 @@
         "../../../src/app/zap-templates/common/StringHelper.js",
         "../../../src/app/zap-templates/templates/app/helper.js",
         "../../../src/app/zap-templates/templates/chip/helper.js",
-        "../../../src/app/zap-templates/common/ClusterTestGeneration.js",
         "helper.js"
     ],
     "override": "../../../src/app/zap-templates/common/override.js",
@@ -22,14 +21,6 @@
         {
             "name": "cluster_header",
             "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
-        },
-        {
-            "name": "test_cluster",
-            "path": "partials/test_cluster.zapt"
-        },
-        {
-            "name": "commandValue",
-            "path": "partials/test_cluster_command_value.zapt"
         }
     ],
     "templates": [
@@ -39,14 +30,24 @@
             "output": "cluster/Commands.h"
         },
         {
-            "path": "reporting-commands.zapt",
-            "name": "Reporting Commands header",
-            "output": "reporting/Commands.h"
+            "path": "logging/DataModelLogger.zapt",
+            "name": "Data Model Logger header",
+            "output": "cluster/logging/DataModelLogger.h"
         },
         {
-            "path": "tests-commands.zapt",
-            "name": "Tests Commands header",
-            "output": "test/Commands.h"
+            "path": "logging/DataModelLogger-src.zapt",
+            "name": "Data Model Logger",
+            "output": "cluster/logging/DataModelLogger.cpp"
+        },
+        {
+            "path": "ComplexArgumentParser.zapt",
+            "name": "Complex Argument Parser header",
+            "output": "cluster/ComplexArgumentParser.h"
+        },
+        {
+            "path": "ComplexArgumentParser-src.zapt",
+            "name": "Complex Argument Parser",
+            "output": "cluster/ComplexArgumentParser.cpp"
         }
     ]
 }

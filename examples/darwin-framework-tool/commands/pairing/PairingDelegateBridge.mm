@@ -1,0 +1,67 @@
+/*
+ *   Copyright (c) 2022 Project CHIP Authors
+ *   All rights reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+#include "PairingDelegateBridge.h"
+#import <CHIP/CHIP.h>
+
+@interface CHIPToolPairingDelegate ()
+@end
+
+@implementation CHIPToolPairingDelegate
+- (void)onStatusUpdate:(CHIPPairingStatus)status
+{
+    NSLog(@"Pairing Status Update: %lu", status);
+    switch (status) {
+    case kSecurePairingSuccess:
+        ChipLogProgress(chipTool, "Secure Pairing Success");
+        break;
+    case kSecurePairingFailed:
+        ChipLogError(chipTool, "Secure Pairing Failed");
+        break;
+    case kUnknownStatus:
+        ChipLogError(chipTool, "Uknown Pairing Status");
+        break;
+    }
+}
+
+- (void)onPairingComplete:(NSError *)error
+{
+    if (error != nil) {
+        _commandBridge->SetCommandExitStatus(error);
+        return;
+    }
+    ChipLogProgress(chipTool, "Pairing Complete");
+    NSError * commissionError;
+    [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
+    if (commissionError != nil) {
+        _commandBridge->SetCommandExitStatus(commissionError);
+        return;
+    }
+}
+
+- (void)onPairingDeleted:(NSError *)error
+{
+    _commandBridge->SetCommandExitStatus(error, "Pairing Delete");
+}
+
+- (void)onCommissioningComplete:(NSError *)error
+{
+    _commandBridge->SetCommandExitStatus(error, "Pairing Commissioning Complete");
+}
+
+@end

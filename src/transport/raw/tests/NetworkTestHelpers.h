@@ -18,7 +18,8 @@
 
 #include <functional>
 
-#include <inet/InetLayer.h>
+#include <inet/TCPEndPoint.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
@@ -27,7 +28,7 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <nlbyteorder.h>
-#include <nlunit-test.h>
+#include <queue>
 
 namespace chip {
 namespace Test {
@@ -35,10 +36,8 @@ namespace Test {
 class IOContext
 {
 public:
-    IOContext() {}
-
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite);
+    CHIP_ERROR Init();
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
@@ -48,23 +47,56 @@ public:
 
     /// DriveIO until the specified number of milliseconds has passed or until
     /// completionFunction returns true
-    void DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction);
+    void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction);
 
-    nlTestSuite * GetTestSuite() { return mSuite; }
     System::Layer & GetSystemLayer() { return *mSystemLayer; }
-    Inet::InetLayer & GetInetLayer() { return *mInetLayer; }
+    Inet::EndPointManager<Inet::TCPEndPoint> * GetTCPEndPointManager() { return mTCPEndPointManager; }
+    Inet::EndPointManager<Inet::UDPEndPoint> * GetUDPEndPointManager() { return mUDPEndPointManager; }
 
 private:
-    nlTestSuite * mSuite         = nullptr;
-    System::Layer * mSystemLayer = nullptr;
-    Inet::InetLayer * mInetLayer = nullptr;
+    System::Layer * mSystemLayer                                   = nullptr;
+    Inet::EndPointManager<Inet::TCPEndPoint> * mTCPEndPointManager = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
+};
+
+class LoopbackTransportDelegate
+{
+public:
+    virtual ~LoopbackTransportDelegate() {}
+
+    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
+    virtual void OnMessageDropped() {}
 };
 
 class LoopbackTransport : public Transport::Base
 {
 public:
+    void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
+    void ShutdownLoopbackTransport()
+    {
+        // Make sure no one left packets hanging out that they thought got
+        // delivered but actually didn't.
+        VerifyOrDie(mPendingMessageQueue.empty());
+    }
+
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char *) { return CHIP_NO_ERROR; }
+
+    bool HasPendingMessages() { return !mPendingMessageQueue.empty(); }
+
+    void SetLoopbackTransportDelegate(LoopbackTransportDelegate * delegate) { mDelegate = delegate; }
+
+    static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)
+    {
+        LoopbackTransport * _this = static_cast<LoopbackTransport *>(aAppState);
+
+        while (!_this->mPendingMessageQueue.empty())
+        {
+            auto item = std::move(_this->mPendingMessageQueue.front());
+            _this->mPendingMessageQueue.pop();
+            _this->HandleMessageReceived(item.mDestinationAddress, std::move(item.mPendingMessage));
+        }
+    }
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
@@ -74,13 +106,15 @@ public:
         if (mNumMessagesToDrop == 0)
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            HandleMessageReceived(address, std::move(receivedMessage));
+            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+            mSystemLayer->ScheduleWork(OnMessageReceived, this);
         }
         else
         {
             mNumMessagesToDrop--;
             mDroppedMessageCount++;
-            MessageDropped();
+            if (mDelegate != nullptr)
+                mDelegate->OnMessageDropped();
         }
 
         return CHIP_NO_ERROR;
@@ -96,13 +130,24 @@ public:
         mMessageSendError    = CHIP_NO_ERROR;
     }
 
-    // Hook for subclasses to perform custom logic on message drops.
-    virtual void MessageDropped() {}
+    struct PendingMessageItem
+    {
+        PendingMessageItem(const Transport::PeerAddress destinationAddress, System::PacketBufferHandle && pendingMessage) :
+            mDestinationAddress(destinationAddress), mPendingMessage(std::move(pendingMessage))
+        {}
 
-    uint32_t mNumMessagesToDrop   = 0;
-    uint32_t mDroppedMessageCount = 0;
-    uint32_t mSentMessageCount    = 0;
-    CHIP_ERROR mMessageSendError  = CHIP_NO_ERROR;
+        const Transport::PeerAddress mDestinationAddress;
+        System::PacketBufferHandle mPendingMessage;
+    };
+
+    System::Layer * mSystemLayer = nullptr;
+    std::queue<PendingMessageItem> mPendingMessageQueue;
+    Transport::PeerAddress mTxAddress;
+    uint32_t mNumMessagesToDrop           = 0;
+    uint32_t mDroppedMessageCount         = 0;
+    uint32_t mSentMessageCount            = 0;
+    CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
+    LoopbackTransportDelegate * mDelegate = nullptr;
 };
 
 } // namespace Test

@@ -50,7 +50,7 @@ typedef int PacketHeaderFlags;
 
 namespace Header {
 
-enum class SessionType
+enum class SessionType : uint8_t
 {
     kUnicastSession = 0,
     kGroupSession   = 1,
@@ -70,6 +70,9 @@ enum class ExFlagValues : uint8_t
 
     /// Set when current message is requesting an acknowledgment from the recipient.
     kExchangeFlag_NeedsAck = 0x04,
+
+    /// Secured Extension block is present.
+    kExchangeFlag_SecuredExtension = 0x08,
 
     /// Set when a vendor id is prepended to the Message Protocol Id field.
     kExchangeFlag_VendorIdPresent = 0x10,
@@ -108,6 +111,11 @@ enum class SecFlagValues : uint8_t
     kPrivacyFlag      = 0b10000000,
     kControlMsgFlag   = 0b01000000,
     kMsgExtensionFlag = 0b00100000,
+};
+
+enum SecFlagMask
+{
+    kSessionTypeMask = 0b00000011, ///< Mask to extract sessionType
 };
 
 using MsgFlags = BitFlags<MsgFlagValues>;
@@ -158,6 +166,23 @@ public:
     uint16_t GetSessionId() const { return mSessionId; }
     Header::SessionType GetSessionType() const { return mSessionType; }
 
+    uint8_t GetMessageFlags() const { return mMsgFlags.Raw(); }
+
+    uint8_t GetSecurityFlags() const { return mSecFlags.Raw(); }
+
+    bool HasPrivacyFlag() const { return mSecFlags.Has(Header::SecFlagValues::kPrivacyFlag); }
+
+    void SetFlags(Header::SecFlagValues value) { mSecFlags.Set(value); }
+    void SetFlags(Header::MsgFlagValues value) { mMsgFlags.Set(value); }
+
+    void SetMessageFlags(uint8_t flags) { mMsgFlags.SetRaw(flags); }
+
+    void SetSecurityFlags(uint8_t securityFlags)
+    {
+        mSecFlags.SetRaw(securityFlags);
+        mSessionType = static_cast<Header::SessionType>(securityFlags & Header::SecFlagMask::kSessionTypeMask);
+    }
+
     bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
     bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }
 
@@ -172,6 +197,20 @@ public:
         default:
             return false;
         }
+    }
+
+    bool IsValidGroupMsg() const
+    {
+        // Check is based on spec 4.11.2
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationGroupId().HasValue() &&
+                !IsSecureSessionControlMsg() && HasPrivacyFlag());
+    }
+
+    bool IsValidMCSPMsg() const
+    {
+        // Check is based on spec 4.9.2.4
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationNodeId().HasValue() &&
+                IsSecureSessionControlMsg() && HasPrivacyFlag());
     }
 
     bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
@@ -252,7 +291,9 @@ public:
 
     PacketHeader & SetSessionType(Header::SessionType type)
     {
-        mSessionType = type;
+        mSessionType     = type;
+        uint8_t typeMask = to_underlying(Header::kSessionTypeMask);
+        mSecFlags.SetRaw(static_cast<uint8_t>((mSecFlags.Raw() & ~typeMask) | (to_underlying(type) & typeMask)));
         return *this;
     }
 
@@ -402,6 +443,9 @@ public:
 
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
+
+    /** Get the raw exchange flags from this header. */
+    uint8_t GetExhangeFlags() const { return mExchangeFlags.Raw(); }
 
     /** Check whether the header has a given secure message type */
     bool HasMessageType(uint8_t type) const { return mMessageType == type; }

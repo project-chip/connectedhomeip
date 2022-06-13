@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the Openchip Inet
- *          Layer on nRF52 platforms using the Nordic nRF5 SDK.
- *
- */
-
 #pragma once
 
 // ==================== Platform Adaptations ====================

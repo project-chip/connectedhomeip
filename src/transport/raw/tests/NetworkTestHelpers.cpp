@@ -22,21 +22,23 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Test {
 
-CHIP_ERROR IOContext::Init(nlTestSuite * suite)
+CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
 
     gSystemLayer.Init();
 
     InitNetwork();
 
-    mSuite       = suite;
-    mSystemLayer = &gSystemLayer;
-    mInetLayer   = &gInet;
+    mSystemLayer        = &gSystemLayer;
+    mTCPEndPointManager = &gTCP;
+    mUDPEndPointManager = &gUDP;
 
     return err;
 }
@@ -47,7 +49,7 @@ CHIP_ERROR IOContext::Shutdown()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ShutdownNetwork();
-    gSystemLayer.Shutdown();
+    ShutdownSystemLayer();
     Platform::MemoryShutdown();
 
     return err;
@@ -55,20 +57,20 @@ CHIP_ERROR IOContext::Shutdown()
 
 void IOContext::DriveIO()
 {
-    // Set the select timeout to 100ms
-    constexpr uint32_t kSleepTimeMilliseconds = 100;
+    // Set the select timeout to 10ms
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
     ServiceEvents(kSleepTimeMilliseconds);
 }
 
-void IOContext::DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction)
+void IOContext::DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction)
 {
-    uint64_t mStartTime = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
 
     while (true)
     {
         DriveIO(); // at least one IO loop is guaranteed
 
-        if (completionFunction() || ((System::SystemClock().GetMonotonicMilliseconds() - mStartTime) >= maxWaitMs))
+        if (completionFunction() || ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait))
         {
             break;
         }

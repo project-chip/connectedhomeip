@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,371 +18,204 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <system/TimeSource.h>
 #include <transport/SecureSession.h>
 
 namespace chip {
 namespace Transport {
 
-// TODO; use 0xffff to match any key id, this is a temporary solution for
-// InteractionModel, where key id is not obtainable. This will be removed when
-// InteractionModel is migrated to messaging layer
-constexpr const uint16_t kAnyKeyId = 0xffff;
+constexpr uint16_t kMaxSessionID       = UINT16_MAX;
+constexpr uint16_t kUnsecuredSessionId = 0;
 
 /**
- * Handles a set of peer connection states.
+ * Handles a set of sessions.
  *
  * Intended for:
- *   - handle connection active time and expiration
- *   - allocate and free space for connection states.
+ *   - handle session active time and expiration
+ *   - allocate and free space for sessions.
  */
-template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::kSystem>
 class SecureSessionTable
 {
 public:
-    /**
-     * Allocates a new peer connection state state object out of the internal resource pool.
-     *
-     * @param address represents the connection state address
-     * @param state [out] will contain the connection state if one was available. May be null if no return value is desired.
-     *
-     * @note the newly created state will have an 'active' time set based on the current time source.
-     *
-     * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum connection count
-     *          has been reached (with CHIP_ERROR_NO_MEMORY).
-     */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, SecureSession ** state)
-    {
-        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+    ~SecureSessionTable() { mEntries.ReleaseAll(); }
 
-        if (state)
-        {
-            *state = nullptr;
-        }
-
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
-        {
-            if (!mStates[i].IsInitialized())
-            {
-                mStates[i] = SecureSession(address);
-                mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
-
-                if (state)
-                {
-                    *state = &mStates[i];
-                }
-
-                err = CHIP_NO_ERROR;
-                break;
-            }
-        }
-
-        return err;
-    }
+    void Init() { mNextSessionId = chip::Crypto::GetRandU16(); }
 
     /**
-     * Allocates a new peer connection state state object out of the internal resource pool.
+     * Allocate a new secure session out of the internal resource pool.
      *
-     * @param peerNode represents optional peer Node's ID
+     * @param secureSessionType secure session type
+     * @param localSessionId unique identifier for the local node's secure unicast session context
+     * @param localNodeId represents the local Node ID for this node
+     * @param peerNodeId represents peer Node's ID
+     * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
-     * @param localSessionId represents the encryption key ID assigned by local node
-     * @param state [out] will contain the connection state if one was available. May be null if no return value is desired.
+     * @param fabricIndex represents fabric index for the session
+     * @param config represents the reliable message protocol configuration
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
      *
-     * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum connection count
+     * @returns CHIP_NO_ERROR if state could be initialized. May fail if maximum session count
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t peerSessionId, uint16_t localSessionId,
-                                            SecureSession ** state)
+    Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
+                                                          NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
+                                                          uint16_t peerSessionId, FabricIndex fabricIndex,
+                                                          const ReliableMessageProtocolConfig & config)
     {
-        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-
-        if (state)
+        if (secureSessionType == SecureSession::Type::kCASE)
         {
-            *state = nullptr;
-        }
-
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
-        {
-            if (!mStates[i].IsInitialized())
+            if ((fabricIndex == kUndefinedFabricIndex) || (localNodeId == kUndefinedNodeId) || (peerNodeId == kUndefinedNodeId))
             {
-                mStates[i] = SecureSession();
-                mStates[i].SetPeerSessionId(peerSessionId);
-                mStates[i].SetLocalSessionId(localSessionId);
-                mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
-
-                if (peerNode.ValueOr(kUndefinedNodeId) != kUndefinedNodeId)
+                return Optional<SessionHandle>::Missing();
+            }
+        }
+        else if (secureSessionType == SecureSession::Type::kPASE)
+        {
+            if ((fabricIndex != kUndefinedFabricIndex) || (localNodeId != kUndefinedNodeId) || (peerNodeId != kUndefinedNodeId))
+            {
+                // TODO: This secure session type is infeasible! We must fix the tests
+                if (false)
                 {
-                    mStates[i].SetPeerNodeId(peerNode.Value());
+                    return Optional<SessionHandle>::Missing();
                 }
-
-                if (state)
+                else
                 {
-                    *state = &mStates[i];
-                }
-
-                err = CHIP_NO_ERROR;
-                break;
-            }
-        }
-
-        return err;
-    }
-
-    /**
-     * Get a peer connection state given a Peer address.
-     *
-     * @param address is the connection to find (based on address)
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
-     *
-     * @return the state found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionState(const PeerAddress & address, SecureSession * begin)
-    {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
-        {
-            if (iter->GetPeerAddress() == address)
-            {
-                state = iter;
-                break;
-            }
-        }
-        return state;
-    }
-
-    /**
-     * Get a peer connection state given a Node Id.
-     *
-     * @param nodeId is the connection to find (based on nodeId). Note that initial connections
-     *        do not have a node id set. Use this if you know the node id should be set.
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
-     *
-     * @return the state found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionState(NodeId nodeId, SecureSession * begin)
-    {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
-            {
-                continue;
-            }
-            if (iter->GetPeerNodeId() == nodeId)
-            {
-                state = iter;
-                break;
-            }
-        }
-        return state;
-    }
-
-    /**
-     * Get a peer connection state given a Node Id and Peer's Encryption Key Id.
-     *
-     * @param nodeId is the connection to find (based on nodeId). Note that initial connections
-     *        do not have a node id set. Use this if you know the node id should be set.
-     * @param peerSessionId Encryption key ID used by the peer node.
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
-     *
-     * @return the state found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerSessionId, SecureSession * begin)
-    {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
-            {
-                continue;
-            }
-            if (peerSessionId == kAnyKeyId || iter->GetPeerSessionId() == peerSessionId)
-            {
-                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
-                    iter->GetPeerNodeId() == nodeId.Value())
-                {
-                    state = iter;
-                    break;
+                    (void) fabricIndex;
                 }
             }
         }
-        return state;
+
+        SecureSession * result = mEntries.CreateObject(*this, secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
+                                                       peerSessionId, fabricIndex, config);
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
     /**
-     * Get a peer connection state given the local Encryption Key Id.
+     * Allocate a new secure session out of the internal resource pool with a
+     * non-colliding session ID and increments mNextSessionId to give a clue to
+     * the allocator for the next allocation.  The secure session session will
+     * not become active until the call to SecureSession::Activate.
      *
-     * @param keyId Encryption key ID assigned by the local node.
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
-     *
-     * @return the state found, nullptr if not found
+     * @returns allocated session, or NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionState(uint16_t keyId, SecureSession * begin)
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType)
     {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
+        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
+        auto sessionId             = FindUnusedSessionId();
+        SecureSession * allocated  = nullptr;
+        VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
+        allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
+        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
+        rv             = MakeOptional<SessionHandle>(*allocated);
+        mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
+                                                            : static_cast<uint16_t>(sessionId.Value() + 1);
+    exit:
+        return rv;
+    }
 
-        VerifyOrDie(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+    void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
-        if (begin != nullptr)
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
-            {
-                continue;
-            }
-
-            if (iter->GetLocalSessionId() == keyId)
-            {
-                state = iter;
-                break;
-            }
-        }
-        return state;
+    template <typename Function>
+    Loop ForEachSession(Function && function)
+    {
+        return mEntries.ForEachActiveObject(std::forward<Function>(function));
     }
 
     /**
-     * Get a peer connection state given a Node Id and Peer's Encryption Key Id.
+     * Get a secure session given its session ID.
      *
-     * @param nodeId is the connection to find (based on peer nodeId). Note that initial connections
-     *        do not have a node id set. Use this if you know the node id should be set.
-     * @param localSessionId Encryption key ID used by the local node.
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
+     * @param localSessionId the identifier of a secure unicast session context within the local node
      *
-     * @return the state found, nullptr if not found
+     * @return the session if found, NullOptional if not found
      */
     CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localSessionId, SecureSession * begin)
+    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId)
     {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
+        SecureSession * result = nullptr;
+        mEntries.ForEachActiveObject([&](auto session) {
+            if (session->GetLocalSessionId() == localSessionId)
             {
-                continue;
+                result = session;
+                return Loop::Break;
             }
-            if (iter->GetLocalSessionId() == localSessionId)
-            {
-                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
-                    iter->GetPeerNodeId() == nodeId.Value())
-                {
-                    state = iter;
-                    break;
-                }
-            }
-        }
-        return state;
+            return Loop::Continue;
+        });
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
-
-    /**
-     * Get the first peer connection state that matches the given fabric index.
-     *
-     * @param fabric The fabric index to match
-     *
-     * @return the state found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindPeerConnectionStateByFabric(FabricIndex fabric)
-    {
-        for (auto & state : mStates)
-        {
-            if (!state.IsInitialized())
-            {
-                continue;
-            }
-            if (state.GetFabricIndex() == fabric)
-            {
-                return &state;
-            }
-        }
-        return nullptr;
-    }
-
-    /// Convenience method to mark a peer connection state as active
-    void MarkConnectionActive(SecureSession * state) { state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs()); }
-
-    /// Convenience method to expired a peer connection state and fired the related callback
-    template <typename Callback>
-    void MarkConnectionExpired(SecureSession * state, Callback callback)
-    {
-        callback(*state);
-        *state = SecureSession(PeerAddress::Uninitialized());
-    }
-
-    /**
-     * Iterates through all active connections and expires any connection with an idle time
-     * larger than the given amount.
-     *
-     * Expiring a connection involves callback execution and then clearing the internal state.
-     */
-    template <typename Callback>
-    void ExpireInactiveConnections(uint64_t maxIdleTimeMs, Callback callback)
-    {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
-
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
-        {
-            if (!mStates[i].GetPeerAddress().IsInitialized())
-            {
-                continue; // not an active connection
-            }
-
-            uint64_t connectionActiveTime = mStates[i].GetLastActivityTimeMs();
-            if (connectionActiveTime + maxIdleTimeMs >= currentTime)
-            {
-                continue; // not expired
-            }
-
-            MarkConnectionExpired(&mStates[i], callback);
-        }
-    }
-
-    /// Allows access to the underlying time source used for keeping track of connection active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
-    Time::TimeSource<kTimeSource> mTimeSource;
-    SecureSession mStates[kMaxConnectionCount];
+    /**
+     * Find an available session ID that is unused in the secure session table.
+     *
+     * The search algorithm iterates over the session ID space in the outer loop
+     * and the session table in the inner loop to locate an available session ID
+     * from the starting mNextSessionId clue.
+     *
+     * The outer-loop considers 64 session IDs in each iteration to give a
+     * runtime complexity of O(CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE^2/64).  Speed up could be
+     * achieved with a sorted session table or additional storage.
+     *
+     * @return an unused session ID if any is found, else NullOptional
+     */
+    CHECK_RETURN_VALUE
+    Optional<uint16_t> FindUnusedSessionId()
+    {
+        uint16_t candidate_base = 0;
+        uint64_t candidate_mask = 0;
+        for (uint32_t i = 0; i <= kMaxSessionID; i += 64)
+        {
+            // candidate_base is the base session ID we are searching from.
+            // We have a 64-bit mask anchored at this ID and iterate over the
+            // whole session table, setting bits in the mask for in-use IDs.
+            // If we can iterate through the entire session table and have
+            // any bits clear in the mask, we have available session IDs.
+            candidate_base = static_cast<uint16_t>(i + mNextSessionId);
+            candidate_mask = 0;
+            {
+                uint16_t shift = static_cast<uint16_t>(kUnsecuredSessionId - candidate_base);
+                if (shift <= 63)
+                {
+                    candidate_mask |= (1ULL << shift); // kUnsecuredSessionId is never available
+                }
+            }
+            mEntries.ForEachActiveObject([&](auto session) {
+                uint16_t shift = static_cast<uint16_t>(session->GetLocalSessionId() - candidate_base);
+                if (shift <= 63)
+                {
+                    candidate_mask |= (1ULL << shift);
+                }
+                if (candidate_mask == UINT64_MAX)
+                {
+                    return Loop::Break; // No bits clear means this bucket is full.
+                }
+                return Loop::Continue;
+            });
+            if (candidate_mask != UINT64_MAX)
+            {
+                break; // Any bit clear means we have an available ID in this bucket.
+            }
+        }
+        if (candidate_mask != UINT64_MAX)
+        {
+            uint16_t offset = 0;
+            while (candidate_mask & 1)
+            {
+                candidate_mask >>= 1;
+                ++offset;
+            }
+            uint16_t available = static_cast<uint16_t>(candidate_base + offset);
+            return MakeOptional<uint16_t>(available);
+        }
+
+        return NullOptional;
+    }
+
+    BitMapObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
+    uint16_t mNextSessionId = 0;
 };
 
 } // namespace Transport

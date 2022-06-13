@@ -36,7 +36,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
-        (host_cpu == "x64" || host_cpu == "arm64")
+        (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
   }
 
@@ -47,17 +47,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "$dir_pw_doctor/py",
       "$dir_pw_env_setup/py",
       "$dir_pw_hdlc/py",
+      "$dir_pw_log:protos.python",
       "$dir_pw_module/py",
       "$dir_pw_protobuf/py",
       "$dir_pw_protobuf_compiler/py",
       "$dir_pw_rpc/py",
       "$dir_pw_status/py",
       "$dir_pw_toolchain/py",
+      "$dir_pw_trace/py",
+      "$dir_pw_trace_tokenized/py",
       "$dir_pw_unit_test/py",
       "$dir_pw_watch/py",
       "integrations/mobly:chip_mobly",
       "scripts:requirements",
-      "third_party/happy",
     ]
   }
 
@@ -66,9 +68,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     deps = [
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
-      "${chip_root}/src/channel",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
+      "${chip_root}/src/credentials:default_attestation_verifier",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
@@ -107,10 +109,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+        "${chip_root}/src/tools/spake2p",
       ]
       if (chip_crypto == "openssl") {
         deps += [ "${chip_root}/src/tools/chip-cert" ]
@@ -125,10 +129,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (current_os == "android") {
       deps += [
+        "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
         "${chip_root}/src/platform/android:java",
         "${chip_root}/src/setup_payload/java",
       ]
+    }
+
+    if (build_tv_casting_common_a) {
+      deps += [ "${chip_root}/examples/tv-casting-app/tv-casting-common:tvCastingCommon" ]
     }
   }
 
@@ -157,18 +166,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_link_tests) {
       deps = [
         "//:fake_platform_tests",
+        "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
+        "//scripts/idl:idl.tests",
         "//src:tests_run",
       ]
-    }
-  }
-
-  # We don't always want to run happy tests, make them a seperate group.
-  if (chip_enable_happy_tests) {
-    group("happy_tests") {
-      if (chip_link_tests) {
-        deps = [ "//src:happy_tests" ]
-      }
     }
   }
 } else {
@@ -180,6 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Enable building for Android.
     enable_android_builds = false
+
+    # Enable building for Tizen.
+    enable_tizen_builds = false
 
     # Set this to true to enable TI builds by default.
     enable_ti_simplelink_builds = false
@@ -195,6 +200,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable k32w builds by default.
     enable_k32w_builds = false
+
+    # Set this to true to enable bl602 builds by default.
+    enable_bl602_builds = false
   }
 
   declare_args() {
@@ -215,7 +223,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_standalone_chip_tool_build =
         enable_default_builds && host_os != "win"
 
-    # Build the chip-tool-darwin example.
+    # Build the darwin-framework-tool example.
     enable_standalone_chip_tool_darwin_build =
         enable_default_builds && host_os == "mac"
 
@@ -246,8 +254,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_thermostat_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux lock app example.
+    enable_linux_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
+
+    # Build the cc13x2x7_26x2x7 all-clusters app example.
+    enable_cc13x2x7_26x2x7_all_clusters_app_build = enable_ti_simplelink_builds
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
@@ -273,7 +288,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
 
+    # Build the bl602 lighting app example.
+    enable_bl602_lighting_app_build = enable_bl602_builds
+
     enable_fake_tests = enable_default_builds && host_os == "linux"
+
+    enable_tizen_lighting_app = enable_tizen_builds
   }
 
   if (enable_host_clang_build) {
@@ -314,7 +334,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_fake_tests) {
     chip_build("fake_platform") {
-      toolchain = "${build_root}/toolchain/host:fake_${host_cpu}_gcc"
+      toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
     }
   }
 
@@ -335,14 +355,21 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_standalone_chip_tool_darwin_build) {
     group("standalone_chip_tool_darwin") {
-      deps =
-          [ "${chip_root}/examples/chip-tool-darwin(${standalone_toolchain})" ]
+      deps = [
+        "${chip_root}/examples/darwin-framework-tool(${standalone_toolchain})",
+      ]
     }
   }
 
   if (enable_cc13x2x7_26x2x7_lock_app_build) {
     group("cc13x2x7_26x2x7_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_lock_app)" ]
+    }
+  }
+
+  if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
+    group("cc13x2x7_26x2x7_all_clusters_app") {
+      deps = [ "${chip_root}/examples/all-clusters-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_all_clusters_app)" ]
     }
   }
 
@@ -397,6 +424,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_linux_lock_app_build) {
+    group("linux_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
@@ -429,19 +462,25 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_lighting_app_build) {
     group("k32w_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
     }
   }
 
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
     }
   }
 
   if (enable_k32w_shell_app_build) {
     group("k32w_shell_app") {
-      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+    }
+  }
+
+  if (enable_tizen_lighting_app) {
+    group("tizen_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
   }
 
@@ -463,6 +502,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":android_x64",
         ":android_x86",
       ]
+    }
+    if (enable_tizen_builds) {
+      deps += [ ":tizen_lighting_app" ]
     }
     if (enable_standalone_chip_cert_build) {
       deps += [ ":standalone_chip_cert" ]
@@ -494,6 +536,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (enable_linux_lighting_app_build) {
       deps += [ ":linux_lighting_app" ]
     }
+    if (enable_linux_lock_app_build) {
+      deps += [ ":linux_lock_app" ]
+    }
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]
     }
@@ -520,6 +565,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_cc13x2x7_26x2x7_lock_app_build) {
       deps += [ ":cc13x2x7_26x2x7_lock_app" ]
+    }
+    if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
+      deps += [ ":cc13x2x7_26x2x7_all_clusters_app" ]
     }
   }
 

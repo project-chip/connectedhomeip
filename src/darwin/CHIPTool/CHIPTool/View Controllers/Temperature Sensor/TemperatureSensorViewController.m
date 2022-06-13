@@ -18,12 +18,15 @@
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
+static TemperatureSensorViewController * _Nullable sCurrentController = nil;
+
 @implementation TemperatureSensorViewController
 
 // MARK: UIViewController methods
 
 - (void)viewDidLoad
 {
+    sCurrentController = self;
     [super viewDidLoad];
     [self setupUI];
 
@@ -31,6 +34,23 @@
     [self.view addGestureRecognizer:tap];
 
     [self readCurrentTemperature];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    sCurrentController = nil;
+    [super viewWillDisappear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    sCurrentController = self;
+    [super viewDidAppear:animated];
+}
+
++ (nullable TemperatureSensorViewController *)currentController
+{
+    return sCurrentController;
 }
 
 - (IBAction)sendReportingSetup:(id)sender
@@ -173,13 +193,11 @@
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
 
-                [cluster
-                    readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        if (error != nil)
-                            return;
-                        NSNumber * value = values[@"value"];
-                        [self updateTempInUI:value.shortValue];
-                    }];
+                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                    if (error != nil)
+                        return;
+                    [self updateTempInUI:value.shortValue];
+                }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -201,26 +219,37 @@
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPTemperatureMeasurement * cluster =
-                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
+                // Use a wildcard subscription
+                [chipDevice subscribeWithQueue:dispatch_get_main_queue()
+                                   minInterval:minIntervalSeconds
+                                   maxInterval:maxIntervalSeconds
+                                        params:nil
+                                cacheContainer:nil
+                                 reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
+                                     if (error) {
+                                         NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
+                                             [error description]);
+                                         return;
+                                     }
+                                     for (CHIPAttributeReport * report in reports) {
+                                         // These should be exposed by the SDK
+                                         if ([report.path.cluster isEqualToNumber:@(kMatterClusterTemperatureMeasurementID)] &&
+                                             [report.path.attribute
+                                                 isEqualToNumber:@(kMatterClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                             if (report.error != nil) {
+                                                 NSLog(@"Error reading temperature: %@", report.error);
+                                             } else {
+                                                 __auto_type controller = [TemperatureSensorViewController currentController];
+                                                 if (controller != nil) {
+                                                     [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                       subscriptionEstablished:^ {
 
-                [cluster
-                    subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                       maxInterval:maxIntervalSeconds
-                                                            change:deltaInCelsius
-                                                   responseHandler:^(NSError * error, NSDictionary * values) {
-                                                       if (error == nil)
-                                                           return;
-                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                           [error description]);
-                                                   }];
-
-                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-                    if (error != nil)
-                        return;
-                    NSNumber * value = values[@"value"];
-                    [self updateTempInUI:value.shortValue];
-                }];
+                       }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

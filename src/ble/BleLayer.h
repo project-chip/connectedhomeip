@@ -246,8 +246,8 @@ public:
 
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState = nullptr,
-                                               BleConnectionDelegate::OnConnectionCompleteFunct onSucess = OnConnectionComplete,
-                                               BleConnectionDelegate::OnConnectionErrorFunct onError     = OnConnectionError);
+                                               BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
+                                               BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
@@ -298,7 +298,7 @@ public:
     /// Call when an outstanding GATT write request receives a positive receipt confirmation.
     bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
-    /// Call when an oustanding GATT indication receives a positive receipt confirmation.
+    /// Call when an outstanding GATT indication receives a positive receipt confirmation.
     bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when a GATT read request is received.
@@ -319,8 +319,6 @@ public:
 #if CHIP_ENABLE_CHIPOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;
 #endif
-
-    BLEEndPoint * mBleEndPoint;
 
 private:
     // Private data members:

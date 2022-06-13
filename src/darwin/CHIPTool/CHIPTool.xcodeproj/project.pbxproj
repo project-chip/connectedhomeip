@@ -11,7 +11,8 @@
 		2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */; };
 		2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C2325D7594B000512D6 /* DeviceSelector.m */; };
 		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
-		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
+		51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3FA28261DCF00D47D00 /* FabricKeys.m */; };
+		991DC091247747F500C13860 /* EnumerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EnumerateViewController.m */; };
 		997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; };
 		997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
@@ -21,7 +22,7 @@
 		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
 		B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */; };
 		B243A6692513A73600E56FEA /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B243A6682513A73600E56FEA /* RootViewController.m */; };
-		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
+		B2946A4224C99D53005C87D0 /* WiFiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WiFiViewController.m */; };
 		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
 		B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B0209125C9C1AC00A4C220 /* BindingsViewController.m */; };
 		B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2C2267426289324009DAB8B /* FabricUIViewController.m */; };
@@ -62,8 +63,10 @@
 		2C460C2325D7594B000512D6 /* DeviceSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceSelector.m; sourceTree = "<group>"; };
 		2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnpairDevicesViewController.m; sourceTree = "<group>"; };
 		2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnpairDevicesViewController.h; sourceTree = "<group>"; };
-		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
-		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
+		51C8E3F928261DCF00D47D00 /* FabricKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FabricKeys.h; sourceTree = "<group>"; };
+		51C8E3FA28261DCF00D47D00 /* FabricKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FabricKeys.m; sourceTree = "<group>"; };
+		991DC08F247747F500C13860 /* EnumerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumerateViewController.h; sourceTree = "<group>"; };
+		991DC090247747F500C13860 /* EnumerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnumerateViewController.m; sourceTree = "<group>"; };
 		997A639B253F93F7005C64E6 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -82,8 +85,8 @@
 		B243A6672513A73600E56FEA /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		B243A6682513A73600E56FEA /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		B27FAB67255D4B980038F0D2 /* CHIPTool.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CHIPTool.entitlements; sourceTree = "<group>"; };
-		B2946A4024C99D53005C87D0 /* WifiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiViewController.h; sourceTree = "<group>"; };
-		B2946A4124C99D53005C87D0 /* WifiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WifiViewController.m; sourceTree = "<group>"; };
+		B2946A4024C99D53005C87D0 /* WiFiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WiFiViewController.h; sourceTree = "<group>"; };
+		B2946A4124C99D53005C87D0 /* WiFiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WiFiViewController.m; sourceTree = "<group>"; };
 		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
 		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
 		B2B0209025C9C1AC00A4C220 /* BindingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BindingsViewController.h; sourceTree = "<group>"; };
@@ -123,13 +126,13 @@
 			path = QRCode;
 			sourceTree = "<group>";
 		};
-		0C79937924858B4F0047A373 /* Echo client */ = {
+		0C79937924858B4F0047A373 /* Enumeration */ = {
 			isa = PBXGroup;
 			children = (
-				991DC08F247747F500C13860 /* EchoViewController.h */,
-				991DC090247747F500C13860 /* EchoViewController.m */,
+				991DC08F247747F500C13860 /* EnumerateViewController.h */,
+				991DC090247747F500C13860 /* EnumerateViewController.m */,
 			);
-			path = "Echo client";
+			path = Enumeration;
 			sourceTree = "<group>";
 		};
 		0CA0E0D0248599C4009087B9 /* OnOffCluster */ = {
@@ -233,10 +236,10 @@
 				B243A6682513A73600E56FEA /* RootViewController.m */,
 				B2F51E93252DCC9E00911FA5 /* Temperature Sensor */,
 				B2B0208F25C9C18500A4C220 /* Bindings */,
-				B2946A3F24C99D21005C87D0 /* Wifi */,
+				B2946A3F24C99D21005C87D0 /* WiFi */,
 				0C79937824858B3B0047A373 /* QRCode */,
 				B2C22672262892D7009DAB8B /* Fabric */,
-				0C79937924858B4F0047A373 /* Echo client */,
+				0C79937924858B4F0047A373 /* Enumeration */,
 				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
 			);
 			path = "View Controllers";
@@ -245,19 +248,21 @@
 		B232D8C0251A0EE200792CB4 /* Framework Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				51C8E3F928261DCF00D47D00 /* FabricKeys.h */,
+				51C8E3FA28261DCF00D47D00 /* FabricKeys.m */,
 				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
 				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
 			);
 			path = "Framework Helpers";
 			sourceTree = "<group>";
 		};
-		B2946A3F24C99D21005C87D0 /* Wifi */ = {
+		B2946A3F24C99D21005C87D0 /* WiFi */ = {
 			isa = PBXGroup;
 			children = (
-				B2946A4024C99D53005C87D0 /* WifiViewController.h */,
-				B2946A4124C99D53005C87D0 /* WifiViewController.m */,
+				B2946A4024C99D53005C87D0 /* WiFiViewController.h */,
+				B2946A4124C99D53005C87D0 /* WiFiViewController.m */,
 			);
-			path = Wifi;
+			path = WiFi;
 			sourceTree = "<group>";
 		};
 		B2B0208F25C9C18500A4C220 /* Bindings */ = {
@@ -393,7 +398,7 @@
 				2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */,
 				B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */,
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
-				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
+				991DC091247747F500C13860 /* EnumerateViewController.m in Sources */,
 				B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */,
 				B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
@@ -401,7 +406,8 @@
 				B243A6692513A73600E56FEA /* RootViewController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
-				B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */,
+				51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */,
+				B2946A4224C99D53005C87D0 /* WiFiViewController.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -478,7 +484,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					HAVE_CONFIG_H,
+					CHIP_HAVE_CONFIG_H,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -536,7 +542,10 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = HAVE_CONFIG_H;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHIP_HAVE_CONFIG_H,
+					"$(inherited)",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

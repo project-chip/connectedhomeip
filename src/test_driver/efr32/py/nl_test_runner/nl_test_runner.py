@@ -89,15 +89,15 @@ def get_hdlc_rpc_client(device: str, baudrate: int, output: Any, **kwargs):
 
 def runner(client) -> int:
     """ Run the tests"""
-    status, result = client.client.channel(
-        1).rpcs.chip.rpc.NlTest.Run(pw_rpc_timeout_s=120)
-
-    if not status.ok():
+    def on_error_callback(call_object, error):
         raise Exception("Error running test RPC: {}".format(status))
+
+    rpc = client.client.channel(1).rpcs.chip.rpc.NlTest.Run
+    invoke = rpc.invoke(rpc.request(), on_error=on_error_callback)
 
     total_failed = 0
     total_run = 0
-    for streamed_data in result:
+    for streamed_data in invoke.get_responses():
         if streamed_data.HasField("test_suite_start"):
             print("\n{}".format(
                 colors.HEADER + streamed_data.test_suite_start.suite_name) + colors.ENDC)

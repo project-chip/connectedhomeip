@@ -1,0 +1,25 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+#include <app/util/af-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataModel::NullObjectType &);
+typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
+{{/chip_cluster_responses}}
+
+{{! TODO: global response types?}}
+
+{{#chip_server_cluster_attributes}}
+{{#if isArray}}
+typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType &);
+{{else}}
+typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableArgType);
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+{{/if}}

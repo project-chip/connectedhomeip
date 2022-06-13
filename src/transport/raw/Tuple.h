@@ -86,6 +86,11 @@ public:
         return SendMessageImpl<0>(address, std::move(msgBuf));
     }
 
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override
+    {
+        return MulticastGroupJoinLeaveImpl<0>(address, join);
+    }
+
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
@@ -204,6 +209,36 @@ private:
     }
 
     /**
+     * Recursive GroupJoinLeave implementation iterating through transport members.
+     *
+     * Listener is activated through the first transport from index N or above, which returns 'CanListenMulticast'
+     *
+     * @tparam N the index of the underlying transport to run GroupJoinLeave through.
+     *
+     * @param address where to send the message
+     * @param join a boolean indicating if the transport should join or leave the group
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
+    {
+        Base * base = &std::get<N>(mTransports);
+        if (base->CanListenMulticast())
+        {
+            return base->MulticastGroupJoinLeave(address, join);
+        }
+        return MulticastGroupJoinLeaveImpl<N + 1>(address, join);
+    }
+
+    /**
+     * GroupJoinLeave when N is out of range. Always returns an error code.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
+    {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    /**
      * Recursive init implementation iterating through transport members
      *
      * Given a set of arguments 'a1, a2, a3, ... aN' will call an Init method on the last N
@@ -239,6 +274,15 @@ private:
     CHIP_ERROR InitImpl(RawTransportDelegate * delegate) { return CHIP_NO_ERROR; }
 
     std::tuple<TransportTypes...> mTransports;
+
+public:
+    template <size_t i>
+    auto GetImplAtIndex() -> decltype(std::get<i>(mTransports)) &
+    {
+        return std::get<i>(mTransports);
+    }
+
+    std::tuple<TransportTypes...> & GetTransports() { return mTransports; }
 };
 
 } // namespace Transport

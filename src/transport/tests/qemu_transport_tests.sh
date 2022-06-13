@@ -1,1 +1,0 @@
-../../../scripts/tools/qemu_run_test.sh

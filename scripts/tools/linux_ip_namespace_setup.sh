@@ -116,7 +116,7 @@ function help() {
     echo "between a controller and device on the same linux machine."
     echo ""
     echo "To use this script, run the device code in a namespace using the -r command"
-    echo "and a controller in a seperate terminal to simulate two devices communicating"
+    echo "and a controller in a separate terminal to simulate two devices communicating"
     echo "across a network."
     echo "Example:"
     echo "--------"

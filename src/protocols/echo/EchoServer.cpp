@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
+ *      This file implements an object for a CHIP Echo unsolicited
  *      responder (server).
  *
  */
@@ -51,6 +51,13 @@ void EchoServer::Shutdown()
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest);
         mExchangeMgr = nullptr;
     }
+}
+
+CHIP_ERROR EchoServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+{
+    // Handle messages by myself
+    newDelegate = this;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,

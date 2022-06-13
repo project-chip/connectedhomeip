@@ -13,6 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TemperatureSensorViewController : UIViewController
 
+/**
+ * Return the current controller, if any.
+ */
++ (nullable TemperatureSensorViewController *)currentController;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -1,0 +1,12 @@
+{{#chip_tests_items}}
+    {{#chip_tests_item_responses}}
+    {{#chip_tests_item_response_parameters}}
+    {{#if saveAs}}
+        {{~#if (isString type)}}
+            {{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;
+        {{/if~}}
+        {{zapTypeToDecodableClusterObjectType type ns=../cluster}} {{saveAs}};
+    {{/if}}
+    {{/chip_tests_item_response_parameters}}
+    {{/chip_tests_item_responses}}
+{{/chip_tests_items}}

@@ -37,8 +37,13 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 CIRQUE_TESTS=(
     "EchoTest"
     "EchoOverTcpTest"
+    "FailsafeTest"
     "MobileDeviceTest"
+    "CommissioningTest"
     "InteractionModelTest"
+    "SplitCommissioningTest"
+    "CommissioningFailureTest"
+    "CommissioningFailureOnReportTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -61,11 +66,14 @@ function __cirquetest_start_flask() {
 function __cirquetest_clean_flask() {
     echo "Cleanup Flask pid $FLASK_PID"
     kill -SIGTERM -"$FLASK_PID"
+    mv "$LOG_DIR/$CURRENT_TEST"/flask.log "$LOG_DIR/$CURRENT_TEST"/flask.log.old
+    cat "$LOG_DIR/$CURRENT_TEST"/flask.log.old | sed 's/\\n/\n/g' | sed 's/\\t/ /g' >"$LOG_DIR/$CURRENT_TEST"/flask.log
+    rm "$LOG_DIR/$CURRENT_TEST"/flask.log.old
 }
 
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
-    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF -DWEB_GUI=0 -DNETWORK_MANAGER=0 -DREST_API=0 -DNAT64=0
     tar czf "$OT_SIMULATION_CACHE" build
     echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
@@ -104,18 +112,6 @@ function cirquetest_bootstrap() {
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
-
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
-        # We may run Cirque tests locally, in that case, we will run
-        # CHIP bootstrap script elsewhere. Don't run bootstrap so we
-        # won't break local environment.
-        set +x
-
-        # Call activate here so the later tests can be faster
-        # set -e will cause error if activate.sh is sourced twice
-        # this is an expected behavior caused by pigweed/activate.sh
-        source "$REPO_DIR/scripts/bootstrap.sh"
-    fi
 }
 
 function cirquetest_run_test() {

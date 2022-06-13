@@ -24,96 +24,109 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventPath.h>
-#include <app/MessageDef/StatusResponse.h>
-#include <app/MessageDef/SubscribeRequest.h>
-#include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/EventPathIB.h>
+#include <app/MessageDef/StatusResponseMessage.h>
+#include <app/MessageDef/SubscribeRequestMessage.h>
+#include <app/MessageDef/SubscribeResponseMessage.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <messaging/ExchangeContext.h>
+
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                             Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // Error if already initialized.
-    VerifyOrReturnError(IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeMgr              = apExchangeMgr;
-    mpExchangeCtx              = apExchangeContext;
-    mSuppressResponse          = true;
-    mpAttributeClusterInfoList = nullptr;
-    mpEventClusterInfoList     = nullptr;
-    mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = true;
-    MoveToState(HandlerState::Initialized);
-    mpDelegate          = apDelegate;
-    mSubscriptionId     = 0;
-    mHoldReport         = false;
-    mDirty              = false;
-    mActiveSubscription = false;
-    mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSecureSession().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSecureSession().GetFabricIndex();
 
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
+                         InteractionType aInteractionType) :
+    mManagementCallback(apCallback)
+{
+    mpExchangeCtx                = apExchangeContext;
+    mInteractionType             = aInteractionType;
+    mLastWrittenEventsBytes      = 0;
+    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mFlags.ClearAll();
+    mFlags.Set(ReadHandlerFlags::PrimingReports, true);
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
     }
-
-    return err;
 }
 
-void ReadHandler::Shutdown(ShutdownOptions aOptions)
+void ReadHandler::Abort(bool aCalledFromDestructor)
 {
-    if (IsSubscriptionType())
+    //
+    // If the exchange context hasn't already been gracefully closed
+    // (signaled by setting it to null), then we need to forcibly
+    // tear it down.
+    //
+    if (mpExchangeCtx != nullptr)
     {
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            OnRefreshSubscribeTimerSyncCallback, this);
-        if (mpDelegate != nullptr)
-        {
-            mpDelegate->SubscriptionTerminated(this);
-        }
+        // We might be a delegate for this exchange, and we don't want the
+        // OnExchangeClosing notification in that case.  Null out the delegate
+        // to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx->Abort();
+        mpExchangeCtx = nullptr;
     }
 
-    if (aOptions == ShutdownOptions::AbortCurrentExchange)
+    if (!aCalledFromDestructor)
     {
-        if (mpExchangeCtx != nullptr)
-        {
-            mpExchangeCtx->Abort();
-            mpExchangeCtx = nullptr;
-        }
+        Close();
+    }
+}
+
+ReadHandler::~ReadHandler()
+{
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (mFlags.Has(ReadHandlerFlags::ActiveSubscription) && appCallback)
+    {
+        appCallback->OnSubscriptionTerminated(*this);
+    }
+
+    Abort(true);
+
+    if (IsType(InteractionType::Subscribe))
+    {
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+            OnUnblockHoldReportCallback, this);
+
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+            OnRefreshSubscribeTimerSyncCallback, this);
     }
 
     if (IsAwaitingReportResponse())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
     }
-    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
-    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
-    mSubscriptionId            = 0;
-    mMinIntervalFloorSeconds   = 0;
-    mMaxIntervalCeilingSeconds = 0;
-    mInteractionType           = InteractionType::Read;
-    mpExchangeCtx              = nullptr;
-    MoveToState(HandlerState::Uninitialized);
-    mpAttributeClusterInfoList = nullptr;
-    mpEventClusterInfoList     = nullptr;
-    mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = false;
-    mpDelegate                 = nullptr;
-    mHoldReport                = false;
-    mDirty                     = false;
-    mActiveSubscription        = false;
-    mInitiatorNodeId           = kUndefinedNodeId;
+    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(mpAttributePathList);
+    InteractionModelEngine::GetInstance()->ReleaseEventPathList(mpEventPathList);
+    InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 }
 
-CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
+void ReadHandler::Close()
+{
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx = nullptr;
+    }
+
+    MoveToState(HandlerState::AwaitingDestruction);
+    mManagementCallback.OnDone(*this);
+}
+
+CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
-    if (IsSubscriptionType())
+
+    if (IsType(InteractionType::Subscribe))
     {
         err = ProcessSubscribeRequest(std::move(aPayload));
     }
@@ -124,7 +137,12 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
 
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        Close();
+    }
+    else
+    {
+        // Force us to be in a dirty state so we get processed by the reporting
+        mFlags.Set(ReadHandlerFlags::ForceDirty);
     }
 
     return err;
@@ -133,89 +151,134 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Protocols::InteractionModel::Status statusCode;
-    StatusResponse::Parser response;
-    System::PacketBufferTLVReader reader;
-    reader.Init(std::move(aPayload));
-    reader.Next();
-    err = response.Init(reader);
+    err            = StatusResponse::ProcessStatusResponse(std::move(aPayload));
     SuccessOrExit(err);
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = response.CheckSchemaValidity();
-    SuccessOrExit(err);
-#endif
-
-    err = response.GetStatus(statusCode);
-    SuccessOrExit(err);
-
-    ChipLogProgress(DataManagement, "In state %s, receive status response, status code is %" PRIu16, GetStateStr(),
-                    to_underlying(statusCode));
-    VerifyOrExit((statusCode == Protocols::InteractionModel::Status::Success), err = CHIP_ERROR_INVALID_ARGUMENT);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:
-        if (IsSubscriptionType())
+        if (IsChunkedReport())
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-            if (IsInitialReport())
+            mpExchangeCtx->WillSendMessage();
+        }
+        else if (IsType(InteractionType::Subscribe))
+        {
+            if (IsPriming())
             {
-                err           = SendSubscribeResponse();
+                err = SendSubscribeResponse();
+
                 mpExchangeCtx = nullptr;
                 SuccessOrExit(err);
-                mActiveSubscription = true;
+
+                mFlags.Set(ReadHandlerFlags::ActiveSubscription);
+
+                auto * appCallback = mManagementCallback.GetAppCallback();
+                if (appCallback)
+                {
+                    appCallback->OnSubscriptionEstablished(*this);
+                }
             }
             else
             {
-                MoveToState(HandlerState::GeneratingReports);
                 mpExchangeCtx = nullptr;
             }
         }
         else
         {
-            Shutdown();
+            //
+            // We're done processing a read, so let's close out and return.
+            //
+            Close();
+            return CHIP_NO_ERROR;
         }
+
+        MoveToState(HandlerState::GeneratingReports);
         break;
+
     case HandlerState::GeneratingReports:
-    case HandlerState::Initialized:
-    case HandlerState::Uninitialized:
+    case HandlerState::Idle:
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
         break;
     }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        Close();
     }
+
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
-    if (IsInitialReport())
+    if (IsPriming() || IsChunkedReport())
     {
-        mSessionHandle.SetValue(mpExchangeCtx->GetSecureSession());
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Value(), this);
-        mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+        mpExchangeCtx = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    MoveToState(HandlerState::AwaitingReportResponse);
-    CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+
+    return StatusResponse::Send(aStatus, mpExchangeCtx,
+                                /* aExpectResponse = */ false);
+}
+
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
+{
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    if (IsPriming() || IsChunkedReport())
+    {
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
+    }
+    else
+    {
+        VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+        mpExchangeCtx = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+    }
+
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!IsReporting())
+    {
+        mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    }
+    mFlags.Set(ReadHandlerFlags::ChunkedReport, aMoreChunks);
+    bool noResponseExpected = IsType(InteractionType::Read) && !aMoreChunks;
+    if (!noResponseExpected)
+    {
+        MoveToState(HandlerState::AwaitingReportResponse);
+    }
+
+    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    CHIP_ERROR err =
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                   Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
+                                                                           : Messaging::SendMessageFlags::kExpectResponse));
+    if (err == CHIP_NO_ERROR && noResponseExpected)
+    {
+        mpExchangeCtx = nullptr;
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
     if (err == CHIP_NO_ERROR)
     {
-        if (IsSubscriptionType() && !IsInitialReport())
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
             err = RefreshSubscribeSyncTimer();
         }
     }
-    ClearDirty();
+    if (!aMoreChunks)
+    {
+        mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration;
+        ClearDirty();
+        InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
+    }
     return err;
 }
 
@@ -235,19 +298,26 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     return err;
 }
 
+bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const
+{
+    return (IsType(InteractionType::Subscribe) &&
+            GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
+            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
+}
+
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    Shutdown();
+    Close();
     return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(apExchangeContext));
-    Shutdown();
+    ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
+                 ChipLogValueExchange(apExchangeContext));
+    Close();
 }
 
 CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
@@ -255,158 +325,250 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
 
-    ReadRequest::Parser readRequestParser;
-    EventPathList::Parser eventPathListParser;
-    AttributePathList::Parser attributePathListParser;
+    ReadRequestMessage::Parser readRequestParser;
+    EventPathIBs::Parser eventPathListParser;
+    EventFilterIBs::Parser eventFilterIBsParser;
+    AttributePathIBs::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
 
-    err = reader.Next();
-    SuccessOrExit(err);
-
-    err = readRequestParser.Init(reader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = readRequestParser.CheckSchemaValidity();
-    SuccessOrExit(err);
+    if (err != CHIP_NO_ERROR)
+    {
+        // The actual error we want to return to our consumer is an IM "invalid
+        // action" error, not whatever internal error CheckSchemaValidity
+        // happens to come up with.
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
+    }
 #endif
 
-    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    else
+    else if (err == CHIP_NO_ERROR)
     {
-        SuccessOrExit(err);
-        err = ProcessAttributePathList(attributePathListParser);
+        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = readRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
-    SuccessOrExit(err);
-    err = readRequestParser.GetEventPathList(&eventPathListParser);
+    ReturnErrorOnFailure(err);
+    err = readRequestParser.GetEventRequests(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    else
+    else if (err == CHIP_NO_ERROR)
     {
-        SuccessOrExit(err);
-        err = ProcessEventPathList(eventPathListParser);
+        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(ProcessEventPaths(eventPathListParser));
+        err = readRequestParser.GetEventFilters(&eventFilterIBsParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessEventFilters(eventFilterIBsParser));
+        }
     }
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(err);
 
-    // if we have exhausted this container
-    if (CHIP_END_OF_TLV == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
+    // Ensure the read transaction doesn't exceed the resources dedicated to
+    // read transactions.
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this));
 
+    bool isFabricFiltered;
+    ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));
+    mFlags.Set(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
+    ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
-    err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    SuccessOrExit(err);
-
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+    mpExchangeCtx->WillSendMessage();
 
     // There must be no code after the WillSendMessage() call that can cause
     // this method to return a failure.
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-        ClusterInfo clusterInfo;
-        AttributePath::Parser path;
+        VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        AttributePathParams attribute;
+        AttributePathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
-        err = path.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
-        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
-        err = path.GetClusterId(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
-        err = path.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
+
+        err = path.GetEndpoint(&(attribute.mEndpointId));
+        if (err == CHIP_NO_ERROR)
         {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+            VerifyOrExit(!attribute.HasWildcardEndpointId(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
         }
-        else if (CHIP_END_OF_TLV == err)
+        else if (err == CHIP_END_OF_TLV)
         {
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
 
-        err = path.GetListIndex(&(clusterInfo.mListIndex));
+        ClusterId clusterId = kInvalidClusterId;
+        err                 = path.GetCluster(&clusterId);
+        if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrExit(IsValidClusterId(clusterId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+            attribute.mClusterId = clusterId;
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        SuccessOrExit(err);
+
+        AttributeId attributeId = kInvalidAttributeId;
+        err                     = path.GetAttribute(&attributeId);
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrExit(IsValidAttributeId(attributeId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+            attribute.mAttributeId = attributeId;
+        }
+        SuccessOrExit(err);
+
+        // A wildcard cluster requires that the attribute path either be
+        // wildcard or a global attribute.
+        VerifyOrExit(!attribute.HasWildcardClusterId() || attribute.HasWildcardAttributeId() ||
+                         IsGlobalAttribute(attribute.mAttributeId),
+                     err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+        err = path.GetListIndex(&(attribute.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            VerifyOrExit(!attribute.HasWildcardAttributeId() && !attribute.HasWildcardListIndex(),
+                         err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
         }
         else if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+        err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attribute);
         SuccessOrExit(err);
-        mInitialReport = true;
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
+        err                          = CHIP_NO_ERROR;
     }
 
 exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
+CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
-    aEventPathListParser.GetReader(&reader);
 
+    aDataVersionFilterListParser.GetReader(&reader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-        ClusterInfo clusterInfo;
-        EventPath::Parser path;
-        err = path.Init(reader);
-        SuccessOrExit(err);
-        err = path.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
-        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
-        err = path.GetClusterId(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
-        err = path.GetEventId(&(clusterInfo.mEventId));
-        if (CHIP_NO_ERROR == err)
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        DataVersionFilter versionFilter;
+        ClusterPathIB::Parser path;
+        DataVersionFilterIB::Parser filter;
+        ReturnErrorOnFailure(filter.Init(reader));
+        DataVersion version = 0;
+        ReturnErrorOnFailure(filter.GetDataVersion(&version));
+        versionFilter.mDataVersion.SetValue(version);
+        ReturnErrorOnFailure(filter.GetPath(&path));
+        ReturnErrorOnFailure(path.GetEndpoint(&(versionFilter.mEndpointId)));
+        ReturnErrorOnFailure(path.GetCluster(&(versionFilter.mClusterId)));
+        VerifyOrReturnError(versionFilter.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
+        ReturnErrorOnFailure(
+            InteractionModelEngine::GetInstance()->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aEventPathsParser.GetReader(&reader);
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        EventPathParams event;
+        EventPathIB::Parser path;
+        ReturnErrorOnFailure(path.Init(reader));
+
+        err = path.GetEndpoint(&(event.mEndpointId));
+        if (err == CHIP_NO_ERROR)
         {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kEventIdValid);
+            VerifyOrReturnError(!event.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
         }
-        else if (CHIP_END_OF_TLV == err)
+        else if (err == CHIP_END_OF_TLV)
         {
             err = CHIP_NO_ERROR;
         }
-        SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
+
+        err = path.GetCluster(&(event.mClusterId));
+        if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(!event.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        err = path.GetEvent(&(event.mEventId));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(!event.HasWildcardEventId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
+        }
+        ReturnErrorOnFailure(err);
+
+        err = path.GetIsUrgent(&(event.mIsUrgentEvent));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, event));
     }
 
     // if we have exhausted this container
@@ -414,8 +576,27 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
     {
         err = CHIP_NO_ERROR;
     }
+    return err;
+}
 
-exit:
+CHIP_ERROR ReadHandler::ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aEventFiltersParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        EventFilterIB::Parser filter;
+        ReturnErrorOnFailure(filter.Init(reader));
+        // this is for current node, and would have only one event filter.
+        ReturnErrorOnFailure(filter.GetEventMin(&(mEventMin)));
+    }
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
     return err;
 }
 
@@ -424,12 +605,10 @@ const char * ReadHandler::GetStateStr() const
 #if CHIP_DETAIL_LOGGING
     switch (mState)
     {
-    case HandlerState::Uninitialized:
-        return "Uninitialized";
-
-    case HandlerState::Initialized:
-        return "Initialized";
-
+    case HandlerState::Idle:
+        return "Idle";
+    case HandlerState::AwaitingDestruction:
+        return "AwaitingDestruction";
     case HandlerState::GeneratingReports:
         return "GeneratingReports";
 
@@ -442,51 +621,49 @@ const char * ReadHandler::GetStateStr() const
 
 void ReadHandler::MoveToState(const HandlerState aTargetState)
 {
+    if (aTargetState == mState)
+    {
+        return;
+    }
+
+    if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
+    //
+    // If we just unblocked sending reports, let's go ahead and schedule the reporting
+    // engine to run to kick that off.
+    //
+    if (aTargetState == HandlerState::GeneratingReports)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
 
 bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 {
-    if (mCurrentPriority == PriorityLevel::Invalid)
+    if (mFlags.Has(ReadHandlerFlags::ChunkedReport))
     {
-        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high
-        // priority to Debug low priority, and set a checkpoint when there is dirty events
-        for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
+        if ((mLastScheduledEventNumber != 0) && (mEventMin <= mLastScheduledEventNumber))
         {
-            EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
-            if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
-            {
-                // We have more events. snapshot last event IDs
-                aEventManager.SetScheduledEventEndpoint(&(mLastScheduledEventNumber[0]));
-                // initialize the next dirty priority level to transfer
-                MoveToNextScheduledDirtyPriority();
-                return false;
-            }
+            return false;
         }
-        return true;
     }
     else
     {
-        // Upload is in middle, previous mLastScheduledEventNumber is still valid, recheck via MoveToNextScheduledDirtyPriority,
-        // if finally mCurrentPriority is invalid, it means no more event
-        MoveToNextScheduledDirtyPriority();
-        return mCurrentPriority == PriorityLevel::Invalid;
-    }
-}
-
-void ReadHandler::MoveToNextScheduledDirtyPriority()
-{
-    for (int i = ArraySize(mSelfProcessedEvents) - 1; i >= 0; i--)
-    {
-        if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
+        EventNumber lastEventNumber = aEventManager.GetLastEventNumber();
+        if ((lastEventNumber != 0) && (mEventMin <= lastEventNumber))
         {
-            mCurrentPriority = static_cast<PriorityLevel>(i);
-            return;
+            // We have more events. snapshot last event number
+            aEventManager.SetScheduledEventInfo(mLastScheduledEventNumber, mLastWrittenEventsBytes);
+            return false;
         }
     }
-
-    mCurrentPriority = PriorityLevel::Invalid;
+    return true;
 }
 
 CHIP_ERROR ReadHandler::SendSubscribeResponse()
@@ -497,24 +674,17 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(packet));
 
-    SubscribeResponse::Builder response;
-    ReturnLogErrorOnFailure(response.Init(&writer));
-    response.SubscriptionId(mSubscriptionId)
-        .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
-        .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
-        .EndOfSubscribeResponse();
-    ReturnLogErrorOnFailure(response.GetError());
+    SubscribeResponseMessage::Builder response;
+    ReturnErrorOnFailure(response.Init(&writer));
+    response.SubscriptionId(mSubscriptionId).MaxInterval(mMaxInterval).EndOfSubscribeResponseMessage();
+    ReturnErrorOnFailure(response.GetError());
 
-    ReturnLogErrorOnFailure(writer.Finalize(&packet));
+    ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnLogErrorOnFailure(RefreshSubscribeSyncTimer());
-    mInitialReport = false;
-    MoveToState(HandlerState::GeneratingReports);
-    if (mpDelegate != nullptr)
-    {
-        mpDelegate->SubscriptionEstablished(this);
-    }
+    ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
+
+    mFlags.Set(ReadHandlerFlags::PrimingReports, false);
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
@@ -523,68 +693,174 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
 
-    ReturnLogErrorOnFailure(reader.Next());
-    SubscribeRequest::Parser subscribeRequestParser;
-    ReturnLogErrorOnFailure(subscribeRequestParser.Init(reader));
+    SubscribeRequestMessage::Parser subscribeRequestParser;
+    ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnLogErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
+    ReturnErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
 #endif
 
-    AttributePathList::Parser attributePathListParser;
-    CHIP_ERROR err = subscribeRequestParser.GetAttributePathList(&attributePathListParser);
+    AttributePathIBs::Parser attributePathListParser;
+    CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnLogErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = subscribeRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
 
-    EventPathList::Parser eventPathListParser;
-    err = subscribeRequestParser.GetEventPathList(&eventPathListParser);
+    EventPathIBs::Parser eventPathListParser;
+    err = subscribeRequestParser.GetEventRequests(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnLogErrorOnFailure(ProcessEventPathList(eventPathListParser));
+        ReturnErrorOnFailure(ProcessEventPaths(eventPathListParser));
+        EventFilterIBs::Parser eventFilterIBsParser;
+        err = subscribeRequestParser.GetEventFilters(&eventFilterIBsParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessEventFilters(eventFilterIBsParser));
+        }
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
 
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
-    ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
+    ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
+    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
+    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
+    //
+    // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
+    // This also provides the application an opportunity to modify the negotiated min/max intervals set above.
+    //
+    auto * appCallback = mManagementCallback.GetAppCallback();
+    if (appCallback)
+    {
+        if (appCallback->OnSubscriptionRequested(*this, *mpExchangeCtx->GetSessionHandle()->AsSecureSession()) != CHIP_NO_ERROR)
+        {
+            return CHIP_ERROR_TRANSACTION_CANCELED;
+        }
+    }
+
+    ChipLogProgress(DataManagement, "Final negotiated min/max parameters: Min = %ds, Max = %ds", mMinIntervalFloorSeconds,
+                    mMaxInterval);
+
+    bool isFabricFiltered;
+    ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&isFabricFiltered));
+    mFlags.Set(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
+    ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+    mpExchangeCtx->WillSendMessage();
+
     return CHIP_NO_ERROR;
+}
+
+void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)
+{
+    VerifyOrReturn(apAppState != nullptr);
+    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
+    ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
+    readHandler->mFlags.Set(ReadHandlerFlags::HoldReport, false);
+    if (readHandler->IsDirty())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        System::Clock::Seconds16(readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds),
+        OnRefreshSubscribeTimerSyncCallback, readHandler);
 }
 
 void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState)
 {
-    ReadHandler * aReadHandler = static_cast<ReadHandler *>(apAppState);
-    aReadHandler->mHoldReport  = false;
+    VerifyOrReturn(apAppState != nullptr);
+    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
+    readHandler->mFlags.Set(ReadHandlerFlags::HoldSync, false);
+    ChipLogDetail(DataManagement, "Refresh subscribe timer sync after %d seconds",
+                  readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalFloorSeconds);
+    ChipLogDetail(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxInterval);
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+        OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
-    mHoldReport = true;
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
+
+    mFlags.Set(ReadHandlerFlags::HoldReport);
+    mFlags.Set(ReadHandlerFlags::HoldSync);
+
+    ReturnErrorOnFailure(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+
+    return CHIP_NO_ERROR;
+}
+
+void ReadHandler::ResetPathIterator()
+{
+    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
+    mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
+}
+
+void ReadHandler::SetDirty(const AttributePathParams & aAttributeChanged)
+{
+    ConcreteAttributePath path;
+
+    mDirtyGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+
+    // We won't reset the path iterator for every SetDirty call to reduce the number of full data reports.
+    // The iterator will be reset after finishing each report session.
+    //
+    // Here we just reset the iterator to the beginning of the current cluster, if the dirty path affects it.
+    // This will ensure the reports are consistent within a single cluster generated from a single path in the request.
+
+    // TODO (#16699): Currently we can only gurentee the reports generated from a single path in the request are consistent. The
+    // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
+    // or make it consistent.
+    if (mAttributePathExpandIterator.Get(path) &&
+        (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
+        (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
+    {
+        ChipLogDetail(DataManagement,
+                      "The dirty path intersects the cluster we are currently reporting; reset the iterator to the beginning of "
+                      "that cluster");
+        // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
+        // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
+        // the state of the cluster as present on the server
+        mAttributePathExpandIterator.ResetCurrentCluster();
+        mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
+    }
+}
+
+Transport::SecureSession * ReadHandler::GetSession() const
+{
+    if (!mSessionHandle)
+    {
+        return nullptr;
+    }
+    return mSessionHandle->AsSecureSession();
 }
 } // namespace app
 } // namespace chip

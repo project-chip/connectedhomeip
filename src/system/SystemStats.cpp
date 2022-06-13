@@ -51,11 +51,7 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     "InetLayer_NumUDPEpsInUse",
 #endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    "InetLayer_NumDNSResolversInUse",
-#endif
-    "ExchangeMgr_NumContextsInUse",   "ExchangeMgr_NumUMHandlersInUse",
-    "ExchangeMgr_NumBindings",        "MessageLayer_NumConnectionsInUse",
+    "ExchangeMgr_NumContextsInUse", "ExchangeMgr_NumUMHandlersInUse", "ExchangeMgr_NumBindings", "MessageLayer_NumConnectionsInUse",
 };
 
 count_t sResourcesInUse[kNumEntries];
@@ -110,13 +106,6 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
-
-// To use LwIP 1.x, some additional definitions are required here.
-#if LWIP_VERSION_MAJOR < 2
-#ifndef MEMP_STATS_GET
-#define MEMP_STATS_GET(FIELD, INDEX) (lwip_stats.memp[INDEX].FIELD)
-#endif // !defined(MEMP_STATS_GET)
-#endif // LWIP_VERSION_MAJOR
 
 void UpdateLwipPbufCounts(void)
 {

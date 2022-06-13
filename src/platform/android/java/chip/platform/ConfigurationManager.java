@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,27 +30,32 @@ public interface ConfigurationManager {
   String kConfigKey_MfrDeviceCert = "device-cert";
   String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
   String kConfigKey_MfrDevicePrivateKey = "device-key";
-  String kConfigKey_ProductRevision = "product-rev";
+  String kConfigKey_HardwareVersion = "hardware-ver";
+  String kConfigKey_HardwareVersionString = "hardware-ver-str";
   String kConfigKey_ManufacturingDate = "mfg-date";
   String kConfigKey_SetupPinCode = "pin-code";
   String kConfigKey_SetupDiscriminator = "discriminator";
+  String kConfigKey_ProductId = "product-id";
+  String kConfigKey_ProductName = "product-name";
+  String kConfigKey_SoftwareVersion = "software-version";
+  String kConfigKey_SoftwareVersionString = "software-version-str";
+  String kConfigKey_PartNumber = "part-number";
+  String kConfigKey_ProductURL = "product-url";
+  String kConfigKey_ProductLabel = "product-label";
+  String kConfigKey_UniqueId = "uniqueId";
+  String kConfigKey_Spake2pIterationCount = "iteration-count";
+  String kConfigKey_Spake2pSalt = "salt";
+  String kConfigKey_Spake2pVerifier = "verifier";
 
   // Keys stored in the Chip-config namespace
-  String kConfigKey_FabricId = "fabric-id";
   String kConfigKey_ServiceConfig = "service-config";
   String kConfigKey_PairedAccountId = "account-id";
   String kConfigKey_ServiceId = "service-id";
-  String kConfigKey_FabricSecret = "fabric-secret";
-  String kConfigKey_GroupKeyIndex = "group-key-index";
   String kConfigKey_LastUsedEpochKeyId = "last-ek-id";
   String kConfigKey_FailSafeArmed = "fail-safe-armed";
   String kConfigKey_WiFiStationSecType = "sta-sec-type";
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
-  String kConfigKey_Breadcrumb = "breadcrumb";
-
-  // Prefix used for NVS keys that contain Chip group encryption keys.
-  String kGroupKeyNamePrefix = "gk-";
 
   long readConfigValueLong(String namespace, String name) throws AndroidChipPlatformException;
 

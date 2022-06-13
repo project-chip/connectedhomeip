@@ -23,10 +23,14 @@ function pad(label, len, ch = ' ')
 function concat()
 {
   let str = ''
-  for (let arg in arguments)
+  // Last argument is our hash argument.
+  for (let arg = 0; arg < arguments.length - 1; ++arg)
   {
-    if (typeof arguments[arg] != 'object') {
+    if (typeof arguments[arg] != 'object' || arguments[arg] instanceof String) {
       str += arguments[arg];
+    } else {
+      throw new TypeError(
+          `Unexpected object in concat: ${arg}:${Object.prototype.toString.call(arguments[arg])}, ${JSON.stringify(arguments)}`);
     }
   }
   return str

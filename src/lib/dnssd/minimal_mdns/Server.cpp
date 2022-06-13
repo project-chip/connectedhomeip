@@ -48,6 +48,73 @@ private:
     ServerBase * mServer;
 };
 
+/**
+ * Extracts the Listening UDP Endpoint from an underlying ServerBase::EndpointInfo
+ */
+class ListenSocketPickerDelegate : public ServerBase::BroadcastSendDelegate
+{
+public:
+    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->mListenUdp; }
+};
+
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+
+/**
+ * Extracts the Querying UDP Endpoint from an underlying ServerBase::EndpointInfo
+ */
+class QuerySocketPickerDelegate : public ServerBase::BroadcastSendDelegate
+{
+public:
+    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->mUnicastQueryUdp; }
+};
+
+#else
+
+using QuerySocketPickerDelegate = ListenSocketPickerDelegate;
+
+#endif
+
+/**
+ * Validates that an endpoint belongs to a specific interface/ip address type before forwarding the
+ * endpoint accept logic to another BroadcastSendDelegate.
+ *
+ * Usage like:
+ *
+ * SomeDelegate *child = ....;
+ * InterfaceTypeFilterDelegate filter(interfaceId, IPAddressType::IPv6, child);
+ *
+ * UDPEndPoint *udp = filter.Accept(endpointInfo);
+ */
+class InterfaceTypeFilterDelegate : public ServerBase::BroadcastSendDelegate
+{
+public:
+    InterfaceTypeFilterDelegate(chip::Inet::InterfaceId interface, chip::Inet::IPAddressType type,
+                                ServerBase::BroadcastSendDelegate * child) :
+        mInterface(interface),
+        mAddressType(type), mChild(child)
+    {}
+
+    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override
+    {
+        if ((info->mInterfaceId != mInterface) && (info->mInterfaceId != chip::Inet::InterfaceId::Null()))
+        {
+            return nullptr;
+        }
+
+        if ((mAddressType != chip::Inet::IPAddressType::kAny) && (info->mAddressType != mAddressType))
+        {
+            return nullptr;
+        }
+
+        return mChild->Accept(info);
+    }
+
+private:
+    chip::Inet::InterfaceId mInterface;
+    chip::Inet::IPAddressType mAddressType;
+    ServerBase::BroadcastSendDelegate * mChild = nullptr;
+};
+
 } // namespace
 
 namespace BroadcastIpAddresses {
@@ -80,12 +147,12 @@ CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::U
 
     chip::Inet::IPAddress address;
 
-    if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv6)
+    if (addressType == chip::Inet::IPAddressType::kIPv6)
     {
         BroadcastIpAddresses::GetIpv6Into(address);
 #if INET_CONFIG_ENABLE_IPV4
     }
-    else if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv4)
+    else if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
         BroadcastIpAddresses::GetIpv4Into(address);
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -98,26 +165,22 @@ CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::U
     return endpoint->JoinMulticastGroup(interfaceId, address);
 }
 
+#if CHIP_ERROR_LOGGING
 const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
 {
     switch (addressType)
     {
-    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+    case chip::Inet::IPAddressType::kIPv6:
         return "IPv6";
 #if INET_CONFIG_ENABLE_IPV4
-    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+    case chip::Inet::IPAddressType::kIPv4:
         return "IPv4";
 #endif // INET_CONFIG_ENABLE_IPV4
     default:
         return "UNKNOWN";
     }
 }
-
-void ShutdownEndpoint(mdns::Minimal::ServerBase::EndpointInfo & aEndpoint)
-{
-    aEndpoint.udp->Free();
-    aEndpoint.udp = nullptr;
-}
+#endif
 
 } // namespace
 
@@ -128,66 +191,86 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
-    for (size_t i = 0; i < mEndpointCount; i++)
-    {
-        if (mEndpoints[i].udp != nullptr)
-        {
-            ShutdownEndpoint(mEndpoints[i]);
-        }
-    }
+    mEndpoints.ReleaseAll();
+}
+
+void ServerBase::ShutdownEndpoint(EndpointInfo & aEndpoint)
+{
+    mEndpoints.ReleaseObject(&aEndpoint);
 }
 
 bool ServerBase::IsListening() const
 {
-    for (size_t i = 0; i < mEndpointCount; i++)
-    {
-        if (mEndpoints[i].udp != nullptr)
+    bool listening = false;
+    mEndpoints.ForEachActiveObject([&](auto * endpoint) {
+        if (endpoint->mListenUdp != nullptr)
         {
-            return true;
+            listening = true;
+            return chip::Loop::Break;
         }
-    }
-    return false;
+        return chip::Loop::Continue;
+    });
+    return listening;
 }
 
-CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
+CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
+                              uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
-    size_t endpointIndex                = 0;
-    chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
 
     ShutdownOnError autoShutdown(this);
 
     while (it->Next(&interfaceId, &addressType))
     {
-        ReturnErrorCodeIf(endpointIndex >= mEndpointCount, CHIP_ERROR_NO_MEMORY);
+        chip::Inet::UDPEndPoint * listenUdp;
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&listenUdp));
+        std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolder(listenUdp, {});
 
-        EndpointInfo * info = &mEndpoints[endpointIndex];
-        info->addressType   = addressType;
-        info->interfaceId   = interfaceId;
+        ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
-        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->udp));
+        ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
-        ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
-
-        ReturnErrorOnFailure(info->udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
-
-        CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
+        CHIP_ERROR err = JoinMulticastGroup(interfaceId, listenUdp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            char interfaceName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-            chip::Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
+            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+            interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
                          AddressTypeStr(addressType), chip::ErrorStr(err));
-            ShutdownEndpoint(mEndpoints[endpointIndex]);
+
+            endPointHolder.reset();
         }
-        else
+
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+        // Separate UDP endpoint for unicast queries, bound to 0 (i.e. pick random ephemeral port)
+        //   - helps in not having conflicts on port 5353, will receive unicast replies directly
+        //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
+        //     not originate from 5353 and the answers will include a query section.
+        chip::Inet::UDPEndPoint * unicastQueryUdp;
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&unicastQueryUdp));
+        std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolderUnicast(unicastQueryUdp, {});
+        ReturnErrorOnFailure(unicastQueryUdp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
+        ReturnErrorOnFailure(unicastQueryUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+#endif
+
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+        if (endPointHolder || endPointHolderUnicast)
         {
-            endpointIndex++;
+            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(endPointHolder), std::move(endPointHolderUnicast));
         }
+#else
+        if (endPointHolder)
+        {
+            // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(endPointHolder));
+        }
+#endif
     }
 
     return autoShutdown.ReturnSuccess();
@@ -196,80 +279,63 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface)
 {
-    for (size_t i = 0; i < mEndpointCount; i++)
-    {
-        EndpointInfo * info = &mEndpoints[i];
-        if (info->udp == nullptr)
+    CHIP_ERROR err = CHIP_ERROR_NOT_CONNECTED;
+    mEndpoints.ForEachActiveObject([&](auto * info) {
+        if (info->mListenUdp == nullptr)
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        if (info->addressType != addr.Type())
+        if (info->mAddressType != addr.Type())
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        chip::Inet::InterfaceId boundIf = info->udp->GetBoundInterface();
+        chip::Inet::InterfaceId boundIf = info->mListenUdp->GetBoundInterface();
 
-        if ((boundIf != INET_NULL_INTERFACEID) && (boundIf != interface))
+        if ((boundIf.IsPresent()) && (boundIf != interface))
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        return info->udp->SendTo(addr, port, std::move(data));
-    }
+        err = info->mListenUdp->SendTo(addr, port, std::move(data));
+        return chip::Loop::Break;
+    });
 
-    return CHIP_ERROR_NOT_CONNECTED;
+    return err;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
+CHIP_ERROR ServerBase::BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port)
 {
-    for (size_t i = 0; i < mEndpointCount; i++)
-    {
-        EndpointInfo * info = &mEndpoints[i];
+    QuerySocketPickerDelegate socketPicker;
+    return BroadcastImpl(std::move(data), port, &socketPicker);
+}
 
-        if (info->udp == nullptr)
-        {
-            continue;
-        }
+CHIP_ERROR ServerBase::BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port,
+                                             chip::Inet::InterfaceId interface, chip::Inet::IPAddressType addressType)
+{
+    QuerySocketPickerDelegate socketPicker;
+    InterfaceTypeFilterDelegate filter(interface, addressType, &socketPicker);
 
-        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
-        {
-            continue;
-        }
+    return BroadcastImpl(std::move(data), port, &filter);
+}
 
-        CHIP_ERROR err;
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
+                                     chip::Inet::IPAddressType addressType)
+{
+    ListenSocketPickerDelegate socketPicker;
+    InterfaceTypeFilterDelegate filter(interface, addressType, &socketPicker);
 
-        /// The same packet needs to be sent over potentially multiple interfaces.
-        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
-        /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
-        {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
-        {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
-        }
-#endif
-        else
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return BroadcastImpl(std::move(data), port, &filter);
 }
 
 CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port)
+{
+    ListenSocketPickerDelegate socketPicker;
+    return BroadcastImpl(std::move(data), port, &socketPicker);
+}
+
+CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate)
 {
     // Broadcast requires sending data multiple times, each of which may error
     // out, yet broadcast only has a single error code.
@@ -279,55 +345,79 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     //   - if at least one broadcast succeeds, assume success overall
     //   + some internal consistency validations for state error.
 
-    bool hadSuccesfulSend = false;
-    CHIP_ERROR lastError  = CHIP_ERROR_NO_ENDPOINT;
+    unsigned successes   = 0;
+    unsigned failures    = 0;
+    CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
 
-    for (size_t i = 0; i < mEndpointCount; i++)
-    {
-        EndpointInfo * info = &mEndpoints[i];
+    if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
+            chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
 
-        if (info->udp == nullptr)
-        {
-            continue;
-        }
+            if (udp == nullptr)
+            {
+                return chip::Loop::Continue;
+            }
 
-        CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
-        /// The same packet needs to be sent over potentially multiple interfaces.
-        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
-        /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
-        {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
-        }
+            /// The same packet needs to be sent over potentially multiple interfaces.
+            /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+            /// for sending via `CloneData`
+            ///
+            /// TODO: this wastes one copy of the data and that could be optimized away
+            if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
+            {
+                err = udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+            }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
-        {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
-        }
+            else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
+            {
+                err = udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+            }
 #endif
-        else
-        {
-            // This is a general error of internal consistency: every address has a known type
-            // Fail completely otherwise.
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+            else
+            {
+                // This is a general error of internal consistency: every address has a known type. Fail completely otherwise.
+                lastError = CHIP_ERROR_INCORRECT_STATE;
+                return chip::Loop::Break;
+            }
 
-        if (err == CHIP_NO_ERROR)
+            if (err == CHIP_NO_ERROR)
+            {
+                successes++;
+            }
+            else
+            {
+                failures++;
+                lastError = err;
+#if CHIP_DETAIL_LOGGING
+                char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+                err = info->mInterfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
+                if (err != CHIP_NO_ERROR)
+                    strcpy(ifaceName, "???");
+                ChipLogDetail(Discovery, "Warning: Attempt to mDNS broadcast failed on %s:  %s", ifaceName, lastError.AsString());
+#endif
+            }
+            return chip::Loop::Continue;
+        }))
+    {
+        return lastError;
+    }
+
+    if (failures != 0)
+    {
+        // if we had failures, log if the final status was success or failure, to make log reading
+        // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
+        if (successes != 0)
         {
-            hadSuccesfulSend = true;
-            ChipLogProgress(Discovery, "mDNS broadcast success");
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
         }
         else
         {
-            ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
-            lastError = err;
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
         }
     }
 
-    if (!hadSuccesfulSend)
+    if (!successes)
     {
         return lastError;
     }
@@ -335,10 +425,10 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     return CHIP_NO_ERROR;
 }
 
-void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle && buffer,
+void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
+    ServerBase * srv = static_cast<ServerBase *>(endPoint->mAppState);
     if (!srv->mDelegate)
     {
         return;

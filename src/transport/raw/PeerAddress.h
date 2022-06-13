@@ -28,6 +28,8 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMemString.h>
 
 namespace chip {
 namespace Transport {
@@ -61,9 +63,8 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined), mInterface(INET_NULL_INTERFACEID) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type), mInterface(INET_NULL_INTERFACEID)
-    {}
+    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -101,6 +102,8 @@ public:
 
     bool IsInitialized() const { return mTransportType != Type::kUndefined; }
 
+    bool IsMulticast() { return Type::kUdp == mTransportType && mIPAddress.IsIPv6Multicast(); }
+
     bool operator==(const PeerAddress & other) const
     {
         return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
@@ -109,20 +112,17 @@ public:
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
-    /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
-#ifdef INET6_ADDRSTRLEN
-    static constexpr size_t kInetMaxAddrLen = INET6_ADDRSTRLEN;
-#else
-    static constexpr size_t kInetMaxAddrLen = INET_ADDRSTRLEN;
-#endif
-
     /// Maximum size of the string outputes by ToString. Format is of the form:
     /// "UDP:<ip>:<port>"
-    static constexpr size_t kMaxToStringSize = //
-        3 /* UDP/TCP/BLE */ + 1 /* : */        //
-        + kInetMaxAddrLen + 1 /* : */          //
-        + 5 /* 16 bit interger */              //
-        + 1 /* NullTerminator */;
+    static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
+        + 1                                      // splitter :
+        + 2                                      // brackets around address
+        + Inet::IPAddress::kMaxStringLength      // address
+        + 1                                      // splitter %
+        + Inet::InterfaceId::kMaxIfNameLength    // interface
+        + 1                                      // splitter :
+        + 5                                      // port: 16 bit interger
+        + 1;                                     // NullTerminator
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
@@ -132,7 +132,19 @@ public:
 
     void ToString(char * buf, size_t bufSize) const
     {
-        char ip_addr[kInetMaxAddrLen];
+        char ip_addr[Inet::IPAddress::kMaxStringLength];
+
+        char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
+        if (mInterface.IsPresent())
+        {
+            interface[0]   = '%';
+            interface[1]   = 0;
+            CHIP_ERROR err = mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1);
+            if (err != CHIP_NO_ERROR)
+            {
+                Platform::CopyString(interface, sizeof(interface), "%(err)");
+            }
+        }
 
         switch (mTransportType)
         {
@@ -141,11 +153,21 @@ public:
             break;
         case Type::kUdp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
+#if INET_CONFIG_ENABLE_IPV4
+            if (mIPAddress.IsIPv4())
+                snprintf(buf, bufSize, "UDP:%s%s:%d", ip_addr, interface, mPort);
+            else
+#endif
+                snprintf(buf, bufSize, "UDP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
         case Type::kTcp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
+#if INET_CONFIG_ENABLE_IPV4
+            if (mIPAddress.IsIPv4())
+                snprintf(buf, bufSize, "TCP:%s%s:%d", ip_addr, interface, mPort);
+            else
+#endif
+                snprintf(buf, bufSize, "TCP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
         case Type::kBle:
             // Note that BLE does not currently use any specific address.
@@ -175,11 +197,27 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
+    static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
+    {
+        constexpr uint8_t scope        = 0x05; // Site-Local
+        constexpr uint8_t prefixLength = 0x40; // 64-bit long network prefix field
+        // The network prefix portion of the Multicast Address is the 64-bit bitstring formed by concatenating:
+        // * 0xFD to designate a locally assigned ULA prefix
+        // * The upper 56-bits of the Fabric ID for the network in big-endian order
+        const uint64_t prefix = 0xfd00000000000000 | ((fabric >> 8) & 0x00ffffffffffffff);
+        // The 32-bit group identifier portion of the Multicast Address is the 32-bits formed by:
+        // * The lower 8-bits of the Fabric ID
+        // * 0x00
+        // * The 16-bits Group Identifier in big-endian order
+        uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | group;
+        return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
+    }
+
 private:
     Inet::IPAddress mIPAddress   = {};
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
-    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
+    Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
 };
 
 } // namespace Transport

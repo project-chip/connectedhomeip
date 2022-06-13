@@ -38,116 +38,21 @@
 namespace chip {
 namespace System {
 
-#if CHIP_SYSTEM_CONFIG_NUM_TIMERS
-
-/*******************************************************************************
- * Timer state
- *
- * There are two fundamental state-change variables: Object::mSystemLayer and
- * Timer::mOnComplete. These must be checked and changed atomically. The state
- * of the timer is governed by the following state machine:
- *
- *  INITIAL STATE: mSystemLayer == NULL, mOnComplete == NULL
- *      |
- *      V
- *  UNALLOCATED<-----------------------------+
- *      |                                    |
- *  (set mSystemLayer != NULL)               |
- *      |                                    |
- *      V                                    |
- *  ALLOCATED-------(set mSystemLayer NULL)--+
- *      |    \-----------------------------+
- *      |                                  |
- *  (set mOnComplete != NULL)               |
- *      |                                  |
- *      V                                  |
- *    ARMED ---------( clear mOnComplete )--+
- *
- * When in the ARMED state:
- *
- *     * None of the member variables may mutate.
- *     * mOnComplete must only be cleared by Cancel() or HandleComplete()
- *     * Cancel() and HandleComplete() will test that they are the one to
- *       successfully set mOnComplete NULL. And if so, that will be the
- *       thread that must call Object::Release().
- *
- *******************************************************************************
- */
-
-ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
-
-Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+TimerList::Node * TimerList::Add(TimerList::Node * add)
 {
-    Timer * timer = Timer::sPool.TryCreate();
-    if (timer == nullptr)
+    VerifyOrDie(add != mEarliestTimer);
+    if (mEarliestTimer == nullptr || (add->AwakenTime() < mEarliestTimer->AwakenTime()))
     {
-        ChipLogError(chipSystemLayer, "Timer pool EMPTY");
+        add->mNextTimer = mEarliestTimer;
+        mEarliestTimer  = add;
     }
     else
     {
-        timer->AppState     = appState;
-        timer->mSystemLayer = &systemLayer;
-        timer->mAwakenTime  = Clock::AddOffset(SystemClock().GetMonotonicMilliseconds(), delayMilliseconds);
-        if (!__sync_bool_compare_and_swap(&timer->mOnComplete, nullptr, onComplete))
-        {
-            chipDie();
-        }
-    }
-    return timer;
-}
-
-void Timer::Clear()
-{
-    TimerCompleteCallback lOnComplete = this->mOnComplete;
-
-    // Check if the timer is armed
-    VerifyOrReturn(lOnComplete != nullptr);
-
-    // Atomically disarm if the value has not changed
-    VerifyOrReturn(__sync_bool_compare_and_swap(&mOnComplete, lOnComplete, nullptr));
-
-    // Since this thread changed the state of mOnComplete, release the timer.
-    AppState     = nullptr;
-    mSystemLayer = nullptr;
-}
-
-void Timer::HandleComplete()
-{
-    // Save information needed to perform the callback.
-    Layer * lLayer                          = this->mSystemLayer;
-    const TimerCompleteCallback lOnComplete = this->mOnComplete;
-    void * lAppState                        = this->AppState;
-
-    // Check if timer is armed
-    VerifyOrReturn(lOnComplete != nullptr, );
-    // Atomically disarm if the value has not changed.
-    VerifyOrReturn(__sync_bool_compare_and_swap(&this->mOnComplete, lOnComplete, nullptr), );
-
-    // Since this thread changed the state of mOnComplete, release the timer.
-    AppState     = nullptr;
-    mSystemLayer = nullptr;
-    this->Release();
-
-    // Invoke the app's callback, if it's still valid.
-    if (lOnComplete != nullptr)
-        lOnComplete(lLayer, lAppState);
-}
-
-Timer * Timer::List::Add(Timer * add)
-{
-    VerifyOrDie(add != mHead);
-    if (mHead == NULL || Clock::IsEarlier(add->mAwakenTime, mHead->mAwakenTime))
-    {
-        add->mNextTimer = mHead;
-        mHead           = add;
-    }
-    else
-    {
-        Timer * lTimer = mHead;
+        TimerList::Node * lTimer = mEarliestTimer;
         while (lTimer->mNextTimer)
         {
             VerifyOrDie(lTimer->mNextTimer != add);
-            if (Clock::IsEarlier(add->mAwakenTime, lTimer->mNextTimer->mAwakenTime))
+            if (add->AwakenTime() < lTimer->mNextTimer->AwakenTime())
             {
                 // found the insert location.
                 break;
@@ -157,47 +62,48 @@ Timer * Timer::List::Add(Timer * add)
         add->mNextTimer    = lTimer->mNextTimer;
         lTimer->mNextTimer = add;
     }
-    return mHead;
+    return mEarliestTimer;
 }
 
-Timer * Timer::List::Remove(Timer * remove)
+TimerList::Node * TimerList::Remove(TimerList::Node * remove)
 {
-    VerifyOrDie(mHead != nullptr);
-
-    if (remove == mHead)
+    if (mEarliestTimer != nullptr && remove != nullptr)
     {
-        mHead = remove->mNextTimer;
-    }
-    else
-    {
-        Timer * lTimer = mHead;
-
-        while (lTimer->mNextTimer)
+        if (remove == mEarliestTimer)
         {
-            if (remove == lTimer->mNextTimer)
-            {
-                lTimer->mNextTimer = remove->mNextTimer;
-                break;
-            }
-
-            lTimer = lTimer->mNextTimer;
+            mEarliestTimer = remove->mNextTimer;
         }
-    }
+        else
+        {
+            TimerList::Node * lTimer = mEarliestTimer;
 
-    remove->mNextTimer = nullptr;
-    return mHead;
+            while (lTimer->mNextTimer)
+            {
+                if (remove == lTimer->mNextTimer)
+                {
+                    lTimer->mNextTimer = remove->mNextTimer;
+                    break;
+                }
+
+                lTimer = lTimer->mNextTimer;
+            }
+        }
+
+        remove->mNextTimer = nullptr;
+    }
+    return mEarliestTimer;
 }
 
-Timer * Timer::List::Remove(TimerCompleteCallback aOnComplete, void * aAppState)
+TimerList::Node * TimerList::Remove(TimerCompleteCallback aOnComplete, void * aAppState)
 {
-    Timer * previous = nullptr;
-    for (Timer * timer = mHead; timer != nullptr; timer = timer->mNextTimer)
+    TimerList::Node * previous = nullptr;
+    for (TimerList::Node * timer = mEarliestTimer; timer != nullptr; timer = timer->mNextTimer)
     {
-        if (timer->mOnComplete == aOnComplete && timer->AppState == aAppState)
+        if (timer->GetCallback().GetOnComplete() == aOnComplete && timer->GetCallback().GetAppState() == aAppState)
         {
             if (previous == nullptr)
             {
-                mHead = timer->mNextTimer;
+                mEarliestTimer = timer->mNextTimer;
             }
             else
             {
@@ -211,58 +117,48 @@ Timer * Timer::List::Remove(TimerCompleteCallback aOnComplete, void * aAppState)
     return nullptr;
 }
 
-Timer * Timer::List::PopEarliest()
+TimerList::Node * TimerList::PopEarliest()
 {
-    if (mHead == nullptr)
+    if (mEarliestTimer == nullptr)
     {
         return nullptr;
     }
-    Timer * earliest     = mHead;
-    mHead                = mHead->mNextTimer;
-    earliest->mNextTimer = nullptr;
+    TimerList::Node * earliest = mEarliestTimer;
+    mEarliestTimer             = mEarliestTimer->mNextTimer;
+    earliest->mNextTimer       = nullptr;
     return earliest;
 }
 
-Timer * Timer::List::PopIfEarlier(Clock::MonotonicMilliseconds t)
+TimerList::Node * TimerList::PopIfEarlier(Clock::Timestamp t)
 {
-    if ((mHead == nullptr) || !Clock::IsEarlier(mHead->mAwakenTime, t))
+    if ((mEarliestTimer == nullptr) || !(mEarliestTimer->AwakenTime() < t))
     {
         return nullptr;
     }
-    Timer * earliest     = mHead;
-    mHead                = mHead->mNextTimer;
-    earliest->mNextTimer = nullptr;
+    TimerList::Node * earliest = mEarliestTimer;
+    mEarliestTimer             = mEarliestTimer->mNextTimer;
+    earliest->mNextTimer       = nullptr;
     return earliest;
 }
 
-Timer * Timer::List::ExtractEarlier(Clock::MonotonicMilliseconds t)
+TimerList TimerList::ExtractEarlier(Clock::Timestamp t)
 {
-    if ((mHead == nullptr) || !Clock::IsEarlier(mHead->mAwakenTime, t))
-    {
-        return nullptr;
-    }
-    Timer * begin = mHead;
-    Timer * end   = mHead;
-    while ((end->mNextTimer != nullptr) && Clock::IsEarlier(end->mNextTimer->mAwakenTime, t))
-    {
-        end = end->mNextTimer;
-    }
-    mHead           = end->mNextTimer;
-    end->mNextTimer = nullptr;
-    return begin;
-}
+    TimerList out;
 
-CHIP_ERROR Timer::MutexedList::Init()
-{
-    mHead = nullptr;
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-    return CHIP_NO_ERROR;
-#else  // CHIP_SYSTEM_CONFIG_NO_LOCKING
-    return Mutex::Init(mMutex);
-#endif // CHIP_SYSTEM_CONFIG_NO_LOCKING
-}
+    if ((mEarliestTimer != nullptr) && (mEarliestTimer->AwakenTime() < t))
+    {
+        out.mEarliestTimer    = mEarliestTimer;
+        TimerList::Node * end = mEarliestTimer;
+        while ((end->mNextTimer != nullptr) && (end->mNextTimer->AwakenTime() < t))
+        {
+            end = end->mNextTimer;
+        }
+        mEarliestTimer  = end->mNextTimer;
+        end->mNextTimer = nullptr;
+    }
 
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
+    return out;
+}
 
 } // namespace System
 } // namespace chip

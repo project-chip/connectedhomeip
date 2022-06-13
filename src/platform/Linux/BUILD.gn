@@ -26,7 +26,7 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
-if (chip_mdns != "none") {
+if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -36,6 +36,7 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -54,10 +55,16 @@ static_library("Linux") {
     "ConnectivityUtils.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -78,13 +85,14 @@ static_library("Linux") {
   deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/third_party/inipp",
   ]
 
   public_configs = []
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     sources += [
       "DnssdImpl.cpp",
       "DnssdImpl.h",
@@ -93,6 +101,13 @@ static_library("Linux") {
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
     public_configs += [ ":avahi_client_config" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
   }
 
   if (chip_enable_openthread) {

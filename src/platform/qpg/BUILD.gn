@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("qpg") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -37,8 +38,11 @@ static_library("qpg") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "Logging.cpp",
+    "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
@@ -58,10 +62,15 @@ static_library("qpg") {
   ]
 
   if (chip_enable_openthread) {
-    public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+    if (chip_openthread_ftd) {
+      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    } else {
+      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+    }
 
     public_configs += [
       "${chip_root}/third_party/openthread/platforms/qpg:openthread_qpg_config",
+      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
     ]
 
     sources += [

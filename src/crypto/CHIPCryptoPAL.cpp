@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,8 +21,12 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <string.h>
@@ -31,6 +35,8 @@ using chip::ByteSpan;
 using chip::MutableByteSpan;
 using chip::Encoding::BufferWriter;
 using chip::Encoding::LittleEndian::Reader;
+
+using namespace chip::ASN1;
 
 namespace {
 
@@ -66,11 +72,9 @@ CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
         // We only support lengths of 0..255 over 2 bytes
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else
-    {
-        // Next byte has length 0..255.
-        return reader.Read8(&length).StatusCode();
-    }
+
+    // Next byte has length 0..255.
+    return reader.Read8(&length).StatusCode();
 }
 
 /**
@@ -344,6 +348,7 @@ exit:
 CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    MutableByteSpan out_span{ out, *out_len };
     uint8_t point_buffer[kMAX_Point_Length];
     void * MN        = nullptr; // Choose N if a prover, M if a verifier
     void * XY        = nullptr; // Choose Y if a prover, X if a verifier
@@ -405,7 +410,8 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 
     SuccessOrExit(error = GenerateKeys());
 
-    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out));
+    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out_span));
+    VerifyOrExit(out_span.size() == hash_size, error = CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::R2;
     error = CHIP_NO_ERROR;
@@ -418,7 +424,9 @@ CHIP_ERROR Spake2p::GenerateKeys()
 {
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    ReturnErrorOnFailure(HashFinalize(Kae));
+    MutableByteSpan Kae_span{ &Kae[0], sizeof(Kae) };
+
+    ReturnErrorOnFailure(HashFinalize(Kae_span));
     ReturnErrorOnFailure(KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size));
 
     return CHIP_NO_ERROR;
@@ -485,9 +493,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(MutableByteSpan & out_span)
 {
-    MutableByteSpan out_span(out, kSHA256_Hash_Length);
     ReturnErrorOnFailure(sha256_hash_ctx.Finish(out_span));
     return CHIP_NO_ERROR;
 }
@@ -501,6 +508,88 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len)
+{
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
+    ReturnErrorOnFailure(FEWrite(w0, w0out, *w0_len));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
+{
+    VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
+    memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
+
+    outSerialized.reduce_size(kSpake2p_VerifierSerialized_Length);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
+{
+    VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
+    memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin)
+{
+    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
+    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t len;
+
+    // Create local Spake2+ object for w0 and L computations.
+#ifdef ENABLE_HSM_SPAKE
+    Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
+#else
+    Spake2p_P256_SHA256_HKDF_HMAC spake2p;
+#endif
+    uint8_t context[kSHA256_Hash_Length] = { 0 };
+    SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
+
+    // Compute w0
+    len = sizeof(mW0);
+    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, &serializedWS[0], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
+
+    // Compute L
+    len = sizeof(mL);
+    SuccessOrExit(err = spake2p.ComputeL(mL, &len, &serializedWS[kSpake2p_WS_Length], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
+
+exit:
+    spake2p.Clear();
+    return err;
+}
+
+CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                      uint32_t ws_len)
+{
+#ifdef ENABLE_HSM_PBKDF2
+    PBKDF2_sha256HSM pbkdf2;
+#else
+    PBKDF2_sha256 pbkdf2;
+#endif
+    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
+
+    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(pbkdf2IterCount < kSpake2p_Min_PBKDF_Iterations || pbkdf2IterCount > kSpake2p_Max_PBKDF_Iterations,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+
+    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+                                pbkdf2IterCount, ws_len, ws);
 }
 
 CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
@@ -655,6 +744,314 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     }
 
     return status;
+}
+
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId, uint64_t & compressedFabricId)
+{
+    uint8_t allocated[sizeof(fabricId)];
+    MutableByteSpan span(allocated);
+    ReturnErrorOnFailure(GenerateCompressedFabricId(rootPublicKey, fabricId, span));
+    // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
+    // returns a binary buffer and is agnostic of usage of the output as an integer type.
+    compressedFabricId = Encoding::BigEndian::Get64(allocated);
+    return CHIP_NO_ERROR;
+}
+
+/* Operational Group Key Group, Security Info: "GroupKey v1.0" */
+static const uint8_t kGroupSecurityInfo[] = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
+
+/* Group Key Derivation Function, Info: "GroupKeyHash" ” */
+static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
+static const uint8_t kGroupKeyHashSalt[0] = {};
+
+/*
+    OperationalGroupKey =
+        Crypto_KDF
+        (
+            InputKey = Epoch Key,
+            Salt = CompressedFabricIdentifier,
+            Info = "GroupKey v1.0",
+            Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS
+        )
+*/
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id, MutableByteSpan & out_key)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Crypto::HKDF_sha crypto;
+    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), compressed_fabric_id.data(), compressed_fabric_id.size(),
+                              kGroupSecurityInfo, sizeof(kGroupSecurityInfo), out_key.data(),
+                              Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+}
+
+/*
+    GKH = Crypto_KDF (
+        InputKey = OperationalGroupKey,
+        Salt = [],
+        Info = "GroupKeyHash",
+        Length = 16)
+*/
+CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == operational_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    Crypto::HKDF_sha crypto;
+    uint8_t out_key[sizeof(uint16_t)];
+
+    ReturnErrorOnFailure(crypto.HKDF_SHA256(operational_key.data(), operational_key.size(), kGroupKeyHashSalt,
+                                            sizeof(kGroupKeyHashSalt), kGroupKeyHashInfo, sizeof(kGroupKeyHashInfo), out_key,
+                                            sizeof(out_key)));
+    session_id = Encoding::BigEndian::Get16(out_key);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
+                                            AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
+{
+    ReturnErrorCodeIf(attrType == DNAttrType::kUnspecified, CHIP_NO_ERROR);
+    ReturnErrorCodeIf(attr.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (attrType == DNAttrType::kMatterVID || attrType == DNAttrType::kMatterPID)
+    {
+        uint16_t matterAttr;
+        VerifyOrReturnError(attr.size() == kVIDandPIDHexLength, CHIP_ERROR_WRONG_CERT_DN);
+        VerifyOrReturnError(Encoding::UppercaseHexToUint16(reinterpret_cast<const char *>(attr.data()), attr.size(), matterAttr) ==
+                                sizeof(matterAttr),
+                            CHIP_ERROR_WRONG_CERT_DN);
+
+        if (attrType == DNAttrType::kMatterVID)
+        {
+            // Not more than one VID attribute can be present.
+            ReturnErrorCodeIf(vidpidFromMatterAttr.mVendorId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            vidpidFromMatterAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
+        }
+        else
+        {
+            // Not more than one PID attribute can be present.
+            ReturnErrorCodeIf(vidpidFromMatterAttr.mProductId.HasValue(), CHIP_ERROR_WRONG_CERT_DN);
+            vidpidFromMatterAttr.mProductId.SetValue(matterAttr);
+        }
+    }
+    // Otherwise, it is a CommonName attribute.
+    else if (!vidpidFromCNAttr.Initialized())
+    {
+        char cnAttr[kMax_CommonNameAttr_Length + 1];
+        if (attr.size() <= chip::Crypto::kMax_CommonNameAttr_Length)
+        {
+            memcpy(cnAttr, attr.data(), attr.size());
+            cnAttr[attr.size()] = 0;
+
+            char * vid = strstr(cnAttr, kVIDPrefixForCNEncoding);
+            if (vid != nullptr)
+            {
+                vid += strlen(kVIDPrefixForCNEncoding);
+                if (cnAttr + attr.size() >= vid + kVIDandPIDHexLength)
+                {
+                    uint16_t matterAttr;
+                    if (Encoding::UppercaseHexToUint16(vid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
+                    {
+                        vidpidFromCNAttr.mVendorId.SetValue(static_cast<VendorId>(matterAttr));
+                    }
+                }
+            }
+
+            char * pid = strstr(cnAttr, kPIDPrefixForCNEncoding);
+            if (pid != nullptr)
+            {
+                pid += strlen(kPIDPrefixForCNEncoding);
+                if (cnAttr + attr.size() >= pid + kVIDandPIDHexLength)
+                {
+                    uint16_t matterAttr;
+                    if (Encoding::UppercaseHexToUint16(pid, kVIDandPIDHexLength, matterAttr) == sizeof(matterAttr))
+                    {
+                        vidpidFromCNAttr.mProductId.SetValue(matterAttr);
+                    }
+                }
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+// Generates the to-be-signed portion of a PKCS#10 CSR (`CertificationRequestInformation`)
+// that contains the
+static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, const Crypto::P256PublicKey & pubkey)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    /**
+     *
+     *  CertificationRequestInfo ::=
+     *     SEQUENCE {
+     *        version       INTEGER { v1(0) } (v1,...),
+     *        subject       Name,
+     *        subjectPKInfo SubjectPublicKeyInfo{{ PKInfoAlgorithms }},
+     *        attributes    [0] Attributes{{ CRIAttributes }}
+     * }
+     */
+    ASN1_START_SEQUENCE
+    {
+        ASN1_ENCODE_INTEGER(0); // version INTEGER { v1(0) }
+
+        // subject Name
+        ASN1_START_SEQUENCE
+        {
+            ASN1_START_SET
+            {
+                ASN1_START_SEQUENCE
+                {
+                    // Any subject, placeholder is good, since this
+                    // is going to usually be ignored
+                    ASN1_ENCODE_OBJECT_ID(kOID_AttributeType_OrganizationalUnitName);
+                    ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, "CSA", static_cast<uint16_t>(strlen("CSA")));
+                }
+                ASN1_END_SEQUENCE;
+            }
+            ASN1_END_SET;
+        }
+        ASN1_END_SEQUENCE;
+
+        // subjectPKInfo
+        ASN1_START_SEQUENCE
+        {
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_PubKeyAlgo_ECPublicKey);
+                ASN1_ENCODE_OBJECT_ID(kOID_EllipticCurve_prime256v1);
+            }
+            ASN1_END_SEQUENCE;
+            ReturnErrorOnFailure(writer.PutBitString(0, pubkey, static_cast<uint8_t>(pubkey.Length())));
+        }
+        ASN1_END_SEQUENCE;
+
+        // attributes [0]
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
+        {
+            // Using a plain empty attributes request
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_Extension_CSRRequest);
+                ASN1_START_SET
+                {
+                    ASN1_START_SEQUENCE {}
+                    ASN1_END_SEQUENCE;
+                }
+                ASN1_END_SET;
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_CONSTRUCTED;
+    }
+    ASN1_END_SEQUENCE;
+exit:
+    return err;
+}
+
+CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span)
+{
+    VerifyOrReturnError(keypair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csr_span.size() >= kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // First pass: Generate the CertificatioRequestInformation inner
+    // encoding one time, to sign it, before re-generating it within the
+    // full ASN1 writer later, since it's easier than trying to
+    // figure-out the span we need to sign of the overall object.
+    P256ECDSASignature signature;
+
+    {
+        // The first pass will just generate a signature, so we can use the
+        // output buffer as scratch to avoid needing more stack space. There
+        // are no secrets here and the contents is not reused since all we
+        // need is the signature which is already separately stored.
+        ASN1Writer toBeSignedWriter;
+        toBeSignedWriter.Init(csr_span);
+        CHIP_ERROR err = GenerateCertificationRequestInformation(toBeSignedWriter, keypair->Pubkey());
+        ReturnErrorOnFailure(err);
+
+        size_t encodedLen = (uint16_t) toBeSignedWriter.GetLengthWritten();
+        // This should not/will not happen
+        if (encodedLen > csr_span.size())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        err = keypair->ECDSA_sign_msg(csr_span.data(), encodedLen, signature);
+        ReturnErrorOnFailure(err);
+    }
+
+    // Second pass: Generate the entire CSR body, restarting a new write
+    // of the CertificationRequestInformation (cheap) and adding the
+    // signature.
+    //
+    // See RFC2986 for ASN.1 module, repeated here in snippets
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ASN1Writer writer;
+    writer.Init(csr_span);
+
+    ASN1_START_SEQUENCE
+    {
+
+        /*  CertificationRequestInfo ::=
+         *     SEQUENCE {
+         *        version       INTEGER { v1(0) } (v1,...),
+         *        subject       Name,
+         *        subjectPKInfo SubjectPublicKeyInfo{{ PKInfoAlgorithms }},
+         *        attributes    [0] Attributes{{ CRIAttributes }}
+         *     }
+         */
+        GenerateCertificationRequestInformation(writer, keypair->Pubkey());
+
+        // algorithm  AlgorithmIdentifier
+        ASN1_START_SEQUENCE
+        {
+            // See RFC5480 sec 2.1
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
+        ASN1_END_SEQUENCE;
+
+        // signature  BIT STRING --> ECDSA-with-SHA256 signature with P256 key with R,S integers format
+        // (see RFC3279 sec 2.2.3 ECDSA Signature Algorithm)
+        ASN1_START_BIT_STRING_ENCAPSULATED
+        {
+            // Convert raw signature to embedded signature
+            FixedByteSpan<Crypto::kP256_ECDSA_Signature_Length_Raw> rawSig(signature.Bytes());
+
+            uint8_t derInt[kP256_FE_Length + kEmitDerIntegerWithoutTagOverhead];
+
+            // Ecdsa-Sig-Value ::= SEQUENCE
+            ASN1_START_SEQUENCE
+            {
+                using P256IntegerSpan = FixedByteSpan<Crypto::kP256_FE_Length>;
+                // r INTEGER
+                {
+                    MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+                    ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data()), derIntSpan));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+                }
+
+                // s INTEGER
+                {
+                    MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+                    ReturnErrorOnFailure(
+                        ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+                }
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_ENCAPSULATED;
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    // Update size of output buffer on success
+    if (err == CHIP_NO_ERROR)
+    {
+        csr_span.reduce_size(writer.GetLengthWritten());
+    }
+    return err;
 }
 
 } // namespace Crypto

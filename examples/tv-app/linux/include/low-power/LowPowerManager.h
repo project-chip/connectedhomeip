@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
+#include <app/clusters/low-power-server/low-power-server.h>
 
-class LowPowerManager
+class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
 public:
+    bool HandleSleep() override;
 };

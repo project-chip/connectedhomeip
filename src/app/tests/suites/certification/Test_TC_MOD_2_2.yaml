@@ -1,0 +1,80 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 78.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT reads the SupportedModes attribute from the TH"
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+          [1645776742.667057][4661:4666] CHIP:TOO:   SupportedModes: 3 entries
+          [1645776742.669546][4661:4666] CHIP:TOO:     [1]: {
+          [1645776742.669588][4661:4666] CHIP:TOO:       Label: Black
+          [1645776742.669613][4661:4666] CHIP:TOO:       Mode: 0
+          [1645776742.669636][4661:4666] CHIP:TOO:       SemanticTag: 0
+          [1645776742.669661][4661:4666] CHIP:TOO:      }
+          [1645776742.669692][4661:4666] CHIP:TOO:     [2]: {
+          [1645776742.669715][4661:4666] CHIP:TOO:       Label: Cappuccino
+          [1645776742.669737][4661:4666] CHIP:TOO:       Mode: 4
+          [1645776742.669757][4661:4666] CHIP:TOO:       SemanticTag: 0
+          [1645776742.669779][4661:4666] CHIP:TOO:      }
+          [1645776742.669808][4661:4666] CHIP:TOO:     [3]: {
+          [1645776742.669831][4661:4666] CHIP:TOO:       Label: Espresso
+          [1645776742.669853][4661:4666] CHIP:TOO:       Mode: 7
+          [1645776742.669874][4661:4666] CHIP:TOO:       SemanticTag: 0
+          [1645776742.669896][4661:4666] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "DUT sends a ChangeToMode command to the TH with a integer from the
+          list in step 1."
+      verification: |
+          ./chip-tool modeselect change-to-mode 4 1 1
+          [1645778189.043893][4888:4893] CHIP:DMG: InvokeResponseMessage =
+          [1645778189.043924][4888:4893] CHIP:DMG: {
+          [1645778189.043953][4888:4893] CHIP:DMG:        suppressResponse = false,
+          [1645778189.043986][4888:4893] CHIP:DMG:        InvokeResponseIBs =
+          [1645778189.044027][4888:4893] CHIP:DMG:        [
+          [1645778189.044056][4888:4893] CHIP:DMG:                InvokeResponseIB =
+          [1645778189.044100][4888:4893] CHIP:DMG:                {
+          [1645778189.044132][4888:4893] CHIP:DMG:                        CommandStatusIB =
+          [1645778189.044171][4888:4893] CHIP:DMG:                        {
+          [1645778189.044203][4888:4893] CHIP:DMG:                                CommandPathIB =
+          [1645778189.044239][4888:4893] CHIP:DMG:                                {
+          [1645778189.044277][4888:4893] CHIP:DMG:                                        EndpointId = 0x1,
+          [1645778189.044319][4888:4893] CHIP:DMG:                                        ClusterId = 0x50,
+          [1645778189.044361][4888:4893] CHIP:DMG:                                        CommandId = 0x0,
+          [1645778189.044394][4888:4893] CHIP:DMG:                                },
+          [1645778189.044435][4888:4893] CHIP:DMG:
+          [1645778189.044472][4888:4893] CHIP:DMG:                                StatusIB =
+          [1645778189.044519][4888:4893] CHIP:DMG:                                {
+          [1645778189.044558][4888:4893] CHIP:DMG:                                        status = 0x0,
+          [1645778189.044603][4888:4893] CHIP:DMG:                                },
+          [1645778189.044650][4888:4893] CHIP:DMG:
+          [1645778189.044686][4888:4893] CHIP:DMG:                        },
+          [1645778189.044724][4888:4893] CHIP:DMG:
+          [1645778189.044754][4888:4893] CHIP:DMG:                },
+          [1645778189.044793][4888:4893] CHIP:DMG:
+          [1645778189.044821][4888:4893] CHIP:DMG:        ],
+          [1645778189.044896][4888:4893] CHIP:DMG:
+          [1645778189.044925][4888:4893] CHIP:DMG:        InteractionModelRevision = 1
+          [1645778189.044954][4888:4893] CHIP:DMG: },
+          [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
+      disabled: true

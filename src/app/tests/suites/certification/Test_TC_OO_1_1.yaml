@@ -15,48 +15,74 @@
 name: 3.1.1. [TC-OO-1] Global attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "On/Off"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3
+          value: 4
+          constraints:
+              type: uint16
+
+    #issue 17495
+    - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [0, 16384, 16385, 16386, 16387]
+          constraints:
+              type: list
 
     - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 3
-      response:
-          error: 1
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "reads back global attribute: ClusterRevision"
+    - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "AcceptedCommandList"
+      PICS: OO_LT
       response:
-          value: 3
+          value: [0, 1, 2, 64, 65, 66]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
+      PICS: OO_LT
       response:
-          value: 0
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 0
-      response:
-          error: 1
-
-    - label: "reads back optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
+          value: 1
+          constraints:
+              type: map32

@@ -18,6 +18,10 @@ on:
     push:
     pull_request:
 
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
 jobs:
     tizen:
         name: Tizen
@@ -28,17 +32,22 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:0.5.15
+            image: connectedhomeip/chip-build-tizen:0.5.77
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform tizen
             - name: Build example Tizen lighting app
-              run:
-                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'tizen-*' build"
+              run: scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'tizen-*' build"

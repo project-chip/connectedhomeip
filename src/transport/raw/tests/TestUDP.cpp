@@ -47,7 +47,6 @@ constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
-TestContext sContext;
 
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
@@ -90,7 +89,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type).SetListenPort(0));
+    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(ctx.GetUDPEndPointManager()).SetAddressType(type).SetListenPort(0));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -98,13 +97,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 #if INET_CONFIG_ENABLE_IPV4
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv4);
 }
 #endif
 
 void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv6);
 }
 
 /////////////////////////// Messaging test
@@ -122,7 +121,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()).SetListenPort(0));
+    err = udp.Init(Transport::UdpListenParameters(ctx.GetUDPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(0));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);
@@ -140,17 +139,9 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     // Should be able to send a message to itself by just calling send.
     err = udp.SendMessage(Transport::PeerAddress::UDP(addr, udp.GetBoundPort()), std::move(buffer));
-    if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
-    {
-        // TODO(#2698): the underlying system does not support IPV6. This early return
-        // should be removed and error should be made fatal.
-        printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
-        return;
-    }
-
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.DriveIOUntil(1000 /* ms */, []() { return ReceiveHandlerCallCount != 0; });
+    ctx.DriveIOUntil(chip::System::Clock::Seconds16(1), []() { return ReceiveHandlerCallCount != 0; });
 
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
 }
@@ -219,6 +210,8 @@ static int Finalize(void * aContext)
 
 int TestUDP()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

@@ -2,5 +2,7 @@
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"]
-    }
+    },
+    "required_submodules": ["third_party/pigweed/repo"],
+    "gni_file": "build_overrides/pigweed_environment.gni"
 }

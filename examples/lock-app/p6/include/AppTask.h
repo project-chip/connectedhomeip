@@ -50,6 +50,7 @@ public:
 
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     void UpdateClusterState(void);
+    void InitOTARequestor();
 
 private:
     friend AppTask & GetAppTask(void);
@@ -68,6 +69,8 @@ private:
     static void LockActionEventHandler(AppEvent * event);
     static void TimerEventHandler(TimerHandle_t timer);
 
+    static void UpdateCluster(intptr_t context);
+
     void StartTimer(uint32_t aTimeoutMs);
 
     enum class Function
@@ -80,7 +83,7 @@ private:
         kInvalid
     };
 
-    Function mFunction              = Function::kInvalid;
+    Function mFunction              = Function::kNoneSelected;
     bool mFunctionTimerActive       = false;
     bool mSyncClusterToButtonAction = false;
 

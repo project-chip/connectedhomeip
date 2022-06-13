@@ -25,29 +25,49 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
-    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
-                              mNodeId, err.Format()));
+    if (IsGroupId(mDestinationId))
+    {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
-exit:
-    return err;
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
+    }
+
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
+
+    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
+    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
+    {
+        return SendCommand(commissioneeDeviceProxy, mEndPointId);
+    }
+
+    return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
+                                                    &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    VerifyOrReturn(command != nullptr,
-                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
-    command->SendCommand(device, command->mEndPointId);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
+
+    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
 {
+    LogErrorOnFailure(err);
+
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error.Format());
-    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
-    command->SetCommandExitStatus(error);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
+    command->SetCommandExitStatus(err);
+}
+
+void ModelCommand::Shutdown()
+{
+    ResetArguments();
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
 }

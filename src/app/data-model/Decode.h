@@ -18,9 +18,13 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
@@ -30,6 +34,12 @@ namespace DataModel {
 // Decode
 //
 template <typename X, typename std::enable_if_t<std::is_integral<X>::value, int> = 0>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
+{
+    return reader.Get(x);
+}
+
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return reader.Get(x);
@@ -71,12 +81,7 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, ByteSpan & x)
 //
 inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
 {
-    ByteSpan bs;
-
-    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_UTF8String, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-    ReturnErrorOnFailure(reader.Get(bs));
-    x = Span<const char>(Uint8::to_const_char(bs.data()), bs.size());
-    return CHIP_NO_ERROR;
+    return reader.Get(x);
 }
 
 /*
@@ -89,13 +94,77 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);
  *
  */
-template <
-    typename X,
-    typename std::enable_if_t<
-        std::is_class<X>::value && std::is_same<decltype(&X::Decode), CHIP_ERROR (X::*)(TLV::TLVReader &)>::value, X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>())), CHIP_ERROR>::value,
+              X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);
+}
+
+/*
+ * @brief
+ *
+ * This specific variant decodes from TLV a cluster object that contains all attributes encapsulated within a single, monolithic
+ * cluster object.
+ *
+ * Each attribute in the cluster is decoded based on the provided ConcreteAttributePath. The TLVReader is to be positioned right on
+ * the data value for the specified attribute.
+ *
+ * This API depends on the presence of a Decode method on the object. The signature of that method
+ * is as follows:
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader, ConcreteAttributePath &path);
+ *
+ */
+template <
+    typename X,
+    typename std::enable_if_t<std::is_class<X>::value &&
+                                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(),
+                                                                                 std::declval<const ConcreteAttributePath &>())),
+                                               CHIP_ERROR>::value,
+                              X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path, X & x)
+{
+    return x.Decode(reader, path);
+}
+
+/*
+ * @brief
+ *
+ * Decodes an optional value (struct field, command field, event field).
+ */
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
+{
+    // If we are calling this, it means we found the right tag, so just decode
+    // the item.
+    return Decode(reader, x.Emplace());
+}
+
+/*
+ * @brief
+ *
+ * Decodes a nullable value.
+ */
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
+{
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        x.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    // We have a value; decode it.
+    ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
+    if (!x.HasValidValue())
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DataModel

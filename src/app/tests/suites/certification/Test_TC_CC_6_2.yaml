@@ -16,10 +16,19 @@ name:
     27.2.13. [TC-CC-6.2] Color Temperature Move functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -32,83 +41,319 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: 100
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Move up color temperature command"
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 10
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label: "Read current color temprature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: -1
-
-    - label: "Stop Color Temperature command"
-      command: "MoveColorTemperature"
+    - label: "Wait 90ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
+              - name: "ms"
+                value: 90
 
-    - label: "Read current color temprature"
-      disabled: true
+    - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 95ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 95
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Move down color temperature command"
       command: "MoveColorTemperature"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 20
-              - name: "colorTemperatureMinimum"
+              - name: "ColorTemperatureMinimumMireds"
                 value: 1
-              - name: "colorTemperatureMaximum"
+              - name: "ColorTemperatureMaximumMireds"
                 value: 255
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label: "Read current color temprature"
-      disabled: true
+    - label: "Wait 190ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 190
+
+    - label: "Read current color temprature attribute from DUT several times"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 195ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 195
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 200ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 200
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Move up color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 10
+              - name: "ColorTemperatureMinimumMireds"
+                value: 1
+              - name: "ColorTemperatureMaximumMireds"
+                value: 255
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Stop Color Temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 10
+              - name: "ColorTemperatureMinimumMireds"
+                value: 1
+              - name: "ColorTemperatureMaximumMireds"
+                value: 255
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 90ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 90
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 95ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 95
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Move down color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 3
+              - name: "Rate"
+                value: 20
+              - name: "ColorTemperatureMinimumMireds"
+                value: 1
+              - name: "ColorTemperatureMaximumMireds"
+                value: 255
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Stop Color Temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 10
+              - name: "ColorTemperatureMinimumMireds"
+                value: 1
+              - name: "ColorTemperatureMaximumMireds"
+                value: 255
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 140ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 140
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 145ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 145
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
+    - label: "Read current color temprature attribute from DUT several times"
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

@@ -32,20 +32,70 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+constexpr const char * kOptionalArgumentPrefix = "--";
+constexpr size_t kOptionalArgumentPrefixLength = 2;
+
 bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
-    size_t argsCount    = mArgs.size();
 
-    VerifyOrExit(argsCount == (size_t)(argc),
-                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, argsCount));
-
-    for (size_t i = 0; i < argsCount; i++)
+    size_t argvExtraArgsCount = (size_t) argc;
+    size_t mandatoryArgsCount = 0;
+    size_t optionalArgsCount  = 0;
+    for (size_t i = 0; i < mArgs.size(); i++)
     {
-        if (!InitArgument(i, argv[i]))
+        if (mArgs[i].isOptional())
+        {
+            optionalArgsCount++;
+        }
+        else
+        {
+            mandatoryArgsCount++;
+            argvExtraArgsCount--;
+        }
+    }
+
+    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
+                              static_cast<unsigned int>(mandatoryArgsCount)));
+
+    // Initialize mandatory arguments
+    for (size_t i = 0; i < mandatoryArgsCount; i++)
+    {
+        char * arg = argv[i];
+        if (!InitArgument(i, arg))
         {
             ExitNow();
         }
+    }
+
+    // Initialize optional arguments
+    // Optional arguments expect a name and a value, so i is increased by 2 on every step.
+    for (size_t i = mandatoryArgsCount; i < (size_t) argc; i += 2)
+    {
+        bool found = false;
+        for (size_t j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++)
+        {
+            // optional arguments starts with kOptionalArgumentPrefix
+            if (strlen(argv[i]) <= kOptionalArgumentPrefixLength &&
+                strncmp(argv[i], kOptionalArgumentPrefix, kOptionalArgumentPrefixLength) != 0)
+            {
+                continue;
+            }
+
+            if (strcmp(argv[i] + strlen(kOptionalArgumentPrefix), mArgs[j].name) == 0)
+            {
+                found = true;
+
+                VerifyOrExit((size_t) argc > (i + 1),
+                             ChipLogError(chipTool, "InitArgs: Optional argument %s missing value.", argv[i]));
+                if (!InitArgument(j, argv[i + 1]))
+                {
+                    ExitNow();
+                }
+            }
+        }
+        VerifyOrExit(found, ChipLogError(chipTool, "InitArgs: Optional argument %s does not exist.", argv[i]));
     }
 
     isValidCommand = true;
@@ -70,18 +120,60 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
         return false;
     }
 
-    address->address = ::chip::Inet::IPAddress::FromSockAddr(*result->ai_addr);
     if (result->ai_family == AF_INET6)
     {
         struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
-        address->interfaceId       = addr->sin6_scope_id;
+        address->address           = ::chip::Inet::IPAddress::FromSockAddr(*addr);
+        address->interfaceId       = ::chip::Inet::InterfaceId(addr->sin6_scope_id);
     }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (result->ai_family == AF_INET)
+    {
+        address->address     = ::chip::Inet::IPAddress::FromSockAddr(*reinterpret_cast<struct sockaddr_in *>(result->ai_addr));
+        address->interfaceId = chip::Inet::InterfaceId::Null();
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
     else
     {
-        address->interfaceId = INET_NULL_INTERFACEID;
+        ChipLogError(chipTool, "Unsupported address: %s", addressString);
+        return false;
     }
 
     return true;
+}
+
+// The callback should return whether the argument is valid, for the non-null
+// case.  It can't directly write to isValidArgument (by closing over it)
+// because in the nullable-and-null case we need to do that from this function,
+// via the return value.
+template <typename T>
+bool HandleNullableOptional(Argument & arg, char * argValue, std::function<bool(T * value)> callback)
+{
+    if (arg.isOptional())
+    {
+        if (arg.isNullable())
+        {
+            arg.value = &(reinterpret_cast<chip::Optional<chip::app::DataModel::Nullable<T>> *>(arg.value)->Emplace());
+        }
+        else
+        {
+            arg.value = &(reinterpret_cast<chip::Optional<T> *>(arg.value)->Emplace());
+        }
+    }
+
+    if (arg.isNullable())
+    {
+        auto * nullable = reinterpret_cast<chip::app::DataModel::Nullable<T> *>(arg.value);
+        if (strcmp(argValue, "null") == 0)
+        {
+            nullable->SetNull();
+            return true;
+        }
+
+        arg.value = &(nullable->SetNonNull());
+    }
+
+    return callback(reinterpret_cast<T *>(arg.value));
 }
 
 bool Command::InitArgument(size_t argIndex, char * argValue)
@@ -90,203 +182,365 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
     Argument arg = mArgs.at(argIndex);
+
+    // We have two places where we handle uint8_t-typed args (actual int8u and
+    // bool args), so declare the handler function here so it can be reused.
+    auto uint8Handler = [&](uint8_t * value) {
+        // stringstream treats uint8_t as char, which is not what we want here.
+        uint16_t tmpValue;
+        std::stringstream ss;
+        isHexNotation ? (ss << std::hex << argValue) : (ss << argValue);
+        ss >> tmpValue;
+        if (chip::CanCastTo<uint8_t>(tmpValue))
+        {
+            *value = static_cast<uint8_t>(tmpValue);
+
+            uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+            uint64_t max = arg.max;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        }
+
+        return false;
+    };
+
     switch (arg.type)
     {
+    case ArgumentType::Complex: {
+        auto complexArgument = static_cast<ComplexArgument *>(arg.value);
+        return CHIP_NO_ERROR == complexArgument->Parse(arg.name, argValue);
+    }
+
+    case ArgumentType::Custom: {
+        auto customArgument = static_cast<CustomArgument *>(arg.value);
+        return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
+    }
+
+    case ArgumentType::VectorBool: {
+        // Currently only chip::Optional<std::vector<bool>> is supported.
+        if (arg.flags != Argument::kOptional)
+        {
+            return false;
+        }
+
+        std::vector<bool> vectorArgument;
+        std::stringstream ss(argValue);
+        while (ss.good())
+        {
+            std::string valueAsString;
+            getline(ss, valueAsString, ',');
+
+            if (strcasecmp(valueAsString.c_str(), "true") == 0)
+            {
+                vectorArgument.push_back(true);
+            }
+            else if (strcasecmp(valueAsString.c_str(), "false") == 0)
+            {
+                vectorArgument.push_back(false);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        auto optionalArgument = static_cast<chip::Optional<std::vector<bool>> *>(arg.value);
+        optionalArgument->SetValue(vectorArgument);
+        return true;
+    }
+
+    case ArgumentType::Vector16:
+    case ArgumentType::Vector32: {
+        std::vector<uint64_t> values;
+        uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+        uint64_t max = arg.max;
+
+        std::stringstream ss(argValue);
+        while (ss.good())
+        {
+            std::string valueAsString;
+            getline(ss, valueAsString, ',');
+            isHexNotation = strncmp(valueAsString.c_str(), "0x", 2) == 0 || strncmp(valueAsString.c_str(), "0X", 2) == 0;
+
+            std::stringstream subss;
+            isHexNotation ? subss << std::hex << valueAsString : subss << valueAsString;
+
+            uint64_t value;
+            subss >> value;
+            VerifyOrReturnError(!subss.fail() && subss.eof() && value >= min && value <= max, false);
+            values.push_back(value);
+        }
+
+        if (arg.type == ArgumentType::Vector16)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            for (uint64_t v : values)
+            {
+                vectorArgument->push_back(static_cast<uint16_t>(v));
+            }
+        }
+        else if (arg.type == ArgumentType::Vector32 && arg.flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
+            for (uint64_t v : values)
+            {
+                vectorArgument->push_back(static_cast<uint32_t>(v));
+            }
+        }
+        else if (arg.type == ArgumentType::Vector32 && arg.flags == Argument::kOptional)
+        {
+            std::vector<uint32_t> vectorArgument;
+            for (uint64_t v : values)
+            {
+                vectorArgument.push_back(static_cast<uint32_t>(v));
+            }
+
+            auto optionalArgument = static_cast<chip::Optional<std::vector<uint32_t>> *>(arg.value);
+            optionalArgument->SetValue(vectorArgument);
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     case ArgumentType::Attribute: {
-        char * value    = reinterpret_cast<char *>(arg.value);
-        isValidArgument = (strcmp(argValue, value) == 0);
+        if (arg.isOptional() || arg.isNullable())
+        {
+            isValidArgument = false;
+        }
+        else
+        {
+            char * value    = reinterpret_cast<char *>(arg.value);
+            isValidArgument = (strcmp(argValue, value) == 0);
+        }
         break;
     }
 
     case ArgumentType::String: {
-        const char ** value = reinterpret_cast<const char **>(arg.value);
-        *value              = argValue;
-        isValidArgument     = true;
+        isValidArgument = HandleNullableOptional<char *>(arg, argValue, [&](auto * value) {
+            *value = argValue;
+            return true;
+        });
         break;
     }
 
     case ArgumentType::CharString: {
-        auto * value    = static_cast<chip::Span<const char> *>(arg.value);
-        *value          = chip::Span<const char>(argValue, strlen(argValue));
-        isValidArgument = true;
+        isValidArgument = HandleNullableOptional<chip::CharSpan>(arg, argValue, [&](auto * value) {
+            *value = chip::Span<const char>(argValue, strlen(argValue));
+            return true;
+        });
         break;
     }
 
     case ArgumentType::OctetString: {
-        auto * value = static_cast<chip::ByteSpan *>(arg.value);
-        // We support two ways to pass an octet string argument.  If it happens
-        // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
-        // 0x followed by the hex-encoded bytes.
-        size_t argLen                     = strlen(argValue);
-        static constexpr char hexPrefix[] = "hex:";
-        constexpr size_t prefixLen        = ArraySize(hexPrefix) - 1; // Don't count the null
-        if (strncmp(argValue, hexPrefix, prefixLen) == 0)
-        {
-            // Hex-encoded.  Decode it into a temporary buffer first, so if we
-            // run into errors we can do correct "argument is not valid" logging
-            // that actually shows the value that was passed in.  After we
-            // determine it's valid, modify the passed-in value to hold the
-            // right bytes, so we don't need to worry about allocating storage
-            // for this somewhere else.  This works because the hex
-            // representation is always longer than the octet string it encodes,
-            // so we have enough space in argValue for the decoded version.
-            chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-            if (!buffer.Calloc(argLen)) // Bigger than needed, but it's fine.
+        isValidArgument = HandleNullableOptional<chip::ByteSpan>(arg, argValue, [&](auto * value) {
+            // We support two ways to pass an octet string argument.  If it happens
+            // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
+            // 0x followed by the hex-encoded bytes.
+            size_t argLen                     = strlen(argValue);
+            static constexpr char hexPrefix[] = "hex:";
+            constexpr size_t prefixLen        = ArraySize(hexPrefix) - 1; // Don't count the null
+            if (strncmp(argValue, hexPrefix, prefixLen) == 0)
             {
-                isValidArgument = false;
-                break;
+                // Hex-encoded.  Decode it into a temporary buffer first, so if we
+                // run into errors we can do correct "argument is not valid" logging
+                // that actually shows the value that was passed in.  After we
+                // determine it's valid, modify the passed-in value to hold the
+                // right bytes, so we don't need to worry about allocating storage
+                // for this somewhere else.  This works because the hex
+                // representation is always longer than the octet string it encodes,
+                // so we have enough space in argValue for the decoded version.
+                chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+                if (!buffer.Calloc(argLen)) // Bigger than needed, but it's fine.
+                {
+                    return false;
+                }
+
+                size_t octetCount = chip::Encoding::HexToBytes(argValue + prefixLen, argLen - prefixLen, buffer.Get(), argLen);
+                if (octetCount == 0)
+                {
+                    return false;
+                }
+
+                memcpy(argValue, buffer.Get(), octetCount);
+                *value = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
+                return true;
             }
 
-            size_t octetCount = chip::Encoding::HexToBytes(argValue + prefixLen, argLen - prefixLen, buffer.Get(), argLen);
-            if (octetCount == 0)
-            {
-                isValidArgument = false;
-                break;
-            }
-
-            memcpy(argValue, buffer.Get(), octetCount);
-            *value          = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
-            isValidArgument = true;
-        }
-        else
-        {
             // Just ASCII.  Check for the "str:" prefix.
             static constexpr char strPrefix[] = "str:";
-            constexpr size_t strPrefixLen     = ArraySize(strPrefix) - 1; // Don't count the null
+            constexpr size_t strPrefixLen     = ArraySize(strPrefix) - 1; // Don't         count the null
             if (strncmp(argValue, strPrefix, strPrefixLen) == 0)
             {
                 // Skip the prefix
                 argValue += strPrefixLen;
                 argLen -= strPrefixLen;
             }
-            *value          = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
-            isValidArgument = true;
-        }
+            *value = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
+            return true;
+        });
         break;
     }
 
-    case ArgumentType::Boolean:
+    case ArgumentType::Bool: {
+        isValidArgument = HandleNullableOptional<bool>(arg, argValue, [&](auto * value) {
+            // Start with checking for actual boolean values.
+            if (strcasecmp(argValue, "true") == 0)
+            {
+                *value = true;
+                return true;
+            }
+
+            if (strcasecmp(argValue, "false") == 0)
+            {
+                *value = false;
+                return true;
+            }
+
+            // For backwards compat, keep accepting 0 and 1 for now as synonyms
+            // for false and true.  Since we set our min to 0 and max to 1 for
+            // booleans, calling uint8Handler does the right thing in terms of
+            // only allowing those two values.
+            uint8_t temp = 0;
+            if (!uint8Handler(&temp))
+            {
+                return false;
+            }
+            *value = (temp == 1);
+            return true;
+        });
+        break;
+    }
+
     case ArgumentType::Number_uint8: {
-        uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
-
-        // stringstream treats uint8_t as char, which is not what we want here.
-        uint16_t tmpValue;
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> tmpValue;
-        if (chip::CanCastTo<uint8_t>(tmpValue))
-        {
-            *value = static_cast<uint8_t>(tmpValue);
-
-            uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
-            uint64_t max    = arg.max;
-            isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
-        }
-        else
-        {
-            isValidArgument = false;
-        }
+        isValidArgument = HandleNullableOptional<uint8_t>(arg, argValue, uint8Handler);
         break;
     }
 
     case ArgumentType::Number_uint16: {
-        uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<uint16_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
-        uint64_t max    = arg.max;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+            uint64_t max = arg.max;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
         break;
     }
 
     case ArgumentType::Number_uint32: {
-        uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<uint32_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
-        uint64_t max    = arg.max;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+            uint64_t max = arg.max;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
         break;
     }
 
     case ArgumentType::Number_uint64: {
-        uint64_t * value = reinterpret_cast<uint64_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<uint64_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
-        uint64_t max    = arg.max;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+            uint64_t max = arg.max;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
         break;
     }
 
     case ArgumentType::Number_int8: {
-        int8_t * value = reinterpret_cast<int8_t *>(arg.value);
+        isValidArgument = HandleNullableOptional<int8_t>(arg, argValue, [&](auto * value) {
+            // stringstream treats int8_t as char, which is not what we want here.
+            int16_t tmpValue;
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> tmpValue;
+            if (chip::CanCastTo<int8_t>(tmpValue))
+            {
+                *value = static_cast<int8_t>(tmpValue);
 
-        // stringstream treats int8_t as char, which is not what we want here.
-        int16_t tmpValue;
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> tmpValue;
-        if (chip::CanCastTo<int8_t>(tmpValue))
-        {
-            *value = static_cast<int8_t>(tmpValue);
+                int64_t min = arg.min;
+                int64_t max = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
+                return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            }
 
-            int64_t min     = arg.min;
-            int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
-            isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
-        }
-        else
-        {
-            isValidArgument = false;
-        }
+            return false;
+        });
         break;
     }
 
     case ArgumentType::Number_int16: {
-        int16_t * value = reinterpret_cast<int16_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<int16_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        int64_t min     = arg.min;
-        int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            int64_t min = arg.min;
+            int64_t max = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
         break;
     }
 
     case ArgumentType::Number_int32: {
-        int32_t * value = reinterpret_cast<int32_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<int32_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        int64_t min     = arg.min;
-        int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            int64_t min = arg.min;
+            int64_t max = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
         break;
     }
 
     case ArgumentType::Number_int64: {
-        int64_t * value = reinterpret_cast<int64_t *>(arg.value);
-        std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
-        ss >> *value;
+        isValidArgument = HandleNullableOptional<int64_t>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            isHexNotation ? ss << std::hex << argValue : ss << argValue;
+            ss >> *value;
 
-        int64_t min     = arg.min;
-        int64_t max     = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
-        isValidArgument = (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+            int64_t min = arg.min;
+            int64_t max = chip::CanCastTo<int64_t>(arg.max) ? static_cast<int64_t>(arg.max) : INT64_MAX;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        });
+        break;
+    }
+
+    case ArgumentType::Float: {
+        isValidArgument = HandleNullableOptional<float>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            ss << argValue;
+            ss >> *value;
+            return (!ss.fail() && ss.eof());
+        });
+        break;
+    }
+
+    case ArgumentType::Double: {
+        isValidArgument = HandleNullableOptional<double>(arg, argValue, [&](auto * value) {
+            std::stringstream ss;
+            ss << argValue;
+            ss >> *value;
+            return (!ss.fail() && ss.eof());
+        });
         break;
     }
 
     case ArgumentType::Address: {
-        AddressWithInterface * value = reinterpret_cast<AddressWithInterface *>(arg.value);
-        isValidArgument              = ParseAddressWithInterface(argValue, value);
+        isValidArgument = HandleNullableOptional<AddressWithInterface>(
+            arg, argValue, [&](auto * value) { return ParseAddressWithInterface(argValue, value); });
         break;
     }
     }
@@ -299,62 +553,176 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     return isValidArgument;
 }
 
-size_t Command::AddArgument(const char * name, const char * value)
+size_t Command::AddArgument(const char * name, const char * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Attribute;
     arg.name  = name;
     arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, char ** value)
+size_t Command::AddArgument(const char * name, char ** value, const char * desc, uint8_t flags)
+{
+    Argument arg;
+    arg.type  = ArgumentType::String;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+    arg.flags = flags;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, chip::CharSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::CharString;
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, chip::CharSpan * value)
-{
-    Argument arg;
-    arg.type  = ArgumentType::CharString;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(value);
-
-    mArgs.emplace_back(arg);
-    return mArgs.size();
-}
-
-size_t Command::AddArgument(const char * name, chip::ByteSpan * value)
+size_t Command::AddArgument(const char * name, chip::ByteSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::OctetString;
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, AddressWithInterface * out)
+size_t Command::AddArgument(const char * name, AddressWithInterface * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Address;
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector16;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector32;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,
+                            const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector32;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = Argument::kOptional;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<bool>> * value,
+                            const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorBool;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = Argument::kOptional;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Complex;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, CustomArgument * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Custom;
+    arg.name  = name;
+    arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, float min, float max, float * out, const char * desc, uint8_t flags)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Float;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(out);
+    arg.flags = flags;
+    arg.desc  = desc;
+    // Ignore min/max for now; they're always +-Infinity anyway.
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, double min, double max, double * out, const char * desc, uint8_t flags)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Double;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(out);
+    arg.flags = flags;
+    arg.desc  = desc;
+    // Ignore min/max for now; they're always +-Infinity anyway.
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, const char * desc,
+                            uint8_t flags)
 {
     Argument arg;
     arg.type  = type;
@@ -362,12 +730,13 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.value = out;
     arg.min   = min;
     arg.max   = max;
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Number_uint8;
@@ -375,9 +744,10 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.value = out;
     arg.min   = min;
     arg.max   = max;
+    arg.flags = flags;
+    arg.desc  = desc;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 const char * Command::GetArgumentName(size_t index) const
@@ -385,6 +755,16 @@ const char * Command::GetArgumentName(size_t index) const
     if (index < mArgs.size())
     {
         return mArgs.at(index).name;
+    }
+
+    return nullptr;
+}
+
+const char * Command::GetArgumentDescription(size_t index) const
+{
+    if (index < mArgs.size())
+    {
+        return mArgs.at(index).desc;
     }
 
     return nullptr;
@@ -403,4 +783,77 @@ const char * Command::GetAttribute(void) const
     }
 
     return nullptr;
+}
+
+const char * Command::GetEvent(void) const
+{
+    size_t argsCount = mArgs.size();
+    for (size_t i = 0; i < argsCount; i++)
+    {
+        Argument arg = mArgs.at(i);
+        if (arg.type == ArgumentType::Attribute)
+        {
+            return reinterpret_cast<const char *>(arg.value);
+        }
+    }
+
+    return nullptr;
+}
+
+size_t Command::AddArgumentToList(Argument && argument)
+{
+    if (argument.isOptional() || mArgs.empty() || !mArgs.back().isOptional())
+    {
+        // Safe to just append.
+        mArgs.emplace_back(std::move(argument));
+        return mArgs.size();
+    }
+
+    // We're inserting a non-optional arg but we already have something optional
+    // in the list.  Insert before the first optional arg.
+    for (auto cur = mArgs.cbegin(), end = mArgs.cend(); cur != end; ++cur)
+    {
+        if ((*cur).isOptional())
+        {
+            mArgs.emplace(cur, std::move(argument));
+            return mArgs.size();
+        }
+    }
+
+    // Never reached.
+    VerifyOrDie(false);
+    return 0;
+}
+
+void Command::ResetArguments()
+{
+    for (size_t i = 0; i < mArgs.size(); i++)
+    {
+        const Argument arg      = mArgs[i];
+        const ArgumentType type = arg.type;
+        const uint8_t flags     = arg.flags;
+        if (type == ArgumentType::VectorBool && flags == Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector16 && flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector32 && flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector32 && flags == Argument::kOptional)
+        {
+            auto optionalArgument = static_cast<chip::Optional<std::vector<uint32_t>> *>(arg.value);
+            if (optionalArgument->HasValue())
+            {
+                optionalArgument->Value().clear();
+            }
+        }
+    }
 }

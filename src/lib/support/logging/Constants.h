@@ -41,7 +41,7 @@ enum LogModule
     kLogModule_ServiceDirectory,
     kLogModule_ServiceProvisioning,
     kLogModule_SoftwareUpdate,
-    kLogModule_TokenPairing,
+    kLogModule_FailSafe,
     kLogModule_TimeService,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
@@ -56,6 +56,9 @@ enum LogModule
     kLogModule_Discovery,
     kLogModule_InteractionModel,
     kLogModule_Test,
+    kLogModule_OperationalDeviceProxy,
+    kLogModule_Automation,
+    kLogModule_CASESessionManager,
 
     kLogModule_Max
 };
@@ -124,7 +127,16 @@ enum LogCategory
      */
     kLogCategory_Detail = 3,
 
-    kLogCategory_Max = kLogCategory_Detail
+    /*!<
+     *   Indicates a category of log message that describes automation
+     *   information about an event or the state of the system.
+     *
+     *   Such messages can be used by automation for test validation.
+     *
+     */
+    kLogCategory_Automation = 4,
+
+    kLogCategory_Max = kLogCategory_Automation
 };
 
 } // namespace Logging

@@ -65,10 +65,8 @@ const int kManualSetupCodeChunk3CharLength = 4;
 const int kManualSetupVendorIdCharLength   = 5;
 const int kManualSetupProductIdCharLength  = 5;
 
-const uint8_t kSerialNumberTag = 128;
-
-// The largest value of the 12-bit Payload discriminator
-const uint16_t kMaxDiscriminatorValue = 0xFFF;
+// Spec 5.1.4.2 CHIP-Common Reserved Tag (kTag_SerialNumber)
+const uint8_t kSerialNumberTag = 0;
 
 // clang-format off
 const int kTotalPayloadDataSizeInBits =
@@ -119,7 +117,11 @@ struct PayloadContents
 
     bool isValidQRCodePayload() const;
     bool isValidManualCode() const;
+    bool isShortDiscriminator = false;
     bool operator==(PayloadContents & input) const;
+
+private:
+    bool CheckPayloadCommonConstraints() const;
 };
 
 enum optionalQRCodeInfoType
@@ -161,9 +163,6 @@ struct OptionalQRCodeInfoExtension : OptionalQRCodeInfo
     uint64_t uint32;
     uint64_t uint64;
 };
-
-bool IsCHIPTag(uint8_t tag);
-bool IsVendorTag(uint8_t tag);
 
 class SetupPayload : public PayloadContents
 {
@@ -225,6 +224,18 @@ public:
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
     std::map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;
+
+    /** @brief Checks if the tag is CHIP Common type
+     * @param tag Tag to be checked
+     * @return Returns True if the tag is of Common type
+     **/
+    static bool IsCommonTag(uint8_t tag);
+
+    /** @brief Checks if the tag is vendor-specific
+     * @param tag Tag to be checked
+     * @return Returns True if the tag is Vendor-specific
+     **/
+    static bool IsVendorTag(uint8_t tag);
 
     /** @brief A function to add an optional QR Code info vendor object
      * @param info Optional QR code info object to add

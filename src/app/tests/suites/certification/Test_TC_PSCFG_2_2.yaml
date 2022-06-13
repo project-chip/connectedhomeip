@@ -1,0 +1,46 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 63.2.2. [TC-PSCFG-2.2] Primary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the Sources attribute from the DUT"
+      verification: |
+          ./chip-tool powersourceconfiguration read sources 1 0
+
+          [...]
+          [1646157640.271321][44339:44344] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000DataVersion: 502821112
+          [1646157640.271401][44339:44344] CHIP:TOO:   Sources: 1 entries
+          [1646157640.271466][44339:44344] CHIP:TOO:     [1]: 1
+      disabled: true
+
+    - label: "./chip-tool powersource read order 1 1"
+      verification: |
+          ./chip-tool powersource read order 1 1
+
+          [...]
+          [1646157759.345628][44355:44360] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001DataVersion: 1844928386
+          [1646157759.345704][44355:44360] CHIP:TOO:   Order: 0
+      disabled: true

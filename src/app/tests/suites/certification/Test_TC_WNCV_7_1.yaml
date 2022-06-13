@@ -1,0 +1,107 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.4.8. [TC-WNCV-7.1] GoToPercentage Commands Verification with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Check GoToLiftPercentage command 50%"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT"
+      verification: |
+          On TestHarnes (all-cluster-app) a received GoToLift for WindowCovering looks like this
+
+          [1646297766.073468][361158:361158] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:12638616 on exchange 3757r
+          [1646297766.073500][361158:361158] CHIP:EM: Handling via exchange: 3757r, Delegate: 0x55d525b25500
+          [1646297766.073560][361158:361158] CHIP:DMG: InvokeRequestMessage =
+          [1646297766.073589][361158:361158] CHIP:DMG: {
+          [1646297766.073618][361158:361158] CHIP:DMG:         suppressResponse = false,
+          [1646297766.073662][361158:361158] CHIP:DMG:         timedRequest = false,
+          [1646297766.073691][361158:361158] CHIP:DMG:         InvokeRequests =
+          [1646297766.073722][361158:361158] CHIP:DMG:         [
+          [1646297766.073769][361158:361158] CHIP:DMG:                 CommandDataIB =
+          [1646297766.073830][361158:361158] CHIP:DMG:                 {
+          [1646297766.073881][361158:361158] CHIP:DMG:                         CommandPathIB =
+          [1646297766.073911][361158:361158] CHIP:DMG:                         {
+          [1646297766.073970][361158:361158] CHIP:DMG:                                 EndpointId = 0x1,
+          [1646297766.074008][361158:361158] CHIP:DMG:                                 ClusterId = 0x102,
+          [1646297766.074069][361158:361158] CHIP:DMG:                                 CommandId = 0x5,
+          [1646297766.074120][361158:361158] CHIP:DMG:                         },
+          [1646297766.074180][361158:361158] CHIP:DMG:
+          [1646297766.074211][361158:361158] CHIP:DMG:                         CommandData =
+          [1646297766.074258][361158:361158] CHIP:DMG:                         {
+          [1646297766.074288][361158:361158] CHIP:DMG:                                 0x0 = 50,
+          [1646297766.074316][361158:361158] CHIP:DMG:                                 0x1 = 5000,
+          [1646297766.074386][361158:361158] CHIP:DMG:                         },
+          [1646297766.074415][361158:361158] CHIP:DMG:                 },
+          [1646297766.074476][361158:361158] CHIP:DMG:
+          [1646297766.074505][361158:361158] CHIP:DMG:         ],
+          [1646297766.074565][361158:361158] CHIP:DMG:
+          [1646297766.074619][361158:361158] CHIP:DMG:         InteractionModelRevision = 1
+          [1646297766.074647][361158:361158] CHIP:DMG: },
+          [1646297766.074705][361158:361158] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
+          [1646297766.074745][361158:361158] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0005
+      disabled: true
+
+    - label: "Check GoToTiltPercentage command 50%"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT"
+      verification: |
+          On TestHarnes (all-cluster-app) a received GoToTilt for WindowCovering looks like this
+
+          [1646298060.215062][361158:361158] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:13675126 on exchange 583r
+          [1646298060.215092][361158:361158] CHIP:EM: Handling via exchange: 583r, Delegate: 0x55d525b25500
+          [1646298060.215225][361158:361158] CHIP:DMG: InvokeRequestMessage =
+          [1646298060.215260][361158:361158] CHIP:DMG: {
+          [1646298060.215285][361158:361158] CHIP:DMG:         suppressResponse = false,
+          [1646298060.215355][361158:361158] CHIP:DMG:         timedRequest = false,
+          [1646298060.215745][361158:361158] CHIP:DMG:         InvokeRequests =
+          [1646298060.215925][361158:361158] CHIP:DMG:         [
+          [1646298060.216063][361158:361158] CHIP:DMG:                 CommandDataIB =
+          [1646298060.216460][361158:361158] CHIP:DMG:                 {
+          [1646298060.216641][361158:361158] CHIP:DMG:                         CommandPathIB =
+          [1646298060.216850][361158:361158] CHIP:DMG:                         {
+          [1646298060.217059][361158:361158] CHIP:DMG:                                 EndpointId = 0x1,
+          [1646298060.217327][361158:361158] CHIP:DMG:                                 ClusterId = 0x102,
+          [1646298060.217551][361158:361158] CHIP:DMG:                                 CommandId = 0x8,
+          [1646298060.217768][361158:361158] CHIP:DMG:                         },
+          [1646298060.217960][361158:361158] CHIP:DMG:
+          [1646298060.218130][361158:361158] CHIP:DMG:                         CommandData =
+          [1646298060.218320][361158:361158] CHIP:DMG:                         {
+          [1646298060.218510][361158:361158] CHIP:DMG:                                 0x0 = 50,
+          [1646298060.218727][361158:361158] CHIP:DMG:                                 0x1 = 5000,
+          [1646298060.218944][361158:361158] CHIP:DMG:                         },
+          [1646298060.219135][361158:361158] CHIP:DMG:                 },
+          [1646298060.219301][361158:361158] CHIP:DMG:
+          [1646298060.219436][361158:361158] CHIP:DMG:         ],
+          [1646298060.219684][361158:361158] CHIP:DMG:
+          [1646298060.219795][361158:361158] CHIP:DMG:         InteractionModelRevision = 1
+          [1646298060.219930][361158:361158] CHIP:DMG: },
+          [1646298060.220021][361158:361158] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
+          [1646298060.220264][361158:361158] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0102 Command=0x0000_0008
+      disabled: true

@@ -1,0 +1,237 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 57.2.3. [TC-I-2.3] Secondary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Identify"
+    endpoint: 1
+
+tests:
+    - label: "1.Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x00 blink and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Manually check DUT executes a blink effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a blink effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x01 breathe and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "check DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a breathe effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x02 okay and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 2
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "check DUT executes an okay effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes an okay effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x0b channel change and the effect variant field set to
+          0x00 default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 11
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "check DUT executes a channel change effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a channel change effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x01 breathe and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "check DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a breathe effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0xfe finish effect and the effect variant field set to
+          0x00 default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 254
+              - name: "EffectVariant"
+                value: 0
+
+    - label:
+          "Manually check DUT stops the breathe effect after the current effect
+          sequence"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "DUT stops the breathe effect after the current effect
+                    sequence"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x01 breathe and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Manually check DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a breathe effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0xff stop effect and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 255
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Check DUT stops the breathe effect as soon as possible."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT stops the breathe effect as soon as possible"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x00 blink and the effect variant field set to 0x42
+          unknown"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 66
+
+    - label: "Check DUT executes a blink effect."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "DUT executes a blink effect"
+
+    - label:
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0xff stop effect and the effect variant field set to 0x00
+          default"
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 255
+              - name: "EffectVariant"
+                value: 0
+
+    - label:
+          "Check DUT stops any effect that may be still running as soon as
+          possible"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "DUT stops any effect that may be still running as soon as
+                    possible"

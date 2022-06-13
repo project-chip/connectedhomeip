@@ -17,62 +17,92 @@
 
 #include "MediaInputManager.h"
 
-#include <app/util/af.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-#include <map>
-#include <string>
+using namespace std;
+using namespace chip;
+using namespace chip::app::Clusters::MediaInput;
 
-CHIP_ERROR MediaInputManager::Init()
+MediaInputManager::MediaInputManager()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    mCurrentInput = 1;
 
-    // TODO: Store feature map once it is supported
-    std::map<std::string, bool> featureMap;
-    featureMap["NU"] = true;
-    SuccessOrExit(err);
-exit:
-    return err;
+    for (int i = 1; i < 3; ++i)
+    {
+        InputInfoType inputInfo;
+        inputInfo.description = chip::CharSpan::fromCharString("High-Definition Multimedia Interface");
+        inputInfo.name        = chip::CharSpan::fromCharString("HDMI");
+        inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
+        inputInfo.index       = static_cast<uint8_t>(i);
+        mInputs.push_back(inputInfo);
+    }
 }
 
-std::vector<MediaInputInfo> MediaInputManager::proxyGetInputList()
+CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    std::vector<MediaInputInfo> mediaInputList;
-    int maximumVectorSize = 2;
-    char description[]    = "exampleDescription";
-    char name[]           = "exampleName";
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & inputInfo : this->mInputs)
+        {
+            ReturnErrorOnFailure(encoder.Encode(inputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
 
-    for (int i = 0; i < maximumVectorSize; ++i)
+uint8_t MediaInputManager::HandleGetCurrentInput()
+{
+    return mCurrentInput;
+}
+
+bool MediaInputManager::HandleSelectInput(const uint8_t index)
+{
+    // TODO: Insert code here
+    bool mediaInputSelected = false;
+    for (InputInfoType & input : mInputs)
     {
-        MediaInputInfo mediaInput;
-        mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description));
-        mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-        mediaInput.index       = static_cast<uint8_t>(1 + i);
-        mediaInputList.push_back(mediaInput);
+        if (input.index == index)
+        {
+            mediaInputSelected = true;
+            mCurrentInput      = index;
+        }
     }
 
-    return mediaInputList;
+    return mediaInputSelected;
 }
 
-bool mediaInputClusterSelectInput(uint8_t input)
+bool MediaInputManager::HandleShowInputStatus()
 {
-    // TODO: Insert code here
+    ChipLogProgress(Zcl, " MediaInputManager::HandleShowInputStatus()");
+    for (auto const & inputInfo : this->mInputs)
+    {
+        string name(inputInfo.name.data(), inputInfo.name.size());
+        string desc(inputInfo.description.data(), inputInfo.description.size());
+        ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputInfo.index,
+                        static_cast<uint16_t>(inputInfo.inputType), (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(),
+                        desc.c_str());
+    }
     return true;
 }
-bool mediaInputClusterShowInputStatus()
+
+bool MediaInputManager::HandleHideInputStatus()
 {
-    // TODO: Insert code here
+    ChipLogProgress(Zcl, " MediaInputManager::HandleHideInputStatus()");
     return true;
 }
-bool mediaInputClusterHideInputStatus()
+
+bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    return true;
-}
-bool mediaInputClusterRenameInput(uint8_t input, std::string name)
-{
-    // TODO: Insert code here
-    return true;
+    bool mediaInputRenamed = false;
+
+    for (InputInfoType & input : mInputs)
+    {
+        if (input.index == index)
+        {
+            mediaInputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            input.name = chip::CharSpan(this->Data(index), name.size());
+        }
+    }
+
+    return mediaInputRenamed;
 }

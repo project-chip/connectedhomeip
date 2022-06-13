@@ -45,15 +45,18 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
     UBaseType_t linkLayerTaskValue;
     UBaseType_t openThreadTaskValue;
     UBaseType_t eventLoopTaskValue;
-    UBaseType_t lwipTaskValue;
 
     TaskHandle_t eventLoopHandleStruct = xTaskGetHandle(CHIP_DEVICE_CONFIG_CHIP_TASK_NAME);
-    TaskHandle_t lwipHandle            = xTaskGetHandle(TCPIP_THREAD_NAME);
     TaskHandle_t otTaskHandle          = xTaskGetHandle(CHIP_DEVICE_CONFIG_THREAD_TASK_NAME);
     TaskHandle_t appTaskHandle         = xTaskGetHandle(APP_TASK_NAME);
     TaskHandle_t bleStackTaskHandle    = xTaskGetHandle(BLE_STACK_TASK_NAME);
     TaskHandle_t bleLinkTaskHandle     = xTaskGetHandle(BLE_LINK_TASK_NAME);
     TaskHandle_t bleEventTaskHandle    = xTaskGetHandle(CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME);
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    UBaseType_t lwipTaskValue;
+    TaskHandle_t lwipHandle = xTaskGetHandle(TCPIP_THREAD_NAME);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     while (1)
     {
@@ -63,7 +66,9 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
         linkLayerTaskValue  = uxTaskGetStackHighWaterMark(bleLinkTaskHandle);
         openThreadTaskValue = uxTaskGetStackHighWaterMark(otTaskHandle);
         eventLoopTaskValue  = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
-        lwipTaskValue       = uxTaskGetStackHighWaterMark(lwipHandle);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        lwipTaskValue = uxTaskGetStackHighWaterMark(lwipHandle);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
         EFR32_LOG("=============================");
         EFR32_LOG("     ");
@@ -77,7 +82,9 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
         EFR32_LOG("Link Layer Task most bytes ever Free  0x%x", (linkLayerTaskValue * 4));
         EFR32_LOG("OpenThread Task most bytes ever Free  0x%x", (openThreadTaskValue * 4));
         EFR32_LOG("Event Loop Task most bytes ever Free  0x%x", (eventLoopTaskValue * 4));
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         EFR32_LOG("LWIP Task most bytes ever Free        0x%x", (lwipTaskValue * 4));
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
         EFR32_LOG("     ");
         EFR32_LOG("=============================");
         vTaskDelay(pdMS_TO_TICKS(5000));

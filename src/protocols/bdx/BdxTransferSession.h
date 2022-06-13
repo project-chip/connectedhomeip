@@ -34,6 +34,7 @@ public:
         kAcceptReceived,
         kBlockReceived,
         kQueryReceived,
+        kQueryWithSkipReceived,
         kAckReceived,
         kAckEOFReceived,
         kStatusReceived,
@@ -77,9 +78,10 @@ public:
 
     struct BlockData
     {
-        const uint8_t * Data = nullptr;
-        size_t Length        = 0;
-        bool IsEof           = false;
+        const uint8_t * Data  = nullptr;
+        size_t Length         = 0;
+        bool IsEof            = false;
+        uint32_t BlockCounter = 0;
     };
 
     struct MessageTypeData
@@ -96,6 +98,11 @@ public:
         {
             return HasProtocol(Protocols::MessageTypeTraits<TMessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
         }
+    };
+
+    struct TransferSkipData
+    {
+        uint64_t BytesToSkip = 0;
     };
 
     /**
@@ -120,10 +127,13 @@ public:
             BlockData blockdata;
             StatusReportData statusData;
             MessageTypeData msgTypeData;
+            TransferSkipData bytesToSkip;
         };
 
-        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
-        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kNone }; }
+        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kUnknown }; }
+        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kUnknown }; }
+
+        const char * ToString(OutputEventType outputEventType);
 
         static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data);
@@ -131,6 +141,7 @@ public:
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
         static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
+        static OutputEvent QueryWithSkipEvent(TransferSkipData bytesToSkip);
     };
 
     /**
@@ -144,14 +155,14 @@ public:
      *   TransferSession object.
      *
      *   Note that if the type outputted is kMsgToSend, the caller is expected to send the message immediately, and the session
-     *   timeout timer will begin at curTimeMs.
+     *   timeout timer will begin at curTime.
      *
      *   See OutputEventType for all possible output event types.
      *
      * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
-     * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
+     * @param curTime   Current time
      */
-    void PollOutput(OutputEvent & event, uint64_t curTimeMs);
+    void PollOutput(OutputEvent & event, System::Clock::Timestamp curTime);
 
     /**
      * @brief
@@ -162,13 +173,13 @@ public:
      * @param role      Inidcates whether this object will be sending or receiving data
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
-     * @param timeoutMs The amount of time to wait for a response before considering the transfer failed (milliseconds)
-     * @param curTimeMs The current time since epoch in milliseconds. Needed to set a start time for the transfer timeout.
+     * @param timeout   The amount of time to wait for a response before considering the transfer failed
+     * @param curTime   The current time since epoch. Needed to set a start time for the transfer timeout.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout);
 
     /**
      * @brief
@@ -179,13 +190,13 @@ public:
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
-     * @param timeoutMs       The amount of time to wait for a response before considering the transfer failed (milliseconds)
+     * @param timeout         The amount of time to wait for a response before considering the transfer failed
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
     CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                               uint32_t timeoutMs);
+                               System::Clock::Timeout timeout);
 
     /**
      * @brief
@@ -217,6 +228,17 @@ public:
      *                    is unable to handle this request.
      */
     CHIP_ERROR PrepareBlockQuery();
+
+    /**
+     * @brief
+     *   Prepare a BlockQueryWithSkip message. The Block counter will be populated automatically.
+     *
+     * @param bytesToSkip Number of bytes to seek skip
+     *
+     * @return CHIP_ERROR The result of the preparation of a BlockQueryWithSkip message. May also indicate if the TransferSession
+     * object is unable to handle this request.
+     */
+    CHIP_ERROR PrepareBlockQueryWithSkip(const uint64_t & bytesToSkip);
 
     /**
      * @brief
@@ -263,17 +285,26 @@ public:
      * @param payloadHeader A PayloadHeader containing the Protocol type and Message Type
      * @param msg           A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
      *                      Buffer is expected to start at data (not header).
-     * @param curTimeMs     Current time indicated by the number of milliseconds since some epoch defined by the platform
+     * @param curTime       Current time
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg, uint64_t curTimeMs);
+    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
+                                     System::Clock::Timestamp curTime);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
     uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
+    uint32_t GetNextBlockNum() const { return mNextBlockNum; }
+    uint32_t GetNextQueryNum() const { return mNextQueryNum; }
+    size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
+    const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
+    {
+        fileDesignatorLen = mTransferRequestData.FileDesLength;
+        return mTransferRequestData.FileDesignator;
+    }
 
     TransferSession();
 
@@ -298,6 +329,7 @@ private:
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
     void HandleSendAccept(System::PacketBufferHandle msgData);
     void HandleBlockQuery(System::PacketBufferHandle msgData);
+    void HandleBlockQueryWithSkip(System::PacketBufferHandle msgData);
     void HandleBlock(System::PacketBufferHandle msgData);
     void HandleBlockEOF(System::PacketBufferHandle msgData);
     void HandleBlockAck(System::PacketBufferHandle msgData);
@@ -317,7 +349,7 @@ private:
     CHIP_ERROR VerifyProposedMode(const BitFlags<TransferControlFlags> & proposed);
 
     void PrepareStatusReport(StatusCode code);
-    bool IsTransferLengthDefinite();
+    bool IsTransferLengthDefinite() const;
 
     OutputEventType mPendingOutput = OutputEventType::kNone;
     TransferState mState           = TransferState::kUnitialized;
@@ -341,6 +373,7 @@ private:
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
     MessageTypeData mMsgTypeData;
+    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 
@@ -349,10 +382,10 @@ private:
     uint32_t mLastQueryNum = 0;
     uint32_t mNextQueryNum = 0;
 
-    uint32_t mTimeoutMs          = 0;
-    uint64_t mTimeoutStartTimeMs = 0;
-    bool mShouldInitTimeoutStart = true;
-    bool mAwaitingResponse       = false;
+    System::Clock::Timeout mTimeout            = System::Clock::kZero;
+    System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
+    bool mShouldInitTimeoutStart               = true;
+    bool mAwaitingResponse                     = false;
 };
 
 } // namespace bdx

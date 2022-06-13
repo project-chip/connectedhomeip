@@ -42,7 +42,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-#include <zap-generated/command-id.h>
+#include <app-common/zap-generated/command-id.h>
 
 using namespace chip;
 
@@ -100,7 +100,7 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(app::CommandHandler 
         }
     }
 
-    emberAfScenesClusterPrintln("");
+    emberAfScenesClusterPrintln("%s", "");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -157,7 +157,7 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
         }
     }
 
-    emberAfScenesClusterPrintln("");
+    emberAfScenesClusterPrintln("%s", "");
     emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

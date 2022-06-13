@@ -24,10 +24,11 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -41,15 +42,24 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     CHIP_ERROR err;
 
     // Initialize the configuration system.
+#if !CHIP_DISABLE_PLATFORM_KVS
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
+
+    // Ensure there is a dispatch queue available
+    GetWorkQueue();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
@@ -116,6 +126,11 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
+    if (mWorkQueue == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);

@@ -25,6 +25,7 @@
  */
 
 #include "chip-cert.h"
+#include <credentials/CHIPCertificateSet.h>
 
 #include "vector"
 
@@ -38,7 +39,7 @@ using namespace chip::ASN1;
 #define CMD_NAME "chip-cert validate-cert"
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
@@ -118,7 +119,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     return true;
 }
 
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc == 0)
     {
@@ -182,7 +183,9 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     certToBeValidated = certSet.GetLastCert();
 
     context.Reset();
-    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), context.mEffectiveTime);
+    uint32_t currentTime;
+    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
+    context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

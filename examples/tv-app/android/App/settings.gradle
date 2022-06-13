@@ -1,0 +1,3 @@
+rootProject.name = "MatterTVAndroid"
+include ':platform-app'
+include ':content-app'

@@ -130,8 +130,7 @@ class Flasher(firmware_utils.Flasher):
 
     def reset(self):
         """Reset the device."""
-        return self.run_tool('nrfjprog', ['--pinresetenable'], name='Enable pin reset')
-        return self.run_tool('nrfjprog', ['--pinreset'], name='Apply pin reset')
+        return self.run_tool('nrfjprog', ['--reset'], name='Reset')
 
     def actions(self):
         """Perform actions on the device according to self.option."""
@@ -141,8 +140,8 @@ class Flasher(firmware_utils.Flasher):
             if self.erase().err:
                 return self
 
-        application = self.optional_file(self.option.application)
-        if application:
+        if self.option.application:
+            application = self.option.application
             if self.flash(application).err:
                 return self
             if self.option.verify_application:

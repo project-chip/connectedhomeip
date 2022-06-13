@@ -22,49 +22,182 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
+#include <app/clusters/target-navigator-server/target-navigator-delegate.h>
+#include <app/clusters/target-navigator-server/target-navigator-server.h>
+
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/target-navigator-server/target-navigator-server.h>
-#include <app/util/af.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TargetNavigator;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
+static constexpr size_t kTargetNavigatorDelegateTableSize =
+    EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-void sendResponse(app::CommandHandler * command, TargetNavigatorResponse response)
+// -----------------------------------------------------------------------------
+// Delegate Implementation
+
+using chip::app::Clusters::TargetNavigator::Delegate;
+
+namespace {
+
+Delegate * gDelegateTable[kTargetNavigatorDelegateTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
-                                         ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
-    SuccessOrExit(err = command->FinishCommand());
-exit:
-    if (err != CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
-        ChipLogError(Zcl, "Failed to send NavigateTargetResponse. Error:%s", ErrorStr(err));
+        ChipLogProgress(Zcl, "TargetNavigator returning ContentApp delegate for endpoint:%u", endpoint);
+        return app->GetTargetNavigatorDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogProgress(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%u", endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+}
+
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+{
+    if (delegate == nullptr)
+    {
+        ChipLogProgress(Zcl, "Target Navigator has no delegate set for endpoint:%u", endpoint);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace TargetNavigator {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
     }
 }
+
+} // namespace TargetNavigator
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
+
+namespace {
+
+class TargetNavigatorAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    TargetNavigatorAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), TargetNavigator::Id) {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+};
+
+TargetNavigatorAttrAccess gTargetNavigatorAttrAccess;
+
+CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::TargetNavigator::Attributes::TargetList::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+
+        return ReadTargetListAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadCurrentTargetAttribute(aEncoder, delegate);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TargetNavigatorAttrAccess::ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetTargetList(aEncoder);
+}
+
+CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint8_t currentTarget = delegate->HandleGetCurrentTarget();
+    return aEncoder.Encode(currentTarget);
+}
+
+} // anonymous namespace
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
 
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
                                                          const app::ConcreteCommandPath & commandPath,
                                                          const Commands::NavigateTarget::DecodableType & commandData)
 {
-    auto & target = commandData.target;
-    auto & data   = commandData.data;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & target       = commandData.target;
+    auto & data         = commandData.data;
+    app::CommandResponseHelper<Commands::NavigateTargetResponse::Type> responder(command, commandPath);
 
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string dataString(data.data(), data.size());
-    TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
-    sendResponse(command, response);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleNavigateTarget(responder, target, data.HasValue() ? data.Value() : CharSpan());
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfTargetNavigatorClusterNavigateTargetCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
+}
+
+void MatterTargetNavigatorPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
 }

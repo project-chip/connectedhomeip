@@ -21,97 +21,165 @@ import("common_flags.gni")
 declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
-      is_debug && (current_os == "linux" || current_os == "mac")
+      is_debug &&
+      (current_os == "linux" || current_os == "mac" || current_os == "android")
+
+  # Logging verbosity control for Access Control implementation
+  #
+  # If set to > 0, it is desired to get additional logging on all
+  # access control checks for better debugging ability.
+  #
+  # If set to > 1, it is desired to log every single check
+  chip_access_control_policy_logging_verbosity = 0
+  if (is_debug && (current_os == "linux" || current_os == "mac")) {
+    chip_access_control_policy_logging_verbosity = 2
+  }
+
+  chip_enable_session_resumption = true
+
+  # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
+  chip_im_force_fabric_quota_check = false
 }
 
 buildconfig_header("app_buildconfig") {
   header = "AppBuildConfig.h"
   header_dir = "app"
 
-  defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
+  defines = [
+    "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK=${chip_im_force_fabric_quota_check}",
+    "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
+    "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
+  ]
 }
 
 static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "Command.cpp",
-    "Command.h",
+    "AttributeAccessInterface.cpp",
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+    "AttributePathParams.h",
+    "AttributePersistenceProvider.h",
+    "BufferedReadCallback.cpp",
+    "CASEClient.cpp",
+    "CASEClient.h",
+    "CASEClientPool.h",
+    "CASESessionManager.cpp",
+    "CASESessionManager.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "CommandHandler.cpp",
+    "CommandResponseHelper.h",
     "CommandSender.cpp",
+    "DefaultAttributePersistenceProvider.cpp",
+    "DeviceProxy.cpp",
+    "DeviceProxy.h",
     "EventManagement.cpp",
+    "EventPathParams.h",
+    "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
-    "MessageDef/AttributeDataElement.cpp",
-    "MessageDef/AttributeDataElement.h",
-    "MessageDef/AttributeDataList.cpp",
-    "MessageDef/AttributeDataList.h",
-    "MessageDef/AttributeDataVersionList.cpp",
-    "MessageDef/AttributeDataVersionList.h",
-    "MessageDef/AttributePath.cpp",
-    "MessageDef/AttributePath.h",
-    "MessageDef/AttributePathList.cpp",
-    "MessageDef/AttributePathList.h",
+    "InteractionModelRevision.h",
+    "InteractionModelTimeout.h",
+    "MessageDef/ArrayBuilder.cpp",
+    "MessageDef/ArrayParser.cpp",
+    "MessageDef/AttributeDataIB.cpp",
+    "MessageDef/AttributeDataIB.h",
+    "MessageDef/AttributeDataIBs.cpp",
+    "MessageDef/AttributeDataIBs.h",
+    "MessageDef/AttributePathIB.cpp",
+    "MessageDef/AttributePathIB.h",
+    "MessageDef/AttributePathIBs.cpp",
+    "MessageDef/AttributePathIBs.h",
+    "MessageDef/AttributeReportIB.cpp",
+    "MessageDef/AttributeReportIB.h",
+    "MessageDef/AttributeReportIBs.cpp",
+    "MessageDef/AttributeReportIBs.h",
     "MessageDef/AttributeStatusIB.cpp",
     "MessageDef/AttributeStatusIB.h",
-    "MessageDef/AttributeStatusList.cpp",
-    "MessageDef/AttributeStatusList.h",
+    "MessageDef/AttributeStatusIBs.cpp",
+    "MessageDef/AttributeStatusIBs.h",
     "MessageDef/Builder.cpp",
     "MessageDef/Builder.h",
-    "MessageDef/CommandDataElement.cpp",
-    "MessageDef/CommandDataElement.h",
-    "MessageDef/CommandList.cpp",
-    "MessageDef/CommandList.h",
-    "MessageDef/CommandPath.cpp",
-    "MessageDef/CommandPath.h",
-    "MessageDef/EventDataElement.cpp",
-    "MessageDef/EventDataElement.h",
-    "MessageDef/EventList.cpp",
-    "MessageDef/EventList.h",
-    "MessageDef/EventPath.cpp",
-    "MessageDef/EventPath.h",
-    "MessageDef/EventPathList.cpp",
-    "MessageDef/EventPathList.h",
-    "MessageDef/InvokeCommand.cpp",
-    "MessageDef/InvokeCommand.h",
+    "MessageDef/ClusterPathIB.cpp",
+    "MessageDef/ClusterPathIB.h",
+    "MessageDef/CommandDataIB.cpp",
+    "MessageDef/CommandPathIB.cpp",
+    "MessageDef/CommandStatusIB.cpp",
+    "MessageDef/DataVersionFilterIB.cpp",
+    "MessageDef/DataVersionFilterIB.h",
+    "MessageDef/DataVersionFilterIBs.cpp",
+    "MessageDef/DataVersionFilterIBs.h",
+    "MessageDef/EventDataIB.cpp",
+    "MessageDef/EventDataIB.h",
+    "MessageDef/EventFilterIB.cpp",
+    "MessageDef/EventFilterIBs.cpp",
+    "MessageDef/EventPathIB.cpp",
+    "MessageDef/EventPathIB.h",
+    "MessageDef/EventPathIBs.cpp",
+    "MessageDef/EventPathIBs.h",
+    "MessageDef/EventReportIB.cpp",
+    "MessageDef/EventReportIB.h",
+    "MessageDef/EventReportIBs.cpp",
+    "MessageDef/EventReportIBs.h",
+    "MessageDef/EventStatusIB.cpp",
+    "MessageDef/EventStatusIB.h",
+    "MessageDef/InvokeRequestMessage.cpp",
+    "MessageDef/InvokeRequests.cpp",
+    "MessageDef/InvokeResponseIB.cpp",
+    "MessageDef/InvokeResponseIBs.cpp",
+    "MessageDef/InvokeResponseMessage.cpp",
     "MessageDef/ListBuilder.cpp",
-    "MessageDef/ListBuilder.h",
     "MessageDef/ListParser.cpp",
-    "MessageDef/ListParser.h",
+    "MessageDef/MessageBuilder.cpp",
+    "MessageDef/MessageBuilder.h",
     "MessageDef/MessageDefHelper.cpp",
     "MessageDef/MessageDefHelper.h",
+    "MessageDef/MessageParser.cpp",
+    "MessageDef/MessageParser.h",
     "MessageDef/Parser.cpp",
     "MessageDef/Parser.h",
-    "MessageDef/ReadRequest.cpp",
-    "MessageDef/ReadRequest.h",
-    "MessageDef/ReportData.cpp",
-    "MessageDef/ReportData.h",
+    "MessageDef/ReadRequestMessage.cpp",
+    "MessageDef/ReadRequestMessage.h",
+    "MessageDef/ReportDataMessage.cpp",
+    "MessageDef/ReportDataMessage.h",
     "MessageDef/StatusIB.cpp",
     "MessageDef/StatusIB.h",
-    "MessageDef/StatusResponse.cpp",
-    "MessageDef/SubscribeRequest.cpp",
-    "MessageDef/SubscribeResponse.cpp",
-    "MessageDef/TimedRequest.cpp",
-    "MessageDef/WriteRequest.cpp",
-    "MessageDef/WriteResponse.cpp",
+    "MessageDef/StatusResponseMessage.cpp",
+    "MessageDef/StructBuilder.cpp",
+    "MessageDef/StructParser.cpp",
+    "MessageDef/SubscribeRequestMessage.cpp",
+    "MessageDef/SubscribeResponseMessage.cpp",
+    "MessageDef/TimedRequestMessage.cpp",
+    "MessageDef/WriteRequestMessage.cpp",
+    "MessageDef/WriteResponseMessage.cpp",
+    "OTAUserConsentCommon.h",
+    "OperationalDeviceProxy.cpp",
+    "OperationalDeviceProxy.h",
+    "OperationalDeviceProxyPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "RequiredPrivilege.cpp",
+    "RequiredPrivilege.h",
+    "StatusResponse.cpp",
+    "StatusResponse.h",
+    "TimedHandler.cpp",
+    "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "decoder.cpp",
-    "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
 
-  if (chip_ip_commissioning) {
-    defines = [
-      "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
-    ]
-  }
-
   public_deps = [
     ":app_buildconfig",
+    "${chip_root}/src/access",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/secure_channel",

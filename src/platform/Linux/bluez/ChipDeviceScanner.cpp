@@ -117,21 +117,27 @@ std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * ada
     return std::make_unique<ChipDeviceScanner>(manager.get(), adapter, cancellable.get(), delegate);
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
+CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(MainLoop::Instance().EnsureStarted());
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
-    if (!MainLoop::Instance().Schedule(MainLoopStartScan, this))
+    if (!MainLoop::Instance().ScheduleAndWait(MainLoopStartScan, this))
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
         mIsScanning = false;
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
+    if (!mIsScanning)
+    {
+        ChipLogError(Ble, "Failed to start BLE scan.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -288,7 +294,7 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     {
         // Not critical: ignore if fails
         ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
-        g_error_free(error);
+        g_clear_error(&error);
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");

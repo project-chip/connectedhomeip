@@ -1,0 +1,17 @@
+{{! For now, just initialize fields to type defaults.  Longer-term, we
+    may want to use spec-defined default values here. }}
+{{#unless isOptional}} {{! Optionals inited by constructor }}
+  {{~#unless isNullable}} {{! Nullables inited by constructor }}
+    {{~#unless isArray}} {{! DataModel lists inited by constructor }}
+      {{~#unless entryType}} {{! DataModel lists (for attributes) inited by constructor }}
+        {{~#unless (isString type)}} {{! Strings are Spans, inited by constructor }}
+          {{~#if_is_struct type}}
+            {{! Structs have their own initializers }}
+          {{~else~}}
+          = static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>(0)
+          {{~/if_is_struct}}
+        {{~/unless}}
+      {{~/unless}}
+    {{~/unless}}
+  {{~/unless}}
+{{~/unless}}

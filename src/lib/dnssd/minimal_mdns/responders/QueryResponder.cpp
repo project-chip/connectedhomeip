@@ -45,7 +45,7 @@ void QueryResponderBase::Init()
 
     if (mResponderInfoSize < 2)
     {
-        // Nothing usefull really
+        // Nothing useful really
         ChipLogError(Discovery, "Query responder storage size too small");
     }
 }
@@ -161,7 +161,7 @@ void QueryResponderBase::ClearBroadcastThrottle()
 {
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
-        mResponderInfos[i].lastMulticastTime = 0;
+        mResponderInfos[i].lastMulticastTime = chip::System::Clock::kZero;
     }
 }
 

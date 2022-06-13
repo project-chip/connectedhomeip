@@ -30,11 +30,12 @@ template("efr32_executable") {
   # or in different containers.
 
   flashing_runtime_target = target_name + ".flashing_runtime"
+  flashing_script_inputs = [
+    "${chip_root}/scripts/flashing/efr32_firmware_utils.py",
+    "${chip_root}/scripts/flashing/firmware_utils.py",
+  ]
   copy(flashing_runtime_target) {
-    sources = [
-      "${chip_root}/scripts/flashing/efr32_firmware_utils.py",
-      "${chip_root}/scripts/flashing/firmware_utils.py",
-    ]
+    sources = flashing_script_inputs
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 
@@ -43,8 +44,28 @@ template("efr32_executable") {
   flashing_script_name = output_base_name + ".flash.py"
   flashing_options = [ "efr32" ]
 
-  flashable_executable(target_name) {
+  flash_target_name = target_name + ".flash_executable"
+  flashbundle_name = "${target_name}.flashbundle.txt"
+  flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]
+  }
+
+  # Add a target which generates the hex file in addition to s37.
+  executable_target = "$flash_target_name.executable"
+  hex_image_name = output_base_name + ".hex"
+  hex_target_name = target_name + ".hex"
+  objcopy_convert(hex_target_name) {
+    conversion_input = "${root_out_dir}/${invoker.output_name}"
+    conversion_output = "${root_out_dir}/${hex_image_name}"
+    conversion_target_format = "ihex"
+    deps = [ ":$executable_target" ]
+  }
+
+  group(target_name) {
+    deps = [
+      ":$flash_target_name",
+      ":$hex_target_name",
+    ]
   }
 }

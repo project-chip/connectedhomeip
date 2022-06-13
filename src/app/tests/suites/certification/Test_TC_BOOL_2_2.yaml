@@ -1,0 +1,138 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 68.2.2. [TC-BOOL-2.2] Primary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Bring the DUT into a state so StateValue is FALSE"
+      verification: |
+          Manual operation
+      disabled: true
+
+    - label: "TH reads the StateValue attribute from the DUT"
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
+      disabled: true
+
+    - label: "Bring the DUT into a state so StateValue is TRUE"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the StateValue attribute from the DUT"
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
+      disabled: true
+
+    - label: "Set up subscription to StateChange event"
+      verification: |
+          ./chip-tool booleanstate subscribe state-value 1 100 1 1 1
+      disabled: true
+
+    - label: "Bring the DUT into a state so StateValue is FALSE"
+      verification: |
+          [1646119162.627309][3311:3316] CHIP:DMG: ReportDataMessage =
+          [1646119162.627342][3311:3316] CHIP:DMG: {
+          [1646119162.627370][3311:3316] CHIP:DMG:        SubscriptionId = 0xb3476ff99df21d7f,
+          [1646119162.627397][3311:3316] CHIP:DMG:        AttributeReportIBs =
+          [1646119162.627432][3311:3316] CHIP:DMG:        [
+          [1646119162.627454][3311:3316] CHIP:DMG:                AttributeReportIB =
+          [1646119162.627483][3311:3316] CHIP:DMG:                {
+          [1646119162.627505][3311:3316] CHIP:DMG:                        AttributeDataIB =
+          [1646119162.627530][3311:3316] CHIP:DMG:                        {
+          [1646119162.627562][3311:3316] CHIP:DMG:                                DataVersion = 0x7ed289df,
+          [1646119162.627592][3311:3316] CHIP:DMG:                                AttributePathIB =
+          [1646119162.627623][3311:3316] CHIP:DMG:                                {
+          [1646119162.627654][3311:3316] CHIP:DMG:                                        Endpoint = 0x1,
+          [1646119162.627685][3311:3316] CHIP:DMG:                                        Cluster = 0x45,
+          [1646119162.627721][3311:3316] CHIP:DMG:                                        Attribute = 0x0000_0000,
+          [1646119162.627759][3311:3316] CHIP:DMG:                                }
+          [1646119162.627794][3311:3316] CHIP:DMG:
+          [1646119162.627830][3311:3316] CHIP:DMG:                                        Data = false,
+          [1646119162.627860][3311:3316] CHIP:DMG:                        },
+          [1646119162.627888][3311:3316] CHIP:DMG:
+          [1646119162.627909][3311:3316] CHIP:DMG:                },
+          [1646119162.627938][3311:3316] CHIP:DMG:
+          [1646119162.627960][3311:3316] CHIP:DMG:        ],
+          [1646119162.627991][3311:3316] CHIP:DMG:
+          [1646119162.628013][3311:3316] CHIP:DMG:        InteractionModelRevision = 1
+          [1646119162.628035][3311:3316] CHIP:DMG: }
+          [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: FALSE
+      disabled: true
+
+    - label: "TH reads the StateValue attribute from the DUT"
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
+      disabled: true
+
+    - label: "Bring the DUT into a state so StateValue is TRUE"
+      verification: |
+          [1646119162.627309][3311:3316] CHIP:DMG: ReportDataMessage =
+          [1646119162.627342][3311:3316] CHIP:DMG: {
+          [1646119162.627370][3311:3316] CHIP:DMG:        SubscriptionId = 0xb3476ff99df21d7f,
+          [1646119162.627397][3311:3316] CHIP:DMG:        AttributeReportIBs =
+          [1646119162.627432][3311:3316] CHIP:DMG:        [
+          [1646119162.627454][3311:3316] CHIP:DMG:                AttributeReportIB =
+          [1646119162.627483][3311:3316] CHIP:DMG:                {
+          [1646119162.627505][3311:3316] CHIP:DMG:                        AttributeDataIB =
+          [1646119162.627530][3311:3316] CHIP:DMG:                        {
+          [1646119162.627562][3311:3316] CHIP:DMG:                                DataVersion = 0x7ed289df,
+          [1646119162.627592][3311:3316] CHIP:DMG:                                AttributePathIB =
+          [1646119162.627623][3311:3316] CHIP:DMG:                                {
+          [1646119162.627654][3311:3316] CHIP:DMG:                                        Endpoint = 0x1,
+          [1646119162.627685][3311:3316] CHIP:DMG:                                        Cluster = 0x45,
+          [1646119162.627721][3311:3316] CHIP:DMG:                                        Attribute = 0x0000_0000,
+          [1646119162.627759][3311:3316] CHIP:DMG:                                }
+          [1646119162.627794][3311:3316] CHIP:DMG:
+          [1646119162.627830][3311:3316] CHIP:DMG:                                        Data = true,
+          [1646119162.627860][3311:3316] CHIP:DMG:                        },
+          [1646119162.627888][3311:3316] CHIP:DMG:
+          [1646119162.627909][3311:3316] CHIP:DMG:                },
+          [1646119162.627938][3311:3316] CHIP:DMG:
+          [1646119162.627960][3311:3316] CHIP:DMG:        ],
+          [1646119162.627991][3311:3316] CHIP:DMG:
+          [1646119162.628013][3311:3316] CHIP:DMG:        InteractionModelRevision = 1
+          [1646119162.628035][3311:3316] CHIP:DMG: }
+          [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: TRUE
+      disabled: true
+
+    - label: "TH reads the StateValue attribute from the DUT"
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
+      disabled: true

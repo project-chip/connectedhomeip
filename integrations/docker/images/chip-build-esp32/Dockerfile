@@ -4,22 +4,13 @@ FROM connectedhomeip/chip-build:${VERSION} as build
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    git=1:2.25.1-1ubuntu3.2 \
+    git=1:2.25.1-1ubuntu3.4 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
-    && git clone --depth 1 --recursive -b v4.3 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
-    && : # last line
-
-# TODO: Remove this patch once https://github.com/espressif/esp-idf/pull/7632 is available
-COPY 0001-esp_crt_bundle-remove-EC-ACC-certificate.patch /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch
-
-WORKDIR /tmp/esp-idf
-RUN set -x \
-    && git apply /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch \
-    && rm -f /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch \
+    && git clone --recursive -b v4.4.1 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}

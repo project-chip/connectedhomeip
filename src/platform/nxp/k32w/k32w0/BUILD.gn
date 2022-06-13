@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("k32w0") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -35,6 +36,8 @@ static_library("k32w0") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "K32W0Config.cpp",
     "K32W0Config.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -44,8 +47,17 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "RamStorage.cpp",
+    "RamStorage.h",
     "ble_function_mux.c",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
 
   deps = []
 
@@ -65,4 +77,7 @@ static_library("k32w0") {
   }
 
   public_deps += [ "${chip_root}/src/crypto" ]
+
+  public_configs =
+      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 }

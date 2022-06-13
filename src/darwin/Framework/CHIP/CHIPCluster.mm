@@ -17,6 +17,7 @@
 
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
+#import "NSDataSpanConversion.h"
 
 using namespace ::chip;
 
@@ -48,15 +49,48 @@ using namespace ::chip;
     return nullptr;
 }
 
-- (chip::ByteSpan)asSpan:(id)value
+- (chip::ByteSpan)asByteSpan:(NSData *)value
 {
-    if ([value isKindOfClass:[NSData class]]) {
-        NSData * v = (NSData *) value;
-        return chip::ByteSpan((const uint8_t *) v.bytes, v.length);
-    } else {
-        NSString * v = (NSString *) value;
-        return chip::ByteSpan((const uint8_t *) [v dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [v lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-    }
+    return AsByteSpan(value);
 }
+
+- (chip::CharSpan)asCharSpan:(NSString *)value
+{
+    return chip::CharSpan(static_cast<const char *>([value dataUsingEncoding:NSUTF8StringEncoding].bytes),
+        [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+}
+@end
+
+@implementation CHIPWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedWriteTimeoutMs = nil;
+    }
+    return self;
+}
+
+@end
+
+@implementation CHIPReadParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _fabricFiltered = nil;
+    }
+    return self;
+}
+
+@end
+
+@implementation CHIPSubscribeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _keepPreviousSubscriptions = nil;
+        _autoResubscribe = nil;
+    }
+    return self;
+}
+
 @end

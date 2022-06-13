@@ -15,6 +15,10 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
 	soc {
 		/* Add a flash controller which has the compatible
 		 * 'zephyr,sim-flash'. This will ensure that the flash
@@ -59,4 +63,24 @@
 		};
 	};
 
+};
+
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&gpio1 {
+	status = "disabled";
+};
+&i2c1 {
+	status = "disabled";
+};
+&pwm0 {
+	status = "disabled";
+};
+&spi2 {
+	status = "disabled";
+};
+&usbd {
+	status = "disabled";
 };

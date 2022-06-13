@@ -46,15 +46,17 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
         Close();
     }
 
-    err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
+    err = params.GetEndPointManager()->NewEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
+
+    mUDPEndPoint->SetNativeParams(params.GetNativeParams());
 
     ChipLogDetail(Inet, "UDP::Init bind&listen port=%d", params.GetListenPort());
 
     err = mUDPEndPoint->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Listen(OnUdpReceive, nullptr /*onReceiveError*/, this);
+    err = mUDPEndPoint->Listen(OnUdpReceive, OnUdpError, this);
     SuccessOrExit(err);
 
     mUDPEndpointType = params.GetAddressType();
@@ -111,10 +113,10 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
+    UDP * udp               = reinterpret_cast<UDP *>(endPoint->mAppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
 
     udp->HandleMessageReceived(peerAddress, std::move(buffer));
@@ -123,6 +125,26 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHan
     {
         ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
     }
+}
+
+void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
+{
+    ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+}
+
+CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
+{
+    char addressStr[Transport::PeerAddress::kMaxToStringSize];
+    address.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
+
+    if (join)
+    {
+        ChipLogProgress(Inet, "Joining Multicast Group with address %s", addressStr);
+        return mUDPEndPoint->JoinMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
+    }
+
+    ChipLogProgress(Inet, "Leaving Multicast Group with address %s", addressStr);
+    return mUDPEndPoint->LeaveMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
 }
 
 } // namespace Transport

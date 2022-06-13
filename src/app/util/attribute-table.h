@@ -47,23 +47,12 @@
 
 // Remote devices writing attributes of local device
 EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                            uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
-                                            EmberAfAttributeType dataType);
+                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-void emberAfRetrieveAttributeAndCraftResponse(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attrId,
-                                              uint8_t mask, uint16_t manufacturerCode, uint16_t readLength);
-EmberAfStatus emberAfAppendAttributeReportFields(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                 chip::AttributeId attributeId, uint8_t mask, uint8_t * buffer, uint8_t bufLen,
-                                                 uint8_t * bufIndex);
 void emberAfPrintAttributeTable(void);
 
-bool emberAfReadSequentialAttributesAddToResponse(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                  chip::AttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
-                                                  uint8_t maxAttributeIds, bool includeAccessControl);
+EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
 
-EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                 uint16_t manufacturerCode, uint8_t * data, EmberAfAttributeType dataType,
-                                 bool overrideReadOnlyAndDataType, bool justTest);
-
-EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);

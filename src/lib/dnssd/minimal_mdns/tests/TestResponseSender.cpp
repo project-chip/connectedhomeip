@@ -21,6 +21,7 @@
 
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
@@ -46,6 +47,7 @@ struct CommonTestElements
     uint8_t * requestNameStart   = requestStorage + ConstHeaderRef::kSizeBytes;
     Encoding::BigEndian::BufferWriter requestBufferWriter =
         Encoding::BigEndian::BufferWriter(requestNameStart, sizeof(requestStorage) - HeaderRef::kSizeBytes);
+    RecordWriter recordWriter;
 
     uint8_t dnsSdServiceStorage[64];
     uint8_t serviceNameStorage[64];
@@ -71,6 +73,7 @@ struct CommonTestElements
     Inet::IPPacketInfo packetInfo;
 
     CommonTestElements(nlTestSuite * inSuite, const char * tag) :
+        recordWriter(&requestBufferWriter),
         dnsSd(FlatAllocatedQName::Build(dnsSdServiceStorage, "_services", "_dns-sd", "_udp", "local")),
         service(FlatAllocatedQName::Build(serviceNameStorage, tag, "service")),
         instance(FlatAllocatedQName::Build(instanceNameStorage, tag, "instance")),
@@ -90,7 +93,7 @@ void SrvAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.srvResponder);
 
     // Build a query for our srv record
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -110,7 +113,7 @@ void SrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance name
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -133,11 +136,11 @@ void PtrSrvTxtAnyResponseToServiceName(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the service name
-    common.service.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.service);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
-    // We should get all because we request to report all instance names when teh PTR is sent.
+    // We should get all because we request to report all instance names when the PTR is sent.
     common.server.AddExpectedRecord(&common.ptrRecord);
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
@@ -158,7 +161,7 @@ void PtrSrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance name
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -182,7 +185,7 @@ void PtrSrvTxtSrvResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::SRV, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -205,7 +208,7 @@ void PtrSrvTxtAnyResponseToServiceListing(nlTestSuite * inSuite, void * inContex
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the dns-sd services listing.
-    common.dnsSd.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.dnsSd);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -226,15 +229,15 @@ void NoQueryResponder(nlTestSuite * inSuite, void * inContext)
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
-    common.dnsSd.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.dnsSd);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
-    common.service.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.service);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 }
@@ -250,24 +253,29 @@ void AddManyQueryResponders(nlTestSuite * inSuite, void * inContext)
     QueryResponder<1> q5;
     QueryResponder<1> q6;
     QueryResponder<1> q7;
-    QueryResponder<1> q8;
 
     // We should be able to re-add the same query responder as many times as we want.
-    for (size_t i = 0; i < ResponseSender::kMaxQueryResponders + 1; ++i)
+    // and it shold only count as one
+    constexpr size_t kAddLoopSize = 1000;
+    for (size_t i = 0; i < kAddLoopSize; ++i)
     {
         NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q1) == CHIP_NO_ERROR);
     }
 
-    // There are 7 total
+    // removing the only copy should clear out everything
+    responseSender.RemoveQueryResponder(&q1);
+    NL_TEST_ASSERT(inSuite, !responseSender.HasQueryResponders());
+
+    // At least 7 should be supported:
+    //   - 5 is the spec minimum
+    //   - 2 for commissionable and commisioner responders
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q3) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q4) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q5) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q6) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q7) == CHIP_NO_ERROR);
-
-    // Last one should return a no memory error (no space)
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&q8) == CHIP_ERROR_NO_MEMORY);
 }
 
 void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inContext)
@@ -289,7 +297,7 @@ void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inConte
     common2.queryResponder.AddResponder(&common2.txtResponder);
 
     // Build a query for the second instance.
-    common2.instance.Output(common2.requestBufferWriter);
+    common2.recordWriter.WriteQName(common2.instance);
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common2.requestNameStart, common2.requestBytesRange);
 
     // Should get back answers from second instance only.
@@ -321,7 +329,7 @@ void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * i
     common2.queryResponder.AddResponder(&common2.txtResponder);
 
     // Build a query for the instance
-    common1.dnsSd.Output(common1.requestBufferWriter);
+    common1.recordWriter.WriteQName(common1.dnsSd);
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common1.requestNameStart, common1.requestBytesRange);
 
     // Should get service listing from both.
@@ -351,12 +359,22 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL() //
 };
 
+int TestSetup(void * inContext)
+{
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 int TestResponseSender(void)
 {
-    chip::Platform::MemoryInit();
-    nlTestSuite theSuite = { "RecordData", sTests, nullptr, nullptr };
+    nlTestSuite theSuite = { "RecordData", sTests, &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

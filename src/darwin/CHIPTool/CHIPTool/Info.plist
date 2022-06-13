@@ -16,8 +16,28 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mt</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>CommissioningCustomFlowLedgerUrl</key>
+		<string>https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
+		<key>CommissioningCustomFlowReturnUrl</key>
+		<string>mt://modelinfo?payload</string>
+		<key>CommissioningCustomFlowUseMockFlag</key>
+		<true/>
+	</dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
@@ -27,6 +47,8 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_matter._tcp</string>
+		<string>_matterc._udp</string>
+		<string>_matterd._udp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan QR code</string>

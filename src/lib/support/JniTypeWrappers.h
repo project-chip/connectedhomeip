@@ -17,27 +17,45 @@
 
 #pragma once
 
-#include "JniReferences.h"
 #include <cstdint>
-
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
-#include <sstream>
+#include <string>
 
 namespace chip {
 /// Exposes the underlying UTF string from a jni string
 class JniUtfString
 {
 public:
-    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string) { mChars = env->GetStringUTFChars(string, 0); }
-    ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
+    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string)
+    {
+        if (string == nullptr)
+        {
+            return;
+        }
+        mChars      = env->GetStringUTFChars(string, 0);
+        mDataLength = env->GetStringUTFLength(string);
+    }
+    ~JniUtfString()
+    {
+        if (mString != nullptr)
+        {
+            mEnv->ReleaseStringUTFChars(mString, mChars);
+        }
+    }
 
     const char * c_str() const { return mChars; }
+
+    chip::CharSpan charSpan() const { return chip::CharSpan(c_str(), static_cast<size_t>(size())); }
+
+    jsize size() const { return mDataLength; }
 
 private:
     JNIEnv * mEnv;
     jstring mString;
     const char * mChars;
+    jsize mDataLength;
 };
 
 /// Exposes the underlying binary data from a jni byte array
@@ -50,7 +68,12 @@ public:
     ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
 
     const jbyte * data() const { return mData; }
-    chip::ByteSpan byteSpan() const { return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), size()); }
+
+    chip::ByteSpan byteSpan() const
+    {
+        return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), static_cast<size_t>(size()));
+    }
+
     jsize size() const { return mDataLength; }
 
 private:
@@ -65,14 +88,10 @@ class UtfString
 {
 public:
     UtfString(JNIEnv * env, const char * data) : mEnv(env) { mData = data != nullptr ? mEnv->NewStringUTF(data) : nullptr; }
-    UtfString(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
+    UtfString(JNIEnv * env, chip::CharSpan data) : mEnv(env)
     {
-        std::ostringstream os;
-        for (size_t i = 0; i < data.size(); i++)
-        {
-            os << data.data()[i];
-        }
-        mData = env->NewStringUTF(os.str().c_str());
+        std::string str(data.data(), data.size());
+        mData = env->NewStringUTF(str.c_str());
     }
     ~UtfString() { mEnv->DeleteLocalRef(mData); }
 
@@ -93,6 +112,14 @@ public:
         if (mArray != nullptr)
         {
             env->SetByteArrayRegion(mArray, 0, dataLen, data);
+        }
+    }
+    ByteArray(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
+    {
+        mArray = mEnv->NewByteArray(static_cast<jsize>(data.size()));
+        if (mArray != nullptr)
+        {
+            env->SetByteArrayRegion(mArray, 0, static_cast<jsize>(data.size()), reinterpret_cast<const jbyte *>(data.data()));
         }
     }
     ~ByteArray() { mEnv->DeleteLocalRef(mArray); }

@@ -3,7 +3,6 @@
 #pragma once
 
 {{#zcl_clusters}}
-{{#*inline "callbackName"}}void __attribute__((weak)) Matter{{asUpperCamelCase label}}{{> @partial-block}}InitCallback() {};{{/inline}}
-{{#>callbackName}}PluginClient{{/callbackName}}
-{{#>callbackName}}PluginServer{{/callbackName}}
+void __attribute__((weak))  Matter{{asUpperCamelCase label}}PluginClientInitCallback() {}
+void Matter{{asUpperCamelCase label}}PluginServerInitCallback();
 {{/zcl_clusters}}

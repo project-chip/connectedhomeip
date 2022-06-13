@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "ListBuilder.h"
-#include "ListParser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -40,24 +40,22 @@ namespace chip {
 namespace app {
 struct StatusIB
 {
+    StatusIB() = default;
+    StatusIB(Protocols::InteractionModel::Status imStatus) : mStatus(imStatus) {}
+    StatusIB(Protocols::InteractionModel::Status imStatus, ClusterStatus clusterStatus) :
+        mStatus(imStatus), mClusterStatus(clusterStatus)
+    {}
+    explicit StatusIB(CHIP_ERROR error) { InitFromChipError(error); }
+
     enum class Tag : uint8_t
     {
         kStatus        = 0,
         kClusterStatus = 1,
     };
 
-    class Parser : public chip::app::Parser
+    class Parser : public StructParser
     {
     public:
-        /**
-         *  @brief Initialize the parser object with TLVReader
-         *
-         *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this StatusIB
-         *
-         *  @return #CHIP_NO_ERROR on success
-         */
-        CHIP_ERROR Init(const TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
         /**
          *  @brief Roughly verify the message is correctly formed
@@ -85,29 +83,9 @@ struct StatusIB
         CHIP_ERROR DecodeStatusIB(StatusIB & aStatusIB) const;
     };
 
-    class Builder : public chip::app::Builder
+    class Builder : public StructBuilder
     {
     public:
-        /**
-         *  @brief Initialize a StatusIB::Builder for writing into a TLV stream
-         *
-         *  @param [in] apWriter    A pointer to TLVWriter
-         *
-         *  @return #CHIP_NO_ERROR on success
-         */
-        CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
-
-        /**
-         * Init the StatusIB container with an particular context tag.
-         * Required to implement arrays of arrays, and to test ListBuilder.
-         *
-         * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-         * @param[in]   aContextTagToUse    A contextTag to use.
-         *
-         * @return                  CHIP_ERROR codes returned by chip::TLV objects.
-         */
-        CHIP_ERROR Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
-
         /**
          * Write the StatusIB into TLV and close the container
          *
@@ -117,6 +95,36 @@ struct StatusIB
          */
         StatusIB::Builder & EncodeStatusIB(const StatusIB & aStatusIB);
     };
+
+    /**
+     * Encapsulate a StatusIB in a CHIP_ERROR.  This can be done for any
+     * StatusIB, but will treat all success codes (including cluster-specific
+     * ones) as CHIP_NO_ERROR.  The resulting CHIP_ERROR will either be
+     * CHIP_NO_ERROR or test true for IsIMStatus().
+     */
+    CHIP_ERROR ToChipError() const;
+
+    /**
+     * Extract a CHIP_ERROR into this StatusIB.  If IsIMStatus() is false for
+     * the error, this might do a best-effort attempt to come up with a
+     * corresponding StatusIB, defaulting to a generic Status::Failure.
+     */
+    void InitFromChipError(CHIP_ERROR aError);
+
+    /**
+     * Test whether this status is a success.
+     */
+    bool IsSuccess() const { return mStatus == Protocols::InteractionModel::Status::Success; }
+
+    /**
+     * Test whether this status is a failure.
+     */
+    bool IsFailure() const { return !IsSuccess(); }
+
+    /**
+     * Register the StatusIB error formatter.
+     */
+    static void RegisterErrorFormatter();
 
     Protocols::InteractionModel::Status mStatus = Protocols::InteractionModel::Status::Success;
     Optional<ClusterStatus> mClusterStatus      = Optional<ClusterStatus>::Missing();

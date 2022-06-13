@@ -26,10 +26,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,6 +44,7 @@
 #include <IOKit/network/IOEthernetController.h>
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
+#include <IOKit/network/IONetworkMedium.h>
 #endif // TARGET_OS_OSX
 
 namespace chip {
@@ -96,15 +100,26 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {
-        CFTypeRef MACAddressAsCFData = nullptr;
-        kernResult                   = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
+        CFTypeRef MACAddressAsCFData   = nullptr;
+        CFTypeRef linkStatusAsCFNumber = nullptr;
+        kernResult                     = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
 
-        MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
-        VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+        linkStatusAsCFNumber = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOLinkStatus), kCFAllocatorDefault, 0);
+        VerifyOrExit(linkStatusAsCFNumber != nullptr, err = CHIP_ERROR_INTERNAL);
 
-        CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
-        CFRelease(MACAddressAsCFData);
+        uint64_t linkStatus;
+        CFNumberGetValue((CFNumberRef) linkStatusAsCFNumber, CFNumberType::kCFNumberLongType, &linkStatus);
+        CFRelease(linkStatusAsCFNumber);
+
+        if ((linkStatus & kIONetworkLinkValid) && (linkStatus & kIONetworkLinkActive))
+        {
+            MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
+            VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
+            CFRelease(MACAddressAsCFData);
+        }
 
         kernResult = IOObjectRelease(controllerService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
@@ -128,23 +143,69 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
-/** Singleton instance of the ConfigurationManager implementation object.
- */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
-
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
-    CHIP_ERROR err;
-
-    // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    static ConfigurationManagerImpl sInstance;
+    return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::Init()
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_NO_ERROR;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    // Initialize the generic implementation base class.
+    ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    {
+        ReturnErrorOnFailure(StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    {
+        ReturnErrorOnFailure(StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID));
+    }
+
+    uint32_t rebootCount;
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
+    {
+        // The first boot after factory reset of the Node.
+        ReturnErrorOnFailure(StoreRebootCount(1));
+    }
+    else
+    {
+        ReturnErrorOnFailure(GetRebootCount(rebootCount));
+        ReturnErrorOnFailure(StoreRebootCount(rebootCount + 1));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_TotalOperationalHours))
+    {
+        ReturnErrorOnFailure(StoreTotalOperationalHours(0));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
+    {
+        ReturnErrorOnFailure(StoreBootReason(to_underlying(BootReasonType::kUnspecified)));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location));
+    }
+
+    return CHIP_NO_ERROR;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if TARGET_OS_OSX
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -162,20 +223,151 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif // TARGET_OS_OSX
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO(#742): query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     ChipLogError(DeviceLayer, "InitiateFactoryReset not implemented");
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
 {
-    PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -183,12 +375,143 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValue(key, val);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValueStr(key, str);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValueStr(key, str, strLen);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return PosixConfig::WriteConfigValueBin(key, data, dataLen);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    PosixConfig::RunConfigUnitTest();
+#endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
 } // namespace DeviceLayer

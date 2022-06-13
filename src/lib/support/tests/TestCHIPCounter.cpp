@@ -23,13 +23,13 @@
 
 static void CheckStartWithZero(nlTestSuite * inSuite, void * inContext)
 {
-    chip::MonotonicallyIncreasingCounter counter;
+    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
     NL_TEST_ASSERT(inSuite, counter.GetValue() == 0);
 }
 
 static void CheckInitialize(nlTestSuite * inSuite, void * inContext)
 {
-    chip::MonotonicallyIncreasingCounter counter;
+    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
 
     NL_TEST_ASSERT(inSuite, counter.Init(4321) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, counter.GetValue() == 4321);
@@ -37,7 +37,7 @@ static void CheckInitialize(nlTestSuite * inSuite, void * inContext)
 
 static void CheckAdvance(nlTestSuite * inSuite, void * inContext)
 {
-    chip::MonotonicallyIncreasingCounter counter;
+    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
 
     NL_TEST_ASSERT(inSuite, counter.Init(22) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, counter.GetValue() == 22);

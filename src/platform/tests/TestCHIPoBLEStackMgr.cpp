@@ -52,8 +52,8 @@ int TestCHIPoBLEStackManager()
     ChipLogProgress(DeviceLayer, "Start Chip Over Ble stack Done");
 
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
-    ChipLogProgress(DeviceLayer, "Start EventLoop");
-
+    ChipLogProgress(DeviceLayer, "RunEventLoop completed");
+    chip::Platform::MemoryShutdown();
     return 0;
 }
 

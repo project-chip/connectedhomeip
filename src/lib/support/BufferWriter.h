@@ -59,7 +59,10 @@ public:
     }
 
     /// Number of bytes required to satisfy all calls to Put() so far
-    size_t Needed() const { return mNeeded; }
+    inline size_t Needed() const { return mNeeded; }
+
+    /// Alias to Needed() for code clarity: current writing position for the buffer.
+    inline size_t WritePos() const { return Needed(); }
 
     /// Number of bytes still available for writing
     size_t Available() const { return mSize < mNeeded ? 0 : mSize - mNeeded; }

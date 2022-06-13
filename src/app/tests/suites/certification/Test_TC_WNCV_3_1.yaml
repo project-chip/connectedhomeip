@@ -12,99 +12,282 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-3.1] UpOrOpen Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-3.1] UpOrOpen Command & Report Verification with
+    server as DUT
 
-# TODO: WindowCovering tests TC-WNCV-3.1 finalize featuremap conditional dependencies
+# TC-WNCV tests featuremap conditional dependencies -> use PICS
 
 config:
+    nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
 
 tests:
-    ### Step 1x -> Initialize Position
-    ### MANDATORY Command
-    - label: "1a: TH adjusts the the DUT to a non-open position"
+    - label: "0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ################ Position Init Phase #############
+    ### Step 1x -> Initialize the Covering position before any testing
+    ### MANDATORY Init Commands
+    - label:
+          "1a: TH sends DownOrClose command to preposition the DUT in the
+          opposite direction"
       command: "DownOrClose"
 
-    ### Depends on the FeatureMap
+    - label: "1b: TH Waits for 10 seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    ###
+    ### Mandatory Depends on the FeatureMap
     - label:
-          "1b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV_LF && WNCV_PA_LF
       response:
           constraints:
               type: uint16
+              minValue: 1
+              maxValue: 10000
 
-    ### Depends on the FeatureMap
+    ### Optional Depends on the FeatureMap
     - label:
-          "1b: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          "1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      response:
+          constraints:
+              type: uint8
+              minValue: 1
+              maxValue: 100
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV_TL && WNCV_PA_TL
       response:
           constraints:
               type: uint16
+              minValue: 1
+              maxValue: 10000
 
-    ### Step 2x -> Check Command instant effect
+    ### Optional Depends on the FeatureMap
+    - label:
+          "1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      response:
+          constraints:
+              type: uint8
+              minValue: 1
+              maxValue: 100
+
+    ######## UpOrOpen Command #######
+    ### Step 2x -> Check UpOrOpen Fast effects
+
+    - label: "2: Subscribe to DUT reports on OperationalStatus attribute"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 4
+      maxInterval: 5
+      response:
+          constraints:
+              type: map8
+
     ### MANDATORY Command
     - label: "2a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
 
-    ### Depends on the FeatureMap
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "2b: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    ### Mandatory Depends on the FeatureMap
     - label:
-          "2b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV_LF && WNCV_PA_LF
       response:
-          constraints:
-              type: uint16
+          value: 0
 
-    ### Depends on the FeatureMap
+    ### Mandatory Depends on the FeatureMap
     - label:
-          "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          "2d: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV_TL && WNCV_PA_TL
+      response:
+          value: 0
+
+    - label: "2e: TH leave the device moving for 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    ######## UpOrOpen Reports #######
+    ### Step 3x -> Check UpOrOpen Mid term effects
+    ### Depends on the FeatureMap
+    # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
+    # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
+    - label:
+          "3a1: Verify DUT reports OperationalStatus attribute to TH after a
+          UpOrOpen"
+      command: "waitForReport"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: map8
+              minValue: 5
+              maxValue: 21
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "3a2: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV_LF && WNCV_PA_LF
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 9999
 
-    ### Depends on a sleep/wait command how to do this with a real device
-    - label: "2d: Wait for the movement to finish"
-      disabled: true
+    ### Optional Depends on the FeatureMap
+    - label:
+          "3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 99
 
-    ### Step 3x -> Check longer period effect
-    ### MANDATORY reads
-    - label: "3a: TH reads OperationalStatus attribute from DUT"
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV_TL && WNCV_PA_TL
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 9999
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 99
+
+    ######## STOP #######
+    ### Step 4x -> Check StopMotion fast effects
+    ### MANDATORY Command
+    - label: "4a: TH sends a StopMotion command to DUT"
+      command: "StopMotion"
+
+    - label:
+          "4b: TH waits for 3 seconds the end of inertial movement(s) on the
+          device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    ### Must Be ZERO
+    # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
+    - label:
+          "4c: Verify DUT update OperationalStatus attribute to TH after a
+          StopMotion"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
           value: 0
 
-    ### Depends on the FeatureMap
-    - label:
-          "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      response:
-          constraints:
-              type: uint16
+    ### Step 5x -> Check Stop Motion longer period effect
+    - label: "5a: TH waits for x seconds attributes update on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
-    ### Depends on the FeatureMap
+    ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionLiftPercent100ths
     - label:
-          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          "5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV_LF && WNCV_PA_LF
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 9999
+
+    ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionTiltPercent100ths
+    - label:
+          "5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV_TL && WNCV_PA_TL
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 9999

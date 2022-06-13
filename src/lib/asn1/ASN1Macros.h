@@ -86,17 +86,27 @@
     }                                                                                                                              \
     while (0)
 
+#define ASN1_SKIP_AND_EXIT_CONSTRUCTED                                                                                             \
+    ASN1_ERR = ASN1_READER.ExitConstructedType();                                                                                  \
+    SuccessOrExit(ASN1_ERR);                                                                                                       \
+    }                                                                                                                              \
+    while (0)
+
 #define ASN1_PARSE_ENTER_SEQUENCE ASN1_PARSE_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Sequence)
 
 #define ASN1_ENTER_SEQUENCE ASN1_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Sequence)
 
 #define ASN1_EXIT_SEQUENCE ASN1_EXIT_CONSTRUCTED
 
+#define ASN1_SKIP_AND_EXIT_SEQUENCE ASN1_SKIP_AND_EXIT_CONSTRUCTED
+
 #define ASN1_PARSE_ENTER_SET ASN1_PARSE_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Set)
 
 #define ASN1_ENTER_SET ASN1_ENTER_CONSTRUCTED(kASN1TagClass_Universal, kASN1UniversalTag_Set)
 
 #define ASN1_EXIT_SET ASN1_EXIT_CONSTRUCTED
+
+#define ASN1_SKIP_AND_EXIT_SET ASN1_SKIP_AND_EXIT_CONSTRUCTED
 
 #define ASN1_ENTER_ENCAPSULATED(CLASS, TAG)                                                                                        \
     do                                                                                                                             \

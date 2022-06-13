@@ -30,3 +30,10 @@ arm_toolchain("qpg_lighting_app") {
     import("${chip_root}/examples/lighting-app/qpg/args.gni")
   }
 }
+
+arm_toolchain("qpg_shell_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/shell-app/qpg/args.gni")
+  }
+}

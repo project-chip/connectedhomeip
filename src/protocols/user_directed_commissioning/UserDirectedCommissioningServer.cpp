@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicited
  *      recipient (server).
  *
  */
@@ -47,9 +47,8 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    char instanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
-    size_t instanceNameLength =
-        (msg->DataLength() > (chip::Dnssd::kMaxInstanceNameSize)) ? chip::Dnssd::kMaxInstanceNameSize : msg->DataLength();
+    char instanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commission::kInstanceNameMaxLength);
     msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
@@ -104,23 +103,107 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     client->SetUDCClientProcessingState(state);
 
     mUdcClients.MarkUDCClientActive(client);
-
-    return;
 }
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
 {
-    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
+    if (nodeData.resolutionData.numIPs == 0)
+    {
+        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
+        return;
+    }
+    if (nodeData.resolutionData.port == 0)
+    {
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
+        return;
+    }
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.commissionData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
         ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),
                       (int) client->GetUDCClientProcessingState(), (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
+#if INET_CONFIG_ENABLE_IPV4
+        // prefer IPv4 if its an option
+        bool foundV4 = false;
+        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
+        {
+            if (nodeData.resolutionData.ipAddress[i].IsIPv4())
+            {
+                foundV4 = true;
+                client->SetPeerAddress(
+                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
+                break;
+            }
+        }
+        // use IPv6 as last resort
+        if (!foundV4)
+        {
+            client->SetPeerAddress(
+                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
+        }
+#else  // INET_CONFIG_ENABLE_IPV4
+       // if we only support V6, then try to find a v6 address
+        bool foundV6 = false;
+        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
+        {
+            if (nodeData.resolutionData.ipAddress[i].IsIPv6())
+            {
+                foundV6 = true;
+                client->SetPeerAddress(
+                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
+                break;
+            }
+        }
+        // last resort, try with what we have
+        if (!foundV6)
+        {
+            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s",
+                         nodeData.commissionData.instanceName);
+            client->SetPeerAddress(
+                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
+        }
+#endif // INET_CONFIG_ENABLE_IPV4
+
+        client->SetDeviceName(nodeData.commissionData.deviceName);
+        client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
+        client->SetVendorId(nodeData.commissionData.vendorId);
+        client->SetProductId(nodeData.commissionData.productId);
+        client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
+
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)
         {
-            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(nodeData);
+            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(*client);
+        }
+    }
+}
+
+void UserDirectedCommissioningServer::PrintUDCClients()
+{
+    for (uint8_t i = 0; i < kMaxUDCClients; i++)
+    {
+        UDCClientState * state = GetUDCClients().GetUDCClientState(i);
+        if (state == nullptr)
+        {
+            ChipLogProgress(AppServer, "UDC Client[%d] null", i);
+        }
+        else
+        {
+            char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
+            state->GetPeerAddress().ToString(addrBuffer);
+
+            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+                                                sizeof(rotatingIdString));
+
+            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s", i,
+                            state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
+                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
         }
     }
 }

@@ -119,7 +119,7 @@
 - (void)_clearTextFields
 {
     CHIPDeviceController * chipController = InitializeCHIP();
-    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.getControllerNodeId];
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.controllerNodeId];
     _endpointIDTextField.text = @"1";
     _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";
@@ -132,23 +132,12 @@
     uint64_t nodeId;
     NSScanner * scanner = [NSScanner scannerWithString:_nodeIDTextField.text];
     [scanner scanUnsignedLongLong:&nodeId];
-    int endpointId = [_endpointIDTextField.text intValue];
-    int groupId = [_groupIDTextField.text intValue];
-    int clusterId = [_clusterIDTextField.text intValue];
 
+    // TODO Binding Support was removed from ObjC Clusters.h
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster bind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
-                    responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        NSString * resultString = (error == nil)
-                            ? @"Bind command: success!"
-                            : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                        NSLog(resultString, nil);
-                    }];
+                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+                NSLog(resultString, nil);
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -161,24 +150,10 @@
 
 - (IBAction)unbind:(id)sender
 {
-    int nodeId = [_nodeIDTextField.text intValue];
-    int endpointId = [_endpointIDTextField.text intValue];
-    int groupId = [_groupIDTextField.text intValue];
-    int clusterId = [_clusterIDTextField.text intValue];
-
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster unbind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
-                    responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        NSString * resultString = (error == nil)
-                            ? @"Unbind command: success!"
-                            : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                        NSLog(resultString, nil);
-                    }];
+                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+                NSLog(resultString, nil);
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

@@ -190,6 +190,31 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
+{
+    sss_object_t keyObject = { 0 };
+    sss_status_t status    = kStatus_SSS_Fail;
+    size_t certBitLen      = 0;
+
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(buflen != nullptr, CHIP_ERROR_INTERNAL);
+
+    certBitLen = (*buflen) * 8;
+
+    se05x_sessionOpen();
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_get_handle(&keyObject, keyId);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, &certBitLen);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
 #if ENABLE_REENTRANCY
 
 /* Init crypto object mutext */

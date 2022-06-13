@@ -19,10 +19,14 @@
 #pragma once
 
 #include "AppEvent.h"
-#include "LightingManager.h"
-#include "Rpc.h"
+#include "LEDWidget.h"
+#include "PWMDevice.h"
 
 #include <platform/CHIPDeviceLayer.h>
+
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
 
 #ifdef CONFIG_MCUMGR_SMP_BT
 #include "DFUOverSMP.h"
@@ -31,29 +35,39 @@
 #include <cstdint>
 
 struct k_timer;
+struct Identify;
 
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
-    void PostLightingActionRequest(LightingManager::Action_t aAction);
+    void PostLightingActionRequest(PWMDevice::Action_t aAction);
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
 
+    static void IdentifyStartHandler(Identify *);
+    static void IdentifyStopHandler(Identify *);
+    PWMDevice & GetLightingDevice() { return mPWMDevice; }
+
 private:
+#ifdef CONFIG_CHIP_PW_RPC
     friend class chip::rpc::NrfButton;
+#endif
+
     friend AppTask & GetAppTask(void);
+    CHIP_ERROR Init();
 
-    int Init();
-
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
 
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
@@ -82,6 +96,7 @@ private:
 
     Function_t mFunction      = kFunction_NoneSelected;
     bool mFunctionTimerActive = false;
+    PWMDevice mPWMDevice;
     static AppTask sAppTask;
 };
 

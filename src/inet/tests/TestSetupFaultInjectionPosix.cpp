@@ -32,8 +32,10 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
-#include <stdio.h>
 #include <system/SystemFaultInjection.h>
+
+#include <stdio.h>
+#include <unistd.h>
 
 struct RestartCallbackContext
 {

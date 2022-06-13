@@ -22,18 +22,18 @@ source "$(dirname "$0")/../../scripts/activate.sh"
 
 # Install required software
 if [ -d "/opt/ModusToolbox" ]; then
-    export CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+    export CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 elif [ -d "$HOME/ModusToolbox" ]; then
     # Set CY TOOLS PATH
-    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.3"
+    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.4"
 else
     # Install Modustoolbox
-    curl --fail --location --silent --show-error http://dlm.cypress.com.edgesuite.net/akdlm/downloadmanager/software/ModusToolbox/ModusToolbox_2.3/ModusToolbox_2.3.0.4276-linux-install.tar.gz -o /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz &&
-        tar -C "$HOME" -zxf /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz &&
-        rm /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz
+    curl --fail --location --silent --show-error https://download.cypress.com/downloadmanager/software/ModusToolbox/ModusToolbox_2.4/ModusToolbox_2.4.0.5972-linux-install.tar.gz -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz &&
+        tar -C "$HOME" -zxf /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz &&
+        rm /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz
 
     # Set CY TOOLS PATH
-    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.3"
+    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.4"
 fi
 
 set -x
@@ -41,14 +41,36 @@ env
 
 # Build steps
 EXAMPLE_DIR=$1
+shift
 OUTPUT_DIR=out/example_app
 P6_BOARD=CY8CKIT-062S2-43012
 
-if [[ ! -z "$2" ]]; then
-    OUTPUT_DIR=$2
+if [[ ! -z "$1" ]]; then
+    OUTPUT_DIR=$1
+    shift
 fi
 
-gn gen --check --fail-on-unused-args "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="p6_board=\"$P6_BOARD\""
-ninja -C "$OUTPUT_DIR"
+GN_ARGS=()
+NINJA_ARGS=()
+for arg; do
+    case $arg in
+        -v)
+            NINJA_ARGS+=(-v)
+            ;;
+        *=*)
+            GN_ARGS+=("$arg")
+            ;;
+        *import*)
+            GN_ARGS+=("$arg")
+            ;;
+        *)
+            echo >&2 "invalid argument: $arg"
+            exit 2
+            ;;
+    esac
+done
+
+gn gen --check --fail-on-unused-args "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="p6_board=\"$P6_BOARD\" ${GN_ARGS[*]}"
+ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
 #print stats
 arm-none-eabi-size -A "$OUTPUT_DIR"/*.out

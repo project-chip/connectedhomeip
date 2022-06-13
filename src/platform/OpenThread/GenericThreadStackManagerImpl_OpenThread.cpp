@@ -46,11 +46,14 @@
 #endif
 
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -58,29 +61,40 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/Encode.h>
 
 #include <limits>
-
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <app/server/Server.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::DataModel;
-
-using chip::Inet::IPPrefix;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+// Network commissioning
+namespace {
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
+app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+#endif
+
+void initNetworkCommissioningThreadDriver(void)
+{
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+    sThreadNetworkCommissioningInstance.Init();
+#endif
+}
+
+NetworkCommissioning::ThreadScanResponse * sScanResult;
+NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
+} // namespace
 
 /**
  * Called by OpenThread to alert the ThreadStackManager of a change in the state of the Thread stack.
@@ -106,6 +120,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     {
         ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
     }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
 }
 
 template <class ImplClass>
@@ -149,7 +165,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(co
 
             while ((otErr = otNetDataGetNextRoute(Impl()->OTInstance(), &routeIter, &routeConfig)) == OT_ERROR_NONE)
             {
-                const IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
+                const Inet::IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
                 char addrStr[64];
                 prefix.IPAddr.ToString(addrStr);
                 if (!routeConfig.mNextHopIsThisDevice && (!destIsULA || routeConfig.mPrefix.mLength > 0) &&
@@ -184,15 +200,38 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             }
         }
 #endif
-        Impl()->LockThreadStack();
+
+        bool isThreadAttached = Impl()->_IsThreadAttached();
+        // Avoid sending muliple events if the attachement state didn't change (Child->router or disable->Detached)
+        if (event->ThreadStateChange.RoleChanged && (isThreadAttached != mIsAttached))
+        {
+            ChipDeviceEvent attachEvent;
+            attachEvent.Clear();
+            attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+            attachEvent.ThreadConnectivityChange.Result = (isThreadAttached) ? kConnectivity_Established : kConnectivity_Lost;
+            CHIP_ERROR status                           = PlatformMgr().PostEvent(&attachEvent);
+            if (status == CHIP_NO_ERROR)
+            {
+                mIsAttached = isThreadAttached;
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
+        }
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
+        {
+            // Refresh Multicast listening
+            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+            Server::GetInstance().RejoinExistingMulticastGroups();
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_DETAIL_LOGGING
-
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
-
 #endif // CHIP_DETAIL_LOGGING
-
-        Impl()->UnlockThreadStack();
     }
 }
 
@@ -281,6 +320,25 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(Thread::OperationalDataset & dataset)
+{
+    VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    otOperationalDatasetTlvs datasetTlv;
+
+    Impl()->LockThreadStack();
+    otError otErr = otDatasetGetActiveTlvs(mOTInst, &datasetTlv);
+    Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
+
+    ReturnErrorOnFailure(dataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void)
 {
     otDeviceRole curRole;
@@ -290,6 +348,117 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
     Impl()->UnlockThreadStack();
 
     return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
+    const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    mpConnectCallback = nullptr;
+    ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
+    ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+
+    if (dataset.IsCommissioned())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
+        mpConnectCallback = callback;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+{
+    if (mpConnectCallback != nullptr)
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            VerifyOrReturn(mpConnectCallback != nullptr);
+            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            mpConnectCallback = nullptr;
+        });
+    }
+}
+
+template <class ImplClass>
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // If there is another ongoing scan request, reject the new one.
+    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mpScanCallback = callback;
+
+    Impl()->LockThreadStack();
+
+    // Ensure that IPv6 interface is up when MLE Discovery is performed.
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    error = MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
+                                                OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
+                                                _OnNetworkScanFinished, this));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    if (error != CHIP_NO_ERROR)
+    {
+        mpScanCallback = nullptr;
+    }
+
+    return error;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext)
+{
+    reinterpret_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->_OnNetworkScanFinished(aResult);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult)
+{
+    if (aResult == nullptr) // scan completed
+    {
+        // If Thread scanning was done before commissioning, turn off the IPv6 interface.
+        if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
+        {
+            otIp6SetEnabled(mOTInst, false);
+        }
+
+        if (mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Thread Network: %s Panid 0x%x Channel %u RSSI %d LQI %u Version %u", aResult->mNetworkName.m8,
+                        aResult->mPanId, aResult->mChannel, aResult->mRssi, aResult->mLqi, aResult->mVersion);
+
+        NetworkCommissioning::ThreadScanResponse scanResponse = { 0 };
+
+        scanResponse.panId           = aResult->mPanId;   // why is scanResponse.panID 64b
+        scanResponse.channel         = aResult->mChannel; // why is scanResponse.channel 16b
+        scanResponse.version         = aResult->mVersion;
+        scanResponse.rssi            = aResult->mRssi;
+        scanResponse.lqi             = aResult->mLqi;
+        scanResponse.extendedAddress = Encoding::BigEndian::Get64(aResult->mExtAddress.m8);
+        scanResponse.extendedPanId   = Encoding::BigEndian::Get64(aResult->mExtendedPanId.m8);
+        scanResponse.networkNameLen  = strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE);
+        memcpy(scanResponse.networkName, aResult->mNetworkName.m8, scanResponse.networkNameLen);
+
+        mScanResponseIter.Add(&scanResponse);
+    }
 }
 
 template <class ImplClass>
@@ -309,6 +478,11 @@ ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<I
 #endif
     if (linkMode.mRxOnWhenIdle)
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    if (otLinkCslGetPeriod(mOTInst) != 0)
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+#endif
 
     ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 
@@ -333,13 +507,15 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
 #endif
     case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
     case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    case ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice:
+#endif
         break;
     default:
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
 #if CHIP_PROGRESS_LOGGING
-
     {
         const char * deviceTypeStr;
         switch (deviceType)
@@ -356,6 +532,11 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
         case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
             deviceTypeStr = "SLEEPY END DEVICE";
             break;
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+        case ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice:
+            deviceTypeStr = "SYNCHRONIZED SLEEPY END DEVICE";
+            break;
+#endif
         default:
             deviceTypeStr = "(unknown)";
             break;
@@ -384,6 +565,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
         linkMode.mRxOnWhenIdle = true;
         break;
     case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
+    case ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice:
         linkMode.mDeviceType   = false;
         linkMode.mRxOnWhenIdle = false;
         break;
@@ -397,21 +579,6 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
 
 exit:
     return err;
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadPollingConfig(
-    ConnectivityManager::ThreadPollingConfig & pollingConfig)
-{
-    pollingConfig = mPollingConfig;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadPollingConfig(
-    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
-{
-    mPollingConfig = pollingConfig;
-    return Impl()->AdjustPollingInterval();
 }
 
 template <class ImplClass>
@@ -463,25 +630,21 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnMessageLayerActivityChanged(bool messageLayerIsActive)
-{
-    Impl()->AdjustPollingInterval();
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadStatsCounters(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr;
-    const otMacCounters * macCounters;
-    const otIpCounters * ipCounters;
     otOperationalDataset activeDataset;
-    otDeviceRole role;
 
     Impl()->LockThreadStack();
+#if CHIP_PROGRESS_LOGGING
+    {
+        otDeviceRole role;
 
-    role = otThreadGetDeviceRole(mOTInst);
-    ChipLogProgress(DeviceLayer, "Thread Role:                  %d\n", role);
+        role = otThreadGetDeviceRole(mOTInst);
+        ChipLogProgress(DeviceLayer, "Thread Role:                  %d\n", role);
+    }
+#endif // CHIP_PROGRESS_LOGGING
 
     if (otDatasetIsCommissioned(mOTInst))
     {
@@ -494,64 +657,69 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         }
     }
 
-    macCounters = otLinkGetCounters(mOTInst);
+#if CHIP_PROGRESS_LOGGING
+    {
+        const otIpCounters * ipCounters;
+        const otMacCounters * macCounters;
 
-    ChipLogProgress(DeviceLayer,
-                    "Rx Counters:\n"
-                    "PHY Rx Total:                 %" PRIu32 "\n"
-                    "MAC Rx Unicast:               %" PRIu32 "\n"
-                    "MAC Rx Broadcast:             %" PRIu32 "\n"
-                    "MAC Rx Data:                  %" PRIu32 "\n"
-                    "MAC Rx Data Polls:            %" PRIu32 "\n"
-                    "MAC Rx Beacons:               %" PRIu32 "\n"
-                    "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
-                    "MAC Rx Other:                 %" PRIu32 "\n"
-                    "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
-                    "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
-                    macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
-                    macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
-                    macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
+        macCounters = otLinkGetCounters(mOTInst);
 
-    ChipLogProgress(DeviceLayer,
-                    "Tx Counters:\n"
-                    "PHY Tx Total:                 %" PRIu32 "\n"
-                    "MAC Tx Unicast:               %" PRIu32 "\n"
-                    "MAC Tx Broadcast:             %" PRIu32 "\n"
-                    "MAC Tx Data:                  %" PRIu32 "\n"
-                    "MAC Tx Data Polls:            %" PRIu32 "\n"
-                    "MAC Tx Beacons:               %" PRIu32 "\n"
-                    "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
-                    "MAC Tx Other:                 %" PRIu32 "\n"
-                    "MAC Tx Retry:                 %" PRIu32 "\n"
-                    "MAC Tx CCA Fail:              %" PRIu32 "\n",
-                    macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
-                    macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
-                    macCounters->mTxRetry, macCounters->mTxErrCca);
+        ChipLogProgress(DeviceLayer,
+                        "Rx Counters:\n"
+                        "PHY Rx Total:                 %" PRIu32 "\n"
+                        "MAC Rx Unicast:               %" PRIu32 "\n"
+                        "MAC Rx Broadcast:             %" PRIu32 "\n"
+                        "MAC Rx Data:                  %" PRIu32 "\n"
+                        "MAC Rx Data Polls:            %" PRIu32 "\n"
+                        "MAC Rx Beacons:               %" PRIu32 "\n"
+                        "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
+                        "MAC Rx Other:                 %" PRIu32 "\n"
+                        "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
+                        "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
+                        macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
+                        macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
+                        macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
 
-    ChipLogProgress(DeviceLayer,
-                    "Failure Counters:\n"
-                    "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
-                    "MAC Rx No Frame Fail:         %" PRIu32 "\n"
-                    "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
-                    "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
-                    "MAC Rx FCS Fail:              %" PRIu32 "\n"
-                    "MAC Rx Other Fail:            %" PRIu32 "\n",
-                    macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
-                    macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
+        ChipLogProgress(DeviceLayer,
+                        "Tx Counters:\n"
+                        "PHY Tx Total:                 %" PRIu32 "\n"
+                        "MAC Tx Unicast:               %" PRIu32 "\n"
+                        "MAC Tx Broadcast:             %" PRIu32 "\n"
+                        "MAC Tx Data:                  %" PRIu32 "\n"
+                        "MAC Tx Data Polls:            %" PRIu32 "\n"
+                        "MAC Tx Beacons:               %" PRIu32 "\n"
+                        "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
+                        "MAC Tx Other:                 %" PRIu32 "\n"
+                        "MAC Tx Retry:                 %" PRIu32 "\n"
+                        "MAC Tx CCA Fail:              %" PRIu32 "\n",
+                        macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
+                        macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
+                        macCounters->mTxRetry, macCounters->mTxErrCca);
 
-    ipCounters = otThreadGetIp6Counters(mOTInst);
+        ChipLogProgress(DeviceLayer,
+                        "Failure Counters:\n"
+                        "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
+                        "MAC Rx No Frame Fail:         %" PRIu32 "\n"
+                        "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
+                        "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
+                        "MAC Rx FCS Fail:              %" PRIu32 "\n"
+                        "MAC Rx Other Fail:            %" PRIu32 "\n",
+                        macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
+                        macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
 
-    ChipLogProgress(DeviceLayer,
-                    "IP Counters:\n"
-                    "IP Tx Success:                %" PRIu32 "\n"
-                    "IP Rx Success:                %" PRIu32 "\n"
-                    "IP Tx Fail:                   %" PRIu32 "\n"
-                    "IP Rx Fail:                   %" PRIu32 "\n",
-                    ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
+        ipCounters = otThreadGetIp6Counters(mOTInst);
 
-    Impl()->UnlockThreadStack();
-
+        ChipLogProgress(DeviceLayer,
+                        "IP Counters:\n"
+                        "IP Tx Success:                %" PRIu32 "\n"
+                        "IP Rx Success:                %" PRIu32 "\n"
+                        "IP Tx Fail:                   %" PRIu32 "\n"
+                        "IP Rx Fail:                   %" PRIu32 "\n",
+                        ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
+    }
+#endif // CHIP_PROGRESS_LOGGING
 exit:
+    Impl()->UnlockThreadStack();
     return err;
 }
 
@@ -559,6 +727,8 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_PROGRESS_LOGGING
     otError otErr;
     const otExtAddress * extAddress;
     uint16_t rloc16;
@@ -597,21 +767,23 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Leader Router ID: %u\n"
                     "Parent Avg RSSI:  %d\n"
                     "Parent Last RSSI: %d\n"
-                    "Partition ID:     %" PRIu32 "\n"
+                    "Partition ID:     %" PRIu32 "\n",
+                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Instant RSSI:     %d\n",
-                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId, extAddress->m8[0],
-                    extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4], extAddress->m8[5],
-                    extAddress->m8[6], extAddress->m8[7], instantRssi);
-
-    Impl()->UnlockThreadStack();
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
 
 exit:
+    Impl()->UnlockThreadStack();
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
+#endif // CHIP_PROGRESS_LOGGING
     return err;
 }
 
@@ -623,6 +795,8 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_PROGRESS_LOGGING
     otError otErr;
     otIp6Address * leaderAddr    = NULL;
     uint8_t * networkData        = NULL;
@@ -633,7 +807,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
     otNeighborInfo neighborInfo[TELEM_NEIGHBOR_TABLE_SIZE];
     otNeighborInfoIterator iter;
     otNeighborInfoIterator iterCopy;
-    char printBuf[TELEM_PRINT_BUFFER_SIZE];
+    char printBuf[TELEM_PRINT_BUFFER_SIZE] = { 0 };
     uint16_t rloc16;
     uint16_t routerId;
     uint16_t leaderRouterId;
@@ -693,30 +867,37 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         iterCopy = iter;
     }
 
+    snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, "%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X",
+             leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
+             leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
+             leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
+             leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
+
     ChipLogProgress(DeviceLayer,
                     "Thread Topology:\n"
                     "RLOC16:                        %04X\n"
                     "Router ID:                     %u\n"
                     "Leader Router ID:              %u\n"
-                    "Leader Address:                %02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
+                    "Leader Address:                %s\n"
                     "Leader Weight:                 %d\n"
                     "Local Leader Weight:           %d\n"
                     "Network Data Len:              %d\n"
                     "Network Data Version:          %d\n"
-                    "Stable Network Data Version:   %d\n"
+                    "Stable Network Data Version:   %d\n",
+                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen, networkDataVersion,
+                    stableNetworkDataVersion);
+
+    memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Partition ID:                  %" PRIx32 "\n"
                     "Instant RSSI:                  %d\n"
                     "Neighbor Table Length:         %d\n"
                     "Child Table Length:            %d\n",
-                    rloc16, routerId, leaderRouterId, leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1],
-                    leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3], leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5],
-                    leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7], leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9],
-                    leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11], leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13],
-                    leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15], leaderWeight, leaderLocalWeight, networkDataLen,
-                    networkDataVersion, stableNetworkDataVersion, extAddress->m8[0], extAddress->m8[1], extAddress->m8[2],
-                    extAddress->m8[3], extAddress->m8[4], extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId,
-                    instantRssi, neighborTableSize, childTableSize);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize,
+                    childTableSize);
 
     // Handle each neighbor event seperatly.
     for (uint32_t i = 0; i < neighborTableSize; i++)
@@ -729,7 +910,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
             otErr               = otThreadGetChildInfoById(mOTInst, neighbor->mRloc16, child);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
-            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3" PRIu8, child->mTimeout,
+            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3u", child->mTimeout,
                      child->mNetworkDataVersion);
         }
         else
@@ -743,28 +924,32 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         "Age:               %3" PRIu32 "\n"
                         "LQI:               %1d\n"
                         "AvgRSSI:           %3d\n"
-                        "LastRSSI:          %3d\n"
+                        "LastRSSI:          %3d\n",
+                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
+                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
+                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
+                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi);
+
+        ChipLogProgress(DeviceLayer,
                         "LinkFrameCounter:  %10" PRIu32 "\n"
                         "MleFrameCounter:   %10" PRIu32 "\n"
                         "RxOnWhenIdle:      %c\n"
                         "FullFunction:      %c\n"
                         "FullNetworkData:   %c\n"
                         "IsChild:           %c%s\n",
-                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
-                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
-                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
-                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi, neighbor->mLinkFrameCounter,
-                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n', neighbor->mFullThreadDevice ? 'Y' : 'n',
-                        neighbor->mFullNetworkData ? 'Y' : 'n', neighbor->mIsChild ? 'Y' : 'n', printBuf);
+                        neighbor->mLinkFrameCounter, neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
+                        neighbor->mFullThreadDevice ? 'Y' : 'n', neighbor->mFullNetworkData ? 'Y' : 'n',
+                        neighbor->mIsChild ? 'Y' : 'n', printBuf);
     }
 
+exit:
     Impl()->UnlockThreadStack();
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
     }
+#endif // CHIP_PROGRESS_LOGGING
     return err;
 }
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -814,10 +999,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts(void)
 {
-    // Reset MAC counters
-    otLinkResetCounters(mOTInst);
-    otThreadResetMleCounters(mOTInst);
-    otThreadResetIp6Counters(mOTInst);
+    // Based on the spec, only OverrunCount should be resetted.
+    mOverrunCount = 0;
 }
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
@@ -838,6 +1021,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 {
     CHIP_ERROR err;
 
+    namespace ThreadNetworkDiagnostics = app::Clusters::ThreadNetworkDiagnostics;
+
     switch (attributeId)
     {
     case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
@@ -847,14 +1032,52 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
-        otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        err               = encoder.Encode(role);
+        ThreadNetworkDiagnostics::RoutingRole routingRole;
+        otDeviceRole otRole = otThreadGetDeviceRole(mOTInst);
+
+        if (otRole == OT_DEVICE_ROLE_DISABLED)
+        {
+            routingRole = EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED;
+        }
+        else if (otRole == OT_DEVICE_ROLE_DETACHED)
+        {
+            routingRole = EMBER_ZCL_ROUTING_ROLE_UNASSIGNED;
+        }
+        else if (otRole == OT_DEVICE_ROLE_ROUTER)
+        {
+            routingRole = EMBER_ZCL_ROUTING_ROLE_ROUTER;
+        }
+        else if (otRole == OT_DEVICE_ROLE_LEADER)
+        {
+            routingRole = EMBER_ZCL_ROUTING_ROLE_LEADER;
+        }
+        else if (otRole == OT_DEVICE_ROLE_CHILD)
+        {
+            otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+
+            if (linkMode.mRxOnWhenIdle)
+            {
+                routingRole = EMBER_ZCL_ROUTING_ROLE_END_DEVICE;
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+                if (otThreadIsRouterEligible(mOTInst))
+                {
+                    routingRole = EMBER_ZCL_ROUTING_ROLE_REED;
+                }
+#endif
+            }
+            else
+            {
+                routingRole = EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE;
+            }
+        }
+
+        err = encoder.Encode(routingRole);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
         const char * networkName = otThreadGetNetworkName(mOTInst);
-        err                      = encoder.Encode(Span<const char>(networkName, strlen(networkName)));
+        err                      = encoder.Encode(CharSpan::fromCharString(networkName));
     }
     break;
 
@@ -882,42 +1105,101 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id: {
-        // TO DO
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        uint64_t overrunCount = mOverrunCount;
+        err                   = encoder.Encode(overrunCount);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
-        // List and structure not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        // TO DO When list is functionnal.
-        // Determined limit of otNeighborInfo list
-        // pReadLength = sizeof(otNeighborInfo) * 20;
-        // buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(*pReadLength));
-        // VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
+            otNeighborInfo neighInfo;
+            otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
 
-        // otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-        // otNeighborInfo neighInfo;
+            while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
+            {
+                ThreadNetworkDiagnostics::Structs::NeighborTable::Type neighborTable;
+                app::DataModel::Nullable<int8_t> averageRssi;
+                app::DataModel::Nullable<int8_t> lastRssi;
 
-        // uint16_t remainingSize = *pReadLength;
-        // uint16_t offset        = 0;
-        // while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
-        // {
-        //     if (remainingSize < sizeof(otNeighborInfo))
-        //     {
-        //         break;
-        //     }
+                averageRssi.SetNonNull(neighInfo.mAverageRssi);
+                lastRssi.SetNonNull(neighInfo.mLastRssi);
 
-        //     memcpy(*buffer + offset, &neighInfo, sizeof(otNeighborInfo));
-        //     remainingSize -= sizeof(otNeighborInfo);
-        //     offset += sizeof(otNeighborInfo);
-        // }
+                neighborTable.averageRssi      = averageRssi;
+                neighborTable.lastRssi         = lastRssi;
+                neighborTable.extAddress       = Encoding::BigEndian::Get64(neighInfo.mExtAddress.m8);
+                neighborTable.age              = neighInfo.mAge;
+                neighborTable.rloc16           = neighInfo.mRloc16;
+                neighborTable.linkFrameCounter = neighInfo.mLinkFrameCounter;
+                neighborTable.mleFrameCounter  = neighInfo.mMleFrameCounter;
+                neighborTable.lqi              = neighInfo.mLinkQualityIn;
+                neighborTable.frameErrorRate   = neighInfo.mFrameErrorRate;
+                neighborTable.messageErrorRate = neighInfo.mMessageErrorRate;
+                neighborTable.rxOnWhenIdle     = neighInfo.mRxOnWhenIdle;
+                neighborTable.fullThreadDevice = neighInfo.mFullThreadDevice;
+                neighborTable.fullNetworkData  = neighInfo.mFullNetworkData;
+                neighborTable.isChild          = neighInfo.mIsChild;
+
+                ReturnErrorOnFailure(aEncoder.Encode(neighborTable));
+            }
+
+            return CHIP_NO_ERROR;
+        });
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
-        // List not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
+            otRouterInfo routerInfo;
+
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+            uint8_t maxRouterId = otThreadGetMaxRouterId(mOTInst);
+            CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
+
+            for (uint8_t i = 0; i <= maxRouterId; i++)
+            {
+                if (otThreadGetRouterInfo(mOTInst, i, &routerInfo) == OT_ERROR_NONE)
+                {
+                    ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
+
+                    routeTable.extAddress      = Encoding::BigEndian::Get64(routerInfo.mExtAddress.m8);
+                    routeTable.rloc16          = routerInfo.mRloc16;
+                    routeTable.routerId        = routerInfo.mRouterId;
+                    routeTable.nextHop         = routerInfo.mNextHop;
+                    routeTable.pathCost        = routerInfo.mPathCost;
+                    routeTable.LQIIn           = routerInfo.mLinkQualityIn;
+                    routeTable.LQIOut          = routerInfo.mLinkQualityOut;
+                    routeTable.age             = routerInfo.mAge;
+                    routeTable.allocated       = routerInfo.mAllocated;
+                    routeTable.linkEstablished = routerInfo.mLinkEstablished;
+
+                    ReturnErrorOnFailure(aEncoder.Encode(routeTable));
+                    chipErr = CHIP_NO_ERROR;
+                }
+            }
+
+            return chipErr;
+
+#else // OPENTHREAD_MTD
+            otError otErr = otThreadGetParentInfo(mOTInst, &routerInfo);
+            ReturnErrorOnFailure(MapOpenThreadError(otErr));
+
+            ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
+
+            routeTable.extAddress      = Encoding::BigEndian::Get64(routerInfo.mExtAddress.m8);
+            routeTable.rloc16          = routerInfo.mRloc16;
+            routeTable.routerId        = routerInfo.mRouterId;
+            routeTable.nextHop         = routerInfo.mNextHop;
+            routeTable.pathCost        = routerInfo.mPathCost;
+            routeTable.LQIIn           = routerInfo.mLinkQualityIn;
+            routeTable.LQIOut          = routerInfo.mLinkQualityOut;
+            routeTable.age             = routerInfo.mAge;
+            routeTable.allocated       = routerInfo.mAllocated;
+            routeTable.linkEstablished = routerInfo.mLinkEstablished;
+
+            ReturnErrorOnFailure(aEncoder.Encode(routeTable));
+            return CHIP_NO_ERROR;
+#endif
+        });
     }
     break;
 
@@ -1243,15 +1525,26 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        // Stuct type nopt yet supported
-        // if (otDatasetIsCommissioned(mOTInst))
-        // {
-        //     otOperationalDataset activeDataset;
-        //     otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-        //     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-        //     activeDataset.mSecurityPolicy
-        // }
+        err = CHIP_ERROR_INCORRECT_STATE;
+
+        if (otDatasetIsCommissioned(mOTInst))
+        {
+            otOperationalDataset activeDataset;
+            otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+
+            ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type securityPolicy;
+            static_assert(sizeof(securityPolicy) == sizeof(activeDataset.mSecurityPolicy),
+                          "securityPolicy Struct do not match otSecurityPolicy");
+            uint16_t policyAsInts[2];
+            static_assert(sizeof(policyAsInts) == sizeof(activeDataset.mSecurityPolicy),
+                          "We're missing some members of otSecurityPolicy?");
+            memcpy(&policyAsInts, &activeDataset.mSecurityPolicy, sizeof(policyAsInts));
+            securityPolicy.rotationTime = policyAsInts[0];
+            securityPolicy.flags        = policyAsInts[1];
+
+            err = encoder.Encode(securityPolicy);
+        }
     }
     break;
 
@@ -1279,28 +1572,45 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
-        // Structure not yet supported
-        // if (otDatasetIsCommissioned(mOTInst))
-        // {
-        //     *pReadLength = sizeof(otOperationalDatasetComponents);
-        //     *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(*pReadLength));
-        //     VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
+            otOperationalDataset activeDataset;
+            otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+            ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type OpDatasetComponents;
 
-        //     otOperationalDataset activeDataset;
-        //     otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-        //     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-        //     // TODO encode TLV STRUCT with content of activeDataset.mComponents
+            OpDatasetComponents.activeTimestampPresent  = activeDataset.mComponents.mIsActiveTimestampPresent;
+            OpDatasetComponents.pendingTimestampPresent = activeDataset.mComponents.mIsPendingTimestampPresent;
+            OpDatasetComponents.masterKeyPresent        = activeDataset.mComponents.mIsNetworkKeyPresent;
+            OpDatasetComponents.networkNamePresent      = activeDataset.mComponents.mIsNetworkNamePresent;
+            OpDatasetComponents.extendedPanIdPresent    = activeDataset.mComponents.mIsExtendedPanIdPresent;
+            OpDatasetComponents.meshLocalPrefixPresent  = activeDataset.mComponents.mIsMeshLocalPrefixPresent;
+            OpDatasetComponents.delayPresent            = activeDataset.mComponents.mIsDelayPresent;
+            OpDatasetComponents.panIdPresent            = activeDataset.mComponents.mIsPanIdPresent;
+            OpDatasetComponents.channelPresent          = activeDataset.mComponents.mIsChannelPresent;
+            OpDatasetComponents.pskcPresent             = activeDataset.mComponents.mIsPskcPresent;
+            OpDatasetComponents.securityPolicyPresent   = activeDataset.mComponents.mIsSecurityPolicyPresent;
+            OpDatasetComponents.channelMaskPresent      = activeDataset.mComponents.mIsChannelMaskPresent;
 
-        // }
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+            err = encoder.Encode(OpDatasetComponents);
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        // List not yet supported
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        break;
+        err = encoder.EncodeList([](const auto & aEncoder) -> CHIP_ERROR {
+            // TODO activeNetworkFaultsList isn't tracked. Encode the list of 4 entries at 0 none the less
+            ThreadNetworkDiagnostics::NetworkFault activeNetworkFaultsList[4] = { ThreadNetworkDiagnostics::NetworkFault(0) };
+            for (auto fault : activeNetworkFaultsList)
+            {
+                ReturnErrorOnFailure(aEncoder.Encode(fault));
+            }
+
+            return CHIP_NO_ERROR;
+        });
     }
+    break;
 
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -1335,7 +1645,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     RegisterOpenThreadErrorFormatter();
 
     mOTInst = NULL;
-    mPollingConfig.Clear();
 
     // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
     // create or acquire a singleton instance of OpenThread.
@@ -1345,11 +1654,24 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otAppCliInit(otInst);
 #endif
 
     mOTInst = otInst;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
+    using namespace System::Clock::Literals;
+    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
+    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    err                                 = _SetSEDIntervalsConfig(sedIntervalsConfig);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to set sleepy end device intervals: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+#endif
 
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
@@ -1382,7 +1704,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
 
+    initNetworkCommissioningThreadDriver();
+
 exit:
+
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
     return err;
 }
@@ -1400,35 +1725,117 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
     return otIp6IsEnabled(mOTInst);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInterval(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSEDIntervalsConfig(
+    ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    intervalsConfig = mIntervalsConfig;
+    return CHIP_NO_ERROR;
+}
 
-    uint32_t newPollingIntervalMS = mPollingConfig.InactivePollingIntervalMS;
-
-    if (newPollingIntervalMS != 0)
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDIntervalsConfig(
+    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+{
+    using namespace System::Clock::Literals;
+    if ((intervalsConfig.IdleIntervalMS < intervalsConfig.ActiveIntervalMS) || (intervalsConfig.IdleIntervalMS == 0_ms32) ||
+        (intervalsConfig.ActiveIntervalMS == 0_ms32))
     {
-        Impl()->LockThreadStack();
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mIntervalsConfig = intervalsConfig;
 
-        uint32_t curPollingIntervalMS = otLinkGetPollPeriod(mOTInst);
+    CHIP_ERROR err = SetSEDIntervalMode(mIntervalsMode);
 
-        if (newPollingIntervalMS != curPollingIntervalMS)
-        {
-            otError otErr = otLinkSetPollPeriod(mOTInst, newPollingIntervalMS);
-            err           = MapOpenThreadError(otErr);
-        }
-
-        Impl()->UnlockThreadStack();
-
-        if (newPollingIntervalMS != curPollingIntervalMS)
-        {
-            ChipLogProgress(DeviceLayer, "OpenThread polling interval set to %" PRId32 "ms", newPollingIntervalMS);
-        }
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kSEDIntervalChange;
+        err        = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
     }
 
     return err;
 }
+
+template <class ImplClass>
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::Clock::Milliseconds32 interval;
+
+    if (intervalType == ConnectivityManager::SEDIntervalMode::Idle)
+    {
+        interval = mIntervalsConfig.IdleIntervalMS;
+    }
+    else if (intervalType == ConnectivityManager::SEDIntervalMode::Active)
+    {
+        interval = mIntervalsConfig.ActiveIntervalMS;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mIntervalsMode = intervalType;
+
+    Impl()->LockThreadStack();
+
+// For Thread devices, the intervals are defined as:
+// * poll period for SED devices that poll the parent for data
+// * CSL period for SSED devices that listen for messages in scheduled time slots.
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
+    uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#else
+    uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
+#endif
+
+    if (interval.count() != curIntervalMS)
+    {
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+        // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
+        otError otErr = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+#else
+        otError otErr = otLinkSetPollPeriod(mOTInst, interval.count());
+#endif
+        err = MapOpenThreadError(otErr);
+    }
+
+    Impl()->UnlockThreadStack();
+
+    if (interval.count() != curIntervalMS)
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread SED interval set to %" PRId32 "ms", interval.count());
+    }
+
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConnectivityManager::SEDIntervalMode mode;
+
+    if (onOff)
+    {
+        mActiveModeConsumers++;
+    }
+    else
+    {
+        if (mActiveModeConsumers > 0)
+            mActiveModeConsumers--;
+    }
+
+    mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
+
+    if (mIntervalsMode != mode)
+        err = SetSEDIntervalMode(mode);
+
+    return err;
+}
+#endif
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
@@ -1449,6 +1856,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otErr
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError)
 {
+#if CHIP_PROGRESS_LOGGING
+
     ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
 
     if (aError == OT_ERROR_NONE)
@@ -1457,6 +1866,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otErr
 
         ChipLogProgress(DeviceLayer, "Start Thread network: %s", otThreadErrorToString(error));
     }
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 template <class ImplClass>
@@ -1476,9 +1886,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerDiscerner discerner;
-        uint16_t discriminator;
+        // This is dead code to remove, so the placeholder value is OK.
+        // See ThreadStackManagerImpl.
+        uint16_t discriminator = 3840;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
@@ -1488,9 +1899,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerPskd pskd;
-        uint32_t pincode;
+        // This is dead code to remove, so the placeholder value is OK.d
+        // See ThreadStackManagerImpl.
+        uint32_t pincode = 20202021;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
         snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
 
         ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
@@ -1504,6 +1916,36 @@ exit:
     ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
 
     return error;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    ByteSpan extpanid;
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(dataset));
+    // The Thread network is not enabled, but has a different extended pan id.
+    ReturnOnFailure(dataset.GetExtendedPanIdAsByteSpan(extpanid));
+    // If we don't have a valid dataset, we are not attempting to connect the network.
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(NetworkCommissioning::Status::kSuccess, MakeOptional(extpanid),
+                                                         NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(NetworkCommissioning::Status::kNetworkNotFound, MakeOptional(extpanid),
+                                                         MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -1520,7 +1962,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
     switch (aError)
     {
     case OT_ERROR_NONE: {
-        ChipLogProgress(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+        ChipLogDetail(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
 
         if (aHostInfo)
         {
@@ -1807,7 +2249,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Avoid adding the same host name multiple times
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)
@@ -1839,7 +2281,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearSrpHost(co
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(mSrpClient.mInitializedCallback, error = CHIP_ERROR_INCORRECT_STATE);
 
     // Add host and remove it with notifying SRP server to clean old information related to the host.
@@ -1881,6 +2323,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 
     // Extract from the <hostname>.<domain-name>. the <hostname> part.
     size_t substringSize = strchr(serviceInfo.mHostNameBuffer, '.') - serviceInfo.mHostNameBuffer;
+    if (substringSize >= ArraySize(mdnsService.mHostName))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
     // Append string terminating character.
     mdnsService.mHostName[substringSize] = '\0';
@@ -1890,6 +2336,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 
     // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
     substringSize = strchr(serviceType, '.') - serviceType;
+    if (substringSize >= ArraySize(mdnsService.mType))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(mdnsService.mType, serviceType, substringSize);
     // Append string terminating character.
     mdnsService.mType[substringSize] = '\0';
@@ -1901,6 +2351,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     substringSize = strchr(protocolSubstringStart, '.') - protocolSubstringStart;
+    if (substringSize >= ArraySize(protocol))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(protocol, protocolSubstringStart, substringSize);
     // Append string terminating character.
     protocol[substringSize] = '\0';
@@ -1918,8 +2372,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
     mdnsService.mPort        = serviceInfo.mPort;
-    mdnsService.mInterface   = INET_NULL_INTERFACEID;
-    mdnsService.mAddressType = Inet::kIPAddressType_IPv6;
+    mdnsService.mInterface   = Inet::InterfaceId::Null();
+    mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
     mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
 
     otDnsTxtEntryIterator iterator;
@@ -1949,15 +2403,46 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr_t context)
+{
+    DnsResult * dnsResult         = reinterpret_cast<DnsResult *>(context);
+    Dnssd::DnssdService & service = dnsResult->mMdnsService;
+    Span<Inet::IPAddress> ipAddrs;
+
+    if (service.mAddress.HasValue())
+    {
+        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+    }
+
+    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &service, ipAddrs, dnsResult->error);
+    Platform::Delete<DnsResult>(dnsResult);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowseEmpty(intptr_t context)
+{
+    auto * dnsResult = reinterpret_cast<DnsResult *>(context);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, nullptr, 0, dnsResult->error);
+    Platform::Delete<DnsResult>(dnsResult);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowse(intptr_t context)
+{
+    auto * dnsResult = reinterpret_cast<DnsResult *>(context);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, &dnsResult->mMdnsService, 1, dnsResult->error);
+    Platform::Delete<DnsResult>(dnsResult);
+}
+
+template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse,
                                                                             void * aContext)
 {
     CHIP_ERROR error;
-    DnsResult browseResult;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kDnssdHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Dnssd::kDnssdHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -1971,45 +2456,52 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
     error = MapOpenThreadError(otDnsBrowseResponseGetServiceName(aResponse, type, sizeof(type)));
 
     VerifyOrExit(error == CHIP_NO_ERROR, );
 
-    while (otDnsBrowseResponseGetServiceInstance(aResponse, index, browseResult.mMdnsService.mName,
-                                                 sizeof(browseResult.mMdnsService.mName)) == OT_ERROR_NONE)
+    char serviceName[Dnssd::Common::kInstanceNameMaxLength + 1];
+    while (otDnsBrowseResponseGetServiceInstance(aResponse, index, serviceName, sizeof(serviceName)) == OT_ERROR_NONE)
     {
         serviceInfo.mHostNameBuffer     = hostname;
         serviceInfo.mHostNameBufferSize = sizeof(hostname);
         serviceInfo.mTxtData            = txtBuffer;
         serviceInfo.mTxtDataSize        = sizeof(txtBuffer);
 
-        error = MapOpenThreadError(otDnsBrowseResponseGetServiceInfo(aResponse, browseResult.mMdnsService.mName, &serviceInfo));
+        error = MapOpenThreadError(otDnsBrowseResponseGetServiceInfo(aResponse, serviceName, &serviceInfo));
 
         VerifyOrExit(error == CHIP_NO_ERROR, );
 
-        if (FromOtDnsResponseToMdnsData(serviceInfo, type, browseResult.mMdnsService, browseResult.mServiceTxtEntry) ==
-            CHIP_NO_ERROR)
+        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
+        error = FromOtDnsResponseToMdnsData(serviceInfo, type, dnsResult->mMdnsService, dnsResult->mServiceTxtEntry);
+        if (CHIP_NO_ERROR == error)
         {
             // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
             // allocate on
             // stack.
-            ThreadStackMgrImpl().mDnsBrowseCallback(aContext, &browseResult.mMdnsService, 1, MapOpenThreadError(aError));
+            static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
+                          "The target buffer must be big enough");
+            Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
+            DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
             wasAnythingBrowsed = true;
+        }
+        else
+        {
+            Platform::Delete<DnsResult>(dnsResult);
         }
         index++;
     }
 
 exit:
 
-    ThreadStackMgrImpl().UnlockThreadStack();
-
     // In case no service was found invoke callback to notify about failure. In other case it was already called before.
     if (!wasAnythingBrowsed)
-        ThreadStackMgrImpl().mDnsBrowseCallback(aContext, nullptr, 0, error);
+    {
+        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
+        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
+    }
 }
 
 template <class ImplClass>
@@ -2043,11 +2535,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
                                                                              void * aContext)
 {
     CHIP_ERROR error;
-    DnsResult resolveResult;
+    DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kDnssdHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Dnssd::kDnssdHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -2059,12 +2551,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
-    error = MapOpenThreadError(otDnsServiceResponseGetServiceName(aResponse, resolveResult.mMdnsService.mName,
-                                                                  sizeof(resolveResult.mMdnsService.mName), type, sizeof(type)));
+    error = MapOpenThreadError(otDnsServiceResponseGetServiceName(aResponse, dnsResult->mMdnsService.mName,
+                                                                  sizeof(dnsResult->mMdnsService.mName), type, sizeof(type)));
 
     VerifyOrExit(error == CHIP_NO_ERROR, );
 
@@ -2077,12 +2567,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 
     VerifyOrExit(error == CHIP_NO_ERROR, );
 
-    error = FromOtDnsResponseToMdnsData(serviceInfo, type, resolveResult.mMdnsService, resolveResult.mServiceTxtEntry);
+    error = FromOtDnsResponseToMdnsData(serviceInfo, type, dnsResult->mMdnsService, dnsResult->mServiceTxtEntry);
 
 exit:
 
-    ThreadStackMgrImpl().UnlockThreadStack();
-    ThreadStackMgrImpl().mDnsResolveCallback(aContext, &(resolveResult.mMdnsService), error);
+    dnsResult->error = error;
+    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
 }
 
 template <class ImplClass>
@@ -2100,7 +2590,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(cons
 
     // Append default SRP domain name to the service name.
     // fullServiceName buffer size is kDnssdTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
-    char fullServiceName[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    char fullServiceName[Dnssd::kDnssdTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
     error = MapOpenThreadError(
@@ -2114,6 +2604,10 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

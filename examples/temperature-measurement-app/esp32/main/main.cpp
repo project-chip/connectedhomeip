@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -27,28 +26,38 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include <app/server/Server.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
 #include <string>
 #include <vector>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <lib/support/ErrorStr.h>
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 const char * TAG = "temperature-measurement-app";
 
-static DeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacks EchoCallbacks;
+
+static void InitServer(intptr_t context)
+{
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+}
 
 extern "C" void app_main()
 {
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
     ESP_LOGI(TAG, "Temperature sensor!");
 
     /* Print chip information */
@@ -80,14 +89,5 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    // Run the UI Loop
-    while (true)
-    {
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

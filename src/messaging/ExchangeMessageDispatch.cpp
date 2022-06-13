@@ -28,6 +28,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <errno.h>
 #include <inttypes.h>
 #include <memory>
 
@@ -40,11 +41,12 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
-                                                ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
-                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager, const SessionHandle & session, uint16_t exchangeId,
+                                                bool isInitiator, ReliableMessageContext * reliableMessageContext,
+                                                bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
+                                                System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
@@ -81,8 +83,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
         };
         std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
-        CHIP_ERROR err = SendPreparedMessage(session, entryOwner->retainedBuf);
+        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+        CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
         if (err == CHIP_ERROR_POSIX(ENOBUFS))
         {
             // sendmsg on BSD-based systems never blocks, no matter how the
@@ -104,34 +106,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
         // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
         EncryptedPacketBufferHandle preparedMessage;
-        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
-        ReturnErrorOnFailure(SendPreparedMessage(session, preparedMessage));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                                      const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                                                      ReliableMessageContext * reliableMessageContext)
-{
-    ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
-                      CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (IsReliableTransmissionAllowed())
-    {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
-            payloadHeader.GetAckMessageCounter().HasValue())
-        {
-            reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
-        }
-
-        if (payloadHeader.NeedsAck())
-        {
-            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
-            ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageCounter, msgFlags));
-        }
+        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
+        ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
     }
 
     return CHIP_NO_ERROR;

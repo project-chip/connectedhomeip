@@ -29,7 +29,9 @@
 #include <zephyr.h>
 
 #include <openthread/thread.h>
+#if !CONFIG_SOC_SERIES_RISCV_TELINK_B91
 #include <platform/Zephyr/BLEManagerImpl.h>
+#endif // !CONFIG_SOC_SERIES_RISCV_TELINK_B91
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -64,14 +66,14 @@ public:
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
-    CHIP_ERROR _StartThreadTask();
+    CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; }
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
 
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
-    void _ProcessThreadActivity();
+    void _ProcessThreadActivity() {}
 
     //} // namespace Internal
 
@@ -84,8 +86,6 @@ private:
     static ThreadStackManagerImpl sInstance;
 
     // ===== Private members for use by this class only.
-
-    ThreadStackManagerImpl() = default;
 };
 
 /**

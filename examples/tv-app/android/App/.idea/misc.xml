@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../../../../../Library/Android/sdk/platforms/android-30/data/res/layout/simple_list_item_1.xml" value="0.29393115942028986" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.29393115942028986" />
+        <entry key="platform-app/src/main/res/layout/activity_main.xml" value="0.23697916666666666" />
+        <entry key="platform-app/src/main/res/layout/applist_item.xml" value="0.23697916666666666" />
+        <entry key="platform-app/src/main/res/layout/temp.xml" value="0.23697916666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

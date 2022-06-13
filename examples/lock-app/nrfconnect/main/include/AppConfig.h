@@ -31,6 +31,3 @@
 
 #define SYSTEM_STATE_LED DK_LED1
 #define LOCK_STATE_LED DK_LED2
-
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000

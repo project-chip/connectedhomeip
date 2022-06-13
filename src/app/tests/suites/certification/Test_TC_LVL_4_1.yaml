@@ -1,0 +1,193 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.4.1. [TC-LVL-4.1] Move Verification (DUT as Server)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "reads max level attribute from DUT"
+      command: "readAttribute"
+      attribute: "max level"
+      response:
+          saveAs: MaxlevelValue
+          constraints:
+              type: uint8
+
+    - label: "sends a Move up command"
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 32
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the DUT moves at a rate of 32 units
+                    per second or as close as possible to this rate and
+                    completes moving to its maximum level"
+
+    - label: "Wait 3000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: MaxlevelValue
+
+    - label: "reads min level attribute from DUT"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
+
+    - label: "sends a Move down command"
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 64
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the DUT moves at a rate of 64 units
+                    per second or as close as possible to this rate and complete
+                    moving to its minimum level"
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    # For lighting Device type current level minimal value is 1
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 1
+          constraints:
+              minValue: 0
+              maxValue: 1
+
+    - label: "reads default move rate attribute from DUT"
+      command: "readAttribute"
+      attribute: "default move rate"
+      response:
+          saveAs: DefaultMoveRateValue
+          constraints:
+              type: uint8
+
+    - label: "sends a Move up command at default move rate"
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 255
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "reads CurrentLevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          constraints:
+              notValue: 255
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the device moves at the rate
+                    recorded in step 3a and completes moving to its maximum
+                    level."
+
+    - label: "Reset level to 254"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100

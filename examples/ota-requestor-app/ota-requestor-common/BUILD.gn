@@ -26,16 +26,9 @@ chip_data_model("ota-requestor-common") {
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/ota-requestor-app/zap-generated"
 
-  use_default_client_callbacks = true
-
   deps = [ "${chip_root}/src/lib" ]
 
-  sources = [
-    "BDXDownloader.cpp",
-    "BDXDownloader.h",
-  ]
+  public_configs = [ ":config" ]
 
   is_server = true
-
-  public_configs = [ ":config" ]
 }

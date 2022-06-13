@@ -18,11 +18,13 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -33,6 +35,12 @@ class ThreadStackManagerImpl : public ThreadStackManager
 {
 public:
     ThreadStackManagerImpl();
+
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
     CHIP_ERROR _InitThreadStack();
     void _ProcessThreadActivity();
@@ -46,9 +54,14 @@ public:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
+
+    void _OnNetworkScanFinished(GAsyncResult * res);
+    static void _OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
+
+    CHIP_ERROR GetExtendedPanId(uint8_t extPanId[Thread::kSizeExtendedPanId]);
 
     void _ErasePersistentInfo();
 
@@ -56,21 +69,30 @@ public:
 
     bool _IsThreadEnabled();
 
-    bool _IsThreadAttached();
+    bool _IsThreadAttached() const;
+
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
 
     CHIP_ERROR _SetThreadEnabled(bool val);
+
+    void _OnThreadAttachFinished(void);
+
+    void _UpdateNetworkStatus();
+
+    static void _OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+#endif
 
     bool _HaveMeshConnectivity();
-
-    void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
     CHIP_ERROR _GetAndLogThreadStatsCounters();
 
@@ -90,6 +112,8 @@ public:
 
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+
     ~ThreadStackManagerImpl() = default;
 
     static ThreadStackManagerImpl sInstance;
@@ -106,6 +130,19 @@ private:
 
     static constexpr char kPropertyDeviceRole[] = "DeviceRole";
 
+    struct ThreadNetworkScanned
+    {
+        uint16_t panId;
+        uint64_t extendedPanId;
+        uint8_t networkName[16];
+        uint8_t networkNameLen;
+        uint16_t channel;
+        uint8_t version;
+        uint64_t extendedAddress;
+        int8_t rssi;
+        uint8_t lqi;
+    };
+
     std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
 
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
@@ -114,8 +151,17 @@ private:
 
     Thread::OperationalDataset mDataset = {};
 
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+
     bool mAttached;
 };
+
+inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
+{
+    // stub for ThreadStackManager.h
+}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceEvent.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,7 +48,12 @@ enum InternalPlatformSpecificEventTypes
     kPlatformTizenBLEPeripheralGATTServerRegisterComplete,
     kPlatformTizenBLEPeripheralAdvConfiguredComplete,
     kPlatformTizenBLEPeripheralAdvStartComplete,
-    kPlatformTizenBLEPeripheralAdvStopComplete
+    kPlatformTizenBLEPeripheralAdvStopComplete,
+    kPlatformTizenBLECentralConnected,
+    kPlatformTizenBLECentralConnectFailed,
+    kPlatformTizenBLEWriteComplete,
+    kPlatformTizenBLESubscribeOpComplete,
+    kPlatformTizenBLEIndicationReceived
 };
 
 } // namespace DeviceEventType
@@ -79,6 +85,28 @@ struct ChipDevicePlatformEvent
             bool mIsSuccess;
             void * mpAppstate;
         } BLEPeripheralAdvStopComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLECentralConnected;
+        struct
+        {
+            CHIP_ERROR mError;
+        } BLECentralConnectFailed;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLEWriteComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            bool mIsSubscribed;
+        } BLESubscribeOpComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            chip::System::PacketBuffer * mData;
+        } BLEIndicationReceived;
     };
 };
 

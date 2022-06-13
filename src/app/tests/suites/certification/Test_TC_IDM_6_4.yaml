@@ -1,0 +1,82 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    19.8.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH [DUT -
+    Controller]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends Subscribe Request Message to the TH for a supported event."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any subscribe-event-by-id 0x0033 0x01 0 100 0 1 1
+      disabled: true
+
+    - label:
+          "DUT sends Subscribe Request Message to the TH + TH sends Report Data
+          message to DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool softwarediagnostics subscribe-by-id 0xFFFFFFFF 0 100 0 1 0
+      disabled: true
+
+    - label:
+          "DUT sends Subscribe Request Message to the TH and TH does not respond
+          with Report Data message to DUT."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT sends Subscribe Request Message to the TH + TH sends Report Data
+          message to DUT + DUT sends Status Response Message to the TH + TH does
+          not respond with Subscribe Response message to DUT."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "With an active Event subscription from DUT to TH, TH sends Report
+          Data message to DUT with an inactive SubscriptionId."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "With an active Event subscription from DUT to TH, TH sends Report
+          Data message to DUT after the maximum interval from the last Report
+          Data."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Subscribe Request Message to DUT with EventRequests set to a
+          specific event. Once the subscription is active, reboot the TH. On the
+          DUT, perform actions to trigger the event. (Trigger it multiple
+          times). TH resubscribes to the same event after bootup to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool softwarediagnostics subscribe-by-id 0x0 0 100 0 1 0
+      disabled: true

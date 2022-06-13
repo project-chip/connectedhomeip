@@ -44,8 +44,8 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
     VerifyOrReturnError(plen > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(slen >= chip::Crypto::kMin_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(slen <= chip::Crypto::kMax_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(slen >= kSpake2p_Min_PBKDF_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(slen <= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(salt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);

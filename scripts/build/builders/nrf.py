@@ -15,35 +15,47 @@
 import logging
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder
 
 
 class NrfApp(Enum):
+    ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    UNIT_TESTS = auto()
 
-    def ExampleName(self):
-        if self == NrfApp.LIGHT:
-            return 'lighting-app'
+    def AppPath(self):
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'examples/all-clusters-app'
+        elif self == NrfApp.ALL_CLUSTERS_MINIMAL:
+            return 'examples/all-clusters-minimal-app'
+        elif self == NrfApp.LIGHT:
+            return 'examples/lighting-app'
         elif self == NrfApp.LOCK:
-            return 'lock-app'
+            return 'examples/lock-app'
         elif self == NrfApp.SHELL:
-            return 'shell'
+            return 'examples/shell'
         elif self == NrfApp.PUMP:
-            return 'pump-app'
+            return 'examples/pump-app'
         elif self == NrfApp.PUMP_CONTROLLER:
-            return 'pump-controller-app'
+            return 'examples/pump-controller-app'
+        elif self == NrfApp.UNIT_TESTS:
+            return 'src/test_driver'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == NrfApp.LIGHT:
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'chip-nrf-all-clusters-example'
+        elif self == NrfApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-nrf-all-clusters-minimal-example'
+        elif self == NrfApp.LIGHT:
             return 'chip-nrf-lighting-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrf-lock-example'
@@ -53,11 +65,17 @@ class NrfApp(Enum):
             return 'chip-nrf-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
+        elif self == NrfApp.UNIT_TESTS:
+            return 'chip-nrf-unit-tests'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def _FlashBundlePrefix(self):
-        if self == NrfApp.LIGHT:
+        if self == NrfApp.ALL_CLUSTERS:
+            return 'chip-nrfconnect-all-clusters-example'
+        elif self == NrfApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-nrfconnect-all-clusters-minimal-example'
+        elif self == NrfApp.LIGHT:
             return 'chip-nrfconnect-lighting-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrfconnect-lock-example'
@@ -67,23 +85,35 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
+        elif self == NrfApp.UNIT_TESTS:
+            raise Exception(
+                'Unit tests compile natively and do not have a flashbundle')
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
-        '''Nrf build script will generate a file naming <project_name>.flashbundle.txt, go through the output dir to find the file and return it.'''
+        '''
+        Nrf build script will generate a file naming <project_name>.flashbundle.txt,
+        go through the output dir to find the file and return it.
+        '''
         return self._FlashBundlePrefix() + '.flashbundle.txt'
 
 
 class NrfBoard(Enum):
-    NRF52840 = auto()
-    NRF5340 = auto()
+    NRF52840DK = auto()
+    NRF52840DONGLE = auto()
+    NRF5340DK = auto()
+    NATIVE_POSIX_64 = auto()
 
     def GnArgName(self):
-        if self == NrfBoard.NRF52840:
+        if self == NrfBoard.NRF52840DK:
             return 'nrf52840dk_nrf52840'
-        elif self == NrfBoard.NRF5340:
+        elif self == NrfBoard.NRF52840DONGLE:
+            return 'nrf52840dongle_nrf52840'
+        elif self == NrfBoard.NRF5340DK:
             return 'nrf5340dk_nrf5340_cpuapp'
+        elif self == NrfBoard.NATIVE_POSIX_64:
+            return 'native_posix_64'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -94,7 +124,7 @@ class NrfConnectBuilder(Builder):
                  root,
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
-                 board: NrfBoard = NrfBoard.NRF52840,
+                 board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
@@ -121,25 +151,33 @@ class NrfConnectBuilder(Builder):
                 try:
                     self._Execute(
                         ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
-                except Exception as e:
+                except Exception:
                     logging.exception('Failed to validate ZEPHYR_BASE status')
                     logging.error(
                         'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
                     raise Exception('ZEPHYR_BASE validation failed')
 
+            flags = []
+            if self.enable_rpcs:
+                flags.append("-DOVERLAY_CONFIG=rpc.overlay")
+
+            if self.board == NrfBoard.NRF52840DONGLE and self.app != NrfApp.ALL_CLUSTERS and self.app != NrfApp.ALL_CLUSTERS_MINIMAL:
+                flags.append("-DCONF_FILE=prj_no_dfu.conf")
+
+            build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
+
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
-                    self.root, 'examples', self.app.ExampleName(), 'nrfconnect')),
-                rpcs=" -- -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
+                    self.root, self.app.AppPath(), 'nrfconnect')),
+                build_flags=build_flags
             ).strip()
-
             self._Execute(['bash', '-c', cmd],
                           title='Generating ' + self.identifier)
 
@@ -148,6 +186,13 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
 
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building ' + self.identifier)
+
+        if self.app == NrfApp.UNIT_TESTS:
+            # Note: running zephyr/zephyr.elf has the same result except it creates
+            # a flash.bin in the current directory. ctest has more options and does not
+            # pollute the source directory
+            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
+                          title='Run Tests ' + self.identifier)
 
     def _generate_flashbundle(self):
         logging.info(f'Generating flashbundle at {self.output_dir}')
@@ -162,6 +207,9 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
         }
 
     def flashbundle(self):
+        if self.app == NrfApp.UNIT_TESTS:
+            return dict()
+
         with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
             return {
                 l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()

@@ -47,6 +47,7 @@ static_library("libopenthread-platform-utils") {
     "${openthread_root}/examples/platforms/utils/encoding.h",
     "${openthread_root}/examples/platforms/utils/logging_rtt.c",
     "${openthread_root}/examples/platforms/utils/logging_rtt.h",
+    "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
     "${openthread_root}/examples/platforms/utils/mac_frame.h",
     "${openthread_root}/examples/platforms/utils/settings.h",
     "${openthread_root}/examples/platforms/utils/settings_ram.c",

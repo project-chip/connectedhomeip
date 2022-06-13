@@ -26,7 +26,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
-#include "EFR32Config.h"
+#include <platform/EFR32/EFR32Config.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,70 +34,55 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the EFR32 platform.
  */
-class ConfigurationManagerImpl final : public ConfigurationManager,
-                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::EFR32Config
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::EFR32Config>
 {
-    // Allow the ConfigurationManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ConfigurationManager;
+public:
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-#endif
+    uint32_t GetBootReason(void);
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR IncreaseBootCount(void);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 
-    CHIP_ERROR _Init(void);
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    bool _CanFactoryReset(void);
-    void _InitiateFactoryReset(void);
-    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
-    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
+    CHIP_ERROR Init(void) override;
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    bool CanFactoryReset(void) override;
+    void InitiateFactoryReset(void) override;
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
+    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
+    CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
+    CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR WriteConfigValue(Key key, bool val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint32_t val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint64_t val) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
+    CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
+    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
-
+    uint32_t rebootCause;
     static void DoFactoryReset(intptr_t arg);
 };
 
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+#ifndef SL_WIFI
+inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+#endif /* SL_WIFI */
 } // namespace DeviceLayer
 } // namespace chip

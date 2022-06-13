@@ -68,8 +68,9 @@ public:
         }
 
         chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+        RecordWriter writer(&out);
 
-        if (!query.Append(mHeader, out))
+        if (!query.Append(mHeader, writer))
         {
             mQueryBuildOk = false;
         }

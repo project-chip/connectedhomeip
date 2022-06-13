@@ -75,7 +75,7 @@ size_t ASN1Writer::GetLengthWritten() const
 
 CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
 {
-    uint8_t encodedVal[8];
+    uint8_t encodedVal[sizeof(int64_t)];
     uint8_t valStart, valLen;
 
     BigEndian::Put64(encodedVal, static_cast<uint64_t>(val));
@@ -282,8 +282,7 @@ CHIP_ERROR ASN1Writer::PutTime(const ASN1UniversalTime & val)
     //
     if (val.Year >= 2050)
         return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_GeneralizedTime, false, buf, 15);
-    else
-        return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_UTCTime, false, buf + 2, 13);
+    return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_UTCTime, false, buf + 2, 13);
 }
 
 CHIP_ERROR ASN1Writer::PutNull()

@@ -31,23 +31,29 @@
 
 #include <ti/drivers/apps/Button.h>
 
+struct Identify;
+
 class AppTask
 {
 public:
     int StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostLockActionRequest(int32_t aActor, PumpManager::Action_t aAction);
+    void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
+    void UpdateClusterState();
+
+    static void IdentifyStartHandler(::Identify *);
+    static void IdentifyStopHandler(::Identify *);
+    static void TriggerIdentifyEffectHandler(::Identify * identify);
 
 private:
     friend AppTask & GetAppTask(void);
 
     int Init();
 
-    // should this be done by BoltLock Manager? I don't want to unravel this spaghetti quite yet
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PumpManager::Action_t aAction);
+    static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
 

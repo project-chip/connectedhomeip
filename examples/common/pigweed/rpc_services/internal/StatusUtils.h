@@ -41,8 +41,6 @@ constexpr pw::Status EmberStatusToPwStatus(EmberAfStatus ember_status)
     {
     case EMBER_ZCL_STATUS_SUCCESS:
         return pw::OkStatus();
-    case EMBER_ZCL_STATUS_INVALID_ARGUMENT:
-        return pw::Status::InvalidArgument();
     case EMBER_ZCL_STATUS_NOT_FOUND:
         return pw::Status::NotFound();
     case EMBER_ZCL_STATUS_NOT_AUTHORIZED:

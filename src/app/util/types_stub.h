@@ -46,6 +46,7 @@
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
@@ -495,8 +496,40 @@ enum
  */
 struct EmberBindingTableEntry
 {
+    EmberBindingTableEntry() = default;
+
+    static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
+                                          chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_UNICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = remoteEndpoint,
+            .nodeId      = node,
+        };
+        return entry;
+    }
+
+    static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
+                                           chip::Optional<chip::ClusterId> cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type        = EMBER_MULTICAST_BINDING,
+            .fabricIndex = fabric,
+            .local       = localEndpoint,
+            .clusterId   = cluster,
+            .remote      = 0,
+            .groupId     = group,
+        };
+        return entry;
+    }
+
     /** The type of binding. */
-    EmberBindingType type;
+    EmberBindingType type = EMBER_UNUSED_BINDING;
+
+    chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
     chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
@@ -506,7 +539,7 @@ struct EmberBindingTableEntry
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    chip::ClusterId clusterId;
+    chip::Optional<chip::ClusterId> clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
@@ -519,8 +552,6 @@ struct EmberBindingTableEntry
         chip::NodeId nodeId;
         chip::GroupId groupId;
     };
-    /** The index of the network the binding belongs to. */
-    uint8_t networkIndex;
 
     bool operator==(EmberBindingTableEntry const & other) const
     {
@@ -534,12 +565,12 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        if (type == EMBER_UNICAST_BINDING && nodeId != other.nodeId)
+        if (type == EMBER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
         {
             return false;
         }
 
-        return local == other.local && clusterId == other.clusterId && remote == other.remote && networkIndex == other.networkIndex;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId;
     }
 };
 
@@ -1695,7 +1726,7 @@ typedef struct
 /**
  * @brief The broadcast endpoint, as defined in the ZigBee spec.
  */
-#define EMBER_BROADCAST_ENDPOINT 0xFF
+#define EMBER_BROADCAST_ENDPOINT (chip::kInvalidEndpointId)
 
 /**
  * @brief Useful to reference a single bit of a byte.

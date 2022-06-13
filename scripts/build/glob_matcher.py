@@ -52,6 +52,12 @@ def _GlobMatch(glob: str, value: str) -> bool:
                 return False
             glob, value = glob[1:], value[1:]
 
+    # if value is empty it has a chance to match subgroups
+    if not value and glob.startswith('{') and glob.endswith('}'):
+        for choice in glob[1: -1].split(','):
+            if _GlobMatch(choice, value):
+                return True
+
     return glob == '*' or (not glob and not value)
 
 

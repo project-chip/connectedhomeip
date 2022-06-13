@@ -4,7 +4,7 @@
 
 #import "CHIPDevice.h"
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 
 @interface CHIP{{asUpperCamelCase name}} ()
 @property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;

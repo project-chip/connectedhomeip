@@ -15,53 +15,67 @@
 name: 18.1.1. [TC-LVL-1.1] Global attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Level Control"
     endpoint: 1
 
 tests:
-    - label: "read the global attribute: ClusterRevision"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 4
-
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
       arguments:
-          value: 4
-      response:
-          error: 1
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "reads back global attribute: ClusterRevision"
-      disabled: true
+    - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 4
+          value: 5
+
+    - label: "Read the global attribute constraints : ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [0, 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14, 15, 16384]
+          constraints:
+              type: list
+
+    #issue #15011
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: [0, 1, 2, 3, 4, 5, 6, 7]
+          constraints:
+              type: list
 
     - label: "read the optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 0
-      response:
-          error: 1
-
-    - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
+          value: 3

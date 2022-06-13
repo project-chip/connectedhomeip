@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">CHIPTVCastingApp</string>
+    <string name="content_launcher_fragment_title">Content Launcher</string>
+    <string name="launch_url_command_title">Launch URL</string>
+    <string name="launch_url_button_text">Launch URL</string>
+    <string name="default_content_url">https://www.test.com/videoid</string>
+    <string name="default_content_display_string">Test video</string>
+    <string name="content_url_prompt_text">URL</string>
+    <string name="content_display_string_prompt_text">Display string</string>
+    <string name="discovery_message_text">Discovering commissioners on-network...</string>
+</resources>

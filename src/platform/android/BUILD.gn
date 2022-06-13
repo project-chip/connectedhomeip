@@ -28,6 +28,7 @@ static_library("android") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "AndroidChipPlatform-JNI.cpp",
     "AndroidConfig.cpp",
     "AndroidConfig.h",
@@ -35,12 +36,16 @@ static_library("android") {
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CommissionableDataProviderImpl.cpp",
+    "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -52,6 +57,7 @@ static_library("android") {
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/trace",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
@@ -62,7 +68,10 @@ static_library("android") {
 android_library("java") {
   output_name = "AndroidPlatform.jar"
 
-  deps = [ ":android_sdk" ]
+  deps = [
+    ":android_sdk",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
   data_deps = [ ":android" ]
 
   sources = [
@@ -74,10 +83,15 @@ android_library("java") {
     "java/chip/platform/ChipMdnsCallback.java",
     "java/chip/platform/ChipMdnsCallbackImpl.java",
     "java/chip/platform/ConfigurationManager.java",
+    "java/chip/platform/DiagnosticDataProvider.java",
+    "java/chip/platform/DiagnosticDataProviderImpl.java",
     "java/chip/platform/KeyValueStoreManager.java",
+    "java/chip/platform/NetworkInterface.java",
+    "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
+    "java/chip/platform/ServiceBrowser.java",
     "java/chip/platform/ServiceResolver.java",
   ]
 

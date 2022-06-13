@@ -23,6 +23,10 @@
 #include "capsense.h"
 #endif
 
+#ifdef CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include "mbedtls/platform.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -45,6 +49,16 @@ int main()
     Capsense::getInstance().init();
 #endif
 
+#if CHIP_PW_RPC
+    auto rpcThread = chip::rpc::Init();
+    if (rpcThread == NULL)
+    {
+        ChipLogError(NotSpecified, "RPC service initialization and run failed");
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
+
     ChipLogProgress(NotSpecified, "Mbed lighting-app example application start");
 
     ret = mbedtls_platform_setup(NULL);
@@ -57,7 +71,7 @@ int main()
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Memory initalization failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Memory initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -65,7 +79,7 @@ int main()
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Chip stack initalization failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Chip stack initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }

@@ -51,37 +51,3 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
 #endif
 #endif
 }
-
-void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::PacketBufferHandle && buffer)
-{
-#ifdef USE_ZAP_CONFIG
-    EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
-    if (ok)
-    {
-        ChipLogDetail(Zcl, "APS frame processing success!");
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "APS frame processing failure!");
-        return;
-    }
-
-    uint8_t * message;
-    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-    ok                  = emberAfProcessMessage(&frame,
-                               0, // type
-                               message, messageLen,
-                               exchange, // source identifier
-                               NULL);
-
-    if (ok)
-    {
-        ChipLogDetail(Zcl, "Data model processing success!");
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "Data model processing failure!");
-    }
-#endif
-}

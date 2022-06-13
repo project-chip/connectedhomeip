@@ -130,7 +130,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
 
     TLV::TLVWriter innerStructureWriter;
 
-    ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, innerStructureWriter));
+    ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, innerStructureWriter));
 
     for (OptionalQRCodeInfo info : optionalData)
     {
@@ -196,6 +196,8 @@ static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, 
         MutableCharSpan subSpan = outBuffer.SubSpan(prefixLen, outBuffer.size() - prefixLen);
         memcpy(outBuffer.data(), kQRCodePrefix, prefixLen);
         err = base38Encode(bits, subSpan);
+        // Reduce output span size to be the size of written data
+        outBuffer.reduce_size(subSpan.size() + prefixLen);
     }
 
     return err;
@@ -213,7 +215,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
 {
     size_t tlvDataLengthInBytes = 0;
 
-    VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mAllowInvalidPayload || mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes));
 
     std::vector<uint8_t> bits(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes);

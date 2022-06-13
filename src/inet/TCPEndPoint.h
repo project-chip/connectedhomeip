@@ -30,14 +30,11 @@
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-
+#include <inet/InetLayer.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <utility>
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
 
 namespace chip {
 
@@ -47,7 +44,7 @@ class TCPTest;
 
 namespace Inet {
 
-class InetLayer;
+class TCPTest;
 
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
@@ -57,38 +54,9 @@ class InetLayer;
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT TCPEndPoint : public EndPointBasis
+class DLL_EXPORT TCPEndPoint : public EndPointBasis<TCPEndPoint>
 {
-    friend class InetLayer;
-    friend class ::chip::Transport::TCPTest;
-
 public:
-    /** Control switch indicating whether the application is receiving data. */
-    bool ReceiveEnabled;
-
-    /**
-     * @brief   Basic dynamic state of the underlying endpoint.
-     *
-     * @details
-     *  Objects are initialized in the "ready" state, proceed to subsequent
-     *  states corresponding to a simplification of the states of the TCP
-     *  transport state machine.
-     */
-    enum
-    {
-        kState_Ready           = 0, /**< Endpoint initialized, but not bound. */
-        kState_Bound           = 1, /**< Endpoint bound, but not listening. */
-        kState_Listening       = 2, /**< Endpoint receiving connections. */
-        kState_Connecting      = 3, /**< Endpoint attempting to connect. */
-        kState_Connected       = 4, /**< Endpoint connected, ready for tx/rx. */
-        kState_SendShutdown    = 5, /**< Endpoint initiated its half-close. */
-        kState_ReceiveShutdown = 6, /**< Endpoint responded to half-close. */
-        kState_Closing         = 7, /**< Endpoint closing bidirectionally. */
-        kState_Closed          = 8  /**< Endpoint closed, ready for release. */
-    } State;
-
-    TCPEndPoint() = default;
-
     /**
      * @brief   Bind the endpoint to an interface IP address.
      *
@@ -105,7 +73,7 @@ public:
      *      \c addrType does not match \c IPVer.
      *
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
-     *      \c addrType is \c kIPAddressType_Any, or the type of \c addr is not
+     *      \c addrType is \c IPAddressType::kAny, or the type of \c addr is not
      *      equal to \c addrType.
      *
      * @retval  other                   another system or platform error
@@ -127,8 +95,8 @@ public:
      * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint is already listening.
      *
      * @details
-     *  If \c State is already \c kState_Listening, then no operation is
-     *  performed, otherwise the \c State is set to \c kState_Listening and
+     *  If \c mState is already \c State::kListening, then no operation is
+     *  performed, otherwise the \c mState is set to \c State::kListening and
      *  the endpoint is prepared to received TCP messages, according to the
      *  semantics of the platform.
      *
@@ -162,7 +130,7 @@ public:
      *      destination \c addr (with \c intfId used as the scope
      *      identifier for IPv6 link-local destinations) and \c port.
      */
-    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = InterfaceId::Null());
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.
@@ -175,9 +143,9 @@ public:
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
-     *  Do not use \c NULL pointer values for either argument.
+     *  Do not use \c nullptr for either argument.
      */
-    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const;
+    virtual CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const = 0;
 
     /**
      * @brief   Extract IP address and TCP port of local endpoint.
@@ -190,9 +158,9 @@ public:
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
-     *  Do not use \c NULL pointer values for either argument.
+     *  Do not use \c nullptr for either argument.
      */
-    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
+    virtual CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const = 0;
 
     /**
      * @brief   Extract the interface id of the TCP endpoint.
@@ -203,7 +171,7 @@ public:
      * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      */
-    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface);
+    virtual CHIP_ERROR GetInterfaceId(InterfaceId * retInterface) = 0;
 
     /**
      * @brief   Send message text on TCP connection.
@@ -217,34 +185,29 @@ public:
     CHIP_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
 
     /**
-     * @brief   Disable reception.
+     * Disable reception.
      *
-     * @details
      *  Disable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void DisableReceive() { ReceiveEnabled = false; }
+    void DisableReceive() { mReceiveEnabled = false; }
 
     /**
-     * @brief   Enable reception.
+     * Enable reception.
      *
-     * @details
      *  Enable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
     void EnableReceive()
     {
-        ReceiveEnabled = true;
+        mReceiveEnabled = true;
         DriveReceiving();
     }
 
     /**
-     *  @brief EnableNoDelay
-     *
-     *    Switch off nagle buffering algorithm in TCP by setting the
-     *    TCP_NODELAY socket options.
+     * Switch off Nagle buffering algorithm.
      */
-    CHIP_ERROR EnableNoDelay();
+    virtual CHIP_ERROR EnableNoDelay() = 0;
 
     /**
      * @brief
@@ -280,7 +243,7 @@ public:
      *
      *  See RFC 1122, section 4.2.3.6 for specification details.
      */
-    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount);
+    virtual CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) = 0;
 
     /**
      * @brief   Disable the TCP "keep-alive" option.
@@ -295,7 +258,7 @@ public:
      *
      * @retval  other                   another system or platform error
      */
-    CHIP_ERROR DisableKeepAlive();
+    virtual CHIP_ERROR DisableKeepAlive() = 0;
 
     /**
      * @brief   Acknowledge receipt of message text.
@@ -311,7 +274,7 @@ public:
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    CHIP_ERROR AckReceive(uint16_t len);
+    virtual CHIP_ERROR AckReceive(uint16_t len) = 0;
 
     /**
      * @brief   Set the receive queue, for testing.
@@ -380,7 +343,7 @@ public:
     /**
      * @brief   Extract whether TCP connection is established.
      */
-    bool IsConnected() const { return IsConnected(State); }
+    bool IsConnected() const { return IsConnected(mState); }
 
     /**
      * Set timeout for Connect to succeed or return an error.
@@ -570,39 +533,55 @@ public:
      */
     OnAcceptErrorFunct OnAcceptError;
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    /**
-     * @brief   Type of TCP SendIdle changed signal handling function.
-     *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     *
-     * @param[in]   isIdle      True if the send channel of the TCP endpoint
-     *                          is Idle, otherwise false.
-     * @details
-     *  Provide a function of this type to the \c OnTCPSendIdleChanged delegate
-     *  member to process the event of the send channel of the TCPEndPoint
-     *  changing state between being idle and not idle.
-     */
-    typedef void (*OnTCPSendIdleChangedFunct)(TCPEndPoint * endPoint, bool isIdle);
-
-    /** The event handling function delegate of the endpoint signaling when the
-     *  idleness of the TCP connection's send channel changes. This is utilized
-     *  by upper layers to take appropriate actions based on whether sent data
-     *  has been reliably delivered to the peer. */
-    OnTCPSendIdleChangedFunct OnTCPSendIdleChanged;
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
     /**
      * Size of the largest TCP packet that can be received.
      */
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
-private:
-    static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
+protected:
+    friend class ::chip::Transport::TCPTest;
+    friend class TCPTest;
+
+    TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
+        EndPointBasis(endPointManager), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
+        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
+        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+        ,
+        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    {}
+
+    virtual ~TCPEndPoint() = default;
+
+    /**
+     * Basic dynamic state of the underlying endpoint.
+     *
+     *  Objects are initialized in the "ready" state, proceed to subsequent
+     *  states corresponding to a simplification of the states of the TCP
+     *  transport state machine.
+     */
+    enum class State : uint8_t
+    {
+        kReady           = 0, /**< Endpoint initialized, but not bound. */
+        kBound           = 1, /**< Endpoint bound, but not listening. */
+        kListening       = 2, /**< Endpoint receiving connections. */
+        kConnecting      = 3, /**< Endpoint attempting to connect. */
+        kConnected       = 4, /**< Endpoint connected, ready for tx/rx. */
+        kSendShutdown    = 5, /**< Endpoint initiated its half-close. */
+        kReceiveShutdown = 6, /**< Endpoint responded to half-close. */
+        kClosing         = 7, /**< Endpoint closing bidirectionally. */
+        kClosed          = 8  /**< Endpoint closed, ready for release. */
+    } mState;
+
+    /** Control switch indicating whether the application is receiving data. */
+    bool mReceiveEnabled;
 
     chip::System::PacketBufferHandle mRcvQueue;
     chip::System::PacketBufferHandle mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
+    static void HandleIdleTimer(System::Layer * aSystemLayer, void * aAppState);
+    static bool IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager);
     uint16_t mIdleTimeout;       // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
     uint16_t mRemainingIdleTime; // in units of INET_TCP_IDLE_CHECK_INTERVAL
 #endif                           // INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -611,124 +590,54 @@ private:
                                    // return an error; zero means use system defaults.
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    uint32_t mUserTimeoutMillis; // The configured TCP user timeout value in milliseconds.
-                                 // If 0, assume not set.
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    bool mIsTCPSendIdle; // Indicates whether the send channel of the TCPEndPoint is Idle.
-
-    uint16_t mTCPSendQueueRemainingPollCount; // The current remaining number of TCP SendQueue polls before
-                                              // the TCP User timeout period is reached.
-
-    uint32_t mTCPSendQueuePollPeriodMillis; // The configured period of active polling of the TCP
-                                            // SendQueue. If 0, assume not set.
-    void SetTCPSendIdleAndNotifyChange(bool aIsSendIdle);
-
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
+    uint32_t mUserTimeoutMillis;   // The configured TCP user timeout value in milliseconds.
+                                   // If 0, assume not set.
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
     static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
+    virtual void TCPUserTimeoutHandler() = 0;
 
     void StartTCPUserTimeoutTimer();
-
     void StopTCPUserTimeoutTimer();
-
     void RestartTCPUserTimeoutTimer();
-
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    uint16_t MaxTCPSendQueuePolls(void)
-    {
-        // If the UserTimeout is configured less than or equal to the poll interval,
-        // return 1 to poll at least once instead of returning zero and timing out
-        // immediately.
-        return (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ? (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
-    }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    uint32_t mBytesWrittenSinceLastProbe; // This counts the number of bytes written on the TCP socket since the
-                                          // last probe into the TCP outqueue was made.
-
-    uint32_t mLastTCPKernelSendQueueLen; // This is the measured size(in bytes) of the kernel TCP send queue
-                                         // at the end of the last user timeout window.
-    CHIP_ERROR CheckConnectionProgress(bool & IsProgressing);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint(const TCPEndPoint &); // not defined
+    TCPEndPoint(const TCPEndPoint &) = delete;
 
-    void Init(InetLayer * inetLayer);
     CHIP_ERROR DriveSending();
     void DriveReceiving();
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
     CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
-    static bool IsConnected(int state);
+    static bool IsConnected(State state);
 
     static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();
 
-    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr);
-    CHIP_ERROR ListenImpl(uint16_t backlog);
-    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId);
-    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty);
-    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis);
+    friend class TCPEndPointDeletor;
 
-    void InitImpl();
-    CHIP_ERROR DriveSendingImpl();
-    void HandleConnectCompleteImpl();
-    void DoCloseImpl(CHIP_ERROR err, int oldState);
+    /*
+     * Implementation helpers for shared methods.
+     */
+    virtual CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) = 0;
+    virtual CHIP_ERROR ListenImpl(uint16_t backlog)                                                            = 0;
+    virtual CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)                  = 0;
+    virtual CHIP_ERROR SendQueuedImpl(bool queueWasEmpty)                                                      = 0;
+    virtual CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis)                                          = 0;
+    virtual CHIP_ERROR DriveSendingImpl()                                                                      = 0;
+    virtual void HandleConnectCompleteImpl()                                                                   = 0;
+    virtual void DoCloseImpl(CHIP_ERROR err, State oldState)                                                   = 0;
+};
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    struct BufferOffset
-    {
-        BufferOffset(System::PacketBufferHandle && aBuffer) : buffer(std::move(aBuffer)), offset(0) {}
-        BufferOffset(BufferOffset && aOther)
-        {
-            buffer = std::move(aOther.buffer);
-            offset = aOther.offset;
-        }
-        chip::System::PacketBufferHandle buffer;
-        uint16_t offset;
-    };
-
-    uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
-                             // to hang-on to backing packet buffers until they are no longer needed.
-
-    uint16_t RemainingToSend();
-    BufferOffset FindStartOfUnsent();
-    CHIP_ERROR GetPCB(IPAddressType addrType);
-    void HandleDataSent(uint16_t len);
-    void HandleDataReceived(chip::System::PacketBufferHandle && buf);
-    void HandleIncomingConnection(TCPEndPoint * pcb);
-    void HandleError(CHIP_ERROR err);
-
-    static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);
-    static err_t LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tcpConPCB, err_t lwipErr);
-    static err_t LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err);
-    static err_t LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len);
-    static void LwIPHandleError(void * arg, err_t err);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO(System::SocketEvents events);
-    void ReceiveData();
-    void HandleIncomingConnection();
-    CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
-    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource  = nullptr;
-    dispatch_source_t mWriteableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+template <>
+struct EndPointProperties<TCPEndPoint>
+{
+    static constexpr const char * kName   = "TCP";
+    static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
+    static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
 };
 
 } // namespace Inet

@@ -144,6 +144,25 @@ SequenceNumber_t BtpEngine::GetAndRecordRxAckSeqNum()
     return ret;
 }
 
+#if CHIP_ENABLE_CHIPOBLE_TEST
+bool BtpEngine::IsCommandPacket(const PacketBufferHandle & p)
+{
+    if (p.IsNull())
+    {
+        return false;
+    }
+
+    BitFlags<HeaderFlags> rx_flags;
+    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
+    CHIP_ERROR err = reader.Read8(rx_flags.RawStorage()).StatusCode();
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    return rx_flags.Has(HeaderFlags::kCommandMessage);
+}
+#endif // CHIP_ENABLE_CHIPOBLE_TEST
+
 bool BtpEngine::HasUnackedData() const
 {
     return (mRxOldestUnackedSeqNum != mRxNextSeqNum);
@@ -182,10 +201,10 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
     {
         mTxOldestUnackedSeqNum = ack_num;
 
-        // All oustanding fragments have been acknowledged.
+        // All outstanding fragments have been acknowledged.
         mExpectingAck = false;
     }
-    else // If ack is valid, but not for newest oustanding unacknowledged fragment...
+    else // If ack is valid, but not for newest outstanding unacknowledged fragment...
     {
         // Update newest unacknowledged fragment to one past that which was just acknowledged.
         mTxOldestUnackedSeqNum = ack_num;
@@ -196,7 +215,7 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 }
 
 // Calling convention:
-//   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   EncodeStandAloneAck may only be called if data arg is committed for immediate, synchronous subsequent transmission.
 CHIP_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 {
     // Ensure enough headroom exists for the lower BLE layers.
@@ -240,62 +259,65 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BitFlags<HeaderFlags> rx_flags;
-    // BLE data uses little-endian byte order.
-    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
 
     VerifyOrExit(!data.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mRxCharCount++;
+    { // Scope for reader, so we can do the VerifyOrExit above.
+        // BLE data uses little-endian byte order.
+        Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
 
-    // Get header flags, always in first byte.
-    err = reader.Read8(rx_flags.RawStorage()).StatusCode();
-    SuccessOrExit(err);
+        mRxCharCount++;
+
+        // Get header flags, always in first byte.
+        err = reader.Read8(rx_flags.RawStorage()).StatusCode();
+        SuccessOrExit(err);
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    if (rx_flags.Has(HeaderFlags::kCommandMessage))
-        SetRxPacketType(kType_Control);
-    else
-        SetRxPacketType(kType_Data);
+        if (rx_flags.Has(HeaderFlags::kCommandMessage))
+            SetRxPacketType(kType_Control);
+        else
+            SetRxPacketType(kType_Data);
 #endif
 
-    didReceiveAck = rx_flags.Has(HeaderFlags::kFragmentAck);
+        didReceiveAck = rx_flags.Has(HeaderFlags::kFragmentAck);
 
-    // Get ack number, if any.
-    if (didReceiveAck)
-    {
-        err = reader.Read8(&receivedAck).StatusCode();
+        // Get ack number, if any.
+        if (didReceiveAck)
+        {
+            err = reader.Read8(&receivedAck).StatusCode();
+            SuccessOrExit(err);
+
+            err = HandleAckReceived(receivedAck);
+            SuccessOrExit(err);
+        }
+
+        // Get sequence number.
+        err = reader.Read8(&mRxNewestUnackedSeqNum).StatusCode();
         SuccessOrExit(err);
 
-        err = HandleAckReceived(receivedAck);
-        SuccessOrExit(err);
+        // Verify that received sequence number is the next one we'd expect.
+        VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
+
+        // Increment next expected rx sequence number.
+        IncSeqNum(mRxNextSeqNum);
+
+        // If fragment was stand-alone ack, we're done here; no payload for message reassembler.
+        if (!DidReceiveData(rx_flags))
+        {
+            ExitNow();
+        }
+
+        // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
+        // mRxFragnentSize may be smaller than the characteristic size.  Make sure
+        // we're not truncating to a data length smaller than what we have already consumed.
+        VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
+        data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
+
+        // Now mark the bytes we consumed as consumed.
+        data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
+
+        ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
+        PrintBufDebug(data);
     }
-
-    // Get sequence number.
-    err = reader.Read8(&mRxNewestUnackedSeqNum).StatusCode();
-    SuccessOrExit(err);
-
-    // Verify that received sequence number is the next one we'd expect.
-    VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
-
-    // Increment next expected rx sequence number.
-    IncSeqNum(mRxNextSeqNum);
-
-    // If fragment was stand-alone ack, we're done here; no payload for message reassembler.
-    if (!DidReceiveData(rx_flags))
-    {
-        ExitNow();
-    }
-
-    // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
-    // mRxFragnentSize may be smaller than the characteristic size.  Make sure
-    // we're not truncating to a data length smaller than what we have already consumed.
-    VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
-    data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
-
-    // Now mark the bytes we consumed as consumed.
-    data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
-
-    ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
-    PrintBufDebug(data);
 
     if (mRxState == kState_Idle)
     {
@@ -385,7 +407,7 @@ exit:
         }
         LogState();
 
-        if (!data.IsNull())
+        if (!data.IsNull()) // NOLINT(bugprone-use-after-move)
         {
             // Tack received data onto rx buffer, to be freed when end point resets protocol engine on close.
             if (!mRxBuf.IsNull())
@@ -412,7 +434,7 @@ PacketBufferHandle BtpEngine::TakeRxPacket()
 }
 
 // Calling convention:
-//   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   May only be called if data arg is committed for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
 bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack)
 {
@@ -437,7 +459,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         mTxLength = mTxBuf->DataLength();
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
 
         // Determine fragment header size.
         uint8_t header_size =
@@ -493,7 +515,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
     }
     else if (mTxState == kState_InProgress)
     {

@@ -34,7 +34,7 @@ struct AppEvent
 #endif
     };
 
-    uint16_t Type;
+    AppEventTypes Type;
 
     union
     {

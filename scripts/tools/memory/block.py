@@ -69,7 +69,6 @@ def main(argv):
             ssdf = ssdf[ssdf.symbol.str.fullmatch(block_re)]
             memdf.report.write_dfs(config, {'Symbols': ssdf})
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

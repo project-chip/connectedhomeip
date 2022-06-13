@@ -32,7 +32,7 @@ RUN set -x \
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-       sudo socat psmisc tigervnc-standalone-server tigervnc-viewer \
+       sudo socat psmisc tigervnc-standalone-server xorg xauth \
        python3-pip python3-venv python3-setuptools libdbus-glib-1-dev \
        uuid-runtime libgirepository1.0-dev \
     && : # aids diffs
@@ -41,4 +41,5 @@ COPY requirements_nogrpc.txt /requirements.txt
 
 RUN set -x \
     && pip3 install -r requirements.txt \
+    && xinit -- /usr/bin/Xvnc \
     && : # aids diffs

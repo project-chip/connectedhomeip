@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Echo unsolicitied
+ *      This file defines objects for a CHIP Echo unsolicited
  *      initaitor (client) and responder (server).
  *
  */
@@ -67,7 +67,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & session);
 
     /**
      *  Shutdown the EchoClient. This terminates this instance
@@ -103,14 +103,14 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     EchoFunct OnEchoResponseReceived          = nullptr;
-    Optional<SessionHandle> mSecureSession    = Optional<SessionHandle>();
+    SessionHolder mSecureSession;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer : public Messaging::ExchangeDelegate
+class DLL_EXPORT EchoServer : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
 {
 public:
     /**
@@ -147,6 +147,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     EchoFunct OnEchoRequestReceived           = nullptr;
 
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}

@@ -38,24 +38,26 @@ CIRQUE_URL = "http://localhost:5000"
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..")
 TEST_EXTPANID = "fedcba9876543210"
+TEST_DISCRIMINATOR = 3840
+MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
         'base_image': 'connectedhomeip/chip-cirque-device-base',
-        'capability': ['Interactive', 'TrafficControl', 'Mount'],
+        'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
         'type': 'CHIPEndDevice',
         'base_image': 'connectedhomeip/chip-cirque-device-base',
-        'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
+        'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }
@@ -81,8 +83,8 @@ class TestPythonController(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run {} --thread".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-lighting-app")))
+            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread --discriminator {}".format(
+                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
 
         self.reset_thread_devices(server_ids)
 
@@ -91,10 +93,10 @@ class TestPythonController(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 75 -a {}".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 240 -a {} --paa-trust-store-path {}".format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"),
-            ethernet_ip)
+                CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"), ethernet_ip,
+            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',
@@ -113,8 +115,13 @@ class TestPythonController(CHIPVirtualHome):
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
-            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)", "No Cluster 0x0000_0006 on Endpoint 0xe9"]),
-                            "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
+                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001",
+                "Toggle on/off from 0 to 1",
+                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
+                "Toggle on/off from 1 to 0",
+                "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 0xe9"]),
+                "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
 
 if __name__ == "__main__":

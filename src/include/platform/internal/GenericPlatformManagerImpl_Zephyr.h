@@ -45,7 +45,7 @@ template <class ImplClass>
 class GenericPlatformManagerImpl_Zephyr : public GenericPlatformManagerImpl<ImplClass>
 {
 protected:
-    using ThreadStack = k_thread_stack_t[K_THREAD_STACK_LEN(CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE)];
+    using ThreadStack = k_thread_stack_t *;
 
     // Members for select() loop
     int mMaxFd;
@@ -65,7 +65,7 @@ protected:
     // Although defining thread stack as a class member is feasible it's discouraged according to
     // the Zephyr documentation (see remarks on K_THREAD_STACK_MEMBER macro). Therefore, this class
     // requires the stack reference to be passed in the constructor.
-    ThreadStack & mChipThreadStack;
+    ThreadStack mChipThreadStack;
     k_thread mChipThread;
 
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -78,11 +78,11 @@ protected:
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(uint32_t durationMS);
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     CHIP_ERROR _Shutdown(void);
 
     // ===== Methods available to the implementation subclass.
-    explicit GenericPlatformManagerImpl_Zephyr(ThreadStack & stack) : mChipThreadStack(stack) {}
+    explicit GenericPlatformManagerImpl_Zephyr(ThreadStack stack) : mChipThreadStack(stack) {}
 
 private:
     // ===== Private members for use by this class only.
@@ -91,6 +91,7 @@ private:
     void SysProcess();
     void ProcessDeviceEvents();
 
+    volatile bool mShouldRunEventLoop;
     static void EventLoopTaskMain(void * thisPtr, void *, void *);
 };
 

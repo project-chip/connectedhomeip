@@ -1,0 +1,109 @@
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Configuration options CHIP ESP32 demo application.
+#
+
+menu "Demo"
+
+    choice
+        prompt "Device Type"
+        default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
+        default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
+        default DEVICE_TYPE_ESP32_S3_DEVKITM if IDF_TARGET_ESP32S3
+        help
+            Specifies the type of ESP32 device.
+
+            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
+            available from third-party manufacturers.
+
+        config DEVICE_TYPE_ESP32_DEVKITC
+            bool "ESP32-DevKitC"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_WROVER_KIT
+            bool "ESP32-WROVER-KIT_V4.1"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_C3_DEVKITM
+            bool "ESP32C3-DevKitM"
+            depends on IDF_TARGET_ESP32C3
+        config DEVICE_TYPE_ESP32_S3_DEVKITM
+            bool "ESP32S3-DevKitM"
+            depends on IDF_TARGET_ESP32S3
+        config DEVICE_TYPE_ESP32H2_DEVKITC
+            bool "ESP32H2-DevKitC"
+            depends on IDF_TARGET_ESP32H2
+    endchoice
+
+    choice LED_TYPE
+        prompt "LED type"
+        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC
+        default LED_TYPE_GPIO
+        help
+            Defines the default LED type used in the example
+
+        config LED_TYPE_GPIO
+            bool "GPIO"
+        config LED_TYPE_RMT
+            bool "RMT - Addressable LED"
+    endchoice
+
+    config LED_RMT_CHANNEL
+        depends on LED_TYPE_RMT
+        int "RMT Channel"
+        range 0 7
+        default 0
+        help
+            Set the RMT peripheral channel.
+            ESP32 RMT channel from 0 to 7
+            ESP32-S3 RMT channel from 0 to 3
+            ESP32-C3 RMT channel from 0 to 1
+
+    config LED_GPIO
+        int "LED GPIO number"
+        range 0 48
+        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC
+        default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
+        default 5
+        help
+            GPIO number (IOxx) to blink on and off or the RMT signal for the addressable LED.
+
+    choice
+      prompt "Rendezvous Mode"
+      default RENDEZVOUS_MODE_BLE
+      help
+          Specifies the Rendezvous mode of the peripheral.
+
+      config RENDEZVOUS_MODE_WIFI
+          bool "Wi-Fi"
+      config RENDEZVOUS_MODE_BLE
+          bool "BLE"
+      config RENDEZVOUS_MODE_THREAD
+          bool "Thread"
+      config RENDEZVOUS_MODE_ETHERNET
+          bool "Ethernet"
+    endchoice
+
+    config RENDEZVOUS_MODE
+       int
+       range 0 8
+       default 1 if RENDEZVOUS_MODE_WIFI
+       default 2 if RENDEZVOUS_MODE_BLE
+       default 4 if RENDEZVOUS_MODE_THREAD
+       default 8 if RENDEZVOUS_MODE_ETHERNET
+
+endmenu

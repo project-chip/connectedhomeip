@@ -34,7 +34,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -49,7 +48,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = Test::LoopbackMessagingContext;
 
 enum : uint8_t
 {
@@ -57,14 +56,15 @@ enum : uint8_t
     kMsgType_TEST2 = 2,
 };
 
-TestContext sContext;
-
-TransportMgr<Test::LoopbackTransport> gTransportMgr;
-Test::IOContext gIOContext;
-
-class MockAppDelegate : public ExchangeDelegate
+class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
@@ -100,17 +100,13 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetSecureSession(ec1->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetBobNodeId());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerSessionId() == ctx.GetBobKeyId());
+    NL_TEST_ASSERT(inSuite, ec1->GetSessionHandle() == ctx.GetSessionAliceToBob());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetSecureSession(ec2->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetAliceNodeId());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerSessionId() == ctx.GetAliceKeyId());
+    NL_TEST_ASSERT(inSuite, ec2->GetSessionHandle() == ctx.GetSessionBobToAlice());
 
     ec1->Close();
     ec2->Close();
@@ -124,7 +120,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
+    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -134,11 +130,16 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                            SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
 }
 
 void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
@@ -150,12 +151,16 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
-    // Expire the session this exchange is supposedly on.  This should close the
-    // exchange.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
+    // Expire the session this exchange is supposedly on.  This should close the exchange.
+    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -203,6 +208,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a malicious packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1 = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
@@ -210,6 +217,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a good packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
@@ -234,45 +243,15 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
-
 // clang-format off
 nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    Initialize,
-    Finalize
+    TestContext::Initialize,
+    TestContext::Finalize
 };
 // clang-format on
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 
@@ -281,6 +260,8 @@ int Finalize(void * aContext)
  */
 int TestExchangeMgr()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

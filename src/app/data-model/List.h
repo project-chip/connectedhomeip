@@ -20,6 +20,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPTLV.h>
 
 namespace chip {
@@ -48,7 +49,18 @@ struct List : public Span<T>
     // List<T> instances as though they were just Spans.
     //
     using Span<T>::Span;
-    using Span<T>::operator=;
+
+    template <size_t N>
+    constexpr List & operator=(T (&databuf)[N])
+    {
+        Span<T>::operator=(databuf);
+        return (*this);
+    }
+
+    //
+    // A list is deemed fabric scoped if the type of its elements is as well.
+    //
+    static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
 };
 
 template <typename X>
@@ -59,7 +71,37 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
     for (auto & item : list)
     {
-        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag, item));
+        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), item));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(type));
+
+    return CHIP_NO_ERROR;
+}
+
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    for (auto & item : list)
+    {
+        ReturnErrorOnFailure(EncodeForWrite(writer, TLV::AnonymousTag(), item));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(type));
+
+    return CHIP_NO_ERROR;
+}
+
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, List<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    for (auto & item : list)
+    {
+        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, item));
     }
     ReturnErrorOnFailure(writer.EndContainer(type));
 

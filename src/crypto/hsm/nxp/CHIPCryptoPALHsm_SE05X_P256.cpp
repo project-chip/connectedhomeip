@@ -121,7 +121,7 @@ CHIP_ERROR P256KeypairHSM::Initialize()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     sss_digest_t digest_ctx           = { 0 };
@@ -205,7 +205,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
+CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
     sss_asymmetric_t asymm_ctx                               = { 0 };
@@ -574,7 +574,7 @@ static void add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, ui
  *
  */
 
-CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length)
+CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
     sss_status_t status        = kStatus_SSS_Success;
@@ -739,6 +739,19 @@ exit:
     }
 
     return error;
+}
+
+CHIP_ERROR P256KeypairHSM::CreateOperationalKey(FabricIndex fabricIdx)
+{
+    (void) fabricIdx;
+    // TBD - Map fabric index to operational keys
+    SetKeyId(kKeyId_operational_key_keyid);
+    if (Initialize() == CHIP_NO_ERROR)
+    {
+        provisioned_key = true;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
 }
 
 } // namespace Crypto

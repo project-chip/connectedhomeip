@@ -16,7 +16,6 @@
  */
 
 #include "AppTask.h"
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -28,10 +27,8 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
-#include <app/server/Server.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
@@ -46,13 +43,23 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 static const char * TAG = "lock-app";
 
-static DeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacks EchoCallbacks;
+
+static void InitServer(intptr_t context)
+{
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    CHIP_ERROR error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %s", ErrorStr(error));
+    }
+}
 
 extern "C" void app_main()
 {
@@ -85,15 +92,5 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
-    error = GetAppTask().StartAppTask();
-    if (error != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "GetAppTask().Init() failed: %s", ErrorStr(error));
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

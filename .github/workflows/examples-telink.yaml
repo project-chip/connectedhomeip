@@ -27,35 +27,61 @@ jobs:
         name: Telink
         env:
             BUILD_TYPE: telink
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.5.15
+            image: connectedhomeip/chip-build-telink:0.5.77
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform telink
+
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
             - name: Build example Telink Lighting App
               run: |
-                ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-*' build"
-                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                  telink tlsr9518adk80d lighting-app \
-                  out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
-                  /tmp/bloat_reports/
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light' build"
+
+            - name: Build example Telink Light Switch App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
+
+            - name: Get Lighting size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lighting-app \
+                    out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Get Light Switch size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d light-switch-app \
+                    out/telink-tlsr9518adk80d-light-switch/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Telink-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  name: Size,Telink-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/bloat_reports/

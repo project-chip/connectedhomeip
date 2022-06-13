@@ -53,7 +53,13 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
+int Commands::RunInteractive(int argc, char ** argv)
+{
+    CHIP_ERROR err = RunCommand(argc, argv, true);
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
 {
     std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
@@ -90,6 +96,23 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
+    else if (IsEventCommand(argv[2]))
+    {
+        if (argc <= 3)
+        {
+            ChipLogError(chipTool, "Missing event name");
+            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        if (command == nullptr)
+        {
+            ChipLogError(chipTool, "Unknown event: %s", argv[3]);
+            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
     else
     {
         if (argc <= 3)
@@ -114,7 +137,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return command->Run();
+    return interactive ? command->RunAsInteractive() : command->Run();
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)
@@ -158,9 +181,19 @@ Command * Commands::GetGlobalCommand(CommandsVector & commands, std::string comm
     return nullptr;
 }
 
+bool Commands::IsAttributeCommand(std::string commandName) const
+{
+    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("subscribe") == 0;
+}
+
+bool Commands::IsEventCommand(std::string commandName) const
+{
+    return commandName.compare("read-event") == 0 || commandName.compare("subscribe-event") == 0;
+}
+
 bool Commands::IsGlobalCommand(std::string commandName) const
 {
-    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("report") == 0;
+    return IsAttributeCommand(commandName) || IsEventCommand(commandName);
 }
 
 void Commands::ShowClusters(std::string executable)
@@ -189,26 +222,36 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    bool readCommand   = false;
-    bool writeCommand  = false;
-    bool reportCommand = false;
+    bool readCommand           = false;
+    bool writeCommand          = false;
+    bool subscribeCommand      = false;
+    bool readEventCommand      = false;
+    bool subscribeEventCommand = false;
     for (auto & command : commands)
     {
         bool shouldPrint = true;
 
         if (IsGlobalCommand(command->GetName()))
         {
-            if (strcmp(command->GetName(), "read") == 0 && readCommand == false)
+            if (strcmp(command->GetName(), "read") == 0 && !readCommand)
             {
                 readCommand = true;
             }
-            else if (strcmp(command->GetName(), "write") == 0 && writeCommand == false)
+            else if (strcmp(command->GetName(), "write") == 0 && !writeCommand)
             {
                 writeCommand = true;
             }
-            else if (strcmp(command->GetName(), "report") == 0 && reportCommand == false)
+            else if (strcmp(command->GetName(), "subscribe") == 0 && !subscribeCommand)
             {
-                reportCommand = true;
+                subscribeCommand = true;
+            }
+            else if (strcmp(command->GetName(), "read-event") == 0 && !readEventCommand)
+            {
+                readEventCommand = true;
+            }
+            else if (strcmp(command->GetName(), "subscribe-event") == 0 && !subscribeEventCommand)
+            {
+                subscribeEventCommand = true;
             }
             else
             {
@@ -244,18 +287,64 @@ void Commands::ShowClusterAttributes(std::string executable, std::string cluster
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
+void Commands::ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName,
+                                 CommandsVector & commands)
+{
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "  %s %s %s event-name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str(), commandName.c_str());
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+    fprintf(stderr, "  | Events:                                                                             |\n");
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+    for (auto & command : commands)
+    {
+        if (commandName.compare(command->GetName()) == 0)
+        {
+            fprintf(stderr, "  | * %-82s|\n", command->GetEvent());
+        }
+    }
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+}
+
 void Commands::ShowCommand(std::string executable, std::string clusterName, Command * command)
 {
     fprintf(stderr, "Usage:\n");
 
-    std::string arguments = "";
+    std::string arguments;
+    std::string description;
     arguments += command->GetName();
 
     size_t argumentsCount = command->GetArgumentsCount();
     for (size_t i = 0; i < argumentsCount; i++)
     {
+        std::string arg;
+        bool isOptional = command->GetArgumentIsOptional(i);
+        if (isOptional)
+        {
+            arg += "[--";
+        }
+        arg += command->GetArgumentName(i);
+        if (isOptional)
+        {
+            arg += "]";
+        }
         arguments += " ";
-        arguments += command->GetArgumentName(i);
+        arguments += arg;
+
+        const char * argDescription = command->GetArgumentDescription(i);
+        if ((argDescription != nullptr) && (strlen(argDescription) > 0))
+        {
+            description += "\n";
+            description += arg;
+            description += ":\n  ";
+            description += argDescription;
+            description += "\n";
+        }
     }
     fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
+
+    if (description.size() > 0)
+    {
+        fprintf(stderr, "%s\n", description.c_str());
+    }
 }

@@ -35,15 +35,15 @@ using chip::DeviceLayer::ConnectivityMgr;
 namespace chip {
 namespace Shell {
 
-static chip::Shell::Engine sShellWifiSubCommands;
+static chip::Shell::Engine sShellWiFiSubCommands;
 
 static CHIP_ERROR WiFiHelpHandler(int argc, char ** argv)
 {
-    sShellWifiSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
+    sShellWiFiSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR PrintWifiMode()
+static CHIP_ERROR PrintWiFiMode()
 {
     streamer_t * sout                            = streamer_get();
     ConnectivityManager::WiFiAPMode apMode       = ConnectivityMgr().GetWiFiAPMode();
@@ -71,7 +71,7 @@ static CHIP_ERROR PrintWifiMode()
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR SetWifiMode(const char * mode)
+static CHIP_ERROR SetWiFiMode(const char * mode)
 {
     if (strcmp(mode, "disable") == 0)
     {
@@ -100,13 +100,13 @@ static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)
 {
     if (argc == 0)
     {
-        return PrintWifiMode();
+        return PrintWiFiMode();
     }
-    else if (argc != 1)
+    if (argc != 1)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return SetWifiMode(argv[0]);
+    return SetWiFiMode(argv[0]);
 }
 
 static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
@@ -125,21 +125,21 @@ static CHIP_ERROR WiFiDispatch(int argc, char ** argv)
     {
         return WiFiHelpHandler(argc, argv);
     }
-    return sShellWifiSubCommands.ExecCommand(argc, argv);
+    return sShellWiFiSubCommands.ExecCommand(argc, argv);
 }
 
 void RegisterWiFiCommands()
 {
     /// Subcommands for root command: `device <subcommand>`
-    static const shell_command_t sWifiSubCommands[] = {
+    static const shell_command_t sWiFiSubCommands[] = {
         { &WiFiHelpHandler, "help", "" },
         { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]." },
         { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect ssid psk." },
     };
-    static const shell_command_t sWifiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
+    static const shell_command_t sWiFiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
-    sShellWifiSubCommands.RegisterCommands(sWifiSubCommands, ArraySize(sWifiSubCommands));
-    Engine::Root().RegisterCommands(&sWifiCommand, 1);
+    sShellWiFiSubCommands.RegisterCommands(sWiFiSubCommands, ArraySize(sWiFiSubCommands));
+    Engine::Root().RegisterCommands(&sWiFiCommand, 1);
 }
 
 } // namespace Shell

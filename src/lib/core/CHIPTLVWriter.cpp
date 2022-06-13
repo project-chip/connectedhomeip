@@ -58,6 +58,7 @@ NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
     mLenWritten             = 0;
     mMaxLen                 = actualMaxLen;
     mContainerType          = kTLVType_NotSpecified;
+    mReservedSize           = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
@@ -77,6 +78,7 @@ CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen)
     mLenWritten    = 0;
     mMaxLen        = maxLen;
     mContainerType = kTLVType_NotSpecified;
+    mReservedSize  = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
@@ -307,12 +309,13 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     va_copy(aq, ap);
 
     dataLen = static_cast<size_t>(vsnprintf(nullptr, 0, fmt, aq));
+
+    va_end(aq);
+
     if (!CanCastTo<uint32_t>(dataLen))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    va_end(aq);
 
     if (dataLen <= UINT8_MAX)
         lenFieldSize = kTLVFieldSize_1Byte;
@@ -510,7 +513,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
     // Reset the container writer so that it can't accidentally be used again.
     containerWriter.Init(static_cast<uint8_t *>(nullptr), 0);
 
-    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag(), 0);
 }
 
 CHIP_ERROR TLVWriter::StartContainer(Tag tag, TLVType containerType, TLVType & outerContainerType)
@@ -552,7 +555,7 @@ CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
     if (IsCloseContainerReserved())
         mMaxLen += kEndOfContainerMarkerSize;
 
-    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag(), 0);
 }
 
 CHIP_ERROR TLVWriter::PutPreEncodedContainer(Tag tag, TLVType containerType, const uint8_t * data, uint32_t dataLen)

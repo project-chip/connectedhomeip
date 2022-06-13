@@ -25,7 +25,7 @@ concurrency:
 jobs:
     qemu:
         name: ESP32
-        timeout-minutes: 70
+        timeout-minutes: 85
 
         env:
             BUILD_TYPE: esp32-qemu
@@ -34,15 +34,21 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:latest
+            image: connectedhomeip/chip-build-esp32-qemu:0.5.77
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform esp32
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -52,14 +58,22 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
-            - name: Build example All Clusters App
-              timeout-minutes: 25
-              run: scripts/examples/esp_example.sh all-clusters-app
-            - name: Build ESP32 QEMU and Run Tests
-              timeout-minutes: 35
-              run: scripts/tests/esp32_qemu_tests.sh /tmp/test_logs
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
+            - name: Build ESP32 QEMU test images
+              timeout-minutes: 20
+              run: |
+                  scripts/run_in_build_env.sh "         \
+                      ./scripts/build/build_examples.py \
+                      --target esp32-qemu-tests         \
+                      build                             \
+                  "
+            - name: Run all tests
+              timeout-minutes: 40
+              run: |
+                  src/test_driver/esp32/run_qemu_image.py \
+                    --verbose                             \
+                    --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

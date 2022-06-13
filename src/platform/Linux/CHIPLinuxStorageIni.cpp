@@ -122,6 +122,33 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
     return retval;
 }
 
+CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
+{
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+    std::map<std::string, std::string> section;
+
+    retval = GetDefaultSection(section);
+
+    if (retval == CHIP_NO_ERROR)
+    {
+        auto it = section.find(key);
+
+        if (it != section.end())
+        {
+            if (!inipp::extract(section[key], val))
+            {
+                retval = CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+        else
+        {
+            retval = CHIP_ERROR_KEY_NOT_FOUND;
+        }
+    }
+
+    return retval;
+}
+
 CHIP_ERROR ChipLinuxStorageIni::GetUIntValue(const char * key, uint32_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;

@@ -65,7 +65,7 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void UpdateClusterState(void);
+    static void UpdateClusterState(chip::System::Layer *, void * context);
 
     void StartTimer(uint32_t aTimeoutMs);
 

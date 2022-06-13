@@ -36,6 +36,8 @@ void TestClone(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, allocatedString != nullptr);
     NL_TEST_ASSERT(inSuite, allocatedString != kTestString);
+
+    // NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg): null check for allocated string already done
     NL_TEST_ASSERT(inSuite, strcmp(allocatedString, kTestString) == 0);
 
     const uint8_t kTestData[]     = { 0xDE, 0xAD, 0xBE, 0xEF };
@@ -43,6 +45,8 @@ void TestClone(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, allocatedData != nullptr);
     NL_TEST_ASSERT(inSuite, allocatedData != kTestData);
+
+    // NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg): null check for allocated data already done
     NL_TEST_ASSERT(inSuite, memcmp(allocatedData, kTestData, sizeof(kTestData)) == 0);
 }
 
@@ -62,7 +66,7 @@ void TestOutOfMemory(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, alloc.AnyAllocFailed());
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("Test successfull clone", TestClone), NL_TEST_DEF("Test out of memory", TestOutOfMemory),
+const nlTest sTests[] = { NL_TEST_DEF("Test successful clone", TestClone), NL_TEST_DEF("Test out of memory", TestOutOfMemory),
                           NL_TEST_SENTINEL() };
 
 } // namespace

@@ -66,8 +66,8 @@ private:
     Verhoeff10()  = delete;
     ~Verhoeff10() = delete;
 
-    static uint8_t sMultiplyTable[];
-    static uint8_t sPermTable[];
+    static const uint8_t sMultiplyTable[];
+    static const uint8_t sPermTable[];
 };
 
 // Verhoeff16 -- Implements Verhoeff's check-digit algorithm for base-16 (hex) strings.
@@ -103,8 +103,8 @@ private:
     Verhoeff16()  = delete;
     ~Verhoeff16() = delete;
 
-    static uint8_t sMultiplyTable[];
-    static uint8_t sPermTable[];
+    static const uint8_t sMultiplyTable[];
+    static const uint8_t sPermTable[];
 };
 
 // Verhoeff32 -- Implements Verhoeff's check-digit algorithm for base-32 strings.
@@ -142,10 +142,10 @@ private:
     Verhoeff32()  = delete;
     ~Verhoeff32() = delete;
 
-    static uint8_t sMultiplyTable[];
-    static uint8_t sPermTable[];
-    static int8_t sCharToValTable[];
-    static char sValToCharTable[];
+    static const uint8_t sMultiplyTable[];
+    static const uint8_t sPermTable[];
+    static const int8_t sCharToValTable[];
+    static const char sValToCharTable[];
 };
 
 // Verhoeff36 -- Implements Verhoeff's check-digit algorithm for base-36 strings.
@@ -177,10 +177,10 @@ private:
     Verhoeff36()  = delete;
     ~Verhoeff36() = delete;
 
-    static uint8_t sMultiplyTable[];
-    static uint8_t sPermTable[];
-    static int8_t sCharToValTable[];
-    static char sValToCharTable[];
+    static const uint8_t sMultiplyTable[];
+    static const uint8_t sPermTable[];
+    static const int8_t sCharToValTable[];
+    static const char sValToCharTable[];
 };
 
 // Verhoeff -- Implements core functions for Verhoeff's algorithm.
@@ -190,5 +190,5 @@ class Verhoeff
 public:
     static int DihedralMultiply(int x, int y, int n);
     static int DihedralInvert(int val, int n);
-    static int Permute(int val, uint8_t * permTable, int permTableLen, uint64_t iterCount);
+    static int Permute(int val, const uint8_t * permTable, int permTableLen, uint64_t iterCount);
 };

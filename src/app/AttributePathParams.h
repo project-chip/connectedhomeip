@@ -18,31 +18,114 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
-#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace app {
+class ReadClient;
 struct AttributePathParams
 {
-    enum class Flags : uint8_t
-    {
-        kFieldIdValid   = 0x01,
-        kListIndexValid = 0x02,
-    };
-
-    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex,
-                        const BitFlags<Flags> aFlags) :
-        mNodeId(aNodeId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
+    //
+    // TODO: (Issue #10596) Need to ensure that we do not encode the NodeId over the wire
+    // if it is either not 'set', or is set to a value that matches accessing fabric
+    // on which the interaction is undertaken.
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
+        AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
     {}
+
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(aEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
+    {}
+
+    AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
+    {}
+
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
+        mClusterId(aClusterId), mAttributeId(aAttributeId), mEndpointId(aEndpointId), mListIndex(aListIndex)
+    {}
+
     AttributePathParams() {}
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    AttributeId mFieldId   = 0;
-    ListIndex mListIndex   = 0;
-    BitFlags<Flags> mFlags;
+
+    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+
+    bool operator==(const AttributePathParams & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mAttributeId == aOther.mAttributeId &&
+            mListIndex == aOther.mListIndex;
+    }
+
+    /**
+     * SPEC 8.9.2.2
+     * Check that the path meets some basic constraints of an attribute path: If list index is not wildcard, then field id must not
+     * be wildcard. This does not verify that the attribute being targeted is actually of list type when the list index is not
+     * wildcard.
+     */
+    bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
+
+    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
+    inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
+    inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
+    inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
+    inline void SetWildcardAttributeId()
+    {
+        mAttributeId = kInvalidAttributeId;
+        mListIndex   = kInvalidListIndex;
+    }
+
+    bool IsAttributePathSupersetOf(const AttributePathParams & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
+        VerifyOrReturnError(HasWildcardListIndex() || mListIndex == other.mListIndex, false);
+
+        return true;
+    }
+
+    bool IsAttributePathSupersetOf(const ConcreteAttributePath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
+
+        return true;
+    }
+
+    bool Intersects(const AttributePathParams & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || other.HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || other.HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || other.HasWildcardAttributeId() || mAttributeId == other.mAttributeId,
+                            false);
+        return true;
+    }
+
+    bool IncludesAttributesInCluster(const DataVersionFilter & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    // check if input concrete cluster path is subset of current wildcard attribute
+    bool IncludesAllAttributesInCluster(const ConcreteClusterPath & aOther) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == aOther.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == aOther.mClusterId, false);
+        return HasWildcardAttributeId();
+    }
+
+    ClusterId mClusterId     = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId = kInvalidAttributeId; // uint32
+    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    ListIndex mListIndex     = kInvalidListIndex;   // uint16
 };
+
 } // namespace app
 } // namespace chip

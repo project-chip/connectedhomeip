@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const char * name = nullptr);
 
     /////////// PersistentStorageDelegate Interface /////////
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -42,7 +42,17 @@ public:
     // Store local node id.
     CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
 
+    // Return the stored local device (commissioner) CASE Authenticated Tags (CATs).
+    chip::CATValues GetCommissionerCATs();
+
+    // Store local CATs.
+    CHIP_ERROR SetCommissionerCATs(const chip::CATValues & cats);
+
+    // Clear all of the persistent storage for running session.
+    CHIP_ERROR SyncClearAll();
+
 private:
-    CHIP_ERROR CommitConfig();
+    CHIP_ERROR CommitConfig(const char * name);
     inipp::Ini<char> mConfig;
+    const char * mName;
 };

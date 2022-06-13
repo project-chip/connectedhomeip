@@ -29,8 +29,12 @@ namespace Minimal {
 class ResponseBuilder
 {
 public:
-    ResponseBuilder() : mHeader(nullptr) {}
-    ResponseBuilder(chip::System::PacketBufferHandle && packet) : mHeader(nullptr) { Reset(std::move(packet)); }
+    ResponseBuilder() : mHeader(nullptr), mEndianOutput(nullptr, 0), mWriter(&mEndianOutput) {}
+    ResponseBuilder(chip::System::PacketBufferHandle && packet) :
+        mHeader(nullptr), mEndianOutput(nullptr, 0), mWriter(&mEndianOutput)
+    {
+        Reset(std::move(packet));
+    }
 
     ResponseBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
@@ -49,6 +53,13 @@ public:
         }
 
         mHeader.SetFlags(mHeader.GetFlags().SetResponse());
+
+        mEndianOutput =
+            chip::Encoding::BigEndian::BufferWriter(mPacket->Start(), mPacket->DataLength() + mPacket->AvailableDataLength());
+        mEndianOutput.Skip(mPacket->DataLength());
+
+        mWriter.Reset();
+
         return *this;
     }
 
@@ -77,16 +88,16 @@ public:
             return *this;
         }
 
-        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
-
-        if (!record.Append(mHeader, type, out))
+        if (!record.Append(mHeader, type, mWriter))
         {
             mBuildOk = false;
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
+            VerifyOrDie(mEndianOutput.Fit()); // should be guaranteed because record Append succeeded
+            mPacket->SetDataLength(static_cast<uint16_t>(mEndianOutput.Needed()));
         }
+
         return *this;
     }
 
@@ -97,15 +108,13 @@ public:
             return *this;
         }
 
-        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
-
-        if (!query.Append(mHeader, out))
+        if (!query.Append(mHeader, mWriter))
         {
             mBuildOk = false;
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
+            mPacket->SetDataLength(static_cast<uint16_t>(mEndianOutput.Needed()));
         }
         return *this;
     }
@@ -116,6 +125,8 @@ public:
 private:
     chip::System::PacketBufferHandle mPacket;
     HeaderRef mHeader;
+    chip::Encoding::BigEndian::BufferWriter mEndianOutput;
+    RecordWriter mWriter;
     bool mBuildOk = false;
 };
 

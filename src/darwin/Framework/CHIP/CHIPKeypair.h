@@ -22,24 +22,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CHIPKeypair <NSObject>
 @required
-
 /**
- * @brief Initialize the keypair.
- * @return Should return whether or not the keypair was successfully initialized
- **/
-- (BOOL)initialize;
-
-/**
- * @brief A function to sign a hash using ECDSA
- * @param hash Hash that needs to be signed
- *
- * @return Returns A signature that consists of: 2 EC elements (r and s), in raw <r,s> point form (see SEC1).
- **/
-- (NSData *)ECDSA_sign_hash:(NSData *)hash;
-
-/** @brief Return public key for the keypair.
- **/
+ * @brief Return public key for the keypair.
+ */
 - (SecKeyRef)pubkey;
+
+@optional
+/**
+ * @brief A function to sign a message using ECDSA
+ *
+ * @param message Message that needs to be signed
+ *
+ * @return A signature that consists of: 2 EC elements (r and s), in raw <r,s>
+ *         point form (see SEC1).  Sometimes also called RFC 4754 form or P1363
+ *         form.
+ *
+ * Either this selector or ECDSA_sign_message_DER must be supported by a
+ * CHIPKeypair.
+ */
+- (NSData *)ECDSA_sign_message_raw:(NSData *)message;
+
+/**
+ * @brief A function to sign a message using ECDSA
+ *
+ * @param message Message that needs to be signed
+ *
+ * @return An ASN.1 DER-encoded signature (per X9.62).
+ *
+ * Either this selector or ECDSA_sign_message_raw must be supported by a
+ * CHIPKeypair.
+ */
+- (NSData *)ECDSA_sign_message_DER:(NSData *)message;
 
 @end
 

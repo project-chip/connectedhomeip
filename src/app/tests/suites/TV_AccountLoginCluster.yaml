@@ -15,27 +15,40 @@
 name: Account Login Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Account Login"
     endpoint: 3
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Get Setup PIN Command"
-      command: "GetSetupPIN"
+      command: "getSetupPIN"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "tempAccountIdentifier"
                 value: "asdf"
-
-      # TODO: Enable these once they are able to work
-      # response:
-      #     values:
-      #         - name: "setupPIN"
-      #           value: "tempPin123"
+      response:
+          values:
+              - name: "setupPIN"
+                value: "tempPin123"
     - label: "Login Command"
-      command: "Login"
+      command: "login"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "tempAccountIdentifier"
                 value: "asdf"
               - name: "setupPIN"
                 value: "tempPin123"
+
+    - label: "Logout Command"
+      command: "logout"
+      timedInteractionTimeoutMs: 10000

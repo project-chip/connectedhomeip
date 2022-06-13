@@ -46,6 +46,7 @@ enum keyid_values
     kKeyId_hkdf_sha256_hmac_keyid,
     kKeyId_hmac_sha256_keyid,
     kKeyId_sha256_ecc_pub_keyid,
+    kKeyId_operational_key_keyid,
 };
 
 // Enable the below macro to make spake HSM imlementation reentrant.

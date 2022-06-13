@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/tests.gni")
 assert(current_os == "zephyr")
 
 declare_args() {
-  chip_build_pw_rpc_lib = false
+  chip_build_example_providers = false
 }
 
 group("nrfconnect") {
@@ -30,10 +30,8 @@ group("nrfconnect") {
     deps += [ "${chip_root}/src:tests" ]
   }
 
-  # Building PW_RPC lib with GN may go obsolete after getting full CMake
-  # support in Pigweed.
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "lib/pw_rpc" ]
+  if (chip_build_example_providers) {
+    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
   }
 }
 

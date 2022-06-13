@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -57,32 +57,37 @@ const char AndroidConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char AndroidConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the Chip-factory namespace
-const AndroidConfig::Key AndroidConfig::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipFactory, "hardware-ver-str" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-version" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipFactory, "software-version-str" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_PartNumber            = { kConfigNamespace_ChipFactory, "part-number" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductURL            = { kConfigNamespace_ChipFactory, "product-url" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductLabel          = { kConfigNamespace_ChipFactory, "product-label" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "uniqueId" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the Chip-config namespace
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
-
-// Prefix used for NVS keys that contain Chip group encryption keys.
-const char AndroidConfig::kGroupKeyNamePrefix[] = "gk-";
 
 void AndroidConfig::InitializeWithObject(jobject managerObject)
 {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ enum class HexFlags : int
 
 /**
  * Encode a buffer of bytes into hexadecimal, with or without null-termination
- * and using either lowercase or uppercase hex.
+ * and using either lowercase or uppercase hex. The input bytes are assumed to be
+ * in a big-engian order. The output is also in a big-endian order.
  *
  * Default is lowercase output, not null-terminated.
  *
@@ -73,8 +74,9 @@ enum class HexFlags : int
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
 
 /**
- * Encode a uin64_t into hexadecimal, with or without null-termination
- * and using either lowercase or uppercase hex.
+ * Encode a uint64_t into hexadecimal, with or without null-termination
+ * and using either lowercase or uppercase hex. The output will be in a big-engian
+ * order.
  *
  * Default is lowercase output, not null-terminated.
  *
@@ -98,8 +100,13 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
  * @return CHIP_ERROR_INVALID_ARGUMENT if either src_bytes or dest_hex is nullptr
  * @return CHIP_NO_ERROR on success
  */
+CHIP_ERROR Uint64ToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
 
-CHIP_ERROR BytesToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
+/** Same as Uint64ToHex() but for uint32_t. */
+CHIP_ERROR Uint32ToHex(uint32_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
+
+/** Same as Uint64ToHex() but for uint16_t. */
+CHIP_ERROR Uint16ToHex(uint16_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
 
 // Alias for Uppercase option, no null-termination
 inline CHIP_ERROR BytesToUppercaseHexBuffer(const uint8_t * src_bytes, size_t src_size, char * dest_hex_buf, size_t dest_size_max)
@@ -126,23 +133,47 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
 }
 
 /**
- * Convert a buffer of hexadecimal characters to bytes.  Supports both lowercase
+ * Convert a buffer of hexadecimal characters to bytes. Supports both lowercase
  * and uppercase (or a mix of cases) hexadecimal characters. Supported input is
- * [0-9a-fA-F].
+ * [0-9a-fA-F]. The input is assumed to be in a big-endian order. The output is
+ * also in a big-endian order.
  *
- * @param srcHex a pointer to the character buffer to convert.  It is not
- *               assumed to be null-terminated.
- * @param srcLen the length of the character buffer to convert.
- * @param destBytes the buffer to fill with the decoded bytes.
- * @param destMaxLen the total size of the buffer to be filled.
+ * @param src_hex a pointer to the character buffer to convert. It is not
+ *                assumed to be null-terminated.
+ * @param src_size the number of characters to convert from src_hex.
+ * @param dest_bytes the buffer to fill with the decoded bytes.
+ * @param dest_size_max the total size of the buffer to be filled.
  *
  * @return 0 on errors:
- *           - destMaxLen not big enough.
- *           - srcLen not even.
- *           - Some character not in [0-9a-fA-F] is present in srcHex.
- *         number of bytes actually decoded from the string on success.
+ *           - dest_size_max not big enough.
+ *           - src_size not even.
+ *           - Some character not in [0-9a-fA-F] is present in src_hex.
+ *         Otherwise, returns number of bytes actually decoded from the string on success.
  */
-size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen);
+size_t HexToBytes(const char * src_hex, const size_t src_size, uint8_t * dest_bytes, size_t dest_size_max);
+
+/**
+ * Convert a buffer of hexadecimal characters into uint64_t. Supports only
+ * uppercase hexadecimal input characters. Supported input is [0-9A-F].
+ * The input is assumed to be in a big-endian order.
+ *
+ * @param src_hex a pointer to the character buffer to convert. It is not
+ *                assumed to be null-terminated.
+ * @param src_size the number of characters to convert from src_hex.
+ * @param dest 64-bit number to output.
+ *
+ * @return 0 on errors:
+ *           - src_size not even.
+ *           - Some character not in [0-9A-F] is present in src_hex.
+ *         Otherwise, returns 8 (number of bytes actually decoded from the string) on success.
+ */
+size_t UppercaseHexToUint64(const char * src_hex, const size_t src_size, uint64_t & dest);
+
+/** Same as UppercaseHexToUint64() but for uint32_t. */
+size_t UppercaseHexToUint32(const char * src_hex, const size_t src_size, uint32_t & dest);
+
+/** Same as UppercaseHexToUint64() but for uint16_t. */
+size_t UppercaseHexToUint16(const char * src_hex, const size_t src_size, uint16_t & dest);
 
 } // namespace Encoding
 } // namespace chip

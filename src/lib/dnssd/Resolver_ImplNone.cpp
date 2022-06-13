@@ -17,6 +17,7 @@
 
 #include "Resolver.h"
 
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -26,9 +27,10 @@ namespace {
 class NoneResolver : public Resolver
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer *) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
     void Shutdown() override {}
-    void SetResolverDelegate(ResolverDelegate *) override {}
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
     {
@@ -47,5 +49,26 @@ Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
 }
+
+ResolverProxy::~ResolverProxy()
+{
+    Shutdown();
+}
+
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace Dnssd
 } // namespace chip

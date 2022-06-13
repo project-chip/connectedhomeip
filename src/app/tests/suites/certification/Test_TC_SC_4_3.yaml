@@ -1,0 +1,59 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 13.4.3. [TC-SC-4.3] Operational Discovery - Node
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH is instructed to start advertising a service using DNS-SD"
+      verification: |
+
+      disabled: true
+
+    - label: "Scan for DNS-SD advertising"
+      verification: |
+          avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
+             hostname = [E45F010EBE440000.local]
+             address = [fe80::e65f:1ff:fe0e:be44]
+             port = [5540]
+             txt = ["T=1" "CRA=300" "CRI=5000"]
+      disabled: true
+
+    - label:
+          "TH is instructed to start advertising a service using DNS-SD and
+          using only the TXT records defined in section of the matter spec"
+      verification: |
+          avahi-browse _matter._tcp -r
+          +   eth0 IPv6 6E1DCC08ABCCD0E5                              _matterc._udp        local
+          =   eth0 IPv6 6E1DCC08ABCCD0E5                              _matterc._udp        local
+             hostname = [E45F010EBE440000.local]
+             address = [fe80::e65f:1ff:fe0e:be44]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=1" "D=0" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH is instructed to start advertising a service using DNS-SD with
+          non-standard TXT record keys"
+      verification: |
+          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp
+          _matterc._udp 11111 D=840 CM=2 INVALID_TEST=40
+      disabled: true

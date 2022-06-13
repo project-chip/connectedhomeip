@@ -33,7 +33,10 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"
@@ -67,9 +70,6 @@ struct ESP32ChipServiceData
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
 
-const ble_uuid128_t UUID_CHIPoBLEService = {
-    BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 }
-};
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
@@ -77,24 +77,26 @@ const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
 };
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
-const ble_uuid128_t UUID_CHIPoBLEChar_RX   = {
-    { BLE_UUID_TYPE_128 }, { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11 }
-};
 
-const ble_uuid128_t UUID128_CHIPoBLEChar_TX = {
-    BLE_UUID_TYPE_128, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
-};
 const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
     { BLE_UUID_TYPE_128 }, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
 };
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+const ble_uuid128_t UUID_CHIPoBLEChar_C3 = {
+    { BLE_UUID_TYPE_128 }, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
+};
+#endif
+
 SemaphoreHandle_t semaphoreHandle = NULL;
 
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
+constexpr System::Clock::Timeout BLEManagerImpl::kAdvertiseTimeout;
+constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
@@ -113,6 +115,14 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
                   .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
                   .val_handle = &sInstance.mTXCharCCCDAttrHandle,
               },
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+              {
+                  .uuid       = (ble_uuid_t *) (&UUID_CHIPoBLEChar_C3),
+                  .access_cb  = gatt_svr_chr_access_additional_data,
+                  .flags      = BLE_GATT_CHR_F_READ,
+                  .val_handle = &sInstance.mC3CharAttrHandle,
+              },
+#endif
               {
                   0, /* No more characteristics in this service */
               },
@@ -131,7 +141,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
-    mRXCharAttrHandle     = 0;
+    mRXCharAttrHandle = 0;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    mC3CharAttrHandle = 0;
+#endif
     mTXCharCCCDAttrHandle = 0;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -171,7 +184,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::SystemClock().GetMonotonicMilliseconds();
+        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
@@ -192,7 +205,7 @@ void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void 
 
 void BLEManagerImpl::HandleAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
     {
@@ -208,7 +221,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, v
 
 void BLEManagerImpl::HandleFastAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
     {
@@ -481,7 +494,7 @@ void BLEManagerImpl::DriveBLEState(void)
 
         // Add delay of 500msec while NimBLE host task gets up and running
         {
-            vTaskDelay(500 / portTICK_RATE_MS);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
 
@@ -681,10 +694,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advData[MAX_ADV_DATA_LEN];
     uint8_t index = 0;
 
+    constexpr uint8_t kServiceDataTypeSize = 1;
+
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
+
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kUseCustomDeviceName))
     {
@@ -704,18 +721,21 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = 0x02;                                                                // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
-    advData[index++] = 0x0A;                                                                // length
+    advData[index++] = kServiceDataTypeSize + sizeof(ESP32ChipServiceData);                 // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
     advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
     advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
 
-    chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %s", ErrorStr(err));
         ExitNow();
     }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    deviceIdInfo.SetAdditionalDataFlag(true);
+#endif
 
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
@@ -783,7 +803,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
     bool notificationsEnabled;
 
     ChipLogProgress(DeviceLayer,
-                    "Write request/command received for CHIPoBLE TX CCCD characteristic (con %" PRIu16
+                    "Write request/command received for CHIPoBLE TX CCCD characteristic (con %u"
                     " ) indicate = %d notify = %d",
                     gapEvent->subscribe.conn_handle, gapEvent->subscribe.cur_indicate, gapEvent->subscribe.cur_notify);
 
@@ -836,7 +856,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
 {
-    ChipLogProgress(DeviceLayer, "Confirm received for CHIPoBLE TX characteristic indication (con %" PRIu16 ") status= %d ",
+    ChipLogProgress(DeviceLayer, "Confirm received for CHIPoBLE TX characteristic indication (con %u) status= %d ",
                     gapEvent->notify_tx.conn_handle, gapEvent->notify_tx.status);
 
     // Signal the BLE Layer that the outstanding indication is complete.
@@ -878,7 +898,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(DeviceLayer, "BLE GAP connection established (con %" PRIu16 ")", gapEvent->connect.conn_handle);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection established (con %u)", gapEvent->connect.conn_handle);
 
     // Track the number of active GAP connections.
     mNumGAPCons++;
@@ -895,8 +915,8 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
 {
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %" PRIu16 " reason 0x%02" PRIx8 ")",
-                    gapEvent->disconnect.conn.conn_handle, gapEvent->disconnect.reason);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %u reason 0x%02x)", gapEvent->disconnect.conn.conn_handle,
+                    gapEvent->disconnect.reason);
 
     // Update the number of GAP connections.
     if (mNumGAPCons > 0)
@@ -1043,6 +1063,71 @@ exit:
 
     return err.AsInteger();
 }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferHandle bufferHandle;
+
+    BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
+    SuccessOrExit(err);
+
+    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+    return;
+}
+
+int BLEManagerImpl::gatt_svr_chr_access_additional_data(uint16_t conn_handle, uint16_t attr_handle,
+                                                        struct ble_gatt_access_ctxt * ctxt, void * arg)
+{
+    struct ble_gatt_char_context param;
+    int err = 0;
+
+    memset(&param, 0, sizeof(struct ble_gatt_char_context));
+
+    switch (ctxt->op)
+    {
+    case BLE_GATT_ACCESS_OP_READ_CHR:
+
+        param.conn_handle = conn_handle;
+        param.attr_handle = attr_handle;
+        param.ctxt        = ctxt;
+        param.arg         = arg;
+        sInstance.HandleC3CharRead(&param);
+        break;
+
+    default:
+        err = BLE_ATT_ERR_UNLIKELY;
+        break;
+    }
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+
+    return err;
+}
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {

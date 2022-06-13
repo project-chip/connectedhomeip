@@ -1,0 +1,67 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 28.2.2. [TC-BDX-2.2] Synchronous file receiving
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "IF (PICS_DT_Receiver_Driver) TH sends a SendInit message to DUT + DUT
+          sends a SendAccept message back to TH + DUT sends a BlockQuery message
+          to TH + TH sends a Block message back to DUT"
+      verification: |
+          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
+
+          [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
+          [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
+          [1636410922974] [59203:62969336] CHIP: [ATM]   Block Counter: 0
+      disabled: true
+
+    - label:
+          "IF (PICS_DT_Receiver_Driver) DUT sends a BlockQuery message to TH +
+          TH sends a Block message back to DUT"
+      verification: |
+          1. Verify from the OTA Reference Provider App logs that the BlockQuery messages are sent in ascending and sequential block counter order.
+
+          [1636410924476] [59203:62969337] CHIP: [ATM] BlockQuery
+          [1636410924476] [59203:62969337] CHIP: [ATM]   Block Counter: 1
+
+          [1636410925977] [59203:62969337] CHIP: [ATM] BlockQuery
+          [1636410925977] [59203:62969337] CHIP: [ATM]   Block Counter: 2
+
+          and so on
+      disabled: true
+
+    - label:
+          "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
+          back to TH"
+      verification: |
+          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT
+
+          [1636410936486] [59203:62969336] CHIP: [ATM] Handling received BDX Message
+          [1636410936486] [59203:62969336] CHIP: [ATM] BlockAckEOF
+          [1636410936486] [59203:62969336] CHIP: [ATM]   Block Counter: 8
+
+          Compare with
+
+          [1636410935209] [59203:62969337] CHIP: [ATM] Sending BDX Message
+          [1636410935209] [59203:62969337] CHIP: [ATM] BlockEOF
+          [1636410935209] [59203:62969337] CHIP: [ATM]   Block Counter: 8
+          [1636410935209] [59203:62969337] CHIP: [ATM]   Data Length: 147
+      disabled: true

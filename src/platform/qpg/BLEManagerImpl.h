@@ -48,6 +48,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -109,11 +110,8 @@ private:
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
-    char mDeviceName[kMaxDeviceNameLength + 1];
     uint16_t mNumGAPCons;
     uint16_t mSubscribedConIds[kMaxConnections];
-    uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
-    uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
     qvCHIP_Ble_Callbacks_t appCbacks;
 
     void DriveBLEState(void);

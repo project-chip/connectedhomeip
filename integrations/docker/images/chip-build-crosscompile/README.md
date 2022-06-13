@@ -44,7 +44,7 @@ image yet), the following symlinks are required:
 -   `usr/lib/arm-linux-gnueabihf` to `usr/lib/armv7-linux-gnueabihf`
 -   `usr/include/arm-linux-gnueabihf` to `usr/lib/armv7-linux-gnueabihf`
 
-Once the sysroot is on the host machine, create the corresponding tar.xz file:
+Once the sysroot is on the host machine, create the corresponding `tar.xz` file:
 
 ```
 tar cvfJ ubuntu-21.04-aarch64-sysroot.tar.xz ubuntu-21.04-aarch64-sysroot
@@ -58,7 +58,7 @@ rebuilding a sysroot. It is located at:
 https://chrome-infra-packages.appspot.com/p/experimental/matter/sysroot/ubuntu-21.04-aarch64/+/
 
 and can be downloaded using the `cipd` script from
-[depot_tools][https://dev.chromium.org/developers/how-tos/depottools]:
+[depot_tools](https://dev.chromium.org/developers/how-tos/depottools):
 
 ```
 echo 'experimental/matter/sysroot/ubuntu-21.04-aarch64 latest' > ensure_file.txt

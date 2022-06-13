@@ -29,7 +29,8 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
+#include <platform/Zephyr/DiagnosticDataProviderImpl.h>
+#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
 #include <drivers/entropy.h>
 #include <malloc.h>
@@ -41,10 +42,12 @@ static K_THREAD_STACK_DEFINE(sChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STAC
 
 PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 
+static k_timer sOperationalHoursSavingTimer;
+
 #if !CONFIG_NORDIC_SECURITY_BACKEND
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    const struct device * entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
+    const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
     int ret                       = entropy_get_entropy(entropy, output, len);
 
     if (ret == 0)
@@ -60,6 +63,37 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 }
 #endif // !CONFIG_NORDIC_SECURITY_BACKEND
 
+void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
+{
+    PlatformMgr().ScheduleWork(UpdateOperationalHours);
+}
+
+void PlatformManagerImpl::UpdateOperationalHours(intptr_t arg)
+{
+    uint64_t upTimeS;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTimeS) != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get up time of the node");
+        return;
+    }
+
+    uint64_t totalOperationalHours = 0;
+    const uint32_t upTimeH         = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
+    const uint64_t deltaTime       = upTimeH - sInstance.mSavedOperationalHoursSinceBoot;
+
+    if (ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalOperationalHours)) == CHIP_NO_ERROR)
+    {
+        ConfigurationMgr().StoreTotalOperationalHours(
+            totalOperationalHours + deltaTime < UINT32_MAX ? totalOperationalHours + deltaTime : UINT32_MAX);
+        sInstance.mSavedOperationalHoursSinceBoot = upTimeH;
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get total operational hours of the node");
+    }
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
@@ -72,6 +106,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
     // Add entropy source based on Zephyr entropy driver
@@ -83,44 +119,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
+    // Start the timer to periodically save node operational hours.
+    k_timer_init(&sOperationalHoursSavingTimer, &PlatformManagerImpl::OperationalHoursSavingTimerEventHandler, nullptr);
+    k_timer_user_data_set(&sOperationalHoursSavingTimer, this);
+    k_timer_start(&sOperationalHoursSavingTimer, K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL),
+                  K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL));
+
 exit:
     return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-#ifdef CONFIG_NEWLIB_LIBC
-    // This will return the amount of memory which has been allocated from the system, but is not
-    // used right now. Ideally, this value should be increased by the amount of memory which can
-    // be allocated from the system, but Zephyr does not expose that number.
-    currentHeapFree = mallinfo().fordblks;
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-#ifdef CONFIG_NEWLIB_LIBC
-    currentHeapUsed = mallinfo().uordblks;
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-#ifdef CONFIG_NEWLIB_LIBC
-    // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
-    // the amount of memory allocated from the system which should be an upper bound of the peak
-    // usage provided that the heap is not very fragmented.
-    currentHeapHighWatermark = mallinfo().arena;
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 } // namespace DeviceLayer

@@ -23,59 +23,62 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
+#include <app/AppBuildConfig.h>
+#include <app/InteractionModelRevision.h>
+#include <app/util/basic-types.h>
 #include <inttypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 namespace chip {
 namespace app {
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
-char gLineBuffer[256];
+char gLineBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 size_t gCurLineBufferSize = 0;
 } // namespace
+
+void PrettyPrintIMBlankLine()
+{
+    if (gCurLineBufferSize)
+    {
+        // Don't need to explicitly NULL-terminate the string because
+        // snprintf takes care of that.
+        ChipLogDetail(DataManagement, "%s", gLineBuffer);
+        gCurLineBufferSize = 0;
+    }
+
+    for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
+    {
+        if (sizeof(gLineBuffer) > gCurLineBufferSize)
+        {
+            size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            if (ret > 0)
+            {
+                gCurLineBufferSize += std::min(ret, sizeLeft);
+            }
+        }
+    }
+}
 
 void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {
     va_list args;
-    size_t ret;
-    size_t sizeLeft;
     va_start(args, aFmt);
 
     if (aIsNewLine)
     {
-        if (gCurLineBufferSize)
-        {
-            // Don't need to explicitly NULL-terminate the string because
-            // snprintf takes care of that.
-            ChipLogDetail(DataManagement, "%s", gLineBuffer);
-            gCurLineBufferSize = 0;
-        }
-
-        for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
-        {
-            if (sizeof(gLineBuffer) > gCurLineBufferSize)
-            {
-                sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
-                if (ret > 0)
-                {
-                    gCurLineBufferSize += std::min(ret, sizeLeft);
-                }
-            }
-        }
+        PrettyPrintIMBlankLine();
     }
 
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
-        sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -94,5 +97,6 @@ void DecreaseDepth()
     gPrettyPrintingDepthLevel--;
 }
 #endif
+
 }; // namespace app
 }; // namespace chip

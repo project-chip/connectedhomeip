@@ -16,8 +16,8 @@
  */
 
 #import "CHIPP256KeypairBridge.h"
+#import "NSDataSpanConversion.h"
 
-#import <CommonCrypto/CommonDigest.h>
 #import <Security/SecKey.h>
 #include <string>
 
@@ -28,6 +28,13 @@ using namespace chip::Crypto;
 
 CHIP_ERROR CHIPP256KeypairBridge::Init(id<CHIPKeypair> keypair)
 {
+    if (![keypair respondsToSelector:@selector(ECDSA_sign_message_DER:)]
+        && ![keypair respondsToSelector:@selector(ECDSA_sign_message_raw:)]) {
+        // Not a valid CHIPKeypair implementation.
+        NSLog(@"Keypair does not support message signing");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mKeypair = keypair;
     return setPubkey();
 }
@@ -38,7 +45,8 @@ CHIP_ERROR CHIPP256KeypairBridge::Initialize()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return ([mKeypair initialize]) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    // Our keypair is always initialized.
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPP256KeypairBridge::Serialize(P256SerializedKeypair & output) const
@@ -59,7 +67,7 @@ CHIP_ERROR CHIPP256KeypairBridge::Deserialize(P256SerializedKeypair & input)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length)
+CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -68,49 +76,60 @@ CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, si
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
         CHIP_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     NSData * msgData = [NSData dataWithBytes:msg length:msg_length];
-    NSMutableData * hashedData = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(msgData.bytes, (CC_LONG) msgData.length, (unsigned char *) hashedData.mutableBytes);
-    CHIP_LOG_DEBUG("Generated Msg hash, signing hash now");
-    NSData * signature = [mKeypair ECDSA_sign_hash:hashedData];
-    if (!signature) {
-        CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
-        return CHIP_ERROR_INTERNAL;
+    NSData * signature;
+    if ([mKeypair respondsToSelector:@selector(ECDSA_sign_message_DER:)]) {
+        signature = [mKeypair ECDSA_sign_message_DER:msgData];
+        if (!signature) {
+            CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        uint8_t buf[kP256_ECDSA_Signature_Length_Raw];
+        chip::MutableByteSpan rawSignature(buf);
+
+        CHIP_ERROR err = EcdsaAsn1SignatureToRaw(kP256_FE_Length, AsByteSpan(signature), rawSignature);
+        if (err != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Converting ASN.1 DER signature to raw form failed: %s", chip::ErrorStr(err));
+            return err;
+        }
+
+        signature = AsData(rawSignature);
+        if (!signature) {
+            CHIP_LOG_ERROR("Failed to create NSData for raw signature");
+            return CHIP_ERROR_INTERNAL;
+        }
+    } else {
+        signature = [mKeypair ECDSA_sign_message_raw:msgData];
+        if (!signature) {
+            CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
     if (signature.length > out_signature.Capacity()) {
-        CHIP_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
+        CHIP_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %llu vs %llu", static_cast<uint64_t>(signature.length),
+            static_cast<uint64_t>(out_signature.Capacity()));
         return CHIP_ERROR_NO_MEMORY;
     }
     out_signature.SetLength(signature.length);
-    std::memcpy(out_signature, signature.bytes, signature.length);
+    std::memcpy(out_signature.Bytes(), signature.bytes, signature.length);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(
+    const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    NSData * hashData = [NSData dataWithBytes:hash length:hash_length];
-    NSData * signature = [mKeypair ECDSA_sign_hash:hashData];
-    if (!signature) {
-        CHIP_LOG_ERROR("ECDSA sign hash failure: no signature returned");
-        return CHIP_ERROR_INTERNAL;
-    }
-    if (signature.length > out_signature.Capacity()) {
-        CHIP_LOG_ERROR(
-            "ECDSA sign hash failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    out_signature.SetLength(signature.length);
-    std::memcpy(out_signature, signature.bytes, signature.length);
-    return CHIP_NO_ERROR;
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(
@@ -123,9 +142,10 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::setPubkey()
+CHIP_ERROR CHIPP256KeypairBridge::setPubkey() { return MatterPubKeyFromSecKeyRef([mKeypair pubkey], &mPubkey); }
+
+CHIP_ERROR CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, P256PublicKey * matterPubKey)
 {
-    SecKeyRef pubkeyRef = [mKeypair pubkey];
     if (!pubkeyRef) {
         CHIP_LOG_ERROR("Unable to initialize Pubkey");
         return CHIP_ERROR_INTERNAL;
@@ -141,7 +161,7 @@ CHIP_ERROR CHIPP256KeypairBridge::setPubkey()
         return CHIP_ERROR_INTERNAL;
     }
     chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);
-    mPubkey = P256PublicKey(pubkeyBytes);
+    *matterPubKey = P256PublicKey(pubkeyBytes);
 
     return CHIP_NO_ERROR;
 }

@@ -21,7 +21,7 @@
 #include "ReplyFilter.h"
 #include "Responder.h"
 
-#include <inet/InetLayer.h>
+#include <system/SystemClock.h>
 
 namespace mdns {
 namespace Minimal {
@@ -29,9 +29,9 @@ namespace Minimal {
 /// Represents available data (replies) for mDNS queries.
 struct QueryResponderRecord
 {
-    Responder * responder      = nullptr; // what response/data is available
-    bool reportService         = false;   // report as a service when listing dnssd services
-    uint64_t lastMulticastTime = 0;       // last time this record was multicast
+    Responder * responder                            = nullptr; // what response/data is available
+    bool reportService                               = false;   // report as a service when listing dnssd services
+    chip::System::Clock::Timestamp lastMulticastTime = chip::System::Clock::kZero; // last time this record was multicast
 };
 
 namespace Internal {
@@ -122,9 +122,9 @@ public:
 
     /// Filter out anything that was multicast past ms.
     /// If ms is 0, no filtering is done
-    QueryResponderRecordFilter & SetIncludeOnlyMulticastBeforeMS(uint64_t ms)
+    QueryResponderRecordFilter & SetIncludeOnlyMulticastBeforeMS(chip::System::Clock::Timestamp time)
     {
-        mIncludeOnlyMulticastBeforeMS = ms;
+        mIncludeOnlyMulticastBefore = time;
         return *this;
     }
 
@@ -140,7 +140,8 @@ public:
             return false;
         }
 
-        if ((mIncludeOnlyMulticastBeforeMS > 0) && (record->lastMulticastTime >= mIncludeOnlyMulticastBeforeMS))
+        if ((mIncludeOnlyMulticastBefore > chip::System::Clock::kZero) &&
+            (record->lastMulticastTime >= mIncludeOnlyMulticastBefore))
         {
             return false;
         }
@@ -154,9 +155,9 @@ public:
     }
 
 private:
-    bool mIncludeAdditionalRepliesOnly     = false;
-    ReplyFilter * mReplyFilter             = nullptr;
-    uint64_t mIncludeOnlyMulticastBeforeMS = 0;
+    bool mIncludeAdditionalRepliesOnly                         = false;
+    ReplyFilter * mReplyFilter                                 = nullptr;
+    chip::System::Clock::Timestamp mIncludeOnlyMulticastBefore = chip::System::Clock::kZero;
 };
 
 /// Iterates over an array of QueryResponderRecord items, providing only 'valid' ones, where
@@ -238,7 +239,7 @@ class QueryResponderBase : public Responder // "_services._dns-sd._udp.local"
 public:
     /// Builds a new responder with the given storage for the response infos
     QueryResponderBase(Internal::QueryResponderInfo * infos, size_t infoSizes);
-    virtual ~QueryResponderBase() {}
+    ~QueryResponderBase() override {}
 
     /// Setup initial settings (clears all infos and sets up dns-sd query replies)
     void Init();

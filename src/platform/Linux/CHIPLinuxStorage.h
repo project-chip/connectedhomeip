@@ -70,11 +70,13 @@ public:
 
     CHIP_ERROR Init(const char * configFile);
     CHIP_ERROR ReadValue(const char * key, bool & val);
+    CHIP_ERROR ReadValue(const char * key, uint16_t & val);
     CHIP_ERROR ReadValue(const char * key, uint32_t & val);
     CHIP_ERROR ReadValue(const char * key, uint64_t & val);
     CHIP_ERROR ReadValueStr(const char * key, char * buf, size_t bufSize, size_t & outLen);
     CHIP_ERROR ReadValueBin(const char * key, uint8_t * buf, size_t bufSize, size_t & outLen);
     CHIP_ERROR WriteValue(const char * key, bool val);
+    CHIP_ERROR WriteValue(const char * key, uint16_t val);
     CHIP_ERROR WriteValue(const char * key, uint32_t val);
     CHIP_ERROR WriteValue(const char * key, uint64_t val);
     CHIP_ERROR WriteValueStr(const char * key, const char * val);
@@ -88,6 +90,7 @@ private:
     std::mutex mLock;
     bool mDirty;
     std::string mConfigPath;
+    bool mInitialized = false;
 };
 
 } // namespace Internal

@@ -22,179 +22,468 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
+#include <app/clusters/media-playback-server/media-playback-delegate.h>
+#include <app/clusters/media-playback-server/media-playback-server.h>
+
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/media-playback-server/media-playback-server.h>
-#include <app/util/af.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaPlayback;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                        uint64_t deltaPositionMilliseconds);
+static constexpr size_t kMediaPlaybackDelegateTableSize =
+    EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-static void writePlaybackState(EndpointId endpoint, uint8_t playbackState)
+// -----------------------------------------------------------------------------
+// Delegate Implementation
+
+using chip::app::Clusters::MediaPlayback::Delegate;
+
+namespace {
+
+Delegate * gDelegateTable[kMediaPlaybackDelegateTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    EmberAfStatus status = emberAfWriteServerAttribute(
-        endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID, &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
-        ChipLogError(Zcl, "Failed to store media playback attribute.");
+        ChipLogError(Zcl, "MediaPlayback returning ContentApp delegate for endpoint:%u", endpoint);
+        return app->GetMediaPlaybackDelegate();
     }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "MediaPlayback NOT returning ContentApp delegate for endpoint:%u", endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, MediaPlayback::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
-static uint8_t readPlaybackStatus(EndpointId endpoint)
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
-    uint8_t playbackState;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
-                                                      ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID, &playbackState, sizeof(uint8_t));
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Failed to read media playback attribute.");
+        ChipLogError(Zcl, "Media Playback has no delegate set for endpoint:%u", endpoint);
+        return true;
     }
-
-    return playbackState;
+    return false;
 }
+} // namespace
 
-void storeNewPlaybackState(EndpointId endpoint, uint8_t newPlaybackState)
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MediaPlayback {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint8_t mediaPlaybackClusterPlaybackState = readPlaybackStatus(endpoint);
-
-    if (mediaPlaybackClusterPlaybackState == newPlaybackState)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, MediaPlayback::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return;
+        gDelegateTable[ep] = delegate;
     }
     else
     {
-        writePlaybackState(endpoint, newPlaybackState);
     }
 }
 
-static void sendResponse(app::CommandHandler * command, const char * responseName, CommandId commandId,
-                         EmberAfMediaPlaybackStatus mediaPlaybackStatus)
-{
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, commandId,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
+} // namespace MediaPlayback
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
-    VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), mediaPlaybackStatus));
-    SuccessOrExit(err = command->FinishCommand());
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
+
+namespace {
+
+class MediaPlaybackAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    MediaPlaybackAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), MediaPlayback::Id) {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadStartTimeAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadDurationAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSampledPositionAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadPlaybackSpeedAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSeekRangeStartAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSeekRangeEndAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+};
+
+MediaPlaybackAttrAccess gMediaPlaybackAttrAccess;
+
+CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (isDelegateNull(delegate, endpoint))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id: {
+        return ReadCurrentStateAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::StartTime::Id: {
+        return ReadStartTimeAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::Duration::Id: {
+        return ReadDurationAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id: {
+        return ReadSampledPositionAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id: {
+        return ReadPlaybackSpeedAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id: {
+        return ReadSeekRangeStartAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
+        return ReadSeekRangeEndAttribute(aEncoder, delegate);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    MediaPlayback::PlaybackStateEnum currentState = delegate->HandleGetCurrentState();
+    return aEncoder.Encode(currentState);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadStartTimeAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint64_t startTime = delegate->HandleGetStartTime();
+    return aEncoder.Encode(startTime);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadDurationAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint64_t duration = delegate->HandleGetDuration();
+    return aEncoder.Encode(duration);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadSampledPositionAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetSampledPosition(aEncoder);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadPlaybackSpeedAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    float playbackSpeed = delegate->HandleGetPlaybackSpeed();
+    return aEncoder.Encode(playbackSpeed);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadSeekRangeStartAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint64_t seekRangeStart = delegate->HandleGetSeekRangeStart();
+    return aEncoder.Encode(seekRangeStart);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadSeekRangeEndAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint64_t seekRangeEnd = delegate->HandleGetSeekRangeEnd();
+    return aEncoder.Encode(seekRangeEnd);
+}
+
+} // anonymous namespace
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
+
+bool emberAfMediaPlaybackClusterPlayCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Play::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandlePlay(responder);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, ErrorStr(err));
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterPlayCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
-}
 
-bool emberAfMediaPlaybackClusterMediaPlayCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::MediaPlay::DecodableType & commandData)
-{
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0);
-    storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_PLAYING);
-    sendResponse(command, "MediaPlayResponse", ZCL_MEDIA_PLAY_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPauseCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::MediaPause::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterPauseCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::Pause::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0);
-    storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_PAUSED);
-    sendResponse(command, "MediaPauseResponse", ZCL_MEDIA_PAUSE_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandlePause(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterPauseCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaStopCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::MediaStop::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterStopPlaybackCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::StopPlayback::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0);
-    storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_NOT_PLAYING);
-    sendResponse(command, "MediaStopResponse", ZCL_MEDIA_STOP_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleStop(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterStopCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaFastForwardCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::MediaFastForward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterFastForwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::FastForward::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0);
-    sendResponse(command, "MediaFastForward", ZCL_MEDIA_FAST_FORWARD_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleFastForward(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterFastForwardCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPreviousCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::MediaPrevious::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterPreviousCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::Previous::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0);
-    sendResponse(command, "MediaPrevious", ZCL_MEDIA_PREVIOUS_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandlePrevious(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterPreviousCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaRewindCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::MediaRewind::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterRewindCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::Rewind::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0);
-    sendResponse(command, "MediaRewind", ZCL_MEDIA_REWIND_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleRewind(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterRewindCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath,
-                                                          const Commands::MediaSkipBackward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterSkipBackwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::SkipBackward::DecodableType & commandData)
 {
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
     auto & deltaPositionMilliseconds = commandData.deltaPositionMilliseconds;
 
-    EmberAfMediaPlaybackStatus status =
-        mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds);
-    sendResponse(command, "MediaSkipBackward", ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, status);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleSkipBackward(responder, deltaPositionMilliseconds);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterSkipBackwardCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::MediaSkipForward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterSkipForwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::SkipForward::DecodableType & commandData)
 {
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    EndpointId endpoint              = commandPath.mEndpointId;
     auto & deltaPositionMilliseconds = commandData.deltaPositionMilliseconds;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
 
-    EmberAfMediaPlaybackStatus status =
-        mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds);
-    sendResponse(command, "MediaSkipForward", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleSkipForward(responder, deltaPositionMilliseconds);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterSkipForwardCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSeekCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::MediaSeek::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterSeekCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Seek::DecodableType & commandData)
 {
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    EndpointId endpoint         = commandPath.mEndpointId;
     auto & positionMilliseconds = commandData.position;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
 
-    EmberAfMediaPlaybackStatus status =
-        mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
-    sendResponse(command, "MediaSeek", ZCL_MEDIA_SEEK_RESPONSE_COMMAND_ID, status);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleSeek(responder, positionMilliseconds);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterSeekCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaNextCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::MediaNext::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterNextCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Next::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0);
-    sendResponse(command, "MediaNext", ZCL_MEDIA_NEXT_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleNext(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterNextCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
-bool emberAfMediaPlaybackClusterMediaStartOverCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::MediaStartOver::DecodableType & commandData)
+
+bool emberAfMediaPlaybackClusterStartOverCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                  const Commands::StartOver::DecodableType & commandData)
 {
-    EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
-    sendResponse(command, "MediaStartOver", ZCL_MEDIA_START_OVER_RESPONSE_COMMAND_ID, status);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleStartOver(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterStartOverCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
+}
+
+void MatterMediaPlaybackPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gMediaPlaybackAttrAccess);
 }

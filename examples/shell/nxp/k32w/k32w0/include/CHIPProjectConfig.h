@@ -33,17 +33,6 @@
 // WARNING: These options make it possible to circumvent basic CHIP security functionality,
 // including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 0
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default CHIP device id and credentials if no device id
- * is found in CHIP NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-//#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -63,44 +52,44 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x4B4C: K32W lighting-app
+ * 0x8009: example shell
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4B4C
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8012
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
- * The product revision number assigned to device or product by the device vendor.  This
+ * The hardware version number assigned to device or product by the device vendor.  This
  * number is scoped to the device product id, and typically corresponds to a revision of the
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software revisions.
+ * This value is generally *not* incremented for device software versions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 100
+#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 100
 
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING "v0.1.0"
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "v0.1.0"
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
- * CHIP currently expects the firmware version to be in the format
+ * A string identifying the software version running on the device.
+ * CHIP currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "04-2020-te2"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "04-2020-te2"
 #endif
 
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 42020
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 42020
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
@@ -112,49 +101,19 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for CHIP-over-BLE (CHIPOBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
  *
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
- * CHIP_CONFIG_MAX_BINDINGS
+ * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
  *
- * Maximum number of simultaneously active bindings per ChipExchangeManager
- * 1 (Time Sync) + 2 (Two 1-way subscriptions) + 1 (Software Update) = 4
- * in the worst case. Keeping another 4 as buffer.
+ * @brief Enable Interaction model Event support in server
  */
-#define CHIP_CONFIG_MAX_BINDINGS 8
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
- *
- * Select the ability to offload event logs to any interested subscribers using WDM.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+#define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 0
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
@@ -176,9 +135,15 @@
  */
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
-#define CONFIG_CHIP_NFC_COMMISSIONING 0
-
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+/**
+ *  @def CHIP_CONFIG_MAX_FABRICS
+ *
+ *  @brief
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
+ */
+#define CHIP_CONFIG_MAX_FABRICS 2 // 1 fabrics + 1 for rotation slack
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
@@ -192,3 +157,17 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 2

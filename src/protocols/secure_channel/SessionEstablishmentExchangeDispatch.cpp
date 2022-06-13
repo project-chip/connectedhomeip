@@ -28,32 +28,10 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
-                                                                System::PacketBufferHandle && message,
-                                                                EncryptedPacketBufferHandle & preparedMessage)
+bool SessionEstablishmentExchangeDispatch::MessagePermitted(Protocols::Id protocol, uint8_t type)
 {
-    return mSessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
-}
-
-CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
-                                                                     const EncryptedPacketBufferHandle & preparedMessage) const
-{
-    return mSessionManager->SendPreparedMessage(session, preparedMessage);
-}
-
-CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                                                   const Transport::PeerAddress & peerAddress,
-                                                                   Messaging::MessageFlags msgFlags,
-                                                                   ReliableMessageContext * reliableMessageContext)
-{
-    return ExchangeMessageDispatch::OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, reliableMessageContext);
-}
-
-bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
-{
-    switch (protocol)
+    if (protocol == Protocols::SecureChannel::Id)
     {
-    case Protocols::SecureChannel::Id.GetProtocolId():
         switch (type)
         {
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck):
@@ -73,11 +51,8 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         default:
             break;
         }
-        break;
-
-    default:
-        break;
     }
+
     return false;
 }
 

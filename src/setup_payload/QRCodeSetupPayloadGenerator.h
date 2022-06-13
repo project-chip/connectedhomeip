@@ -82,9 +82,18 @@ public:
      */
     CHIP_ERROR payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
 
+    /**
+     * This function disable internal checks about the validity of the generated payload.
+     * It allows using the generator to generates invalid payloads.
+     * Defaults is false.
+     */
+    void SetAllowInvalidPayload(bool allow) { mAllowInvalidPayload = allow; }
+
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
                                            size_t & tlvDataLengthInBytes);
+
+    bool mAllowInvalidPayload = false;
 };
 
 /**
@@ -103,6 +112,8 @@ public:
      * This function is called to encode the binary data of a payload to a
      * base38 null-terminated string.
      *
+     * The resulting size of the out_buf span will be the size of data written and not including the null terminator.
+     *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.
      *
@@ -114,6 +125,9 @@ public:
      *               producing the requested string.
      */
     CHIP_ERROR payloadBase38Representation(MutableCharSpan & outBuffer);
+
+    // TODO - Find the optimal value for maximum length of QR Code Base38 string
+    static constexpr uint16_t kMaxQRCodeBase38RepresentationLength = 128;
 };
 
 } // namespace chip

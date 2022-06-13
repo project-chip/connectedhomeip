@@ -26,21 +26,17 @@
 #include <array>
 #include <stdint.h>
 
-#include <messaging/ExchangeContext.h>
-#include <messaging/ReliableMessageProtocolConfig.h>
-
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Pool.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Messaging {
-
-class ExchangeContext;
-using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 enum class SendMessageFlags : uint16_t;
 class ReliableMessageContext;
@@ -63,36 +59,18 @@ public:
         RetransTableEntry(ReliableMessageContext * rc);
         ~RetransTableEntry();
 
-        ExchangeHandle ec;                       /**< The context for the stored CHIP message. */
-        EncryptedPacketBufferHandle retainedBuf; /**< The packet buffer holding the CHIP message. */
-        uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
+        ExchangeHandle ec;                        /**< The context for the stored CHIP message. */
+        EncryptedPacketBufferHandle retainedBuf;  /**< The packet buffer holding the CHIP message. */
+        System::Clock::Timestamp nextRetransTime; /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;                        /**< The number of times we have tried to send this entry,
+                                                       including both successfully and failure send. */
     };
 
-public:
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
-    void Init(chip::System::Layer * systemLayer, SessionManager * sessionManager);
+    void Init(chip::System::Layer * systemLayer);
     void Shutdown();
-
-    /**
-     * Return a tick counter value given a time period.
-     *
-     * @param[in]  period        Timestamp value of in milliseconds.
-     *
-     * @return Tick count for the time period.
-     */
-    uint64_t GetTickCounterFromTimePeriod(uint64_t period);
-
-    /**
-     * Return a tick counter value between the given time and the stored time.
-     *
-     * @param[in]  newTime        Timestamp value of in milliseconds.
-     *
-     * @return Tick count of the difference between the given time and the stored time.
-     */
-    uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
     /**
      * Iterate through active exchange contexts and retrans table entries.  If an
@@ -121,6 +99,19 @@ public:
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
 
     /**
+     *  Calculate the backoff timer for the retransmission.
+     *
+     *  @param[in]   backoffBase    The base interval to use for the backoff calculation, either the active or idle interval.
+     *  @param[in]   sendCount      Count of how many times this message
+     *                              has been retransmitted so far (0 if it has
+     *                              been sent only once with no retransmits,
+     *                              1 if it has been sent twice, etc).
+     *
+     *  @retval  The backoff time value, including jitter.
+     */
+    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount);
+
+    /**
      *  Start retranmisttion of cached encryped packet for current entry.
      *
      *  @param[in]   entry    A pointer to a retransmission table entry added into the table.
@@ -128,26 +119,6 @@ public:
      *  @retval  #CHIP_NO_ERROR On success.
      */
     void StartRetransmision(RetransTableEntry * entry);
-
-    /**
-     *  Pause retranmisttion of current exchange for specified period.
-     *
-     *  @param[in]    rc                A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    PauseTimeMillis   Pause period in milliseconds.
-     *
-     *  @retval  #CHIP_NO_ERROR On success.
-     */
-    void PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
-
-    /**
-     *  Re-start retranmisttion of cached encryped packets for the given ReliableMessageContext.
-     *
-     *  @param[in] rc The ReliableMessageContext to resume retransmission for.
-     *
-     *  @retval  #CHIP_NO_ERROR On success.
-     */
-    void ResumeRetransmision(ReliableMessageContext * rc);
 
     /**
      *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
@@ -186,16 +157,6 @@ public:
     void ClearRetransTable(RetransTableEntry & rEntry);
 
     /**
-     *  Fail entries matching a specified ExchangeContext.
-     *
-     *  @param[in]    rc    A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    err   The error for failing table entries.
-     *
-     */
-    void FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
-
-    /**
      * Iterate through active exchange contexts and retrans table entries.
      * Determine how many ReliableMessageProtocol ticks we need to sleep before we
      * need to physically wake the CPU to perform an action.  Set a timer to go off
@@ -210,29 +171,14 @@ public:
      */
     void StopTimer();
 
-    /**
-     * Calculate number of virtual ReliableMessageProtocol ticks that have expired
-     * since we last called this function. Iterate through active exchange contexts
-     * and retrans table entries, subtracting expired virtual ticks to synchronize
-     * wakeup times with the current system time. Do not perform any actions beyond
-     * updating tick counts, actions will be performed by the physical
-     * ReliableMessageProtocol timer tick expiry.
-     *
-     */
-    void ExpireTicks();
-
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
-    void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
 #endif // CHIP_CONFIG_TEST
 
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
-    System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
-    uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift
 
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>
@@ -240,7 +186,7 @@ private:
     {
         mContextPool.ForEachActiveObject([&](auto * ec) {
             function(ec->GetReliableMessageContext());
-            return true;
+            return Loop::Continue;
         });
     }
 

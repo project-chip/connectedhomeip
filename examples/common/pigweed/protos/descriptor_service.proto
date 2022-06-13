@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+import 'pw_protobuf_protos/common.proto';
+
+message DeviceType {
+  uint32 device_type = 1;
+}
+
+message Cluster {
+  uint32 cluster_id = 1;
+}
+
+message Endpoint {
+  uint32 endpoint = 1;
+}
+
+service Descriptor {
+  rpc DeviceTypeList(Endpoint) returns (stream DeviceType){}
+  rpc ServerList(Endpoint) returns (stream Cluster){}
+  rpc ClientList(Endpoint) returns (stream Cluster){}
+  rpc PartsList(Endpoint) returns (stream Endpoint){}
+}

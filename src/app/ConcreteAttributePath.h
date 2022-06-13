@@ -18,23 +18,126 @@
 
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
 
 /**
- * A representation of a concrete attribute path.
+ * A representation of a concrete attribute path. This does not convey any list index specifiers.
+ *
+ * The expanded flag can be set to indicate that a concrete path was expanded from a wildcard
+ * or group path.
  */
-struct ConcreteAttributePath
+struct ConcreteAttributePath : public ConcreteClusterPath
 {
+    ConcreteAttributePath()
+    {
+        // Note: mExpanded is in the superclass, so we can't use a field
+        // initializer.
+        mExpanded = false;
+    }
+
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
+        ConcreteClusterPath(aEndpointId, aClusterId), mAttributeId(aAttributeId)
+    {
+        // Note: mExpanded is in the supercclass, so we can't use a field
+        // initializer.
+        mExpanded = false;
+    }
+
+    bool operator==(const ConcreteAttributePath & aOther) const
+    {
+        return ConcreteClusterPath::operator==(aOther) && (mAttributeId == aOther.mAttributeId);
+    }
+
+    bool operator!=(const ConcreteAttributePath & aOther) const { return !(*this == aOther); }
+
+    bool operator<(const ConcreteAttributePath & path) const
+    {
+        return (mEndpointId < path.mEndpointId) || ((mEndpointId == path.mEndpointId) && (mClusterId < path.mClusterId)) ||
+            ((mEndpointId == path.mEndpointId) && (mClusterId == path.mClusterId) && (mAttributeId < path.mAttributeId));
+    }
+
+    AttributeId mAttributeId = 0;
+};
+
+/**
+ * A representation of a concrete path as it appears in a Read or Subscribe
+ * request after path expansion. This contains support for expressing an
+ * optional list index.
+ */
+struct ConcreteReadAttributePath : public ConcreteAttributePath
+{
+    ConcreteReadAttributePath() {}
+
+    ConcreteReadAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
+
+    ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
     {}
 
-    const EndpointId mEndpointId   = 0;
-    const ClusterId mClusterId     = 0;
-    const AttributeId mAttributeId = 0;
+    ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, uint16_t aListIndex) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {
+        mListIndex.SetValue(aListIndex);
+    }
+
+    Optional<uint16_t> mListIndex;
 };
+
+/**
+ * A representation of a concrete path as it appears in a Report or Write
+ * request after path expansion. This contains support for expressing list and list item-specific operations
+ * like replace, update, delete and append.
+ */
+struct ConcreteDataAttributePath : public ConcreteAttributePath
+{
+    enum class ListOperation
+    {
+        NotList,     // Path points to an attribute that isn't a list.
+        ReplaceAll,  // Path points to an attribute that is a list, indicating that the contents of the list should be replaced in
+                     // its entirety.
+        ReplaceItem, // Path points to a specific item in a list, indicating that that item should be replaced in its entirety.
+        DeleteItem,  // Path points to a specific item in a list, indicating that that item should be deleted from the list.
+        AppendItem   // Path points to an attribute that is a list, indicating that an item should be appended into the list.
+    };
+
+    ConcreteDataAttributePath() {}
+
+    ConcreteDataAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
+
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {}
+
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId,
+                              const Optional<DataVersion> & aDataVersion) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId),
+        mDataVersion(aDataVersion)
+    {}
+
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListOperation aListOp,
+                              uint16_t aListIndex) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {
+        mListOp    = aListOp;
+        mListIndex = aListIndex;
+    }
+
+    bool IsListOperation() const { return mListOp != ListOperation::NotList; }
+    bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
+
+    //
+    // This index is only valid if `mListOp` is set to a list item operation, i.e
+    // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.
+    //
+    uint16_t mListIndex                = 0;
+    ListOperation mListOp              = ListOperation::NotList;
+    Optional<DataVersion> mDataVersion = NullOptional;
+};
+
 } // namespace app
 } // namespace chip

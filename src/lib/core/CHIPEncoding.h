@@ -33,9 +33,18 @@
 
 #pragma once
 
+// The nlio headers use [inout] instead of [in,out], which makes the clang
+// documentation warning unhappy.  Suppress it for those headers.
+#pragma GCC diagnostic push
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wdocumentation"
+#endif // __clang__
+
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>
 #include <nlio.hpp>
+
+#pragma GCC diagnostic pop
 
 #include <stdint.h>
 
@@ -192,11 +201,20 @@ inline void Write8(uint8_t *& p, uint8_t v)
  *  </ul>
  *
  *  On little endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */
 namespace LittleEndian {
+
+/**
+ * This conditionally performs, as necessary for the target system, a
+ * byte order swap by value of the specified value, presumed to be in
+ * little endian byte ordering to the target system (i.e. host)
+ * byte ordering.
+ */
+template <typename T>
+inline T HostSwap(T v);
 
 /**
  * This conditionally performs, as necessary for the target system, a
@@ -214,6 +232,12 @@ namespace LittleEndian {
 inline uint16_t HostSwap16(uint16_t v)
 {
     return nl::ByteOrder::Swap16LittleToHost(v);
+}
+
+template <>
+inline uint16_t HostSwap<uint16_t>(uint16_t v)
+{
+    return HostSwap16(v);
 }
 
 /**
@@ -234,6 +258,12 @@ inline uint32_t HostSwap32(uint32_t v)
     return nl::ByteOrder::Swap32LittleToHost(v);
 }
 
+template <>
+inline uint32_t HostSwap<uint32_t>(uint32_t v)
+{
+    return HostSwap32(v);
+}
+
 /**
  * This conditionally performs, as necessary for the target system, a
  * byte order swap by value of the specified 64-bit value, presumed to
@@ -250,6 +280,12 @@ inline uint32_t HostSwap32(uint32_t v)
 inline uint64_t HostSwap64(uint64_t v)
 {
     return nl::ByteOrder::Swap64LittleToHost(v);
+}
+
+template <>
+inline uint64_t HostSwap<uint64_t>(uint64_t v)
+{
+    return HostSwap64(v);
 }
 
 /**
@@ -562,7 +598,7 @@ inline void Write64(uint8_t *& p, uint64_t v)
  *  </ul>
  *
  *  On big endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */

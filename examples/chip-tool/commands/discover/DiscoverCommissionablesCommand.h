@@ -23,12 +23,13 @@
 class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
-    DiscoverCommissionablesCommand() : CHIPCommand("commissionables") {}
+    DiscoverCommissionablesCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("commissionables", credsIssuerConfig)
+    {}
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 30; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
 };

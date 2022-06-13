@@ -58,9 +58,27 @@ def getDirPath(name):
     return fullpath
 
 
+def detectZclFile(zapFile):
+    print(f"Searching for zcl file from {zapFile}")
+
+    path = 'src/app/zap-templates/zcl/zcl.json'
+
+    data = json.load(open(zapFile))
+    for package in data["package"]:
+        if package["type"] != "zcl-properties":
+            continue
+
+        # found the right path, try to figure out the actual path
+        if package["pathRelativity"] == "relativeToZap":
+            path = os.path.abspath(os.path.join(os.path.dirname(zapFile), package["path"]))
+        else:
+            path = package["path"]
+
+    return getFilePath(path)
+
+
 def runArgumentsParser():
     default_templates = 'src/app/zap-templates/app-templates.json'
-    default_zcl = 'src/app/zap-templates/zcl/zcl.json'
     default_output_dir = 'zap-generated/'
 
     parser = argparse.ArgumentParser(
@@ -68,8 +86,8 @@ def runArgumentsParser():
     parser.add_argument('zap', help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates,
                         help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
-    parser.add_argument('-z', '--zcl', default=default_zcl,
-                        help='Path to the zcl templates records to use for generating artifacts (default: "' + default_zcl + '")')
+    parser.add_argument('-z', '--zcl',
+                        help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: automatically selected)')
     args = parser.parse_args()
@@ -86,11 +104,35 @@ def runArgumentsParser():
         output_dir = ''
 
     zap_file = getFilePath(args.zap)
-    zcl_file = getFilePath(args.zcl)
+
+    if args.zcl:
+        zcl_file = getFilePath(args.zcl)
+    else:
+        zcl_file = detectZclFile(zap_file)
+
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
     return (zap_file, zcl_file, templates_file, output_dir)
+
+
+def extractGeneratedIdl(output_dir, zap_config_path):
+    """Find a file Clusters.matter in the output directory and
+       place it along with the input zap file.
+
+       Intent is to make the "zap content" more humanly understandable.
+    """
+    idl_path = os.path.join(output_dir, "Clusters.matter")
+    if not os.path.exists(idl_path):
+        return
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+    os.rename(idl_path, target_path)
 
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
@@ -98,6 +140,8 @@ def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
                           zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
+
+    extractGeneratedIdl(output_dir, zap_file)
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -112,9 +156,28 @@ def runClangPrettifier(templates_file, output_dir):
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
-            args = ['clang-format', '-i']
-            args.extend(clangOutputs)
-            subprocess.check_call(args)
+            # The "clang-format" pigweed comes with is now version 14, which
+            # changed behavior from version 13 and earlier regarding some
+            # whitespace formatting.  Unfortunately, all the CI bits run
+            # clang-format 13 or earlier, so we get styling mismatches.
+            #
+            # Try some older clang-format versions just in case they are
+            # installed.  In particular, clang-format-13 is available on various
+            # Linux distributions and clang-format-11 is available via homebrew
+            # on Mac.  If all else fails, fall back to clang-format.
+            clang_formats = ['clang-format-13', 'clang-format-12', 'clang-format-11', 'clang-format']
+            for clang_format in clang_formats:
+                args = [clang_format, '-i']
+                args.extend(clangOutputs)
+                try:
+                    subprocess.check_call(args)
+                    err = None
+                    break
+                except Exception as thrown:
+                    err = thrown
+                    # Press on to the next binary name
+            if err is not None:
+                raise err
     except Exception as err:
         print('clang-format error:', err)
 
@@ -146,33 +209,17 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
-def runPythonPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        pyOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".py", outputs))
-
-        if not pyOutputs:
-            return
-        args = ['autopep8', '--in-place']
-        args.extend(pyOutputs)
-        subprocess.check_call(args)
-    except Exception as err:
-        print('autopep8 error:', err)
-
-
 def main():
     checkPythonVersion()
 
+    # The maximum meory usage is over 4GB (#15620)
+    os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
     zap_file, zcl_file, templates_file, output_dir = runArgumentsParser()
     runGeneration(zap_file, zcl_file, templates_file, output_dir)
 
     prettifiers = [
         runClangPrettifier,
         runJavaPrettifier,
-        runPythonPrettifier,
     ]
 
     for prettifier in prettifiers:

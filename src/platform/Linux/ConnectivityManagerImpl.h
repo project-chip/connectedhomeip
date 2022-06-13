@@ -38,9 +38,16 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
+#include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+
+#include <mutex>
 #endif
+
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/NetworkCommissioning.h>
+#include <vector>
 
 namespace chip {
 namespace Inet {
@@ -73,6 +80,7 @@ struct GDBusWpaSupplicant
 
     WpaFiW1Wpa_supplicant1 * proxy;
     WpaFiW1Wpa_supplicant1Interface * iface;
+    WpaFiW1Wpa_supplicant1BSS * bss;
     gchar * interfacePath;
     gchar * networkPath;
 };
@@ -106,12 +114,47 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
+    CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
+                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+    void PostNetworkConnect();
+    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    CHIP_ERROR CommitConfig();
+
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
+    int32_t GetDisconnectReason();
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
+    CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+#endif
+
+    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    static const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
+
+    struct WiFiNetworkScanned
+    {
+        // The fields matches WiFiInterfaceScanResult::Type.
+        uint8_t ssid[Internal::kMaxWiFiSSIDLength];
+        uint8_t ssidLen;
+        uint8_t bssid[6];
+        int8_t rssi;
+        uint16_t frequencyBand;
+        uint8_t channel;
+        uint8_t security;
+    };
 
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -119,8 +162,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
-    uint32_t _GetWiFiStationReconnectIntervalMS();
-    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiStationReconnectInterval();
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
@@ -135,51 +178,33 @@ private:
     void _DemandStartWiFiAP();
     void _StopOnDemandWiFiAP();
     void _MaintainOnDemandWiFiAP();
-    uint32_t _GetWiFiAPIdleTimeoutMS();
-    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiAPIdleTimeout();
+    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    void UpdateNetworkStatus();
+    static CHIP_ERROR StopAutoScan();
 
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                        gpointer user_data);
     static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
+    static void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
+                                        const gchar * const * invalidated_properties, gpointer user_data);
     static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    static void _OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
+    static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+
+    static bool mAssociattionStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
     static std::mutex mWpaSupplicantMutex;
-#endif
 
-    CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
-    CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
-    CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);
-    CHIP_ERROR _GetEthPacketRxCount(uint64_t & packetRxCount);
-    CHIP_ERROR _GetEthPacketTxCount(uint64_t & packetTxCount);
-    CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
-    CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
-    CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
-    CHIP_ERROR _ResetEthNetworkDiagnosticsCounts();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
-    CHIP_ERROR _GetWiFiRssi(int8_t & rssi);
-    CHIP_ERROR _GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
-    CHIP_ERROR _GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount);
-    CHIP_ERROR _GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount);
-    CHIP_ERROR _GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount);
-    CHIP_ERROR _GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount);
-    CHIP_ERROR _GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
-    CHIP_ERROR _GetWiFiOverrunCount(uint64_t & overrunCount);
-    CHIP_ERROR _ResetWiFiNetworkDiagnosticsCounts();
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================
-
-    CHIP_ERROR ResetEthernetStatsCount();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR ResetWiFiStatsCount();
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void DriveAPState();
@@ -197,31 +222,25 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    uint64_t mEthPacketRxCount  = 0;
-    uint64_t mEthPacketTxCount  = 0;
-    uint64_t mEthTxErrCount     = 0;
-    uint64_t mEthCollisionCount = 0;
-    uint64_t mEthOverrunCount   = 0;
     char mEthIfName[IFNAMSIZ];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
-    uint64_t mLastAPDemandTime;
-    uint32_t mWiFiStationReconnectIntervalMS;
-    uint32_t mWiFiAPIdleTimeoutMS;
+    System::Clock::Timestamp mLastAPDemandTime;
+    System::Clock::Timeout mWiFiStationReconnectInterval;
+    System::Clock::Timeout mWiFiAPIdleTimeout;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    uint32_t mBeaconLostCount        = 0;
-    uint32_t mPacketMulticastRxCount = 0;
-    uint32_t mPacketMulticastTxCount = 0;
-    uint32_t mPacketUnicastRxCount   = 0;
-    uint32_t mPacketUnicastTxCount   = 0;
-    uint64_t mOverrunCount           = 0;
-    char mWiFiIfName[IFNAMSIZ];
+    static char sWiFiIfName[IFNAMSIZ];
 #endif
+
+    static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+    static uint8_t sInterestedSSIDLen;
+    static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -240,9 +259,9 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
     return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
 }
 
-inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 {
-    return mWiFiAPIdleTimeoutMS;
+    return mWiFiAPIdleTimeout;
 }
 
 #endif

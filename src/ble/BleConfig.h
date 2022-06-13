@@ -37,6 +37,7 @@
 
 #if CHIP_HAVE_CONFIG_H
 #include <ble/BleBuildConfig.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
 #include <system/SystemConfig.h>
@@ -122,7 +123,7 @@
  *
  */
 #ifndef BLE_CONNECTION_UNINITIALIZED
-#define BLE_CONNECTION_UNINITIALIZED NULL
+#define BLE_CONNECTION_UNINITIALIZED nullptr
 #endif // BLE_CONNECTION_UNINITIALIZED
 
 /**

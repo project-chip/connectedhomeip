@@ -44,12 +44,29 @@
 #define OPENTHREAD_CONFIG_CLI_UART_RX_BUFFER_SIZE 512
 #endif
 
-#define OPENTHREAD_CONFIG_JOINER_ENABLE 1
 #define OPENTHREAD_CONFIG_NCP_HDLC_ENABLE 1
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
 
+#define OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE 1
 #define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
 #define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
+
+// disable unused features
+#define OPENTHREAD_CONFIG_COAP_API_ENABLE 0
+#define OPENTHREAD_CONFIG_JOINER_ENABLE 0
+#define OPENTHREAD_CONFIG_COMMISSIONER_ENABLE 0
+#define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
+#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
+#define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
+#define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
+#define OPENTHREAD_CONFIG_TCP_ENABLE 0
+
+// Support udp multicast by enabling Multicast Listener Registration (MLR)
+#define OPENTHREAD_CONFIG_MLR_ENABLE 1
+
+// Define as 1 to stay awake between fragments while transmitting a large packet,
+// and to stay awake after receiving a packet with frame pending set to true.
+#define OPENTHREAD_CONFIG_MAC_STAY_AWAKE_BETWEEN_FRAGMENTS 1
 
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.

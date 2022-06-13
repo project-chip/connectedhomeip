@@ -122,7 +122,9 @@ CHIP_ERROR MainLoop::EnsureStarted()
     }
 
     int pthreadErr = pthread_create(&mThread, nullptr, &MainLoop::Thread, reinterpret_cast<void *>(this));
-    int tmpErrno   = errno;
+#if CHIP_ERROR_LOGGING
+    int tmpErrno = errno;
+#endif // CHIP_ERROR_LOGGING
     if (pthreadErr != 0)
     {
         ChipLogError(DeviceLayer, "FAIL: pthread_create (%s) in %s", strerror(tmpErrno), __func__);

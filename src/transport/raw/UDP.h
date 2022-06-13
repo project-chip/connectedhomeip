@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the CHIP Connection object that maintains a UDP connection.
- *      It binds to any avaiable local addr and port and begins listening.
+ *      It binds to any available local addr and port and begins listening.
  *
  */
 
@@ -28,10 +28,15 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/IPEndPointBasis.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+struct otInstance;
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 namespace chip {
 namespace Transport {
@@ -40,11 +45,11 @@ namespace Transport {
 class UdpListenParameters
 {
 public:
-    explicit UdpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
+    explicit UdpListenParameters(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) : mEndPointManager(endPointManager) {}
     UdpListenParameters(const UdpListenParameters &) = default;
     UdpListenParameters(UdpListenParameters &&)      = default;
 
-    Inet::InetLayer * GetInetLayer() { return mLayer; }
+    Inet::EndPointManager<Inet::UDPEndPoint> * GetEndPointManager() { return mEndPointManager; }
 
     Inet::IPAddressType GetAddressType() const { return mAddressType; }
     UdpListenParameters & SetAddressType(Inet::IPAddressType type)
@@ -70,11 +75,23 @@ public:
         return *this;
     }
 
+    /**
+     * Networking Stack Native parameter (optional)
+     */
+    void * GetNativeParams() const { return mNativeParams; }
+    UdpListenParameters & SetNativeParams(void * params)
+    {
+        mNativeParams = params;
+
+        return *this;
+    }
+
 private:
-    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
-    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;                 ///< UDP listen port
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
+    Inet::EndPointManager<Inet::UDPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
+    void * mNativeParams             = nullptr;
 };
 
 /** Implements a transport using UDP. */
@@ -114,6 +131,13 @@ public:
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
 
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override;
+
+    bool CanListenMulticast() override
+    {
+        return (mState == State::kInitialized) && (mUDPEndpointType == Inet::IPAddressType::kIPv6);
+    }
+
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kUdp) &&
@@ -122,12 +146,14 @@ public:
 
 private:
     // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer,
+    static void OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer,
                              const Inet::IPPacketInfo * pktInfo);
 
-    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
-    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
-    State mState                         = State::kNotReady;                            ///< State of the UDP transport
+    static void OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo);
+
+    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport
+    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
+    State mState                         = State::kNotReady;              ///< State of the UDP transport
 };
 
 } // namespace Transport

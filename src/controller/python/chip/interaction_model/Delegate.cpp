@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/ConcreteAttributePath.h"
 #include <cinttypes>
 
 #include <app/CommandSender.h>
@@ -30,129 +31,18 @@ namespace chip {
 
 namespace Controller {
 
-PythonInteractionModelDelegate gPythonInteractionModelDelegate;
-
-void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
-                                                TLV::TLVReader * aData)
-{
-    CommandStatus status{ Protocols::InteractionModel::Status::Success, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId,
-                          1 }; // This indicates the index of the command if multiple command/status payloads are present in the
-                               // message. For now, we don't support this in the IM layer, so just always set this to 1.
-    if (commandResponseStatusFunct != nullptr)
-    {
-        commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
-    }
-
-    DeviceControllerInteractionModelDelegate::OnResponse(apCommandSender, aPath, aData);
-
-    if (commandResponseErrorFunct != nullptr)
-    {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), CHIP_NO_ERROR.AsInteger());
-    }
-}
-
-void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                             Protocols::InteractionModel::Status aStatus, CHIP_ERROR aError)
-{
-    CommandStatus status{ aStatus, 0, 0, 0, 1 };
-
-    if (commandResponseStatusFunct != nullptr)
-    {
-        commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
-    }
-
-    if (commandResponseErrorFunct != nullptr)
-    {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
-    }
-    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
-}
-
-CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                               const app::StatusIB & aStatusIB,
-                                                               app::AttributePathParams & aAttributePathParams,
-                                                               uint8_t aAttributeIndex)
-{
-    if (onWriteResponseFunct != nullptr)
-    {
-        AttributeWriteStatus status{
-            apWriteClient->GetSourceNodeId(), apWriteClient->GetAppIdentifier(), aStatusIB.mStatus,
-            aAttributePathParams.mEndpointId, aAttributePathParams.mClusterId,   aAttributePathParams.mFieldId
-        };
-        onWriteResponseFunct(&status, sizeof(status));
-    }
-    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aStatusIB, aAttributePathParams, aAttributeIndex);
-    return CHIP_NO_ERROR;
-}
-
-void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
-                                                  TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
-{
-    if (onReportDataFunct != nullptr)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TLV::TLVWriter writer;
-        uint8_t writerBuffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        writer.Init(writerBuffer);
-        // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
-        // status.
-        if (apData != nullptr)
-        {
-            TLV::TLVReader tmpReader;
-            tmpReader.Init(*apData);
-            // The Copy operation should succeed since:
-            // - We used a buffer that is large enough
-            // - The writer is in a clean state.
-            err = writer.CopyElement(TLV::AnonymousTag, tmpReader);
-        }
-        if (CHIP_NO_ERROR == err)
-        {
-            AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mFieldId };
-            onReportDataFunct(apReadClient->GetPeerNodeId(), apReadClient->GetAppIdentifier(),
-                              /* TODO: Use real SubscriptionId */ apReadClient->IsSubscriptionType() ? 1 : 0, &path, sizeof(path),
-                              writerBuffer, writer.GetLengthWritten(), to_underlying(status));
-        }
-        else
-        {
-            // We failed to dump the TLV data to buffer, so we cannot pass valid data to the Python side, this should be a internal
-            // error of the binding.
-            ChipLogError(Controller, "Cannot pass TLV data to python: failed to copy TLV: %s", ErrorStr(err));
-        }
-    }
-    DeviceControllerInteractionModelDelegate::OnReportData(apReadClient, aPath, apData, status);
-}
-
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseStatusCodeReceivedCallback(f);
-}
+{}
 
 void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseProtocolErrorCallback(f);
-}
+{}
 
-void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseCallback(f);
-}
-
-void pychip_InteractionModelDelegate_SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnReportDataCallback(f);
-}
+void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f) {}
 
 void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnWriteResponseStatusCallback(f);
-}
-
-PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()
-{
-    return gPythonInteractionModelDelegate;
-}
+{}
 
 } // namespace Controller
 } // namespace chip

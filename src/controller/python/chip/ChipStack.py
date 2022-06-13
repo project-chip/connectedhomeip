@@ -35,7 +35,16 @@ import logging
 from threading import Lock, Event, Condition
 from ctypes import *
 from .ChipUtility import ChipUtility
+from .storage import *
 from .exceptions import *
+import builtins
+
+from .interaction_model import InteractionModelError, delegate as im
+from .clusters import Command as ClusterCommand
+from .clusters import Attribute as ClusterAttribute
+from .clusters import ClusterObjects as ClusterObjects
+from .clusters import Objects as GeneratedObjects
+from .clusters.CHIPClusters import *
 
 __all__ = [
     "DeviceStatusStruct",
@@ -159,13 +168,17 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, installDefaultLogHandler=True, bluetoothAdapter=0):
+    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True, bluetoothAdapter=None):
+        builtins.enableDebugMode = False
+
         self.networkLock = Lock()
         self.completeEvent = Event()
+        self.commissioningCompleteEvent = Event()
         self._ChipStackLib = None
         self._chipDLLPath = None
         self.devMgr = None
         self.callbackRes = None
+        self.commissioningEventRes = None
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
 
@@ -239,10 +252,28 @@ class ChipStack(object):
         if res != 0:
             raise self.ErrorToException(res)
 
+        if (bluetoothAdapter is None):
+            bluetoothAdapter = 0
+
         res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(
             bluetoothAdapter)
         if res != 0:
             raise self.ErrorToException(res)
+
+        self._persistentStorage = PersistentStorage(persistentStoragePath)
+
+        res = self._ChipStackLib.pychip_DeviceController_StackInit()
+        if res != 0:
+            raise self.ErrorToException(res)
+
+        im.InitIMDelegate()
+        ClusterAttribute.Init()
+        ClusterCommand.Init()
+
+        builtins.chipStack = self
+
+    def GetStorageManager(self):
+        return self._persistentStorage
 
     @property
     def defaultLogFunct(self):
@@ -287,7 +318,10 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        self._ChipStack.Call(lambda: self._dmLib.pychip_Stack_Shutdown())
+        # Make sure PersistentStorage is destructed before chipStack
+        # to avoid accessing builtins.chipStack after destruction.
+        self._persistentStorage = None
+        self.Call(lambda: self._ChipStackLib.pychip_Stack_Shutdown())
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None

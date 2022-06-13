@@ -59,8 +59,8 @@ public:
         }
         if ((fit && (mLen < needed || written != needed)) || (!fit && (mLen >= needed || written != mLen)))
         {
-            printf("Fit(written) is wrong: mLen == %zu, needed == %zu, written == %zu, Fit() == %s\n", mLen, needed, written,
-                   fit ? "true" : "false");
+            printf("Fit(written) is wrong: mLen == %u, needed == %u, written == %u, Fit() == %s\n", static_cast<unsigned int>(mLen),
+                   static_cast<unsigned int>(needed), static_cast<unsigned int>(written), fit ? "true" : "false");
             return false;
         }
 

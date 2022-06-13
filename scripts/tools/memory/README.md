@@ -41,14 +41,15 @@ The following options are common to _most_ of the scripts, where applicable:
 -   `--output-format` _FORMAT_, `--to` _FORMAT_, `-t` _FORMAT_ Output format.
     One of:
     -   `text` — Plain text tables, in a single file.
-    -   `csv` — Comma-separated tables (in several files).
-    -   `tsv` — Tab-separated tables (in several files).
+    -   `csv` — Comma-separated tables (in several files, if not stdout).
+    -   `tsv` — Tab-separated tables (in several files, if not stdout).
     -   `json_split` — JSON - see Pandas documentation for details.
     -   `json_records` — JSON - see Pandas documentation for details.
     -   `json_index` — JSON - see Pandas documentation for details.
     -   `json_columns` — JSON - see Pandas documentation for details.
     -   `json_values` — JSON - see Pandas documentation for details.
     -   `json_table` — JSON - see Pandas documentation for details.
+    -   Any format provided by [tabulate](https://pypi.org/project/tabulate/).
 -   `--report-limit` _BYTES_, `--limit` _BYTES_ Limit display to items above the
     given size. Suffixes (e.g. `K`) are accepted.
 -   `--report-by` _GROUP_, `--by` _GROUP_ Reporting group. One of:

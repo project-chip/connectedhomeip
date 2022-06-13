@@ -22,10 +22,10 @@ chip_device_project_config_include = ""
 
 chip_inet_config_enable_udp_endpoint = true
 chip_inet_config_enable_tcp_endpoint = true
-chip_inet_config_enable_dns_resolver = true
-chip_inet_config_enable_async_dns_sockets = false
 
 chip_custom_build_cflags = []
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]

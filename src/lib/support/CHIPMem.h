@@ -179,6 +179,15 @@ inline UniquePtr<T> MakeUnique(Args &&... args)
     return UniquePtr<T>(New<T>(std::forward<Args>(args)...));
 }
 
+template <typename T>
+using SharedPtr = std::shared_ptr<T>;
+
+template <typename T, typename... Args>
+inline SharedPtr<T> MakeShared(Args &&... args)
+{
+    return SharedPtr<T>(New<T>(std::forward<Args>(args)...), Deleter<T>());
+}
+
 // See MemoryDebugCheckPointer().
 extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);
 

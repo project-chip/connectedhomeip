@@ -1,0 +1,145 @@
+{{#if header}}
+namespace {{asUpperCamelCase name}} {
+    enum class Fields {
+    {{#zcl_struct_items}}
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
+    {{/zcl_struct_items}}
+    };
+
+    struct Type {
+    public:
+        {{#zcl_struct_items}}
+        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+        {{/zcl_struct_items}}
+
+        {{#unless struct_contains_array}}
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+        {{/unless}}
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
+        {{#if struct_is_fabric_scoped}}
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+        }
+
+        CHIP_ERROR EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const;
+        CHIP_ERROR EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+
+    private:
+        CHIP_ERROR DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> &accessingFabricIndex) const;
+        {{else}}
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+        {{/if}}
+    };
+
+    {{#if struct_contains_array}}
+    struct DecodableType {
+    public:
+        {{#zcl_struct_items}}
+        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+        {{/zcl_struct_items}}
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
+        {{#if struct_is_fabric_scoped}}
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+        }
+        {{/if}}
+    };
+    {{else}}
+    using DecodableType = Type;
+    {{/if}}
+
+} // namespace {{asUpperCamelCase name}}
+{{else}}
+namespace {{asUpperCamelCase name}} {
+{{#if struct_is_fabric_scoped}}
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const
+{
+    return DoEncode(writer, tag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
+{
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
+{
+    {{#if struct_has_fabric_sensitive_fields}}
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == {{ asLowerCamelCase struct_fabric_idx_field }});
+    {{/if}}
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    {{#zcl_struct_items}}
+    {{#if (isStrEqual label ../struct_fabric_idx_field)}}
+    if (accessingFabricIndex.HasValue()) {
+      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    }
+    {{else if isFabricSensitive}}
+    if (includeSensitive) {
+       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    }
+    {{else}}
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{/if}}
+    {{/zcl_struct_items}}
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+{{else}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    {{#zcl_struct_items}}
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{/zcl_struct_items}}
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+{{/if}}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR) {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+            {{#zcl_struct_items}}
+            case to_underlying(Fields::k{{asUpperCamelCase label}}):
+                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+                break;
+            {{/zcl_struct_items}}
+            default:
+                break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace {{asUpperCamelCase name}}
+{{/if}}

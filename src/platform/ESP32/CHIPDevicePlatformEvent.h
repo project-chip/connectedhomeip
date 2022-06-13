@@ -28,6 +28,8 @@
 #include <platform/CHIPDeviceEvent.h>
 
 #include <esp_event.h>
+#include <esp_netif_types.h>
+#include <esp_wifi_types.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -60,15 +62,15 @@ struct ChipDevicePlatformEvent final
                 ip_event_got_ip_t IpGotIp;
                 ip_event_got_ip6_t IpGotIp6;
                 ip_event_ap_staipassigned_t IpApStaIpAssigned;
-                wifi_event_sta_scan_done_t WifiStaScanDone;
-                wifi_event_sta_connected_t WifiStaConnected;
-                wifi_event_sta_disconnected_t WifiStaDisconnected;
-                wifi_event_sta_authmode_change_t WifiStaAuthModeChange;
-                wifi_event_sta_wps_er_pin_t WifiStaWpsErPin;
-                wifi_event_sta_wps_fail_reason_t WifiStaWpsErFailed;
-                wifi_event_ap_staconnected_t WifiApStaConnected;
-                wifi_event_ap_stadisconnected_t WifiApStaDisconnected;
-                wifi_event_ap_probe_req_rx_t WifiApProbeReqRecved;
+                wifi_event_sta_scan_done_t WiFiStaScanDone;
+                wifi_event_sta_connected_t WiFiStaConnected;
+                wifi_event_sta_disconnected_t WiFiStaDisconnected;
+                wifi_event_sta_authmode_change_t WiFiStaAuthModeChange;
+                wifi_event_sta_wps_er_pin_t WiFiStaWpsErPin;
+                wifi_event_sta_wps_fail_reason_t WiFiStaWpsErFailed;
+                wifi_event_ap_staconnected_t WiFiApStaConnected;
+                wifi_event_ap_stadisconnected_t WiFiApStaDisconnected;
+                wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
     };

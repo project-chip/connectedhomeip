@@ -45,7 +45,7 @@ typedef bool (*OptionHandlerFunct)(const char * progName, OptionSet * optSet, in
 /**
  * A function that can be called to handle any remaining, non-option command line arguments.
  */
-typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char * argv[]);
+typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char * const argv[]);
 
 /**
  * Defines the argument requirements for a command line option.
@@ -94,10 +94,11 @@ private:
     static bool CallHandleFunct(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 };
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[]);
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
-               bool ignoreUnknown);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[]);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
 bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[]);
 bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
@@ -123,6 +124,8 @@ bool ParseInt(const char * str, uint16_t & output);
 bool ParseInt(const char * str, int32_t & output);
 bool ParseInt(const char * str, uint32_t & output);
 bool ParseInt(const char * str, uint64_t & output);
+bool ParseInt(const char * str, uint8_t & output, int base);
+bool ParseInt(const char * str, uint16_t & output, int base);
 bool ParseInt(const char * str, int32_t & output, int base);
 bool ParseInt(const char * str, uint32_t & output, int base);
 bool ParseInt(const char * str, uint64_t & output, int base);
@@ -147,9 +150,9 @@ public:
     HelpOptions(const char * appName, const char * appUsage, const char * appVersion);
     HelpOptions(const char * appName, const char * appUsage, const char * appVersion, const char * appDesc);
 
-    void PrintBriefUsage(FILE * s);
-    void PrintLongUsage(OptionSet * optSets[], FILE * s);
-    void PrintVersion(FILE * s);
+    void PrintBriefUsage(FILE * s) const;
+    void PrintLongUsage(OptionSet * optSets[], FILE * s) const;
+    void PrintVersion(FILE * s) const;
 
     bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg) override;
 };

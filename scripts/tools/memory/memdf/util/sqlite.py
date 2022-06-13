@@ -20,6 +20,8 @@ import sqlite3
 
 from typing import List, Optional
 
+import pandas as pd  # type: ignore
+
 from memdf import Config, ConfigDescription
 
 CONFIG: ConfigDescription = {
@@ -29,7 +31,7 @@ CONFIG: ConfigDescription = {
     'database.file': {
         'help': 'Sqlite3 file',
         'metavar': 'FILENAME',
-        'default': ':memory:',
+        'default': None,
         'argparse': {
             'alias': ['--db'],
         },
@@ -97,14 +99,27 @@ class Database:
         self.connection().execute(q, v)
 
     def get_matching(self, table: str, columns: List[str], **kwargs):
-        return self.connection().execute(
-            f"SELECT {','.join(columns)} FROM {table}"
-            f"  WHERE {'=? AND '.join(kwargs.keys())}=?",
-            list(kwargs.values()))
+        q = (f"SELECT {','.join(columns)} FROM {table}"
+             f"  WHERE {'=? AND '.join(kwargs.keys())}=?")
+        v = list(kwargs.values())
+        return self.connection().execute(q, v)
 
     def get_matching_id(self, table: str, **kwargs):
-        return self.get_matching(table, ['id'], **kwargs).fetchone()[0]
+        cur = self.get_matching(table, ['id'], **kwargs)
+        row = cur.fetchone()
+        if row:
+            return row[0]
+        return None
 
-    def store_and_return_id(self, table: str, **kwargs) -> int:
+    def store_and_return_id(self, table: str, **kwargs) -> Optional[int]:
         self.store(table, **kwargs)
         return self.get_matching_id(table, **kwargs)
+
+    def data_frame(self, query, parameters=None) -> pd.DataFrame:
+        """Return the results of a query as a DataFrame."""
+        cur = self.execute(query, parameters)
+        columns = [i[0] for i in cur.description]
+        df = pd.DataFrame(cur.fetchall(), columns=columns)
+        self.commit()
+        df.attrs = {'title': query}
+        return df

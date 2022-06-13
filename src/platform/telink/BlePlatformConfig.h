@@ -26,9 +26,8 @@
 
 // ==================== Platform Adaptations ====================
 
-struct bt_conn;
-#define BLE_CONNECTION_OBJECT bt_conn *
-#define BLE_CONNECTION_UNINITIALIZED nullptr
+#define BLE_CONNECTION_OBJECT uint16_t
+#define BLE_CONNECTION_UNINITIALIZED ((uint16_t) 0xFFFF)
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5
 
 // ========== Platform-specific Configuration Overrides =========

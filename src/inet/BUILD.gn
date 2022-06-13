@@ -24,6 +24,10 @@ import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
+if (chip_system_config_use_open_thread_inet_endpoints) {
+  import("//build_overrides/openthread.gni")
+}
+
 declare_args() {
   # Extra header to include in SystemConfig.h for project.
   chip_inet_project_config_include = ""
@@ -36,8 +40,6 @@ buildconfig_header("inet_buildconfig") {
   defines = [
     "INET_CONFIG_TEST=${chip_build_tests}",
     "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
-    "INET_CONFIG_ENABLE_DNS_RESOLVER=${chip_inet_config_enable_dns_resolver}",
-    "INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS=${chip_inet_config_enable_async_dns_sockets}",
     "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
     "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
     "HAVE_LWIP_RAW_BIND_NETIF=true",
@@ -51,6 +53,9 @@ buildconfig_header("inet_buildconfig") {
     defines +=
         [ "INET_PLATFORM_CONFIG_INCLUDE=${chip_inet_platform_config_include}" ]
   }
+
+  defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
+  defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
 }
 
 source_set("inet_config_header") {
@@ -68,14 +73,14 @@ static_library("inet") {
   output_name = "libInetLayer"
 
   sources = [
-    "EndPointBasis.cpp",
     "EndPointBasis.h",
+    "EndPointState${chip_system_config_inet}.h",
     "IANAConstants.h",
     "IPAddress-StringFuncts.cpp",
     "IPAddress.cpp",
     "IPAddress.h",
-    "IPEndPointBasis.cpp",
-    "IPEndPointBasis.h",
+    "IPPacketInfo.cpp",
+    "IPPacketInfo.h",
     "IPPrefix.cpp",
     "IPPrefix.h",
     "Inet.h",
@@ -86,10 +91,7 @@ static_library("inet") {
     "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
-    "InetLayer.cpp",
     "InetLayer.h",
-    "InetLayerBasis.h",
-    "InetLayerEvents.h",
     "arpa-inet-compatibility.h",
   ]
 
@@ -105,10 +107,23 @@ static_library("inet") {
     public_deps += [ "${chip_root}/src/lwip" ]
   }
 
+  if (chip_system_config_use_open_thread_inet_endpoints) {
+    if (chip_openthread_ftd) {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+    }
+  }
+
   if (chip_inet_config_enable_tcp_endpoint) {
     sources += [
       "TCPEndPoint.cpp",
       "TCPEndPoint.h",
+      "TCPEndPointImpl${chip_system_config_inet}.cpp",
+      "TCPEndPointImpl${chip_system_config_inet}.h",
+      "TCPEndPointImpl.h",
     ]
   }
 
@@ -116,20 +131,9 @@ static_library("inet") {
     sources += [
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_dns_resolver) {
-    sources += [
-      "DNSResolver.cpp",
-      "DNSResolver.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_async_dns_sockets) {
-    sources += [
-      "AsyncDNSResolverSockets.cpp",
-      "AsyncDNSResolverSockets.h",
+      "UDPEndPointImpl${chip_system_config_inet}.cpp",
+      "UDPEndPointImpl${chip_system_config_inet}.h",
+      "UDPEndPointImpl.h",
     ]
   }
 

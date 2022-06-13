@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,80 +29,79 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
-#define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_ACCESS_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_AUDIO_OUTPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BINARY_INPUT_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BINDING_CLUSTER_SERVER_ENDPOINT_COUNT (2)
-#define EMBER_AF_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (2)
+#define EMBER_AF_CHANNEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CONTENT_LAUNCH_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_DESCRIPTOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (3)
 #define EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_FIXED_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_FIXED_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_IAS_ZONE_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_KEYPAD_INPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_LEVEL_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_MEDIA_INPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_TV_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_TARGET_NAVIGATOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_UNIT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
-// Use this macro to check if the server side of the Account Login cluster is included
-#define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_SERVER
-#define EMBER_AF_PLUGIN_ACCOUNT_LOGIN
+// Use this macro to check if the server side of the Access Control cluster is included
+#define ZCL_USING_ACCESS_CONTROL_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_ACCESS_CONTROL_SERVER
+#define EMBER_AF_PLUGIN_ACCESS_CONTROL
+
+// Use this macro to check if the client side of the Account Login cluster is included
+#define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_CLIENT
 
 // Use this macro to check if the server side of the AdministratorCommissioning cluster is included
 #define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING
 
-// Use this macro to check if the server side of the Application Basic cluster is included
-#define ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_APPLICATION_BASIC_SERVER
-#define EMBER_AF_PLUGIN_APPLICATION_BASIC
+// Use this macro to check if the client side of the Application Basic cluster is included
+#define ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_APPLICATION_BASIC_CLIENT
 
-// Use this macro to check if the server side of the Application Launcher cluster is included
-#define ZCL_USING_APPLICATION_LAUNCHER_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_APPLICATION_LAUNCHER_SERVER
-#define EMBER_AF_PLUGIN_APPLICATION_LAUNCHER
+// Use this macro to check if the client side of the Application Launcher cluster is included
+#define ZCL_USING_APPLICATION_LAUNCHER_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_APPLICATION_LAUNCHER_CLIENT
 
-// Use this macro to check if the server side of the Audio Output cluster is included
-#define ZCL_USING_AUDIO_OUTPUT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
-#define EMBER_AF_PLUGIN_AUDIO_OUTPUT
+// Use this macro to check if the client side of the Audio Output cluster is included
+#define ZCL_USING_AUDIO_OUTPUT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_AUDIO_OUTPUT_CLIENT
 
 // Use this macro to check if the server side of the Barrier Control cluster is included
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_SERVER
@@ -124,24 +123,17 @@
 #define EMBER_AF_PLUGIN_BINDING_SERVER
 #define EMBER_AF_PLUGIN_BINDING
 
-// Use this macro to check if the server side of the Bridged Device Basic cluster is included
-#define ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_BRIDGED_DEVICE_BASIC_SERVER
-#define EMBER_AF_PLUGIN_BRIDGED_DEVICE_BASIC
+// Use this macro to check if the client side of the Channel cluster is included
+#define ZCL_USING_CHANNEL_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CHANNEL_CLIENT
 
-// Use this macro to check if the server side of the Color Control cluster is included
-#define ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER
-#define EMBER_AF_PLUGIN_COLOR_CONTROL
-// User options for server plugin Color Control
-#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+// Use this macro to check if the client side of the Content Launcher cluster is included
+#define ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER_CLIENT
 
-// Use this macro to check if the server side of the Content Launcher cluster is included
-#define ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER_SERVER
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER
+// Use this macro to check if the client side of the Descriptor cluster is included
+#define ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_DESCRIPTOR_CLIENT
 
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
@@ -153,11 +145,6 @@
 #define EMBER_AF_PLUGIN_DIAGNOSTIC_LOGS_SERVER
 #define EMBER_AF_PLUGIN_DIAGNOSTIC_LOGS
 
-// Use this macro to check if the server side of the Door Lock cluster is included
-#define ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
-#define EMBER_AF_PLUGIN_DOOR_LOCK
-
 // Use this macro to check if the server side of the Ethernet Network Diagnostics cluster is included
 #define ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ETHERNET_NETWORK_DIAGNOSTICS_SERVER
@@ -167,11 +154,6 @@
 #define ZCL_USING_FIXED_LABEL_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_FIXED_LABEL_SERVER
 #define EMBER_AF_PLUGIN_FIXED_LABEL
-
-// Use this macro to check if the server side of the Flow Measurement cluster is included
-#define ZCL_USING_FLOW_MEASUREMENT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_FLOW_MEASUREMENT_SERVER
-#define EMBER_AF_PLUGIN_FLOW_MEASUREMENT
 
 // Use this macro to check if the server side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
@@ -205,29 +187,35 @@
 #define EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY
 
-// Use this macro to check if the server side of the Keypad Input cluster is included
-#define ZCL_USING_KEYPAD_INPUT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_KEYPAD_INPUT_SERVER
-#define EMBER_AF_PLUGIN_KEYPAD_INPUT
+// Use this macro to check if the client side of the Keypad Input cluster is included
+#define ZCL_USING_KEYPAD_INPUT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_KEYPAD_INPUT_CLIENT
+
+// Use this macro to check if the client side of the Level Control cluster is included
+#define ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_CLIENT
 
 // Use this macro to check if the server side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL
 // User options for server plugin Level Control
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
 
-// Use this macro to check if the server side of the Media Input cluster is included
-#define ZCL_USING_MEDIA_INPUT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_MEDIA_INPUT_SERVER
-#define EMBER_AF_PLUGIN_MEDIA_INPUT
+// Use this macro to check if the server side of the Localization Configuration cluster is included
+#define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION
 
-// Use this macro to check if the server side of the Media Playback cluster is included
-#define ZCL_USING_MEDIA_PLAYBACK_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_MEDIA_PLAYBACK_SERVER
-#define EMBER_AF_PLUGIN_MEDIA_PLAYBACK
+// Use this macro to check if the client side of the Media Input cluster is included
+#define ZCL_USING_MEDIA_INPUT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_MEDIA_INPUT_CLIENT
+
+// Use this macro to check if the client side of the Media Playback cluster is included
+#define ZCL_USING_MEDIA_PLAYBACK_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_MEDIA_PLAYBACK_CLIENT
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
@@ -239,10 +227,9 @@
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_PROVIDER_SERVER
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_PROVIDER
 
-// Use this macro to check if the server side of the Occupancy Sensing cluster is included
-#define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_SERVER
-#define EMBER_AF_PLUGIN_OCCUPANCY_SENSING
+// Use this macro to check if the client side of the On/Off cluster is included
+#define ZCL_USING_ON_OFF_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ON_OFF_CLIENT
 
 // Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
@@ -254,22 +241,22 @@
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS
 
-// Use this macro to check if the server side of the Pressure Measurement cluster is included
-#define ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_PRESSURE_MEASUREMENT_SERVER
-#define EMBER_AF_PLUGIN_PRESSURE_MEASUREMENT
-
-// Use this macro to check if the server side of the Relative Humidity Measurement cluster is included
-#define ZCL_USING_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER
-#define EMBER_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT
-
 // Use this macro to check if the server side of the Scenes cluster is included
 #define ZCL_USING_SCENES_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_SCENES_SERVER
 #define EMBER_AF_PLUGIN_SCENES
 // User options for server plugin Scenes
-#define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
+// Cluster spec 1.4.8.2
+#ifdef CHIP_CONFIG_MAX_SCENES_PER_FABRIC
+#define MATTER_SCENES_TABLE_SIZE CHIP_CONFIG_MAX_SCENES_PER_FABRIC
+#else
+#define MATTER_SCENES_TABLE_SIZE 16
+#endif
+
+// Scenes FeatureMap Attribute Toggle Scenes Name feature
+// App cluster specs 1.4.4
+#define MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK 0x0001
+#define MATTER_CLUSTER_SCENE_NAME_SUPPORT (0x0000 & MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK)
 
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER
@@ -281,35 +268,34 @@
 #define EMBER_AF_PLUGIN_SWITCH_SERVER
 #define EMBER_AF_PLUGIN_SWITCH
 
-// Use this macro to check if the server side of the TV Channel cluster is included
-#define ZCL_USING_TV_CHANNEL_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_TV_CHANNEL_SERVER
-#define EMBER_AF_PLUGIN_TV_CHANNEL
-
-// Use this macro to check if the server side of the Target Navigator cluster is included
-#define ZCL_USING_TARGET_NAVIGATOR_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_TARGET_NAVIGATOR_SERVER
-#define EMBER_AF_PLUGIN_TARGET_NAVIGATOR
-
-// Use this macro to check if the server side of the Temperature Measurement cluster is included
-#define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
-#define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT
+// Use this macro to check if the client side of the Target Navigator cluster is included
+#define ZCL_USING_TARGET_NAVIGATOR_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TARGET_NAVIGATOR_CLIENT
 
 // Use this macro to check if the server side of the Test Cluster cluster is included
 #define ZCL_USING_TEST_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_TEST_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_TEST_CLUSTER
 
-// Use this macro to check if the server side of the Thermostat cluster is included
-#define ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_THERMOSTAT_SERVER
-#define EMBER_AF_PLUGIN_THERMOSTAT
-
 // Use this macro to check if the server side of the Thread Network Diagnostics cluster is included
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
+
+// Use this macro to check if the server side of the Time Format Localization cluster is included
+#define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
+#define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION
+
+// Use this macro to check if the server side of the Unit Localization cluster is included
+#define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_UNIT_LOCALIZATION_SERVER
+#define EMBER_AF_PLUGIN_UNIT_LOCALIZATION
+
+// Use this macro to check if the server side of the User Label cluster is included
+#define ZCL_USING_USER_LABEL_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_USER_LABEL_SERVER
+#define EMBER_AF_PLUGIN_USER_LABEL
 
 // Use this macro to check if the server side of the Wake on LAN cluster is included
 #define ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER
@@ -320,8 +306,3 @@
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS
-
-// Use this macro to check if the server side of the Window Covering cluster is included
-#define ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_WINDOW_COVERING_SERVER
-#define EMBER_AF_PLUGIN_WINDOW_COVERING

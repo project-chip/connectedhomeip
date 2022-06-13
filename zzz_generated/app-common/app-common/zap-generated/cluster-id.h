@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,11 +61,23 @@ static constexpr chip::ClusterId ZCL_POWER_PROFILE_CLUSTER_ID = 0x001A;
 // Definitions for cluster: Appliance Control
 static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 
+// Definitions for cluster: Pulse Width Modulation
+static constexpr chip::ClusterId ZCL_PWM_CLUSTER_ID = 0x001C;
+
 // Definitions for cluster: Descriptor
 static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 
+// Definitions for cluster: Binding
+static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0x001E;
+
+// Definitions for cluster: Access Control
+static constexpr chip::ClusterId ZCL_ACCESS_CONTROL_CLUSTER_ID = 0x001F;
+
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
+
+// Definitions for cluster: Bridged Actions
+static constexpr chip::ClusterId ZCL_BRIDGED_ACTIONS_CLUSTER_ID = 0x0025;
 
 // Definitions for cluster: Basic
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
@@ -75,6 +87,18 @@ static constexpr chip::ClusterId ZCL_OTA_PROVIDER_CLUSTER_ID = 0x0029;
 
 // Definitions for cluster: OTA Software Update Requestor
 static constexpr chip::ClusterId ZCL_OTA_REQUESTOR_CLUSTER_ID = 0x002A;
+
+// Definitions for cluster: Localization Configuration
+static constexpr chip::ClusterId ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID = 0x002B;
+
+// Definitions for cluster: Time Format Localization
+static constexpr chip::ClusterId ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID = 0x002C;
+
+// Definitions for cluster: Unit Localization
+static constexpr chip::ClusterId ZCL_UNIT_LOCALIZATION_CLUSTER_ID = 0x002D;
+
+// Definitions for cluster: Power Source Configuration
+static constexpr chip::ClusterId ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID = 0x002E;
 
 // Definitions for cluster: Power Source
 static constexpr chip::ClusterId ZCL_POWER_SOURCE_CLUSTER_ID = 0x002F;
@@ -103,6 +127,9 @@ static constexpr chip::ClusterId ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x003
 // Definitions for cluster: Ethernet Network Diagnostics
 static constexpr chip::ClusterId ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x0037;
 
+// Definitions for cluster: Time Synchronization
+static constexpr chip::ClusterId ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID = 0x0038;
+
 // Definitions for cluster: Bridged Device Basic
 static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;
 
@@ -115,8 +142,29 @@ static constexpr chip::ClusterId ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID = 0x
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
 
+// Definitions for cluster: Group Key Management
+static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0x003F;
+
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
+
+// Definitions for cluster: User Label
+static constexpr chip::ClusterId ZCL_USER_LABEL_CLUSTER_ID = 0x0041;
+
+// Definitions for cluster: Proxy Configuration
+static constexpr chip::ClusterId ZCL_PROXY_CONFIGURATION_CLUSTER_ID = 0x0042;
+
+// Definitions for cluster: Proxy Discovery
+static constexpr chip::ClusterId ZCL_PROXY_DISCOVERY_CLUSTER_ID = 0x0043;
+
+// Definitions for cluster: Proxy Valid
+static constexpr chip::ClusterId ZCL_PROXY_VALID_CLUSTER_ID = 0x0044;
+
+// Definitions for cluster: Boolean State
+static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
+
+// Definitions for cluster: Mode Select
+static constexpr chip::ClusterId ZCL_MODE_SELECT_CLUSTER_ID = 0x0050;
 
 // Definitions for cluster: Shade Configuration
 static constexpr chip::ClusterId ZCL_SHADE_CONFIG_CLUSTER_ID = 0x0100;
@@ -152,10 +200,7 @@ static constexpr chip::ClusterId ZCL_COLOR_CONTROL_CLUSTER_ID = 0x0300;
 static constexpr chip::ClusterId ZCL_BALLAST_CONFIGURATION_CLUSTER_ID = 0x0301;
 
 // Definitions for cluster: Illuminance Measurement
-static constexpr chip::ClusterId ZCL_ILLUM_MEASUREMENT_CLUSTER_ID = 0x0400;
-
-// Definitions for cluster: Illuminance Level Sensing
-static constexpr chip::ClusterId ZCL_ILLUM_LEVEL_SENSING_CLUSTER_ID = 0x0401;
+static constexpr chip::ClusterId ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID = 0x0400;
 
 // Definitions for cluster: Temperature Measurement
 static constexpr chip::ClusterId ZCL_TEMP_MEASUREMENT_CLUSTER_ID = 0x0402;
@@ -274,8 +319,8 @@ static constexpr chip::ClusterId ZCL_IAS_WD_CLUSTER_ID = 0x0502;
 // Definitions for cluster: Wake on LAN
 static constexpr chip::ClusterId ZCL_WAKE_ON_LAN_CLUSTER_ID = 0x0503;
 
-// Definitions for cluster: TV Channel
-static constexpr chip::ClusterId ZCL_TV_CHANNEL_CLUSTER_ID = 0x0504;
+// Definitions for cluster: Channel
+static constexpr chip::ClusterId ZCL_CHANNEL_CLUSTER_ID = 0x0504;
 
 // Definitions for cluster: Target Navigator
 static constexpr chip::ClusterId ZCL_TARGET_NAVIGATOR_CLUSTER_ID = 0x0505;
@@ -307,9 +352,6 @@ static constexpr chip::ClusterId ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
 // Definitions for cluster: Account Login
 static constexpr chip::ClusterId ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
 
-// Definitions for cluster: Test Cluster
-static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0x050F;
-
 // Definitions for cluster: Messaging
 static constexpr chip::ClusterId ZCL_MESSAGING_CLUSTER_ID = 0x0703;
 
@@ -328,14 +370,5 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
 
-// Definitions for cluster: Binding
-static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0xF000;
-
-// Definitions for cluster: Group Key Management
-static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
-
-// Definitions for cluster: Sample Mfg Specific Cluster
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
-
-// Definitions for cluster: Sample Mfg Specific Cluster 2
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID = 0xFC00;
+// Definitions for cluster: Test Cluster
+static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0xFFF1FC05;

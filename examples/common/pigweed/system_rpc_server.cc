@@ -33,7 +33,7 @@ stream::SysIoWriter writer;
 stream::SysIoReader reader;
 
 // Set up the output channel for the pw_rpc server to use.
-hdlc::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
+hdlc::RpcChannelOutput hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
 Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
 rpc::Server server(channels);
 

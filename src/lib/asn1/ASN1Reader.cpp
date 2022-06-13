@@ -30,10 +30,13 @@
 #include <stdlib.h>
 
 #include <lib/asn1/ASN1.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace ASN1 {
+
+using namespace chip::Encoding;
 
 void ASN1Reader::Init(const uint8_t * buf, size_t len)
 {
@@ -142,17 +145,24 @@ bool ASN1Reader::IsContained() const
 
 CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 {
+    uint8_t encodedVal[sizeof(int64_t)] = { 0 };
+    size_t valPaddingLen                = sizeof(int64_t) - ValueLen;
+
     ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 
-    const uint8_t * p = Value;
-    val               = ((*p & 0x80) == 0) ? 0 : -1;
-    for (uint32_t i = ValueLen; i > 0; i--, p++)
+    if ((*Value & 0x80) == 0x80)
     {
-        val = (val << 8) | *p;
+        for (size_t i = 0; i < valPaddingLen; i++)
+        {
+            encodedVal[i] = 0xFF;
+        }
     }
+    memcpy(&encodedVal[valPaddingLen], Value, ValueLen);
+
+    val = static_cast<int64_t>(BigEndian::Get64(encodedVal));
 
     return CHIP_NO_ERROR;
 }
@@ -297,7 +307,7 @@ CHIP_ERROR ASN1Reader::DecodeHead()
 
     mHeadLen = static_cast<uint32_t>(p - mElemStart);
 
-    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && Constructed == false && ValueLen == 0);
+    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && !Constructed && ValueLen == 0);
 
     Value = p;
 
@@ -342,8 +352,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
                     nestLevel--;
                     continue;
                 }
-                else
-                    break;
+                break;
             }
             printf("ASN1Reader::Next() failed: %" CHIP_ERROR_FORMAT "\n", err.Format());
             return err;

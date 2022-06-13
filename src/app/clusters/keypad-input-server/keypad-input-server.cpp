@@ -21,45 +21,125 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
+#include <app/clusters/keypad-input-server/keypad-input-delegate.h>
+#include <app/clusters/keypad-input-server/keypad-input-server.h>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/data-model/Encode.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::KeypadInput;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
+static constexpr size_t kKeypadInputDelegateTableSize =
+    EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-static void sendResponse(app::CommandHandler * command, EmberAfKeypadInputStatus keypadInputStatus)
+// -----------------------------------------------------------------------------
+// Delegate Implementation
+
+using chip::app::Clusters::KeypadInput::Delegate;
+
+namespace {
+
+Delegate * gDelegateTable[kKeypadInputDelegateTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_KEYPAD_INPUT_CLUSTER_ID,
-                                         ZCL_SEND_KEY_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-
-    VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), keypadInputStatus));
-    SuccessOrExit(err = command->FinishCommand());
-
-exit:
-    if (err != CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
-        ChipLogError(Zcl, "Failed to encode KeypadInputResponse command. Error:%s", ErrorStr(err));
+        ChipLogProgress(Zcl, "KeypadInput returning ContentApp delegate for endpoint:%u", endpoint);
+        return app->GetKeypadInputDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogProgress(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%u", endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+}
+
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+{
+    if (delegate == nullptr)
+    {
+        ChipLogProgress(Zcl, "Keypad Input has no delegate set for endpoint:%u", endpoint);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace KeypadInput {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
     }
 }
+
+bool HasFeature(chip::EndpointId endpoint, KeypadInputFeature feature)
+{
+    bool hasFeature     = false;
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        hasFeature = (featureMap & chip::to_underlying(feature));
+    }
+
+    return hasFeature;
+}
+
+} // namespace KeypadInput
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
 
 bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                               const Commands::SendKey::DecodableType & commandData)
 {
-    auto & keyCode = commandData.keyCode;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & keyCode      = commandData.keyCode;
+    app::CommandResponseHelper<Commands::SendKeyResponse::Type> responder(command, commandPath);
 
-    EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
-    sendResponse(command, status);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    {
+        delegate->HandleSendKey(responder, keyCode);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfKeypadInputClusterSendKeyCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
     return true;
 }
+
+void MatterKeypadInputPluginServerInitCallback() {}

@@ -1,0 +1,175 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+#include "CHIPReadCallbacks.h"
+
+#include <zap-generated/CHIPClientCallbacks.h>
+
+#include <jni.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/PlatformManager.h>
+
+{{#chip_server_global_responses}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+
+CHIP{{chipCallback.name}}AttributeCallback::CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr) {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr) {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIP{{chipCallback.name}}AttributeCallback::~CHIP{{chipCallback.name}}AttributeCallback() {
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{chipCallback.type}} value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{chipCallback.name}}AttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    {{#unless (isStrEqual chipCallback.name "OctetString")}}
+    {{#unless (isStrEqual chipCallback.name "CharString")}}
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{convertCTypeToJniSignature chipCallback.type false}})V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{convertBasicCTypeToJniType chipCallback.type}}>(value));
+    {{/unless}}
+    {{/unless}}
+
+    {{#if (isStrEqual chipCallback.name "OctetString")}}
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+    jbyteArray valueArr = env->NewByteArray(value.size());
+    env->ExceptionClear();
+    env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
+    {{/if}}
+
+    {{#if (isStrEqual chipCallback.name "CharString")}}
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+    chip::UtfString valueStr(env, value);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
+    {{/if}}
+}
+{{/unless}}
+{{/chip_server_global_responses}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+
+{{#if_basic_global_response}}
+{{else}}
+CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr) {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr) {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback() {
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+{{/if_basic_global_response}}
+
+{{#if isArray}}
+void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    {{>decode_value source="list" target="arrayListObj" cluster=(asUpperCamelCase parent.name) depth=0}}
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+{{else}}
+  {{#if_basic_global_response}}
+  {{else}}
+    void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+        std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jmethodID javaMethod;
+        err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignatureBasic type true}}{{/if}})V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        {{>decode_value source="value" target="javaValue" cluster=(asUpperCamelCase parent.name) depth=0}}
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+    }
+  {{/if_basic_global_response}}
+{{/if}}
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{/if}}

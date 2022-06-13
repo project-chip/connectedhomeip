@@ -31,7 +31,8 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
            lwip_platform == "k32w0" || lwip_platform == "qpg" ||
-           lwip_platform == "mbed" || lwip_platform == "p6",
+           lwip_platform == "mbed" || lwip_platform == "p6" ||
+           lwip_platform == "cyw30739" || lwip_platform == "bl602",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -47,10 +48,15 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/efr32_sdk.gni")
 } else if (lwip_platform == "qpg") {
   import("//build_overrides/qpg_sdk.gni")
+  import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (lwip_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
 } else if (lwip_platform == "p6") {
   import("//build_overrides/p6.gni")
+} else if (lwip_platform == "cyw30739") {
+  import("//build_overrides/cyw30739_sdk.gni")
+} else if (lwip_platform == "bl602") {
+  import("//build_overrides/bl602_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -59,7 +65,7 @@ buildconfig_header("lwip_buildconfig") {
 
   defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
   if (lwip_platform != "external") {
-    if (is_debug) {
+    if (lwip_debug) {
       # Automatically enable LWIP_DEBUG for internal is_debug builds.
       defines += [ "LWIP_DEBUG=1" ]
     }
@@ -76,6 +82,47 @@ if (current_os == "zephyr" || current_os == "mbed") {
 } else if (lwip_platform == "external") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "p6") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "qpg") {
+  config("lwip_config") {
+    include_dirs = [ "freertos" ]
+  }
+
+  lwip_target("lwip") {
+    public = [
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/cc.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/perf.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwipopts.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwippools.h",
+      "freertos/arch/sys_arch.h",
+    ]
+    sources = [ "${qpg_sdk_root}/Components/ThirdParty/Lwip/sys_arch.c" ]
+
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
+  }
+} else if (lwip_platform == "bl602") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
   }
 
   group("all") {
@@ -102,6 +149,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     if (lwip_platform == "standalone") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
+    } else if (lwip_platform == "cyw30739") {
     } else {
       public += [
         "${lwip_platform}/lwippools.h",
@@ -115,21 +163,19 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
-    } else if (lwip_platform == "qpg") {
-      public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+    } else if (lwip_platform == "cyw30739") {
+      public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
+    } else if (lwip_platform == "bl602") {
+      public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
     }
 
     public_configs = [
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
-
-    if (lwip_platform == "p6") {
-      public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
-    }
   }
 }

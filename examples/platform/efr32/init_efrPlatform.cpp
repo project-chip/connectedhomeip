@@ -53,6 +53,7 @@ extern "C" {
 
 #include "init_efrPlatform.h"
 #include "sl_component_catalog.h"
+#include "sl_mbedtls.h"
 #include "sl_system_init.h"
 
 #if DISPLAY_ENABLED
@@ -64,6 +65,7 @@ void initAntenna(void);
 void init_efrPlatform(void)
 {
     sl_system_init();
+    sl_mbedtls_init();
 
 #if DISPLAY_ENABLED
     initLCD();

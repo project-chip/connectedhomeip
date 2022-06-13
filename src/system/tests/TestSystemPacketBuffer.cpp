@@ -37,6 +37,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -47,11 +48,11 @@
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
-#define PBUF_TYPE(pbuf) (pbuf)->type_internal
-#else
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #define PBUF_TYPE(pbuf) (pbuf)->type
-#endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_TYPE(pbuf) (pbuf)->type_internal
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::Encoding::PacketBufferWriter;
@@ -136,7 +137,7 @@ public:
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
         printf("%s %p ref=%u len=%-4u next=%p\n", tag, buffer, buffer ? buffer->ref : 0, buffer ? buffer->len : 0,
-               buffer ? buffer->next : 0);
+               buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
 
@@ -214,6 +215,10 @@ PacketBufferTest::PacketBufferTest(TestContext * context) : mContext(context)
 int PacketBufferTest::TestSetup(void * inContext)
 {
     chip::Platform::MemoryInit();
+
+    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
+        return FAILURE;
+
     TestContext * const theContext = reinterpret_cast<TestContext *>(inContext);
     theContext->test               = new PacketBufferTest(theContext);
     if (theContext->test == nullptr)
@@ -225,6 +230,13 @@ int PacketBufferTest::TestSetup(void * inContext)
 
 int PacketBufferTest::TestTeardown(void * inContext)
 {
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().Shutdown();
+    // RTOS shutdown is not implemented, ignore CHIP_ERROR_NOT_IMPLEMENTED
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_IMPLEMENTED)
+        return FAILURE;
+
+    chip::Platform::MemoryShutdown();
+
     return SUCCESS;
 }
 
@@ -279,7 +291,8 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
         config->handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
         if (config->handle.IsNull())
         {
-            printf("NewPacketBuffer: Failed to allocate packet buffer (%zu retained): %s\n", handles.size(), strerror(errno));
+            printf("NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s\n",
+                   static_cast<unsigned int>(handles.size()), strerror(errno));
             exit(EXIT_FAILURE);
         }
         if (flags & kRecordHandle)
@@ -332,12 +345,12 @@ bool PacketBufferTest::ResetHandles()
         const PacketBufferHandle & handle = handles[i];
         if (handle.Get() == nullptr)
         {
-            printf("TestTerminate: handle %zu null\n", i);
+            printf("TestTerminate: handle %u null\n", static_cast<unsigned int>(i));
             handles_ok = false;
         }
         else if (handle->ref != 1)
         {
-            printf("TestTerminate: handle %zu buffer=%p ref=%u\n", i, handle.Get(), handle->ref);
+            printf("TestTerminate: handle %u buffer=%p ref=%u\n", static_cast<unsigned int>(i), handle.Get(), handle->ref);
             handles_ok = false;
             while (handle->ref > 1)
             {
@@ -390,7 +403,7 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
     // Use the rest of the buffer space
     std::vector<PacketBufferHandle> allocate_all_the_things;
     for (;;)
@@ -403,7 +416,7 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
         // Hold on to the buffer, to use up all the buffer space.
         allocate_all_the_things.push_back(std::move(buffer));
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 }
 
 /**
@@ -521,7 +534,7 @@ void PacketBufferTest::CheckDataLength(nlTestSuite * inSuite, void * inContext)
  *               without specifying the head of the buffer chain. Otherwise,
  *               test SetDataLength with one buffer being down the chain and the
  *               other one being passed as the head of the chain. After calling
- *               the method verify that data lenghts were correctly adjusted.
+ *               the method verify that data lengths were correctly adjusted.
  */
 void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 {
@@ -1783,20 +1796,20 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
         NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
     }
 
-#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
 
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer != buffer);
     NL_TEST_ASSERT(inSuite, handle->DataLength() == sizeof kPayload);
     NL_TEST_ASSERT(inSuite, memcmp(handle->Start(), kPayload, sizeof kPayload) == 0);
 
-#else // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+#else // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
 
     // For this configuration, RightSize() does nothing.
     handle.RightSize();
     NL_TEST_ASSERT(inSuite, handle.mBuffer == buffer);
 
-#endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+#endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
 }
 
 void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inContext)
@@ -1874,7 +1887,7 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
         }
     }
 
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 
     // It is possible for a packet buffer allocation to return a larger block than requested (e.g. when using a shared pool)
     // and in particular to return a larger block than it is possible to request from PackBufferHandle::New().
@@ -1920,7 +1933,7 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     // Free the packet buffer memory ourselves, since we allocated it ourselves.
     chip::Platform::MemoryFree(std::move(handle).UnsafeRelease());
 
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 }
 
 void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inContext)

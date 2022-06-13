@@ -15,53 +15,90 @@
 name: 9.1.1. [TC-RH-1.1] Global attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
     endpoint: 1
 
 tests:
-    - label: "read the global attribute: ClusterRevision"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
+          "Read ClusterRevision attribute from the DUT and Verify that the DUT
+          response indicates ClusterRevision attribute has the value 3"
+      verification: |
+          ./chip-tool relativehumiditymeasurement read cluster-revision 1 1
+          verify that you see something like this:
+          [1643287333.135402][12177:12182] CHIP:DMG:  Data = 3,
+          [1643287333.135504][12177:12182] CHIP:DMG:                         }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 1
-      response:
-          error: 1
+          values:
+              - name: "message"
+                value: "Enter the Value"
+              - name: "expectedValue"
+                value: 3
 
-    - label: "reads back global attribute: ClusterRevision"
-      disabled: true
+    #Disabled due to issue 17462
+    - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "AttributeList"
       response:
-          value: 1
+          value: [0, 1, 2]
+          constraints:
+              type: list
 
-    - label: "read the optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "FeatureMap"
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: 1
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
-      attribute: "FeatureMap"
+      attribute: "AcceptedCommandList"
       response:
-          value: 0
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Read FeatureMap attribute from the DUT and Verify that the DUT
+          response"
+      verification: |
+          ./chip-tool lowpower read feature-map 1 1
+          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter FeatureMap attribute value"
+              - name: "expectedValue"
+                value: 0

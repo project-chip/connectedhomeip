@@ -45,14 +45,14 @@
 
 using namespace chip;
 
-uint8_t * emAfZclBuffer   = NULL;
+uint8_t * emAfZclBuffer   = nullptr;
 uint16_t emAfZclBufferLen = 0;
 
 // Pointer to where this API should put the length
-uint16_t * emAfResponseLengthPtr = NULL;
+uint16_t * emAfResponseLengthPtr = nullptr;
 
 // Pointer to where the API should put the cluster ID
-EmberApsFrame * emAfCommandApsFrame = NULL;
+EmberApsFrame * emAfCommandApsFrame = nullptr;
 
 /////////////////
 
@@ -101,7 +101,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         char cmd;
         value    = 0;
         valueLen = 0;
-        data     = 0;
+        data     = nullptr;
         cmd      = format[i];
         if (cmd <= 's')
         {
@@ -231,7 +231,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         // explicit check.
         if (dataLen != 0)
         {
-            if (data == NULL)
+            if (data == nullptr)
             {
                 emberAfDebugPrintln("ERR: Missing data for %d bytes for format '%c'", dataLen, cmd);
                 return 0;
@@ -254,21 +254,6 @@ void emberAfSetExternalBuffer(uint8_t * buffer, uint16_t bufferLen, uint16_t * l
     emAfCommandApsFrame   = apsFrame;
 }
 
-uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, ClusterId clusterId, uint16_t manufacturerCode,
-                                                       CommandId commandId, const char * format, ...)
-{
-    uint16_t returnValue;
-    va_list argPointer;
-
-    va_start(argPointer, format);
-    returnValue = vFillBuffer(emAfZclBuffer, emAfZclBufferLen, frameControl, manufacturerCode, commandId, format, argPointer);
-    va_end(argPointer);
-    *emAfResponseLengthPtr         = returnValue;
-    emAfCommandApsFrame->clusterId = clusterId;
-    emAfCommandApsFrame->options   = EMBER_AF_DEFAULT_APS_OPTIONS;
-    return returnValue;
-}
-
 uint16_t emberAfFillExternalBuffer(uint8_t frameControl, ClusterId clusterId, CommandId commandId, const char * format, ...)
 {
     uint16_t returnValue;
@@ -283,96 +268,6 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, ClusterId clusterId, Co
     emAfCommandApsFrame->options   = EMBER_AF_DEFAULT_APS_OPTIONS;
     return returnValue;
 }
-
-uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, CommandId commandId, const char * format,
-                           ...)
-{
-    uint16_t returnValue;
-    va_list argPointer;
-    va_start(argPointer, format);
-    returnValue = vFillBuffer(buffer, bufferLen, frameControl, EMBER_AF_NULL_MANUFACTURER_CODE, commandId, format, argPointer);
-    va_end(argPointer);
-    return returnValue;
-}
-
-EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
-{
-    return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-}
-
-EmberStatus emberAfSendCommandUnicastToBindings(void)
-{
-    return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
-}
-
-// EmberStatus emberAfSendCommandMulticastWithCallback(GroupId multicastId, EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendMulticastWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
-
-// EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(GroupId multicastId, EmberNodeId alias, uint8_t sequence,
-//                                                              EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendMulticastWithAliasWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-//     alias,
-//                                                      sequence, callback);
-// }
-
-// EmberStatus emberAfSendCommandMulticast(GroupId multicastId)
-// {
-//     return emberAfSendCommandMulticastWithCallback(multicastId, NULL);
-// }
-
-// EmberStatus emberAfSendCommandMulticastWithAlias(GroupId multicastId, EmberNodeId alias, uint8_t sequence)
-// {
-//     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
-// }
-
-EmberStatus emberAfSendCommandMulticastToBindings(void)
-{
-    return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
-}
-
-// EmberStatus emberAfSendCommandUnicastWithCallback(const chip::MessageSendDestination & destination, EmberAfMessageSentFunction
-// callback)
-// {
-//     return emberAfSendUnicastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
-
-// EmberStatus emberAfSendCommandUnicast(const chip::MessageSendDestination & destination)
-// {
-//     return emberAfSendCommandUnicastWithCallback(destination, NULL);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithCallback(EmberNodeId destination, EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendBroadcastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithAliasWithCallback(EmberNodeId destination, EmberNodeId alias, uint8_t sequence,
-//                                                              EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendBroadcastWithAliasWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
-//     alias,
-//                                                      sequence, callback);
-// }
-
-// EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberNodeId alias, uint8_t sequence)
-// {
-//     return emberAfSendCommandBroadcastWithAliasWithCallback(destination, alias, sequence, NULL);
-// }
-
-// EmberStatus emberAfSendCommandBroadcast(EmberNodeId destination)
-// {
-//     return emberAfSendCommandBroadcastWithCallback(destination, NULL);
-// }
-
-// EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-//                                        GroupId multicastId)
-// {
-//     return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId,
-//                                *emAfResponseLengthPtr, emAfZclBuffer);
-// }
 
 EmberApsFrame * emberAfGetCommandApsFrame(void)
 {

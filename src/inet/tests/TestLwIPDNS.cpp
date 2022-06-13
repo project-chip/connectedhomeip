@@ -39,7 +39,6 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetArgParser.h>
-#include <inet/InetLayer.h>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
@@ -51,7 +50,7 @@ using namespace chip::Inet;
 
 #define TOOL_NAME "TestLwIPDNS"
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // Globals
 
@@ -88,7 +87,7 @@ static void found_multi(const char * aName, ip_addr_t * aIpAddrs, uint8_t aNumIp
     {
         char addrStr[INET6_ADDRSTRLEN];
 
-        IPAddress::FromIPv4(aIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+        IPAddress(aIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
 
         printf("\t(%d) IPv4: %s\n", i, addrStr);
     }
@@ -145,7 +144,7 @@ static void TestLwIPDNS(void)
         for (uint8_t i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }
@@ -171,7 +170,7 @@ static void TestLwIPDNS(void)
         for (i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }
@@ -197,7 +196,7 @@ static void TestLwIPDNS(void)
         for (i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }
@@ -240,7 +239,7 @@ int main(int argc, char * argv[])
     return (EXIT_SUCCESS);
 }
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc < 2)
     {

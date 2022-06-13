@@ -16,158 +16,157 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/enums.h>
-#include <app/server/Server.h>
-#include <app/util/util.h>
-#include <controller/CHIPDevice.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeDelegate.h>
-#include <messaging/ExchangeMgr.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-#include <protocols/bdx/BdxMessages.h>
-#include <protocols/bdx/BdxTransferSession.h>
-#include <zap-generated/CHIPClientCallbacks.h>
-#include <zap-generated/CHIPClusters.h>
+#include "AppMain.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
-#include "BDXDownloader.h"
-#include "ExampleSelfCommissioning.h"
-#include "PersistentStorage.h"
-
-#include <fstream>
-#include <iostream>
-
+using chip::BDXDownloader;
 using chip::ByteSpan;
+using chip::CharSpan;
 using chip::EndpointId;
+using chip::FabricIndex;
+using chip::GetRequestorInstance;
+using chip::NodeId;
+using chip::OnDeviceConnected;
+using chip::OnDeviceConnectionFailure;
+using chip::OTADownloader;
+using chip::OTAImageProcessorImpl;
+using chip::PeerId;
+using chip::Server;
 using chip::VendorId;
-using chip::ArgParser::HelpOptions;
-using chip::ArgParser::OptionDef;
-using chip::ArgParser::OptionSet;
-using chip::ArgParser::PrintArgError;
-using chip::bdx::TransferSession;
+using chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 using chip::Callback::Callback;
-using chip::Controller::Device;
-using chip::Controller::DeviceController;
-using chip::Controller::ExampleOperationalCredentialsIssuer;
-using chip::Controller::OnDeviceConnected;
-using chip::Controller::OnDeviceConnectionFailure;
+using chip::System::Layer;
+using chip::Transport::PeerAddress;
+using namespace chip;
+using namespace chip::ArgParser;
+using namespace chip::Messaging;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-// TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
-chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-Device * providerDevice                        = nullptr;
-BdxDownloader bdxDownloader;
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                          uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
-                          chip::ByteSpan metadataForRequestor)
+class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
 {
-    ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
+public:
+    bool CanConsent() override;
+    void UpdateDownloaded() override;
+};
 
-    TransferSession::TransferInitData initOptions;
-    initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
-    initOptions.MaxBlockSize     = 1024;
-    char testFileDes[9]          = { "test.txt" };
-    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
-    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+CustomOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+
+constexpr uint16_t kOptionAutoApplyImage       = 'a';
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
+constexpr uint16_t kOptionUserConsentState     = 'u';
+constexpr uint16_t kOptionWatchdogTimeout      = 'w';
+constexpr size_t kMaxFilePathSize              = 256;
+
+uint32_t gPeriodicQueryTimeoutSec = 0;
+uint32_t gWatchdogTimeoutSec      = 0;
+chip::Optional<bool> gRequestorCanConsent;
+static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
+bool gAutoApplyImage                           = false;
+
+OptionDef cmdLineOptionsDef[] = {
+    { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
+    { "requestorCanConsent", chip::ArgParser::kArgumentRequired, kOptionRequestorCanConsent },
+    { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
+    { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
+    { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
+    {},
+};
+
+OptionSet cmdLineOptions = {
+    HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+    "  -a, --autoApplyImage\n"
+    "       If supplied, apply the image immediately after download.\n"
+    "       Otherwise, the OTA update is complete after image download.\n"
+    "  -c, --requestorCanConsent <true | false>\n"
+    "       Value for the RequestorCanConsent field in the QueryImage command.\n"
+    "       If not supplied, the value is determined by the driver.\n"
+    "  -f, --otaDownloadPath <file path>\n"
+    "       If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
+    "       Otherwise, the default location for the downloaded image is at /tmp/test.bin\n"
+    "  -p, --periodicQueryTimeout <time in seconds>\n"
+    "       The periodic time interval to wait before attempting to query a provider from the default OTA provider list.\n"
+    "       If none or zero is supplied, the timeout is determined by the driver.\n"
+    "  -u, --userConsentState <granted | denied | deferred>\n"
+    "       Represents the current user consent status when the OTA Requestor is acting as a user consent\n"
+    "       delegate. This value is only applicable if value of the UserConsentNeeded field in the\n"
+    "       QueryImageResponse is set to true. This value is used for the first attempt to\n"
+    "       download. For all subsequent queries, the value of granted will be used.\n"
+    "       granted: Authorize OTA requestor to download an OTA image\n"
+    "       denied: Forbid OTA requestor to download an OTA image\n"
+    "       deferred: Defer obtaining user consent\n"
+    "  -w, --watchdogTimeout <time in seconds>\n"
+    "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
+    "       If none or zero is supplied, the timeout is determined by the driver.\n"
+};
+
+OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
+
+bool CustomOTARequestorDriver::CanConsent()
+{
+    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+}
+
+void CustomOTARequestorDriver::UpdateDownloaded()
+{
+    if (gAutoApplyImage)
     {
-        chip::Messaging::ExchangeManager * exchangeMgr = providerDevice->GetExchangeManager();
-        chip::Optional<chip::SessionHandle> session    = providerDevice->GetSecureSession();
-        if (exchangeMgr != nullptr && session.HasValue())
-        {
-            exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
-        }
-
-        if (exchangeCtx == nullptr)
-        {
-            ChipLogError(BDX, "unable to allocate ec: exchangeMgr=%p sessionExists? %u", exchangeMgr, session.HasValue());
-            return;
-        }
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
+        DefaultOTARequestorDriver::UpdateDownloaded();
     }
-
-    bdxDownloader.SetInitialExchange(exchangeCtx);
-
-    // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions, 20000);
-}
-
-void OnQueryFailure(void * context, uint8_t status)
-{
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
-}
-
-Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> mQueryImageResponseCallback(OnQueryImageResponse, nullptr);
-Callback<DefaultFailureCallback> mOnQueryFailureCallback(OnQueryFailure, nullptr);
-void OnConnection(void * context, Device * device)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
-    constexpr EndpointId kOtaProviderEndpoint = 0;
-
-    chip::Callback::Cancelable * successCallback = mQueryImageResponseCallback.Cancel();
-    chip::Callback::Cancelable * failureCallback = mOnQueryFailureCallback.Cancel();
-
-    // These QueryImage params have been chosen arbitrarily
-    constexpr VendorId kExampleVendorId        = VendorId::Common;
-    constexpr uint16_t kExampleProductId       = 77;
-    constexpr uint16_t kExampleHWVersion       = 3;
-    constexpr uint16_t kExampleSoftwareVersion = 0;
-    constexpr uint8_t kExampleProtocolsSupported =
-        EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const uint8_t locationBuf[] = { 'U', 'S' };
-    ByteSpan exampleLocation(locationBuf);
-    constexpr bool kExampleClientCanConsent = false;
-    ByteSpan metadata;
-
-    err = cluster.Associate(device, kOtaProviderEndpoint);
-    if (err != CHIP_NO_ERROR)
+    else
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
-        return;
+        // Download complete but we're not going to apply image, so reset provider retry counter.
+        mProviderRetryCount = 0;
+
+        // Reset to put the state back to idle to allow the next OTA update to occur
+        gRequestorCore.Reset();
     }
-    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
-                             kExampleSoftwareVersion, kExampleProtocolsSupported, exampleLocation, kExampleClientCanConsent,
-                             metadata);
-    if (err != CHIP_NO_ERROR)
+}
+
+static void InitOTARequestor(void)
+{
+    // Set the global instance of the OTA requestor core component
+    SetRequestorInstance(&gRequestorCore);
+
+    // Periodic query timeout must be set prior to the driver being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
+
+    // Watchdog timeout can be set any time before a query image is sent
+    gRequestorUser.SetWatchdogTimeout(gWatchdogTimeoutSec);
+
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Set the image processor instance used for handling image being downloaded
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
     }
 }
-
-void OnConnectFail(void * context, chip::NodeId deviceId, CHIP_ERROR error)
-{
-    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %s", deviceId, chip::ErrorStr(error));
-}
-
-Callback<OnDeviceConnected> mConnectionCallback(OnConnection, nullptr);
-Callback<OnDeviceConnectionFailure> mConnectFailCallback(OnConnectFail, nullptr);
-
-PersistentStorage mStorage;
-DeviceController mController;
-ExampleOperationalCredentialsIssuer mOpCredsIssuer;
-
-chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
-{
-    VendorId vendorId   = static_cast<VendorId>(rawProtocolId >> 16);
-    uint16_t protocolId = static_cast<uint16_t>(rawProtocolId & 0x0000FFFF);
-    return chip::Protocols::Id(vendorId, protocolId);
-}
-
-constexpr uint16_t kOptionProviderLocation = 'p';
-constexpr uint16_t kOptionUdpPort          = 'u';
-constexpr uint16_t kOptionDiscriminator    = 'd';
-
-chip::NodeId providerNodeId  = 0x0;
-uint16_t requestorSecurePort = 0;
-uint16_t setupDiscriminator  = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -175,32 +174,54 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionProviderLocation:
-        if (1 != sscanf(aValue, "%" PRIX64, &providerNodeId))
-        {
-            PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
-        }
+    case kOptionPeriodicQueryTimeout:
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
-    case kOptionUdpPort:
-        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (requestorSecurePort == 0)
+    case kOptionRequestorCanConsent:
+        if (strcmp(aValue, "true") == 0)
         {
-            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
+            gRequestorCanConsent.SetValue(true);
+        }
+        else if (strcmp(aValue, "false") == 0)
+        {
+            gRequestorCanConsent.SetValue(false);
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "%s: ERROR: Invalid requestorCanConsent parameter: %s\n", aProgram, aValue);
             retval = false;
         }
         break;
-    case kOptionDiscriminator:
-        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (setupDiscriminator > 0xFFF)
+    case kOptionOtaDownloadPath:
+        chip::Platform::CopyString(gOtaDownloadPath, aValue);
+        break;
+    case kOptionUserConsentState:
+        if (strcmp(aValue, "granted") == 0)
         {
-            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            gUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+        else if (strcmp(aValue, "denied") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kDenied;
+        }
+        else if (strcmp(aValue, "deferred") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kObtaining;
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "%s: ERROR: Invalid UserConsent parameter: %s\n", aProgram, aValue);
             retval = false;
         }
+        break;
+    case kOptionAutoApplyImage:
+        gAutoApplyImage = true;
+        break;
+    case kOptionWatchdogTimeout:
+        gWatchdogTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     default:
-        PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
         break;
     }
@@ -208,116 +229,31 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-OptionDef cmdLineOptionsDef[] = {
-    { "providerLocation", chip::ArgParser::kArgumentRequired, kOptionProviderLocation },
-    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
-    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
-    {},
-};
-
-OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -p/--providerLocation <node ID>\n"
-                             "        Node ID of the OTA Provider to connect to (hex format)\n\n"
-                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "        See README.md for more info.\n"
-                             "  -u/--udpPort <UDP port number>\n"
-                             "        UDP Port that the Requestor listens on for secure connections.\n"
-                             "        When this parameter is present the Requestor skips self-commissioning.\n"
-                             "        See README.md for more info.\n"
-                             "  -d/--discriminator <discriminator>\n"
-                             "        A 12-bit value used to discern between multiple commissionable CHIP device"
-                             "        advertisements. Default value is 3840\n" };
-
-HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+void ApplicationInit()
+{
+    // Initialize all OTA download components
+    InitOTARequestor();
+}
 
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    ChipLinuxAppMainLoop();
 
-    // NOTE: most of the following Init() calls were just copied from chip-tool code
-
-    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+    // If the event loop had been stopped due to an update being applied, boot into the new image
+    if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
     {
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
+        {
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+            return -1;
+        }
 
-        fprintf(stderr, "FAILED to initialize memory\n");
-        return 1;
+        argv[0] = kImageExecPath;
+        execv(argv[0], argv);
+
+        // If successfully executing the new iamge, execv should not return
+        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
     }
-
-    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "FAILED to initialize chip stack\n");
-        return 1;
-    }
-
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
-    }
-
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-    err = mStorage.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
-
-    chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
-
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
-
-    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(SoftwareUpdate, "Setup discriminator set to: %d \n", setupDiscriminator);
-    }
-    else
-    {
-        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %s \n", chip::ErrorStr(err));
-        goto exit;
-    }
-
-    // When the udpPort command line parameter is not present the Requestor self-commissions and automatically requests
-    // an image from the Provider. When the parameter is present the Requestor initializes like any other application and
-    // does not perform any automatic actions.
-    if (requestorSecurePort != 0)
-    {
-        uint16_t unsecurePort = CHIP_UDC_PORT;
-
-        ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
-
-        // Init ZCL Data Model and CHIP App Server
-        chip::Server::GetInstance().Init(nullptr, requestorSecurePort, unsecurePort);
-
-        // Initialize device attestation config
-        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-    }
-    else
-    {
-        // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
-        // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from
-        // persistent storage to connect to the Provider node. See README.md for instructions. NOTE: Controller is initialized in
-        // this call
-        err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(),
-                                         mStorage.GetListenPort());
-        VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
-
-        err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
-
-        ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
-
-        // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
-        // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the
-        // following call.
-        err = mController.GetDevice(providerNodeId, &providerDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
-
-        err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
-    }
-
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-exit:
-    ChipLogDetail(SoftwareUpdate, "%s", ErrorStr(err));
     return 0;
 }

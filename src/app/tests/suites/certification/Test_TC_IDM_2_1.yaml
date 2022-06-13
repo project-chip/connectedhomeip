@@ -1,0 +1,246 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: "[TC-IDM-2.1] Read Request Action from DUT to TH [DUT - Controller]"
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends the Read Request Message to the TH to read one attribute on
+          a given cluster and endpoint. The Message should contain one valid
+          CommandDataIB, which has the specific Endpoint, Specific Cluster and
+          Specific Attribute. On receipt of this message, TH should send a
+          report data action with the attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+          sudo ./chip-tool identify read identify-time 1 1
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should read
+          all attributes on a given cluster and Endpoint AttributePath =
+          [[Endpoint = Endpoint1, Cluster = ClusterID]] On receipt of this
+          message, TH should send a report data action with the attribute value
+          to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type bool."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool onoff read on-off 1 1
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type string."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool modeselect read description  1 1
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type unsigned integer."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0x3 0x1 1 0
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type signed integer."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool pressuremeasurement read measured-value 1 1
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type floating point."
+      verification: |
+          Currently the Spec is not supporting for this data type.
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type Octet String."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type Struct."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          Currently the Spec is not supporting for this data type.
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type List."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool modeselect read  supported-modes 1 1
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type enum."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
+      disabled: true
+
+    - label:
+          "[Optional] DUT sends the Read Request Message to the TH to read an
+          attribute of data type bitmap."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool levelcontrol read options 1 1
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read any attribute TH
+          responds with the report data action with the right attribute value
+          and sets the SuppressResponse field is set to True"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool basic read vendor-name 1 0
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read an attribute
+          Repeat the above steps 3 times."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool  occupancysensing read occupancy    1 1
+           sudo ./chip-tool  occupancysensing read occupancy    1 1
+
+
+           sudo ./chip-tool  occupancysensing read occupancy    1 1
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read an attribute
+          data or event data which is large in size For every chunked data
+          message received, DUT sends a status response."
+      verification: |
+          Add multiple admins on to the node (say 5 , if device supports) and read trusted-root-certificates  attribute
+
+          In case of chip tool, here is an example command to use
+
+          sudo ./out/debug/chip-tool operationalcredentials read trusted-root-certificates 5 0
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read any data which
+          is larger than 1 MTU(1280 bytes) The read can be done on any attribute
+          data or event data which is of type list and is greater than 1 MTU in
+          size or a set of attributes whose total size is greater than 1 MTU.
+          For every chunked data message received, DUT sends a status response."
+      verification: |
+          Out of Scope for TE8
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[ ]]
+          On receipt of this message, TH should send a report data action with
+          the attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool colorcontrol read current-hue  1 1
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[
+          Attribute = specific attribute]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0x0 1 0xFFFF
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[
+          Cluster = Specific Cluster]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0xFFFF
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[
+          Cluster = Specific Cluster, Attribute = specific attribute]] On
+          receipt of this message, TH should send a report data action with the
+          attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0x3 0x1 1 0xFFFF
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[
+          Endpoint = Specific Endpoint]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH. The Message should
+          contain one valid CommandDataIB, which has the AttributePath = [[
+          Endpoint = Specific Endpoint, Attribute = specific attribute]] On
+          receipt of this message, TH should send a report data action with the
+          attribute value to the DUT."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          sudo ./chip-tool levelcontrol read min-level   1 1
+      disabled: true

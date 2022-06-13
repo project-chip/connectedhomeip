@@ -45,16 +45,16 @@ typedef NS_ENUM(NSUInteger, CHIPPairingStatus) {
 - (void)onPairingComplete:(nullable NSError *)error;
 
 /**
+ * Notify the delegate when commissioning is completed
+ *
+ */
+- (void)onCommissioningComplete:(nullable NSError *)error;
+
+/**
  * Notify the delegate when pairing is deleted
  *
  */
 - (void)onPairingDeleted:(nullable NSError *)error;
-
-/**
- * Notify the delegate when address is updated
- *
- */
-- (void)onAddressUpdated:(nullable NSError *)error;
 
 @end
 

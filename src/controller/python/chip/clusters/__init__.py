@@ -21,5 +21,7 @@
 #
 
 """Provides Python APIs for CHIP."""
-
-from . import TestObjects
+from . import Command
+from . import Attribute
+from .Objects import *
+from . import CHIPClusters

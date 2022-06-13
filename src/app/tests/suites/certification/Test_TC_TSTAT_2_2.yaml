@@ -1,0 +1,1025 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.2.2. [TC-TSTAT-2.2] Setpoint Test Cases with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
+          that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 2600
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Writes a value back that is different but valid for
+          OccupiedCoolingSetpoint attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          OccupiedCoolingSetpoint attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 2000
+
+    - label:
+          "Writes OccupiedCoolingSetpoint to value below the
+          MinCoolSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 30
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes OccupiedCoolingSetpoint to value above the
+          MaxCoolSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 4000
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Disabled: This test makes no sense: It's setting OccupiedCoolingSetpoint
+    # to below OccupiedHeatingSetpoint.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
+          attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2600
+
+    - label:
+          "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
+          that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      response:
+          value: 2000
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          OccupiedHeatingSetpoint attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2100
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          OccupiedHeatingSetpoint attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      response:
+          value: 2100
+
+    - label:
+          "Writes OccupiedHeatingSetpoint to value below the
+          MinHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 600
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes OccupiedHeatingSetpoint to value above the
+          MaxHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 4010
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 700
+
+    # Disabled: This test makes no sense: It's setting OccupiedHeatingSetpoint
+    # to above OccupiedCoolingSetpoint.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
+          attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
+          verifies that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 2600
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes a value back that is different but valid for
+          UnoccupiedCoolingSetpoint attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2500
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          UnoccupiedCoolingSetpoint attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 2500
+
+    - label:
+          "Writes UnoccupiedCoolingSetpoint to value below the
+          MinHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 1002
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes UnoccupiedCoolingSetpoint to value above the
+          MaxHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 4010
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 1800
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
+          verifies that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      response:
+          value: 2000
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          UnoccupiedHeatingSetpoint attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2500
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          UnoccupiedHeatingSetpoint attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      response:
+          value: 2500
+
+    - label:
+          "Writes UnoccupiedHeatingSetpoint to value below the
+          MinHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 500
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes UnoccupiedHeatingSetpoint to value above the
+          MaxHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 4010
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 1800
+
+    - label:
+          "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      response:
+          value: 700
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
+    # to above MinCoolSetpointLimit when AUTO is supported, which is not
+    # allowed.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes a value back that is different but valid for
+          MinHeatSetpointLimit attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 2000
+
+    # Disabled: Because the previous set is disabled.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Reads it back again to confirm the successful write of
+          MinHeatSetpointLimit attribute"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      response:
+          value: 2000
+
+    - label:
+          "Writes MinHeatSetpointLimit to value below the
+          AbsMinHeatSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 650
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes MinHeatSetpointLimit to value above the
+          AbsMaxHeatSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 4050
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 700
+
+    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
+    # to higher than what we have various cooling limits set to.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 3000
+
+    # Disabled: Because the preceding write is disabled.
+    - label:
+          "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      response:
+          value: 3000
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          MaxHeatSetpointLimit attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MaxHeatSetpointLimit attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      response:
+          value: 2000
+
+    - label:
+          "Writes MaxHeatSetpointLimit to value below the
+          AbsMinHeatSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      arguments:
+          value: 500
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes MaxHeatSetpointLimit to value above the
+          AbsMaxHeatSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      arguments:
+          value: 4000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      arguments:
+          value: 700
+
+    - label:
+          "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MAXHEATSETPOINTLIMIT
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      response:
+          value: 1600
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes a value back that is different but valid for
+          MinCoolSetpointLimit attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MinCoolSetpointLimit attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      response:
+          value: 2000
+
+    - label:
+          "Writes MinCoolSetpointLimit to value below the
+          AbsMinCoolSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 1000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 4000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 3200
+
+    - label:
+          "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      response:
+          value: 3200
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit to
+    # below what we just set MinCoolSetpointLimit to.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes a value back that is different but valid for
+          MaxCoolSetpointLimit attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 2000
+
+    # Disabled: Because the previous set is disabled.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Reads it back again to confirm the successful write of
+          MaxCoolSetpointLimit attribute"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      response:
+          value: 2000
+
+    - label:
+          "Writes MaxCoolSetpointLimit to value below the
+          AbsMinCoolSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 1000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 4000
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit
+    # to below various heating setpoints.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
+          attribute"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit
+          attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 3200
+
+    - label: "Writes (sets back) default value of MinHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 700
+
+    - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 3000
+
+    - label: "Writes (sets back) default value of MinCoolSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 1600
+
+    - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
+      arguments:
+          value: 3200
+
+    - label:
+          "Reads MinSetpointDeadBand attribute from Server DUT and verifies that
+          the value is within range"
+      optional: true
+      command: "readAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      response:
+          value: 25
+          constraints:
+              type: temp-s8
+              minValue: 0
+              maxValue: 25
+
+    - label:
+          "Writes a value back that is different but valid for
+          MinSetpointDeadBand attribute"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      arguments:
+          value: 5
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MinSetpointDeadBand attribute"
+      optional: true
+      command: "readAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      response:
+          value: 5
+
+    - label: "Writes the value below MinSetpointDeadBand"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      arguments:
+          value: -1
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Writes the value above MinSetpointDeadBand "
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      arguments:
+          value: 30
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Writes the min limit of MinSetpointDeadBand"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      arguments:
+          value: 0
+
+    - label: "Writes the max limit of MinSetpointDeadBand"
+      optional: true
+      command: "writeAttribute"
+      attribute: "MinSetpointDeadBand"
+      PICS: A_MINSETPOINTDEADBAND
+      arguments:
+          value: 25
+
+    - label:
+          "Reads ControlSequenceOfOperation from Server DUT and verifies that
+          the value is valid"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
+      response:
+          value: 4
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Write Attribute command for ControlSequenceOfOperation with a new
+          valid value"
+      command: "writeAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
+      arguments:
+          value: 2
+
+    - label: "Read it back again to confirm the successful write"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
+      response:
+          value: 2
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2000
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      response:
+          value: -30
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2000
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2600
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 1
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: -30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2600
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 1
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2600
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2000
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 2
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP
+      response:
+          value: -30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      response:
+          value: -30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      arguments:
+          value: 2600
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
+      arguments:
+          value: 2000
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 2
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      response:
+          value: 30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      response:
+          value: 30

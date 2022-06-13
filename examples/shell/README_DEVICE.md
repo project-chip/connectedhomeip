@@ -1,6 +1,6 @@
-# CHIP Shell - Device Layer module
+# Matter Shell - Device Layer module
 
-The chip::DeviceLayer APIs may be invoked via the CHIP Shell CLI.
+The chip::DeviceLayer APIs may be invoked via the Matter Shell CLI.
 
 ## Command List
 
@@ -32,7 +32,7 @@ Dump the configuration of the device.
 > device config
 VendorId:        235a
 ProductId:       feff
-ProductRevision: 0001
+HardwareVersion: 0001
 SerialNumber:    <None>
 ServiceId:       <None>
 FabricId:        <None>
@@ -54,7 +54,7 @@ Where valid parameter names include:
 
 -   vendorid: Vendor Identifier
 -   productid: Product Identifier
--   productrev: Product Revision
+-   hardwarever: Hardware Version
 -   serial: Serial Number
 -   deviceid: Device Identification Number
 -   cert: Device Certificate
@@ -75,7 +75,7 @@ Done
 
 ### start
 
-Initialize the chip stack and start the device layer event loop.
+Initialize the Matter stack and start the device layer event loop.
 
 ```bash
 > device start

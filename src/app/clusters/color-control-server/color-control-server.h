@@ -34,9 +34,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 #include <app/util/basic-types.h>
-#include <unordered_map>
 
 /**********************************************************
  * Defines and Macros
@@ -66,6 +67,8 @@
 #define MAX_CURRENT_LEVEL 0xFE
 
 #define REPORT_FAILED 0xFF
+
+using chip::app::Clusters::ColorControl::ColorControlFeature;
 
 /**
  * @brief color-control-server class
@@ -140,40 +143,49 @@ public:
      * Functions Definitions
      *********************************************************/
     static ColorControlServer & Instance();
-    void stopAllColorTransitions(chip::EndpointId endpoint);
-    bool stopMoveStepCommand(uint8_t optionsMask, uint8_t optionsOverride);
+
+    bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
+    EmberAfStatus stopAllColorTransitions(chip::EndpointId endpoint);
+    bool stopMoveStepCommand(chip::EndpointId, uint8_t optionsMask, uint8_t optionsOverride);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    bool moveHueCommand(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
-    bool moveToHueCommand(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-                          bool isEnhanced);
-    bool moveToHueAndSaturationCommand(uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                       uint8_t optionsOverride, bool isEnhanced);
-    bool stepHueCommand(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
+    bool moveHueCommand(chip::EndpointId endpoint, uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
                         bool isEnhanced);
-    bool moveSaturationCommand(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    bool moveToSaturationCommand(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    bool stepSaturationCommand(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                               uint8_t optionsOverride);
-    bool colorLoopCommand(uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue,
-                          uint8_t optionsMask, uint8_t optionsOverride);
+    bool moveToHueCommand(chip::EndpointId endpoint, uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime,
+                          uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
+    bool moveToHueAndSaturationCommand(chip::EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                       uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
+    bool stepHueCommand(chip::EndpointId endpoint, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime,
+                        uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
+    bool moveSaturationCommand(const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
+    bool moveToSaturationCommand(const chip::app::ConcreteCommandPath & commandPath,
+                                 const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
+    bool stepSaturationCommand(const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & commandData);
+    bool colorLoopCommand(const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
     void updateHueSatCommand(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-    bool moveToColorCommand(uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
-                            uint8_t optionsOverride);
-    bool moveColorCommand(int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
-    bool stepColorCommand(int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+    bool moveToColorCommand(const chip::app::ConcreteCommandPath & commandPath,
+                            const chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & commandData);
+    bool moveColorCommand(const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::ColorControl::Commands::MoveColor::DecodableType & commandData);
+    bool stepColorCommand(const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
     void updateXYCommand(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    bool moveColorTempCommand(uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
-                              uint8_t optionsMask, uint8_t optionsOverride);
-    bool moveToColorTempCommand(uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    bool stepColorTempCommand(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-                              uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
+    bool moveColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
+                              const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
+    bool
+    moveToColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
+                           const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & commandData);
+    bool stepColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
+                              const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
     void levelControlColorTempChangeCommand(chip::EndpointId endpoint);
     void startUpColorTempCommand(chip::EndpointId endpoint);
     void updateTempCommand(chip::EndpointId endpoint);
@@ -220,13 +232,13 @@ private:
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
-    void moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
+    EmberAfStatus moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
     EmberEventControl * configureTempEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     /**********************************************************
-     * Attributes Decleration
+     * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
 
@@ -262,3 +274,7 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId en
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+void emberAfPluginLevelControlCoupledColorTempChangeCallback(chip::EndpointId endpoint);
+#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

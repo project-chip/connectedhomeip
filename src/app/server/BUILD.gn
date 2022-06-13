@@ -27,8 +27,13 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "AclStorage.cpp",
+    "AclStorage.h",
+    "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "DefaultAclStorage.cpp",
+    "DefaultAclStorage.h",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",
@@ -45,6 +50,7 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",

@@ -1,0 +1,16 @@
+{
+    "name": "CHIP README Templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../../zap-templates/common/ClusterTestGeneration.js",
+        "tests.js"
+    ],
+
+    "templates": [
+        {
+            "path": "../TestGenExample.zapt",
+            "name": "Test Generate Example",
+            "output": "TestGenExample.out"
+        }
+    ]
+}

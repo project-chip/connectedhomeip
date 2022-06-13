@@ -25,6 +25,8 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -32,6 +34,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
+  private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -55,7 +58,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
-    Log.d(TAG, "Starting service resolution for '" + instanceName + "'");
+    Log.d(
+        TAG,
+        "resolve: Starting service resolution for '"
+            + instanceName
+            + "' type '"
+            + serviceType
+            + "'");
 
     Runnable timeoutRunnable =
         new Runnable() {
@@ -64,6 +73,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             // Ensure we always release the multicast lock. It's possible that we release the
             // multicast lock here before ResolveListener returns, but since NsdManager has no API
             // to cancel service resolution, there's not much we can do here.
+            Log.d(TAG, "resolve: Timing out");
             if (multicastLock.isHeld()) {
               multicastLock.release();
             }
@@ -79,7 +89,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
             chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+                instanceName, serviceType, null, null, 0, null, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -99,8 +109,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             chipMdnsCallback.handleServiceResolve(
                 instanceName,
                 serviceType,
+                serviceInfo.getHost().getHostName(),
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
+                serviceInfo.getAttributes(),
                 callbackHandle,
                 contextHandle);
 
@@ -111,5 +123,85 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
+  }
+
+  @Override
+  public void publish(
+      String serviceName,
+      String hostName,
+      String type,
+      int port,
+      String[] textEntriesKeys,
+      byte[][] textEntriesDatas,
+      String[] subTypes) {
+    NsdServiceInfo serviceInfo = new NsdServiceInfo();
+    serviceInfo.setServiceName(serviceName);
+
+    /**
+     * Note, subtypes registration is using an undocumented feature of android dns-sd
+     * service/mDNSResponder which MAY STOP WORKING in future Android versions. Here, set type =
+     * "${type},${subtypes1},${subtypes2},...", then subtypes1, subtypes2 etc are all registered to
+     * this dns-sd server, we can usd `dns-sd -B ${type},${subtypes}` or avahi-browse
+     * ${subtypes}._sub.${type} -r to browser it
+     */
+    StringBuilder sb = new StringBuilder(type);
+    for (String subType : subTypes) {
+      sb.append(",").append(subType);
+    }
+    serviceInfo.setServiceType(sb.toString());
+
+    serviceInfo.setPort(port);
+    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + sb.toString() + " port=" + port);
+    int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
+    for (int i = 0; i < cnt; i++) {
+      String value = new String(textEntriesDatas[i]);
+      serviceInfo.setAttribute(textEntriesKeys[i], value);
+      Log.i(TAG, "     " + textEntriesKeys[i] + "=" + value);
+    }
+
+    NsdManager.RegistrationListener registrationListener =
+        new NsdManager.RegistrationListener() {
+          @Override
+          public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.w(
+                TAG,
+                "service " + serviceInfo.getServiceName() + " onRegistrationFailed:" + errorCode);
+          }
+
+          @Override
+          public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.w(
+                TAG,
+                "service " + serviceInfo.getServiceName() + " onUnregistrationFailed:" + errorCode);
+          }
+
+          @Override
+          public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceRegistered");
+          }
+
+          @Override
+          public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceUnregistered");
+          }
+        };
+    registrationListeners.add(registrationListener);
+
+    nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
+    Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
+  }
+
+  @Override
+  public void removeServices() {
+    Log.d(TAG, "removeServices: ");
+    for (NsdManager.RegistrationListener l : registrationListeners) {
+      Log.i(TAG, "Remove " + l);
+      nsdManager.unregisterService(l);
+    }
+    registrationListeners.clear();
   }
 }

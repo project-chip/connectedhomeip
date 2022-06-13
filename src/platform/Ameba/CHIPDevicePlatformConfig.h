@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,6 @@
 #pragma once
 
 // ==================== Platform Adaptations ====================
-#define CHIP_CONFIG_ERROR_CLASS 1
-
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
@@ -34,14 +32,9 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY 2
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY 3
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY 4
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY 5
 
 // ========== Platform-specific Configuration =========
 
@@ -53,7 +46,7 @@
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 4096
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 8192
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
@@ -64,4 +57,16 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
+
 #define CHIP_DEVICE_LAYER_NONE 0
+
+//  Enable use of test setup parameters for testing purposes only.
+//
+//    WARNING: This option makes it possible to circumvent basic chip security functionality.
+//    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+
+#define CONFIG_RENDEZVOUS_MODE 6
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
+//#define CHIP_DEVICE_CONFIG_UNIQUE_ID "00112233445566778899AABBCCDDEEFF"

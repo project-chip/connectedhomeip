@@ -53,7 +53,7 @@ class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplC
 {
 protected:
     // OS-specific members (pthread)
-    pthread_mutex_t mChipStackLock;
+    pthread_mutex_t mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
     enum TaskType
     {
@@ -93,7 +93,7 @@ protected:
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(int64_t durationMS);
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     CHIP_ERROR _Shutdown();
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED

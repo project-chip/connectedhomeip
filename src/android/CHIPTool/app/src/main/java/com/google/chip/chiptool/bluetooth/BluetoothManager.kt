@@ -20,6 +20,7 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
@@ -60,7 +61,12 @@ class BluetoothManager : BleCallback {
             val device = result.device
             Log.i(TAG, "Bluetooth Device Scanned Addr: ${device.address}, Name ${device.name}")
 
-            offer(device)
+            val producerScope: ProducerScope<BluetoothDevice> = this@callbackFlow
+            if (producerScope.channel.isClosedForSend) {
+              Log.w(TAG, "Bluetooth device was scanned, but channel is already closed")
+            } else {
+              offer(device)
+            }
           }
 
           override fun onScanFailed(errorCode: Int) {

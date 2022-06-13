@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("cc13x2_26x2") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BlePlatformConfig.h",
     "CC13X2_26X2Config.cpp",
     "CC13X2_26X2Config.h",
@@ -36,6 +37,8 @@ static_library("cc13x2_26x2") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
@@ -52,11 +55,23 @@ static_library("cc13x2_26x2") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+  public_configs =
+      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 
   if (chip_enable_ble) {
     sources += [
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      # this needs to be in the final link to place the data correctly
+      # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
+      #"oad_image_header.c",
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
     ]
   }
 
@@ -70,10 +85,12 @@ static_library("cc13x2_26x2") {
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
     ]
 
-    if (ti_simplelink_device_family == "cc13x2_26x2") {
-      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
-    } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    if (chip_openthread_ftd) {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
     }
 
     sources += [

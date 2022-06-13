@@ -22,6 +22,9 @@ APP="$1"
 BOARD="$2"
 shift 2
 
+# Disable debug symbols and firmware build time to increase ccache hit ratio in CI
+COMMON_CI_FLAGS=(-DCONFIG_CHIP_DEBUG_SYMBOLS=n -DCONFIG_CHIP_FIRMWARE_BUILD_UNIX_TIME=n)
+
 if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" || -z "$BOARD" ]]; then
     echo "Usage: $0 <application> <board>" >&2
     echo "Applications:" >&2
@@ -36,7 +39,12 @@ source "../scripts/activate.sh"
 
 # Activate Zephyr environment
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR"
-env
 
-west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"
+# Use toolchain from Pigweed CIPD
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR"
+
+# Set ccache base directory to improve the cache hit ratio
+export CCACHE_BASEDIR="$PWD/$APP/nrfconnect"
+
+env
+west build -p auto -b "$BOARD" -d "$APP/nrfconnect/build" "$APP/nrfconnect" -- "${COMMON_CI_FLAGS[@]}" "$@"

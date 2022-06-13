@@ -38,10 +38,16 @@
 #include <lib/support/Defer.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/EphemeralExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -74,10 +80,54 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
 }
 
+void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+{
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
+}
+
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
 {
     mResponseTimeout = timeout;
 }
+
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+void ExchangeContext::UpdateSEDIntervalMode()
+{
+    if (!HasSessionHandle())
+    {
+        // After the session has been deleted, no further communication can occur on the exchange,
+        // so withdraw a SED active mode request.
+        UpdateSEDIntervalMode(false);
+        return;
+    }
+
+    Transport::PeerAddress address;
+
+    switch (GetSessionHandle()->GetSessionType())
+    {
+    case Transport::Session::SessionType::kSecure:
+        address = GetSessionHandle()->AsSecureSession()->GetPeerAddress();
+        break;
+    case Transport::Session::SessionType::kUnauthenticated:
+        address = GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+        break;
+    default:
+        return;
+    }
+
+    VerifyOrReturn(address.GetTransportType() != Transport::Type::kBle);
+    UpdateSEDIntervalMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked());
+}
+
+void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
+{
+    if (activeMode != IsRequestingActiveMode())
+    {
+        SetRequestingActiveMode(activeMode);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode);
+    }
+}
+#endif
 
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
@@ -93,7 +143,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSecureSession.HasValue(), CHIP_ERROR_CONNECTION_ABORTED);
+    VerifyOrReturnError(mSession, CHIP_ERROR_CONNECTION_ABORTED);
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
@@ -103,16 +153,13 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
-    // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSecureSession().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    // Treat unknown peer address as "not UDP", because we have no idea whether
-    // it's safe to do MRP there.
-    bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
-    bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    // If session requires MRP, NoAutoRequestAck send flag is not specified and is not a group exchange context, request reliable
+    // transmission.
+    bool reliableTransmissionRequested =
+        GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
     // If a response message is expected...
-    if (sendFlags.Has(SendMessageFlags::kExpectResponse))
+    if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
         // Only one 'response expected' message can be outstanding at a time.
         if (IsResponseExpected())
@@ -124,7 +171,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         SetResponseExpected(true);
 
         // Arm the response timer if a timeout has been specified.
-        if (mResponseTimeout > 0)
+        if (mResponseTimeout > System::Clock::kZero)
         {
             CHIP_ERROR err = StartResponseTimer();
             if (err != CHIP_NO_ERROR)
@@ -136,9 +183,30 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     {
+        // ExchangeContext for group are supposed to always be Initiator
+        if (IsGroupExchangeContext() && !IsInitiator())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        //
+        // It is possible that we might have evicted a session as a side-effect of processing an inbound message on this exchange.
+        // We cannot proceed any further sending a message since we don't have an attached session, so let's error out.
+        //
+        // This should not happen to well-behaved logic attempting to sending messages on exchanges, so let's print out a warning
+        // to ensure it alerts someone to fixing their logic...
+        //
+        if (!mSession)
+        {
+            ChipLogError(ExchangeManager,
+                         "WARNING: We shouldn't be sending a message on an exchange that has no attached session...");
+            return CHIP_ERROR_MISSING_SECURE_SESSION;
+        }
+
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId,
+                                               IsInitiator(), GetReliableMessageContext(), reliableTransmissionRequested,
+                                               protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
             CancelResponseTimer();
@@ -176,7 +244,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
     // Cancel the response timer.
@@ -194,8 +262,7 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
-                  ChipLogValueExchange(this), __func__);
+    ChipLogDetail(ExchangeManager, "ec - close[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(false);
@@ -211,8 +278,7 @@ void ExchangeContext::Abort()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
-                  ChipLogValueExchange(this), __func__);
+    ChipLogDetail(ExchangeManager, "ec - abort[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(true);
@@ -224,37 +290,24 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
     ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
-                                 ExchangeDelegate * delegate)
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                                 ExchangeDelegate * delegate, bool isEphemeralExchange) :
+    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
+    mSession(*this)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
     mExchangeMgr = em;
     mExchangeId  = ExchangeId;
-    mSecureSession.SetValue(session);
+    mSession.Grab(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
+    mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
     mDelegate = delegate;
 
-    ExchangeMessageDispatch * dispatch = nullptr;
-    if (delegate != nullptr)
-    {
-        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionManager());
-        if (dispatch == nullptr)
-        {
-            dispatch = &em->mDefaultExchangeDispatch;
-        }
-    }
-    else
-    {
-        dispatch = &em->mDefaultExchangeDispatch;
-    }
-    VerifyOrDie(dispatch != nullptr);
-    mDispatch = dispatch->Retain();
-
-    SetDropAckDebug(false);
     SetAckPending(false);
-    SetMsgRcvdFromPeer(false);
-    SetAutoRequestAck(true);
+
+    // Do not request Ack for multicast
+    SetAutoRequestAck(!session->IsGroupSession());
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
@@ -267,6 +320,11 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
     VerifyOrDie(!IsAckPending());
 
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+    // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
+    UpdateSEDIntervalMode(false);
+#endif
+
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
@@ -274,19 +332,14 @@ ExchangeContext::~ExchangeContext()
     DoClose(false);
     mExchangeMgr = nullptr;
 
-    if (mDispatch != nullptr)
-    {
-        mDispatch->Release();
-        mDispatch = nullptr;
-    }
-
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec-- id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -294,8 +347,8 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         // The exchange identifier of the message matches the exchange identifier of the context.
         (mExchangeId == payloadHeader.GetExchangeID())
 
-        // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSecureSession.HasValue() && mSecureSession.Value().MatchIncomingSession(session))
+        // AND The Session associated with the incoming message matches the Session associated with the exchange.
+        && (mSession.Contains(session))
 
         // TODO: This check should be already implied by the equality of session check,
         // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
@@ -308,25 +361,44 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         && (payloadHeader.IsInitiator() != IsInitiator());
 }
 
-void ExchangeContext::OnConnectionExpired()
+void ExchangeContext::OnSessionReleased()
 {
-    // Reset our mSecureSession to a default-initialized (hence not matching any
-    // connection state) value, because it's still referencing the now-expired
-    // connection.  This will mean that no more messages can be sent via this
-    // exchange, which seems fine given the semantics of connection expiration.
-    mSecureSession.ClearValue();
-
-    if (!IsResponseExpected())
+    if (mFlags.Has(Flags::kFlagClosed))
     {
-        // Nothing to do in this case
+        // Exchange is already being closed. It may occur when closing an exchange after sending
+        // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
         return;
     }
 
-    // If we're waiting on a response, we now know it's never going to show up
-    // and we should notify our delegate accordingly.
-    CancelResponseTimer();
-    SetResponseExpected(false);
-    NotifyResponseTimeout();
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount without worrying about use-after-free.
+    ExchangeHandle ref(*this);
+
+    if (IsResponseExpected())
+    {
+        // If we're waiting on a response, we now know it's never going to show up
+        // and we should notify our delegate accordingly.
+        CancelResponseTimer();
+        // We want to Abort, not just Close, so that RMP bits are cleared, so
+        // don't let NotifyResponseTimeout close us.
+        NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
+        Abort();
+    }
+    else
+    {
+        // Either we're expecting a send or we are in our "just allocated, first
+        // send has not happened yet" state.
+        //
+        // Just mark ourselves as closed.  The consumer is responsible for
+        // releasing us.  See documentation for
+        // ExchangeDelegate::OnExchangeClosing.
+        if (IsSendExpected())
+        {
+            mFlags.Clear(Flags::kFlagWillSendMessage);
+        }
+        DoClose(true /* clearRetransTable */);
+    }
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -360,10 +432,10 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    ec->NotifyResponseTimeout();
+    ec->NotifyResponseTimeout(/* aCloseIfNeeded = */ true);
 }
 
-void ExchangeContext::NotifyResponseTimeout()
+void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
@@ -375,11 +447,13 @@ void ExchangeContext::NotifyResponseTimeout()
         delegate->OnResponseTimeout(this);
     }
 
-    MessageHandled();
+    if (aCloseIfNeeded)
+    {
+        MessageHandled();
+    }
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
     // We hold a reference to the ExchangeContext here to
@@ -388,25 +462,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // layer has completed its work on the ExchangeContext.
     ExchangeHandle ref(*this);
 
-    // Keep track of whether we're nested under an outer HandleMessage
-    // invocation.
-    bool alreadyHandlingMessage = mFlags.Has(Flags::kFlagHandlingMessage);
-    mFlags.Set(Flags::kFlagHandlingMessage);
-
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
     auto deferred = MakeDefer([&]() {
-        // The alreadyHandlingMessage check is effectively a workaround for the fact that SendMessage() is not calling
-        // MessageHandled() yet and will go away when we fix that.
-        if (alreadyHandlingMessage)
-        {
-            // Don't close if there's an outer HandleMessage invocation.  It'll deal with the closing.
-            return;
-        }
-        // We are the outermost HandleMessage invocation.  We're not handling a message anymore.
-        mFlags.Clear(Flags::kFlagHandlingMessage);
-
         // Duplicates and standalone acks are not application-level messages, so they should generally not lead to any state
         // changes.  The one exception to that is that if we have a null mDelegate then our lifetime is not application-defined,
         // since we don't interact with the application at that point.  That can happen when we are already closed (in which case
@@ -420,8 +479,21 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(
-        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    if (mDispatch.IsReliableTransmissionAllowed() && !IsGroupExchangeContext())
+    {
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+            payloadHeader.GetAckMessageCounter().HasValue())
+        {
+            HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+        }
+
+        if (payloadHeader.NeedsAck())
+        {
+            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+
+            HandleNeedsAck(messageCounter, msgFlags);
+        }
+    }
 
     if (IsAckPending() && !mDelegate)
     {
@@ -443,6 +515,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
+    if (IsEphemeralExchange())
+    {
+        // The EphemeralExchange has done its job, since StandaloneAck is sent in previous FlushAcks() call.
+        return CHIP_NO_ERROR;
+    }
+
     // Since we got the response, cancel the response timer.
     CancelResponseTimer();
 
@@ -450,26 +528,41 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // is implicitly that response.
     SetResponseExpected(false);
 
-    if (mDelegate != nullptr)
+    // Don't send messages on to our delegate if our dispatch does not allow
+    // those messages.
+    if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
     {
         return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
-    else
-    {
-        DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
-                                 std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
+
+    DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
+                             std::move(msgBuf));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::MessageHandled()
 {
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+    UpdateSEDIntervalMode();
+#endif
+
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
         return;
     }
 
     Close();
+}
+
+ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate)
+{
+    if (isEphemeralExchange)
+        return EphemeralExchangeDispatch::Instance();
+
+    if (delegate != nullptr)
+        return delegate->GetMessageDispatch();
+
+    return ApplicationExchangeDispatch::Instance();
 }
 
 } // namespace Messaging

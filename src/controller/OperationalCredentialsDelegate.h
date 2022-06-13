@@ -30,9 +30,10 @@ namespace chip {
 namespace Controller {
 
 typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                     const ByteSpan & rcac);
+                                     const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
 
 constexpr uint32_t kMaxCHIPDERCertLength = 600;
+constexpr size_t kCSRNonceLength         = 32;
 
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate
@@ -42,7 +43,7 @@ public:
 
     /**
      * @brief
-     *   This function generates an operational certificate chain for the device.
+     *   This function generates an operational certificate chain for a remote device that is being commissioned.
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
@@ -50,17 +51,19 @@ public:
      *
      *   The delegate will call `onCompletion` when the NOC certificate chain is ready.
      *
-     * @param[in] csrElements          CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] csrElements          CSR elements as per specifications section 11.18.5.6. NOCSR Elements.
+     * @param[in] csrNonce             CSR nonce as described in 6.4.6.1
      * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
+     * @param[in] attestationChallenge Attestation challenge as per 11.18.5.7
      * @param[in] DAC                  Device attestation certificate received from the device being commissioned
      * @param[in] PAI                  Product Attestation Intermediate certificate
-     * @param[in] PAA                  Product Attestation Authority certificate
      * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                        const ByteSpan & PAI, const ByteSpan & PAA,
+    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                        const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**
@@ -76,6 +79,13 @@ public:
      *   fabric ID.
      */
     virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
+
+    virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
+    {
+        VerifyOrReturnError(csrNonce.size() == kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(csrNonce.data(), csrNonce.size()));
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace Controller

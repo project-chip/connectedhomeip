@@ -43,16 +43,14 @@
 
 @implementation KeyValueItem
 
-@synthesize key;
-@synthesize value;
+@dynamic key;
+@dynamic value;
 
-- (instancetype)initWithContext:(nonnull NSManagedObjectContext *)context
-                            key:(nonnull NSString *)key_
-                          value:(nonnull NSData *)value_
+- (instancetype)initWithContext:(nonnull NSManagedObjectContext *)context key:(nonnull NSString *)key value:(nonnull NSData *)value
 {
     if (self = [super initWithContext:context]) {
-        key = key_;
-        value = value_;
+        self.key = key;
+        self.value = value;
     }
     return self;
 }
@@ -109,12 +107,24 @@ namespace DeviceLayer {
                 return model;
             }
 
-            KeyValueItem * FindItemForKey(NSString * key, NSError ** error)
+            KeyValueItem * FindItemForKey(NSString * key, NSError ** error, BOOL returnsData)
             {
                 NSFetchRequest * request = [[NSFetchRequest alloc] initWithEntityName:@"KeyValue"];
+                if (returnsData) {
+                    [request setReturnsObjectsAsFaults:NO];
+                }
                 request.predicate = [NSPredicate predicateWithFormat:@"key = %@", key];
 
-                NSArray * result = [gContext executeFetchRequest:request error:error];
+                __block NSError * fetchError = nil;
+                __block NSArray * result;
+                [gContext performBlockAndWait:^{
+                    result = [gContext executeFetchRequest:request error:&fetchError];
+                }];
+
+                if (error != nil) {
+                    *error = fetchError;
+                }
+
                 if (result == nil) {
                     return nullptr;
                 }
@@ -125,20 +135,28 @@ namespace DeviceLayer {
                 return (KeyValueItem *) [result objectAtIndex:0];
             }
 
+            KeyValueItem * FindItemForKey(NSString * key, NSError ** error) { return FindItemForKey(key, error, false); }
+
         }
 
         KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
         CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * fileName)
         {
+            if (mInitialized) {
+                return CHIP_NO_ERROR;
+            }
+
             ReturnErrorCodeIf(gContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
             ReturnErrorCodeIf(fileName == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
             NSURL * url = nullptr;
+            NSString * filepath = [NSString stringWithUTF8String:fileName];
+            ReturnErrorCodeIf(filepath == nil, CHIP_ERROR_INVALID_ARGUMENT);
 
             // relative paths are relative to Documents folder
-            if (fileName[0] != '/') {
+            if (![filepath hasPrefix:@"/"]) {
                 NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
                                                                                   inDomain:NSUserDomainMask
                                                                          appropriateForURL:nil
@@ -151,9 +169,9 @@ namespace DeviceLayer {
                 ChipLogProgress(
                     DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
 
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+                url = [NSURL URLWithString:filepath relativeToURL:documentsDirectory];
             } else {
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName]];
+                url = [NSURL fileURLWithPath:filepath];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -184,9 +202,11 @@ namespace DeviceLayer {
             }
 
             // create Managed Object context
-            gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+            gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            [gContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
             [gContext setPersistentStoreCoordinator:coordinator];
 
+            mInitialized = true;
             return CHIP_NO_ERROR;
         }
 
@@ -195,18 +215,36 @@ namespace DeviceLayer {
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
 
-            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
+            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil, true);
             if (!item) {
-                return CHIP_ERROR_KEY_NOT_FOUND;
+                return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
             }
 
+            __block NSData * itemValue = nil;
+            // can only access this object on the managed queue
+            [gContext performBlockAndWait:^{
+                itemValue = item.value;
+            }];
+
             if (read_bytes_size != nullptr) {
-                *read_bytes_size = item.value.length;
+                *read_bytes_size = itemValue.length;
             }
 
             if (value != nullptr) {
-                memcpy(value, item.value.bytes, std::min<size_t>((item.value.length), value_size));
+                memcpy(value, itemValue.bytes, std::min<size_t>((itemValue.length), value_size));
+#if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
+                fprintf(stderr, "GETTING VALUE FOR: '%s': ", key);
+                for (size_t i = 0; i < std::min<size_t>((itemValue.length), value_size); ++i) {
+                    fprintf(stderr, "%02x ", static_cast<uint8_t *>(value)[i]);
+                }
+                fprintf(stderr, "\n");
+#endif
+            }
+
+            if (itemValue.length > value_size) {
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
 
             return CHIP_NO_ERROR;
@@ -215,18 +253,23 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
 
             KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
             if (!item) {
-                return CHIP_NO_ERROR;
+                return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
             }
 
-            [gContext deleteObject:item];
+            __block BOOL success = NO;
+            __block NSError * error = nil;
+            [gContext performBlockAndWait:^{
+                [gContext deleteObject:item];
+                success = [gContext save:&error];
+            }];
 
-            NSError * error = nil;
-            if (![gContext save:&error]) {
+            if (!success) {
                 ChipLogError(DeviceLayer, "Error saving context: %s", error.localizedDescription.UTF8String);
-                return CHIP_ERROR_INTERNAL;
+                return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
 
             return CHIP_NO_ERROR;
@@ -235,22 +278,42 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
 
             NSData * data = [[NSData alloc] initWithBytes:value length:value_size];
 
-            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
+            NSString * itemKey = [[NSString alloc] initWithUTF8String:key];
+            ReturnErrorCodeIf(itemKey == nil, CHIP_ERROR_INVALID_ARGUMENT);
+
+            KeyValueItem * item = FindItemForKey(itemKey, nil);
             if (!item) {
-                item = [[KeyValueItem alloc] initWithContext:gContext key:[[NSString alloc] initWithUTF8String:key] value:data];
-                [gContext insertObject:item];
+                [gContext performBlockAndWait:^{
+                    [gContext insertObject:[[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data]];
+                }];
             } else {
-                item.value = data;
+                [gContext performBlockAndWait:^{
+                    item.value = data;
+                }];
             }
 
-            NSError * error = nil;
-            if (![gContext save:&error]) {
+            __block BOOL success = NO;
+            __block NSError * error = nil;
+            [gContext performBlockAndWait:^{
+                success = [gContext save:&error];
+            }];
+
+            if (!success) {
                 ChipLogError(DeviceLayer, "Error saving context: %s", error.localizedDescription.UTF8String);
-                return CHIP_ERROR_INTERNAL;
+                return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
+
+#if CHIP_CONFIG_DARWIN_STORAGE_VERBOSE_LOGGING
+            fprintf(stderr, "PUT VALUE FOR: '%s': ", key);
+            for (size_t i = 0; i < value_size; ++i) {
+                fprintf(stderr, "%02x ", static_cast<const uint8_t *>(value)[i]);
+            }
+            fprintf(stderr, "\n");
+#endif
 
             return CHIP_NO_ERROR;
         }

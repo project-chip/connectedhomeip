@@ -63,23 +63,43 @@ public:
     UDCClientState & operator=(const UDCClientState &) = default;
     UDCClientState & operator=(UDCClientState &&) = default;
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    const PeerAddress GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     const char * GetInstanceName() const { return mInstanceName; }
     void SetInstanceName(const char * instanceName) { strncpy(mInstanceName, instanceName, sizeof(mInstanceName)); }
 
+    const char * GetDeviceName() const { return mDeviceName; }
+    void SetDeviceName(const char * deviceName) { strncpy(mDeviceName, deviceName, sizeof(mDeviceName)); }
+
+    uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
+    void SetLongDiscriminator(uint16_t value) { mLongDiscriminator = value; }
+
+    uint16_t GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t value) { mVendorId = value; }
+
+    uint16_t GetProductId() const { return mProductId; }
+    void SetProductId(uint16_t value) { mProductId = value; }
+
+    const uint8_t * GetRotatingId() const { return mRotatingId; }
+    size_t GetRotatingIdLength() const { return mRotatingIdLen; }
+    void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
+    {
+        size_t maxSize = ArraySize(mRotatingId);
+        mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
+        memcpy(mRotatingId, rotatingId, mRotatingIdLen);
+    }
+
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
 
-    uint64_t GetExpirationTimeMs() const { return mExpirationTimeMs; }
-    void SetExpirationTimeMs(uint64_t value) { mExpirationTimeMs = value; }
+    System::Clock::Timestamp GetExpirationTime() const { return mExpirationTime; }
+    void SetExpirationTime(System::Clock::Timestamp value) { mExpirationTime = value; }
 
-    bool IsInitialized(uint64_t currentTime)
+    bool IsInitialized(System::Clock::Timestamp currentTime)
     {
         // if state is not the "not-initialized" and it has not expired
-        return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTimeMs > currentTime);
+        return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTime > currentTime);
     }
 
     /**
@@ -88,15 +108,21 @@ public:
     void Reset()
     {
         mPeerAddress              = PeerAddress::Uninitialized();
-        mExpirationTimeMs         = 0;
+        mExpirationTime           = System::Clock::kZero;
         mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
     }
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
+    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
+    uint16_t mLongDiscriminator = 0;
+    uint16_t mVendorId;
+    uint16_t mProductId;
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
+    size_t mRotatingIdLen = 0;
     UDCClientProcessingState mUDCClientProcessingState;
-    uint64_t mExpirationTimeMs = 0;
+    System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };
 
 } // namespace UserDirectedCommissioning

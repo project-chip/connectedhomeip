@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <controller/DevicePairingDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
@@ -38,57 +39,136 @@
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceDiscoveryDelegate.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+
+#include <queue>
 
 namespace chip {
 namespace Controller {
 
 class DeviceCommissioner;
 
-class DLL_EXPORT SetUpCodePairer
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    : public DeviceDiscoveryDelegate
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+enum class SetupCodePairerBehaviour : uint8_t
+{
+    kCommission,
+    kPaseOnly,
+};
+
+class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
-    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
+    SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) { ResetDiscoveryState(); }
     virtual ~SetUpCodePairer() {}
 
-    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode);
+    CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
+                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission);
+
+    // Called by the DeviceCommissioner to notify that we have discovered a new device.
+    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
+
+    void SetSystemLayer(System::Layer * systemLayer) { mSystemLayer = systemLayer; };
 
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    CHIP_ERROR Connect(RendezvousInformationFlag rendezvousInformation, uint16_t discriminator, bool isShort);
-    CHIP_ERROR StartDiscoverOverBle(uint16_t discriminator, bool isShort);
+    // DevicePairingDelegate implementation.
+    void OnStatusUpdate(DevicePairingDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+
+    CHIP_ERROR Connect(SetupPayload & paload);
+    CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
     CHIP_ERROR StopConnectOverBle();
-    CHIP_ERROR StartDiscoverOverIP(uint16_t discriminator, bool isShort);
+    CHIP_ERROR StartDiscoverOverIP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverIP();
-    CHIP_ERROR StartDiscoverOverSoftAP(uint16_t discriminator, bool isShort);
+    CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverSoftAP();
 
-    void OnDeviceDiscovered(RendezvousParameters & params);
+    // Returns whether we have kicked off a new connection attempt.
+    bool ConnectToDiscoveredDevice();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    // Reset our mWaitingForDiscovery/mDiscoveredParameters state to indicate no
+    // pending work.
+    void ResetDiscoveryState();
+
+    // Get ready to start PASE establishment via mCommissioner.  Sets up
+    // whatever state is needed for that.
+    void ExpectPASEEstablishment();
+
+    // PASE establishment by mCommissioner has completed: we either have a PASE
+    // session now or we failed to set one up, but we are done waiting on
+    // mCommissioner.
+    void PASEEstablishmentComplete();
+
+    // Called when PASE establishment fails.
+    //
+    // May start a new PASE establishment.
+    //
+    // Will return whether we might in fact have more rendezvous parameters to
+    // try (e.g. because we started a new PASE establishment or are waiting on
+    // more device discovery).
+    //
+    // The commissioner can use the return value to decide whether pairing has
+    // actually failed or not.
+    bool TryNextRendezvousParameters();
+
+    // True if we are still waiting on discovery to possibly produce new
+    // RendezvousParameters in the future.
+    bool DiscoveryInProgress() const;
+
+    // Not an enum class because we use this for indexing into arrays.
+    enum TransportTypes
+    {
+        kBLETransport = 0,
+        kIPTransport,
+        kSoftAPTransport,
+        kTransportTypeCount,
+    };
+
+    static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
     void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj);
+    void OnBLEDiscoveryError(CHIP_ERROR err);
     /////////// BLEConnectionDelegate Callbacks /////////
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+    bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
+    Dnssd::DiscoveryFilter currentFilter;
+
     DeviceCommissioner * mCommissioner = nullptr;
+    System::Layer * mSystemLayer       = nullptr;
     chip::NodeId mRemoteId;
-    uint32_t mSetUpPINCode = 0;
+    uint32_t mSetUpPINCode                   = 0;
+    SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
+
+    // While we are trying to pair, we intercept the DevicePairingDelegate
+    // notifications from mCommissioner.  We want to make sure we send them on
+    // to the original pairing delegate, if any.
+    DevicePairingDelegate * mPairingDelegate = nullptr;
+
+    // Boolean will be set to true if we currently have an async discovery
+    // process happening via the relevant transport.
+    bool mWaitingForDiscovery[kTransportTypeCount] = { false };
+
+    // Queue of things we have discovered but not tried connecting to yet.  The
+    // general discovery/pairing process will terminate once this queue is empty
+    // and all the booleans in mWaitingForDiscovery are false.
+    std::queue<RendezvousParameters> mDiscoveredParameters;
+
+    // mWaitingForPASE is true if we have called either
+    // EstablishPASEConnection or PairDevice on mCommissioner and are now just
+    // waiting to see whether that works.
+    bool mWaitingForPASE = false;
+
+    // mLastPASEError is the error from the last OnPairingComplete call we got.
+    CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 };
 
 } // namespace Controller

@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 config("app-main-config") {
@@ -26,10 +27,16 @@ source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
     "CommissioneeShellCommands.cpp",
     "CommissioneeShellCommands.h",
+    "CommissionerMain.cpp",
+    "CommissionerMain.h",
     "ControllerShellCommands.cpp",
     "ControllerShellCommands.h",
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
     "Options.cpp",
     "Options.h",
   ]
@@ -39,9 +46,38 @@ source_set("app-main") {
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
   }
-  if (chip_ip_commissioning) {
-    # BLE and on-network. Code defaults to BLE if this is not set.
-    defines += [ "CONFIG_RENDEZVOUS_MODE=6" ]
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+  }
+
+  public_deps = [
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
+
+  if (chip_enable_transport_trace) {
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commissioner-main") {
+  defines = []
+  sources = [
+    "CommissionerMain.cpp",
+    "CommissionerMain.h",
+  ]
+
+  defines = []
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
   }
   if (chip_build_libshell) {
     defines += [ "ENABLE_CHIP_SHELL" ]
@@ -49,10 +85,15 @@ source_set("app-main") {
 
   public_deps = [
     "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/shell:shell_core",
   ]
+
+  if (chip_enable_transport_trace) {
+    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+  }
 
   public_configs = [ ":app-main-config" ]
 }

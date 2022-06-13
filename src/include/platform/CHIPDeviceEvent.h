@@ -25,6 +25,9 @@
 #pragma once
 #include <stdint.h>
 
+#include <inet/IPAddress.h>
+#include <lib/core/DataModelTypes.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace DeviceEventType {
@@ -159,6 +162,13 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
+     * SED Interval Change
+     *
+     * Signals a change to the sleepy end device interval.
+     */
+    kSEDIntervalChange,
+
+    /**
      * Security Session Established
      *
      * Signals that an external entity has established a new security session with the device.
@@ -207,9 +217,15 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Commissioning has completed either through timer expiry or by a call to the general commissioning cluster command.
+     * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
+
+    /**
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
+     * successfully invoked.
+     */
+    kFailSafeTimerExpired,
 
     /**
      *
@@ -220,6 +236,16 @@ enum PublicEventTypes
      * Signals that DNS-SD platform layer was initialized and is ready to operate.
      */
     kDnssdPlatformInitialized,
+
+    /**
+     * Signals that bindings were updated.
+     */
+    kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -279,6 +305,11 @@ enum ActivityChange
     kActivity_Stopped  = -1,
 };
 
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
+};
+
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
     if (prevState == newState)
@@ -306,10 +337,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
-#include <inet/InetLayer.h>
+#include <inet/InetInterface.h>
+#include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
 #include <system/SystemLayer.h>
-#include <system/SystemObject.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -325,13 +356,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
-        System::LambdaBridge LambdaEvent;
-        struct
-        {
-            ::chip::System::EventType Type;
-            ::chip::System::Object * Target;
-            uintptr_t Argument;
-        } ChipSystemLayerEvent;
+        LambdaBridge LambdaEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;
@@ -349,7 +374,14 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
-            char address[INET6_ADDRSTRLEN];
+            // WARNING: There used to be `char address[INET6_ADDRSTRLEN]` here and it is
+            //          deprecated/removed since it was too large and only used for logging.
+            //          Consider not relying on ipAddress field either since the platform
+            //          layer *does not actually validate* that the actual internet is reachable
+            //          before issuing this event *and* there may be multiple addresses
+            //          (especially IPv6) so it's recommended to use `ChipDevicePlatformEvent`
+            //          instead and do something that is better for your platform.
+            chip::Inet::IPAddress ipAddress;
         } InternetConnectivityChange;
         struct
         {
@@ -438,14 +470,27 @@ struct ChipDeviceEvent final
 
         struct
         {
-            CHIP_ERROR status;
+            uint64_t nodeId;
+            FabricIndex fabricIndex;
         } CommissioningComplete;
+
+        struct
+        {
+            FabricIndex fabricIndex;
+            bool addNocCommandHasBeenInvoked;
+            bool updateNocCommandHasBeenInvoked;
+        } FailSafeTimerExpired;
 
         struct
         {
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

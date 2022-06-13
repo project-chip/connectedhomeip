@@ -24,23 +24,25 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
 
-class Lighting : public generated::Lighting<Lighting>
+class Lighting : public pw_rpc::nanopb::Lighting::Service<Lighting>
 {
 public:
     Lighting(bool support_level = true, bool support_color = true) : mSupportLevel(support_level), mSupportColor(support_color) {}
 
     virtual ~Lighting() = default;
 
-    virtual pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
+    virtual pw::Status Set(const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
+        DeviceLayer::StackLock lock;
+
         uint8_t on = request.on;
         RETURN_STATUS_IF_NOT_OK(
-            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
-
+            emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
         if (mSupportLevel && request.has_level)
         {
             // Clip level to max
@@ -61,18 +63,18 @@ public:
                                                                 ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation,
                                                                 ZCL_INT8U_ATTRIBUTE_TYPE));
         }
-
         return pw::OkStatus();
     }
 
-    virtual pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
+    virtual pw::Status Get(const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
     {
+        DeviceLayer::StackLock lock;
+
         uint8_t on;
         uint8_t level;
         uint8_t hue;
         uint8_t saturation;
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfReadServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, sizeof(on)));
+        RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, sizeof(on)));
         response.on = on;
 
         if (mSupportLevel)

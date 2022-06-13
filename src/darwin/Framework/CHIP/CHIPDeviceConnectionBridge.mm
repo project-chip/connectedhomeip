@@ -19,7 +19,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 
-void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::Controller::Device * device)
+void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
 {
     auto * object = static_cast<CHIPDeviceConnectionBridge *>(context);
     CHIPDevice * chipDevice = [[CHIPDevice alloc] initWithDevice:device];
@@ -29,7 +29,7 @@ void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::Controller::D
     });
 }
 
-void CHIPDeviceConnectionBridge::OnConnectionFailure(void * context, chip::NodeId deviceId, CHIP_ERROR error)
+void CHIPDeviceConnectionBridge::OnConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error)
 {
     auto * object = static_cast<CHIPDeviceConnectionBridge *>(context);
     dispatch_async(object->mQueue, ^{

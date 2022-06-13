@@ -111,7 +111,7 @@ def generateBloatReport(outputFileName,
                         baselineDir,
                         buildOutputDir,
                         title='BLOAT REPORT'):
-    """Generates a bloat report fo files betwen two diferent directories."""
+    """Generates a bloat report fo files between two diferent directories."""
     logging.info('Generating bloat diff report between %s and %s', baselineDir,
                  buildOutputDir)
     with open(outputFileName, 'wt') as f:

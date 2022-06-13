@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,30 +64,31 @@ public:
     using Key = uint16_t;
 
     // Key definitions for well-known configuration values.
-    static constexpr Key kConfigKey_SerialNum           = QorvoConfigKey(kFileId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId         = QorvoConfigKey(kFileId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert       = QorvoConfigKey(kFileId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = QorvoConfigKey(kFileId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate   = QorvoConfigKey(kFileId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode        = QorvoConfigKey(kFileId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = QorvoConfigKey(kFileId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_SetupDiscriminator  = QorvoConfigKey(kFileId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_SerialNum             = QorvoConfigKey(kFileId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = QorvoConfigKey(kFileId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = QorvoConfigKey(kFileId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = QorvoConfigKey(kFileId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = QorvoConfigKey(kFileId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_SetupPinCode          = QorvoConfigKey(kFileId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = QorvoConfigKey(kFileId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_SetupDiscriminator    = QorvoConfigKey(kFileId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_Spake2pIterationCount = QorvoConfigKey(kFileId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_Spake2pSalt           = QorvoConfigKey(kFileId_ChipFactory, 0x09);
+    static constexpr Key kConfigKey_Spake2pVerifier       = QorvoConfigKey(kFileId_ChipFactory, 0x0A);
 
-    static constexpr Key kConfigKey_FabricId           = QorvoConfigKey(kFileId_ChipConfig, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = QorvoConfigKey(kFileId_ChipConfig, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = QorvoConfigKey(kFileId_ChipConfig, 0x02);
     static constexpr Key kConfigKey_ServiceId          = QorvoConfigKey(kFileId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = QorvoConfigKey(kFileId_ChipConfig, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId = QorvoConfigKey(kFileId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = QorvoConfigKey(kFileId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_GroupKey           = QorvoConfigKey(kFileId_ChipConfig, 0x07);
-    static constexpr Key kConfigKey_ProductRevision    = QorvoConfigKey(kFileId_ChipConfig, 0x08);
+    static constexpr Key kConfigKey_HardwareVersion    = QorvoConfigKey(kFileId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = QorvoConfigKey(kFileId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_CountryCode        = QorvoConfigKey(kFileId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_Breadcrumb         = QorvoConfigKey(kFileId_ChipConfig, 0x0B);
+    static constexpr Key kConfigKey_UniqueId           = QorvoConfigKey(kFileId_ChipConfig, 0x0C);
 
-    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0C);
-    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1B); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0F);
+    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1E); // Allows 16 Group Keys to be created.
 
     static constexpr Key kConfigKey_CounterKeyBase = QorvoConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kConfigKey_CounterKeyMax =
@@ -95,8 +96,8 @@ public:
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = kConfigKey_SerialNum;
-    static constexpr Key kMaxConfigKey_ChipFactory = kConfigKey_SetupDiscriminator;
-    static constexpr Key kMinConfigKey_ChipConfig  = kConfigKey_FabricId;
+    static constexpr Key kMaxConfigKey_ChipFactory = kConfigKey_Spake2pVerifier;
+    static constexpr Key kMinConfigKey_ChipConfig  = kConfigKey_ServiceConfig;
     static constexpr Key kMaxConfigKey_ChipConfig  = kConfigKey_GroupKeyMax;
     static constexpr Key kMinConfigKey_ChipCounter = kConfigKey_CounterKeyBase;
     static constexpr Key kMaxConfigKey_ChipCounter = kConfigKey_CounterKeyMax; // Allows 32 Counters to be created.

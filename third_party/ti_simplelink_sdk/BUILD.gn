@@ -48,6 +48,8 @@ mbedtls_target("mbedtls") {
   # Hardware acceleration
   sources = [
     "${chip_root}/src/platform/cc13x2_26x2/crypto/aes_alt.c",
+    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdh_alt.c",
+    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdsa_alt.c",
     "${chip_root}/src/platform/cc13x2_26x2/crypto/ecjpake_alt.c",
     "${chip_root}/src/platform/cc13x2_26x2/crypto/sha256_alt.c",
   ]

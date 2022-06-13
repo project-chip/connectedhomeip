@@ -1,7 +1,7 @@
-# CHIP Shell - OpenThread CLI pass-through
+# Matter Shell - OpenThread CLI pass-through
 
-The CHIP Shell CLI can execute pass-through commands to the
-[OpenThread cli](https://github.com/openthread/openthread/blob/master/src/cli/README.md)
+The Matter Shell CLI can execute pass-through commands to the
+[OpenThread CLI](https://github.com/openthread/openthread/blob/master/src/cli/README.md)
 directly.
 
 ## Setup

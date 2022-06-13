@@ -15,6 +15,10 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
 	/*
 	* In some default configurations within the nRF Connect SDK,
 	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
@@ -24,4 +28,30 @@
 	chosen {
 		zephyr,entropy = &rng;
 	};
+};
+
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&uart1 {
+	status = "disabled";
+};
+&gpio1 {
+	status = "disabled";
+};
+&i2c0 {
+	status = "disabled";
+};
+&pwm0 {
+	status = "disabled";
+};
+&spi1 {
+	status = "disabled";
+};
+&spi3 {
+	status = "disabled";
+};
+&usbd {
+	status = "disabled";
 };

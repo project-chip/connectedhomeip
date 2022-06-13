@@ -28,27 +28,45 @@ from dataclasses import dataclass
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
-    "Status" / Int16ul,
+    "Status" / Int8ul,
+    "ClusterStatus" / Int8ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "CommandId" / Int32ul,
     "CommandIndex" / Int8ul,
 )
 
+# The type should match WriteStatus in interaction_model/Delegate.h
 IMWriteStatus = Struct(
     "NodeId" / Int64ul,
     "AppIdentifier" / Int64ul,
-    "Status" / Int16ul,
+    "Status" / Int8ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
 )
 
 # AttributePath should not contain padding
-AttributePathStruct = Struct(
+AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
+    "DataVersion" / Int32ul,
+    "HasDataVersion" / Int8ul,
+)
+
+# EventPath should not contain padding
+EventPathIBstruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "EventId" / Int32ul,
+    "Urgent" / Int8ul,
+)
+
+DataVersionFilterIBstruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "DataVersion" / Int32ul,
 )
 
 
@@ -61,9 +79,24 @@ class AttributePath:
 
 
 @dataclass
+class EventPath:
+    nodeId: int
+    endpointId: int
+    clusterId: int
+    eventId: int
+    urgent: int
+
+
+@dataclass
 class AttributeReadResult:
     path: AttributePath
     status: int
+    value: 'typing.Any'
+
+
+@dataclass
+class EventReadResult:
+    path: EventPath
     value: 'typing.Any'
 
 
@@ -77,15 +110,10 @@ class AttributeWriteResult:
 #                                                                                         void * commandStatusBuf);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr, uint8_t commandIndex);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t commandSenderPtr, uint32_t error);
-# typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
-#                                                                  void * attributePathBuf, size_t attributePathBufLen,
-#                                                                  uint8_t * readTlvData, size_t readTlvDataLen, uint16_t statusCode);
 _OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(
     None, c_uint64, c_void_p, c_uint32)
 _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
-_OnReportDataFunct = CFUNCTYPE(
-    None, c_uint64, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
 _OnWriteResponseStatusFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
 _commandStatusDict = dict()
@@ -103,14 +131,6 @@ _writeStatusDictLock = threading.RLock()
 PLACEHOLDER_COMMAND_HANDLE = 1
 DEFAULT_ATTRIBUTEREAD_APPID = 0
 DEFAULT_ATTRIBUTEWRITE_APPID = 0
-
-_onSubscriptionReport = None
-
-
-class OnSubscriptionReport:
-    @abstractmethod
-    def OnData(self, path: AttributePath, subscriptionId: int, data: typing.Any) -> None:
-        pass
 
 
 def _GetCommandStatus(commandHandle: int):
@@ -132,8 +152,6 @@ def _SetCommandStatus(commandHandle: int, val):
 
 def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
     with _commandStatusLock:
-        print("SetCommandIndexStatus commandHandle={} commandIndex={}".format(
-            commandHandle, commandIndex))
         indexDict = _commandIndexStatusDict.get(commandHandle, {})
         indexDict[commandIndex] = status
         _commandIndexStatusDict[commandHandle] = indexDict
@@ -155,32 +173,6 @@ def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
 @ _OnCommandResponseFunct
 def _OnCommandResponse(commandHandle: int, errorcode: int):
     _SetCommandStatus(PLACEHOLDER_COMMAND_HANDLE, errorcode)
-
-
-@ _OnReportDataFunct
-def _OnReportData(nodeId: int, appId: int, subscriptionId: int, attrPathBuf, attrPathBufLen: int, tlvDataBuf, tlvDataBufLen: int, statusCode: int):
-    global _onSubscriptionReport
-    attrPath = AttributePathStruct.parse(
-        ctypes.string_at(attrPathBuf, attrPathBufLen))
-    tlvData = None
-    path = AttributePath(nodeId, attrPath["EndpointId"],
-                         attrPath["ClusterId"], attrPath["AttributeId"])
-    if tlvDataBufLen > 0:
-        tlvBuf = ctypes.string_at(tlvDataBuf, tlvDataBufLen)
-        # We converts the data to AnonymousTag, and it becomes Any in decoded values.
-        tlvData = chip.tlv.TLVReader(tlvBuf).get().get('Any')
-
-    if appId < 256:
-        # For all attribute read requests using CHIPCluster API, appId is filled by CHIPDevice, and should be smaller than 256 (UINT8_MAX).
-        appId = DEFAULT_ATTRIBUTEREAD_APPID
-
-    if subscriptionId != 0:
-        if _onSubscriptionReport:
-            _onSubscriptionReport.OnData(path, subscriptionId, tlvData)
-
-    with _attributeDictLock:
-        _attributeDict[appId] = AttributeReadResult(
-            path, statusCode, tlvData)
 
 
 @_OnWriteResponseStatusFunct
@@ -210,8 +202,6 @@ def InitIMDelegate():
                    _OnCommandResponseFunct])
         setter.Set("pychip_InteractionModel_GetCommandSenderHandle",
                    c_uint32, [ctypes.POINTER(c_uint64)])
-        setter.Set("pychip_InteractionModelDelegate_SetOnReportDataCallback", None, [
-                   _OnReportDataFunct])
         setter.Set("pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback", None, [
                    _OnWriteResponseStatusFunct])
 
@@ -221,8 +211,6 @@ def InitIMDelegate():
             _OnCommandResponseProtocolError)
         handle.pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(
             _OnCommandResponse)
-        handle.pychip_InteractionModelDelegate_SetOnReportDataCallback(
-            _OnReportData)
         handle.pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(
             _OnWriteResponseStatus)
 
@@ -288,8 +276,3 @@ def GetAttributeReadResponse(appId: int) -> AttributeReadResult:
 def GetAttributeWriteResponse(appId: int) -> AttributeWriteResult:
     with _writeStatusDictLock:
         return _writeStatusDict.get(appId, None)
-
-
-def SetAttributeReportCallback(path: AttributePath, callback: OnSubscriptionReport):
-    global _onSubscriptionReport
-    _onSubscriptionReport = callback

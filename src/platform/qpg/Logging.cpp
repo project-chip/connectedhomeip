@@ -5,9 +5,11 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <cstdio>
 #include <ctype.h>
 #include <string.h>
 
@@ -15,6 +17,10 @@
 #include <openthread/platform/logging.h>
 #include <openthread/platform/memory.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#ifdef PW_RPC_ENABLED
+#include "PigweedLogger.h"
+#endif
 
 constexpr uint8_t kPrintfModuleLwip       = 0x01;
 constexpr uint8_t kPrintfModuleOpenThread = 0x02;
@@ -42,7 +48,7 @@ namespace Platform {
  * CHIP log output function.
  */
 
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     size_t prefixLen;
@@ -81,6 +87,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 } // namespace Logging
 } // namespace chip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * LwIP log output function.
  */
@@ -105,6 +112,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
 }
+#endif // #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)

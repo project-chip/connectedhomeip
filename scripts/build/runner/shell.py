@@ -29,7 +29,7 @@ class LogPipe(threading.Thread):
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = os.pipe()
-        self.pipeReader = os.fdopen(self.fd_read)
+        self.pipeReader = os.fdopen(self.fd_read, errors='replace')
         self.start()
 
     def fileno(self):
@@ -64,7 +64,8 @@ class ShellRunner:
         if title:
             logging.info(title)
 
-        with subprocess.Popen(cmd, cwd=self.root_dir, stdout=outpipe, stderr=errpipe) as s:
+        with subprocess.Popen(cmd, cwd=self.root_dir,
+                              stdout=outpipe, stderr=errpipe) as s:
             outpipe.close()
             errpipe.close()
             code = s.wait()

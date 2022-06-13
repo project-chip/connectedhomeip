@@ -1,0 +1,2 @@
+rootProject.name = "CHIPTVCastingApp"
+include ':app'

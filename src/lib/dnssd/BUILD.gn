@@ -26,11 +26,11 @@ static_library("dnssd") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging:messaging_mrp_config",
   ]
 
   sources = [
     "Advertiser.h",
-    "DnssdCache.h",
     "Resolver.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",
@@ -45,12 +45,19 @@ static_library("dnssd") {
     ]
   } else if (chip_mdns == "minimal") {
     sources += [
+      "ActiveResolveAttempts.cpp",
+      "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
+      "IncrementalResolve.cpp",
+      "IncrementalResolve.h",
       "MinimalMdnsServer.cpp",
       "MinimalMdnsServer.h",
       "Resolver_ImplMinimalMdns.cpp",
     ]
-    public_deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
+    public_deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/trace",
+    ]
   } else if (chip_mdns == "platform") {
     sources += [
       "Discovery_ImplPlatform.cpp",

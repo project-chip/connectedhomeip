@@ -15,21 +15,46 @@
 name: Target Navigator Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Read attribute Target Navigator list"
       command: "readAttribute"
-      attribute: "Target Navigator List"
+      attribute: "TargetList"
       response:
-          value: [{ identifier: 1, name: 12 }, { identifier: 2, name: 12 }]
+          value:
+              [
+                  { identifier: 1, name: "exampleName" },
+                  { identifier: 2, name: "exampleName" },
+              ]
 
-    - label: "Navigate Target Command"
-      command: "NavigateTarget"
+    - label: "Read attribute current navigator target"
+      command: "readAttribute"
+      attribute: "CurrentTarget"
+      response:
+          value: 0
+
+    - label: "Navigate Target Request Command"
+      command: "navigateTarget"
       arguments:
           values:
               - name: "target"
                 value: 1
               - name: "data"
-                value: 1
+                value: "1"
+      response:
+          values:
+              - name: "data"
+                value: "data response"
+              - name: "status"
+                value: 0

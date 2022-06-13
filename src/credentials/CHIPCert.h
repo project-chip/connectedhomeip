@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -32,8 +32,10 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
@@ -42,7 +44,7 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr uint32_t kKeyIdentifierLength                 = 20;
+static constexpr uint32_t kKeyIdentifierLength                 = static_cast<uint32_t>(Crypto::kSubjectKeyIdentifierLength);
 static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
@@ -171,18 +173,6 @@ enum class CertDecodeFlags : uint8_t
     kIsTrustAnchor = 0x02,   /**< Indicates that the corresponding certificate is trust anchor. */
 };
 
-/** CHIP Certificate Validate Flags
- *
- * Contains information specifying how a certificate should be validated.
- */
-enum class CertValidateFlags : uint8_t
-{
-    kIgnoreNotBefore = 0x01, /**< Indicate that a Not Before field should be ignored when doing certificate validation. This
-                                flag applies to all certificates in the validation chain. */
-    kIgnoreNotAfter = 0x02,  /**< Indicate that a Not After field should be ignored when doing certificate validation. This
-                                flag applies to all certificates in the validation chain. */
-};
-
 enum
 {
     kNullCertTime = 0
@@ -196,9 +186,10 @@ enum
  */
 struct ChipRDN
 {
-    ByteSpan mString;         /**< Attribute value when encoded as a string. */
-    uint64_t mChipVal;        /**< CHIP specific DN attribute value. */
-    chip::ASN1::OID mAttrOID; /**< DN attribute CHIP OID. */
+    CharSpan mString;                                         /**< Attribute value when encoded as a string. */
+    uint64_t mChipVal;                                        /**< CHIP specific DN attribute value. */
+    chip::ASN1::OID mAttrOID = chip::ASN1::kOID_NotSpecified; /**< DN attribute CHIP OID. */
+    bool mAttrIsPrintableString;                              /**< Specifies if attribute is a printable string type. */
 
     bool IsEqual(const ChipRDN & other) const;
     bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
@@ -228,15 +219,105 @@ public:
     CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
 
     /**
-     * @brief Add string attribute to the DN.
+     * @brief Add CASE Authenticated Tags (CATs) attributes to the DN.
      *
-     * @param oid     String OID for DN attribute.
-     * @param val     A ByteSpan object containing a pointer and length of the DN string attribute
-     *                buffer. The value in the buffer should remain valid while the object is in use.
+     * @param cats    Array of CAT values.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, ByteSpan val);
+    CHIP_ERROR AddCATs(const chip::CATValues & cats);
+
+    /**
+     * @brief Add string attribute to the DN.
+     *
+     * @param oid     String OID for DN attribute.
+     * @param val     A CharSpan object containing a pointer and length of the DN string attribute
+     *                buffer. The value in the buffer should remain valid while the object is in use.
+     * @param isPrintableString  Specifies if attribute ASN1 type is a printable string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrintableString);
+
+    inline CHIP_ERROR AddAttribute_CommonName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_CommonName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Surname(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Surname, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_SerialNumber(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_SerialNumber, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_CountryName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_CountryName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_LocalityName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_LocalityName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_StateOrProvinceName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_StateOrProvinceName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_OrganizationName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_OrganizationName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_OrganizationalUnitName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_OrganizationalUnitName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Title(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Title, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Name(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Name, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_GivenName(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_GivenName, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Initials(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Initials, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_GenerationQualifier(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_GenerationQualifier, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_DNQualifier(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_DNQualifier, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_Pseudonym(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_Pseudonym, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_DomainComponent(CharSpan val, bool isPrintableString)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_DomainComponent, val, isPrintableString);
+    }
+    inline CHIP_ERROR AddAttribute_MatterNodeId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterNodeId, val); }
+    inline CHIP_ERROR AddAttribute_MatterFirmwareSigningId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterFirmwareSigningId, val);
+    }
+    inline CHIP_ERROR AddAttribute_MatterICACId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterICACId, val); }
+    inline CHIP_ERROR AddAttribute_MatterRCACId(uint64_t val) { return AddAttribute(ASN1::kOID_AttributeType_MatterRCACId, val); }
+    inline CHIP_ERROR AddAttribute_MatterFabricId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterFabricId, val);
+    }
+    inline CHIP_ERROR AddAttribute_MatterCASEAuthTag(CASEAuthTag val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterCASEAuthTag, val);
+    }
 
     /**
      * @brief Determine type of a CHIP certificate.
@@ -263,6 +344,30 @@ public:
      **/
     CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
 
+    /**
+     * @brief Encode ChipDN attributes in TLV form.
+     **/
+    CHIP_ERROR EncodeToTLV(chip::TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    /**
+     * @brief Decode ChipDN attributes from TLV encoded format.
+     *
+     * @param reader  A TLVReader positioned at the ChipDN TLV list.
+     **/
+    CHIP_ERROR DecodeFromTLV(chip::TLV::TLVReader & reader);
+
+    /**
+     * @brief Encode ChipDN attributes in ASN1 form.
+     **/
+    CHIP_ERROR EncodeToASN1(ASN1::ASN1Writer & writer) const;
+
+    /**
+     * @brief Decode ChipDN attributes from ASN1 encoded format.
+     *
+     * @param reader  A ASN1Reader positioned at the ChipDN ASN1 list.
+     **/
+    CHIP_ERROR DecodeFromASN1(ASN1::ASN1Reader & reader);
+
     bool IsEqual(const ChipDN & other) const;
 
     /**
@@ -272,6 +377,7 @@ public:
      **/
     bool IsEmpty() const { return RDNCount() == 0; }
 
+    static_assert((CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES) >= 5, "Spec requires at least 5 RDN to be supported per Matter TLV cert");
     ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
 
     uint8_t RDNCount() const;
@@ -290,7 +396,7 @@ using P256ECDSASignatureSpan = FixedByteSpan<Crypto::kP256_ECDSA_Signature_Lengt
 /**
  *  @brief  A data structure for holding a P256 Public Key, without the ownership of it.
  */
-using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_Point_Length>;
+using P256PublicKeySpan = FixedByteSpan<Crypto::kP256_PublicKey_Length>;
 
 /**
  *  @brief  A data structure for holding a P256 Integer, without the ownership of it.
@@ -334,225 +440,6 @@ struct ChipCertificateData
     P256ECDSASignatureSpan mSignature;          /**< Certificate signature. */
 
     uint8_t mTBSHash[Crypto::kSHA256_Hash_Length]; /**< Certificate TBS hash. */
-};
-
-/**
- *  @struct ValidationContext
- *
- *  @brief
- *    Context information used during certification validation.
- */
-struct ValidationContext
-{
-    uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
-    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure.
-                                                       This value is set during certificate validation process
-                                                       to indicate to the caller the trust anchor of the
-                                                       validated certificate. */
-    BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
-                                                       validated certificate. */
-    BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
-                                                       in the validated certificate. */
-    BitFlags<CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
-                                                       should be validated. */
-    uint8_t mRequiredCertType;                      /**< Required certificate type. */
-
-    void Reset();
-};
-
-/**
- *  @class ChipCertificateSet
- *
- *  @brief
- *    Collection of CHIP certificate data providing methods for
- *    certificate validation and signature verification.
- */
-class DLL_EXPORT ChipCertificateSet
-{
-public:
-    ChipCertificateSet();
-    ~ChipCertificateSet();
-
-    ChipCertificateSet & operator=(ChipCertificateSet && aOther)
-    {
-        mCerts               = aOther.mCerts;
-        aOther.mCerts        = nullptr;
-        mCertCount           = aOther.mCertCount;
-        mMaxCerts            = aOther.mMaxCerts;
-        mMemoryAllocInternal = aOther.mMemoryAllocInternal;
-
-        return *this;
-    }
-
-    /**
-     * @brief Initialize ChipCertificateSet.
-     *        This initialization method is used when all memory structures needed for operation are
-     *        allocated internally using chip::Platform::MemoryAlloc() and freed with chip::Platform::MemoryFree().
-     *
-     * @param maxCertsArraySize  Maximum number of CHIP certificates to be loaded to the set.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Init(uint8_t maxCertsArraySize);
-
-    /**
-     * @brief Initialize ChipCertificateSet.
-     *        This initialization method is used when all memory structures needed for operation are
-     *        allocated externally and methods in this class don't need to deal with memory allocations.
-     *
-     * @param certsArray      A pointer to the array of the ChipCertificateData structures.
-     * @param certsArraySize  Number of ChipCertificateData entries in the array.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize);
-
-    /**
-     * @brief Release resources allocated by this class.
-     **/
-    void Release();
-
-    /**
-     * @brief Clear certificate data loaded into this set.
-     **/
-    void Clear();
-
-    /**
-     * @brief Load CHIP certificate into set.
-     *        It is required that the CHIP certificate in the chipCert buffer stays valid while
-     *        the certificate data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param chipCert     Buffer containing certificate encoded in CHIP format.
-     * @param decodeFlags  Certificate decoding option flags.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCert(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags);
-
-    /**
-     * @brief Load CHIP certificate into set.
-     *        It is required that the CHIP certificate in the reader's underlying buffer stays valid while
-     *        the certificate data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param reader       A TLVReader positioned at the CHIP certificate TLV structure.
-     * @param decodeFlags  Certificate decoding option flags.
-     * @param chipCert     Buffer containing certificate encoded on CHIP format. It is required that this CHIP certificate
-     *                     in chipCert ByteSpan stays valid while the certificate data in the set is used.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert = ByteSpan());
-
-    CHIP_ERROR ReleaseLastCert();
-
-    /**
-     * @brief Find certificate in the set.
-     *
-     * @param subjectKeyId  Subject key identifier of the certificate to be found in the set.
-     *
-     * @return A pointer to the certificate data On success. Otherwise, NULL if no certificate found.
-     **/
-    const ChipCertificateData * FindCert(const CertificateKeyId & subjectKeyId) const;
-
-    /**
-     * @return A pointer to the set of certificate data entries.
-     **/
-    const ChipCertificateData * GetCertSet() const { return mCerts; }
-
-    /**
-     * @return A pointer to the last certificate data in the set. Returns NULL if certificate set is empty.
-     **/
-    const ChipCertificateData * GetLastCert() const { return (mCertCount > 0) ? &mCerts[mCertCount - 1] : nullptr; }
-
-    /**
-     * @return Number of certificates loaded into the set.
-     **/
-    uint8_t GetCertCount() const { return mCertCount; }
-
-    /**
-     * @brief Check whether certificate is in the set.
-     *
-     * @param cert  Pointer to the ChipCertificateData structures.
-     *
-     * @return True if certificate is in the set, false otherwise.
-     **/
-    bool IsCertInTheSet(const ChipCertificateData * cert) const;
-
-    /**
-     * @brief Validate CHIP certificate.
-     *
-     * @param cert     Pointer to the CHIP certificate to be validated. The certificate is
-     *                 required to be in this set, otherwise this function returns error.
-     * @param context  Certificate validation context.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context);
-
-    /**
-     * @brief Find and validate CHIP certificate.
-     *
-     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
-     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
-     * @param[in]  context       Certificate validation context.
-     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             const ChipCertificateData ** certData);
-
-    /**
-     * @brief Verify CHIP certificate signature.
-     *
-     * @param cert    Pointer to the CHIP certificate which signature should be validated.
-     * @param caCert  Pointer to the CA certificate of the verified certificate.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    static CHIP_ERROR VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert);
-
-private:
-    ChipCertificateData * mCerts; /**< Pointer to an array of certificate data. */
-    uint8_t mCertCount;           /**< Number of certificates in mCerts
-                                     array. We maintain the invariant that all
-                                     the slots at indices less than
-                                     mCertCount have been constructed and slots
-                                     at indices >= mCertCount have either never
-                                     had their constructor called, or have had
-                                     their destructor called since then. */
-    uint8_t mMaxCerts;            /**< Length of mCerts array. */
-    bool mMemoryAllocInternal;    /**< Indicates whether temporary memory buffers are allocated internally. */
-
-    /**
-     * @brief Find and validate CHIP certificate.
-     *
-     * @param[in]  subjectDN      Subject distinguished name to use as certificate search parameter.
-     * @param[in]  subjectKeyId   Subject key identifier to use as certificate search parameter.
-     * @param[in]  context        Certificate validation context.
-     * @param[in]  validateFlags  Certificate validation flags.
-     * @param[in]  depth          Depth of the current certificate in the certificate validation chain.
-     * @param[out] certData       A slot to write a pointer to the CHIP certificate data that matches search criteria.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, const ChipCertificateData ** certData);
-
-    /**
-     * @brief Validate CHIP certificate.
-     *
-     * @param cert           Pointer to the CHIP certificate to be validated.
-     * @param context        Certificate validation context.
-     * @param validateFlags  Certificate validation flags.
-     * @param depth          Depth of the current certificate in the certificate validation chain.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth);
 };
 
 /**
@@ -611,23 +498,13 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
  **/
 CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & x509Cert);
 
-// TODO: Add support for Authentication Tag Attribute
 struct X509CertRequestParams
 {
     int64_t SerialNumber;
-    uint64_t Issuer;
     uint32_t ValidityStart;
     uint32_t ValidityEnd;
-    bool HasFabricID;
-    uint64_t FabricID;
-    bool HasNodeID;
-    uint64_t NodeID;
-};
-
-enum CertificateIssuerLevel
-{
-    kIssuerIsRootCA,
-    kIssuerIsIntermediateCA,
+    ChipDN SubjectDN;
+    ChipDN IssuerDN;
 };
 
 /**
@@ -646,42 +523,38 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @brief Generate a new X.509 DER encoded Intermediate CA certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param subject         The requested subject ID
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t subject,
-                          const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                          MutableByteSpan & x509Cert);
+CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
+                          Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel,
-                                      const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                      MutableByteSpan & x509Cert);
+CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
+                                      Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief
- *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch UTC time.
+ *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch time.
  *
  * @note
  *   This function makes no attempt to verify the correct range of the input time other than year.
  *   Therefore callers must make sure the supplied values are valid prior to invocation.
  *
  * @param asn1Time   The calendar date/time to be converted.
- * @param epochTime  A reference to an integer that will receive CHIP Epoch UTC time.
+ * @param epochTime  A reference to an integer that will receive CHIP Epoch time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  * @retval  #ASN1_ERROR_UNSUPPORTED_ENCODING    If the input time contained a year value that could not
@@ -705,9 +578,9 @@ CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime
  **/
 inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipFirmwareSigningId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipICAId || oid == chip::ASN1::kOID_AttributeType_ChipRootId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
+    return (oid == chip::ASN1::kOID_AttributeType_MatterNodeId || oid == chip::ASN1::kOID_AttributeType_MatterFirmwareSigningId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterICACId || oid == chip::ASN1::kOID_AttributeType_MatterRCACId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterFabricId);
 }
 
 /**
@@ -715,7 +588,7 @@ inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
  **/
 inline bool IsChip32bitDNAttr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipAuthTag1 || oid == chip::ASN1::kOID_AttributeType_ChipAuthTag2);
+    return (oid == chip::ASN1::kOID_AttributeType_MatterCASEAuthTag);
 }
 
 /**
@@ -772,15 +645,14 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
 
 /**
- * Extract the FabricID from a CHIP certificate in ByteSpan TLV-encoded
- * form.  This does not perform any sort of validation on the certificate
- * structure other than parsing it.
+ * Extract the Fabric ID from an operational certificate that has already been
+ * parsed.
  *
  * This function can be used to extract Fabric ID from an ICA certificate.
  * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
  * cannot be used for such certificates.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have RDN
  * corresponding to FabricID.
  */
 CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
@@ -789,12 +661,61 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
  * Extract Node ID and Fabric ID from an operational certificate that has already been
  * parsed.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have at
  * least one NodeId RDN and one FabricId RDN in the Subject DN.  No other
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.
  */
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
+
+/**
+ * Extract Node ID, Fabric ID and Compressed Fabric ID from an operational
+ * certificate and its associated root certificate.
+ *
+ * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                              FabricId & fabricId, NodeId & nodeId);
+
+/**
+ * Extract Node ID and Compressed Fabric ID from an operational certificate
+ * and its associated root certificate.
+ *
+ * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ExtractNodeIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                      NodeId & nodeId);
+
+/**
+ * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
+ *
+ * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL if there are too many CATs in the NOC
+ */
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats);
+
+/**
+ * Extract CASE Authenticated Tags from an operational certificate that has already been
+ * parsed.
+ *
+ * All values in the 'cats' struct will be set either to a valid CAT value or to the kUndefinedCAT value.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL if the passed-in CATs array is too small.
+ */
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats);
+
+/**
+ * Extract the and Fabric ID from an operational certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert or from the
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
+ */
+CHIP_ERROR ExtractFabricIdFromCert(const ByteSpan & opcert, FabricId * fabricId);
 
 /**
  * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded
@@ -809,20 +730,55 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
 /**
  * Extract Public Key from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey);
 
 /**
+ * Extract Not Before Time from a chip certificate in ByteSpan TLV-encoded form.
+ * Output format is seconds referenced from the CHIP epoch.
+ *
+ * Special value 0 corresponds to the X.509/RFC5280 defined special time value
+ * 99991231235959Z meaning 'no well-defined expiration date'.  However, as a
+ * NotBefore time, this does not require special handling when comparing to
+ * a CHIP epoch time source, as 0 (the epoch) is also the earliest representable
+ * uint32 time.
+
+ * This does not perform any sort of validation on the certificate structure
+ * other than parsing it.
+ *
+ * @param chipCert CHIP certificate in TLV-encoded form
+ * @param notBeforeChipEpochTime (out) certificate NotBefore time as seconds from the CHIP epoch
+ * @return CHIP_NO_ERROR if certificate parsing was successful, else an appropriate CHIP_ERROR
+ */
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime);
+
+/**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan TLV-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn);
+
+/**
+ * Extract Subject Distinguished Name (DN) from a chip certificate in ByteSpan X509 DER-encoded form.
+ * It is required that the certificate in the chipCert buffer stays valid while the `dn` output is used.
+ *
+ * Can return any error that can be returned from converting and parsing the cert.
+ */
+CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
 
 } // namespace Credentials
 } // namespace chip

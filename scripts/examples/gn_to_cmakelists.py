@@ -96,9 +96,11 @@ def SetVariable(out, variable_name, value):
 def SetVariableList(out, variable_name, values):
     """Sets a CMake variable to a list."""
     if not values:
-        return SetVariable(out, variable_name, "")
+        SetVariable(out, variable_name, "")
+        return
     if len(values) == 1:
-        return SetVariable(out, variable_name, values[0])
+        SetVariable(out, variable_name, values[0])
+        return
     out.write('list(APPEND "')
     out.write(CMakeStringEscape(variable_name))
     out.write('"\n  "')

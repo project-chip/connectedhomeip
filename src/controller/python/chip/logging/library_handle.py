@@ -16,7 +16,6 @@
 
 import chip.native
 import ctypes
-from ctypes import c_void_p
 from chip.logging.types import LogRedirectCallback_t
 
 
@@ -35,6 +34,6 @@ def _GetLoggingLibraryHandle() -> ctypes.CDLL:
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_logging_set_callback',
-                   c_void_p, [LogRedirectCallback_t])
+                   ctypes.c_void_p, [LogRedirectCallback_t])
 
     return handle

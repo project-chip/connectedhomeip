@@ -1,0 +1,117 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 60.2.2. [TC-PS-2.2] Event reporting with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Bring the DUT into a state without any wired faults."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveWiredFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-wired-faults 12345 1
+      disabled: true
+
+    - label: "Set up subscription to WiredFaultChange event"
+      verification: |
+          ./apps/chip-tool powersource subscribe-event-by-id 0 120 3600 1 54321 1
+      disabled: true
+
+    - label: "Bring the DUT into a wired fault state."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveWiredFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-wired-faults 12345 1
+      disabled: true
+
+    - label: "Bring the DUT back into a clean state."
+      verification: |
+
+      disabled: true
+
+    - label: "Bring the DUT into a state without any battery faults."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveBatFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-battery-faults 12345 1
+      disabled: true
+
+    - label: "Set up subscription to BatFaultChange event"
+      verification: |
+          ./apps/chip-tool powersource subscribe-event-by-id 1 120 3600 1 54321 1
+      disabled: true
+
+    - label: "Bring the DUT into a battery fault state."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveBatFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-battery-faults 12345 1
+      disabled: true
+
+    - label: "Bring the DUT back into a clean state."
+      verification: |
+
+      disabled: true
+
+    - label: "Bring the DUT into a state without any charge faults."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-battery-charge-faults 12345 1
+      disabled: true
+
+    - label: "Set up subscription to BatChargeFaultChange event"
+      verification: |
+          ./apps/chip-tool powersource subscribe-event-by-id 2 120 3600 1 54321 1
+      disabled: true
+
+    - label: "Bring the DUT into a charge fault state."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
+      verification: |
+          ./apps/chip-tool powersource read active-battery-charge-faults 12345 1
+      disabled: true
+
+    - label: "Bring the DUT back into a clean state."
+      verification: |
+
+      disabled: true

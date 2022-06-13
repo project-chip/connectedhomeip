@@ -23,20 +23,4 @@ namespace chip {
 
 using namespace Transport;
 
-const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
-{
-    if (IsSecure())
-    {
-        SecureSession * state = sessionManager->GetSecureSession(*this);
-        if (state == nullptr)
-        {
-            return nullptr;
-        }
-
-        return &state->GetPeerAddress();
-    }
-
-    return &GetUnauthenticatedSession()->GetPeerAddress();
-}
-
 } // namespace chip

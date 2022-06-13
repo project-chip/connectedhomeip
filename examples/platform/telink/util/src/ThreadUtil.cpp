@@ -18,15 +18,14 @@
 
 #include "ThreadUtil.h"
 
-#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+
+#include <app/server/Dnssd.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
 
 #include <cstring>
-#include <stdio.h>
-#include <stdlib.h>
 
 void StartDefaultThreadNetwork(void)
 {
@@ -49,17 +48,6 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
     chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
-}
 
-void tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
-{
-    va_list args;
-
-    va_start(args, aFormat);
-
-    vprintf(aFormat, args);
-
-    printf("\r\n");
-
-    va_end(args);
+    chip::app::DnssdServer::Instance().StartServer();
 }

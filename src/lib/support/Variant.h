@@ -22,9 +22,12 @@
 
 #include <algorithm>
 #include <new>
+#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+
+#include <lib/core/InPlace.h>
 
 namespace chip {
 
@@ -70,10 +73,8 @@ struct VariantCurry<Index, T, Ts...>
         {
             return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
         }
-        else
-        {
-            return VariantCurry<Index + 1, Ts...>::Equal(type_t, that_v, this_v);
-        }
+
+        return VariantCurry<Index + 1, Ts...>::Equal(type_t, that_v, this_v);
     }
 };
 
@@ -147,6 +148,13 @@ private:
 public:
     Variant() : mTypeId(kInvalidType) {}
 
+    template <typename T, class... Args>
+    constexpr explicit Variant(InPlaceTemplateType<T>, Args &&... args) :
+        mTypeId(VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value)
+    {
+        new (&mData) T(std::forward<Args>(args)...);
+    }
+
     Variant(const Variant<Ts...> & that) : mTypeId(that.mTypeId) { Curry::Copy(that.mTypeId, &that.mData, &mData); }
 
     Variant(Variant<Ts...> && that) : mTypeId(that.mTypeId)
@@ -188,6 +196,12 @@ public:
     std::size_t GetType() const { return mTypeId; }
 
     bool Valid() const { return (mTypeId != kInvalidType); }
+
+    template <typename T, typename... Args>
+    static Variant<Ts...> Create(Args &&... args)
+    {
+        return Variant<Ts...>(InPlaceTemplate<T>, std::forward<Args>(args)...);
+    }
 
     template <typename T, typename... Args>
     void Set(Args &&... args)

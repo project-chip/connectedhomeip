@@ -23,11 +23,19 @@
  */
 #pragma once
 
+#include <new>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
-#include <lib/support/Variant.h>
 
 namespace chip {
+
+/// An empty class type used to indicate optional type with uninitialized state.
+struct NullOptionalType
+{
+    explicit NullOptionalType() = default;
+};
+constexpr NullOptionalType NullOptional{};
 
 /**
  * Pairs an object with a boolean value to determine if the object value
@@ -38,8 +46,11 @@ class Optional
 {
 public:
     constexpr Optional() : mHasValue(false) {}
+    constexpr Optional(NullOptionalType) : mHasValue(false) {}
+
     ~Optional()
     {
+        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Branch): mData is set when mHasValue
         if (mHasValue)
         {
             mValue.mData.~T();
@@ -148,7 +159,14 @@ public:
     }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
-    const T & Value() const
+    T & Value() &
+    {
+        VerifyOrDie(HasValue());
+        return mValue.mData;
+    }
+
+    /** Gets the current value of the optional. Valid IFF `HasValue`. */
+    const T & Value() const &
     {
         VerifyOrDie(HasValue());
         return mValue.mData;
@@ -186,6 +204,12 @@ private:
         T mData;
     } mValue;
 };
+
+template <class T>
+constexpr Optional<std::decay_t<T>> MakeOptional(T && value)
+{
+    return Optional<std::decay_t<T>>(InPlace, std::forward<T>(value));
+}
 
 template <class T, class... Args>
 constexpr Optional<T> MakeOptional(Args &&... args)

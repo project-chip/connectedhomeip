@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
-#include <app/util/af-types.h>
+#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <lib/core/CHIPError.h>
+
+using namespace chip::app::Clusters::WindowCovering;
 
 class WindowApp
 {
@@ -76,49 +77,83 @@ public:
         CoverChange,
         CoverTypeChange,
         TiltModeChange,
-        LiftUp,
-        LiftDown,
-        LiftChanged,
-        TiltUp,
-        TiltDown,
-        TiltChanged,
-        StopMotion,
+
+        // Cover Attribute update events
+        AttributeChange,
+
         // Provisioning events
         ProvisionedStateChanged,
         ConnectivityStateChanged,
         BLEConnectionsChanged,
+        WinkOff,
+        WinkOn,
     };
 
     struct Event
     {
         Event(EventId id) : mId(id), mEndpoint(0) {}
         Event(EventId id, chip::EndpointId endpoint) : mId(id), mEndpoint(endpoint) {}
+        Event(EventId id, chip::EndpointId endpoint, chip::AttributeId attributeId) :
+            mId(id), mEndpoint(endpoint), mAttributeId(attributeId)
+        {}
 
         EventId mId;
         chip::EndpointId mEndpoint;
+        chip::AttributeId mAttributeId;
     };
 
     struct Cover
     {
         void Init(chip::EndpointId endpoint);
         void Finish();
-        void LiftUp();
-        void LiftDown();
-        void GotoLift(EventId action = EventId::None);
-        void TiltUp();
-        void TiltDown();
-        void GotoTilt(EventId action = EventId::None);
-        void StopMotion();
-        EmberAfWcType CycleType();
+
+        void LiftUpdate(bool newTarget);
+        void LiftGoToTarget() { LiftUpdate(true); }
+        void LiftContinueToTarget() { LiftUpdate(false); }
+        void LiftStepToward(OperationalState direction);
+        void LiftSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, false); }
+
+        void TiltUpdate(bool newTarget);
+        void TiltGoToTarget() { TiltUpdate(true); }
+        void TiltContinueToTarget() { TiltUpdate(false); }
+        void TiltStepToward(OperationalState direction);
+        void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
+
+        void StepToward(OperationalState direction, bool isTilt);
+
+        Type CycleType();
 
         static void OnLiftTimeout(Timer & timer);
         static void OnTiltTimeout(Timer & timer);
 
         chip::EndpointId mEndpoint = 0;
-        Timer * mLiftTimer         = nullptr;
-        Timer * mTiltTimer         = nullptr;
-        EventId mLiftAction        = EventId::None;
-        EventId mTiltAction        = EventId::None;
+
+        // Attribute: Id 10 OperationalStatus
+        OperationalStatus mOperationalStatus = { .global = OperationalState::Stall,
+                                                 .lift   = OperationalState::Stall,
+                                                 .tilt   = OperationalState::Stall };
+
+        Timer * mLiftTimer            = nullptr;
+        Timer * mTiltTimer            = nullptr;
+        OperationalState mLiftOpState = OperationalState::Stall;
+        OperationalState mTiltOpState = OperationalState::Stall;
+
+        struct CoverWorkData
+        {
+            chip::EndpointId mEndpointId;
+            bool isTilt;
+
+            union
+            {
+                chip::Percent100ths percent100ths;
+                OperationalStatus opStatus;
+            };
+        };
+
+        void SchedulePositionSet(chip::Percent100ths position, bool isTilt);
+        static void CallbackPositionSet(intptr_t arg);
+        void ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus);
+        static void CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg);
     };
 
     static WindowApp & Instance();
@@ -128,14 +163,21 @@ public:
     virtual CHIP_ERROR Start() = 0;
     virtual CHIP_ERROR Run();
     virtual void Finish();
-    virtual void PostEvent(const Event & event) = 0;
+    virtual void PostEvent(const Event & event)                                                = 0;
+    virtual void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) = 0;
 
 protected:
     struct StateFlags
     {
+#if CHIP_ENABLE_OPENTHREAD
         bool isThreadProvisioned = false;
         bool isThreadEnabled     = false;
-        bool haveBLEConnections  = false;
+#else
+        bool isWiFiProvisioned = false;
+        bool isWiFiEnabled     = false;
+#endif
+        bool haveBLEConnections = false;
+        bool isWinking          = false;
     };
 
     Cover & GetCover();
@@ -164,6 +206,7 @@ protected:
 
 private:
     void HandleLongPress();
+    void DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute);
 
     Cover mCoverList[WINDOW_COVER_COUNT];
     uint8_t mCurrentCover = 0;

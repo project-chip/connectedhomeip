@@ -32,20 +32,20 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <system/TimeSource.h>
 
 namespace chip {
 namespace Dnssd {
 
 // None of these sizes include an null character at the end.
-static constexpr uint8_t kDnssdInstanceNameMaxSize = 33; // [Node]-[Fabric] ID in hex - 16+1+16
-static constexpr uint8_t kDnssdHostNameMaxSize     = 16; // 64-bits in hex.
-static constexpr size_t kDnssdProtocolTextMaxSize  = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
+static constexpr size_t kDnssdProtocolTextMaxSize = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
 static constexpr size_t kDnssdTypeMaxSize =
     std::max({ sizeof(kCommissionableServiceName), sizeof(kOperationalServiceName), sizeof(kCommissionerServiceName) }) - 1;
 static constexpr uint8_t kDnssdTypeAndProtocolMaxSize     = kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1; // <type>.<protocol>
 static constexpr uint16_t kDnssdTextMaxSize               = 64;
-static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = kMaxSubtypeDescSize + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
+static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = Common::kSubTypeMaxLength + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
 
 enum class DnssdServiceProtocol : uint8_t
 {
@@ -63,11 +63,12 @@ struct TextEntry
 
 struct DnssdService
 {
-    char mName[kDnssdInstanceNameMaxSize + 1];
-    char mHostName[kDnssdHostNameMaxSize + 1] = "";
+    char mName[Common::kInstanceNameMaxLength + 1];
+    char mHostName[kHostNameMaxLength + 1] = "";
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
-    Inet::IPAddressType mAddressType;
+    Inet::IPAddressType mAddressType;   // Address record type to query or publish (A or AAAA)
+    Inet::IPAddressType mTransportType; // Transport to use for the query.
     uint16_t mPort;
     chip::Inet::InterfaceId mInterface;
     TextEntry * mTextEntries;
@@ -75,6 +76,8 @@ struct DnssdService
     const char ** mSubTypes;
     size_t mSubTypeSize;
     Optional<chip::Inet::IPAddress> mAddress;
+    // Time to live in seconds. Per rfc6762 section 10, because we have a hostname, our default TTL is 120 seconds
+    uint32_t mTtlSeconds = 120;
 };
 
 /**
@@ -84,11 +87,14 @@ struct DnssdService
  * any pointer inside this structure.
  *
  * @param[in] context     The context passed to ChipDnssdBrowse or ChipDnssdResolve.
- * @param[in] result      The mdns resolve result, can be nullptr if error happens.
+ * @param[in] result      The mdns resolve result, can be nullptr if error
+ *                        happens.  The mAddress of this object will be ignored.
+ * @param[in] addresses   IP addresses that we resolved.
  * @param[in] error       The error code.
  *
  */
-using DnssdResolveCallback = void (*)(void * context, DnssdService * result, CHIP_ERROR error);
+using DnssdResolveCallback = void (*)(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                      CHIP_ERROR error);
 
 /**
  * The callback function for mDNS browse.
@@ -103,6 +109,21 @@ using DnssdResolveCallback = void (*)(void * context, DnssdService * result, CHI
  *
  */
 using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error);
+
+/**
+ * The callback function for mDNS publish.
+ *
+ * Will be called when publishing succeeds or fails.
+ *
+ * The callback function SHALL NOT take the ownership of the service pointer or
+ * any pointer inside this structure.
+ *
+ * @param[in] context       The context passed to ChipDnssdPublish.
+ * @param[in] type          The published type if no errors has occured, nullptr otherwise.
+ * @param[in] error         The error code.
+ *
+ */
+using DnssdPublishCallback = void (*)(void * context, const char * type, CHIP_ERROR error);
 
 using DnssdAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
@@ -147,13 +168,15 @@ CHIP_ERROR ChipDnssdRemoveServices();
  * This function will NOT take the ownership of service->mTextEntries memory.
  *
  * @param[in] service   The service entry.
+ * @param[in] callback  The callback to call when the service is published.
+ * @param[in] context   The context passed to the callback.
  *
  * @retval CHIP_NO_ERROR                The publish succeeds.
  * @retval CHIP_ERROR_INVALID_ARGUMENT  The service is nullptr.
  * @retval Error code                   The publish fails.
  *
  */
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service);
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback = nullptr, void * context = nullptr);
 
 /**
  * Finalizes updating advertised services.

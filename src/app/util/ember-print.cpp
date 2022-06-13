@@ -29,9 +29,10 @@ bool emberAfPrintReceivedMessages = true;
 
 using namespace chip::Logging;
 
+#if CHIP_PROGRESS_LOGGING
+
 void emberAfPrint(int category, const char * format, ...)
 {
-#if _CHIP_USE_LOGGING
     if (format != nullptr)
     {
         va_list args;
@@ -39,12 +40,11 @@ void emberAfPrint(int category, const char * format, ...)
         chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, format, args);
         va_end(args);
     }
-#endif
 }
 
+#if !CHIP_PW_TOKENIZER_LOGGING
 void emberAfPrintln(int category, const char * format, ...)
 {
-#if _CHIP_USE_LOGGING
     if (format != nullptr)
     {
         va_list args;
@@ -52,8 +52,8 @@ void emberAfPrintln(int category, const char * format, ...)
         chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, format, args);
         va_end(args);
     }
-#endif
 }
+#endif
 
 // TODO: add unit tests.
 
@@ -76,7 +76,14 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
             const uint32_t outStringEnd   = segmentLength * perByteCharCount;
             for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
             {
+                // The perByteFormatStr is in fact a literal (one of two), but
+                // the compiler does not realize that.  We could branch on
+                // perByteFormatStr and have separate snprintf calls, but this
+                // seems like it might lead to smaller code.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
                 snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
+#pragma GCC diagnostic pop
             }
             result[outStringEnd] = 0;
             emberAfPrint(category, "%s", result);
@@ -92,3 +99,5 @@ void emberAfPrintString(int category, const uint8_t * string)
 {
     emberAfPrint(category, "%.*s", emberAfStringLength(string), string + 1);
 }
+
+#endif // CHIP_PROGRESS_LOGGING

@@ -34,6 +34,7 @@ static_library("Darwin") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -46,11 +47,12 @@ static_library("Darwin") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "DnssdContexts.cpp",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.h",
-    "KeyValueStoreManagerImpl.mm",
     "Logging.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
@@ -59,16 +61,35 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
   ]
+
+  if (chip_disable_platform_kvs == false) {
+    sources += [
+      "KeyValueStoreManagerImpl.h",
+      "KeyValueStoreManagerImpl.mm",
+    ]
+  }
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/app:app_buildconfig",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   public_configs = [ ":darwin_config" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      # using the implements from Linux platform
+      "../Linux/OTAImageProcessorImpl.cpp",
+      "../Linux/OTAImageProcessorImpl.h",
+    ]
+  }
 
   if (chip_enable_ble) {
     sources += [

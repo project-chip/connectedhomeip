@@ -13,6 +13,9 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -51,9 +54,9 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
 
-#Mac OS X \$ brew install ninja
+#Mac OS X `brew install ninja`
 
 -   Supported hardware:
 
@@ -77,38 +80,73 @@ Silicon Labs platform.
 
 *   Build the example application:
 
+          ```
           cd ~/connectedhomeip
           ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app BRD4161A
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
+          ```
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
+          ```
 
-OR use GN/Ninja directly
+    OR use GN/Ninja directly
 
+          ```
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug
           $ ninja -C out/debug
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
+          ```
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ rm -rf out/
+          ```
 
-*   Build the example with pigweed RCP use GN/Ninja Directly
+*   Build the example as Sleepy End Device (SED)
 
+          ```
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
+          ```
+
+    or use gn as previously mentioned but adding the following arguments:
+
+          ```
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          ```
+
+*   Build the example with pigweed RPC
+
+          ```
+          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          ```
+
+    or use GN/Ninja Directly
+
+          ```
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
+          ```
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
+
+For more build options, help is provided when running the build script without
+arguments
+
+         ```
+         ./scripts/examples/gn_efr32_example.sh
+         ```
 
 <a name="flashing"></a>
 
@@ -116,8 +154,10 @@ OR use GN/Ninja directly
 
 -   On the command line:
 
+          ```
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ python3 out/debug/chip-efr32-lighting-example.flash.py
+          ```
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -145,14 +185,18 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
+          ```
           $ cd ~/Downloads
           $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+          ```
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
+          ```
           $ sudo usermod -a -G dialout ${USER}
+          ```
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -161,15 +205,21 @@ combination with JLinkRTTClient as follows:
 
     For MG12 use:
 
+          ```
           $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
+          ```
 
     For MG21 use:
 
+          ```
           $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+          ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
+          ```
           $ JLinkRTTClient
+          ```
 
 <a name="running-complete-example"></a>
 
@@ -233,24 +283,17 @@ combination with JLinkRTTClient as follows:
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
 
-    Here is an example with the Python controller:
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the CHIPTool:
 
     ```
-      chip-device-ctrl
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-      connect -ble 3840 73141520 1234
-
-      zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
-
-      zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
-
-      close-ble
-
-      resolve 0 1234
-
-      zcl OnOff Toggle 1234 1 0
+    chip-tool onoff on 1 1
     ```
 
 ### Notes
@@ -260,12 +303,12 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-#On Border Router: \$ sudo ip addr add dev <Network interface> 2002::2/64
+#On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
 
-#On PC(Linux): \$ sudo ip addr add dev <Network interface> 2002::1/64
+#On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
 
-#Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
-via 2002::2
+#Add Ipv6 route on PC(Linux)
+`sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
 <a name="running-pigweed-rpc-console"></a>
 
@@ -278,7 +321,7 @@ via 2002::2
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
@@ -289,6 +332,18 @@ via 2002::2
     `rpcs.chip.rpc.Lighting.Get()`
 
     `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See Build the example with pigweed RPC.
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```
 
 ## Memory settings
 
@@ -305,3 +360,59 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+
+## Group Communication (Multicast)
+
+With this lighting example you can also use group communication to send Lighting
+commands to multiples devices at once. Please refer to the
+[chip-tool documentation](../../chip-tool/README.md) _Configuring the server
+side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
+Commands_
+
+## Building options
+
+All of Silabs's examples within the Matter repo have all the features enabled by
+default, as to provide the best end user experience. However some of those
+features can easily be toggled on or off. Here is a short list of options to be
+passed to the build scripts.
+
+### Disabling logging
+
+`chip_progress_logging, chip_detail_logging, chip_automation_logging`
+
+    ```
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    ```
+
+### Debug build / release build
+
+`is_debug`
+
+    ```
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+    ```
+
+### Disabling LCD
+
+`show_qr_code`
+
+    ```
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+    ```
+
+### KVS maximum entry count
+
+`kvs_max_entries`
+
+    ```
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
+    ```

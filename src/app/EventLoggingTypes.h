@@ -17,10 +17,13 @@
 
 #pragma once
 
-#include <app/ClusterInfo.h>
+#include <access/SubjectDescriptor.h>
+#include <app/EventPathParams.h>
+#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 #include <system/SystemPacketBuffer.h>
 
 constexpr size_t kNumPriorityLevel = 3;
@@ -88,47 +91,34 @@ static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
 
 /**
  * @brief
- *   The structure that provides a full resolution of the cluster.
- */
-struct EventSchema
-{
-    EventSchema(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, PriorityLevel aPriority) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority)
-    {}
-    NodeId mNodeId          = 0;
-    EndpointId mEndpointId  = 0;
-    ClusterId mClusterId    = 0;
-    EventId mEventId        = 0;
-    PriorityLevel mPriority = PriorityLevel::Invalid;
-};
-
-/**
- * @brief
- *   The struct that provides an application set system or UTC timestamp.
+ *   The struct that provides an application set System or Epoch timestamp.
  */
 struct Timestamp
 {
     enum class Type
     {
-        kInvalid = 0,
-        kSystem,
-        kUTC
+        kSystem = 0,
+        kEpoch
     };
     Timestamp() {}
     Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
-    static Timestamp UTC(uint64_t aValue)
+    Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
+    static Timestamp Epoch(System::Clock::Timestamp aValue)
     {
-        Timestamp timestamp(Type::kUTC, aValue);
+        Timestamp timestamp(Type::kEpoch, aValue.count());
         return timestamp;
     }
-    static Timestamp System(uint64_t aValue)
+    static Timestamp System(System::Clock::Timestamp aValue)
     {
-        Timestamp timestamp(Type::kSystem, aValue);
+        Timestamp timestamp(Type::kSystem, aValue.count());
         return timestamp;
     }
 
-    Type mType      = Type::kInvalid;
+    bool IsSystem() const { return mType == Type::kSystem; }
+    bool IsEpoch() const { return mType == Type::kEpoch; }
+
+    Type mType      = Type::kSystem;
     uint64_t mValue = 0;
 };
 
@@ -138,24 +128,13 @@ struct Timestamp
 class EventOptions
 {
 public:
-    enum class Type
-    {
-        kUrgent = 0,
-        kNotUrgent,
-    };
-    EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
-
-    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aType) {}
-
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
-
-    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent) {}
+    EventOptions() : mPriority(PriorityLevel::Invalid) {}
+    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
+    ConcreteEventPath mPath;
     Timestamp mTimestamp;
-
-    EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
-
-    Type mUrgent = Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be
-                                        flushed. */
+    PriorityLevel mPriority = PriorityLevel::Invalid;
+    // kUndefinedFabricIndex 0 means not fabric associated at all
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
 /**
@@ -165,20 +144,19 @@ public:
 struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
-        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber),
-        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC), mFirst(true)
+        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
     PriorityLevel mPriority          = PriorityLevel::Invalid;
     EventNumber mStartingEventNumber = 0;
-    Timestamp mPreviousSystemTime;
-    Timestamp mCurrentSystemTime;
-    EventNumber mCurrentEventNumber = 0;
-    size_t mEventCount              = 0;
-    Timestamp mCurrentUTCTime;
-    ClusterInfo * mpInterestedEventPaths = nullptr;
-    bool mFirst                          = true;
+    Timestamp mPreviousTime;
+    Timestamp mCurrentTime;
+    EventNumber mCurrentEventNumber                            = 0;
+    size_t mEventCount                                         = 0;
+    const ObjectList<EventPathParams> * mpInterestedEventPaths = nullptr;
+    bool mFirst                                                = true;
+    Access::SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app
 } // namespace chip

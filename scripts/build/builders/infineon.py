@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 from enum import Enum, auto
 
@@ -21,16 +20,43 @@ from .gn import GnBuilder
 
 class InfineonApp(Enum):
     LOCK = auto()
+    LIGHT = auto()
+    ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
 
     def ExampleName(self):
         if self == InfineonApp.LOCK:
             return 'lock-app'
+        elif self == InfineonApp.LIGHT:
+            return 'lighting-app'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
             return 'chip-p6-lock-example'
+        elif self == InfineonApp.LIGHT:
+            return 'chip-p6-lighting-example'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'chip-p6-clusters-example'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-p6-clusters-minimal-example'
+        else:
+            raise Exception('Unknown app type: %r' % self)
+
+    def FlashBundleName(self):
+        if self == InfineonApp.LOCK:
+            return 'lock_app.flashbundle.txt'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'clusters_app.flashbundle.txt'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'clusters_minimal_app.flashbundle.txt'
+        elif self == InfineonApp.LIGHT:
+            return 'lighting_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -71,3 +97,9 @@ class InfineonBuilder(GnBuilder):
         }
 
         return items
+
+    def flashbundle(self):
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
+            return {
+                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+            }

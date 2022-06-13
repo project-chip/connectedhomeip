@@ -52,14 +52,14 @@
 #include <lwip/pbuf.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 #include <lib/support/CHIPMem.h>
 #endif
 
 namespace chip {
 namespace System {
 
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 //
 // Pool allocation for PacketBuffer objects.
 //
@@ -102,12 +102,12 @@ PacketBuffer * PacketBuffer::BuildFreeList()
     return static_cast<PacketBuffer *>(lHead);
 }
 
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 //
 // Heap allocation for PacketBuffer objects.
 //
 
-#if CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
 void PacketBuffer::InternalCheck(const PacketBuffer * buffer)
 {
     if (buffer)
@@ -118,7 +118,7 @@ void PacketBuffer::InternalCheck(const PacketBuffer * buffer)
                            "packet buffer overflow %u < %u+%u", buffer->alloc_size, buffer->ReservedSize(), buffer->len);
     }
 }
-#endif // CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+#endif // CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
 
 // Number of unused bytes below which \c RightSize() won't bother reallocating.
 constexpr uint16_t kRightSizingThreshold = 16;
@@ -161,7 +161,7 @@ void PacketBufferHandle::InternalRightSize()
     mBuffer = newBuffer;
 }
 
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
 
 void PacketBufferHandle::InternalRightSize()
 {
@@ -170,11 +170,11 @@ void PacketBufferHandle::InternalRightSize()
     {
         mBuffer = lNewPacket;
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
-        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
+        ChipLogDetail(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
 }
 
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+#endif
 
 #ifndef LOCK_BUF_POOL
 #define LOCK_BUF_POOL()                                                                                                            \
@@ -460,17 +460,22 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
         return PacketBufferHandle();
     }
 
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL ||                                                  \
-    CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), PBUF_POOL));
+    lPacket = static_cast<PacketBuffer *>(
+        pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
     static_cast<void>(lBlockSize);
-
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+    if (!sBufferPoolMutex.isInitialized())
+    {
+        Mutex::Init(sBufferPoolMutex);
+    }
+#endif
     LOCK_BUF_POOL();
 
     lPacket = PacketBuffer::sFreeList;
@@ -482,14 +487,14 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 
     UNLOCK_BUF_POOL();
 
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 
     lPacket = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(lBlockSize));
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
 #else
-#error "Unimplemented CHIP_SYSTEM_PACKETBUFFER_STORE case"
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+#error "Unimplemented PacketBuffer storage case"
+#endif
 
     if (lPacket == nullptr)
     {
@@ -501,7 +506,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     lPacket->len = lPacket->tot_len = 0;
     lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     lPacket->alloc_size = static_cast<uint16_t>(lAllocSize);
 #endif
 
@@ -538,8 +543,7 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
  */
 void PacketBuffer::Free(PacketBuffer * aPacket)
 {
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL ||                                                  \
-    CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (aPacket != nullptr)
     {
@@ -548,8 +552,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
     }
 
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL ||                                                \
-    CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
     LOCK_BUF_POOL();
 
@@ -563,16 +566,16 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
         if (aPacket->ref == 0)
         {
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             ::chip::Platform::MemoryDebugCheckPointer(aPacket, aPacket->alloc_size + kStructureSize);
 #endif
             aPacket->Clear();
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
             aPacket->next = sFreeList;
             sFreeList     = aPacket;
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             chip::Platform::MemoryFree(aPacket);
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+#endif
             aPacket       = lNextPacket;
         }
         else
@@ -584,8 +587,8 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
     UNLOCK_BUF_POOL();
 
 #else
-#error "Unimplemented CHIP_SYSTEM_PACKETBUFFER_STORE case"
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+#error "Unimplemented PacketBuffer storage case"
+#endif
 }
 
 /**
@@ -597,7 +600,7 @@ void PacketBuffer::Clear()
 {
     tot_len = 0;
     len     = 0;
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     alloc_size = 0;
 #endif
 }

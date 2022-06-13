@@ -1,0 +1,38 @@
+{
+    "requires": [
+        "bare-metal",
+        "mbedtls",
+        "mcuboot",
+        "flashiap-block-device",
+        "spif-driver",
+        "qspif",
+        "mbed-trace"
+    ],
+    "config": {
+        "serial-bootloader-enable": {
+            "help": "Build bootloader with serial update support",
+            "value": 0
+        }
+    },
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "target.restrict_size": "0x20000",
+            "target.c_lib": "small",
+            "mcuboot.log-enable": true,
+            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_INFO",
+            "mbed-trace.enable": true,
+            "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
+            "mbed-trace.fea-ipv6": false
+        },
+        "CY8CPROTO_062_4343W": {
+            "target.components_remove": ["WHD"],
+            "mcuboot.primary-slot-address": "0x10022000",
+            "mcuboot.slot-size": "0x180000",
+            "mcuboot.scratch-address": "0x101A2000",
+            "mcuboot.scratch-size": "0x40000",
+            "mcuboot.max-img-sectors": "0xC00",
+            "mcuboot.overwrite-only": true
+        }
+    }
+}

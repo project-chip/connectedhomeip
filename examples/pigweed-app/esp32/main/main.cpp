@@ -64,9 +64,4 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "----------- chip-esp32-pigweed-example starting -----------");
 
     xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);
-
-    while (1)
-    {
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
 }

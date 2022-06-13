@@ -46,12 +46,17 @@ constexpr bool IsOperationalGroupId(GroupId aGroupId)
 
 constexpr bool IsFabricGroupId(GroupId aGroupId)
 {
-    return (aGroupId <= kMaxFabricGroupId) && (aGroupId >= kMinFabricGroupId);
+    return (aGroupId >= kMinFabricGroupId) && (aGroupId <= kMaxFabricGroupId);
 }
 
 constexpr bool IsUniversalGroupId(GroupId aGroupId)
 {
     return (aGroupId >= kMinUniversalGroupId);
+}
+
+constexpr bool IsValidGroupId(GroupId aGroupId)
+{
+    return aGroupId != kUndefinedGroupId;
 }
 
 } // namespace chip

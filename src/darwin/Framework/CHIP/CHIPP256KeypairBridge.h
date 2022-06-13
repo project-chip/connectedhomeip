@@ -37,19 +37,24 @@ public:
 
     CHIP_ERROR Deserialize(chip::Crypto::P256SerializedKeypair & input) override;
 
-    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
 
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, chip::Crypto::P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
+                              chip::Crypto::P256ECDSASignature & out_signature) const override;
 
-    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, chip::Crypto::P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length,
+                               chip::Crypto::P256ECDSASignature & out_signature) const override;
 
     CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
                                   chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 
     const chip::Crypto::P256PublicKey & Pubkey() const override { return mPubkey; };
 
+    // On success, writes to *pubKey.
+    static CHIP_ERROR MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, chip::Crypto::P256PublicKey * matterPubKey);
+
 private:
-    id<CHIPKeypair> mKeypair;
+    id<CHIPKeypair> _Nullable mKeypair;
     chip::Crypto::P256PublicKey mPubkey;
 
     CHIP_ERROR setPubkey();

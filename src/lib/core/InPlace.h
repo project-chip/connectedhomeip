@@ -33,4 +33,12 @@ struct InPlaceType
 };
 constexpr InPlaceType InPlace{};
 
+template <class T>
+struct InPlaceTemplateType
+{
+    explicit InPlaceTemplateType() = default;
+};
+template <class T>
+constexpr InPlaceTemplateType<T> InPlaceTemplate{};
+
 } // namespace chip

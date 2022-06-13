@@ -73,11 +73,7 @@ private:
     bool mAddrAssigned[LWIP_IPV6_NUM_ADDRESSES];
 
     static err_t DoInitThreadNetIf(struct netif * netif);
-#if LWIP_VERSION_MAJOR < 2
-    static err_t SendPacket(struct netif * netif, struct pbuf * pkt, struct ip6_addr * ipaddr);
-#else
     static err_t SendPacket(struct netif * netif, struct pbuf * pkt, const struct ip6_addr * ipaddr);
-#endif
     static void ReceivePacket(otMessage * pkt, void * context);
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }

@@ -14,7 +14,9 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build_overrides/pigweed.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/lib/core/core.gni")
 
 static_library("transport") {
   output_name = "libTransportLayer"
@@ -22,31 +24,43 @@ static_library("transport") {
   sources = [
     "CryptoContext.cpp",
     "CryptoContext.h",
-    "FabricTable.cpp",
-    "FabricTable.h",
-    "MessageCounter.cpp",
+    "GroupPeerMessageCounter.cpp",
+    "GroupPeerMessageCounter.h",
+    "GroupSession.h",
     "MessageCounter.h",
+    "MessageCounterManagerInterface.h",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
+    "SecureSession.cpp",
     "SecureSession.h",
     "SecureSessionTable.h",
+    "Session.cpp",
+    "Session.h",
+    "SessionDelegate.h",
     "SessionHandle.cpp",
     "SessionHandle.h",
+    "SessionHolder.cpp",
+    "SessionHolder.h",
     "SessionManager.cpp",
     "SessionManager.h",
+    "SessionMessageCounter.h",
+    "SessionMessageDelegate.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
+    "UnauthenticatedSessionTable.h",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:chip_buildconfig",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
@@ -54,4 +68,11 @@ static_library("transport") {
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
   ]
+
+  if (chip_enable_transport_trace) {
+    sources += [ "TraceMessage.cpp" ]
+  }
+  if (chip_enable_transport_pw_trace) {
+    public_deps += [ "$dir_pw_trace" ]
+  }
 }

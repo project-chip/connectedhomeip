@@ -1,0 +1,359 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+import androidx.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import androidx.annotation.Nullable;
+import chip.clusterinfo.ClusterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.clusterinfo.ClusterCommandCallback;
+import chip.clusterinfo.CommandResponseInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import chip.devicecontroller.ClusterReadMapping;
+import chip.devicecontroller.ClusterWriteMapping;
+
+public class ClusterInfoMapping {
+
+  public static class DelegatedCharStringAttributeCallback implements ChipClusters.CharStringAttributeCallback, DelegatedClusterCallback {
+    /** Indicates a successful read for a CHAR_STRING attribute. */
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(String value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "String");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedOctetStringAttributeCallback implements ChipClusters.OctetStringAttributeCallback, DelegatedClusterCallback {
+    /** Indicates a successful read for an OCTET_STRING attribute. */
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedIntegerAttributeCallback implements ChipClusters.IntegerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(int value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "int");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedLongAttributeCallback implements ChipClusters.LongAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "long");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedBooleanAttributeCallback implements ChipClusters.BooleanAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "boolean");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedFloatAttributeCallback implements ChipClusters.FloatAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "float");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoubleAttributeCallback implements ChipClusters.DoubleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(double value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "double");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    // Parameters and list-adds here should be generated - refer to the template code that creates each callback interface.
+    @Override
+    public void onSuccess() {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception e) {
+      callback.onFailure(e);
+    }
+  }
+  {{#chip_client_clusters}}
+  {{#chip_cluster_responses}}
+      public static class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asSymbol label}}{{/chip_cluster_response_arguments}}) {
+           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+           {{#chip_cluster_response_arguments}}
+             {{#if isArray}}
+               // {{asSymbol label}}: {{asUnderlyingZclType type}}
+               // Conversion from this type to Java is not properly implemented yet
+             {{else}}
+             {{#if_is_struct type}}
+               // {{asSymbol label}}: Struct {{type}}
+               // Conversion from this type to Java is not properly implemented yet
+             {{else}}
+               CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaType type null parent.parent.name}}");
+               responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
+             {{/if_is_struct}}
+             {{/if}}
+           {{/chip_cluster_response_arguments}}
+           callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+  {{/chip_cluster_responses}}
+      {{#chip_server_cluster_attributes}}
+      {{#if isArray}}
+      {{#if isStruct}}
+
+      {{/if}}
+
+      public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
+          false. }}
+        {{~#*inline "asJavaTypeForEntry"}}{{asJavaType type null parent.name forceNotList=true}}{{/inline~}}
+        @Override
+        public void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{> asJavaTypeForEntry isArray=false}}> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<{{> asJavaTypeForEntry isArray=false}}>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      {{/if}}
+      {{/chip_server_cluster_attributes}}
+
+  {{/chip_client_clusters}}
+
+ public Map<String, ClusterInfo> getClusterMap() {
+    Map<String, ClusterInfo> clusterMap = initializeClusterMap();
+    Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
+    combineCommand(clusterMap, commandMap);
+    Map<String, Map<String, InteractionInfo>> readAttributeMap = new ClusterReadMapping().getReadAttributeMap();
+    combineCommand(clusterMap, readAttributeMap);
+    Map<String, Map<String, InteractionInfo>> writeAttributeMap = new ClusterWriteMapping().getWriteAttributeMap();
+    combineCommand(clusterMap, writeAttributeMap);
+    return clusterMap;
+ }
+
+ public Map<String, ClusterInfo> initializeClusterMap() {
+    Map<String, ClusterInfo> clusterMap = new HashMap<>();
+    {{#chip_client_clusters}}
+      ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
+    {{/chip_client_clusters}}
+    return clusterMap;
+ }
+
+ public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
+    {{#chip_client_clusters}}
+      destination.get("{{asLowerCamelCase name}}").combineCommands(source.get("{{asLowerCamelCase name}}"));
+    {{/chip_client_clusters}}
+ }
+
+ @SuppressWarnings("unchecked")
+ public Map<String, Map<String, InteractionInfo>> getCommandMap() {
+     Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
+     {{#chip_client_clusters}}
+     Map<String, InteractionInfo> {{asLowerCamelCase name}}ClusterInteractionInfoMap = new LinkedHashMap<>();
+     {{#chip_cluster_commands}}
+     Map<String, CommandParameterInfo> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+     {{! TODO: fill out parameter types }}
+     {{#if (zcl_command_arguments_count this.id)}}
+     {{#chip_cluster_command_arguments}}
+     {{#if_is_struct type}}
+     {{else}}
+       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaType type null parent.parent.name removeGenericType=true}}.class, {{asJavaType type null parent.parent.name underlyingType=true}}.class);
+       {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
+     {{#not_last}} {{/not_last}}
+     {{/if_is_struct}}
+     {{/chip_cluster_command_arguments}}
+     {{else}}
+     {{/if}}
+     {{#if hasSpecificResponse}}
+       InteractionInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
+           .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
+           {{#chip_cluster_command_arguments}}
+           , ({{asJavaType type chipType parent.parent.name}})
+           commandArguments.get("{{asLowerCamelCase label}}")
+           {{/chip_cluster_command_arguments}}
+            {{! TODO: Allow timeout to be passed from client for this and timed write. }}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
+           );
+         },
+         () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
+           {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
+       );
+     {{else}}
+       InteractionInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
+           .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
+           {{#chip_cluster_command_arguments}}
+           , ({{asJavaType type chipType parent.parent.name}})
+           commandArguments.get("{{asLowerCamelCase label}}")
+           {{/chip_cluster_command_arguments}}
+           {{! TODO: Allow timeout to be passed from client for this and timed write. }}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
+       );
+     {{/if}}
+       {{asLowerCamelCase ../name}}ClusterInteractionInfoMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo);
+     {{/chip_cluster_commands}}
+     commandMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInteractionInfoMap);
+     {{/chip_client_clusters}}
+     return commandMap;
+  }
+
+}
+
+{{/if}}

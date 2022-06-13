@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include <DFUManager.h>
 
 class AppTask
 {
@@ -29,6 +30,8 @@ public:
 
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
+
+    void ButtonEventHandler(uint32_t id, bool pushed);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -57,6 +60,7 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
+        kFunction_StartBleAdv    = 1,
         kFunction_FactoryReset,
 
         kFunction_Invalid

@@ -19,6 +19,8 @@
 
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
+
+#include <map>
 #include <string>
 #include <vector>
 
@@ -30,7 +32,6 @@ enum class ContextType
     Register,
     Browse,
     Resolve,
-    GetAddrInfo,
 };
 
 struct GenericContext
@@ -38,72 +39,15 @@ struct GenericContext
     ContextType type;
     void * context;
     DNSServiceRef serviceRef;
+
+    virtual ~GenericContext() {}
+
+    CHIP_ERROR Finalize(DNSServiceErrorType err = kDNSServiceErr_NoError);
+    virtual void DispatchFailure(DNSServiceErrorType err) = 0;
+    virtual void DispatchSuccess()                        = 0;
 };
 
-struct RegisterContext : public GenericContext
-{
-    char mType[kDnssdTypeMaxSize + 1];
-    RegisterContext(const char * sType, void * cbContext)
-    {
-        type = ContextType::Register;
-        strncpy(mType, sType, sizeof(mType));
-        context = cbContext;
-    }
-
-    bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
-};
-
-struct BrowseContext : public GenericContext
-{
-    DnssdBrowseCallback callback;
-    std::vector<DnssdService> services;
-    DnssdServiceProtocol protocol;
-
-    BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
-    {
-        type     = ContextType::Browse;
-        context  = cbContext;
-        callback = cb;
-        protocol = cbContextProtocol;
-    }
-};
-
-struct ResolveContext : public GenericContext
-{
-    DnssdResolveCallback callback;
-
-    char name[kDnssdInstanceNameMaxSize + 1];
-    chip::Inet::IPAddressType addressType;
-
-    ResolveContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
-    {
-        type     = ContextType::Resolve;
-        context  = cbContext;
-        callback = cb;
-        strncpy(name, cbContextName, sizeof(name));
-        addressType = cbAddressType;
-    }
-};
-
-struct GetAddrInfoContext : public GenericContext
-{
-    DnssdResolveCallback callback;
-    std::vector<TextEntry> textEntries;
-    char name[kDnssdInstanceNameMaxSize + 1];
-    uint32_t interfaceId;
-    uint16_t port;
-
-    GetAddrInfoContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, uint32_t cbInterfaceId,
-                       uint16_t cbContextPort)
-    {
-        type        = ContextType::GetAddrInfo;
-        context     = cbContext;
-        callback    = cb;
-        interfaceId = cbInterfaceId;
-        port        = cbContextPort;
-        strncpy(name, cbContextName, sizeof(name));
-    }
-};
+struct RegisterContext;
 
 class MdnsContexts
 {
@@ -113,25 +57,91 @@ public:
     ~MdnsContexts();
     static MdnsContexts & GetInstance() { return sInstance; }
 
-    void PrepareSelect(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
-    void HandleSelectResult(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
-
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
-    CHIP_ERROR Removes(ContextType type);
-    CHIP_ERROR Get(ContextType type, GenericContext ** context);
-    CHIP_ERROR GetRegisterType(const char * type, GenericContext ** context);
+    CHIP_ERROR RemoveAllOfType(ContextType type);
+    CHIP_ERROR Has(GenericContext * context);
 
-    void SetHostname(const char * name) { mHostname = name; }
-    const char * GetHostname() { return mHostname.c_str(); }
+    /**
+     * @brief
+     *   Returns a pointer to a RegisterContext that has previously been registered
+     *   with a given type.
+     *
+     * @param[in]  type     A service type. Service type are composed of
+     *                      of the service name, the service protocol, and the PTR records.
+     *                      Example:
+     *                        _matterc._udp,_V65521,_S15,_L3840,_CM
+     *                        _matter._tcp,_I4CEEAD044CC35B63
+     * @param[out] context  A reference to the context previously registered
+     *
+     * @return     On success, the context parameter will point to the previously
+     *             registered context.
+     */
+    CHIP_ERROR GetRegisterContextOfType(const char * type, RegisterContext ** context);
+
+    void Delete(GenericContext * context);
 
 private:
     MdnsContexts(){};
     static MdnsContexts sInstance;
-    std::string mHostname;
 
-    void Delete(GenericContext * context);
     std::vector<GenericContext *> mContexts;
+};
+
+struct RegisterContext : public GenericContext
+{
+    DnssdPublishCallback callback;
+    std::string mType;
+
+    RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext);
+    virtual ~RegisterContext() {}
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
+
+    bool matches(const char * sType) { return mType.compare(sType) == 0; }
+};
+
+struct BrowseContext : public GenericContext
+{
+    DnssdBrowseCallback callback;
+    std::vector<DnssdService> services;
+    DnssdServiceProtocol protocol;
+
+    BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
+    virtual ~BrowseContext() {}
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
+};
+
+struct InterfaceInfo
+{
+    DnssdService service;
+    std::vector<Inet::IPAddress> addresses;
+    std::string fullyQualifiedDomainName;
+};
+
+struct ResolveContext : public GenericContext
+{
+    DnssdResolveCallback callback;
+    std::map<uint32_t, InterfaceInfo> interfaces;
+    DNSServiceProtocol protocol;
+
+    ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType);
+    virtual ~ResolveContext();
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
+
+    CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
+    CHIP_ERROR OnNewLocalOnlyAddress();
+    bool HasAddress();
+
+    void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
+                        const unsigned char * txtRecord);
+    bool HasInterface();
+    void RemoveInterfaces();
 };
 
 } // namespace Dnssd

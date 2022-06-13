@@ -55,7 +55,7 @@ defined:
     application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
-`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
 -   These three macros are used to declare a list of clusters for use within a
@@ -63,7 +63,9 @@ defined:
     `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN` macro which will define the name of the
     allocated cluster structure. Each cluster is then added by the
     `DECLARE_DYNAMIC_CLUSTER` macro referencing attribute list previously
-    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros. Finally,
+    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros and the lists of
+    incoming/outgoing commands terminated by kInvalidCommandId (or nullptr if
+    there aren't any commands in the list). Finally,
     `DECLARE_DYNAMIC_CLUSTER_LIST_END` macro should be used to close the
     definition.
 
@@ -110,34 +112,30 @@ value/label pair `"room"`/`[light name]`.
 
 -   Install tool chain
 
+          ```
           $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+          ```
 
 -   Build the example application:
 
+          ```
           $ cd ~/connectedhomeip/examples/bridge-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
           $ ninja -C out/debug
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
+          ```
           $ cd ~/connectedhomeip/examples/bridge-app/linux
           $ rm -rf out/
+          ```
 
 <a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
-
-> If you want to test ZCL, please disable Rendezvous
->
->     gn gen out/debug --args='bypass_rendezvous=true'
->     ninja -C out/debug
->
-> Note that GN will set bypass_rendezvous for future builds, to enable
-> rendezvous, re-generate using
->
->     gn gen out/debug --args='chip_bypass_rendezvous=false'
 
 -   Prerequisites
 
@@ -159,6 +157,7 @@ value/label pair `"room"`/`[light name]`.
             number after `hci` is the bluetooth device number, `1` in this
             example.
 
+                  ```
                   $ hciconfig
                   hci1:	Type: Primary  Bus: USB
                       BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
@@ -171,13 +170,16 @@ value/label pair `"room"`/`[light name]`.
                       UP RUNNING PSCAN ISCAN
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+                  ```
 
         -   Run Linux Bridge Example App
 
+                  ```
                   $ cd ~/connectedhomeip/examples/bridge-app/linux
                   $ sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
                   $ sudo out/debug/chip-bridge-app --ble-device 1
+                  ```
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.

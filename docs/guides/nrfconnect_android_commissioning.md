@@ -1,8 +1,8 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-You can use [CHIPTool](android_chiptool_building.md) for Android smartphones to
+You can use [CHIPTool](android_building.md) for Android smartphones to
 commission a Nordic Semiconductor device running an nRF Connect platform example
-onto a CHIP-enabled Thread network.
+onto a Matter-enabled Thread network.
 
 This guide references the nRF52840 DK and the door lock example application
 based on the nRF Connect platform, but the instructions are also valid for the
@@ -18,7 +18,7 @@ and applications as well.
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Preparing accessory device](#preparing-accessory)
 -   [Commissioning accessory device](#commissioning-accessory)
--   [Sending CHIP commands](#sending-chip-commands)
+-   [Sending Matter commands](#sending-chip-commands)
 
 <hr>
 
@@ -28,10 +28,10 @@ and applications as well.
 
 The commissioning process is composed of the following main stages:
 
-1.  CHIPTool discovers a CHIP accessory device over Bluetooth LE.
+1.  CHIPTool discovers a Matter accessory device over Bluetooth LE.
 2.  CHIPTool establishes a secure channel to the device over Bluetooth LE, and
-    sends CHIP operational credentials and Thread provisioning data.
-3.  The accessory device joins a CHIP-enabled Thread network.
+    sends Matter operational credentials and Thread provisioning data.
+3.  The accessory device joins a Matter-enabled Thread network.
 
 CHIPTool uses both Bluetooth LE and the IPv6 connectivity. Bluetooth LE is used
 only during the commissioning phase. Afterwards, only the IPv6 connectivity
@@ -49,7 +49,7 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
 applications:
 
-![CHIP nodes connectivity](./images/nrfconnect_android_connectivity.png)
+![Matter nodes connectivity](./images/nrfconnect_android_connectivity.png)
 
 <hr>
 
@@ -104,14 +104,16 @@ learn how to build and program the example onto an nRF52840 DK.
 ## Building and installing Android CHIPTool
 
 To build the CHIPTool application for your smartphone, read the
-[Building Android CHIPTool](android_chiptool_building.md) guide.
+[Building Android](android_building.md) guide.
 
 After building, install the application by completing the following steps:
 
 1.  Install the Android Debug Bridge (adb) package by running the following
     command:
 
-        $ sudo apt install android-tools-adb
+        ```
+        sudo apt install android-tools-adb
+        ```
 
 2.  Enable **USB debugging** on the smartphone. See the
     [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
@@ -120,9 +122,11 @@ After building, install the application by completing the following steps:
     turn it on.
 4.  Plug the smartphone into a USB port on your PC.
 5.  Run the following command to install the application, with _chip-dir_
-    replaced with the path to the CHIP source directory:
+    replaced with the path to the Matter source directory:
 
-        $ adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
+        adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        ```
 
 6.  Navigate to settings on your smartphone and grant **Camera** and
     **Location** permissions to CHIPTool.
@@ -183,7 +187,7 @@ device successfully joins the Thread network.
 
 <a name="sending-commands"></a>
 
-## Sending CHIP commands
+## Sending Matter commands
 
 Once the device is commissioned, the main application screen appears.
 

@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/telink.gni")
 
 import("${build_root}/chip/tests.gni")
 
@@ -24,7 +25,10 @@ declare_args() {
 }
 
 group("telink") {
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/lib",
+    "${telink_sdk_build_root}",
+  ]
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]

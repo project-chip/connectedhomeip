@@ -81,6 +81,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -188,6 +189,9 @@ private:
     uint16_t mServiceAttrHandle;
     uint16_t mRXCharAttrHandle;
     uint16_t mTXCharAttrHandle;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    uint16_t mC3CharAttrHandle;
+#endif
     uint16_t mTXCharCCCDAttrHandle;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
@@ -198,9 +202,11 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
-    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
-    uint64_t mAdvertiseStartTime;
+    static constexpr System::Clock::Timeout kAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
+    static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    System::Clock::Timestamp mAdvertiseStartTime;
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
@@ -243,6 +249,11 @@ private:
     static int ble_svr_gap_event(struct ble_gap_event * event, void * arg);
 
     static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static int gatt_svr_chr_access_additional_data(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt,
+                                                   void * arg);
+    void HandleC3CharRead(struct ble_gatt_char_context * param);
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 #endif
 
     static void DriveBLEState(intptr_t arg);

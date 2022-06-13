@@ -42,7 +42,6 @@ def main(argv):
         memdf.report.write_dfs(config, memdf.collect.collect_files(config))
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

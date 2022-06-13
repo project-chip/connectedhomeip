@@ -39,9 +39,10 @@ template <typename CommandResponseObjectT>
 class TypedCommandCallback final : public app::CommandSender::Callback
 {
 public:
-    using OnSuccessCallbackType = std::function<void(const app::ConcreteCommandPath &, const CommandResponseObjectT &)>;
-    using OnErrorCallbackType   = std::function<void(Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
-    using OnDoneCallbackType    = std::function<void(app::CommandSender * commandSender)>;
+    using OnSuccessCallbackType =
+        std::function<void(const app::ConcreteCommandPath &, const app::StatusIB &, const CommandResponseObjectT &)>;
+    using OnErrorCallbackType = std::function<void(CHIP_ERROR aError)>;
+    using OnDoneCallbackType  = std::function<void(app::CommandSender * commandSender)>;
 
     /*
      * Constructor that takes in success, failure and onDone callbacks.
@@ -58,13 +59,9 @@ public:
 
 private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
-                    TLV::TLVReader * aReader) override;
+                    const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aIMStatus,
-                 CHIP_ERROR aError) override
-    {
-        mOnError(aIMStatus, aError);
-    }
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mOnError(aError); }
 
     void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
 
@@ -81,7 +78,7 @@ private:
 template <typename CommandResponseObjectT>
 void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender * apCommandSender,
                                                               const app::ConcreteCommandPath & aCommandPath,
-                                                              TLV::TLVReader * aReader)
+                                                              const app::StatusIB & aStatus, TLV::TLVReader * aReader)
 {
     CommandResponseObjectT response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -102,12 +99,12 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
     err = app::DataModel::Decode(*aReader, response);
     SuccessOrExit(err);
 
-    mOnSuccess(aCommandPath, response);
+    mOnSuccess(aCommandPath, aStatus, response);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        mOnError(Protocols::InteractionModel::Status::Failure, err);
+        mOnError(err);
     }
 }
 
@@ -120,6 +117,7 @@ exit:
 template <>
 inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app::CommandSender * apCommandSender,
                                                                              const app::ConcreteCommandPath & aCommandPath,
+                                                                             const app::StatusIB & aStatus,
                                                                              TLV::TLVReader * aReader)
 {
     //
@@ -127,12 +125,12 @@ inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app
     //
     if (aReader != nullptr)
     {
-        mOnError(Protocols::InteractionModel::Status::Failure, CHIP_ERROR_SCHEMA_MISMATCH);
+        mOnError(CHIP_ERROR_SCHEMA_MISMATCH);
         return;
     }
 
     app::DataModel::NullObjectType nullResp;
-    mOnSuccess(aCommandPath, nullResp);
+    mOnSuccess(aCommandPath, aStatus, nullResp);
 }
 
 } // namespace Controller

@@ -23,10 +23,14 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/qpg/DiagnosticDataProviderImpl.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,9 +44,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::QPGConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -51,39 +61,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    size_t freeHeapSize;
-    size_t usedHeapSize;
-    size_t highWatermarkHeapSize;
-
-    qvCHIP_GetHeapStats(&freeHeapSize, &usedHeapSize, &highWatermarkHeapSize);
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    size_t freeHeapSize;
-    size_t usedHeapSize;
-    size_t highWatermarkHeapSize;
-
-    qvCHIP_GetHeapStats(&freeHeapSize, &usedHeapSize, &highWatermarkHeapSize);
-    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    size_t freeHeapSize;
-    size_t usedHeapSize;
-    size_t highWatermarkHeapSize;
-
-    qvCHIP_GetHeapStats(&freeHeapSize, &usedHeapSize, &highWatermarkHeapSize);
-    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
-    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

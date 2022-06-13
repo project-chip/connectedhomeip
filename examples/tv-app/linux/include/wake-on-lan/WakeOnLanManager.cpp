@@ -17,58 +17,26 @@
  */
 
 #include "WakeOnLanManager.h"
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/basic-types.h>
-#include <lib/support/ZclString.h>
-
-#include <inipp/inipp.h>
-
 #include <fstream>
 #include <iostream>
-#include <sstream>
+#include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters::WakeOnLan;
 
-CHIP_ERROR WakeOnLanManager::Init()
+std::string getMacAddress()
 {
-    CHIP_ERROR err                                       = CHIP_NO_ERROR;
-    EndpointConfigurationStorage & endpointConfiguration = EndpointConfigurationStorage::GetInstance();
-    err                                                  = endpointConfiguration.Init();
-    SuccessOrExit(err);
-    es = &endpointConfiguration;
-exit:
-    return err;
+    std::ifstream input("/sys/class/net/eth0/address");
+    std::string line;
+    std::getline(input, line);
+    return line;
 }
 
-void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[32])
+CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
-    uint8_t bufferMemory[32];
-    MutableByteSpan zclString(bufferMemory);
-    MakeZclCharString(zclString, macAddress);
-    EmberAfStatus macAddressStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
-                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to store mac address attribute.");
-    }
-}
-
-void WakeOnLanManager::setMacAddress(chip::EndpointId endpoint, char * macAddress)
-{
-    char address[18];
-    uint16_t size = static_cast<uint16_t>(sizeof(address));
-
-    std::string section = "endpoint" + std::to_string(endpoint);
-    CHIP_ERROR err      = es->get(section, "macAddress", macAddress, size);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get mac address. Error:%s", chip::ErrorStr(err));
-    }
+#if CHIP_ENABLE_WAKE_ON_LAN
+    return aEncoder.Encode(CharSpan::fromCharString(getMacAddress().c_str()));
+#else
+    return aEncoder.Encode(CharSpan::fromCharString("00:00:00:00:00"));
+#endif // CHIP_ENABLE_WAKE_ON_LAN
 }

@@ -17,8 +17,9 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../third_party/zap/repo/dist/src-electron/';
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const zclQuery     = require(zapPath + 'db/query-zcl.js');
 
 const ChipTypesHelper = require('../../../src/app/zap-templates/common/ChipTypesHelper.js');
 
@@ -48,6 +49,9 @@ function asTypeMinValue(type)
       case 'uint32_t':
       case 'uint64_t':
         return '0';
+      case 'float':
+      case 'double':
+        return `-std::numeric_limits<${basicType}>::infinity()`;
       default:
         error = 'asTypeMinValue: Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
@@ -82,6 +86,9 @@ function asTypeMaxValue(type)
       case 'uint32_t':
       case 'uint64_t':
         return 'UINT' + parseInt(basicType.slice(4)) + '_MAX';
+      case 'float':
+      case 'double':
+        return `std::numeric_limits<${basicType}>::infinity()`;
       default:
         return 'err';
         error = 'asTypeMaxValue: Unhandled underlying type ' + zclType + ' for original type ' + type;
@@ -97,9 +104,43 @@ function asTypeMaxValue(type)
   return templateUtil.templatePromise(this.global, promise);
 }
 
+async function structs_with_cluster_name(options)
+{
+  const packageId = await templateUtil.ensureZclPackageId(this);
+
+  const structs = await zclQuery.selectAllStructsWithItems(this.global.db, packageId);
+
+  let blocks = [];
+  for (const s of structs) {
+    if (s.struct_cluster_count == 0) {
+      continue;
+    }
+
+    s.items.forEach(i => {
+      if (i.type.toLowerCase() == "fabric_idx") {
+        s.struct_fabric_idx_field = i.label;
+      }
+    })
+
+    if (s.struct_cluster_count == 1)
+    {
+      const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
+      blocks.push(
+          { id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : clusters[0].name });
+    }
+
+    if (s.struct_cluster_count > 1) {
+      blocks.push({ id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : "detail" });
+    }
+  }
+
+  return templateUtil.collectBlocks(blocks, options, this);
+}
+
 //
 // Module exports
 //
-exports.asDelimitedCommand = asDelimitedCommand;
-exports.asTypeMinValue     = asTypeMinValue;
-exports.asTypeMaxValue     = asTypeMaxValue;
+exports.asDelimitedCommand        = asDelimitedCommand;
+exports.asTypeMinValue            = asTypeMinValue;
+exports.asTypeMaxValue            = asTypeMaxValue;
+exports.structs_with_cluster_name = structs_with_cluster_name;

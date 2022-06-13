@@ -143,6 +143,7 @@ limitations under the License.
     <item name="Down" value="0x1"/>
   </enum>
   <enum name="ThermostatControlSequence" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="coolingOnly" value="0x0"/>
     <item name="coolingWithReheat" value="0x1"/>
     <item name="heatingOnly" value="0x2"/>
@@ -151,6 +152,7 @@ limitations under the License.
     <item name="coolingAndHeatingWithReheat" value="0x5"/>
   </enum>
   <enum name="ThermostatSystemMode" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="off" value="0x0"/>
     <item name="auto" value="0x1"/>
     <item name="cool" value="0x3"/>
@@ -243,18 +245,10 @@ limitations under the License.
   <enum name="ColorControlOptions" type="BITMAP8">
     <item name="ExecuteIfOff" value="0x1"/>
   </enum>
-  <enum name="MeasurementLightSensorType" type="ENUM8">
-    <item name="photodiode" value="0x0"/>
-    <item name="CMOS" value="0x1"/>
-  </enum>
   <enum name="LevelStatus" type="ENUM8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
     <item name="AboveTarget" value="0x2"/>
-  </enum>
-  <enum name="SensingLightSensorType" type="ENUM8">
-    <item name="photodiode" value="0x0"/>
-    <item name="CMOS" value="0x1"/>
   </enum>
   <enum name="OccupancySensorType" type="ENUM8">
     <item name="PIR" value="0x0"/>
@@ -408,6 +402,56 @@ limitations under the License.
     <item name="ReadOnly" value="0x88"/>
     <item name="InvalidDataType" value="0x8D"/>
   </enum>
+  <enum name="Status" type="ENUM8" description="Status codes used in the ZigBee Cluster Library">
+    <item name="SUCCESS" value="0x00"/>
+    <item name="FAILURE" value="0x01"/>
+    <item name="NOT_AUTHORIZED" value="0x7E"/>
+    <!-- item name="reserved" value="0x7F"/ -->
+    <item name="MALFORMED_COMMAND" value="0x80"/>
+    <item name="UNSUP_COMMAND" value="0x81"/>
+    <!-- renamed from UNSUP_CLUSTER_COMMAND -->
+    <item name="UNSUP_GENERAL_COMMAND" value="0x82"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="UNSUP_MANUF_CLUSTER_COMMAND" value="0x83"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="UNSUP_MANUF_GENERAL_COMMAND" value="0x84"/>
+    <!-- DEPRECATED use UNSUP_COMMAND -->
+    <item name="INVALID_FIELD" value="0x85"/>
+    <item name="UNSUPPORTED_ATTRIBUTE" value="0x86"/>
+    <item name="INVALID_VALUE" value="0x87"/>
+    <item name="READ_ONLY" value="0x88"/>
+    <item name="INSUFFICIENT_SPACE" value="0x89"/>
+    <item name="DUPLICATE_EXISTS" value="0x8A"/>
+    <!-- DEPRECATED use SUCCESS -->
+    <item name="NOT_FOUND" value="0x8B"/>
+    <item name="UNREPORTABLE_ATTRIBUTE" value="0x8C"/>
+    <item name="INVALID_DATA_TYPE" value="0x8D"/>
+    <item name="INVALID_SELECTOR" value="0x8E"/>
+    <item name="WRITE_ONLY" value="0x8F"/>
+    <!-- DEPRECATED use NOT_AUTHORIZED -->
+    <item name="INCONSISTENT_STARTUP_STATE" value="0x90"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="DEFINED_OUT_OF_BAND" value="0x91"/>
+    <!-- DEPRECATED use FAILURE -->
+    <!-- item name="reserved" value="0x92"/ -->
+    <item name="ACTION_DENIED" value="0x93"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="TIMEOUT" value="0x94"/>
+    <item name="ABORT" value="0x95"/>
+    <item name="INVALID_IMAGE" value="0x96"/>
+    <item name="WAIT_FOR_DATA" value="0x97"/>
+    <item name="NO_IMAGE_AVAILABLE" value="0x98"/>
+    <item name="REQUIRE_MORE_IMAGE" value="0x99"/>
+    <item name="NOTIFICATION_PENDING" value="0x9A"/>
+    <item name="HARDWARE_FAILURE" value="0xC0"/>
+    <!-- DEPRECATED use FAILURE -->
+    <item name="SOFTWARE_FAILURE" value="0xC1"/>
+    <!-- DEPRECATED use FAILURE -->
+    <!-- item name="reserved" value="0xC2"/ -->
+    <item name="UNSUPPORTED_CLUSTER" value="0xC3"/>
+    <item name="LIMIT_REACHED" value="0xC4"/>
+    <!-- DEPRECATED use SUCCESS -->
+  </enum>
   <struct name="ReadAttributeStatusRecord">
     <item name="attributeId" type="ATTRIB_ID"/>
     <item name="status" type="Status"/>
@@ -422,15 +466,6 @@ limitations under the License.
   <struct name="WriteAttributeStatusRecord">
     <item name="status" type="Status"/>
     <item name="attributeId" type="ATTRIB_ID"/>
-  </struct>
-  <struct name="DiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-  </struct>
-  <struct name="ExtendedDiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-    <item name="attributeAccessControl" type="INT8U"/>
   </struct>
   <struct name="ReadStructuredAttributeRecord">
     <item name="attributeId" type="ATTRIB_ID"/>
@@ -449,16 +484,6 @@ limitations under the License.
     <item name="attributeId" type="ATTRIB_ID"/>
     <item name="indicator" type="INT8U"/>
     <item name="indicies" type="INT16U" array="true"/>
-  </struct>
-  <struct name="SceneExtensionAttributeInfo">
-    <item name="attributeType" type="INT8U"/>
-    <item name="attributeLocation" type="NO_DATA"/>
-  </struct>
-  <struct name="SceneExtensionFieldSet">
-    <cluster code="0x0005"/>
-    <item name="clusterId" type="CLUSTER_ID"/>
-    <item name="length" type="INT8U"/>
-    <item name="value" type="INT8U"/>
   </struct>
   <struct name="Notification">
     <item name="contentId" type="INT16U"/>
@@ -679,6 +704,7 @@ limitations under the License.
     <item name="IdDeleted" value="0x06"/>
   </enum>
   <enum name="ThermostatRunningMode" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
     <item name="Cool" value="0x03"/>
     <item name="Heat" value="0x04"/>
@@ -827,7 +853,6 @@ limitations under the License.
     <item name="SetToOn" value="0x01"/>
     <item name="SetToToggle" value="0x02"/>
     <!-- 0x03-0xFF reserved -->
-    <item name="SetToPrevious" value="0xFF"/>
   </enum>
   <enum name="LevelControlOptions" type="BITMAP8">
     <item name="ExecuteIfOff" value="0x1"/>

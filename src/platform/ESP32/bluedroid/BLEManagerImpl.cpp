@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/CommissionableDataProvider.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -124,6 +125,8 @@ const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoB
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
+constexpr System::Clock::Timeout BLEManagerImpl::kAdvertiseTimeout;
+constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
@@ -175,7 +178,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::SystemClock().GetMonotonicMilliseconds();
+        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
@@ -194,7 +197,7 @@ void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void 
 
 void BLEManagerImpl::HandleAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
     {
@@ -210,7 +213,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, v
 
 void BLEManagerImpl::HandleFastAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
     {
@@ -687,7 +690,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // discriminator value
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kUseCustomDeviceName))
     {
@@ -962,12 +965,10 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
             // possibly not fitting.  There's no way to suppress that warning
             // via explicit cast; we have to disable the warning around the
             // assignment.
-            //
-            // TODO: https://github.com/project-chip/connectedhomeip/issues/2569
-            // tracks making this safe with a check or explaining why no check
-            // is needed.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+            // As per the BLE specification, the maximum MTU value can be 517 bytes.
+            // This can be accomodated in 10 bits
             conState->MTU = param->mtu.mtu;
 #pragma GCC diagnostic pop
         }

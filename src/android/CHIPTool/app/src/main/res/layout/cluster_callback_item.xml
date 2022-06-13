@@ -1,0 +1,43 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clusterCallbackRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+  <TextView
+      android:id="@+id/clusterCallbackNameTv"
+      android:layout_width="90dp"
+      android:layout_height="wrap_content"
+      android:layout_marginHorizontal="10dp"
+      android:padding="8dp"
+      android:minWidth="90dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/clusterCallbackDataTv"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+
+  <TextView
+      android:id="@+id/clusterCallbackDataTv"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:singleLine="false"
+      android:maxLines="4"
+      android:ellipsize="end"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/clusterCallbackTypeTv"
+      app:layout_constraintStart_toEndOf="@id/clusterCallbackNameTv"
+      app:layout_constraintTop_toTopOf="parent" />
+  <TextView
+      android:id="@+id/clusterCallbackTypeTv"
+      android:textStyle="bold"
+      android:layout_width="100dp"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:singleLine="false"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/clusterCallbackDataTv"
+      app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

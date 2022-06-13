@@ -1,0 +1,181 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 19.5.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends a subscription request message to the target node/reference
+          device for a single attribute of any data type supported."
+      verification: |
+          sudo ./chip-tool onoff  subscribe on-time   0 100 0 1 1
+
+          TH Side
+          [1650620003.657208][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620003.657272][2221:2221] CHIP:DMG: {
+          [1650620003.657310][2221:2221] CHIP:DMG:         Status = 0x0,
+          [1650620003.657346][2221:2221] CHIP:DMG:         InteractionModelRevision = 1
+          [1650620003.657380][2221:2221] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "DUT sends the subscription request message to TH TH sends a report
+          data DUT sends the status response back to TH"
+      verification: |
+          '' ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1
+          TH side
+          [1650620108.691178][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620108.691207][2221:2221] CHIP:DMG: {
+          [1650620108.691231][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620108.691256][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620108.691279][2221:2221] CHIP:DMG: }
+          [1650620108.691304][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type boolean. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times)."
+      verification: |
+          In case of chip tool, here is an example command to use
+          '' ./chip-tool basic write local-config-disabled 1 1 0
+           '' ./chip-tool basic subscribe local-config-disabled 0 100  1 0
+
+          [1650620484.058559][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620484.058598][2221:2221] CHIP:DMG: {
+          [1650620484.058632][2221:2221] CHIP:DMG:         Status = 0x0,
+          [1650620484.058669][2221:2221] CHIP:DMG:         InteractionModelRevision = 1
+          [1650620484.058703][2221:2221] CHIP:DMG: }
+          [1650620484.058738][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type string. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times). 3"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool basic write  node-label 1 1 0
+          '' ./chip-tool basic subscribe node-label 0 100 0  1 0
+          [1650620543.500119][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620543.500147][2221:2221] CHIP:DMG: {
+          [1650620543.500172][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620543.500198][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620543.500222][2221:2221] CHIP:DMG: }
+          [1650620543.500248][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type unsigned integer. Modify that attribute on
+          the TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          '' ./chip-tool any subscribe-by-id 0x0008 0x0010 0 100 0 1 1
+          [1650620581.445609][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620581.445659][2221:2221] CHIP:DMG: {
+          [1650620581.445701][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620581.445746][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620581.445789][2221:2221] CHIP:DMG: }
+          [1650620581.445833][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type signed integer. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      verification: |
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 4 1 1
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 5 1 1
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type Floating Point. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      verification: |
+          DUT implementation required to verify read an attribute of data type floating point
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an
+          attribute. Force the TH to not send any report data for the duration
+          of the maximum interval. After the maximum interval, TH sends a report
+          data with the subscription id created during the subscription
+          activation."
+      verification: |
+          This is not testable in normal scenario, and needs to be tested as part of Unit test. his test step to be removed from the manual execution.
+      disabled: true
+
+    - label:
+          "DUT sends a subscription request message to the target node/reference
+          device for multiple attributes(3 attributes)."
+      verification: |
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-pressure 0 100 0 1 1
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-speed 0 100 0 1 1
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-flow 0 100 0 1 1
+          ''  ./chip-tool pumpconfigurationandcontrol subscribe min-const-pressure 0 100 0 1 1
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          Force the TH to send a report data with no data and Suppress Response
+          set to True"
+      verification: |
+          This is not testable in normal scenario, and needs to be tested as part of Unit test. his test step to be removed from the manual execution.
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type list. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times)."
+      verification: |
+          '' ./chip-tool modeselect subscribe supported-modes 0 100 0 1 1
+          '' ./chip-tool modeselect subscribe supported-modes 1 100 0 1 1
+          '' ./chip-tool modeselect subscribe supported-modes 2 100 0 1 1
+      disabled: true
+
+    - label:
+          "DUT sends a subscription request message to the TH for a single
+          attribute of any data type supported. Reboot the DUT."
+      verification: |
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-speed 0 100 0 1 1
+          after reboot the DUT verify once that the  TH does not send a report data message to the DUT
+      disabled: true

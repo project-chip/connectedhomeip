@@ -23,10 +23,12 @@
 
 #pragma once
 
+#include <atomic>
 #include <limits>
 #include <stdlib.h>
 
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
@@ -37,23 +39,26 @@ public:
     static void Release(T * obj) { chip::Platform::Delete(obj); }
 };
 
+template <class T>
+class NoopDeletor
+{
+public:
+    static void Release(T * obj) {}
+};
+
 /**
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
  */
-template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1>
+template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1, typename CounterType = uint32_t>
 class ReferenceCounted
 {
 public:
-    typedef uint32_t count_type;
-
     /** Adds one to the usage count of this class */
     Subclass * Retain()
     {
-        if (mRefCount == std::numeric_limits<count_type>::max())
-        {
-            abort();
-        }
+        VerifyOrDie(!kInitRefCount || mRefCount > 0);
+        VerifyOrDie(mRefCount < std::numeric_limits<CounterType>::max());
         ++mRefCount;
 
         return static_cast<Subclass *>(this);
@@ -62,10 +67,7 @@ public:
     /** Release usage of this class */
     void Release()
     {
-        if (mRefCount == 0)
-        {
-            abort();
-        }
+        VerifyOrDie(mRefCount != 0);
 
         if (--mRefCount == 0)
         {
@@ -74,10 +76,10 @@ public:
     }
 
     /** Get the current reference counter value */
-    count_type GetReferenceCount() const { return mRefCount; }
+    CounterType GetReferenceCount() const { return mRefCount; }
 
 private:
-    count_type mRefCount = kInitRefCount;
+    CounterType mRefCount = kInitRefCount;
 };
 
 } // namespace chip

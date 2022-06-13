@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
@@ -42,10 +43,20 @@ namespace Controller {
 class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredentialsDelegate
 {
 public:
-    virtual ~ExampleOperationalCredentialsIssuer() {}
+    //
+    // Constructor to create an instance of this object that vends out operational credentials for a given fabric.
+    //
+    // An index should be provided to numerically identify this instance relative to others in a multi-fabric deployment. This is
+    // needed given the interactions of this object with persistent storage. Consequently, the index is used to scope the entries
+    // read/written to/from storage.
+    //
+    // It is recommended that this index track the fabric index within which this issuer is operating.
+    //
+    ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
+    ~ExampleOperationalCredentialsIssuer() override {}
 
-    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
-                                const ByteSpan & PAI, const ByteSpan & PAA,
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
@@ -89,8 +100,9 @@ public:
      * This method is expected to be called once all the checks (e.g. device attestation, CSR verification etc)
      * have been completed, or not required (e.g. for self trusted devices such as commissioner apps).
      */
-    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & pubkey,
-                                               MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc);
+    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const CATValues & cats,
+                                               const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
+                                               MutableByteSpan & noc);
 
 private:
     Crypto::P256Keypair mIssuer;
@@ -107,8 +119,9 @@ private:
     PersistentStorageDelegate * mStorage = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 0;
+    FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
+    uint64_t mIndex             = 0;
 };
 
 } // namespace Controller

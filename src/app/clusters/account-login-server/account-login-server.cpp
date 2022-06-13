@@ -21,62 +21,161 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/account-login-server/account-login-delegate.h>
+#include <app/clusters/account-login-server/account-login-server.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
-#include <string>
+#include <platform/CHIPDeviceConfig.h>
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::app::Clusters::AccountLogin::Delegate;
 
-bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
-std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, EndpointId endpoint);
+static constexpr size_t kAccountLoginDeletageTableSize =
+    EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
+// -----------------------------------------------------------------------------
+// Delegate Implementation
+
+namespace {
+
+Delegate * gDelegateTable[kAccountLoginDeletageTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_ACCOUNT_LOGIN_CLUSTER_ID,
-                                         ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(0), responseSetupPin));
-    SuccessOrExit(err = command->FinishCommand());
-exit:
-    if (err != CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
     {
-        ChipLogError(Zcl, "Failed to encode GetSetupPIN command. Error:%s", ErrorStr(err));
+        ChipLogProgress(Zcl, "AccountLogin returning ContentApp delegate for endpoint:%u", endpoint);
+        return app->GetAccountLoginDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogProgress(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%u", endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, AccountLogin::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+}
+
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+{
+    if (delegate == nullptr)
+    {
+        ChipLogProgress(Zcl, "Account Login has no delegate set for endpoint:%u", endpoint);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace AccountLogin {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, AccountLogin::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
     }
 }
+
+} // namespace AccountLogin
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
 
 bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::GetSetupPIN::DecodableType & commandData)
 {
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+    app::CommandResponseHelper<Commands::GetSetupPINResponse::Type> responder(command, commandPath);
 
-    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    std::string responseSetupPin = accountLoginClusterGetSetupPin(tempAccountIdentifierString, emberAfCurrentEndpoint());
-    sendResponse(command, responseSetupPin.c_str());
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleGetSetupPin(responder, tempAccountIdentifier);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfAccountLoginClusterGetSetupPINCallback error: %s", err.AsString());
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
 bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                              const Commands::Login::DecodableType & commandData)
 {
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
-    auto & tempSetupPin          = commandData.setupPIN;
+    auto & setupPin              = commandData.setupPIN;
 
-    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    std::string tempSetupPinString(tempSetupPin.data(), tempSetupPin.size());
-    bool isLoggedIn      = accountLoginClusterIsUserLoggedIn(tempAccountIdentifierString, tempSetupPinString);
-    EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
-    if (!isLoggedIn)
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+exit:
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "User is not authorized.");
+        ChipLogError(Zcl, "emberAfAccountLoginClusterLoginCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
+
+    bool isLoggedIn      = delegate->HandleLogin(tempAccountIdentifier, setupPin);
+    EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
+
+bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::Logout::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    bool isLoggedOut     = delegate->HandleLogout();
+    EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterAccountLoginPluginServerInitCallback() {}

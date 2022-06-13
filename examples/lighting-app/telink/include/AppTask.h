@@ -46,13 +46,18 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
     static void LightingActionButtonEventHandler(void);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
+    static void StartBleAdvButtonEventHandler(void);
+
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
+    static void StartBleAdvHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 

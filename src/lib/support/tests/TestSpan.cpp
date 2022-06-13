@@ -247,12 +247,59 @@ static void TestSpanOfPointers(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s3.data_equal(s5));
 }
 
+static void TestSubSpan(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t array[16];
+    ByteSpan span(array);
+
+    NL_TEST_ASSERT(inSuite, span.data() == &array[0]);
+    NL_TEST_ASSERT(inSuite, span.size() == 16);
+
+    ByteSpan subspan = span.SubSpan(1, 14);
+    NL_TEST_ASSERT(inSuite, subspan.data() == &array[1]);
+    NL_TEST_ASSERT(inSuite, subspan.size() == 14);
+
+    subspan = span.SubSpan(1, 0);
+    NL_TEST_ASSERT(inSuite, subspan.size() == 0);
+
+    subspan = span.SubSpan(10);
+    NL_TEST_ASSERT(inSuite, subspan.data() == &array[10]);
+    NL_TEST_ASSERT(inSuite, subspan.size() == 6);
+
+    subspan = span.SubSpan(16);
+    NL_TEST_ASSERT(inSuite, subspan.size() == 0);
+}
+
+static void TestFromZclString(nlTestSuite * inSuite, void * inContext)
+{
+    // Purposefully larger size than data.
+    constexpr uint8_t array[16] = { 3, 0x41, 0x63, 0x45 };
+
+    constexpr char str[] = "AcE";
+
+    ByteSpan s1 = ByteSpan::fromZclString(array);
+    NL_TEST_ASSERT(inSuite, s1.data_equal(ByteSpan(&array[1], 3)));
+
+    CharSpan s2 = CharSpan::fromZclString(array);
+    NL_TEST_ASSERT(inSuite, s2.data_equal(CharSpan(str, 3)));
+}
+
+static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr char str[] = "AcE";
+
+    CharSpan s1 = CharSpan::fromCharString(str);
+    NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan), NL_TEST_DEF_FN(TestMutableByteSpan),
-                                 NL_TEST_DEF_FN(TestFixedByteSpan), NL_TEST_DEF_FN(TestSpanOfPointers), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan),       NL_TEST_DEF_FN(TestMutableByteSpan),
+                                 NL_TEST_DEF_FN(TestFixedByteSpan),  NL_TEST_DEF_FN(TestSpanOfPointers),
+                                 NL_TEST_DEF_FN(TestSubSpan),        NL_TEST_DEF_FN(TestFromZclString),
+                                 NL_TEST_DEF_FN(TestFromCharString), NL_TEST_SENTINEL() };
 
 int TestSpan(void)
 {

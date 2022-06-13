@@ -15,21 +15,29 @@
 name: 6.2.1. [TC-TM-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Temperature Measurement"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: int16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
-      disabled: true
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: int16
@@ -37,9 +45,8 @@ tests:
               maxValue: 32766
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
-      disabled: true
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: int16
@@ -47,7 +54,7 @@ tests:
               maxValue: 32767
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:

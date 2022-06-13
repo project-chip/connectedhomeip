@@ -80,7 +80,7 @@ struct TestState
 
 static void HandleSignal(int aSignal);
 static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[]);
 
 static void StartTest();
 static void CleanupTest();
@@ -185,6 +185,22 @@ static OptionSet *       sToolOptionSets[] =
 };
 // clang-format on
 
+namespace chip {
+namespace Inet {
+
+class TCPTest
+{
+public:
+    static bool StateIsConnected(const TCPEndPoint * endPoint) { return endPoint->mState == TCPEndPoint::State::kConnected; }
+    static bool StateIsConnectedOrReceiveShutdown(const TCPEndPoint * endPoint)
+    {
+        return endPoint->mState == TCPEndPoint::State::kConnected || endPoint->mState == TCPEndPoint::State::kReceiveShutdown;
+    }
+};
+
+} // namespace Inet
+} // namespace chip
+
 static void CheckSucceededOrFailed(TestState & aTestState, bool & aOutSucceeded, bool & aOutFailed)
 {
     const TransferStats & lStats = aTestState.mStats;
@@ -261,7 +277,7 @@ int main(int argc, char * argv[])
 
     if (gInterfaceName != nullptr)
     {
-        lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
+        lStatus = InterfaceId::InterfaceNameToId(gInterfaceName, gInterfaceId);
         if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
@@ -303,6 +319,8 @@ shutdown:
     ShutdownSystemLayer();
 
     lSuccessful = Common::WasSuccessful(sTestState.mStatus);
+
+    ShutdownTestInetCommon();
 
 exit:
     return (lSuccessful ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -411,7 +429,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
     return (retval);
 }
 
-bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[])
 {
     if (Common::IsSender())
     {
@@ -524,7 +542,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -570,7 +588,7 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
     VerifyOrExit(aEndPoint != nullptr, lStatus = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!aBuffer.IsNull(), lStatus = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aEndPoint->State != TCPEndPoint::kState_Connected)
+    if (!TCPTest::StateIsConnected(aEndPoint))
     {
         lStatus = aEndPoint->SetReceivedDataForTesting(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
@@ -582,8 +600,8 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
 
     lPeerAddress.ToString(lPeerAddressBuffer);
 
-    printf("TCP message received from %s:%u (%zu bytes)\n", lPeerAddressBuffer, lPeerPort,
-           static_cast<size_t>(aBuffer->DataLength()));
+    printf("TCP message received from %s:%u (%u bytes)\n", lPeerAddressBuffer, lPeerPort,
+           static_cast<unsigned int>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
     VerifyOrExit(lCheckPassed == true, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
@@ -625,7 +643,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(UDPEndPoint * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
@@ -645,7 +663,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(UDPEndPoint * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -654,33 +672,18 @@ static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError
 
 static bool IsTransportReadyForSend()
 {
-    bool lStatus = false;
-
     if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
-        lStatus = (sUDPIPEndPoint != nullptr);
+        return (sUDPIPEndPoint != nullptr);
     }
-    else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
+
+    if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
     {
-        if (sTCPIPEndPoint != nullptr)
-        {
-            if (sTCPIPEndPoint->PendingSendLength() == 0)
-            {
-                switch (sTCPIPEndPoint->State)
-                {
-                case TCPEndPoint::kState_Connected:
-                case TCPEndPoint::kState_ReceiveShutdown:
-                    lStatus = true;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
+        return (sTCPIPEndPoint != nullptr) && (sTCPIPEndPoint->PendingSendLength() == 0) &&
+            TCPTest::StateIsConnectedOrReceiveShutdown(sTCPIPEndPoint);
     }
 
-    return (lStatus);
+    return false;
 }
 
 static CHIP_ERROR PrepareTransportForSend()
@@ -691,8 +694,8 @@ static CHIP_ERROR PrepareTransportForSend()
     {
         if (sTCPIPEndPoint == nullptr)
         {
-            lStatus = gInet.NewTCPEndPoint(&sTCPIPEndPoint);
-            INET_FAIL_ERROR(lStatus, "InetLayer::NewTCPEndPoint failed");
+            lStatus = gTCP.NewEndPoint(&sTCPIPEndPoint);
+            INET_FAIL_ERROR(lStatus, "TCP NewEndPoint failed");
 
             sTCPIPEndPoint->OnConnectComplete  = HandleTCPConnectionComplete;
             sTCPIPEndPoint->OnConnectionClosed = HandleTCPConnectionClosed;
@@ -760,7 +763,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
@@ -789,7 +792,7 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPAddress lAddress           = chip::Inet::IPAddress::Any;
     CHIP_ERROR lStatus;
 
@@ -799,7 +802,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
+        lIPAddressType = IPAddressType::kIPv4;
         if (!gNetworkOptions.LocalIPv6Addr.empty())
             lAddress = gNetworkOptions.LocalIPv4Addr[0];
         else
@@ -819,10 +822,10 @@ static void StartTest()
 
     if (gOptFlags & kOptFlagUseUDPIP)
     {
-        lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
-        INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
+        lStatus = gUDP.NewEndPoint(&sUDPIPEndPoint);
+        INET_FAIL_ERROR(lStatus, "UDP NewEndPoint failed");
 
-        if (IsInterfaceIdPresent(gInterfaceId))
+        if (gInterfaceId.IsPresent())
         {
             lStatus = sUDPIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");
@@ -844,8 +847,8 @@ static void StartTest()
             const uint16_t lConnectionBacklogMax = 1;
             const bool lReuseAddress             = true;
 
-            lStatus = gInet.NewTCPEndPoint(&sTCPIPListenEndPoint);
-            INET_FAIL_ERROR(lStatus, "InetLayer::NewTCPEndPoint failed");
+            lStatus = gTCP.NewEndPoint(&sTCPIPListenEndPoint);
+            INET_FAIL_ERROR(lStatus, "TCP NewEndPoint failed");
 
             sTCPIPListenEndPoint->OnConnectionReceived = HandleTCPConnectionReceived;
             sTCPIPListenEndPoint->OnAcceptError        = HandleTCPAcceptError;

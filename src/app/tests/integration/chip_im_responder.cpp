@@ -32,6 +32,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -45,11 +46,27 @@
 namespace chip {
 namespace app {
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
-    return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == kTestClusterId &&
-            aCommandPath.mCommandId == kTestCommandId);
+    using Protocols::InteractionModel::Status;
+
+    if (aCommandPath.mEndpointId != kTestEndpointId)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    if (aCommandPath.mClusterId != kTestClusterId)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    if (aCommandPath.mCommandId != kTestCommandId)
+    {
+        return Status::UnsupportedCommand;
+    }
+
+    return Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
@@ -57,7 +74,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 {
     static bool statusCodeFlipper = false;
 
-    if (!ServerClusterCommandExists(aCommandPath))
+    if (ServerClusterCommandExists(aCommandPath) != Protocols::InteractionModel::Status::Success)
     {
         return;
     }
@@ -67,21 +84,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath path = {
+        kTestEndpointId, // Endpoint
+        kTestClusterId,  // ClusterId
+        kTestCommandId,  // CommandId
+    };
 
     // Add command data here
     if (statusCodeFlipper)
     {
-        chip::app::ConcreteCommandPath commandPath(kTestEndpointId, // Endpoint
-                                                   kTestClusterId,  // ClusterId
-                                                   kTestCommandId   // CommandId
-        );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        apCommandObj->AddStatus(path, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -89,9 +102,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
+        ReturnOnFailure(apCommandObj->PrepareCommand(path));
 
-        writer = apCommandObj->GetCommandDataElementTLVWriter();
+        writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
 
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2));
@@ -101,51 +114,45 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     statusCodeFlipper = !statusCodeFlipper;
 }
 
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-    // Nothing todo.
+    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint64_t version = 0;
-    VerifyOrExit(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apWriter != nullptr, /* no op */);
-
-    err = AttributeValueEncoder(apWriter).Encode(kTestFieldValue1);
-    SuccessOrExit(err);
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
-
-exit:
-    return err;
+    // Note: This test does not make use of the real attribute metadata.
+    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
+    return &stub;
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
-
-    err = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+    ConcreteDataAttributePath attributePath(2, 3, 4);
+    err = apWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
     return err;
 }
+
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
+{
+    return true;
+}
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
+}
+
 } // namespace app
 } // namespace chip
 
 namespace {
-bool testSyncReport = false;
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
 LivenessEventGenerator gLivenessGenerator;
 
 uint8_t gDebugEventBuffer[2048];
@@ -153,68 +160,42 @@ uint8_t gInfoEventBuffer[2048];
 uint8_t gCritEventBuffer[2048];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+chip::MonotonicallyIncreasingCounter<chip::EventNumber> gEventCounter;
+
+CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
+    ReturnErrorOnFailure(gEventCounter.Init(0));
+
     chip::app::LogStorageResources logStorageResources[] = {
-        { &gCritEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
-        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
-        { &gDebugEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
     chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources);
+                                                      gCircularEventBuffer, logStorageResources, &gEventCounter);
+    return CHIP_NO_ERROR;
 }
 
-void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
-{
-    chip::app::ClusterInfo dirtyPath;
-    dirtyPath.mClusterId  = kTestClusterId;
-    dirtyPath.mEndpointId = kTestEndpointId;
-    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    printf("MutateClusterHandler is triggered...");
-    // send dirty change
-    if (!testSyncReport)
-    {
-        dirtyPath.mFieldId = 1;
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
-        testSyncReport = true;
-    }
-    else
-    {
-        dirtyPath.mFieldId = 10; // unknown field
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
-        // send sync message(empty report)
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    }
-}
-
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate
-{
-public:
-    virtual CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler)
-    {
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
-        return CHIP_NO_ERROR;
-    }
-};
 } // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MockInteractionModelApp mockDelegate;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    chip::Transport::PeerAddress peer(chip::Transport::Type::kUndefined);
     const chip::FabricIndex gFabricIndex = 0;
 
     InitializeChip();
 
-    err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6));
+    err = gFabricTable.Init(&gStorage);
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
+    err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
+                                     .SetAddressType(chip::Inet::IPAddressType::kIPv6));
+    SuccessOrExit(err);
+
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage,
+                               &gFabricTable);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -223,13 +204,14 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable);
     SuccessOrExit(err);
 
-    InitializeEventLogging(&gExchangeManager);
+    err = InitializeEventLogging(&gExchangeManager);
+    SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
-                                     gFabricIndex);
+    err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestControllerNodeId, 1, gFabricIndex, peer,
+                                                       chip::CryptoContext::SessionRole::kResponder);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
@@ -248,7 +230,7 @@ exit:
     }
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
+    gTransportManager.Close();
     ShutdownChip();
 
     return EXIT_SUCCESS;

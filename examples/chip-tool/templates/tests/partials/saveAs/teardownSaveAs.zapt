@@ -1,0 +1,15 @@
+{{#chip_tests_items}}
+    {{#chip_tests_item_responses}}
+    {{#chip_tests_item_response_parameters}}
+    {{#if saveAs}}
+        {{#if (isString type)}}
+            if ({{saveAs}}Buffer != nullptr)
+            {
+                chip::Platform::MemoryFree({{saveAs}}Buffer);
+                {{saveAs}}Buffer = nullptr;
+            }
+        {{/if}}
+    {{/if}}
+    {{/chip_tests_item_response_parameters}}
+    {{/chip_tests_item_responses}}
+{{/chip_tests_items}}

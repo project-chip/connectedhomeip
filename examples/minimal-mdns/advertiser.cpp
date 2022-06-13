@@ -45,10 +45,10 @@ struct Options
     // commissionable node / commissioner params
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
-    Optional<uint16_t> deviceType;
+    Optional<uint32_t> deviceType;
     Optional<const char *> deviceName;
 
-    // commisionable node params
+    // commissionable node params
     uint8_t shortDiscriminator                 = 52;
     uint16_t longDiscriminator                 = 840;
     Dnssd::CommissioningMode commissioningMode = Dnssd::CommissioningMode::kDisabled;
@@ -68,16 +68,16 @@ using namespace chip::ArgParser;
 constexpr uint16_t kOptionEnableIpV4      = '4';
 constexpr uint16_t kOptionAdvertisingMode = 'm';
 
-constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
-constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
-constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
-constexpr uint16_t kOptionCommisioningProductId          = 'p';
-constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
-constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
-constexpr uint16_t kOptionCommisioningDeviceType         = 0x400;
-constexpr uint16_t kOptionCommisioningDeviceName         = 0x500;
-constexpr uint16_t kOptionCommisioningMode               = 0x600;
-constexpr uint16_t kOptionCommisioningRotatingId         = 0x700;
+constexpr uint16_t kOptionCommissioningShortDiscriminator = 's';
+constexpr uint16_t kOptionCommissioningLongDiscriminaotr  = 'l';
+constexpr uint16_t kOptionCommissioningVendorId           = 0x100; // v is used by 'version'
+constexpr uint16_t kOptionCommissioningProductId          = 'p';
+constexpr uint16_t kOptionCommissioningPairingInstr       = 0x200; // Just use the long format
+constexpr uint16_t kOptionCommissioningPairingHint        = 0x300;
+constexpr uint16_t kOptionCommissioningDeviceType         = 0x400;
+constexpr uint16_t kOptionCommissioningDeviceName         = 0x500;
+constexpr uint16_t kOptionCommissioningMode               = 0x600;
+constexpr uint16_t kOptionCommissioningRotatingId         = 0x700;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -110,19 +110,19 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             return false;
         }
         return true;
-    case kOptionCommisioningShordDiscriminator:
+    case kOptionCommissioningShortDiscriminator:
         gOptions.shortDiscriminator = static_cast<uint8_t>(atoi(aValue));
         return true;
-    case kOptionCommisioningLongDiscriminaotr:
+    case kOptionCommissioningLongDiscriminaotr:
         gOptions.longDiscriminator = static_cast<uint16_t>(atoi(aValue));
         return true;
-    case kOptionCommisioningVendorId:
+    case kOptionCommissioningVendorId:
         gOptions.vendorId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
-    case kOptionCommisioningProductId:
+    case kOptionCommissioningProductId:
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
-    case kOptionCommisioningMode:
+    case kOptionCommissioningMode:
         cm = static_cast<uint8_t>(atoi(aValue));
         if (cm == 1)
         {
@@ -133,19 +133,19 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOptions.commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
         }
         return true;
-    case kOptionCommisioningDeviceType:
-        gOptions.deviceType = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
+    case kOptionCommissioningDeviceType:
+        gOptions.deviceType = Optional<uint32_t>::Value(static_cast<uint32_t>(atoi(aValue)));
         return true;
-    case kOptionCommisioningDeviceName:
+    case kOptionCommissioningDeviceName:
         gOptions.deviceName = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
-    case kOptionCommisioningRotatingId:
+    case kOptionCommissioningRotatingId:
         gOptions.rotatingId = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
-    case kOptionCommisioningPairingInstr:
+    case kOptionCommissioningPairingInstr:
         gOptions.pairingInstr = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
-    case kOptionCommisioningPairingHint:
+    case kOptionCommissioningPairingHint:
         gOptions.pairingHint = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
@@ -174,16 +174,16 @@ OptionDef cmdLineOptionsDef[] = {
 #endif
     { "advertising-mode", kArgumentRequired, kOptionAdvertisingMode },
 
-    { "short-discriminator", kArgumentRequired, kOptionCommisioningShordDiscriminator },
-    { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
-    { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
-    { "product-id", kArgumentRequired, kOptionCommisioningProductId },
-    { "commissioning-mode", kNoArgument, kOptionCommisioningMode },
-    { "device-type", kArgumentRequired, kOptionCommisioningDeviceType },
-    { "device-name", kArgumentRequired, kOptionCommisioningDeviceName },
-    { "rotating-id", kArgumentRequired, kOptionCommisioningRotatingId },
-    { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
-    { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
+    { "short-discriminator", kArgumentRequired, kOptionCommissioningShortDiscriminator },
+    { "long-discriminator", kArgumentRequired, kOptionCommissioningLongDiscriminaotr },
+    { "vendor-id", kArgumentRequired, kOptionCommissioningVendorId },
+    { "product-id", kArgumentRequired, kOptionCommissioningProductId },
+    { "commissioning-mode", kNoArgument, kOptionCommissioningMode },
+    { "device-type", kArgumentRequired, kOptionCommissioningDeviceType },
+    { "device-name", kArgumentRequired, kOptionCommissioningDeviceName },
+    { "rotating-id", kArgumentRequired, kOptionCommissioningRotatingId },
+    { "pairing-instruction", kArgumentRequired, kOptionCommissioningPairingInstr },
+    { "pairing-hint", kArgumentRequired, kOptionCommissioningPairingHint },
 
     { "fabric-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
@@ -201,15 +201,15 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Advertise in this mode (operational or commissionable-node or commissioner).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
-                             "        Commisioning/commisionable short discriminator.\n"
+                             "        Commissioning/commissionable short discriminator.\n"
                              "  --long-discriminator <value>\n"
                              "  -l <value>\n"
-                             "        Commisioning/commisionable long discriminator.\n"
+                             "        Commissioning/commissionable long discriminator.\n"
                              "  --vendor-id <value>\n"
-                             "        Commisioning/commisionable vendor id.\n"
+                             "        Commissioning/commissionable vendor id.\n"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
-                             "        Commisioning/commisionable product id.\n"
+                             "        Commissioning/commissionable product id.\n"
                              "  --commissioning-mode <value>\n"
                              "        Commissioning Mode (0=disabled, 1=basic, 2=enhanced).\n"
                              "  --device-type <value>\n"
@@ -219,9 +219,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --rotating-id <value>\n"
                              "        Rotating Id.\n"
                              "  --pairing-instruction <value>\n"
-                             "        Commisionable pairing instruction.\n"
+                             "        Commissionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
-                             "        Commisionable pairing hint.\n"
+                             "        Commissionable pairing hint.\n"
                              "  --fabric-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
@@ -255,7 +255,7 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer) != CHIP_NO_ERROR)
+    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
     {
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
@@ -277,8 +277,8 @@ int main(int argc, char ** args)
                                                                        .SetCommissioningMode(gOptions.commissioningMode)
                                                                        .SetDeviceType(gOptions.deviceType)
                                                                        .SetDeviceName(gOptions.deviceName)
-                                                                       .SetRotatingId(gOptions.rotatingId)
-                                                                       .SetPairingInstr(gOptions.pairingInstr)
+                                                                       .SetRotatingDeviceId(gOptions.rotatingId)
+                                                                       .SetPairingInstruction(gOptions.pairingInstr)
                                                                        .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)

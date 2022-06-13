@@ -14,15 +14,19 @@ using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
 
-static void HandleResolve(void * context, DnssdService * result, CHIP_ERROR error)
+static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
+                          CHIP_ERROR error)
 {
     char addrBuf[100];
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);
 
     NL_TEST_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
-    result->mAddress.Value().ToString(addrBuf, sizeof(addrBuf));
-    printf("Service at [%s]:%u\n", addrBuf, result->mPort);
+    if (!addresses.empty())
+    {
+        addresses.data()[0].ToString(addrBuf, sizeof(addrBuf));
+        printf("Service at [%s]:%u\n", addrBuf, result->mPort);
+    }
     NL_TEST_ASSERT(suite, result->mTextEntrySize == 1);
     NL_TEST_ASSERT(suite, strcmp(result->mTextEntries[0].mKey, "key") == 0);
     NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val") == 0);
@@ -39,12 +43,14 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
     if (services)
     {
-        printf("Mdns service size %zu\n", servicesSize);
+        printf("Mdns service size %u\n", static_cast<unsigned int>(servicesSize));
         printf("Service name %s\n", services->mName);
         printf("Service type %s\n", services->mType);
-        NL_TEST_ASSERT(suite, ChipDnssdResolve(services, INET_NULL_INTERFACEID, HandleResolve, suite) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(suite, ChipDnssdResolve(services, chip::Inet::InterfaceId::Null(), HandleResolve, suite) == CHIP_NO_ERROR);
     }
 }
+
+static void HandlePublish(void * context, const char * type, CHIP_ERROR error) {}
 
 static void InitCallback(void * context, CHIP_ERROR error)
 {
@@ -56,11 +62,11 @@ static void InitCallback(void * context, CHIP_ERROR error)
 
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
-    service.mInterface = INET_NULL_INTERFACEID;
+    service.mInterface = chip::Inet::InterfaceId::Null();
     service.mPort      = 80;
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
-    service.mAddressType   = chip::Inet::kIPAddressType_Any;
+    service.mAddressType   = chip::Inet::IPAddressType::kAny;
     service.mProtocol      = DnssdServiceProtocol::kDnssdProtocolTcp;
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
@@ -70,18 +76,14 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
-    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                    HandleBrowse, suite);
+    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
+    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
+                    chip::Inet::InterfaceId::Null(), HandleBrowse, suite);
 }
 
 static void ErrorCallback(void * context, CHIP_ERROR error)
 {
-    if (error != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "Mdns error: %" CHIP_ERROR_FORMAT "\n", error.Format());
-        abort();
-    }
+    VerifyOrDieWithMsg(error == CHIP_NO_ERROR, DeviceLayer, "Mdns error: %" CHIP_ERROR_FORMAT "\n", error.Format());
 }
 
 void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)

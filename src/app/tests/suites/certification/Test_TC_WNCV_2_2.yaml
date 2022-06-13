@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 39.2.2. [TC-WNCV-2.2] ConfigStatus Attribute with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue #10811 if condition is required, need YAML support for this
+    #Issue 14396
+    - label:
+          "Reads ConfigStatus attribute from DUT, if (PA & LF) value of bit 3
+          must be 1b else 0b & if (PA & TL) value of bit 4 must be 1b else 0b"
+      verification: |
+          ./chip-tool windowcovering read config-status 1 1
+          [1650882400.614314][8634:8639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 366273182
+          [1650882400.614428][8634:8639] CHIP:TOO:   ConfigStatus: 27
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Reads ConfigStatus attribute from DUT, value of bit 0 must be 1b
+          operational"
+      verification: |
+          ./chip-tool windowcovering read config-status 1 1
+          [1650882400.614314][8634:8639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 366273182
+          [1650882400.614428][8634:8639] CHIP:TOO:   ConfigStatus: 27
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

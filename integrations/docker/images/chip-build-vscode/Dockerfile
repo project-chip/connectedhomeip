@@ -9,6 +9,10 @@ FROM connectedhomeip/chip-build-infineon:${VERSION} AS p6
 FROM connectedhomeip/chip-build-tizen:${VERSION} AS tizen
 FROM connectedhomeip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM connectedhomeip/chip-build-ameba:${VERSION} AS ameba
+FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
+FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
+FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
+FROM connectedhomeip/chip-build-zap:${VERSION} AS zap
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -29,13 +33,21 @@ COPY --from=mbedos /opt/openocd/ /opt/openocd/
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
-COPY --from=telink /opt/telink/zephyr-sdk-0.13.0 /opt/telink/zephyr-sdk-0.13.0
+COPY --from=telink /opt/telink/zephyr-sdk-0.13.2 /opt/telink/zephyr-sdk-0.13.2
 
-COPY --from=tizen /opt/tizen_sdk /opt/tizen_sdk
+COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
 COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
+
+COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
+
+COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
+
+COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
+
+COPY --from=zap /opt/zap /opt/zap
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -45,21 +57,36 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
-ENV IDF_PATH=/opt/espressif/esp-idf/
-ENV IDF_TOOLS_PATH=/opt/espressif/tools
-ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
-ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
-ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-ENV EFR32_BOARD=BRD4161A
+# Required for the Tizen SDK
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && : # last line
+
+ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
+ENV EFR32_BOARD=BRD4161A
+ENV IDF_PATH=/opt/espressif/esp-idf/
+ENV IDF_TOOLS_PATH=/opt/espressif/tools
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/
+ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
+ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
-ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.0
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
-ENV TIZEN_HOME /opt/tizen_sdk
+ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
+ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
-ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
+ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.11.0
+ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
+ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+
+ENV TIZEN_VERSION 6.0
+ENV TIZEN_SDK_ROOT /opt/tizen-sdk
+ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core

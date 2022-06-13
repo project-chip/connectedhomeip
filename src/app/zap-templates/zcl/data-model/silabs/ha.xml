@@ -46,114 +46,6 @@ limitations under the License.
     <!-- MODE -->
   </cluster>
   <cluster>
-    <name>Thermostat</name>
-    <domain>HVAC</domain>
-    <description>An interface for configuring and controlling the functionality of a thermostat.</description>
-    <code>0x0201</code>
-    <define>THERMOSTAT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="INT16S" min="0x954D" max="0x7FFF" writable="false" reportable="true" optional="false">local temperature</attribute>
-    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="INT16S" min="0x954D" max="0x7FFF" writable="false" optional="true">outdoor temperature</attribute>
-    <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" default="0x01" optional="true">occupancy</attribute>
-    <!-- OCCUPANCY -->
-    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="0x02BC" optional="true">abs min heat setpoint limit</attribute>
-    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="0x0BB8" optional="true">abs max heat setpoint limit</attribute>
-    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="0x0640" optional="true">abs min cool setpoint limit</attribute>
-    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="0x0C80" optional="true">abs max cool setpoint limit</attribute>
-    <attribute side="server" code="0x0007" define="PI_COOLING_DEMAND" type="INT8U" min="0x00" max="0x64" writable="false" reportable="true" optional="true">pi cooling demand</attribute>
-    <attribute side="server" code="0x0008" define="PI_HEATING_DEMAND" type="INT8U" min="0x00" max="0x64" writable="false" reportable="true" optional="true">pi heating demand</attribute>
-    <attribute side="server" code="0x0009" define="HVAC_SYSTEM_TYPE_CONFIGURATION" type="BITMAP8" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">HVAC system type configuration</attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="INT8S" min="0xE7" max="0x19" writable="true" default="0x00" optional="true">local temperature calibration</attribute>
-    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="INT16S" writable="true" default="0x0A28" optional="false">occupied cooling setpoint</attribute>
-    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="INT16S" writable="true" default="0x07D0" optional="false">occupied heating setpoint</attribute>
-    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="INT16S" writable="true" default="0x0A28" optional="true">unoccupied cooling setpoint</attribute>
-    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="INT16S" writable="true" default="0x07D0" optional="true">unoccupied heating setpoint</attribute>
-    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x02BC" optional="true">min heat setpoint limit</attribute>
-    <attribute side="server" code="0x0016" define="MAX_HEAT_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0BB8" optional="true">max heat setpoint limit</attribute>
-    <attribute side="server" code="0x0017" define="MIN_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0640" optional="true">min cool setpoint limit</attribute>
-    <attribute side="server" code="0x0018" define="MAX_COOL_SETPOINT_LIMIT" type="INT16S" min="0x954D" max="0x7FFF" writable="true" default="0x0C80" optional="true">max cool setpoint limit</attribute>
-    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="INT8S" min="0x0A" max="0x19" writable="true" default="0x19" optional="true">min setpoint dead band</attribute>
-    <attribute side="server" code="0x001A" define="REMOTE_SENSING" type="BITMAP8" min="0x00" max="0x07" writable="true" default="0x00" optional="true">remote sensing</attribute>
-    <attribute side="server" code="0x001B" define="CONTROL_SEQUENCE_OF_OPERATION" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x04" optional="false">control sequence of operation</attribute>
-    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ENUM8" min="0x00" max="0x07" writable="true" default="0x01" optional="false">system mode</attribute>
-    <attribute side="server" code="0x001D" define="THERMOSTAT_ALARM_MASK" type="BITMAP8" min="0x00" max="0x07" writable="false" default="0x00" optional="true">alarm mask</attribute>
-    <!-- ALARM_MASK -->
-    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">thermostat running mode</attribute>
-    <attribute side="server" code="0x0020" define="START_OF_WEEK" type="ENUM8" min="0x00" max="0x06" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">start of week</attribute>
-    <attribute side="server" code="0x0021" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">number of weekly transitions</attribute>
-    <attribute side="server" code="0x0022" define="NUMBER_OF_DAILY_TRANSITIONS" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">number of daily transitions</attribute>
-    <attribute side="server" code="0x0023" define="TEMPERATURE_SETPOINT_HOLD" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">temperature setpoint hold</attribute>
-    <attribute side="server" code="0x0024" define="TEMPERATURE_SETPOINT_HOLD_DURATION" type="INT16U" min="0x0000" max="0x05A0" writable="true" default="0xFFFF" optional="true" introducedIn="ha-1.2-05-3520-29">temperature setpoint hold duration</attribute>
-    <attribute side="server" code="0x0025" define="THERMOSTAT_PROGRAMMING_OPERATION_MODE" type="BITMAP8" min="0x00" max="0xFF" writable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">thermostat programming operation mode</attribute>
-    <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="BITMAP16" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">hvac relay state</attribute>
-    <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="ENUM8" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source</attribute>
-    <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="INT16S" writable="false" default="0x8000" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change amount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source timestamp</attribute>
-    <attribute side="server" code="0x0040" define="AC_TYPE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac type</attribute>
-    <attribute side="server" code="0x0041" define="AC_CAPACITY" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">ac capacity</attribute>
-    <attribute side="server" code="0x0042" define="AC_REFRIGERANT_TYPE" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac refrigerant type</attribute>
-    <attribute side="server" code="0x0043" define="AC_COMPRESSOR" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac compressor</attribute>
-    <attribute side="server" code="0x0044" define="AC_ERROR_CODE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="true" default="0x00000000" optional="true" introducedIn="ha-1.2-05-3520-29">ac error code</attribute>
-    <attribute side="server" code="0x0045" define="AC_LOUVER_POSITION" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac louver position</attribute>
-    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="INT16S" min="0x954D" max="0x7FFF" writable="false" default="0x8000" optional="true" introducedIn="ha-1.2-05-3520-29">ac coil temperature</attribute>
-    <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ENUM8" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac capacity format</attribute>
-    <command source="client" code="0x00" name="SetpointRaiseLower" optional="false" cli="zcl tstat set">
-      <description>
-        Command description for SetpointRaiseLower
-      </description>
-      <arg name="mode" type="SetpointAdjustMode"/>
-      <arg name="amount" type="INT8S"/>
-    </command>
-    <command source="client" code="0x01" name="SetWeeklySchedule" optional="false" cli="zcl tstat sws" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        Command description for SetWeeklySchedule
-      </description>
-      <arg name="numberOfTransitionsForSequence" type="ENUM8"/>
-      <arg name="dayOfWeekForSequence" type="DayOfWeek"/>
-      <arg name="modeForSequence" type="ModeForSequence"/>
-      <arg name="payload" type="INT8U" array="true"/>
-    </command>
-    <command source="client" code="0x02" name="GetWeeklySchedule" optional="false" cli="zcl tstat gws" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        Command description for GetWeeklySchedule
-      </description>
-      <arg name="daysToReturn" type="DayOfWeek"/>
-      <arg name="modeToReturn" type="ModeForSequence"/>
-    </command>
-    <command source="client" code="0x03" name="ClearWeeklySchedule" optional="false" cli="zcl tstat cws" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        The Clear Weekly Schedule command is used to clear the weekly schedule.
-      </description>
-    </command>
-    <command source="client" code="0x04" name="GetRelayStatusLog" optional="false" cli="zcl tstat grs" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        The Get Relay Status Log command is used to query the thermostat internal relay status log.
-      </description>
-    </command>
-    <command source="server" code="0x00" name="CurrentWeeklySchedule" optional="false" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
-      </description>
-      <arg name="numberOfTransitionsForSequence" type="ENUM8"/>
-      <arg name="dayOfWeekForSequence" type="DayOfWeek"/>
-      <arg name="modeForSequence" type="ModeForSequence"/>
-      <arg name="payload" type="INT8U" array="true"/>
-    </command>
-    <command source="server" code="0x01" name="RelayStatusLog" optional="false" introducedIn="ha-1.2-05-3520-29">
-      <description>
-        This command is sent from the thermostat cluster server in response to the Get  Relay Status Log.
-      </description>
-      <arg name="timeOfDay" type="INT16U"/>
-      <arg name="relayStatus" type="BITMAP16"/>
-      <arg name="localTemperature" type="INT16S"/>
-      <arg name="humidityInPercentage" type="INT8U"/>
-      <arg name="setpoint" type="INT16S"/>
-      <arg name="unreadEntries" type="INT16U"/>
-    </command>
-  </cluster>
-  <cluster>
     <name>Fan Control</name>
     <domain>HVAC</domain>
     <description>An interface for controlling a fan in a heating/cooling system.</description>
@@ -161,11 +53,61 @@ limitations under the License.
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_CONTROL_FAN_MODE" type="ENUM8" min="0x00" max="0x06" writable="true" default="0x05" optional="false">fan mode</attribute>
-    <!-- FAN_MODE -->
-    <attribute side="server" code="0x0001" define="FAN_CONTROL_FAN_MODE_SEQUENCE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x02" optional="false">fan mode sequence</attribute>
-    <!-- FAN_MODE_SEQUENCE -->
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">fan mode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">fan mode sequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">percent setting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">percent current</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">speed max</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">speed setting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">speed current</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">rock support</attribute> 
+    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">rock setting</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">wind support</attribute>
+    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">wind setting</attribute>                            
   </cluster>
+  <!-- Fan Control Cluster data types -->  
+  <enum name="FanModeType" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Off" value="0x00"/>
+    <item name="Low" value="0x01"/>
+    <item name="Medium" value="0x02"/>
+    <item name="High" value="0x03"/>
+    <item name="On" value="0x04"/>
+    <item name="Auto" value="0x05"/>
+    <item name="Smart" value="0x06"/>
+  </enum>
+  <enum name="FanModeSequenceType" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Off/Low/Med/High" value="0x00"/>
+    <item name="Off/Low/High" value="0x01"/>
+    <item name="Off/Low/Med/High/Auto" value="0x02"/>
+    <item name="Off/Low/High/Auto" value="0x03"/>
+    <item name="Off/On/Auto" value="0x04"/>
+    <item name="Off/On" value="0x05"/>
+  </enum>  
+  <bitmap name="FanControlFeature" type="BITMAP32">
+    <cluster code="0x0202" />
+    <field name="MultiSpeed" mask="0x01" />
+    <field name="Auto" mask="0x02" />
+    <field name="Rocking" mask="0x04" />
+    <field name="Wind" mask="0x08" />
+  </bitmap>
+  <bitmap name="RockSupportMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="RockLeftRight" mask="0x01" />
+      <field name="RockUpDown" mask="0x02" />
+      <field  name="RockRound" mask="0x04" />
+  </bitmap>
+  <bitmap name="WindSupportMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="SleepWind" mask="0x01" />
+      <field name="NaturalWind" mask="0x02" />
+  </bitmap>
+  <bitmap name="WindSettingMask" type="BITMAP8">
+      <cluster code="0x0202" />
+      <field name="SleepWind" mask="0x01" />
+      <field name="NaturalWind" mask="0x02" />
+  </bitmap>    
   <cluster>
     <name>Dehumidification Control</name>
     <domain>HVAC</domain>
@@ -192,8 +134,16 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">temperature display mode</attribute>
-    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">keypad lockout</attribute>
-    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">schedule programming visibility</attribute>
+    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
+      <description>keypad lockout</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
+      <description>schedule programming visibility</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
   </cluster>
   <cluster>
     <name>Color Control</name>
@@ -203,195 +153,251 @@ limitations under the License.
     <define>COLOR_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current hue</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentHue</attribute>
     <!-- CURRENT_HUE -->
-    <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">current saturation</attribute>
+    <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="INT8U" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentSaturation</attribute>
     <!-- CURRENT_SATURATION -->
-    <attribute side="server" code="0x0002" define="COLOR_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFE" writable="false" default="0x0000" optional="true">remaining time</attribute>
+    <attribute side="server" code="0x0002" define="COLOR_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFE" writable="false" default="0x0000" optional="true">RemainingTime</attribute>
     <!-- REMAINING_TIME -->
-    <attribute side="server" code="0x0003" define="COLOR_CONTROL_CURRENT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x616B" optional="false">current x</attribute>
+    <attribute side="server" code="0x0003" define="COLOR_CONTROL_CURRENT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x616B" optional="true">CurrentX</attribute>
     <!-- CURRENT_X -->
-    <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="false">current y</attribute>
+    <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="true">CurrentY</attribute>
     <!-- CURRENT_Y -->
-    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true">drift compensation</attribute>
+    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
     <!-- DRIFT_COMPENSATION -->
-    <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="CHAR_STRING" length="254" writable="false" optional="true">compensation text</attribute>
+    <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="CHAR_STRING" length="254" writable="false" optional="true">CompensationText</attribute>
     <!-- COMPENSATION_TEXT -->
-    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">color temperature</attribute>
+    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperature</attribute>
     <!-- COLOR_TEMPERATURE -->
-    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x01" optional="true">color mode</attribute>
+    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
     <!-- COLOR_MODE -->
-    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="BITMAP8" min="0x00" max="0xFF" writable="true" default="0x00" optional="false" introducedIn="zcl-6.0-15-02017-001">color control options</attribute>
+    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="BITMAP8" writable="true" default="0x00">Options</attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
-    <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="INT8U" min="0x00" max="0x06" writable="false" optional="true">number of primaries</attribute>
+    <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="INT8U" min="0x00" max="0x06" isNullable="true" writable="false">NumberOfPrimaries</attribute>
     <!-- NUMBER_OF_PRIMARIES -->
-    <attribute side="server" code="0x0011" define="COLOR_CONTROL_PRIMARY_1_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 1 x</attribute>
+    <attribute side="server" code="0x0011" define="COLOR_CONTROL_PRIMARY_1_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1X</attribute>
     <!-- PRIMARY_1_X -->
-    <attribute side="server" code="0x0012" define="COLOR_CONTROL_PRIMARY_1_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 1 y</attribute>
+    <attribute side="server" code="0x0012" define="COLOR_CONTROL_PRIMARY_1_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1Y</attribute>
     <!-- PRIMARY_1_Y -->
-    <attribute side="server" code="0x0013" define="COLOR_CONTROL_PRIMARY_1_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 1 intensity</attribute>
+    <attribute side="server" code="0x0013" define="COLOR_CONTROL_PRIMARY_1_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary1Intensity</attribute>
     <!-- PRIMARY_1_INTENSITY -->
-    <attribute side="server" code="0x0015" define="COLOR_CONTROL_PRIMARY_2_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 2 x</attribute>
+    <attribute side="server" code="0x0015" define="COLOR_CONTROL_PRIMARY_2_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2X</attribute>
     <!-- PRIMARY_2_X -->
-    <attribute side="server" code="0x0016" define="COLOR_CONTROL_PRIMARY_2_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 2 y</attribute>
+    <attribute side="server" code="0x0016" define="COLOR_CONTROL_PRIMARY_2_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2Y</attribute>
     <!-- PRIMARY_2_Y -->
-    <attribute side="server" code="0x0017" define="COLOR_CONTROL_PRIMARY_2_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 2 intensity</attribute>
+    <attribute side="server" code="0x0017" define="COLOR_CONTROL_PRIMARY_2_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary2Intensity</attribute>
     <!-- PRIMARY_2_INTENSITY -->
-    <attribute side="server" code="0x0019" define="COLOR_CONTROL_PRIMARY_3_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 3 x</attribute>
+    <attribute side="server" code="0x0019" define="COLOR_CONTROL_PRIMARY_3_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3X</attribute>
     <!-- PRIMARY_3_X -->
-    <attribute side="server" code="0x001A" define="COLOR_CONTROL_PRIMARY_3_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 3 y</attribute>
+    <attribute side="server" code="0x001A" define="COLOR_CONTROL_PRIMARY_3_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3Y</attribute>
     <!-- PRIMARY_3_Y -->
-    <attribute side="server" code="0x001B" define="COLOR_CONTROL_PRIMARY_3_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 3 intensity</attribute>
+    <attribute side="server" code="0x001B" define="COLOR_CONTROL_PRIMARY_3_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary3Intensity</attribute>
     <!-- PRIMARY_3_INTENSITY -->
-    <attribute side="server" code="0x0020" define="COLOR_CONTROL_PRIMARY_4_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 4 x</attribute>
+    <attribute side="server" code="0x0020" define="COLOR_CONTROL_PRIMARY_4_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4X</attribute>
     <!-- PRIMARY_4_X -->
-    <attribute side="server" code="0x0021" define="COLOR_CONTROL_PRIMARY_4_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 4 y</attribute>
+    <attribute side="server" code="0x0021" define="COLOR_CONTROL_PRIMARY_4_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4Y</attribute>
     <!-- PRIMARY_4_Y -->
-    <attribute side="server" code="0x0022" define="COLOR_CONTROL_PRIMARY_4_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 4 intensity</attribute>
+    <attribute side="server" code="0x0022" define="COLOR_CONTROL_PRIMARY_4_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary4Intensity</attribute>
     <!-- PRIMARY_4_INTENSITY -->
-    <attribute side="server" code="0x0024" define="COLOR_CONTROL_PRIMARY_5_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 5 x</attribute>
+    <attribute side="server" code="0x0024" define="COLOR_CONTROL_PRIMARY_5_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5X</attribute>
     <!-- PRIMARY_5_X -->
-    <attribute side="server" code="0x0025" define="COLOR_CONTROL_PRIMARY_5_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 5 y</attribute>
+    <attribute side="server" code="0x0025" define="COLOR_CONTROL_PRIMARY_5_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5Y</attribute>
     <!-- PRIMARY_5_Y -->
-    <attribute side="server" code="0x0026" define="COLOR_CONTROL_PRIMARY_5_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 5 intensity</attribute>
+    <attribute side="server" code="0x0026" define="COLOR_CONTROL_PRIMARY_5_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary5Intensity</attribute>
     <!-- PRIMARY_5_INTENSITY -->
-    <attribute side="server" code="0x0028" define="COLOR_CONTROL_PRIMARY_6_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 6 x</attribute>
+    <attribute side="server" code="0x0028" define="COLOR_CONTROL_PRIMARY_6_X" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6X</attribute>
     <!-- PRIMARY_6_X -->
-    <attribute side="server" code="0x0029" define="COLOR_CONTROL_PRIMARY_6_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">primary 6 y</attribute>
+    <attribute side="server" code="0x0029" define="COLOR_CONTROL_PRIMARY_6_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6Y</attribute>
     <!-- PRIMARY_6_Y -->
-    <attribute side="server" code="0x002A" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">primary 6 intensity</attribute>
+    <attribute side="server" code="0x002A" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="INT8U" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary6Intensity</attribute>
     <!-- PRIMARY_6_INTENSITY -->
-    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">white point x</attribute>
+    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>WhitePointX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- WHITE_POINT_X -->
-    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">white point y</attribute>
+    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>WhitePointY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- WHITE_POINT_Y -->
-    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point r x</attribute>
+    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointRX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_X -->
-    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point r y</attribute>
+    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointRY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_Y -->
-    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point r intensity</attribute>
+    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" isNullable="true" writable="true" optional="true">
+      <description>ColorPointRIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_R_INTENSITY -->
-    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g x</attribute>
+    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointGX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_X -->
-    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g y</attribute>
+    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointGY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_Y -->
-    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point g intensity</attribute>
+    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" isNullable="true" writable="true" optional="true">
+      <description>ColorPointGIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_G_INTENSITY -->
-    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b x</attribute>
+    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointBX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_X -->
-    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b y</attribute>
+    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointBY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_Y -->
-    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point b intensity</attribute>
+    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" isNullable="true" writable="true" optional="true">
+      <description>ColorPointBIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
-    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">couple color temp to level min-mireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">start up color temperature mireds</attribute>
+    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">CoupleColorTempToLevelMinMireds</attribute>
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>StartUpColorTemperatureMireds</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
     <command source="client" code="0x00" name="MoveToHue" optional="true" cli="zcl color-control movetohue">
       <description>
         Move to specified hue.
       </description>
-      <arg name="hue" type="INT8U"/>
-      <arg name="direction" type="HueDirection"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="Hue" type="INT8U"/>
+      <arg name="Direction" type="HueDirection"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x01" name="MoveHue" optional="true" cli="zcl color-control movehue">
       <description>
         Move hue up or down at specified rate.
       </description>
-      <arg name="moveMode" type="HueMoveMode"/>
-      <arg name="rate" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="Rate" type="INT8U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x02" name="StepHue" optional="true" cli="zcl color-control stephue">
       <description>
         Step hue up or down by specified size at specified rate.
       </description>
-      <arg name="stepMode" type="HueStepMode"/>
-      <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepSize" type="INT8U"/>
+      <arg name="TransitionTime" type="INT8U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x03" name="MoveToSaturation" optional="true" cli="zcl color-control movetosat">
       <description>
         Move to specified saturation.
       </description>
-      <arg name="saturation" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="Saturation" type="INT8U"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x04" name="MoveSaturation" optional="true" cli="zcl color-control movesat">
       <description>
         Move saturation up or down at specified rate.
       </description>
-      <arg name="moveMode" type="SaturationMoveMode"/>
-      <arg name="rate" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="MoveMode" type="SaturationMoveMode"/>
+      <arg name="Rate" type="INT8U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x05" name="StepSaturation" optional="true" cli="zcl color-control stepsat">
       <description>
         Step saturation up or down by specified size at specified rate.
       </description>
-      <arg name="stepMode" type="SaturationStepMode"/>
-      <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT8U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="StepMode" type="SaturationStepMode"/>
+      <arg name="StepSize" type="INT8U"/>
+      <arg name="TransitionTime" type="INT8U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x06" name="MoveToHueAndSaturation" optional="true" cli="zcl color-control movetohueandsat">
       <description>
         Move to hue and saturation.
       </description>
-      <arg name="hue" type="INT8U"/>
-      <arg name="saturation" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="Hue" type="INT8U"/>
+      <arg name="Saturation" type="INT8U"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x07" name="MoveToColor" optional="false" cli="zcl color-control movetocolor">
+    <command source="client" code="0x07" name="MoveToColor" optional="true" cli="zcl color-control movetocolor">
       <description>
         Move to specified color.
       </description>
-      <arg name="colorX" type="INT16U"/>
-      <arg name="colorY" type="INT16U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="ColorX" type="INT16U"/>
+      <arg name="ColorY" type="INT16U"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x08" name="MoveColor" optional="false" cli="zcl color-control movecolor">
+    <command source="client" code="0x08" name="MoveColor" optional="true" cli="zcl color-control movecolor">
       <description>
         Moves the color.
       </description>
-      <arg name="rateX" type="INT16S"/>
-      <arg name="rateY" type="INT16S"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="RateX" type="INT16S"/>
+      <arg name="RateY" type="INT16S"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
-    <command source="client" code="0x09" name="StepColor" optional="false" cli="zcl color-control stepcolor">
+    <command source="client" code="0x09" name="StepColor" optional="true" cli="zcl color-control stepcolor">
       <description>
         Steps the lighting to a specific color.
       </description>
-      <arg name="stepX" type="INT16S"/>
-      <arg name="stepY" type="INT16S"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="StepX" type="INT16S"/>
+      <arg name="StepY" type="INT16S"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x0A" name="MoveToColorTemperature" optional="true" cli="zcl color-control movetocolortemp">
       <description>
         Move to a specific color temperature.
       </description>
-      <arg name="colorTemperature" type="INT16U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="ColorTemperature" type="INT16U"/>
+      <arg name="TransitionTime" type="INT16U"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
   </cluster>
+  <bitmap name="ColorControlFeature" type="BITMAP32">
+    <cluster code="0x0300" />
+    <field name="HueAndSaturation" mask="0x01" />
+    <field name="EnhancedHue" mask="0x02" />
+    <field name="ColorLoop" mask="0x04" />
+    <field name="XY" mask="0x08" />
+    <field name="ColorTemperature" mask="0x10" />
+  </bitmap>
   <cluster>
     <name>Ballast Configuration</name>
     <domain>Lighting</domain>
@@ -419,39 +425,6 @@ limitations under the License.
     <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0xFFFFFF" optional="true">lamp burn hours trip point</attribute>
   </cluster>
   <cluster>
-    <name>Illuminance Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.</description>
-    <code>0x0400</code>
-    <define>ILLUM_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFD" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFE" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="ILLUM_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-    <attribute side="server" code="0x0004" define="MEASUREMENT_LIGHT_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">light sensor type</attribute>
-    <!-- LIGHT_SENSOR_TYPE -->
-  </cluster>
-  <cluster>
-    <name>Illuminance Level Sensing</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the sensing of illuminance levels, and reporting whether illuminance is above, below, or on target.</description>
-    <code>0x0401</code>
-    <define>ILLUM_LEVEL_SENSING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="LEVEL_STATUS" type="ENUM8" min="0x00" max="0xFE" writable="false" reportable="true" optional="false">level status</attribute>
-    <attribute side="server" code="0x0001" define="SENSING_LIGHT_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="true">light sensor type</attribute>
-    <!-- LIGHT_SENSOR_TYPE -->
-    <attribute side="server" code="0x0010" define="ILLUMINANCE_TARGET_LEVEL" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="false">illuminance level target</attribute>
-  </cluster>
-  <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
@@ -463,15 +436,51 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="OCCUPANCY" type="BITMAP8" min="0x00" max="0x01" writable="false" reportable="true" optional="false">occupancy</attribute>
     <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">occupancy sensor type</attribute>
     <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="BITMAP8" min="0x00" max="0x07" writable="false" optional="false">occupancy sensor type bitmap</attribute>
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">PIR occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">PIR unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">PIR unoccupied to occupied threshold</attribute>
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">ultrasonic occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">ultrasonic unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">ultrasonic unoccupied to occupied threshold</attribute>
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">physical contact occupied to unoccupied delay</attribute>
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">physical contact unoccupied to occupied delay</attribute>
-    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">physical contact unoccupied to occupied threshold</attribute>
+    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>PIR occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>PIR unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>PIR unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>ultrasonic occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>ultrasonic unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>ultrasonic unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>physical contact occupied to unoccupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+      <description>physical contact unoccupied to occupied delay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>physical contact unoccupied to occupied threshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
   </cluster>
   <cluster>
     <name>Carbon Monoxide Concentration Measurement</name>
@@ -1036,12 +1045,12 @@ limitations under the License.
       <arg name="enrollResponseCode" type="IasEnrollResponseCode"/>
       <arg name="zoneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x01" name="InitiateNormalOperationMode" optional="true">
+    <command source="client" code="0x01" name="InitiateNormalOperationMode" response="InitiateNormalOperationModeResponse" optional="true">
       <description>
         Used to tell the IAS Zone server to commence normal operation mode
       </description>
     </command>
-    <command source="client" code="0x02" name="InitiateTestMode" optional="true">
+    <command source="client" code="0x02" name="InitiateTestMode" response="InitiateTestModeResponse" optional="true">
       <description>
         Certain IAS Zone servers may have operational configurations that could be configured OTA or locally on the device. This command enables them to be remotely placed into a test mode so that the user or installer may configure their field of view, sensitivity, and other operational parameters.
       </description>
@@ -1057,7 +1066,7 @@ limitations under the License.
       <arg name="zoneId" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="delay" type="INT16U" introducedIn="ha-1.2-05-3520-29"/>
     </command>
-    <command source="server" code="0x01" name="ZoneEnrollRequest" optional="false" cli="zcl ias-zone enroll">
+    <command source="server" code="0x01" name="ZoneEnrollRequest" response="ZoneEnrollResponse" optional="false" cli="zcl ias-zone enroll">
       <description>
         Command description for zoneEnrollRequest
       </description>
@@ -1083,7 +1092,7 @@ limitations under the License.
     <define>IAS_ACE_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <command source="client" code="0x00" name="Arm" optional="false" cli="zcl ias-ace a">
+    <command source="client" code="0x00" name="Arm" response="ArmResponse" optional="false" cli="zcl ias-ace a">
       <description>
         Command description for Arm
       </description>
@@ -1091,7 +1100,7 @@ limitations under the License.
       <arg name="armDisarmCode" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="zoneId" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
     </command>
-    <command source="client" code="0x01" name="Bypass" optional="false" cli="zcl ias-ace b">
+    <command source="client" code="0x01" name="Bypass" response="BypassResponse" optional="false" cli="zcl ias-ace b">
       <description>
         Command description for Bypass
       </description>
@@ -1114,18 +1123,18 @@ limitations under the License.
         Command description for Panic
       </description>
     </command>
-    <command source="client" code="0x05" name="GetZoneIdMap" optional="false" cli="zcl ias-ace getzm">
+    <command source="client" code="0x05" name="GetZoneIdMap" response="GetZoneIdMapResponse" optional="false" cli="zcl ias-ace getzm">
       <description>
         Command description for GetZoneIdMap
       </description>
     </command>
-    <command source="client" code="0x06" name="GetZoneInformation" optional="false" cli="zcl ias-ace getzi">
+    <command source="client" code="0x06" name="GetZoneInformation" response="GetZoneInformationResponse" optional="false" cli="zcl ias-ace getzi">
       <description>
         Command description for GetZoneInformation
       </description>
       <arg name="zoneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x07" name="GetPanelStatus" optional="false" introducedIn="ha-1.2.1-05-3520-30">
+    <command source="client" code="0x07" name="GetPanelStatus" response="GetPanelStatusResponse" optional="false" introducedIn="ha-1.2.1-05-3520-30">
       <description>
         Used by the ACE client to request an update to the status of the ACE server
       </description>
@@ -1135,7 +1144,7 @@ limitations under the License.
         Used by the ACE client to retrieve the bypassed zones
         </description>
     </command>
-    <command source="client" code="0x09" name="GetZoneStatus" optional="false" introducedIn="ha-1.2.1-05-3520-30">
+    <command source="client" code="0x09" name="GetZoneStatus" response="GetZoneStatusResponse" optional="false" introducedIn="ha-1.2.1-05-3520-30">
       <description>
         Used by the ACE client to request an update to the zone status of the ACE server
       </description>
@@ -1257,447 +1266,6 @@ limitations under the License.
     </command>
   </cluster>
   <cluster>
-    <name>Door Lock</name>
-    <domain>Closures</domain>
-    <description>Provides an interface into a generic way to secure a door. </description>
-    <code>0x0101</code>
-    <define>DOOR_LOCK_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="LOCK_STATE" type="ENUM8" writable="false" reportable="true" optional="false">lock state</attribute>
-    <attribute side="server" code="0x0001" define="LOCK_TYPE" type="ENUM8" writable="false" optional="false">lock type</attribute>
-    <attribute side="server" code="0x0002" define="ACTUATOR_ENABLED" type="BOOLEAN" writable="false" optional="false">actuator enabled</attribute>
-    <attribute side="server" code="0x0003" define="DOOR_STATE" type="ENUM8" writable="false" reportable="true" optional="true">door state</attribute>
-    <attribute side="server" code="0x0004" define="DOOR_OPEN_EVENTS" type="INT32U" writable="true" optional="true">door open events</attribute>
-    <attribute side="server" code="0x0005" define="DOOR_CLOSED_EVENTS" type="INT32U" writable="true" optional="true">door closed events</attribute>
-    <attribute side="server" code="0x0006" define="OPEN_PERIOD" type="INT16U" writable="true" optional="true">open period</attribute>
-    <attribute side="server" code="0x0010" define="NUM_LOCK_RECORDS_SUPPORTED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">num lock records supported</attribute>
-    <attribute side="server" code="0x0011" define="NUM_TOTAL_USERS_SUPPORTED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">num total users supported</attribute>
-    <attribute side="server" code="0x0012" define="NUM_PIN_USERS_SUPPORTED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">num PIN users supported</attribute>
-    <attribute side="server" code="0x0013" define="NUM_RFID_USERS_SUPPORTED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">num RFID users supported</attribute>
-    <attribute side="server" code="0x0014" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" min="0x0000" max="0xFF" writable="false" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">num weekday schedules supported per user</attribute>
-    <attribute side="server" code="0x0015" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" min="0x0000" max="0xFF" writable="false" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">num yearday schedules supported per user</attribute>
-    <attribute side="server" code="0x0016" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" min="0x0000" max="0xFF" writable="false" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">num holiday schedules supported per user</attribute>
-    <attribute side="server" code="0x0017" define="MAX_PIN_LENGTH" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x08" optional="true" introducedIn="ha-1.2-05-3520-29">max pin length</attribute>
-    <attribute side="server" code="0x0018" define="MIN_PIN_LENGTH" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x04" optional="true" introducedIn="ha-1.2-05-3520-29">min pin length</attribute>
-    <attribute side="server" code="0x0019" define="MAX_RFID_CODE_LENGTH" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x14" optional="true" introducedIn="ha-1.2-05-3520-29">max rfid code length</attribute>
-    <attribute side="server" code="0x001A" define="MIN_RFID_CODE_LENGTH" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x08" optional="true" introducedIn="ha-1.2-05-3520-29">min rfid code length</attribute>
-    <attribute side="server" code="0x0020" define="ENABLE_LOGGING" type="BOOLEAN" min="0x00" max="0x01" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">enable logging</attribute>
-    <attribute side="server" code="0x0021" define="LANGUAGE" type="CHAR_STRING" length="2" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">language</attribute>
-    <attribute side="server" code="0x0022" define="LED_SETTINGS" type="INT8U" min="0x00" max="0x02" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">led settings</attribute>
-    <attribute side="server" code="0x0023" define="AUTO_RELOCK_TIME" type="INT32U" min="0x00" max="0xFFFFFFFF" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">auto relock time</attribute>
-    <attribute side="server" code="0x0024" define="SOUND_VOLUME" type="INT8U" min="0x00" max="0x02" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">sound volume</attribute>
-    <attribute side="server" code="0x0025" define="OPERATING_MODE" type="ENUM8" min="0x00" max="0x05" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">operating mode</attribute>
-    <attribute side="server" code="0x0026" define="SUPPORTED_OPERATING_MODES" type="BITMAP16" min="0x0000" max="0xFFFF" writable="false" default="0x01" optional="true" introducedIn="ha-1.2-05-3520-29">supported operating modes</attribute>
-    <attribute side="server" code="0x0027" define="DEFAULT_CONFIGURATION_REGISTER" type="BITMAP16" min="0x0000" max="0xFFFF" writable="false" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">default configuration register</attribute>
-    <attribute side="server" code="0x0028" define="ENABLE_LOCAL_PROGRAMMING" type="BOOLEAN" min="0x00" max="0x01" writable="true" reportable="true" default="0x01" optional="true" introducedIn="ha-1.2-05-3520-29">enable local programming</attribute>
-    <attribute side="server" code="0x0029" define="ENABLE_ONE_TOUCH_LOCKING" type="BOOLEAN" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">enable one touch locking</attribute>
-    <attribute side="server" code="0x002A" define="ENABLE_INSIDE_STATUS_LED" type="BOOLEAN" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">enable inside status led</attribute>
-    <attribute side="server" code="0x002B" define="ENABLE_PRIVACY_MODE_BUTTON" type="BOOLEAN" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">enable privacy mode button</attribute>
-    <attribute side="server" code="0x0030" define="WRONG_CODE_ENTRY_LIMIT" type="INT8U" min="0x00" max="0xFF" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">wrong code entry limit</attribute>
-    <attribute side="server" code="0x0031" define="USER_CODE_TEMPORARY_DISABLE_TIME" type="INT8U" min="0x00" max="0xFF" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">user code temporary disable time</attribute>
-    <attribute side="server" code="0x0032" define="SEND_PIN_OVER_THE_AIR" type="BOOLEAN" min="0x00" max="0x01" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">send pin over the air</attribute>
-    <attribute side="server" code="0x0033" define="REQUIRE_PIN_FOR_RF_OPERATION" type="BOOLEAN" min="0x00" max="0x01" writable="true" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">require pin for rf operation</attribute>
-    <attribute side="server" code="0x0034" define="ZIGBEE_SECURITY_LEVEL" type="ENUM8" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">zigbee security level</attribute>
-    <attribute side="server" code="0x0040" define="DOOR_LOCK_ALARM_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">alarm mask</attribute>
-    <attribute side="server" code="0x0041" define="KEYPAD_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">keypad operation event mask</attribute>
-    <attribute side="server" code="0x0042" define="RF_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">RF operation event mask</attribute>
-    <attribute side="server" code="0x0043" define="MANUAL_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">manual operation event mask</attribute>
-    <attribute side="server" code="0X0044" define="RFID_OPERATION_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">rfid operation event mask</attribute>
-    <attribute side="server" code="0x0045" define="KEYPAD_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">keypad programming event mask</attribute>
-    <attribute side="server" code="0X0046" define="RF_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">rf programming event mask</attribute>
-    <attribute side="server" code="0X0047" define="RFID_PROGRAMMING_EVENT_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" reportable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">rfid programming event mask</attribute>
-    <command source="client" code="0x00" name="LockDoor" optional="false" cli="zcl lock lock">
-      <description>
-        Locks the door
-      </description>
-      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="client" code="0x01" name="UnlockDoor" optional="false" cli="zcl lock unlock">
-      <description>
-        Unlocks the door
-      </description>
-      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="client" code="0x02" name="Toggle" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Toggles the door lock from its current state to the opposite state locked or unlocked.
-       </description>
-      <arg name="pin" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="client" code="0x03" name="UnlockWithTimeout" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock unlock-with-timeout">
-      <description>
-         Unlock the door with a timeout. When the timeout expires, the door will automatically re-lock.
-       </description>
-      <arg name="timeoutInSeconds" type="INT16U"/>
-      <arg name="pin" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="client" code="0x04" name="GetLogRecord" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-log-record">
-      <description>
-         Retrieve a log record at a specified index.
-       </description>
-      <arg name="logIndex" type="INT16U"/>
-    </command>
-    <command source="client" code="0x05" name="SetPin" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-pin">
-      <description>
-         Set the PIN for a specified user id.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="OCTET_STRING"/>
-    </command>
-    <command source="client" code="0x06" name="GetPin" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-pin">
-      <description>
-         Retrieve PIN information for a user with a specific user ID.
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x07" name="ClearPin" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-pin">
-      <description>
-         Clear the PIN for a user with a specific user ID
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x08" name="ClearAllPins" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Clear all PIN codes on the lock for all users.
-       </description>
-    </command>
-    <command source="client" code="0x09" name="SetUserStatus" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Set the status value for a specified user ID.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userStatus" type="INT8U"/>
-    </command>
-    <command source="client" code="0x0A" name="GetUserStatus" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Retrieve the status byte for a specific user.
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x0B" name="SetWeekdaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-weekday-schedule">
-      <description>
-         Set the schedule of days during the week that the associated user based on the user ID will have access to the lock and will be able to operate it.
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="daysMask" type="DoorLockDayOfWeek"/>
-      <arg name="startHour" type="INT8U"/>
-      <arg name="startMinute" type="INT8U"/>
-      <arg name="endHour" type="INT8U"/>
-      <arg name="endMinute" type="INT8U"/>
-    </command>
-    <command source="client" code="0x0C" name="GetWeekdaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-weekday-schedule">
-      <description>
-         Retrieve a weekday schedule for doorlock user activation for a specific schedule id and user id.
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x0D" name="ClearWeekdaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-weekday-schedule">
-      <description>
-         Clear a weekday schedule for doorlock user activation for a specific schedule id and user id.
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x0E" name="SetYeardaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-yearday-schedule">
-      <description>
-         Set a door lock user id activation schedule according to a specific absolute local start and end time
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="localStartTime" type="INT32U"/>
-      <arg name="localEndTime" type="INT32U"/>
-    </command>
-    <command source="client" code="0x0F" name="GetYeardaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-yearday-schedule">
-      <description>
-         Retrieve a yearday schedule for a specific scheduleId and userId
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x10" name="ClearYeardaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-yearday-schedule">
-      <description>
-         Clear a yearday schedule for a specific scheduleId and userId
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x11" name="SetHolidaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-holiday-schedule">
-      <description>
-         Set the holiday schedule for a specific user
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="localStartTime" type="INT32U"/>
-      <arg name="localEndTime" type="INT32U"/>
-      <arg name="operatingModeDuringHoliday" type="ENUM8"/>
-    </command>
-    <command source="client" code="0x12" name="GetHolidaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-holiday-schedule">
-      <description>
-         Retrieve a holiday schedule for a specific scheduleId
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-    </command>
-    <command source="client" code="0x13" name="ClearHolidaySchedule" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-holiday-schedule">
-      <description>
-         Clear a holiday schedule for a specific scheduleId
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-    </command>
-    <command source="client" code="0x14" name="SetUserType" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-user-type">
-      <description>
-         Set the type value for a user based on user ID.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userType" type="DoorLockUserType"/>
-    </command>
-    <command source="client" code="0x15" name="GetUserType" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-user-type">
-      <description>
-         Retrieve the type for a specific user based on the user ID.
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x16" name="SetRfid" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock set-rfid">
-      <description>
-         Set the PIN for a specified user id.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="userType" type="DoorLockUserType"/>
-      <arg name="id" type="OCTET_STRING"/>
-    </command>
-    <command source="client" code="0x17" name="GetRfid" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-rfid">
-      <description>
-         Retrieve RFID ID information for a user with a specific user ID.
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x18" name="ClearRfid" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-rfid">
-      <description>
-         Clear the RFID ID for a user with a specific user ID
-       </description>
-      <arg name="userId" type="INT16U"/>
-    </command>
-    <command source="client" code="0x19" name="ClearAllRfids" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock clear-all-rfids">
-      <description>
-         Clear all RFID ID codes on the lock for all users.
-       </description>
-    </command>
-    <command source="server" code="0x00" name="LockDoorResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Indicates lock success or failure
-      </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x01" name="UnlockDoorResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Indicates unlock success or failure
-      </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x02" name="ToggleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Response provided to the toggle command, indicates whether the toggle was successful or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x03" name="UnlockWithTimeoutResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Response provided to unlock with specific timeout. This command indicates whether the unlock command was successful or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x04" name="GetLogRecordResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the specific log record requested.
-       </description>
-      <arg name="logEntryId" type="INT16U"/>
-      <arg name="timestamp" type="INT32U"/>
-      <arg name="eventType" type="ENUM8"/>
-      <arg name="source" type="INT8U"/>
-      <arg name="eventIdOrAlarmCode" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="OCTET_STRING"/>
-    </command>
-    <command source="server" code="0x05" name="SetPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Indicates whether the setting of the PIN was successful or not.
-       </description>
-      <arg name="status" type="DoorLockSetPinOrIdStatus"/>
-    </command>
-    <command source="server" code="0x06" name="GetPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the PIN requested according to the user ID passed.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="OCTET_STRING"/>
-    </command>
-    <command source="server" code="0x07" name="ClearPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the PIN was cleared or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x08" name="ClearAllPinsResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the PINs were cleared or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x09" name="SetUserStatusResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the user status was set or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x0A" name="GetUserStatusResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the user status.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x0B" name="SetWeekdayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the status of setting the weekday schedule
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x0C" name="GetWeekdayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the weekday schedule requested.
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
-      <arg name="daysMask" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="startHour" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="startMinute" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="endHour" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="endMinute" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="server" code="0x0D" name="ClearWeekdayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the status of clearing the weekday schedule
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x0E" name="SetYeardayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the yearday schedule was set or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x0F" name="GetYeardayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the yearday schedule requested
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
-      <arg name="localStartTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="localEndTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="server" code="0x10" name="ClearYeardayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the yearday schedule was removed or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x11" name="SetHolidayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the holiday schedule was set or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x12" name="GetHolidayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the holiday schedule requested
-       </description>
-      <arg name="scheduleId" type="INT8U"/>
-      <arg name="status" type="INT8U"/>
-      <arg name="localStartTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="localEndTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
-      <arg name="operatingModeDuringHoliday" type="ENUM8" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="server" code="0x13" name="ClearHolidayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the holiday schedule was removed or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x14" name="SetUserTypeResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         returns success or failure depending on whether the user type was set or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x15" name="GetUserTypeResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the user type for the user ID requested.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userType" type="DoorLockUserType"/>
-    </command>
-    <command source="server" code="0x16" name="SetRfidResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-          Indicates whether the setting of the RFID ID was successful or not.
-        </description>
-      <arg name="status" type="DoorLockSetPinOrIdStatus"/>
-    </command>
-    <command source="server" code="0x17" name="GetRfidResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns the RFID ID requested according to the user ID passed.
-       </description>
-      <arg name="userId" type="INT16U"/>
-      <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="userType" type="DoorLockUserType"/>
-      <arg name="rfid" type="OCTET_STRING"/>
-    </command>
-    <command source="server" code="0x18" name="ClearRfidResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the RFID ID was cleared or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x19" name="ClearAllRfidsResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
-      <description>
-         Returns success or failure depending on whether the RFID IDs were cleared or not.
-       </description>
-      <arg name="status" type="INT8U"/>
-    </command>
-    <command source="server" code="0x20" name="OperationEventNotification" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Indicates that an operation event has taken place. Includes the associated event information.
-       </description>
-      <arg name="source" type="INT8U"/>
-      <arg name="eventCode" type="DoorLockOperationEventCode"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="OCTET_STRING"/>
-      <arg name="timeStamp" type="epoch_s"/>
-      <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-    <command source="server" code="0x21" name="ProgrammingEventNotification" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>
-         Indicates that a programming event has taken place. Includes the associated programming event information.
-       </description>
-      <arg name="source" type="INT8U"/>
-      <arg name="eventCode" type="DoorLockProgrammingEventCode"/>
-      <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="OCTET_STRING"/>
-      <arg name="userType" type="DoorLockUserType"/>
-      <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="timeStamp" type="epoch_s"/>
-      <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-  </cluster>
-  <cluster>
     <name>Barrier Control</name>
     <domain>Closures</domain>
     <description>This cluster provides control of a barrier (garage door).</description>
@@ -1744,7 +1312,7 @@ limitations under the License.
       </description>
       <arg name="commandId" type="CommandIdentification"/>
     </command>
-    <command source="client" code="0x01" name="SignalState" optional="false">
+    <command source="client" code="0x01" name="SignalState" response="SignalStateResponse" optional="false">
       <description>
         This basic message is used to retrieve Household Appliances status.
       </description>
@@ -1805,13 +1373,13 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="ENERGY_FORMATTING" type="BITMAP8" min="0x00" max="0xFF" writable="false" default="0x01" optional="false">energy formatting</attribute>
     <attribute side="server" code="0x0003" define="ENERGY_REMOTE" type="BOOLEAN" min="0x00" max="0x01" writable="false" reportable="true" default="0x00" optional="false">energy remote</attribute>
     <attribute side="server" code="0x0004" define="SCHEDULE_MODE" type="BITMAP8" min="0x00" max="0xFF" writable="true" reportable="true" default="0x00" optional="false">schedule mode</attribute>
-    <command source="client" code="0x00" name="PowerProfileRequest" optional="false" cli="zcl power-profile profile">
+    <command source="client" code="0x00" name="PowerProfileRequest" response="PowerProfileResponse" optional="false" cli="zcl power-profile profile">
       <description>
         The PowerProfileRequest Command is generated by a device supporting the client side of the Power Profile cluster in order to request the Power Profile of a server device.
       </description>
       <arg name="powerProfileId" type="INT8U"/>
     </command>
-    <command source="client" code="0x01" name="PowerProfileStateRequest" optional="false" cli="zcl power-profile state">
+    <command source="client" code="0x01" name="PowerProfileStateRequest" response="PowerProfileStateResponse" optional="false" cli="zcl power-profile state">
       <description>
         The PowerProfileStateRequest Command is generated in order to retrieve the identifiers of current Power Profiles.
       </description>
@@ -1849,13 +1417,13 @@ limitations under the License.
       <arg name="numOfScheduledPhases" type="INT8U"/>
       <arg name="scheduledPhases" type="ScheduledPhase" array="true"/>
     </command>
-    <command source="client" code="0x06" name="PowerProfileScheduleConstraintsRequest" optional="false" cli="zcl power-profile schedule-constraints">
+    <command source="client" code="0x06" name="PowerProfileScheduleConstraintsRequest" response="PowerProfileScheduleConstraintsResponse" optional="false" cli="zcl power-profile schedule-constraints">
       <description>
         The PowerProfileScheduleConstraintsRequest Command is generated by a device supporting the client side of the Power Profile cluster in order to request the constraints -if set- of Power Profile of a client device, in order to set the proper boundaries for the scheduling when calculating the schedules.
       </description>
       <arg name="powerProfileId" type="INT8U"/>
     </command>
-    <command source="client" code="0x07" name="EnergyPhasesScheduleStateRequest" optional="false" cli="zcl power-profile energy-phases-schedule-states">
+    <command source="client" code="0x07" name="EnergyPhasesScheduleStateRequest" response="EnergyPhasesScheduleStateResponse" optional="false" cli="zcl power-profile energy-phases-schedule-states">
       <description>
         The EnergyPhasesScheduleStateRequest  Command is generated by a device supporting the client side of the Power Profile cluster to check the states of the scheduling of a power profile, which is supported in the device implementing the server side of Power Profile cluster.
       </description>
@@ -1895,7 +1463,7 @@ limitations under the License.
       <arg name="powerProfileCount" type="INT8U"/>
       <arg name="powerProfileRecords" type="PowerProfileRecord" array="true"/>
     </command>
-    <command source="server" code="0x03" name="GetPowerProfilePrice" optional="true">
+    <command source="server" code="0x03" name="GetPowerProfilePrice" response="GetPowerProfilePriceResponse" optional="true">
       <description>
         The GetPowerProfilePrice Command is generated by the server (e.g. White goods) in order to retrieve the cost associated to a specific Power profile.
       </description>
@@ -1908,12 +1476,12 @@ limitations under the License.
       <arg name="powerProfileCount" type="INT8U"/>
       <arg name="powerProfileRecords" type="PowerProfileRecord" array="true"/>
     </command>
-    <command source="server" code="0x05" name="GetOverallSchedulePrice" optional="true">
+    <command source="server" code="0x05" name="GetOverallSchedulePrice" response="GetOverallSchedulePriceResponse" optional="true">
       <description>
         The GetOverallSchedulePrice Command is generated by the server (e.g. White goods) in order to retrieve the overall cost associated to all the Power Profiles scheduled by the scheduler (the device supporting the Power Profile cluster client side) for the next 24 hours.
       </description>
     </command>
-    <command source="server" code="0x06" name="EnergyPhasesScheduleRequest" optional="false">
+    <command source="server" code="0x06" name="EnergyPhasesScheduleRequest" response="EnergyPhasesScheduleResponse" optional="false">
       <description>
         The EnergyPhasesScheduleRequest Command is generated by the server (e.g. White goods) in order to retrieve from the scheduler (e.g. Home Gateway) the schedule (if available) associated to the specific Power Profile carried in the payload.
       </description>
@@ -1951,7 +1519,7 @@ limitations under the License.
       <arg name="startAfter" type="INT16U"/>
       <arg name="stopBefore" type="INT16U"/>
     </command>
-    <command source="server" code="0x0B" name="GetPowerProfilePriceExtended" optional="true">
+    <command source="server" code="0x0B" name="GetPowerProfilePriceExtended" response="GetPowerProfilePriceExtendedResponse" optional="true">
       <description>
         The Get Power Profile Price Extended command is generated by the server (e.g., White Goods) in order to retrieve the cost associated to a specific Power profile considering specific conditions described in the option field (e.g., a specific time).
       </description>
@@ -1976,7 +1544,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="CHECK_IN_INTERVAL_MIN" type="INT32U" writable="false" default="0x00000000" optional="true">check in interval min</attribute>
     <attribute side="server" code="0x0005" define="LONG_POLL_INTERVAL_MIN" type="INT32U" writable="false" default="0x00000000" optional="true">long poll interval min</attribute>
     <attribute side="server" code="0x0006" define="FAST_POLL_TIMEOUT_MAX" type="INT16U" writable="false" default="0x0000" optional="true">fast poll timeout max</attribute>
-    <command source="server" code="0x00" name="CheckIn" optional="false">
+    <command source="server" code="0x00" name="CheckIn" response="CheckInResponse" optional="false">
       <description>
         The Poll Control Cluster server sends out a Check-in command to the devices to which it is paired based on the server's Check-in Interval attribute.
       </description>
@@ -2058,7 +1626,7 @@ limitations under the License.
     <define>APPLIANCE_EVENTS_AND_ALERT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <command source="client" code="0x00" name="GetAlerts" optional="false">
+    <command source="client" code="0x00" name="GetAlerts" response="GetAlertsResponse" optional="false">
       <description>
         This basic message is used to retrieve Household Appliance current alerts.
       </description>
@@ -2129,13 +1697,13 @@ limitations under the License.
       <arg name="logQueueSize" type="INT8U"/>
       <arg name="logIds" type="INT32U" array="true"/>
     </command>
-    <command source="client" code="0x00" name="LogRequest" optional="false">
+    <command source="client" code="0x00" name="LogRequest" response="LogResponse" optional="false">
       <description>
         The Log request command is sent from a device supporting the client side of the Appliance Statistics cluster (e.g., Home Gateway) to retrieve the log from the device supporting the server side (e.g., appliance).
       </description>
       <arg name="logId" type="INT32U"/>
     </command>
-    <command source="client" code="0x01" name="LogQueueRequest" optional="false">
+    <command source="client" code="0x01" name="LogQueueRequest" response="LogQueueResponse" optional="false">
       <description>
         The Log Queue Request command is send from a device supporting the client side of the Appliance Statistics cluster (e.g. Home Gateway) to retrieve the information about the logs inserted in the queue, from the device supporting the server side (e.g. appliance).
       </description>

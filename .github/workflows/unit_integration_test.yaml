@@ -30,32 +30,33 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls]
+                type: [main, clang, mbedtls, rotating_device_id]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.15
+            image: connectedhomeip/chip-build:0.5.77
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-                - "/tmp/happy_test_logs:/tmp/happy_test_logs"
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Bootstrap
               timeout-minutes: 10
               run: |
-                  mkdir -p /tmp/happy_test_logs ;
                   mkdir -p /tmp/log_output ;
-                  scripts/tests/happy_tests.sh install_packages ;
-                  scripts/tests/happy_tests.sh bootstrap ;
                   scripts/build/gn_bootstrap.sh ;
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
@@ -63,8 +64,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -79,23 +80,17 @@ jobs:
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_enable_happy_tests=true"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 5
-              run: scripts/build/gn_build.sh
+              timeout-minutes: 30
+              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
-              timeout-minutes: 10
-              run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
-            - name: Uploading Happy Test Log
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name:
-                      happy_log-${{ steps.outsuffix.outputs.value }}-${{ matrix.type }}
-                  path: /tmp/happy_test_logs/
+              timeout-minutes: 30
+              run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

@@ -2772,30 +2772,6 @@
 #define emberAfAttributesPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 
-// Printing macros for Service discovery
-// Prints messages related to service discovery
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SERVICE_DISCOVERY)
-#define emberAfServiceDiscoveryPrint(...) emberAfPrint(EMBER_AF_PRINT_SERVICE_DISCOVERY, __VA_ARGS__)
-#define emberAfServiceDiscoveryPrintln(...) emberAfPrintln(EMBER_AF_PRINT_SERVICE_DISCOVERY, __VA_ARGS__)
-// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
-#define emberAfServiceDiscoveryFlush()
-#define emberAfServiceDiscoveryDebugExec(x)                                                                                        \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_SERVICE_DISCOVERY))                                                                     \
-    {                                                                                                                              \
-        x;                                                                                                                         \
-    }
-#define emberAfServiceDiscoveryPrintBuffer(buffer, len, withSpace)                                                                 \
-    emberAfPrintBuffer(EMBER_AF_PRINT_SERVICE_DISCOVERY, (buffer), (len), (withSpace))
-#define emberAfServiceDiscoveryPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_SERVICE_DISCOVERY, (buffer))
-#else
-#define emberAfServiceDiscoveryPrint(...)
-#define emberAfServiceDiscoveryPrintln(...)
-#define emberAfServiceDiscoveryFlush()
-#define emberAfServiceDiscoveryDebugExec(x)
-#define emberAfServiceDiscoveryPrintBuffer(buffer, len, withSpace)
-#define emberAfServiceDiscoveryPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SERVICE_DISCOVERY)
-
 // Printing macros for Registration
 // Prints messages related to registration
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_REGISTRATION)

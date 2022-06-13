@@ -145,10 +145,9 @@ uint8_t GetCommissioningMode(const ByteSpan & value)
     return MakeU8FromAsciiDecimal(value);
 }
 
-// TODO: possibly 32-bit? see spec issue #3226
-uint16_t GetDeviceType(const ByteSpan & value)
+uint32_t GetDeviceType(const ByteSpan & value)
 {
-    return MakeU16FromAsciiDecimal(value);
+    return MakeU32FromAsciiDecimal(value);
 }
 
 void GetDeviceName(const ByteSpan & value, char * name)
@@ -171,14 +170,15 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
-uint32_t GetRetryInterval(const ByteSpan & value)
+Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
-    const auto retryInterval = MakeU32FromAsciiDecimal(value, kUndefinedRetryInterval);
+    const auto undefined     = std::numeric_limits<uint32_t>::max();
+    const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
-    if (retryInterval != kUndefinedRetryInterval && retryInterval <= kMaxRetryInterval)
-        return retryInterval;
+    if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
+        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
 
-    return kUndefinedRetryInterval;
+    return NullOptional;
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
@@ -195,7 +195,7 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
@@ -225,32 +225,23 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kTcpSupport:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
-        break;
     default:
         break;
     }
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData)
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSleepyIdleInterval:
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSleepyActiveInterval:
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kTcpSupport:
-        nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+    case TxtFieldKey::kTcpSupported:
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:
         break;

@@ -21,16 +21,29 @@
 #import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
 
-#include <controller/CHIPDevice.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/DeviceProxy.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDevice ()
 
-- (instancetype)initWithDevice:(chip::Controller::Device *)device;
-- (chip::Controller::Device *)internalDevice;
+- (instancetype)initWithDevice:(chip::DeviceProxy *)device;
+- (chip::DeviceProxy *)internalDevice;
 
 @end
+
+@interface CHIPAttributePath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
+@end
+
+@interface CHIPCommandPath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteCommandPath &)path;
+@end
+
+// Exported utility function
+id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END
 

@@ -31,6 +31,7 @@
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 #include <system/WakeEvent.h>
 
 namespace chip {
@@ -40,13 +41,13 @@ class LayerImplSelect : public LayerSocketsLoop
 {
 public:
     LayerImplSelect() = default;
-    ~LayerImplSelect() { mLayerState.Destroy(); }
+    ~LayerImplSelect() override { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
@@ -71,15 +72,17 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
-    void HandleTimerComplete(Timer * timer);
+    void HandleTimerComplete(TimerList::Node * timer);
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+    // Expose the result of WaitForEvents() for non-blocking socket implementations.
+    bool IsSelectResultValid() const { return mSelectResult >= 0; }
 
 protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
-        (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0) +
-        (INET_CONFIG_ENABLE_DNS_RESOLVER ? INET_CONFIG_NUM_DNS_RESOLVERS : 0);
+        (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0);
 
     struct SocketWatch
     {
@@ -91,7 +94,8 @@ protected:
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
 
-    Timer::MutexedList mTimerList;
+    TimerPool<TimerList::Node> mTimerPool;
+    TimerList mTimerList;
     timeval mNextTimeout;
 
     // Members for select loop

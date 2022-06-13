@@ -55,6 +55,9 @@ template("android_clang_toolchain") {
     _ndk_host_cpu = ""
     if (host_cpu == "x64") {
       _ndk_host_cpu = "-x86_64"
+    } else if (host_cpu == "arm64") {
+      # until NDK 24.0.7856742-beta1, the host cpu on apple silicon is x86_64
+      _ndk_host_cpu = "-x86_64"
     }
 
     _ndk_host = _ndk_host_os + _ndk_host_cpu

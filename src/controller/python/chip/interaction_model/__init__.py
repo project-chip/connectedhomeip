@@ -22,11 +22,11 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath
+from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct, DataVersionFilterIBstruct
 
 from chip.exceptions import ChipStackException
 
-__all__ = ["IMDelegate", "Status", "InteractionModelError"]
+__all__ = ["Status", "InteractionModelError"]
 
 
 class Status(enum.IntEnum):
@@ -53,7 +53,7 @@ class Status(enum.IntEnum):
     UnsupportedRead = 0x8f
     Deprecated90 = 0x90
     Deprecated91 = 0x91
-    Reserved92 = 0x92
+    DataVersionMismatch = 0x92
     Deprecated93 = 0x93
     Timeout = 0x94
     Reserved95 = 0x95

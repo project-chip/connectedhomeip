@@ -49,17 +49,6 @@ bool IPPrefix::operator!=(const IPPrefix & other) const
     return IPAddr != other.IPAddr || Length != other.Length;
 }
 
-IPPrefix & IPPrefix::operator=(const IPPrefix & other)
-{
-    if (this != &other)
-    {
-        IPAddr = other.IPAddr;
-        Length = other.Length;
-    }
-
-    return *this;
-}
-
 bool IPPrefix::MatchAddress(const IPAddress & addr) const
 {
     uint8_t l = (Length <= 128) ? Length : 128;

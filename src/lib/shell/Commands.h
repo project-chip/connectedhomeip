@@ -51,6 +51,12 @@ void RegisterConfigCommands();
 void RegisterDeviceCommands();
 
 /**
+ * This function registers the OTA (Over-the-Air) software update commands.
+ *
+ */
+void RegisterOtaCommands();
+
+/**
  * This function registers the device onboarding codes commands.
  *
  */

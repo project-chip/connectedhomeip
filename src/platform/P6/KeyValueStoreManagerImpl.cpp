@@ -34,10 +34,12 @@ namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-KeyValueStoreManagerImpl::KeyValueStoreManagerImpl()
+CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
     cy_rslt_t result = mtb_key_value_store_init(&kvstore_obj);
     init_success     = (CY_RSLT_SUCCESS == result) ? true : false;
+
+    return ConvertCyResultToChip(result);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
@@ -170,6 +172,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::ConvertCyResultToChip(cy_rslt_t err) const
     return CHIP_ERROR_INTERNAL;
 }
 
+CHIP_ERROR KeyValueStoreManagerImpl::Erase(void)
+{
+    if (!init_success)
+    {
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+    }
+
+    cy_rslt_t result = mtb_kvstore_reset(&kvstore_obj);
+    return ConvertCyResultToChip(result);
+}
 } // namespace PersistedStorage
 } // namespace DeviceLayer
 } // namespace chip

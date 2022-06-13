@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical">
+  <AutoCompleteTextView
+      android:id="@+id/clusterAutoCompleteTv"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:completionHint="@string/select_a_cluster"
+      android:completionThreshold="0"
+      android:hint="@string/select_a_cluster"
+      android:minHeight="48dp" />
+
+  <AutoCompleteTextView
+      android:id="@+id/commandAutoCompleteTv"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:completionHint="@string/select_a_command"
+      android:completionThreshold="0"
+      android:hint="@string/select_a_command"
+      android:minHeight="48dp" />
+
+  <Button
+      android:id="@+id/invokeCommand"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom|right"
+      android:text="@string/invoke" />
+
+  <LinearLayout
+      android:id="@+id/parameterList"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:layout_below="@id/commandAutoCompleteTv"
+      android:orientation="vertical" />
+  <ScrollView
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/callbackList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_below="@+id/invokeCommand"
+        android:orientation="vertical" />
+  </ScrollView>
+</LinearLayout>

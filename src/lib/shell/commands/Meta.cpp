@@ -32,6 +32,7 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Shell {
@@ -41,6 +42,11 @@ static CHIP_ERROR ExitHandler(int argc, char ** argv)
     streamer_printf(streamer_get(), "Goodbye\r\n");
     exit(0);
     return CHIP_NO_ERROR;
+}
+
+static void AtExitShell()
+{
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 static CHIP_ERROR HelpHandler(int argc, char ** argv)
@@ -62,6 +68,8 @@ void RegisterMetaCommands()
         { &HelpHandler, "help", "List out all top level commands" },
         { &VersionHandler, "version", "Output the software version" },
     };
+
+    std::atexit(AtExitShell);
 
     Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
 }

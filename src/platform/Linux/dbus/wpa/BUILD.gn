@@ -19,6 +19,7 @@ import("${chip_root}/build/chip/linux/gdbus_library.gni")
 gdbus_library("wpa") {
   sources = [
     "DBusWpa.xml",
+    "DBusWpaBss.xml",
     "DBusWpaInterface.xml",
     "DBusWpaNetwork.xml",
   ]

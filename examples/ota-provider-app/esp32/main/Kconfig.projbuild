@@ -1,0 +1,53 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Configuration options CHIP ESP32 demo application.
+#
+
+menu "Demo"
+
+    choice
+      prompt "Rendezvous Mode"
+      default RENDEZVOUS_MODE_BLE
+      help
+          Specifies the Rendezvous mode of the peripheral.
+
+      config RENDEZVOUS_MODE_WIFI
+          bool "Wi-Fi"
+      config RENDEZVOUS_MODE_BLE
+          bool "BLE"
+      config RENDEZVOUS_MODE_THREAD
+          bool "Thread"
+      config RENDEZVOUS_MODE_ETHERNET
+          bool "Ethernet"
+    endchoice
+
+    config RENDEZVOUS_MODE
+       int
+       range 0 8
+       default 1 if RENDEZVOUS_MODE_WIFI
+       default 2 if RENDEZVOUS_MODE_BLE
+       default 4 if RENDEZVOUS_MODE_THREAD
+       default 8 if RENDEZVOUS_MODE_ETHERNET
+
+    config OTA_IMAGE_NAME
+        string "OTA image file name"
+        default "hello_world.bin"
+        help
+            Name of OTA image file which will be added to '/spiffs_image/' and sent to the OTA Requestor.
+
+endmenu

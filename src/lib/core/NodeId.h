@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <lib/core/GroupId.h>
+#include <lib/core/PasscodeId.h>
+
 #include <cstdint>
 
 namespace chip {
@@ -33,6 +36,7 @@ constexpr NodeId kMinGroupNodeId = 0xFFFF'FFFF'FFFF'0000ULL;
 // The max group id is complicated, depending on how we want to count the
 // various special group ids.  Let's not define it for now, until we have use
 // cases.
+constexpr NodeId kMaskGroupId = 0x0000'0000'0000'FFFFULL;
 
 constexpr NodeId kMinTemporaryLocalId = 0xFFFF'FFFE'0000'0000ULL;
 // We use the largest available temporary local id to represent
@@ -40,14 +44,14 @@ constexpr NodeId kMinTemporaryLocalId = 0xFFFF'FFFE'0000'0000ULL;
 constexpr NodeId kMaxTemporaryLocalId = 0xFFFF'FFFE'FFFF'FFFEULL;
 constexpr NodeId kPlaceholderNodeId   = 0xFFFF'FFFE'FFFF'FFFFULL;
 
-constexpr NodeId kMinCASEAuthTag1 = 0xFFFF'FFFD'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag1 = 0xFFFF'FFFD'FFFF'FFFFULL;
+constexpr NodeId kMinCASEAuthTag  = 0xFFFF'FFFD'0000'0000ULL;
+constexpr NodeId kMaxCASEAuthTag  = 0xFFFF'FFFD'FFFF'FFFFULL;
+constexpr NodeId kMaskCASEAuthTag = 0x0000'0000'FFFF'FFFFULL;
 
-constexpr NodeId kMinCASEAuthTag2 = 0xFFFF'FFFC'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag2 = 0xFFFF'FFFC'FFFF'FFFFULL;
-
-constexpr NodeId kMinPAKEKeyId = 0xFFFF'FFFB'0000'0000ULL;
-constexpr NodeId kMaxPAKEKeyId = 0xFFFF'FFFB'FFFF'FFFFULL;
+constexpr NodeId kMinPAKEKeyId        = 0xFFFF'FFFB'0000'0000ULL;
+constexpr NodeId kMaxPAKEKeyId        = 0xFFFF'FFFB'FFFF'FFFFULL;
+constexpr NodeId kMaskPAKEKeyId       = 0x0000'0000'0000'FFFFULL;
+constexpr NodeId kMaskUnusedPAKEKeyId = 0x0000'0000'FFFF'0000ULL;
 
 // There are more reserved ranges here, not assigned to anything yet, going down
 // all the way to 0xFFFF'FFF0'0000'0000ULL
@@ -57,6 +61,41 @@ constexpr NodeId kMaxOperationalNodeId = 0xFFFF'FFEF'FFFF'FFFFULL;
 constexpr bool IsOperationalNodeId(NodeId aNodeId)
 {
     return (aNodeId != kUndefinedNodeId) && (aNodeId <= kMaxOperationalNodeId);
+}
+
+constexpr bool IsGroupId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinGroupNodeId);
+}
+
+constexpr bool IsCASEAuthTag(NodeId aNodeId)
+{
+    return (aNodeId >= kMinCASEAuthTag) && (aNodeId <= kMaxCASEAuthTag);
+}
+
+constexpr bool IsPAKEKeyId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinPAKEKeyId) && (aNodeId <= kMaxPAKEKeyId);
+}
+
+constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
+{
+    return kMinGroupNodeId | aGroupId;
+}
+
+constexpr GroupId GroupIdFromNodeId(NodeId aNodeId)
+{
+    return aNodeId & kMaskGroupId;
+}
+
+constexpr NodeId NodeIdFromPAKEKeyId(PasscodeId aPAKEKeyId)
+{
+    return kMinPAKEKeyId | aPAKEKeyId;
+}
+
+constexpr PasscodeId PAKEKeyIdFromNodeId(NodeId aNodeId)
+{
+    return aNodeId & kMaskPAKEKeyId;
 }
 
 } // namespace chip

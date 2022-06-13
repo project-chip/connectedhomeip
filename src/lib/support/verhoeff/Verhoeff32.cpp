@@ -32,7 +32,7 @@
 
 #ifndef VERHOEFF32_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff32::sMultiplyTable[] = {
+const uint8_t Verhoeff32::sMultiplyTable[] = {
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
     1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 0,  17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 16,
     2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 0,  1,  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 16, 17,
@@ -69,19 +69,19 @@ uint8_t Verhoeff32::sMultiplyTable[] = {
 
 #endif // VERHOEFF32_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff32::sPermTable[] = {
+const uint8_t Verhoeff32::sPermTable[] = {
     // Detects all single digit and adjacent transposition errors, and 97.076613% of jump transposition errors.
     7, 2, 1, 30, 16, 20, 27, 11, 31, 6, 8, 13, 29, 5, 10, 21, 22, 3, 24, 0, 23, 25, 12, 9, 28, 14, 4, 15, 17, 18, 19, 26,
 };
 
-int8_t Verhoeff32::sCharToValTable[] = {
+const int8_t Verhoeff32::sCharToValTable[] = {
     // NOTE: table starts at ASCII 30h
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17,
     -1, 18, 19, 20, 21, 22, -1, 23, -1, 24, 25, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1, -1, -1, -1, 10,
     11, 12, 13, 14, 15, 16, 17, -1, 18, 19, 20, 21, 22, -1, 23, -1, 24, 25, 26, 27, 28, 29, 30, 31
 };
 
-char Verhoeff32::sValToCharTable[] = "0123456789ABCDEFGHJKLMNPRSTUVWXY";
+const char Verhoeff32::sValToCharTable[] = "0123456789ABCDEFGHJKLMNPRSTUVWXY";
 
 char Verhoeff32::ComputeCheckChar(const char * str)
 {

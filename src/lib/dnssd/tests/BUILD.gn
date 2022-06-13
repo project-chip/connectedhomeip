@@ -26,14 +26,20 @@ chip_test_suite("tests") {
     "TestTxtFields.cpp",
   ]
 
-  if (chip_device_platform != "efr32") {
-    test_sources += [ "TestDnssdCache.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
   public_deps = [
     "${chip_root}/src/lib/dnssd",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_mdns == "minimal") {
+    test_sources += [
+      "TestActiveResolveAttempts.cpp",
+      "TestIncrementalResolve.cpp",
+    ]
+
+    public_deps +=
+        [ "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:support" ]
+  }
+
+  cflags = [ "-Wconversion" ]
 }

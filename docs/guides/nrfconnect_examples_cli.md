@@ -10,10 +10,12 @@ To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.
 
 For example, to start using the CLI console with Minicom, run the following
-command with _/dev/ttyACM0_ replaced with the device node name of your
+command with `/dev/ttyACM0` replaced with the device node name of your
 development kit:
 
-    $ minicom -D /dev/ttyACM0 -b 115200
+    ```
+    minicom -D /dev/ttyACM0 -b 115200
+    ```
 
 When you reboot the kit, you will see the boot logs in the console, similar to
 the following messages:
@@ -79,9 +81,9 @@ uart:~$ ot masterkey
 Done
 ```
 
-## Using CHIP-specific commands
+## Using Matter-specific commands
 
-The nRF Connect examples let you use several CHIP-specific CLI commands.
+The nRF Connect examples let you use several Matter-specific CLI commands.
 
 These commands are not available by default and to enable using them, set the
 `CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
@@ -89,7 +91,8 @@ example.
 
 Every invoked command must be preceded by the `matter` prefix.
 
-See the following subsections for the description of each CHIP-specific command.
+See the following subsections for the description of each Matter-specific
+command.
 
 ### device
 
@@ -99,27 +102,36 @@ this command together with one of the additional subcommands listed below.
 #### factoryreset
 
 Performs device factory reset that is hardware reset preceded by erasing of the
-whole CHIP settings stored in a non-volatile memory.
+whole Matter settings stored in a non-volatile memory.
 
 ```shell
-uart:~$ matter factoryreset
+uart:~$ matter device factoryreset
 Performing factory reset ...
 ```
 
 ### onboardingcodes
 
 Handles a group of commands that are used to view information about device
-onboarding codes. You can use this command without any subcommand to print all
-available onboarding codes or to add a specific subcommand.
+onboarding codes. The `onboardingcodes` command takes one required parameter for
+the rendezvous type, then an optional parameter for printing a specific type of
+onboarding code.
+
+The full format of the command is:
+
+```
+onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]
+```
+
+To print all the onboardingcodes:
 
 ```shell
-uart:~$ matter onboardingcodes
+uart:~$ matter onboardingcodes none
 QRCode:             MT:W0GU2OTB00KA0648G00
 QRCodeUrl:          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ManualPairingCode:  34970112332
 ```
 
-The `onboardingcodes` command can also take the subcommands listed below.
+To print a specific type of onboarding code:
 
 #### qrcode
 
@@ -128,7 +140,7 @@ Prints the device
 Takes no arguments.
 
 ```shell
-uart:~$ matter onboardingcodes qrcode
+uart:~$ matter onboardingcodes none qrcode
 MT:W0GU2OTB00KA0648G00
 ```
 
@@ -139,7 +151,7 @@ Prints the URL to view the
 in a web browser. Takes no arguments.
 
 ```shell
-uart:~$ matter onboardingcodes qrcodeurl
+uart:~$ matter onboardingcodes none qrcodeurl
 https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ```
 
@@ -149,7 +161,7 @@ Prints the pairing code for the manual onboarding of a device. Takes no
 arguments.
 
 ```shell
-uart:~$ matter onboardingcodes manualpairingcode
+uart:~$ matter onboardingcodes none manualpairingcode
 34970112332
 ```
 
@@ -160,9 +172,9 @@ information. You can use this command without any subcommand to print all
 available configuration data or to add a specific subcommand.
 
 ```shell
-VendorId:        9050 (0x235A)
-ProductId:       20043 (0x4E4B)
-ProductRevision: 1 (0x1)
+VendorId:        65521 (0xFFF1)
+ProductId:       32768 (0x8000)
+HardwareVersion: 1 (0x1)
 FabricId:
 PinCode:         020202021
 Discriminator:   f00
@@ -195,7 +207,7 @@ Prints the vendor ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config vendorid
-9050 (0x235A)
+65521 (0xFFFF1)
 ```
 
 #### productid
@@ -204,15 +216,15 @@ Prints the product ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config productid
-20043 (0x4E4B)
+32768 (0x8000)
 ```
 
-#### productrev
+#### hardwarever
 
-Prints the product revision of the device. Takes no arguments.
+Prints the hardware version of the device. Takes no arguments.
 
 ```shell
-uart:~$ matter config productrev
+uart:~$ matter config hardwarever
 1 (0x1)
 ```
 

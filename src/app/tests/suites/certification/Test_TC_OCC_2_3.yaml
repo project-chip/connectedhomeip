@@ -1,0 +1,45 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.2.3. [TC-OCC-2.3] OccupancySensorTypeBitmap and OccupancySensorType
+    interdependency with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads OccupancySensorType attribute from DUT"
+      verification: |
+          ./chip-tool occupancysensing read occupancy-sensor-type 1 1
+
+          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001DataVersion: 289401399
+          [1646129490.492433][2997:3002] CHIP:TOO:   occupancy sensor type: 0
+      disabled: true
+
+    - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
+      verification: |
+          ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
+
+          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002DataVersion: 289401399
+          [1646129577.158531][3007:3013] CHIP:TOO:   occupancy sensor type bitmap: 1
+      disabled: true

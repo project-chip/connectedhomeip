@@ -39,14 +39,14 @@ public:
         if (mState == State::kIpV4)
         {
             *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::kIPAddressType_IPv4;
+            *type  = chip::Inet::IPAddressType::kIPv4;
             mState = State::kIpV6;
             return true;
         }
 #endif
 
         *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::kIPAddressType_IPv6;
+        *type = chip::Inet::IPAddressType::kIPv6;
 #if INET_CONFIG_ENABLE_IPV4
         mState = State::kIpV4;
 #endif
@@ -98,11 +98,12 @@ GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
     return _instance;
 }
 
-CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+                                                uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
     AllInterfaces allInterfaces;
-    return GlobalMinimalMdnsServer::Server().Listen(inetLayer, &allInterfaces, port);
+    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, &allInterfaces, port);
 }
 
 void GlobalMinimalMdnsServer::ShutdownServer()

@@ -58,7 +58,7 @@
 
 /* Constants that describe the hardware and memory usage. */
 #define configCPU_CLOCK_HZ ((unsigned long) 48000000)
-#define configMINIMAL_STACK_SIZE ((unsigned short) 1024)
+#define configMINIMAL_STACK_SIZE ((unsigned short) 512)
 #define configMAX_TASK_NAME_LEN (12)
 
 /* FreeRTOS heap size is 0 because currently "bget" heap is the
@@ -105,7 +105,8 @@
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_PRIORITY (6)
 #define configTIMER_QUEUE_LENGTH (20)
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE)
+#define configIDLE_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE)
 
 #define configENABLE_BACKWARD_COMPATIBILITY 1
 
@@ -161,7 +162,7 @@
 #define INCLUDE_vTaskSuspend 1
 #define INCLUDE_vTaskDelayUntil 1
 #define INCLUDE_vTaskDelay 1
-#define INCLUDE_uxTaskGetStackHighWaterMark 0
+#define INCLUDE_uxTaskGetStackHighWaterMark 1
 #define INCLUDE_xTaskGetIdleTaskHandle 0
 #define INCLUDE_eTaskGetState 1
 #define INCLUDE_xTaskResumeFromISR 0

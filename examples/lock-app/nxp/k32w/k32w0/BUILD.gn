@@ -15,10 +15,13 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 import("${k32w0_sdk_build_root}/k32w0_executable.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+
+import("${chip_root}/src/crypto/crypto.gni")
 
 assert(current_os == "freertos")
 
@@ -42,6 +45,10 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
   ]
+
+  if (chip_with_se05x == 1) {
+    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
+  }
 
   defines = []
   if (is_debug) {
@@ -75,9 +82,19 @@ k32w0_executable("lock_app") {
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-cli-mtd",
-    "${openthread_root}:libopenthread-mtd",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 

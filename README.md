@@ -1,40 +1,42 @@
-# Connected Home over IP
+# Matter
 
-![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
+[![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)
 
-![Examples - EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)
-![Examples - nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)
-![Examples - QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)
-![Examples - Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)
-![Examples - ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)
-![Examples - K32W with SE051](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20K32W%20with%20SE051/badge.svg)
+[![Examples - EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-efr32.yaml)
+[![Examples - ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-esp32.yaml)
+[![Examples - i.MX Linux](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20i.MX%20Linux/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-imx.yaml)
+[![Examples - K32W with SE051](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20K32W%20with%20SE051/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-k32w.yaml)
+[![Examples - Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
+[![Examples - nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
+[![Examples - QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-qpg.yaml)
+[![Examples - TI CC26X2X7](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC26X2X7/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc13x2x7_26x2x7.yaml)
 
-![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)
+[![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/android.yaml)
 
-![Unit / Interation Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Interation%20Tests/badge.svg)
-![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)
-![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)
+[![Unit / Interation Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Interation%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
+[![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
+[![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
 
-![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)
+[![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/zap_templates.yaml)
 
-# What is Project Connected Home over IP?
+# What is Matter?
 
-Project Connected Home over IP is a new Working Group within the Zigbee
-Alliance. This Working Group plans to develop and promote the adoption of a new,
-royalty-free connectivity standard to increase compatibility among smart home
-products, with security as a fundamental design tenet.
+Matter (formerly Project Connected Home over IP, or Project CHIP) is a new
+Working Group within the Connectivity Standards Alliance (CSA, formerly Zigbee
+Alliance). This Working Group plans to develop and promote the adoption of a
+new, royalty-free connectivity standard to increase compatibility among smart
+home products, with security as a fundamental design tenet.
 
-The goal of the Connected Home over IP project is to simplify development for
-manufacturers and increase compatibility for consumers. The project is built
-around a shared belief that smart home devices should be secure, reliable, and
-seamless to use. By building upon Internet Protocol (IP), the project aims to
-enable communication across smart home devices, mobile apps, and cloud services
-and to define a specific set of IP-based networking technologies for device
+The goal of the Matter project is to simplify development for manufacturers and
+increase compatibility for consumers. The project is built around a shared
+belief that smart home devices should be secure, reliable, and seamless to use.
+By building upon Internet Protocol (IP), the project aims to enable
+communication across smart home devices, mobile apps, and cloud services and to
+define a specific set of IP-based networking technologies for device
 certification.
 
-The Zigbee Alliance officially opened the Project Connected Home over IP
-(Project CHIP) Working Group on January 17, 2020 and is in the process of
-drafting the specification.
+The CSA officially opened the Matter Working Group on January 17, 2020 and is in
+the process of drafting the specification.
 
 Visit [buildwithmatter.com](https://buildwithmatter.com) to learn more and read
 the latest news and updates about the project.
@@ -43,14 +45,13 @@ the latest news and updates about the project.
 
 ## Development Goals
 
-Project Connected Home over IP is developed with the following goals and
-principles in mind:
+Matter is developed with the following goals and principles in mind:
 
-**Unifying:** Project CHIP will produce a new specification, building with and
-on top of market-tested, existing technologies.
+**Unifying:** Matter will produce a new specification, building with and on top
+of market-tested, existing technologies.
 
-**Interoperable:** The specification permits communication between any Project
-CHIP-certified device, subject to users’ permission.
+**Interoperable:** The specification permits communication between any
+Matter-certified device, subject to users’ permission.
 
 **Secure:** The specification leverages modern security practices and protocols.
 
@@ -82,21 +83,21 @@ transparent to the general public, including to non-members wherever possible.
 
 ## Architecture Overview
 
-![CHIP Architecture Overview](docs/images/CHIP_IP_pyramid.png)
+![Matter Architecture Overview](docs/images/CHIP_IP_pyramid.png)
 
 The Project, as illustrated above, defines the application layer that will be
 deployed on devices and controllers as well as the supported IPv6-based networks
-to help achieve our interoperability architectural goal. Project CHIP will
-initially support Wi-Fi and Thread for core, operational communications and
-Bluetooth Low Energy (BLE) to simplify device commissioning and setup.
+to help achieve our interoperability architectural goal. Matter will initially
+support Wi-Fi and Thread for core, operational communications and Bluetooth Low
+Energy (BLE) to simplify device commissioning and setup.
 
-The Application Layer can be further broken down seven main components:
+The Application Layer can be further broken down into seven main components:
 
-![CHIP Stack Architecture](docs/images/CHIP_Arch_Pyramid.png)
+![Matter Stack Architecture](docs/images/CHIP_Arch_Pyramid.png)
 
 1. **Application:** High order business logic of a device. For example, an
    application that is focused on lighting might contain logic to handle turning
-   on/off the bulb as well its color characteristics.
+   on/off the bulb as well as its color characteristics.
 
 2. **Data Model:** Data primitives that help describe the various
    functionalities of the devices. The Application operates on these data
@@ -117,67 +118,65 @@ The Application Layer can be further broken down seven main components:
 
 6. **Message Framing & Routing:** With an interaction encrypted and signed, the
    Message Layer constructs the payload format with required and optional header
-   fields; which specify properties of the message as well some routing
+   fields; which specify properties of the message as well as some routing
    information.
 
 7. **IP Framing & Transport Management:** After the final payload has been
    constructed, it is sent to the underlying transport protocol for IP
    management of the data.
 
-# Current Status of Project Connected Home over IP
+# Current Status of Matter
 
-The Project’s design and technical processes are intended to be open and
-transparent to the general public, including to Work Group non-members wherever
-possible. The availability of this GitHub repository and its source code under
-an Apache v2 license is an important and demonstrable step to achieving this
-commitment.
+Matter’s design and technical processes are intended to be open and transparent
+to the general public, including to Work Group non-members wherever possible.
+The availability of this GitHub repository and its source code under an Apache
+v2 license is an important and demonstrable step to achieving this commitment.
 
-The Project endeavors to bring together the best aspects of market-tested
+Matter endeavors to bring together the best aspects of market-tested
 technologies and to redeploy them as a unified and cohesive whole-system
-solution. The overall goal of this approach is to bring the benefits of the
-Project to consumers and manufacturers as quickly as possible. As a result, what
-you observe in this repository is an implementation-first approach to the
-technical specification, vetting integrations in practice.
+solution. The overall goal of this approach is to bring the benefits of Matter
+to consumers and manufacturers as quickly as possible. As a result, what you
+observe in this repository is an implementation-first approach to the technical
+specification, vetting integrations in practice.
 
-The Project repository is growing and evolving to implement the overall
+The Matter repository is growing and evolving to implement the overall
 architecture. The repository currently contains the security foundations,
 message framing and dispatch, an implementation of the interaction model and
 data model. The code examples show simple interactions, and are supported on
 multiple transports -- Wi-Fi and Thread -- starting with resource-constrained
-(i.e., memory, processing) silicon platforms to help ensure the Project’s
+(i.e., memory, processing) silicon platforms to help ensure Matter’s
 scalability.
 
 # How to Contribute
 
-We welcome your contributions to Project Connected Home over IP. Read our
-contribution guidelines [here](./CONTRIBUTING.md).
+We welcome your contributions to Matter. Read our contribution guidelines
+[here](./CONTRIBUTING.md).
 
-# Building and Developing in Project
+# Building and Developing in Matter
 
-Instructions about how to build Project Connected Home over IP can be found
-[here](./docs/README.md).
+Instructions about how to build Matter can be found [here](./docs/README.md).
 
 # Directory Structure
 
-The Connected Home over IP repository is structured as follows:
+The Matter repository is structured as follows:
 
-| File / Folder                          | Contents                                                                                 |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `build/`                               | Build system support content and build output directories                                |
-| [BUILDING.md](docs/guides/BUILDING.md) | More detailed information on configuring and building Project CHIP for different targets |
-| `CODE_OF_CONDUCT.md`                   | Code of Conduct for Project CHIP, and contributions to it                                |
-| [CONTRIBUTING.md](./CONTRIBUTING.md)   | Guidelines for contributing to Project CHIP                                              |
-| `docs/`                                | Documentation, including [guides](./docs/guides)                                         |
-| `examples/`                            | Example firmware applications that demonstrate use of Project CHIP technology            |
-| `integrations/`                        | Third party integrations related to this project                                         |
-| `integrations/docker/`                 | Docker scripts and Dockerfiles                                                           |
-| `LICENSE`                              | Project CHIP [License file](./LICENSE) (Apache 2.0)                                      |
-| `BUILD.gn`                             | Top level GN build file                                                                  |
-| `README.md`                            | This file                                                                                |
-| `src/`                                 | Implementation of Project CHIP                                                           |
-| `third_party/`                         | Third-party code used by Project CHIP                                                    |
-| `scripts/`                             | Scripts needed to work with the Project CHIP repo                                        |
+| File / Folder                          | Contents                                                                           |
+| -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `build/`                               | Build system support content and build output directories                          |
+| [BUILDING.md](docs/guides/BUILDING.md) | More detailed information on configuring and building Matter for different targets |
+| `CODE_OF_CONDUCT.md`                   | Code of Conduct for Matter, and contributions to it                                |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)   | Guidelines for contributing to Matter                                              |
+| `docs/`                                | Documentation, including [guides](./docs/guides)                                   |
+| `examples/`                            | Example firmware applications that demonstrate use of the Matter technology        |
+| `integrations/`                        | Third party integrations related to this project                                   |
+| `integrations/docker/`                 | Docker scripts and Dockerfiles                                                     |
+| `LICENSE`                              | Matter [License file](./LICENSE) (Apache 2.0)                                      |
+| `BUILD.gn`                             | Top level GN build file                                                            |
+| `README.md`                            | This file                                                                          |
+| `src/`                                 | Implementation of Matter                                                           |
+| `third_party/`                         | Third-party code used by Matter                                                    |
+| `scripts/`                             | Scripts needed to work with the Matter repository                                  |
 
 # License
 
-Project CHIP is released under the [Apache 2.0 license](./LICENSE).
+Matter is released under the [Apache 2.0 license](./LICENSE).

@@ -19,26 +19,23 @@
 // module header, comes first
 #include <controller/AbstractDnssdDiscoveryController.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
-
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {
 
-void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.IsValid())
+        if (!discoveredNode.resolutionData.IsValid())
         {
             continue;
         }
-        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0)
+        if (strcmp(discoveredNode.resolutionData.hostName, nodeData.resolutionData.hostName) == 0 &&
+            discoveredNode.resolutionData.port == nodeData.resolutionData.port)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -51,7 +48,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd
     // Node not yet in the list
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.IsValid())
+        if (!discoveredNode.resolutionData.IsValid())
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -61,16 +58,11 @@ void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd
             return;
         }
     }
-    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.hostName);
+    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.resolutionData.hostName);
 }
 
 CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
 {
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer));
-#endif
-    mResolver->SetResolverDelegate(this);
-
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
     {
@@ -83,7 +75,7 @@ const Dnssd::DiscoveredNodeData * AbstractDnssdDiscoveryController::GetDiscovere
 {
     // TODO(cecille): Add assertion about main loop.
     auto discoveredNodes = GetDiscoveredNodes();
-    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].IsValid())
+    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].resolutionData.IsValid())
     {
         return discoveredNodes.data() + idx;
     }

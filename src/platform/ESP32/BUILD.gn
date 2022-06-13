@@ -20,7 +20,7 @@ assert(chip_device_platform == "esp32")
 
 static_library("ESP32") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -28,10 +28,16 @@ static_library("ESP32") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
     "ESP32Config.h",
+    "ESP32FactoryDataProvider.cpp",
+    "ESP32FactoryDataProvider.h",
     "ESP32Utils.cpp",
     "ESP32Utils.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -41,31 +47,55 @@ static_library("ESP32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
   ]
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
 
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WiFi.cpp",
-      "WiFiProvisioning.cpp",
-      "WiFiProvisioning.h",
+      "NetworkCommissioningDriver.cpp",
+      "NetworkCommissioningDriver.h",
     ]
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+      ]
+    }
   }
 
   if (chip_enable_openthread) {
     sources += [
+      "../OpenThread/DnssdImpl.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
-      "ESPThreadConfig.h",
+      "OpenthreadConfig.h",
+      "OpenthreadLauncher.c",
+      "OpenthreadLauncher.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
   }
 }

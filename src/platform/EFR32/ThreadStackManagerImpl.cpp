@@ -27,8 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
@@ -55,7 +54,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -116,7 +115,7 @@ extern "C" void otPlatFree(void * aPtr)
 #include "uart.h"
 #endif
 
-extern "C" __WEAK otError otPlatUartEnable(void)
+extern "C" otError otPlatUartEnable(void)
 {
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
@@ -126,7 +125,9 @@ extern "C" __WEAK otError otPlatUartEnable(void)
 #endif
 }
 
-extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+
+extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
@@ -140,7 +141,7 @@ extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLeng
 #endif
 }
 
-extern "C" __WEAK void efr32UartProcess(void)
+extern "C" void efr32UartProcess(void)
 {
 #if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
     uint8_t tempBuf[128] = { 0 };
@@ -163,3 +164,5 @@ extern "C" __WEAK otError otPlatUartDisable(void)
 {
     return OT_ERROR_NOT_IMPLEMENTED;
 }
+
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI

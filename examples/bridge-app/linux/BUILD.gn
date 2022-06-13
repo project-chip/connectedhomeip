@@ -20,21 +20,20 @@ assert(chip_build_tools)
 
 executable("chip-bridge-app") {
   sources = [
+    "${chip_root}/examples/bridge-app/linux/bridged-actions-stub.cpp",
+    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
     "Device.cpp",
-    "Options.cpp",
     "include/Device.h",
     "main.cpp",
   ]
 
   deps = [
     "${chip_root}/examples/bridge-app/bridge-common",
+    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
 
   cflags = [ "-Wconversion" ]
-
-  # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
-  cflags += [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 
   include_dirs = [ "include" ]
 

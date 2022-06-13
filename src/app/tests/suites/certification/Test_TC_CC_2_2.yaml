@@ -1,0 +1,77 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.1.3. [TC-CC-2.2]  Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT reads all supported mandatory attributes from TH once at a time
+          in a manufacturer specific order"
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+          ./chip-tool colorcontrol read current-saturation 1 1
+          ./chip-tool colorcontrol read current-x 1 1
+          ./chip-tool colorcontrol read current-y 1 1
+          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-mode 1 1
+          ./chip-tool colorcontrol read color-control-options 1 1
+          ./chip-tool colorcontrol read enhanced-current-hue 1 1
+          ./chip-tool colorcontrol read enhanced-color-mode 1 1
+          ./chip-tool colorcontrol read color-loop-active 1 1
+          ./chip-tool colorcontrol read color-loop-direction 1 1
+          ./chip-tool colorcontrol read color-loop-time 1 1
+          ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
+          ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
+          ./chip-tool colorcontrol read color-capabilities 1 1
+          ./chip-tool colorcontrol read color-temp-physical-min 1 1
+          ./chip-tool colorcontrol read color-temp-physical-max 1 1
+          ./chip-tool colorcontrol read couple-color-temp-to-level-min-mireds 1 1
+          ./chip-tool colorcontrol read start-up-color-temperature-mireds 1 1
+          ./chip-tool colorcontrol read number-of-primaries 1 1
+
+          depending on the value of number-of-primaries, primary#x, primary#y, primary#intensity are mandatory (not all devices implemented this)
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH once at a time in
+          a manufacturer specific order"
+      verification: |
+          ./chip-tool colorcontrol read remaining-time 1 1
+          ./chip-tool colorcontrol read drift-compensation 1 1
+          ./chip-tool colorcontrol read compensation-text 1 1
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          Expect pass:
+          ./chip-tool colorcontrol write color-control-options 12 1 1
+          ./chip-tool colorcontrol write start-up-color-temperature-mireds 12 1 1
+
+          All other write command to mandatory attributes expects Failures.
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          write optional attributes if implemented on device
+      disabled: true

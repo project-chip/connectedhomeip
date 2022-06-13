@@ -26,6 +26,26 @@
         {
             "name": "im_command_handler_cluster_commands",
             "path": "partials/im_command_handler_cluster_commands.zapt"
+        },
+        {
+            "name": "idl_structure_definition",
+            "path": "partials/idl/structure_definition.zapt"
+        },
+        {
+            "name": "idl_structure_member",
+            "path": "partials/idl/structure_member.zapt"
+        },
+        {
+            "name": "idl_command_request_response",
+            "path": "partials/idl/command_request_response.zapt"
+        },
+        {
+            "name": "idl_command_request_struct",
+            "path": "partials/idl/command_request_struct.zapt"
+        },
+        {
+            "name": "idl_command_response_struct",
+            "path": "partials/idl/command_response_struct.zapt"
         }
     ],
     "templates": [
@@ -33,11 +53,6 @@
             "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
             "name": "Matter Application Callbacks header",
             "output": "PluginApplicationCallbacks.h"
-        },
-        {
-            "path": "templates/app/attribute-size-src.zapt",
-            "name": "ZCL attribute-size",
-            "output": "attribute-size.cpp"
         },
         {
             "path": "templates/app/callback-stub-src.zapt",
@@ -65,11 +80,6 @@
             "output": "CHIPClientCallbacks.h"
         },
         {
-            "path": "templates/app/CHIPClientCallbacks-src.zapt",
-            "name": "CHIP Client Callbacks",
-            "output": "CHIPClientCallbacks.cpp"
-        },
-        {
             "path": "templates/app/im-cluster-command-handler.zapt",
             "name": "CHIP Client Callbacks for Interaction Model",
             "output": "IMClusterCommandHandler.cpp"
@@ -80,9 +90,14 @@
             "output": "CHIPClusters.h"
         },
         {
-            "path": "templates/app/CHIPClusters-src.zapt",
-            "name": "C++ ZCL API",
-            "output": "CHIPClusters.cpp"
+            "path": "templates/app/MatterIDL.zapt",
+            "name": "Human-readable Matter IDL",
+            "output": "Clusters.matter"
+        },
+        {
+            "path": "templates/app/access.zapt",
+            "name": "Matter access definitions",
+            "output": "access.h"
         }
     ]
 }

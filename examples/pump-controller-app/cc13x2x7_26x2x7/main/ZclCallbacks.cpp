@@ -15,7 +15,10 @@
  *    limitations under the License.
  */
 
+#include <lib/support/logging/CHIPLogging.h>
+
 #include "AppConfig.h"
+#include "AppTask.h"
 #include "PumpManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,12 +29,22 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        PumpMgr().InitiateAction(0, *value ? PumpManager::LOCK_ACTION : PumpManager::UNLOCK_ACTION);
+        PumpMgr().InitiateAction(0, *value ? PumpManager::START_ACTION : PumpManager::STOP_ACTION);
+    }
+    else if (attributePath.mClusterId == LevelControl::Id &&
+             attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
+    {
+        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+        return;
     }
 }
 
@@ -52,5 +65,5 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    // TODO: implement any additional Cluster Server init actions
+    GetAppTask().UpdateClusterState();
 }

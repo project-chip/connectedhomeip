@@ -15,10 +15,19 @@
 name: 27.2.17. [TC-CC-7.3] Enhanced Step functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -30,62 +39,78 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
+    - label: "Reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1025
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Step Hue Up command"
       command: "EnhancedStepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 0
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 50
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 1
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1075
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Step Hue Down command"
       command: "EnhancedStepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 75
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 1
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1000
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

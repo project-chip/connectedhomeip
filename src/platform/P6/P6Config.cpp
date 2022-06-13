@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -48,31 +48,39 @@ const char P6Config::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char P6Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const P6Config::Key P6Config::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const P6Config::Key P6Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
-const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation  = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const P6Config::Key P6Config::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-ver" };
+const P6Config::Key P6Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const P6Config::Key P6Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const P6Config::Key P6Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const P6Config::Key P6Config::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const P6Config::Key P6Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const P6Config::Key P6Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const P6Config::Key P6Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the chip-config namespace
-const P6Config::Key P6Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
 const P6Config::Key P6Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
 const P6Config::Key P6Config::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
 const P6Config::Key P6Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const P6Config::Key P6Config::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace_ChipConfig, "wifi-ssid" };
+const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
+const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
+const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
+const P6Config::Key P6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
-// Prefix used for keys that contain Chip group encryption keys.
-const char P6Config::kGroupKeyNamePrefix[] = "gk-";
+// Keys stored in the Chip-counters namespace
+const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const P6Config::Key P6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const P6Config::Key P6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
 
 CHIP_ERROR P6Config::ReadConfigValue(Key key, bool & val)
 {
@@ -204,18 +212,27 @@ bool P6Config::ConfigValueExists(Key key)
 // Clear out keys in config namespace
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
-    const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,     &kConfigKey_PairedAccountId,
-                                  &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,     &kConfigKey_LastUsedEpochKeyId,
-                                  &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType };
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    const Key * config_keys[] = { &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId, &kConfigKey_ServiceId,
+                                  &kConfigKey_LastUsedEpochKeyId, &kConfigKey_FailSafeArmed,   &kConfigKey_WiFiStationSecType,
+                                  &kConfigKey_WiFiSSID,           &kConfigKey_WiFiPassword,    &kConfigKey_WiFiSecurity,
+                                  &kConfigKey_WiFiMode,           &kConfigKey_SoftwareVersion };
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {
-        CHIP_ERROR err = ClearConfigValue(*config_keys[i]);
+        err = ClearConfigValue(*config_keys[i]);
         // Something unexpected happened
         if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && err != CHIP_NO_ERROR)
         {
             return err;
         }
+    }
+
+    // Erase all key-values including fabric info.
+    err = PersistedStorage::KeyValueStoreMgrImpl().Erase();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
     }
 
     return CHIP_NO_ERROR;

@@ -30,7 +30,7 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -57,7 +57,7 @@ efr32_executable("pigweed_app") {
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
 

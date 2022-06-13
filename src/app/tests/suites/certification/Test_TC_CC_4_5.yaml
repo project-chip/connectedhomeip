@@ -1,0 +1,235 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.9. [TC-CC-4.5] Saturation functionality with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Test Step"
+      verification: |
+          Verification Steps
+      disabled: true
+
+    - label:
+          "DUT sends MoveToSaturation command to TH a Saturation with
+          _TransitionTime 300."
+      verification: |
+          ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
+
+          [1648101474.910794][2480:2480] CHIP:EM: Handling via exchange: 53143r, Delegate: 0xaaaab8814368
+          [1648101474.910970][2480:2480] CHIP:DMG: InvokeRequestMessage =
+          [1648101474.911016][2480:2480] CHIP:DMG: {
+          [1648101474.911055][2480:2480] CHIP:DMG:         suppressResponse = false,
+          [1648101474.911099][2480:2480] CHIP:DMG:         timedRequest = false,
+          [1648101474.911140][2480:2480] CHIP:DMG:         InvokeRequests =
+          [1648101474.911191][2480:2480] CHIP:DMG:         [
+          [1648101474.911232][2480:2480] CHIP:DMG:                 CommandDataIB =
+          [1648101474.911287][2480:2480] CHIP:DMG:                 {
+          [1648101474.911330][2480:2480] CHIP:DMG:                         CommandPathIB =
+          [1648101474.911412][2480:2480] CHIP:DMG:                         {
+          [1648101474.911467][2480:2480] CHIP:DMG:                                 EndpointId = 0x1,
+          [1648101474.911523][2480:2480] CHIP:DMG:                                 ClusterId = 0x300,
+          [1648101474.911577][2480:2480] CHIP:DMG:                                 CommandId = 0x3,
+          [1648101474.911628][2480:2480] CHIP:DMG:                         },
+          [1648101474.911681][2480:2480] CHIP:DMG:
+          [1648101474.911728][2480:2480] CHIP:DMG:                         CommandData =
+          [1648101474.911783][2480:2480] CHIP:DMG:                         {
+          [1648101474.911837][2480:2480] CHIP:DMG:                                 0x0 = 200,
+          [1648101474.911897][2480:2480] CHIP:DMG:                                 0x1 = 300,
+          [1648101474.911952][2480:2480] CHIP:DMG:                                 0x2 = 0,
+          [1648101474.912012][2480:2480] CHIP:DMG:                                 0x3 = 0,
+          [1648101474.912069][2480:2480] CHIP:DMG:                         },
+          [1648101474.912117][2480:2480] CHIP:DMG:                 },
+          [1648101474.912172][2480:2480] CHIP:DMG:
+          [1648101474.912211][2480:2480] CHIP:DMG:         ],
+          [1648101474.912263][2480:2480] CHIP:DMG:
+          [1648101474.912302][2480:2480] CHIP:DMG:         InteractionModelRevision = 1
+          [1648101474.912341][2480:2480] CHIP:DMG: },
+          [1648101474.912442][2480:2480] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1648101474.912507][2480:2480] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0003
+          [1648101474.912605][2480:2480] CHIP:DMG: Endpoint 1, Cluster 0x0000_0300 update version to 6143bba0
+      disabled: true
+
+    - label:
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH
+          periodically."
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+          [1646210970.309403][2190:2190] CHIP:IM: Received Read request
+          [1646210970.309465][2190:2190] CHIP:DMG: ReadRequestMessage =
+          [1646210970.309495][2190:2190] CHIP:DMG: {
+          [1646210970.309514][2190:2190] CHIP:DMG:        AttributePathIBs =
+          [1646210970.309541][2190:2190] CHIP:DMG:        [
+          [1646210970.309567][2190:2190] CHIP:DMG:                AttributePathIB =
+          [1646210970.309599][2190:2190] CHIP:DMG:                {
+          [1646210970.309629][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
+          [1646210970.309664][2190:2190] CHIP:DMG:                        Cluster = 0x300,
+          [1646210970.309691][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1646210970.309720][2190:2190] CHIP:DMG:                }
+          [1646210970.309750][2190:2190] CHIP:DMG:
+          [1646210970.309779][2190:2190] CHIP:DMG:        ],
+          [1646210970.309815][2190:2190] CHIP:DMG:
+          [1646210970.309844][2190:2190] CHIP:DMG:        isFabricFiltered = false,
+          [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646210970.309892][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT sends MoveSaturation command to TH"
+      verification: |
+          ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
+
+          [1646211062.545513][2190:2190] CHIP:DMG: InvokeRequestMessage =
+          [1646211062.545543][2190:2190] CHIP:DMG: {
+          [1646211062.545565][2190:2190] CHIP:DMG:        suppressResponse = false,
+          [1646211062.545596][2190:2190] CHIP:DMG:        timedRequest = false,
+          [1646211062.545625][2190:2190] CHIP:DMG:        InvokeRequests =
+          [1646211062.545657][2190:2190] CHIP:DMG:        [
+          [1646211062.545681][2190:2190] CHIP:DMG:                CommandDataIB =
+          [1646211062.545711][2190:2190] CHIP:DMG:                {
+          [1646211062.545737][2190:2190] CHIP:DMG:                        CommandPathIB =
+          [1646211062.545771][2190:2190] CHIP:DMG:                        {
+          [1646211062.545806][2190:2190] CHIP:DMG:                                EndpointId = 0x1,
+          [1646211062.545840][2190:2190] CHIP:DMG:                                ClusterId = 0x300,
+          [1646211062.545872][2190:2190] CHIP:DMG:                                CommandId = 0x4,
+          [1646211062.545902][2190:2190] CHIP:DMG:                        },
+          [1646211062.545933][2190:2190] CHIP:DMG:
+          [1646211062.545960][2190:2190] CHIP:DMG:                        CommandData =
+          [1646211062.545991][2190:2190] CHIP:DMG:                        {
+          [1646211062.546025][2190:2190] CHIP:DMG:                                0x0 = 1,
+          [1646211062.546060][2190:2190] CHIP:DMG:                                0x1 = 10,
+          [1646211062.546095][2190:2190] CHIP:DMG:                                0x2 = 0,
+          [1646211062.546126][2190:2190] CHIP:DMG:                                0x3 = 0,
+          [1646211062.546158][2190:2190] CHIP:DMG:                        },
+          [1646211062.546185][2190:2190] CHIP:DMG:                },
+          [1646211062.546218][2190:2190] CHIP:DMG:
+          [1646211062.546243][2190:2190] CHIP:DMG:        ],
+          [1646211062.546274][2190:2190] CHIP:DMG:
+          [1646211062.546297][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646211062.546320][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+          [1646210970.309403][2190:2190] CHIP:IM: Received Read request
+          [1646210970.309465][2190:2190] CHIP:DMG: ReadRequestMessage =
+          [1646210970.309495][2190:2190] CHIP:DMG: {
+          [1646210970.309514][2190:2190] CHIP:DMG:        AttributePathIBs =
+          [1646210970.309541][2190:2190] CHIP:DMG:        [
+          [1646210970.309567][2190:2190] CHIP:DMG:                AttributePathIB =
+          [1646210970.309599][2190:2190] CHIP:DMG:                {
+          [1646210970.309629][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
+          [1646210970.309664][2190:2190] CHIP:DMG:                        Cluster = 0x300,
+          [1646210970.309691][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1646210970.309720][2190:2190] CHIP:DMG:                }
+          [1646210970.309750][2190:2190] CHIP:DMG:
+          [1646210970.309779][2190:2190] CHIP:DMG:        ],
+          [1646210970.309815][2190:2190] CHIP:DMG:
+          [1646210970.309844][2190:2190] CHIP:DMG:        isFabricFiltered = false,
+          [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646210970.309892][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT sends StepSaturation command to TH"
+      verification: |
+          ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
+          [1646211149.169696][2190:2190] CHIP:DMG: InvokeRequestMessage =
+          [1646211149.169731][2190:2190] CHIP:DMG: {
+          [1646211149.169757][2190:2190] CHIP:DMG:        suppressResponse = false,
+          [1646211149.169788][2190:2190] CHIP:DMG:        timedRequest = false,
+          [1646211149.169816][2190:2190] CHIP:DMG:        InvokeRequests =
+          [1646211149.169852][2190:2190] CHIP:DMG:        [
+          [1646211149.169879][2190:2190] CHIP:DMG:                CommandDataIB =
+          [1646211149.169914][2190:2190] CHIP:DMG:                {
+          [1646211149.169943][2190:2190] CHIP:DMG:                        CommandPathIB =
+          [1646211149.169979][2190:2190] CHIP:DMG:                        {
+          [1646211149.170014][2190:2190] CHIP:DMG:                                EndpointId = 0x1,
+          [1646211149.170055][2190:2190] CHIP:DMG:                                ClusterId = 0x300,
+          [1646211149.170095][2190:2190] CHIP:DMG:                                CommandId = 0x5,
+          [1646211149.170129][2190:2190] CHIP:DMG:                        },
+          [1646211149.170165][2190:2190] CHIP:DMG:
+          [1646211149.170196][2190:2190] CHIP:DMG:                        CommandData =
+          [1646211149.170234][2190:2190] CHIP:DMG:                        {
+          [1646211149.170269][2190:2190] CHIP:DMG:                                0x0 = 1,
+          [1646211149.170310][2190:2190] CHIP:DMG:                                0x1 = 10,
+          [1646211149.170344][2190:2190] CHIP:DMG:                                0x2 = 200,
+          [1646211149.170379][2190:2190] CHIP:DMG:                                0x3 = 0,
+          [1646211149.170409][2190:2190] CHIP:DMG:                                0x4 = 0,
+          [1646211149.170451][2190:2190] CHIP:DMG:                        },
+          [1646211149.170481][2190:2190] CHIP:DMG:                },
+          [1646211149.170516][2190:2190] CHIP:DMG:
+          [1646211149.170542][2190:2190] CHIP:DMG:        ],
+          [1646211149.170576][2190:2190] CHIP:DMG:
+          [1646211149.170603][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646211149.170629][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+          [1646210970.309403][2190:2190] CHIP:IM: Received Read request
+          [1646210970.309465][2190:2190] CHIP:DMG: ReadRequestMessage =
+          [1646210970.309495][2190:2190] CHIP:DMG: {
+          [1646210970.309514][2190:2190] CHIP:DMG:        AttributePathIBs =
+          [1646210970.309541][2190:2190] CHIP:DMG:        [
+          [1646210970.309567][2190:2190] CHIP:DMG:                AttributePathIB =
+          [1646210970.309599][2190:2190] CHIP:DMG:                {
+          [1646210970.309629][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
+          [1646210970.309664][2190:2190] CHIP:DMG:                        Cluster = 0x300,
+          [1646210970.309691][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1646210970.309720][2190:2190] CHIP:DMG:                }
+          [1646210970.309750][2190:2190] CHIP:DMG:
+          [1646210970.309779][2190:2190] CHIP:DMG:        ],
+          [1646210970.309815][2190:2190] CHIP:DMG:
+          [1646210970.309844][2190:2190] CHIP:DMG:        isFabricFiltered = false,
+          [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646210970.309892][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT sends StopMoveStep command to TH."
+      verification: |
+          ./chip-tool colorcontrol stop-move-step 0 0 1 1
+          [1646211221.659999][2190:2190] CHIP:DMG: InvokeRequestMessage =
+          [1646211221.660038][2190:2190] CHIP:DMG: {
+          [1646211221.660076][2190:2190] CHIP:DMG:        suppressResponse = false,
+          [1646211221.660110][2190:2190] CHIP:DMG:        timedRequest = false,
+          [1646211221.660138][2190:2190] CHIP:DMG:        InvokeRequests =
+          [1646211221.660174][2190:2190] CHIP:DMG:        [
+          [1646211221.660199][2190:2190] CHIP:DMG:                CommandDataIB =
+          [1646211221.660234][2190:2190] CHIP:DMG:                {
+          [1646211221.660266][2190:2190] CHIP:DMG:                        CommandPathIB =
+          [1646211221.660301][2190:2190] CHIP:DMG:                        {
+          [1646211221.660342][2190:2190] CHIP:DMG:                                EndpointId = 0x1,
+          [1646211221.660381][2190:2190] CHIP:DMG:                                ClusterId = 0x300,
+          [1646211221.660420][2190:2190] CHIP:DMG:                                CommandId = 0x47,
+          [1646211221.660460][2190:2190] CHIP:DMG:                        },
+          [1646211221.660502][2190:2190] CHIP:DMG:
+          [1646211221.660535][2190:2190] CHIP:DMG:                        CommandData =
+          [1646211221.660572][2190:2190] CHIP:DMG:                        {
+          [1646211221.660612][2190:2190] CHIP:DMG:                                0x0 = 0,
+          [1646211221.660652][2190:2190] CHIP:DMG:                                0x1 = 0,
+          [1646211221.660691][2190:2190] CHIP:DMG:                        },
+          [1646211221.660724][2190:2190] CHIP:DMG:                },
+          [1646211221.660759][2190:2190] CHIP:DMG:
+          [1646211221.660788][2190:2190] CHIP:DMG:        ],
+          [1646211221.660823][2190:2190] CHIP:DMG:
+          [1646211221.660849][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646211221.660877][2190:2190] CHIP:DMG: },
+      disabled: true

@@ -27,7 +27,7 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/Zephyr/ThreadStackManagerImpl.h>
 
-#include <inet/IPEndPointBasis.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -46,24 +46,18 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
 
-    IPEndPointBasis::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
     });
 
-    IPEndPointBasis::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
     });
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
-{
-    // Intentionally empty.
     return CHIP_NO_ERROR;
 }
 
@@ -81,11 +75,6 @@ bool ThreadStackManagerImpl::_TryLockThreadStack()
 void ThreadStackManagerImpl::_UnlockThreadStack()
 {
     openthread_api_mutex_unlock(openthread_get_default_context());
-}
-
-void ThreadStackManagerImpl::_ProcessThreadActivity()
-{
-    // Intentionally empty.
 }
 
 } // namespace DeviceLayer

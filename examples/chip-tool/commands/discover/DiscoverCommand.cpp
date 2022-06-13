@@ -20,6 +20,5 @@
 
 CHIP_ERROR DiscoverCommand::RunCommand()
 {
-    mController.RegisterDeviceAddressUpdateDelegate(this);
     return RunCommand(mNodeId, mFabricId);
 }

@@ -17,64 +17,48 @@
  */
 
 #include "AccountLoginManager.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace std;
+using namespace chip::app::Clusters::AccountLogin;
 
-bool AccountLoginManager::isUserLoggedIn(string requestTempAccountIdentifier, string requestSetupPin)
+AccountLoginManager::AccountLoginManager(const char * setupPin)
 {
-    // TODO: Fix hardcoding length of strings
-    requestTempAccountIdentifier = requestTempAccountIdentifier.substr(0, 4);
-    requestSetupPin              = requestSetupPin.substr(0, 10);
-    for (auto it = accounts.cbegin(); it != accounts.cend(); ++it)
+    CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
+}
+
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
+{
+    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    string setupPinString(setupPin.data(), setupPin.size());
+    ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
+    ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
+
+    if (strcmp(mSetupPin, setupPinString.c_str()) == 0)
     {
-        ChipLogProgress(Zcl, "temporary account id: %s", it->first.c_str());
-        ChipLogProgress(Zcl, "setup pin %s", it->second.c_str());
+        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin success");
+        return true;
     }
 
-    if (accounts.find(requestTempAccountIdentifier) != accounts.end())
-    {
-        bool found = accounts[requestTempAccountIdentifier] == requestSetupPin;
-        if (!found)
-        {
-            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin.");
-        }
-        return found;
-    }
-    else
-    {
-        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier.");
-        return false;
-    }
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPin);
+    return false;
 }
 
-void AccountLoginManager::setTempAccountIdentifierForPin(string tempAccountIdentifier, string setupPin)
+bool AccountLoginManager::HandleLogout()
 {
-    // TODO: Fix hardcoding length of strings
-    string tempId    = tempAccountIdentifier.substr(0, 4);
-    accounts[tempId] = setupPin;
+    // TODO: Insert your code here to send logout request
+    return true;
 }
 
-string AccountLoginManager::proxySetupPinRequest(string requestTempAccountIdentifier, chip::EndpointId endpoint)
+void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                                            const CharSpan & tempAccountIdentifier)
 {
-    // TODO: Insert your code here to send temp account identifier request
-    return "tempPin123";
-}
+    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
-bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin)
-{
-    return AccountLoginManager().GetInstance().isUserLoggedIn(requestTempAccountIdentifier, requestSetupPin);
-}
+    GetSetupPINResponse response;
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
-std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, chip::EndpointId endpoint)
-{
-    string responseSetupPin = AccountLoginManager().proxySetupPinRequest(requestTempAccountIdentifier, endpoint);
-    AccountLoginManager().GetInstance().setTempAccountIdentifierForPin(requestTempAccountIdentifier, responseSetupPin);
-    return responseSetupPin;
+    response.setupPIN = CharSpan::fromCharString(mSetupPin);
+    helper.Success(response);
 }

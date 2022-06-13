@@ -45,6 +45,8 @@ private:
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
 
     static KeyValueStoreManagerImpl sInstance;
+
+    bool mInitialized = false;
 };
 
 /**

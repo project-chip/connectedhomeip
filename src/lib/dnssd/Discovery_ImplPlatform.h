@@ -21,8 +21,8 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
-#include <lib/dnssd/DnssdCache.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -37,7 +37,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
-    CHIP_ERROR Init(Inet::InetLayer *) override { return InitImpl(); }
+    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.
@@ -45,10 +45,15 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR FinalizeServiceUpdate() override;
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override;
+    CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverDelegate = delegate; }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
+    {
+        mResolverProxy.SetCommissioningDelegate(delegate);
+    }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -62,34 +67,32 @@ private:
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
 
-    static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error);
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
-    static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error);
-    static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR error);
+    static void HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
-#ifdef DETAIL_LOGGING
-    static void PrintEntries(const DnssdService * service);
-#endif
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, const OperationalAdvertisingParameters & params);
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, const CommissionAdvertisingParameters & params);
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
+                              DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalAdvertisingParams;
+    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
     CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerAdvertisingParams;
-    bool mIsOperationalPublishing        = false;
+    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
+    bool mIsOperationalNodePublishing    = false;
     bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerPublishing       = false;
+    bool mIsCommissionerNodePublishing   = false;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
-    bool mDnssdInitialized               = false;
-    ResolverDelegate * mResolverDelegate = nullptr;
+    bool mDnssdInitialized = false;
+
+    ResolverProxy mResolverProxy;
 
     static DiscoveryImplPlatform sManager;
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    static DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sDnssdCache;
-#endif
 };
 
 } // namespace Dnssd

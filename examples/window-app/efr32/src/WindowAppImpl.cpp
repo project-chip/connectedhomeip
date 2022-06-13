@@ -26,10 +26,16 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
+#endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
+
+#ifdef SL_WIFI
+#include "wfx_host_events.h"
+#endif
 
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
@@ -143,6 +149,18 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
+    }
+    EFR32_LOG("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+#endif
     WindowApp::Init();
 
     // Initialize App Task
@@ -165,9 +183,6 @@ CHIP_ERROR WindowAppImpl::Init()
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
-
-    // Print setup info on LCD if available
-    UpdateLCD();
 
     return CHIP_NO_ERROR;
 }
@@ -219,6 +234,11 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
     }
 }
 
+void WindowAppImpl::PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    Instance().PostEvent(WindowApp::Event(WindowApp::EventId::AttributeChange, endpoint, attributeId));
+}
+
 void WindowAppImpl::ProcessEvents()
 {
     WindowApp::Event event = EventId::None;
@@ -242,11 +262,43 @@ WindowApp::Button * WindowAppImpl::CreateButton(WindowApp::Button::Id id, const 
     return new Button(id, name);
 }
 
+void WindowAppImpl::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
+{
+    switch (attribute)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        UpdateLEDs();
+        break;
+    /* RO Type: not supposed to dynamically change -> Cycling Window Covering Demo */
+    case Attributes::Type::Id:
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        UpdateLCD();
+        break;
+    /* ### ATTRIBUTEs CHANGEs IGNORED ### */
+    /* RO EndProductType: not supposed to dynamically change */
+    case Attributes::EndProductType::Id:
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+    /* RO SafetyStatus: set by WC server */
+    case Attributes::SafetyStatus::Id:
+    /* RW Mode: User can change */
+    case Attributes::Mode::Id:
+    default:
+        break;
+    }
+}
+
 void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
 {
     WindowApp::DispatchEvent(event);
     switch (event.mId)
     {
+    case EventId::AttributeChange:
+        DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
+        break;
     case EventId::ResetWarning:
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
         // Turn off all LEDs before starting blink to make sure blink is
@@ -261,13 +313,17 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         UpdateLEDs();
         UpdateLCD();
         break;
+
+    case EventId::WinkOn:
+    case EventId::WinkOff:
+        mState.isWinking = (EventId::WinkOn == event.mId);
+        UpdateLEDs();
+        break;
     case EventId::ConnectivityStateChanged:
     case EventId::BLEConnectionsChanged:
         UpdateLEDs();
         break;
     case EventId::CoverTypeChange:
-    case EventId::LiftChanged:
-    case EventId::TiltChanged:
         UpdateLCD();
         break;
     case EventId::CoverChange:
@@ -298,30 +354,46 @@ void WindowAppImpl::UpdateLEDs()
     }
     else
     {
-        if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        if (mState.isWinking)
+        {
+            mStatusLED.Blink(200, 200);
+        }
+        else
+#if CHIP_ENABLE_OPENTHREAD
+            if (mState.isThreadProvisioned && mState.isThreadEnabled)
+#else
+            if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
+#endif
+
         {
             mStatusLED.Blink(950, 50);
         }
-        else if (mState.haveBLEConnections)
-        {
-            mStatusLED.Blink(100, 100);
-        }
-        else
-        {
-            mStatusLED.Blink(50, 950);
-        }
+        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
+        else { mStatusLED.Blink(50, 950); }
 
         // Action LED
+        NPercent100ths current;
+        LimitStatus liftLimit = LimitStatus::Intermediate;
 
-        if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        if (!current.IsNull())
+        {
+            AbsoluteLimits limits = { .open = WC_PERCENT100THS_MIN_OPEN, .closed = WC_PERCENT100THS_MAX_CLOSED };
+            liftLimit             = CheckLimitState(current.Value(), limits);
+        }
+
+        if (OperationalState::Stall != cover.mLiftOpState)
         {
             mActionLED.Blink(100);
         }
-        else if (IsOpen(cover.mEndpoint))
+        else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
             mActionLED.Set(true);
         }
-        else if (IsClosed(cover.mEndpoint))
+        else if (LimitStatus::IsDownOrClose == liftLimit)
         {
             mActionLED.Set(false);
         }
@@ -336,21 +408,39 @@ void WindowAppImpl::UpdateLCD()
 {
     // Update LCD
 #ifdef DISPLAY_ENABLED
+#if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
+#else
+    if (mState.isWiFiProvisioned)
+#endif // CHIP_ENABLE_OPENTHREAD
     {
-        Cover & cover      = GetCover();
-        EmberAfWcType type = TypeGet(cover.mEndpoint);
-        uint16_t lift      = 0;
-        uint16_t tilt      = 0;
-        Attributes::CurrentPositionLift::Get(cover.mEndpoint, &lift);
-        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, &tilt);
-        LcdPainter::Paint(type, static_cast<uint8_t>(lift), static_cast<uint8_t>(tilt), mIcon);
+        Cover & cover = GetCover();
+        chip::app::DataModel::Nullable<uint16_t> lift;
+        chip::app::DataModel::Nullable<uint16_t> tilt;
+
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        Type type = TypeGet(cover.mEndpoint);
+
+        Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
+        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        if (!tilt.IsNull() && !lift.IsNull())
+        {
+            LcdPainter::Paint(type, lift.Value(), tilt.Value(), mIcon);
+        }
     }
+#ifdef QR_CODE_ENABLED
     else
     {
-        LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+        chip::MutableCharSpan qrCode(mQRCodeBuffer);
+        if (GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            LCDWriteQRCode((uint8_t *) qrCode.data());
+        }
     }
-#endif
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
 }
 
 void WindowAppImpl::OnMainLoop()

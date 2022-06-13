@@ -24,11 +24,21 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using chip::DeviceLayer::ConfigurationMgr;
 
 namespace chip {
 namespace Shell {
+
+static chip::Shell::Engine sShellConfigSubcommands;
+
+CHIP_ERROR ConfigHelpHandler(int argc, char ** argv)
+{
+    sShellConfigSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
 
 static CHIP_ERROR ConfigGetVendorId(bool printHeader)
 {
@@ -40,8 +50,13 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ConfigVendorId(int argc, char ** argv)
+{
+    return ConfigGetVendorId(false);
 }
 
 static CHIP_ERROR ConfigGetProductId(bool printHeader)
@@ -54,22 +69,32 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
+static CHIP_ERROR ConfigProductId(int argc, char ** argv)
+{
+    return ConfigGetProductId(false);
+}
+
+static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
 {
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(value16));
     if (printHeader)
     {
-        streamer_printf(sout, "ProductRevision: ");
+        streamer_printf(sout, "HardwareVersion: ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ConfigHardwareVersion(int argc, char ** argv)
+{
+    return ConfigGetHardwareVersion(false);
 }
 
 static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
@@ -77,7 +102,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
@@ -86,17 +111,22 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR ConfigPinCode(int argc, char ** argv)
+{
+    return ConfigGetSetupPinCode(false);
+}
+
 static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
 {
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
     }
-    streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
+    streamer_printf(sout, "%03x\r\n", setupDiscriminator & chip::kMaxDiscriminatorValue);
     return CHIP_NO_ERROR;
 }
 
@@ -104,11 +134,11 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 {
     CHIP_ERROR error;
     streamer_t * sout           = streamer_get();
-    uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
+    uint16_t setupDiscriminator = strtoull(argv, nullptr, 10);
 
-    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    error = DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
 
     if (error == CHIP_NO_ERROR)
     {
@@ -122,11 +152,21 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
     return error;
 }
 
+static CHIP_ERROR ConfigDiscriminator(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return ConfigGetSetupDiscriminator(false);
+    }
+
+    return ConfigSetSetupDiscriminator(argv[0]);
+}
+
 static CHIP_ERROR PrintAllConfigs()
 {
     ReturnErrorOnFailure(ConfigGetVendorId(true));
     ReturnErrorOnFailure(ConfigGetProductId(true));
-    ReturnErrorOnFailure(ConfigGetProductRevision(true));
+    ReturnErrorOnFailure(ConfigGetHardwareVersion(true));
 
     ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
     ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
@@ -141,54 +181,35 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
     case 0:
         return PrintAllConfigs();
     case 1:
-        if (strcmp(argv[0], "vendorid") == 0)
+        if ((strcmp(argv[0], "help") == 0) || (strcmp(argv[0], "-h") == 0))
         {
-            return ConfigGetVendorId(false);
+            return ConfigHelpHandler(argc, argv);
         }
-        else if (strcmp(argv[0], "productid") == 0)
-        {
-            return ConfigGetProductId(false);
-        }
-        else if (strcmp(argv[0], "productrev") == 0)
-        {
-            return ConfigGetProductRevision(false);
-        }
-        else if (strcmp(argv[0], "pincode") == 0)
-        {
-            return ConfigGetSetupPinCode(false);
-        }
-        else if (strcmp(argv[0], "discriminator") == 0)
-        {
-            return ConfigGetSetupDiscriminator(false);
-        }
-        else
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    case 2:
-        if (strcmp(argv[0], "discriminator") == 0)
-        {
-            return ConfigSetSetupDiscriminator(argv[1]);
-        }
-        else
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return sShellConfigSubcommands.ExecCommand(argc, argv);
 }
 
 void RegisterConfigCommands()
 {
 
-    static const shell_command_t sDeviceComand = { &ConfigHandler, "config",
+    static const shell_command_t sConfigComand = { &ConfigHandler, "config",
                                                    "Manage device configuration. Usage to dump value: config [param_name] and "
                                                    "to set some values (discriminator): config [param_name] [param_value]." };
 
-    // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
+    static const shell_command_t sConfigSubCommands[] = {
+        { &ConfigHelpHandler, "help", "Usage: config <subcommand>" },
+        { &ConfigVendorId, "vendorid", "Get VendorId. Usage: config vendorid" },
+        { &ConfigProductId, "productid", "Get ProductId. Usage: config productid" },
+        { &ConfigHardwareVersion, "hardwarever", "Get HardwareVersion. Usage: config hardwarever" },
+        { &ConfigPinCode, "pincode", "Get commissioning pincode. Usage: config pincode" },
+        { &ConfigDiscriminator, "discriminator", "Get/Set commissioning discriminator. Usage: config discriminator [value]" },
+    };
+
+    // Register `config` subcommands with the local shell dispatcher.
+    sShellConfigSubcommands.RegisterCommands(sConfigSubCommands, ArraySize(sConfigSubCommands));
+
+    // Register the root `config` command with the top-level shell.
+    Engine::Root().RegisterCommands(&sConfigComand, 1);
 }
 
 } // namespace Shell

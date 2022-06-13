@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/python.gni")
 
 config("config") {
   # TODO: this should be a dependency on src/controller/data_model however this is circular:
@@ -25,31 +27,43 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "AbstractDnssdDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
-    "CHIPCommissionableNodeController.cpp",
-    "CHIPCommissionableNodeController.h",
-    "CHIPDevice.cpp",
-    "CHIPDevice.h",
-    "CHIPDeviceController.cpp",
-    "CHIPDeviceController.h",
-    "CHIPDeviceControllerFactory.cpp",
-    "CHIPDeviceControllerFactory.h",
-    "DeviceAddressUpdateDelegate.h",
-    "DeviceDiscoveryDelegate.h",
-    "EmptyDataModelHandler.cpp",
-    "ExampleOperationalCredentialsIssuer.cpp",
-    "ExampleOperationalCredentialsIssuer.h",
-    "SetUpCodePairer.cpp",
-    "SetUpCodePairer.h",
   ]
+
+  if (chip_controller) {
+    sources += [
+      "AbstractDnssdDiscoveryController.cpp",
+      "AutoCommissioner.cpp",
+      "AutoCommissioner.h",
+      "CHIPCommissionableNodeController.cpp",
+      "CHIPCommissionableNodeController.h",
+      "CHIPDeviceController.cpp",
+      "CHIPDeviceController.h",
+      "CHIPDeviceControllerFactory.cpp",
+      "CHIPDeviceControllerFactory.h",
+      "CommissioneeDeviceProxy.cpp",
+      "CommissioneeDeviceProxy.h",
+      "CommissionerDiscoveryController.cpp",
+      "CommissionerDiscoveryController.h",
+      "CommissioningDelegate.cpp",
+      "CommissioningWindowOpener.cpp",
+      "CommissioningWindowOpener.h",
+      "DeviceDiscoveryDelegate.h",
+      "DevicePairingDelegate.h",
+      "EmptyDataModelHandler.cpp",
+      "ExampleOperationalCredentialsIssuer.cpp",
+      "ExampleOperationalCredentialsIssuer.h",
+      "SetUpCodePairer.cpp",
+      "SetUpCodePairer.h",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app",
-    "${chip_root}/src/app/util:device_callbacks_manager",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
@@ -57,8 +71,11 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/trace",
     "${chip_root}/src/transport",
   ]
+
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
 
   public_configs = [ ":config" ]
 

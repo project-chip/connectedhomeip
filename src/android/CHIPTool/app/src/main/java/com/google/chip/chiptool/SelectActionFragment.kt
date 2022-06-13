@@ -29,7 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.android.synthetic.main.select_action_fragment.provisionThreadCredentialsBtn
-import kotlinx.android.synthetic.main.select_action_fragment.provisionWifiCredentialsBtn
+import kotlinx.android.synthetic.main.select_action_fragment.provisionWiFiCredentialsBtn
 import kotlinx.android.synthetic.main.select_action_fragment.view.*
 
 /** Fragment to select from various options to interact with a CHIP device. */
@@ -42,21 +42,23 @@ class SelectActionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.select_action_fragment, container, false).apply {
       scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
-      provisionWifiCredentialsBtn.apply {
+      provisionWiFiCredentialsBtn.apply {
         isEnabled = hasLocationPermission()
-        setOnClickListener { getCallback()?.onProvisionWifiCredentialsClicked() }
+        setOnClickListener { getCallback()?.onProvisionWiFiCredentialsClicked() }
       }
       provisionThreadCredentialsBtn.apply {
         isEnabled = hasLocationPermission()
         setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
       }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
-      sensorClustersBtn.setOnClickListener{ getCallback()?.handleSensorClicked() }
-      multiAdminClusterBtn.setOnClickListener{ getCallback()?.handleMultiAdminClicked() }
-      opCredClustersBtn.setOnClickListener{ getCallback()?.handleOpCredClicked() }
-      basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
+      sensorClustersBtn.setOnClickListener { getCallback()?.handleSensorClicked() }
+      multiAdminClusterBtn.setOnClickListener { getCallback()?.handleMultiAdminClicked() }
+      opCredClustersBtn.setOnClickListener { getCallback()?.handleOpCredClicked() }
+      basicClusterBtn.setOnClickListener { getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
+      provisionCustomFlowBtn.setOnClickListener{  getCallback()?.handleCustomFlowClicked() }
+      wildcardBtn.setOnClickListener { getCallback()?.handleWildcardClicked() }
     }
   }
 
@@ -70,10 +72,10 @@ class SelectActionFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
       if (granted) {
-        provisionWifiCredentialsBtn.isEnabled = true
+        provisionWiFiCredentialsBtn.isEnabled = true
         provisionThreadCredentialsBtn.isEnabled = true
       } else {
-        provisionWifiCredentialsBtn.isEnabled = false
+        provisionWiFiCredentialsBtn.isEnabled = false
         provisionThreadCredentialsBtn.isEnabled = false
 
         AlertDialog.Builder(requireContext())
@@ -105,8 +107,8 @@ class SelectActionFragment : Fragment() {
   interface Callback {
     /** Notifies listener of Scan QR code button click. */
     fun handleScanQrCodeClicked()
-    /** Notifies listener of provision-Wifi-credentials button click. */
-    fun onProvisionWifiCredentialsClicked()
+    /** Notifies listener of provision-WiFi-credentials button click. */
+    fun onProvisionWiFiCredentialsClicked()
     /** Notifies listener of provision-Thread-credentials button click. */
     fun onProvisionThreadCredentialsClicked()
     /** Notifies listener of Light On/Off & Level Cluster button click. */
@@ -121,10 +123,14 @@ class SelectActionFragment : Fragment() {
     fun handleBasicClicked()
     /** Notifies listener of attestation command button clicked. */
     fun handleAttestationTestClicked()
-    /** Notifies listener of a click to manually input the CHIP device address.. */
+    /** Notifies listener of a click to manually input the CHIP device address. */
     fun onShowDeviceAddressInput()
-    /** Notifies listener of cluster interaction button click.. */
+    /** Notifies listener of cluster interaction button click. */
     fun handleClusterInteractionClicked()
+    /** Notifies listener of wildcard button click. */
+    fun handleWildcardClicked()
+    /** Notifies listener of provision-custom-flow button click. */
+    fun handleCustomFlowClicked()
   }
 
   companion object {

@@ -33,6 +33,7 @@
 #include "esp_netif.h"
 #include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
+#include "nvs.h"
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
@@ -49,6 +50,21 @@ CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
     }
 
     apEnabled = (curWiFiMode == WIFI_MODE_AP || curWiFiMode == WIFI_MODE_APSTA);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
+{
+    wifi_mode_t curWiFiMode;
+    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
+    }
+
+    staEnabled = (curWiFiMode == WIFI_MODE_STA || curWiFiMode == WIFI_MODE_APSTA);
 
     return CHIP_NO_ERROR;
 }
@@ -310,6 +326,10 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     if (error == ESP_OK)
     {
         return CHIP_NO_ERROR;
+    }
+    if (error == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     return CHIP_ERROR(ChipError::Range::kPlatform, error);
 }

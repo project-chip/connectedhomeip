@@ -34,12 +34,16 @@ Complete the following steps:
     directory, with _build-target_ replaced with the build target name of the
     kit, for example _nrf52840dk_nrf52840_:
 
-         $ west build -b build-target
+         ```
+         west build -b build-target
+         ```
 
 2.  Run the terminal-based interface called menuconfig by typing the following
     command:
 
-         $ west build -t menuconfig
+         ```
+         west build -t menuconfig
+         ```
 
     The menuconfig terminal window appears, in which you can navigate using
     arrow keys and other keys, based on the description at the bottom of the
@@ -93,7 +97,9 @@ that you rebuild your application after editing them by typing the following
 command in the example directory, with _build-target_ replaced with the build
 target name of the kit, for example _nrf52840dk_nrf52840_:
 
-        $ west build -b build-target
+        ```
+        west build -b build-target
+        ```
 
 <hr>
 
@@ -142,3 +148,85 @@ Read the
 guide in the nRF Connect SDK's Zephyr documentation if you are interested in
 getting more advanced and detailed information about the configuration
 structure.
+
+<hr>
+
+## Configuring Matter in nRF Connect platform
+
+### Mandatory configuration
+
+To use the Matter protocol, you need to set the `CONFIG_CHIP` Kconfig option.
+Setting this option enables the Matter protocol stack and other associated
+Kconfig options, including `CONFIG_CHIP_ENABLE_DNSSD_SRP` that is required for
+the Matter device to be discoverable using DNS-SD.
+
+After that, make sure to set the `CONFIG_CHIP_PROJECT_CONFIG` Kconfig option and
+define the path to the configuration file that specifies Vendor ID, Product ID,
+and other project-specific Matter settings.
+
+<hr>
+
+### Optional configuration
+
+After enabling the Matter protocol and defining the path to the Matter
+configuration file, you can enable additional options in Kconfig.
+
+**Sleepy End Device support**
+
+You can enable the support for Thread Sleepy End Device in Matter by setting the
+following Kconfig options:
+
+-   `CONFIG_OPENTHREAD_MTD`
+-   `CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT`
+
+**Commissioning with NFC support**
+
+You can configure the Matter protocol to use an NFC tag for commissioning,
+instead of using a QR code, which is the default configuration.
+
+To enable NFC for commissioning and share the onboarding payload in an NFC tag,
+set the `CONFIG_CHIP_NFC_COMMISSIONING` option.
+
+**Logging**
+
+You can enable logging for both the stack and Zephyr’s
+[Logging](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/reference/logging/index.html#logging-api)
+API by setting the `CONFIG_LOG` option.
+
+Zephyr allows you to configure log levels of different software modules
+independently. To change the log level configuration for the Matter module, set
+one of the available options:
+
+-   `CONFIG_MATTER_LOG_LEVEL_ERR`
+-   `CONFIG_MATTER_LOG_LEVEL_INFO`
+-   `CONFIG_MATTER_LOG_LEVEL_DBG`
+
+**Shell**
+
+You can enable the Matter shell library using the `CONFIG_CHIP_LIB_SHELL`
+Kconfig option. This option lets you use the Matter specific shell commands. See
+[Using CLI in nRF Connect examples](nrfconnect_examples_cli.md) for the list of
+available Matter shell commands.
+
+**Matter device identification**
+
+Matter has many mandatory and optional ways to identify a specific device. These
+can be used for various purposes, such as dividing devices into groups (by
+function, by vendor or by location), device commissioning or vendor-specific
+cases before the device was commissioned (for example, identifying factory
+software version or related features).
+
+Only some part of these features can be configured using Kconfig options and
+only those were listed below:
+
+-   `CONFIG_CHIP_DEVICE_TYPE` - type of device that uses the Matter Device Type
+    Identifier, for example Door Lock (0x000A) or Dimmable Light Bulb (0x0101).
+-   `CONFIG_CHIP_COMMISSIONABLE_DEVICE_TYPE` - enables including optional device
+    type subtype in the commissionable node discovery record, which allows
+    filtering of the discovery results to find the nodes that match the device
+    type.
+-   `CONFIG_CHIP_ROTATING_DEVICE_ID` - enables rotating device identifier, an
+    optional feature that provides an additional unique identifier for each
+    device. This identifier is similar to the serial number, but it additionally
+    changes at predefined times to protect against long-term tracking of the
+    device.

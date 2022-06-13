@@ -1,0 +1,73 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 16.3. [TC-DA-1.3] Device Attestation Request Validation [DUT Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT generates 32-byte AttestationNonce"
+      verification: |
+          DUT send Attestation request command with attesation nonce to the reference App (lighting app or all-cluster-app)
+      disabled: true
+
+    - label: "Save the AttestationNonce as Nonce1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT sends AttestationRequest Command with AttestationNonce as field
+          to the TH1."
+      verification: |
+          Compare the attesation nonce received in the AttestationResposne is same as the one sent in Attesation Request
+      disabled: true
+
+    - label: "DUT generates 32-byte AttestationNonce for second time"
+      verification: |
+
+      disabled: true
+
+    - label: "Save the AttestationNonce as Nonce2"
+      verification: |
+          Verify that the values of Nonce1 and Nonce2 are different
+      disabled: true
+
+    - label:
+          "DUT sends AttestationRequest Command with AttestationNonce as field
+          to the TH1."
+      verification: |
+          Compare the attesation nonce received in the AttestationResposne is same as the one sent in Attesation Request
+      disabled: true
+
+    - label: "DUT generates 32-byte AttestationNonce for third time"
+      verification: |
+
+      disabled: true
+
+    - label: "Save the AttestationNonce as Nonce3"
+      verification: |
+          Verify that the values of Nonce1,Nonce2 and Nonce3 are different
+      disabled: true
+
+    - label:
+          "DUT sends AttestationRequest Command with AttestationNonce as field
+          to the TH1."
+      verification: |
+          Compare the attesation nonce received in the AttestationResposne is same as the one sent in Attesation Request
+      disabled: true

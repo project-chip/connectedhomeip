@@ -37,6 +37,7 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 ClockImpl gClockImpl;
@@ -58,17 +59,82 @@ extern "C" uint64_t get_clock_monotonic()
 
 // Platform-specific function for getting monotonic system time in microseconds.
 // Returns elapsed time in microseconds since an arbitrary, platform-defined epoch.
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
-    return get_clock_monotonic();
+    return Microseconds64(get_clock_monotonic());
 }
 
 // Platform-specific function for getting monotonic system time in milliseconds.
 // Return elapsed time in milliseconds since an arbitrary, platform-defined epoch.
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    return get_clock_monotonic() / kMicrosecondsPerMillisecond;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
+{
+    // TODO(19081): This platform does not properly error out if wall clock has
+    //              not been set.  For now, short circuit this.
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#if 0
+    struct timeval tv;
+    if (gettimeofday(&tv, nullptr) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime = Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+    return CHIP_NO_ERROR;
+#endif
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    Microseconds64 curTimeUs;
+    auto err = GetClock_RealTime(curTimeUs);
+    aCurTime = std::chrono::duration_cast<Milliseconds64>(curTimeUs);
+    return err;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    struct timeval tv;
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
+    if (settimeofday(&tv, nullptr) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    const time_t timep = tv.tv_sec;
+    struct tm calendar;
+    localtime_r(&timep, &calendar);
+    ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04d/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec, calendar.tm_year,
+                    calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    //
+    // TODO(19081): This is broken because it causes the platform to report
+    //              that it does have wall clock time when it actually doesn't.
+    return System::SystemClock().SetClock_RealTime(curTime);
+}
+
+} // namespace Clock
 } // namespace System
 } // namespace chip

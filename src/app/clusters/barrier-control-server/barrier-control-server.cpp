@@ -235,11 +235,9 @@ static uint32_t calculateDelayMs(EndpointId endpoint, uint8_t targetPosition, bo
     {
         return MIN_POSITION_CHANGE_DELAY_MS;
     }
-    else
-    {
-        uint32_t delayMs = openOrClosePeriodMs / positionDelta;
-        return (delayMs < MIN_POSITION_CHANGE_DELAY_MS ? MIN_POSITION_CHANGE_DELAY_MS : delayMs);
-    }
+
+    uint32_t delayMs = openOrClosePeriodMs / positionDelta;
+    return (delayMs < MIN_POSITION_CHANGE_DELAY_MS ? MIN_POSITION_CHANGE_DELAY_MS : delayMs);
 }
 
 void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
@@ -318,7 +316,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.currentPosition = getCurrentPosition(endpoint);
         state.targetPosition  = percentOpen;
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
-        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %dms delay", state.currentPosition,
+        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
                                             state.targetPosition, state.delayMs);
         emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
 
@@ -347,3 +345,5 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
     sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+void MatterBarrierControlPluginServerInitCallback() {}

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -32,17 +32,22 @@
 #include <stddef.h>
 
 #include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 namespace chip {
 namespace Credentials {
@@ -136,7 +141,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const ByteSpan chipCert, BitFlags<CertDe
 
     reader.Init(chipCert);
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
 
     return LoadCert(reader, decodeFlags, chipCert);
 }
@@ -269,7 +274,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     context.mTrustAnchor = nullptr;
 
-    return ValidateCert(cert, context, context.mValidateFlags, 0);
+    return ValidateCert(cert, context, 0);
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
@@ -277,12 +282,16 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 {
     context.mTrustAnchor = nullptr;
 
-    return FindValidCert(subjectDN, subjectKeyId, context, context.mValidateFlags, 0, certData);
+    return FindValidCert(subjectDN, subjectKeyId, context, 0, certData);
 }
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
+#ifdef ENABLE_HSM_ECDSA_VERIFY
+    P256PublicKeyHSM caPublicKey;
+#else
     P256PublicKey caPublicKey;
+#endif
     P256ECDSASignature signature;
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
@@ -296,8 +305,7 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth)
+CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context, uint8_t depth)
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     const ChipCertificateData * caCert = nullptr;
@@ -363,15 +371,85 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         }
     }
 
-    // Verify the validity time of the certificate, if requested.
-    if (cert->mNotBeforeTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
+    // Verify NotBefore and NotAfter validity of the certificates.
+    //
+    // See also ASN1ToChipEpochTime().
+    //
+    // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no
+    // well-defined expiration date'.  In CHIP TLV-encoded certificates, this
+    // special value is represented as a CHIP Epoch time value of 0 sec
+    // (2020-01-01 00:00:00 UTC).
+    //
+    // When evaluating NotBefore from a CHIP TLV-encoded certificate, this
+    // special value 0 does not require additional handling, as it is impossible
+    // for CHIP epoch time to represent any moment before the epoch, and so all
+    // representable times at or after this will be considered valid.  But for
+    // NotAfter, we special case this value as always passing (not expired).
+    CertificateValidityResult validityResult;
+    if (context.mEffectiveTime.Is<CurrentChipEpochTime>())
     {
-        // TODO - enable check for certificate validity dates
-        // VerifyOrExit(context.mEffectiveTime >= cert->mNotBeforeTime, err = CHIP_ERROR_CERT_NOT_VALID_YET);
+        if (context.mEffectiveTime.Get<CurrentChipEpochTime>().count() < cert->mNotBeforeTime)
+        {
+            validityResult = CertificateValidityResult::kNotYetValid;
+        }
+        else if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
+        {
+            validityResult = CertificateValidityResult::kExpired;
+        }
+        else
+        {
+            validityResult = CertificateValidityResult::kValid;
+        }
     }
-    if (cert->mNotAfterTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
+    else if (context.mEffectiveTime.Is<LastKnownGoodChipEpochTime>())
     {
-        VerifyOrExit(context.mEffectiveTime <= cert->mNotAfterTime, err = CHIP_ERROR_CERT_EXPIRED);
+        // Last Known Good Time may not be moved forward except at the time of
+        // commissioning or firmware update, so we can't use it to validate
+        // NotBefore.  However, so long as firmware build times are properly
+        // recorded and certificates loaded during commissioning are in fact
+        // valid at the time of commissioning, observing a NotAfter that falls
+        // before Last Known Good Time is a reliable indicator that the
+        // certificate in question is expired.  Check for this.
+        if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count() > cert->mNotAfterTime)
+        {
+            validityResult = CertificateValidityResult::kExpiredAtLastKnownGoodTime;
+        }
+        else
+        {
+            validityResult = CertificateValidityResult::kNotExpiredAtLastKnownGoodTime;
+        }
+    }
+    else
+    {
+        validityResult = CertificateValidityResult::kTimeUnknown;
+    }
+
+    if (context.mValidityPolicy != nullptr)
+    {
+        SuccessOrExit(err = context.mValidityPolicy->ApplyCertificateValidityPolicy(cert, depth, validityResult));
+    }
+    else
+    {
+        switch (validityResult)
+        {
+        case CertificateValidityResult::kValid:
+        case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+        // By default, we do not enforce certificate validity based upon a Last
+        // Known Good Time source.  However, implementations may always inject a
+        // policy that does enforce based upon this.
+        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
+        case CertificateValidityResult::kTimeUnknown:
+            break;
+        case CertificateValidityResult::kNotYetValid:
+            ExitNow(err = CHIP_ERROR_CERT_NOT_VALID_YET);
+            break;
+        case CertificateValidityResult::kExpired:
+            ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
+            break;
+        default:
+            ExitNow(err = CHIP_ERROR_INTERNAL);
+            break;
+        }
     }
 
     // If the certificate itself is trusted, then it is implicitly valid.  Record this certificate as the trust
@@ -403,7 +481,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
-    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, static_cast<uint8_t>(depth + 1), &caCert);
+    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
@@ -419,8 +497,7 @@ exit:
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
-                                             ValidationContext & context, BitFlags<CertValidateFlags> validateFlags, uint8_t depth,
-                                             const ChipCertificateData ** certData)
+                                             ValidationContext & context, uint8_t depth, const ChipCertificateData ** certData)
 {
     CHIP_ERROR err;
 
@@ -453,7 +530,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
         // Attempt to validate the cert.  If the cert is valid, return it to the caller. Otherwise,
         // save the returned error and continue searching.  If there are no other matching certs this
         // will be the error returned to the caller.
-        err = ValidateCert(candidateCert, context, validateFlags, depth);
+        err = ValidateCert(candidateCert, context, depth);
         if (err == CHIP_NO_ERROR)
         {
             *certData = candidateCert;
@@ -505,17 +582,18 @@ bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
 
 void ValidationContext::Reset()
 {
-    mEffectiveTime = 0;
-    mTrustAnchor   = nullptr;
+    mEffectiveTime  = EffectiveTime{};
+    mTrustAnchor    = nullptr;
+    mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
-    mValidateFlags.ClearAll();
     mRequiredCertType = kCertType_NotSpecified;
 }
 
 bool ChipRDN::IsEqual(const ChipRDN & other) const
 {
-    if (mAttrOID == kOID_Unknown || mAttrOID == kOID_NotSpecified || mAttrOID != other.mAttrOID)
+    if (mAttrOID == kOID_Unknown || mAttrOID == kOID_NotSpecified || mAttrOID != other.mAttrOID ||
+        mAttrIsPrintableString != other.mAttrIsPrintableString)
     {
         return false;
     }
@@ -524,10 +602,8 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
     {
         return mChipVal == other.mChipVal;
     }
-    else
-    {
-        return mString.data_equal(other.mString);
-    }
+
+    return mString.data_equal(other.mString);
 }
 
 ChipDN::ChipDN() {}
@@ -569,13 +645,27 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
         VerifyOrReturnError(CanCastTo<uint32_t>(val), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    rdn[rdnCount].mAttrOID = oid;
-    rdn[rdnCount].mChipVal = val;
+    rdn[rdnCount].mAttrOID               = oid;
+    rdn[rdnCount].mChipVal               = val;
+    rdn[rdnCount].mAttrIsPrintableString = false;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, ByteSpan val)
+CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
+{
+    for (auto & cat : cats.values)
+    {
+        if (cat != kUndefinedCAT)
+        {
+            ReturnErrorOnFailure(AddAttribute_MatterCASEAuthTag(cat));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrintableString)
 {
     uint8_t rdnCount = RDNCount();
 
@@ -583,8 +673,9 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, ByteSpan val)
     VerifyOrReturnError(!IsChipDNAttr(oid), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(oid != kOID_NotSpecified, CHIP_ERROR_INVALID_ARGUMENT);
 
-    rdn[rdnCount].mAttrOID = oid;
-    rdn[rdnCount].mString  = val;
+    rdn[rdnCount].mAttrOID               = oid;
+    rdn[rdnCount].mString                = val;
+    rdn[rdnCount].mAttrIsPrintableString = isPrintableString;
 
     return CHIP_NO_ERROR;
 }
@@ -600,42 +691,42 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
-        if (rdn[i].mAttrOID == kOID_AttributeType_ChipRootId)
+        if (rdn[i].mAttrOID == kOID_AttributeType_MatterRCACId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_Root;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipICAId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterICACId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_ICA;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipNodeId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_NODE_ID);
             lCertType = kCertType_Node;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFirmwareSigningId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_FirmwareSigning;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFabricId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFabricId)
         {
             // Only one fabricId attribute is allowed per DN.
-            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
+            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             fabricIdPresent = true;
         }
     }
 
     if (lCertType == kCertType_Node)
     {
-        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
     }
 
     certType = lCertType;
@@ -654,11 +745,11 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
     {
         switch (rdn[i].mAttrOID)
         {
-        case kOID_AttributeType_ChipRootId:
-        case kOID_AttributeType_ChipICAId:
-        case kOID_AttributeType_ChipNodeId:
-        case kOID_AttributeType_ChipFirmwareSigningId:
-            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+        case kOID_AttributeType_MatterRCACId:
+        case kOID_AttributeType_MatterICACId:
+        case kOID_AttributeType_MatterNodeId:
+        case kOID_AttributeType_MatterFirmwareSigningId:
+            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId = rdn[i].mChipVal;
             break;
@@ -674,16 +765,16 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
 {
     uint8_t rdnCount = RDNCount();
 
-    fabricId = UINT64_MAX;
+    fabricId = kUndefinedFabricId;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
         switch (rdn[i].mAttrOID)
         {
-        case kOID_AttributeType_ChipFabricId:
-            // Ensure only one FabricID RDN present, since start value is UINT64_MAX, which is reserved and never seen.
-            VerifyOrReturnError(fabricId == UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
-
+        case kOID_AttributeType_MatterFabricId:
+            // Ensure only one FabricID RDN present, since start value is kUndefinedFabricId, which is reserved and never seen.
+            VerifyOrReturnError(fabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             fabricId = rdn[i].mChipVal;
             break;
         default:
@@ -691,8 +782,282 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
         }
     }
 
-    VerifyOrReturnError(fabricId != UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(IsValidFabricId(fabricId), CHIP_ERROR_WRONG_CERT_DN);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDN::EncodeToTLV(TLVWriter & writer, Tag tag) const
+{
+    TLVType outerContainer;
+    uint8_t rdnCount = RDNCount();
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, kTLVType_List, outerContainer));
+
+    for (uint8_t i = 0; i < rdnCount; i++)
+    {
+        // Derive the TLV tag number from the enum value assigned to the attribute type OID. For attributes that can be
+        // either UTF8String or PrintableString, use the high bit in the tag number to distinguish the two.
+        uint8_t tlvTagNum = GetOIDEnum(rdn[i].mAttrOID);
+        if (rdn[i].mAttrIsPrintableString)
+        {
+            tlvTagNum |= 0x80;
+        }
+
+        if (IsChipDNAttr(rdn[i].mAttrOID))
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(tlvTagNum), rdn[i].mChipVal));
+        }
+        else
+        {
+            ReturnErrorOnFailure(writer.PutString(ContextTag(tlvTagNum), rdn[i].mString));
+        }
+    }
+
+    return writer.EndContainer(outerContainer);
+}
+
+CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLVType outerContainer;
+
+    static constexpr uint32_t kOID_AttributeIsPrintableString_Flag = 0x00000080;
+    static constexpr uint32_t kOID_AttributeType_Mask              = 0x0000007F;
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_List, CHIP_ERROR_WRONG_TLV_TYPE);
+
+    // Enter the List TLV element that represents the DN in TLV format.
+    ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
+
+    // Read the RDN attributes in the List.
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        // Get the TLV tag, make sure it is a context tag and extract the context tag number.
+        Tag tlvTag = reader.GetTag();
+        VerifyOrReturnError(IsContextTag(tlvTag), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tlvTagNum = TagNumFromTag(tlvTag);
+
+        // Derive the OID of the corresponding ASN.1 attribute from the TLV tag number.
+        // The numeric value of the OID is encoded in the bottom 7 bits of the TLV tag number.
+        // This eliminates the need for a translation table/switch statement but has the
+        // effect of tying the two encodings together.
+        //
+        // NOTE: In the event that the computed OID value is not one that we recognize
+        // (specifically, is not in the table of OIDs defined in ASN1OID.h) then the
+        // macro call below that encodes the attribute's object id (ASN1_ENCODE_OBJECT_ID)
+        // will fail for lack of the OID's encoded representation.  Given this there's no
+        // need to test the validity of the OID here.
+        //
+        OID attrOID = GetOID(kOIDCategory_AttributeType, static_cast<uint8_t>(tlvTagNum & kOID_AttributeType_Mask));
+
+        bool attrIsPrintableString = (tlvTagNum & kOID_AttributeIsPrintableString_Flag) == kOID_AttributeIsPrintableString_Flag;
+
+        // For 64-bit CHIP-defined DN attributes.
+        if (IsChip64bitDNAttr(attrOID))
+        {
+            uint64_t chipAttr;
+            VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
+            ReturnErrorOnFailure(reader.Get(chipAttr));
+            if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
+            {
+                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_WRONG_NODE_ID);
+            }
+            else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
+            {
+                VerifyOrReturnError(IsValidFabricId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+            }
+            ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
+        }
+        // For 32-bit CHIP-defined DN attributes.
+        else if (IsChip32bitDNAttr(attrOID))
+        {
+            uint32_t chipAttr;
+            VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
+            ReturnErrorOnFailure(reader.Get(chipAttr));
+            if (attrOID == chip::ASN1::kOID_AttributeType_MatterCASEAuthTag)
+            {
+                VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
+            }
+            ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
+        }
+        // Otherwise the attribute is one of the supported X.509 attributes
+        else
+        {
+            CharSpan asn1Attr;
+            ReturnErrorOnFailure(reader.Get(asn1Attr));
+            ReturnErrorOnFailure(AddAttribute(attrOID, asn1Attr, attrIsPrintableString));
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainer));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDN::EncodeToASN1(ASN1Writer & writer) const
+{
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    uint8_t rdnCount = RDNCount();
+
+    ASN1_START_SEQUENCE
+    {
+        for (uint8_t i = 0; i < rdnCount; i++)
+        {
+            ASN1_START_SET
+            {
+                char chipAttrStr[kChip64bitAttrUTF8Length];
+                CharSpan asn1Attr;
+                uint8_t asn1Tag;
+                chip::ASN1::OID attrOID = rdn[i].mAttrOID;
+
+                if (IsChip64bitDNAttr(attrOID))
+                {
+                    ReturnErrorOnFailure(
+                        Encoding::Uint64ToHex(rdn[i].mChipVal, chipAttrStr, sizeof(chipAttrStr), Encoding::HexFlags::kUppercase));
+                    asn1Attr = CharSpan(chipAttrStr, kChip64bitAttrUTF8Length);
+                    asn1Tag  = kASN1UniversalTag_UTF8String;
+                }
+                else if (IsChip32bitDNAttr(attrOID))
+                {
+                    ReturnErrorOnFailure(Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), chipAttrStr,
+                                                               sizeof(chipAttrStr), Encoding::HexFlags::kUppercase));
+                    asn1Attr = CharSpan(chipAttrStr, kChip32bitAttrUTF8Length);
+                    asn1Tag  = kASN1UniversalTag_UTF8String;
+                }
+                else
+                {
+                    asn1Attr = rdn[i].mString;
+
+                    // Determine the appropriate ASN.1 tag for the DN attribute.
+                    // - DomainComponent is always an IA5String.
+                    // - For all other ASN.1 defined attributes, bit 0x80 in the TLV tag value conveys whether the attribute
+                    //   is a UTF8String or a PrintableString (in some cases the certificate generator has a choice).
+                    if (attrOID == kOID_AttributeType_DomainComponent)
+                    {
+                        asn1Tag = kASN1UniversalTag_IA5String;
+                    }
+                    else
+                    {
+                        asn1Tag = rdn[i].mAttrIsPrintableString ? kASN1UniversalTag_PrintableString : kASN1UniversalTag_UTF8String;
+                    }
+                }
+
+                // AttributeTypeAndValue ::= SEQUENCE
+                ASN1_START_SEQUENCE
+                {
+                    // type AttributeType
+                    // AttributeType ::= OBJECT IDENTIFIER
+                    ASN1_ENCODE_OBJECT_ID(attrOID);
+
+                    VerifyOrReturnError(CanCastTo<uint16_t>(asn1Attr.size()), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+
+                    // value AttributeValue
+                    // AttributeValue ::= ANY -- DEFINED BY AttributeType
+                    ReturnErrorOnFailure(writer.PutString(asn1Tag, asn1Attr.data(), static_cast<uint16_t>(asn1Attr.size())));
+                }
+                ASN1_END_SEQUENCE;
+            }
+            ASN1_END_SET;
+        }
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
+{
+    CHIP_ERROR err;
+
+    // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+    ASN1_PARSE_ENTER_SEQUENCE
+    {
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
+            ASN1_ENTER_SET
+            {
+                // AttributeTypeAndValue ::= SEQUENCE
+                ASN1_PARSE_ENTER_SEQUENCE
+                {
+                    // type AttributeType
+                    // AttributeType ::= OBJECT IDENTIFIER
+                    OID attrOID;
+                    ASN1_PARSE_OBJECT_ID(attrOID);
+                    VerifyOrReturnError(GetOIDCategory(attrOID) == kOIDCategory_AttributeType, ASN1_ERROR_INVALID_ENCODING);
+
+                    // AttributeValue ::= ANY -- DEFINED BY AttributeType
+                    ASN1_PARSE_ANY;
+
+                    uint8_t attrTag = reader.GetTag();
+
+                    // Can only support UTF8String, PrintableString and IA5String.
+                    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_Universal &&
+                                            (attrTag == kASN1UniversalTag_PrintableString ||
+                                             attrTag == kASN1UniversalTag_UTF8String || attrTag == kASN1UniversalTag_IA5String),
+                                        ASN1_ERROR_UNSUPPORTED_ENCODING);
+
+                    // CHIP attributes must be UTF8Strings.
+                    if (IsChipDNAttr(attrOID))
+                    {
+                        VerifyOrReturnError(attrTag == kASN1UniversalTag_UTF8String, ASN1_ERROR_INVALID_ENCODING);
+                    }
+
+                    // If 64-bit CHIP attribute.
+                    if (IsChip64bitDNAttr(attrOID))
+                    {
+                        uint64_t chipAttr;
+                        VerifyOrReturnError(Encoding::UppercaseHexToUint64(reinterpret_cast<const char *>(reader.GetValue()),
+                                                                           static_cast<size_t>(reader.GetValueLen()),
+                                                                           chipAttr) == sizeof(uint64_t),
+                                            ASN1_ERROR_INVALID_ENCODING);
+
+                        if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
+                        {
+                            VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_NODE_ID);
+                        }
+                        else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
+                        {
+                            VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+                        }
+
+                        ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
+                    }
+                    // If 32-bit CHIP attribute.
+                    else if (IsChip32bitDNAttr(attrOID))
+                    {
+                        CASEAuthTag chipAttr;
+                        VerifyOrReturnError(Encoding::UppercaseHexToUint32(reinterpret_cast<const char *>(reader.GetValue()),
+                                                                           reader.GetValueLen(), chipAttr) == sizeof(CASEAuthTag),
+                                            ASN1_ERROR_INVALID_ENCODING);
+
+                        VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+
+                        ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
+                    }
+                    // Otherwise, it is a string.
+                    else
+                    {
+                        ReturnErrorOnFailure(AddAttribute(attrOID,
+                                                          CharSpan(Uint8::to_const_char(reader.GetValue()), reader.GetValueLen()),
+                                                          attrTag == kASN1UniversalTag_PrintableString));
+                    }
+                }
+                ASN1_EXIT_SEQUENCE;
+
+                // Only one AttributeTypeAndValue allowed per RDN.
+                err = reader.Next();
+                ReturnErrorCodeIf(err == CHIP_NO_ERROR, ASN1_ERROR_UNSUPPORTED_ENCODING);
+                VerifyOrReturnError(err == ASN1_END, err);
+            }
+            ASN1_EXIT_SET;
+        }
+    }
+    ASN1_EXIT_SEQUENCE;
+
+exit:
+    return err;
 }
 
 bool ChipDN::IsEqual(const ChipDN & other) const
@@ -717,7 +1082,7 @@ DLL_EXPORT CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // In CHIP certificate it is represented as a CHIP Epoch UTC time value of 0 sec (2020-01-01 00:00:00 UTC).
+    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 sec (2000-01-01 00:00:00 UTC).
     if ((asn1Time.Year == kX509NoWellDefinedExpirationDateYear) && (asn1Time.Month == kMonthsPerYear) &&
         (asn1Time.Day == kMaxDaysPerMonth) && (asn1Time.Hour == kHoursPerDay - 1) && (asn1Time.Minute == kMinutesPerHour - 1) &&
         (asn1Time.Second == kSecondsPerMinute - 1))
@@ -740,7 +1105,7 @@ exit:
 DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time)
 {
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
-    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2020-01-01 00:00:00 UTC).
+    // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2000-01-01 00:00:00 UTC).
     if (epochTime == kNullCertTime)
     {
         asn1Time.Year   = kX509NoWellDefinedExpirationDateYear;
@@ -846,12 +1211,12 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
-        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipNodeId)
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterNodeId)
         {
             nodeId      = rdn.mChipVal;
             foundNodeId = true;
         }
-        else if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
+        else if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterFabricId)
         {
             fabricId      = rdn.mChipVal;
             foundFabricId = true;
@@ -859,11 +1224,31 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     }
     if (!foundNodeId || !foundFabricId)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     *outNodeId   = nodeId;
     *outFabricId = fabricId;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                              FabricId & fabricId, NodeId & nodeId)
+{
+    Crypto::P256PublicKey rootPubKey;
+    Credentials::P256PublicKeySpan rootPubKeySpan;
+    ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(rcac, rootPubKeySpan));
+    rootPubKey = Crypto::P256PublicKey(rootPubKeySpan);
+    ReturnErrorOnFailure(Credentials::ExtractNodeIdFabricIdFromOpCert(noc, &nodeId, &fabricId));
+    ReturnErrorOnFailure(GenerateCompressedFabricId(rootPubKey, fabricId, compressedFabricId));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractNodeIdCompressedFabricIdFromOpCerts(ByteSpan rcac, ByteSpan noc, CompressedFabricId & compressedFabricId,
+                                                      NodeId & nodeId)
+{
+    FabricId fabricId;
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(rcac, noc, compressedFabricId, fabricId, nodeId));
     return CHIP_NO_ERROR;
 }
 
@@ -873,36 +1258,103 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
-        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterFabricId)
         {
             *fabricId = rdn.mChipVal;
             return CHIP_NO_ERROR;
         }
     }
 
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+
+    return ExtractCATsFromOpCert(certData, cats);
+}
+
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
+{
+    uint8_t catCount = 0;
+    uint8_t certType;
+
+    ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == kCertType_Node, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const ChipDN & subjectDN = opcert.mSubjectDN;
+    for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
+    {
+        const auto & rdn = subjectDN.rdn[i];
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_MatterCASEAuthTag)
+        {
+            // This error should never happen in practice because valid NOC cannot have more
+            // than kMaxSubjectCATAttributeCount CATs in its subject. The check that it is
+            // valid NOC was done above.
+            ReturnErrorCodeIf(catCount == cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
+            cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
+        }
+    }
+    for (size_t i = catCount; i < cats.size(); ++i)
+    {
+        cats.values[i] = kUndefinedCAT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractFabricIdFromCert(const ByteSpan & opcert, FabricId * fabricId)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+    return ExtractFabricIdFromCert(certData, fabricId);
 }
 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
 
-    return ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], nodeId, fabricId);
+    return ExtractNodeIdFabricIdFromOpCert(certData, nodeId, fabricId);
 }
 
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    publicKey = certSet.GetLastCert()->mPublicKey;
+    publicKey = certData.mPublicKey;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    notBeforeChipEpochTime = chip::System::Clock::Seconds32(certData.mNotBeforeTime);
 
     return CHIP_NO_ERROR;
 }
@@ -910,14 +1362,71 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    skid = certSet.GetLastCert()->mSubjectKeyId;
+    skid = certData.mSubjectKeyId;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    dn = certData.mSubjectDN;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn)
+{
+    CHIP_ERROR err;
+    ASN1Reader reader;
+
+    VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    reader.Init(x509Cert);
+
+    // Certificate ::= SEQUENCE
+    ASN1_PARSE_ENTER_SEQUENCE
+    {
+        // tbsCertificate TBSCertificate,
+        // TBSCertificate ::= SEQUENCE
+        ASN1_PARSE_ENTER_SEQUENCE
+        {
+            // Skip version [0] EXPLICIT Version DEFAULT v1
+            ASN1_PARSE_ELEMENT(kASN1TagClass_ContextSpecific, 0);
+
+            // Skip serialNumber CertificateSerialNumber
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
+
+            // Skip signature AlgorithmIdentifier
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Sequence);
+
+            // Skip issuer Name
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Sequence);
+
+            // Skip validity Validity,
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Sequence);
+
+            // Decode subject Name,
+            ReturnErrorOnFailure(dn.DecodeFromASN1(reader));
+        }
+        ASN1_SKIP_AND_EXIT_SEQUENCE;
+    }
+    ASN1_SKIP_AND_EXIT_SEQUENCE;
+
+exit:
+    return err;
 }
 
 } // namespace Credentials

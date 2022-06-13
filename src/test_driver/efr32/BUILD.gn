@@ -22,6 +22,7 @@ import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
 
 import("$dir_pw_build/python.gni")
 import("$dir_pw_protobuf_compiler/proto.gni")
@@ -43,7 +44,7 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -56,6 +57,9 @@ efr32_sdk("sdk") {
     "BOARD_ID=${efr32_board}",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
+
+    # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
+    "_NO_NETWORK_COMMISSIONING_DRIVER_",
   ]
 }
 
@@ -69,9 +73,12 @@ efr32_executable("efr32_device_tests") {
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
     "src/main.cpp",
   ]
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
 
   deps = [
     ":nl_test_service.nanopb_rpc",
@@ -82,11 +89,21 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   deps += pw_build_LINK_DEPS
 
@@ -102,9 +119,13 @@ efr32_executable("efr32_device_tests") {
 }
 
 group("efr32") {
+  deps = [ ":efr32_device_tests" ]
+}
+
+group("runner") {
   deps = [
-    ":efr32_device_tests",
     "${efr32_project_dir}/py:nl_test_runner.install",
+    "${efr32_project_dir}/py:nl_test_runner_wheel",
   ]
 }
 

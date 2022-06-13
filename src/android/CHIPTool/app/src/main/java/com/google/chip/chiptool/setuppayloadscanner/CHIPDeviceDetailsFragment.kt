@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discoveryCapabilitiesTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discriminatorTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.productIdTv
@@ -33,6 +34,8 @@ import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorIdTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsContainer
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsLabelTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.versionTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.commissioningFlowTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.customFlowBtn
 
 /** Show the [CHIPDeviceInfo]. */
 class CHIPDeviceDetailsFragment : Fragment() {
@@ -72,7 +75,24 @@ class CHIPDeviceDetailsFragment : Fragment() {
           vendorTagsContainer.addView(tv)
         }
       }
+
+      commissioningFlowTv.text = "${deviceInfo.commissioningFlow}"
+
+      // commissioningFlow = 2 (Custom), read device info from Ledger
+      if (deviceInfo.commissioningFlow == 2) {
+        customFlowBtn.visibility = View.VISIBLE
+        customFlowBtn.setOnClickListener {
+          FragmentUtil.getHost(this@CHIPDeviceDetailsFragment, Callback::class.java)
+            ?.handleReadFromLedgerClicked(deviceInfo)
+        }
+      }
     }
+  }
+
+  /** Interface for notifying the host. */
+  interface Callback {
+    /** Notifies listener of Read Device Info from Ledger button click. */
+    fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo)
   }
 
   companion object {

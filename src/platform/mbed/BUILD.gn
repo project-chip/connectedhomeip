@@ -20,6 +20,7 @@ assert(chip_device_platform == "mbed")
 
 static_library("mbed") {
   sources = [
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "ConfigurationManagerImpl.cpp",
@@ -27,11 +28,14 @@ static_library("mbed") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "MbedConfig.cpp",
     "MbedEventTimeout.cpp",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "SystemTimeSupport.cpp",
     "arch.c",
@@ -39,8 +43,10 @@ static_library("mbed") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_enable_openthread && chip_mdns == "platform") {
-    sources += [ "../OpenThread/DnssdImpl.cpp" ]
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  if (chip_enable_wifi) {
+    sources += [
+      "ConnectivityManagerImpl_WiFi.cpp",
+      "NetworkCommissioningWiFiDriver.cpp",
+    ]
   }
 }

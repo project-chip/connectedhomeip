@@ -1,0 +1,117 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 13.4.1. [TC-SC-4.1] Commissionable Node Discovery - Commissionee Case
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT is put in Commissioning Mode using Open Basic Commissioning
+          Window command and starts advertising Commissionable Node Discovery
+          service using DNS-SD"
+      verification: |
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 10 1 0 --timedInteractionTimeoutMs 1000
+
+
+
+          The delay timer is given 10 as an example , use whatever works for your product
+      disabled: true
+
+    - label: "Check DNS-SD subtypes used by DUT"
+      verification: |
+          ~$ avahi-browse -rt _matterc._udp
+
+          =   eth0 IPv6 F95E077ABDCC2B36                              _matterc._udp        local
+             hostname = [422F10CDC290A406.local]
+             address = [fd11:28::8a29:a7d0:3d31:eab9]
+             port = [5540]
+             txt = ["PI=" "PH=36" "RI=00007C5F6E176CD40F68685D100A1CF8A98B" "CM=1" "D=3840" "T=0" "CRA=300" "CRI=5000" "VP=9050+20044"]
+
+          Service Domain 422F10CDC290A406.local
+          verify CM flag is 1
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
+
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterc._udp;local
+          +;eth0;IPv6;_S0;_sub._matterc._udp;local
+          +;eth0;IPv6;_V9050;_sub._matterc._udp;local
+      disabled: true
+
+    - label:
+          "DUT is rebooted, then put in Commissioning Mode using Open Basic
+          Commissioning Window command, starting advertising Commissionable Node
+          Discovery service using DNS-SD"
+      verification: |
+          Reboot the device
+          if the device proivisioning state persists, run the chip-tool cmd in Step2
+      disabled: true
+
+    - label: "Check DNS-SD subtypes used by DUT"
+      verification: |
+          Verify same step as Step3,
+      disabled: true
+
+    - label: "Commission DUT with TH"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT is instructed to enter in commissioning mode using Open
+          Commissioning Window command"
+      verification: |
+          run chip tool command to open
+          ./chip-tool pairing open-commissioning-window 1 1 20 2000 3840
+      disabled: true
+
+    - label: "Check DNS-SD subtypes used by DUT"
+      verification: |
+          Same verification steps as Step 3, Except Verify CM flag to be 2
+
+
+          $avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 923F5363843F26A0                              _matterc._udp        local
+          +   eth0 IPv6 8CDE894B98DF7DEF                              _matterc._udp        local
+          =   eth0 IPv6 8CDE894B98DF7DEF                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=1" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          =   eth0 IPv6 923F5363843F26A0                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+      disabled: true
+
+    - label: "Wait for OCW timeout to expire"
+      verification: |
+          Wait until timeout to expire
+      disabled: true
+
+    - label: "If (PICS_EXTENDED_DISCOVERY) enable Extended Discovery"
+      verification: |
+          If the device supports Discovery for extended period of time, Device should continue to advertise that duration
+      disabled: true
+
+    - label: "If (PICS_EXTENDED_DISCOVERY) check DNS-SD subtypes used by DUT"
+      verification: |
+          same as step 8
+      disabled: true

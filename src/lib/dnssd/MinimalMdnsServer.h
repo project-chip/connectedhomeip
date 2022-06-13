@@ -15,22 +15,25 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <inet/IPPacketInfo.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 
 namespace chip {
 namespace Dnssd {
 
 namespace Internal {
+
 /// Checks if the current interface is powered on
 /// and not local loopback.
 template <typename T>
 bool IsCurrentInterfaceUsable(T & iterator)
 {
-    if (!iterator.IsUp() || !iterator.SupportsMulticast())
+    if (!iterator.IsUp())
     {
         return false; // not a usable interface
     }
-    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    char name[chip::Inet::InterfaceId::kMaxIfNameLength];
     if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get interface name.");
@@ -82,14 +85,12 @@ public:
         {
             return *Instance().mReplacementServer;
         }
-        else
-        {
-            return Instance().mServer;
-        }
+
+        return Instance().mServer;
     }
 
     /// Calls Server().Listen() on all available interfaces
-    CHIP_ERROR StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port);
+    CHIP_ERROR StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, uint16_t port);
     void ShutdownServer();
 
     void SetQueryDelegate(MdnsPacketDelegate * delegate) { mQueryDelegate = delegate; }

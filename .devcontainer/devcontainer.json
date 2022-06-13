@@ -5,6 +5,7 @@
         "--security-opt",
         "seccomp=unconfined",
         "--network=host",
+        "--privileged",
         "-v",
         "/dev/bus/usb:/dev/bus/usb:ro",
         "--device-cgroup-rule=a 189:* rmw",
@@ -16,7 +17,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "BUILD_VERSION": "0.5.15"
+            "BUILD_VERSION": "0.5.77"
         }
     },
     "remoteUser": "vscode",
@@ -37,7 +38,8 @@
         "christian-kohler.path-intellisense",
         "knisterpeter.vscode-github",
         "npclaudiu.vscode-gn",
-        "marus25.cortex-debug"
+        "marus25.cortex-debug",
+        "msedge-dev.gnls"
     ],
     // Use 'settings' to set *default* container specific settings.json values on container create.
     // You can edit these settings after create using File > Preferences > Settings > Remote.

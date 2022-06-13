@@ -31,7 +31,7 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
+CHIP_ERROR ClusterBase::Associate(DeviceProxy * device, EndpointId endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Check if the device supports mCluster at the requested endpoint
@@ -45,16 +45,6 @@ CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
 void ClusterBase::Dissociate()
 {
     mDevice = nullptr;
-}
-
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback,
-                                                  app::TLVDataFilter tlvDataFilter)
-{
-    VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(tlvDataFilter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback, tlvDataFilter);
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

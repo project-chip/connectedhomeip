@@ -20,6 +20,7 @@
 #pragma once
 
 #include "AppEvent.h"
+#include "LEDWidget.h"
 #include "PumpManager.h"
 
 #include <platform/CHIPDeviceLayer.h>
@@ -33,7 +34,7 @@ struct k_timer;
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
     void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
     void PostEvent(AppEvent * event);
@@ -42,7 +43,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
@@ -51,6 +52,9 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);

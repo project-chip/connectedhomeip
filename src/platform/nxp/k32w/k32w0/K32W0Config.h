@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +28,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "MemManager.h"
 #include "PDM.h"
+#include "RamStorage.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -60,65 +60,57 @@ public:
                                                          *   Cleared during factory reset. */
     static constexpr uint8_t kPDMId_ChipCounter = 0x03; /**< PDM id for settings containing dynamic counter values set at runtime.
                                                          *   Retained during factory reset. */
-    static constexpr uint8_t kPDMId_KVS = 0x04;         /**< PDM id for settings containing KVS set at runtime.
+    static constexpr uint8_t kPDMId_KVSKey = 0x04;      /**< PDM id for settings containing KVS keys set at runtime.
+                                                         *   Cleared during factory reset. */
+    static constexpr uint8_t kPDMId_KVSValue = 0x05;    /**< PDM id for settings containing KVS values set at runtime.
                                                          *   Cleared during factory reset. */
 
     using Key = uint32_t;
 
     // Key definitions for well-known configuration values.
-    // Factory config keys
-    static constexpr Key kConfigKey_SerialNum           = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId         = K32WConfigKey(kPDMId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert       = K32WConfigKey(kPDMId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = K32WConfigKey(kPDMId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate   = K32WConfigKey(kPDMId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode        = K32WConfigKey(kPDMId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = K32WConfigKey(kPDMId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_ProductRevision     = K32WConfigKey(kPDMId_ChipFactory, 0x07);
-    static constexpr Key kConfigKey_SetupDiscriminator  = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    // Factory Config Keys
+    static constexpr Key kConfigKey_SerialNum             = K32WConfigKey(kPDMId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = K32WConfigKey(kPDMId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = K32WConfigKey(kPDMId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = K32WConfigKey(kPDMId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = K32WConfigKey(kPDMId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_SetupPinCode          = K32WConfigKey(kPDMId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = K32WConfigKey(kPDMId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_HardwareVersion       = K32WConfigKey(kPDMId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_SetupDiscriminator    = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_Spake2pIterationCount = K32WConfigKey(kPDMId_ChipFactory, 0x09);
+    static constexpr Key kConfigKey_Spake2pSalt           = K32WConfigKey(kPDMId_ChipFactory, 0x0A);
+    static constexpr Key kConfigKey_Spake2pVerifier       = K32WConfigKey(kPDMId_ChipFactory, 0x0B);
+
     // CHIP Config Keys
-    static constexpr Key kConfigKey_FabricId           = K32WConfigKey(kPDMId_ChipConfig, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = K32WConfigKey(kPDMId_ChipConfig, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = K32WConfigKey(kPDMId_ChipConfig, 0x02);
     static constexpr Key kConfigKey_ServiceId          = K32WConfigKey(kPDMId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = K32WConfigKey(kPDMId_ChipConfig, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId = K32WConfigKey(kPDMId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = K32WConfigKey(kPDMId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
+    static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
+    static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
+    static constexpr Key kConfigKey_FirstRunOfOTAImage = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
 
-    static constexpr Key kConfigKey_GroupKey   = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_GroupKey0  = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
-    static constexpr Key kConfigKey_GroupKey1  = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
-    static constexpr Key kConfigKey_GroupKey2  = K32WConfigKey(kPDMId_ChipConfig, 0x0D);
-    static constexpr Key kConfigKey_GroupKey3  = K32WConfigKey(kPDMId_ChipConfig, 0x0E);
-    static constexpr Key kConfigKey_GroupKey4  = K32WConfigKey(kPDMId_ChipConfig, 0x0F);
-    static constexpr Key kConfigKey_GroupKey5  = K32WConfigKey(kPDMId_ChipConfig, 0x10);
-    static constexpr Key kConfigKey_GroupKey6  = K32WConfigKey(kPDMId_ChipConfig, 0x11);
-    static constexpr Key kConfigKey_GroupKey7  = K32WConfigKey(kPDMId_ChipConfig, 0x12);
-    static constexpr Key kConfigKey_GroupKey8  = K32WConfigKey(kPDMId_ChipConfig, 0x13);
-    static constexpr Key kConfigKey_GroupKey9  = K32WConfigKey(kPDMId_ChipConfig, 0x14);
-    static constexpr Key kConfigKey_GroupKey10 = K32WConfigKey(kPDMId_ChipConfig, 0x15);
-    static constexpr Key kConfigKey_GroupKey11 = K32WConfigKey(kPDMId_ChipConfig, 0x16);
-    static constexpr Key kConfigKey_GroupKey12 = K32WConfigKey(kPDMId_ChipConfig, 0x17);
-    static constexpr Key kConfigKey_GroupKey13 = K32WConfigKey(kPDMId_ChipConfig, 0x18);
-    static constexpr Key kConfigKey_GroupKey14 = K32WConfigKey(kPDMId_ChipConfig, 0x19);
-    static constexpr Key kConfigKey_GroupKey15 = K32WConfigKey(kPDMId_ChipConfig, 0x1A);
-
-    static constexpr Key kConfigKey_GroupKeyBase = kConfigKey_GroupKey0;
-    static constexpr Key kConfigKey_GroupKeyMax  = K32WConfigKey(kPDMId_ChipConfig, 0x1E);
-    ; // Allows 16 Group Keys to be created.
+    // CHIP Counter Keys
+    static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipCounter, 0x00);
+    static constexpr Key kCounterKey_UpTime                = K32WConfigKey(kPDMId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kPDMId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kPDMId_ChipCounter, 0x03);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0xFF);
     static constexpr Key kMinConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0x00);
-    static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0x1E);
+    static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0xFF);
     static constexpr Key kMinConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0x00);
-    static constexpr Key kMaxConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0x1F); // Allows 32 Counters to be created.
-    static constexpr Key kMinConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0x00);
-    static constexpr Key kMaxConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0xFF);
+    static constexpr Key kMaxConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0xFF); // Allows 32 Counters to be created.
+    static constexpr Key kMinConfigKey_KVSKey      = K32WConfigKey(kPDMId_KVSKey, 0x00);
+    static constexpr Key kMaxConfigKey_KVSKey      = K32WConfigKey(kPDMId_KVSKey, 0xFF);
+    static constexpr Key kMinConfigKey_KVSValue    = K32WConfigKey(kPDMId_KVSValue, 0x00);
+    static constexpr Key kMaxConfigKey_KVSValue    = K32WConfigKey(kPDMId_KVSValue, 0xFF);
 
     static CHIP_ERROR Init(void);
 
@@ -144,15 +136,14 @@ public:
     static void RunConfigUnitTest(void);
 
 protected:
-    using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & PDMIdKey, const size_t & length)>;
-    static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
     static constexpr uint8_t GetPDMId(uint32_t key);
     static constexpr uint8_t GetRecordKey(uint32_t key);
 
 private:
     static CHIP_ERROR MapPdmStatus(PDM_teStatus pdmStatus);
+    static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
     static CHIP_ERROR MapPdmInitStatus(int pdmStatus);
-    static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
+    static void FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
 
 /**

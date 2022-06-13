@@ -1,0 +1,32 @@
+{{> header}}
+
+#pragma once
+
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+{{#zcl_events}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Events {
+
+{{/first}}
+namespace {{asUpperCamelCase name}} {
+static constexpr EventId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase name}}
+
+{{#last}}
+} // namespace Events
+} // namespace {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/zcl_events}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

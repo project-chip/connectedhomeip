@@ -1,0 +1,149 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.11. [TC-DD-3.11] Commissioning Flow = 0 (Standard Flow) - QR Code [DUT -
+    Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "If (PICS_DT_BLE), Standard Commissioning Flow: Use a Commissionee
+          with a QR code that has the Custom Flow field set to 0 and supports
+          BLE for its Discovery Capability. Ensure the Version bit string
+          follows the current Matter spec. documentation."
+      verification: |
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2
+          ...
+          [1651101335.714230][22353:22353] CHIP:DL: Device Configuration:
+          [1651101335.722064][22353:22353] CHIP:DL:   Serial Number: TEST_SN
+          [1651101335.722638][22353:22353] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651101335.723167][22353:22353] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651101335.723712][22353:22353] CHIP:DL:   Hardware Version: 0
+          [1651101335.724228][22353:22353] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651101335.724756][22353:22353] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651101335.725226][22353:22353] CHIP:DL:   Manufacturing Date: (not set)
+          [1651101335.725721][22353:22353] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651101335.733693][22353:22353] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651101335.734598][22353:22353] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1651101335.735182][22353:22353] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1651101335.735618][22353:22353] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
+      verification: |
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
+
+    - label:
+          "If (PICS_DT_BLE), Using the DUT, parse the THs QR code and follow any
+          steps needed for the Commissioner/Commissionee to complete the
+          commissioning process using BLE"
+      verification: |
+          TH Commissionee:
+
+          [1651101510.975272][22353:22353] CHIP:SVR: Commissioning completed successfully
+          [1651101510.975318][22353:22353] CHIP:DIS: Updating services using commissioning mode 0
+
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J042C00KA0648G00
+
+          [1651101510810] [94338:65557180] CHIP: [CTL] Received CommissioningComplete response
+          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651101510810] [94338:65557180] CHIP: [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "If (PICS_DT_IP), Standard Commissioning Flow: Use a Commissionee with
+          a QR code that has the Custom Flow field set to 0, supports IP Network
+          for its Discovery Capability and is already on the same IP network as
+          the DUT commissioner. Ensure the Version bit string follows the
+          current Matter spec. documentation."
+      verification: |
+          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 0 --capabilities 4
+
+          [1651105420.610637][27312:27312] CHIP:DL: Device Configuration:
+          [1651105420.610695][27312:27312] CHIP:DL:   Serial Number: TEST_SN
+          [1651105420.610727][27312:27312] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651105420.610761][27312:27312] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651105420.610792][27312:27312] CHIP:DL:   Hardware Version: 0
+          [1651105420.610815][27312:27312] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651105420.610836][27312:27312] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651105420.610864][27312:27312] CHIP:DL:   Manufacturing Date: (not set)
+          [1651105420.610886][27312:27312] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651105420.610907][27312:27312] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651105420.610962][27312:27312] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
+      verification: |
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
+
+    - label:
+          "If (PICS_DT_IP), Using the DUT, parse the THs QR code and follow any
+          steps needed for the Commissioner/Commissionee to complete the
+          commissioning process using IP Network"
+      verification: |
+          TH Commissionee:
+
+          [1651105530.973166][27371:27371] CHIP:SVR: Commissioning completed successfully
+          [1651105530.973215][27371:27371] CHIP:DIS: Updating services using commissioning mode 0
+
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+
+          [1651105530854] [95067:65607294] CHIP: [CTL] Received CommissioningComplete response
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651105530854] [95067:65607294] CHIP: [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "If (PICS_DT_SOFTAP), Standard Commissioning Flow: Use a Commissionee
+          with a QR code that has the Custom Flow field set to 0 and supports
+          SoftAP for its Discovery Capability. Ensure the Version bit string
+          follows the current Matter spec. documentation."
+      verification: |
+          BLOCKED: SoftAP commissioning not currently supported
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
+      verification: |
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
+
+    - label:
+          "If (PICS_DT_SOFTAP), Using the DUT, parse the THs QR code and follow
+          any steps needed for the Commissioner/Commissionee to complete the
+          commissioning process using SoftAP"
+      verification: |
+          BLOCKED: SoftAP commissioning not currently supported
+      disabled: true

@@ -45,11 +45,11 @@ class Connection:
         self._controller = controller
         self._pair_queue = Queue()
 
-    def ConnectToWifi(self, ssid: str, password: str):
+    def ConnectToWiFi(self, ssid: str, password: str):
         if not self.needsNetworkCredentials:
             raise Exception("Not requiring network credentials yet.")
 
-        self._controller.PairSendWifiCredentials(ssid, password)
+        self._controller.PairSendWiFiCredentials(ssid, password)
         self._WaitForPairProgress()
 
     def ConnectToThread(self, blob: bytes):

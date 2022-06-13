@@ -73,9 +73,19 @@ public:
     virtual bool CanSendToPeer(const PeerAddress & address) = 0;
 
     /**
+     * Determine if this transport can Listen to IPV6 Multicast.
+     */
+    virtual bool CanListenMulticast() { return false; }
+
+    /**
      * Handle disconnection from the specified peer if currently connected to it.
      */
     virtual void Disconnect(const PeerAddress & address) {}
+
+    /**
+     * Enable Listening for multicast messages ( IPV6 UDP only)
+     */
+    virtual CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) { return CHIP_ERROR_INTERNAL; }
 
     /**
      * Close the open endpoint without destroying the object

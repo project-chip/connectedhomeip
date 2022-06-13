@@ -17,9 +17,9 @@
  */
 
 #pragma once
+#include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
-#include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/WriteResponse.h>
+#include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -29,59 +29,86 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
 /**
  *  @brief The write handler is responsible for processing a write request and sending a write reply.
  */
-class WriteHandler
+class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
     /**
      *  Initialize the WriteHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
+     *  construction until a call to Close is made to terminate the
      *  instance.
-     *
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init();
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
-     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
+     *  guarantees that it will call Close on itself when processing is done (including if OnWriteRequest
      *  returns an error).
      *
      *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
      *  @param[in]    aPayload             A payload that has read request data
+     *  @param[in]    aIsTimedWrite        Whether write is part of a timed interaction.
      *
-     *  @retval #Others If fails to process read request
-     *  @retval #CHIP_NO_ERROR On success.
+     *  @retval Status.  Callers are expected to send a status response if the
+     *  return status is not Status::Success.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    Protocols::InteractionModel::Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                       System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to and de-initializes the object. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() below.
+     */
+    void Abort();
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
-    virtual ~WriteHandler() = default;
+    ~WriteHandler() override = default;
 
-    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+    CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
+    CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
-    CHIP_ERROR AddStatus(const AttributePathParams & aAttributePathParams, const Protocols::InteractionModel::Status aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
 
-    CHIP_ERROR AddClusterSpecificSuccess(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
+
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
+
+    FabricIndex GetAccessingFabricIndex() const;
+
+    /**
+     * Check whether the WriteRequest we are handling is a timed write.
+     */
+    bool IsTimedWrite() const { return mIsTimedRequest; }
+
+    bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return !IsFree() && mpExchangeCtx == apExchangeContext;
     }
 
-    CHIP_ERROR AddClusterSpecificFailure(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
+    void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
+
+    bool ACLCheckCacheHit(const AttributeAccessToken & aToken)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
+    }
+
+    bool IsCurrentlyProcessingWritePath(const ConcreteAttributePath & aPath)
+    {
+        return mProcessingAttributePath.HasValue() && mProcessingAttributePath.Value() == aPath;
     }
 
 private:
@@ -92,11 +119,12 @@ private:
         AddStatus,         // The handler has added status code
         Sending,           // The handler has sent out the write response
     };
-    CHIP_ERROR ProcessWriteRequest(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
-    CHIP_ERROR SendWriteResponse();
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeStatusIB::Builder aAttributeStatusIB);
+    Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
+    CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
 
     void MoveToState(const State aTargetState);
     void ClearState();
@@ -104,12 +132,51 @@ private:
     /**
      *  Clean up state when we are done sending the write response.
      */
-    void Shutdown();
+    void Close();
+
+    void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
+    void DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful);
+
+    // Deliver the signal that we have delivered all list entries to the AttributeAccessInterface. This function will be called
+    // after handling the last chunk of a series of write requests. Or the write handler was shutdown (usually due to transport
+    // timeout).
+    // This function will become no-op on group writes, since DeliverFinalListWriteEndForGroupWrite will clear the
+    // mProcessingAttributePath after processing the AttributeDataIBs from the request.
+    void DeliverFinalListWriteEnd(bool writeWasSuccessful);
+
+    // Deliver the signal that we have delivered all list entries to the AttributeAccessInterface. This function will be called
+    // after handling the last attribute in a group write request (since group writes will never be chunked writes). Or we failed to
+    // process the group write request (usually due to malformed messages). This function should only be called by
+    // ProcessGroupAttributeDataIBs.
+    CHIP_ERROR DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful);
+
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
+
+private:
+    // ExchangeDelegate
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    WriteResponse::Builder mWriteResponseBuilder;
-    System::PacketBufferTLVWriter mMessageWriter;
-    State mState = State::Uninitialized;
+    WriteResponseMessage::Builder mWriteResponseBuilder;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mSuppressResponse = false;
+    bool mHasMoreChunks    = false;
+    Optional<ConcreteAttributePath> mProcessingAttributePath;
+    bool mProcessingAttributeIsList = false;
+    // We record the Status when AddStatus is called to determine whether all data of a list write is accepted.
+    // This value will be used by DeliverListWriteEnd and DeliverFinalListWriteEnd but it won't be used by group writes based on the
+    // fact that the errors that won't be delivered to AttributeAccessInterface are:
+    //  (1) Attribute not found
+    //  (2) Access control failed
+    //  (3) Write request to a read-only attribute
+    //  (4) Data version mismatch
+    //  (5) Not using timed write.
+    //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
+    bool mAttributeWriteSuccessful                = false;
+    Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app
 } // namespace chip

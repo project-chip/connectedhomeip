@@ -20,12 +20,10 @@
  * @brief Registers shell commands for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
-#include <controller/CHIPDeviceController.h>
-
 namespace chip {
 namespace Shell {
 
-void RegisterDiscoverCommands(chip::Controller::DeviceCommissioner * commissioner);
+void RegisterControllerCommands();
 
 } // namespace Shell
 } // namespace chip

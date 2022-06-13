@@ -15,16 +15,17 @@
  *    limitations under the License.
  */
 
-#include "DnssdCache.h"
 #include "Resolver.h"
 
 #include <limits>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/dnssd/ActiveResolveAttempts.h>
+#include <lib/dnssd/IncrementalResolve.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
-#include <lib/dnssd/TxtFields.h>
-#include <lib/dnssd/minimal_mdns/ActiveResolveAttempts.h>
+#include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -41,298 +42,218 @@ namespace chip {
 namespace Dnssd {
 namespace {
 
-const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
-{
-    return ByteSpan(range.Start(), range.Size());
-}
-
-template <class NodeData>
-class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
-{
-public:
-    explicit TxtRecordDelegateImpl(NodeData & nodeData) : mNodeData(nodeData) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
-    {
-        FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mNodeData);
-    }
-
-private:
-    NodeData & mNodeData;
-};
-
 constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
-using DnssdCacheType = Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
-class PacketDataReporter : public ParserDelegate
+/// Handles processing of minmdns packet data.
+///
+/// Can process multiple incremental resolves based on SRV data and allows
+/// retrieval of pending (e.g. to ask for AAAA) and complete data items.
+///
+class PacketParser : private ParserDelegate
 {
 public:
-    PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet, DnssdCacheType & mdnsCache) :
-        mDelegate(delegate),
-        mDiscoveryType(discoveryType), mPacketRange(packet)
-    {
-        mInterfaceId           = interfaceId;
-        mNodeData.mInterfaceId = interfaceId;
-    }
+    PacketParser(ActiveResolveAttempts & activeResolves) : mActiveResolves(activeResolves) {}
 
+    /// Goes through the given SRV records within a response packet
+    /// and sets up data resolution
+    void ParseSrvRecords(const BytesRange & packet);
+
+    /// Goes through non-SRV records and feeds them through the initialized
+    /// SRV record parsing.
+    ///
+    /// Must be called AFTER ParseSrvRecords has been called.
+    void ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet);
+
+    IncrementalResolver * ResolverBegin() { return mResolvers; }
+    IncrementalResolver * ResolverEnd() { return mResolvers + kMinMdnsNumParallelResolvers; }
+
+private:
     // ParserDelegate implementation
-
     void OnHeader(ConstHeaderRef & header) override;
     void OnQuery(const QueryData & data) override;
     void OnResource(ResourceType type, const ResourceData & data) override;
 
-    // Called after ParsePacket is complete to send final notifications to the delegate.
-    // Used to ensure all the available IP addresses are attached before completion.
-    void OnComplete(ActiveResolveAttempts & activeAttempts);
+    /// Called IFF data is of SRV type and we are in SRV initialization state
+    ///
+    /// Initializes a resolver with the given SRV content as long as
+    /// inactive resolvers exist.
+    void ParseSRVResource(const ResourceData & data);
 
-private:
-    ResolverDelegate * mDelegate = nullptr;
-    DiscoveryType mDiscoveryType;
-    ResolvedNodeData mNodeData;
-    DiscoveredNodeData mDiscoveredNodeData;
-    chip::Inet::InterfaceId mInterfaceId;
+    /// Called IFF parsing state is in RecordParsing
+    ///
+    /// Forwards the resource to all active resolvers.
+    void ParseResource(const ResourceData & data);
+
+    enum class RecordParsingState
+    {
+        kIdle,
+        kSrvInitialization,
+        kRecordParsing,
+    };
+
+    static constexpr size_t kMinMdnsNumParallelResolvers = CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES;
+
+    // Individual parse set
+    bool mIsResponse               = false;
+    Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
     BytesRange mPacketRange;
+    RecordParsingState mParsingState = RecordParsingState::kIdle;
 
-    bool mValid       = false;
-    bool mHasNodePort = false;
-    bool mHasIP       = false;
-
-    void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
-    void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
-
-    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
-    void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
+    // resolvers kept between parse steps
+    ActiveResolveAttempts & mActiveResolves;
+    IncrementalResolver mResolvers[kMinMdnsNumParallelResolvers];
 };
 
-void PacketDataReporter::OnQuery(const QueryData & data)
+void PacketParser::OnHeader(ConstHeaderRef & header)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
-}
+    mIsResponse = header.GetFlags().IsResponse();
 
-void PacketDataReporter::OnHeader(ConstHeaderRef & header)
-{
-    mValid = header.GetFlags().IsResponse();
-
+#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
     if (header.GetFlags().IsTruncated())
     {
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
         // MinMdns does not cache data, so receiving piecewise data does not work
         ChipLogError(Discovery, "Truncated responses not supported for address resolution");
+    }
 #endif
+}
+
+void PacketParser::OnQuery(const QueryData & data)
+{
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
+}
+
+void PacketParser::OnResource(ResourceType type, const ResourceData & data)
+{
+    if (!mIsResponse)
+    {
+        return;
+    }
+
+    switch (mParsingState)
+    {
+    case RecordParsingState::kSrvInitialization: {
+        if (data.GetType() != QType::SRV)
+        {
+            return;
+        }
+        mdns::Minimal::Logging::LogReceivedResource(data);
+        ParseSRVResource(data);
+        break;
+    }
+    case RecordParsingState::kRecordParsing:
+        if (data.GetType() != QType::SRV)
+        {
+            // SRV packets logged during 'SrvInitialization' phase
+            mdns::Minimal::Logging::LogReceivedResource(data);
+        }
+        ParseResource(data);
+        break;
+    case RecordParsingState::kIdle:
+        ChipLogError(Discovery, "Illegal state: received DNSSD resource while IDLE");
+        break;
     }
 }
 
-void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
+void PacketParser::ParseResource(const ResourceData & data)
 {
-    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (it.Next())
+    for (auto & resolver : mResolvers)
     {
-        Platform::CopyString(mNodeData.mHostName, it.Value());
+        if (resolver.IsActive())
+        {
+            CHIP_ERROR err = resolver.OnRecord(mInterfaceId, data, mPacketRange);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
     }
 
-    if (!name.Next())
+    // Once an IP address is received, stop requesting it.
+    if (data.GetType() == QType::AAAA)
     {
+        mActiveResolves.CompleteIpResolution(data.GetName());
+    }
+}
+
+void PacketParser::ParseSRVResource(const ResourceData & data)
+{
+    SrvRecord srv;
+    if (!srv.Parse(data.GetData(), mPacketRange))
+    {
+        ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
+        return;
+    }
+
+    for (auto & resolver : mResolvers)
+    {
+        if (resolver.IsActive() && (resolver.GetRecordName() == data.GetName()))
+        {
+            ChipLogDetail(Discovery, "SRV record already actively processed.");
+            return;
+        }
+    }
+
+    for (auto & resolver : mResolvers)
+    {
+        if (resolver.IsActive())
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), srv);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Receiving records that we do not need to parse is normal:
+            // MinMDNS may receive all DNSSD packets on the network, only
+            // interested in a subset that is matter-specific
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-        ChipLogError(Discovery, "mDNS packet is missing a valid server name");
+            ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
-        mHasNodePort = false;
+        }
+
+        // Done finding an inactive resolver and attempting to use it.
         return;
     }
 
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
-        mHasNodePort = false;
-        return;
-    }
-
-    mNodeData.mPort = srv.GetPort();
-    mHasNodePort    = true;
+    ChipLogError(Discovery, "Insufficient parsers to process all SRV entries.");
 }
 
-void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
+void PacketParser::ParseSrvRecords(const BytesRange & packet)
 {
-    // Host name is the first part of the qname
-    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (it.Next())
+    mParsingState = RecordParsingState::kSrvInitialization;
+    mPacketRange  = packet;
+
+    if (!ParsePacket(packet, this))
     {
-        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
+        ChipLogError(Discovery, "DNSSD packet parsing failed (for SRV records)");
     }
-    if (name.Next())
-    {
-        strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
-    }
-    mDiscoveredNodeData.port = srv.GetPort();
+
+    mParsingState = RecordParsingState::kIdle;
 }
 
-void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
+void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet)
 {
-    // TODO: should validate that the IP address we receive belongs to the
-    // server associated with the SRV record.
-    //
-    // This code assumes that all entries in the mDNS packet relate to the
-    // same entity. This may not be correct if multiple servers are reported
-    // (if multi-admin decides to use unique ports for every ecosystem).
-    mNodeData.mAddress = addr;
-    mHasIP             = true;
-}
+    mParsingState = RecordParsingState::kRecordParsing;
+    mPacketRange  = packet;
+    mInterfaceId  = interface;
 
-void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
-{
-    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
+    if (!ParsePacket(packet, this))
     {
-        return;
-    }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
-    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
-    mDiscoveredNodeData.numIPs++;
-}
-
-bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
-{
-    while (qname.Next())
-    {
-        if (strcmp(qname.Value(), part) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data)
-{
-    if (!mValid)
-    {
-        return;
+        ChipLogError(Discovery, "DNSSD packet parsing failed (for non-srv records)");
     }
 
-    /// Data content is expected to contain:
-    /// - A SRV entry that includes the node ID in expected format (fabric + nodeid)
-    ///    - Can extract: fabricid, nodeid, port
-    ///    - References ServerName
-    /// - Additional records tied to ServerName contain A/AAAA records for IP address data
-    switch (data.GetType())
-    {
-    case QType::SRV: {
-        SrvRecord srv;
-        if (!srv.Parse(data.GetData(), mPacketRange))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
-            mHasNodePort = false;
-        }
-        else if (mDiscoveryType == DiscoveryType::kOperational)
-        {
-            // Ensure this is our record.
-            // TODO: Fix this comparison which is too loose.
-            if (HasQNamePart(data.GetName(), kOperationalServiceName))
-            {
-                OnOperationalSrvRecord(data.GetName(), srv);
-            }
-        }
-        else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-        {
-            // TODO: Fix this comparison which is too loose.
-            if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
-            {
-                OnCommissionableNodeSrvRecord(data.GetName(), srv);
-            }
-        }
-        break;
-    }
-    case QType::PTR: {
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
-        {
-            SerializedQNameIterator qname;
-            ParsePtrRecord(data.GetData(), mPacketRange, &qname);
-            if (qname.Next())
-            {
-                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
-            }
-        }
-        break;
-    }
-    case QType::TXT:
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-        {
-            TxtRecordDelegateImpl<DiscoveredNodeData> textRecordDelegate(mDiscoveredNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
-        }
-        else if (mDiscoveryType == DiscoveryType::kOperational)
-        {
-            TxtRecordDelegateImpl<ResolvedNodeData> textRecordDelegate(mNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
-        }
-        break;
-    case QType::A: {
-        Inet::IPAddress addr;
-        if (!ParseARecord(data.GetData(), &addr))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse A record");
-            mHasIP = false;
-        }
-        else
-        {
-            if (mDiscoveryType == DiscoveryType::kOperational)
-            {
-                OnOperationalIPAddress(addr);
-            }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-            {
-                OnDiscoveredNodeIPAddress(addr);
-            }
-        }
-        break;
-    }
-    case QType::AAAA: {
-        Inet::IPAddress addr;
-        if (!ParseAAAARecord(data.GetData(), &addr))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse AAAA record");
-            mHasIP = false;
-        }
-        else
-        {
-            if (mDiscoveryType == DiscoveryType::kOperational)
-            {
-                OnOperationalIPAddress(addr);
-            }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-            {
-                OnDiscoveredNodeIPAddress(addr);
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
-{
-    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
-        mDiscoveredNodeData.IsValid())
-    {
-        mDelegate->OnNodeDiscoveryComplete(mDiscoveredNodeData);
-    }
-    else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
-    {
-        activeAttempts.Complete(mNodeData.mPeerId);
-
-        mNodeData.LogNodeIdResolved();
-        mDelegate->OnNodeIdResolved(mNodeData);
-    }
+    mParsingState = RecordParsingState::kIdle;
 }
 
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock())
+    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock()), mPacketParser(mActiveResolves)
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
@@ -341,25 +262,40 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
 private:
-    ResolverDelegate * mDelegate = nullptr;
-    DiscoveryType mDiscoveryType = DiscoveryType::kUnknown;
-    System::Layer * mSystemLayer = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
+    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    System::Layer * mSystemLayer                          = nullptr;
     ActiveResolveAttempts mActiveResolves;
+    PacketParser mPacketParser;
 
-    CHIP_ERROR SendPendingResolveQueries();
-    CHIP_ERROR ScheduleResolveRetries();
+    void ScheduleIpAddressResolve(SerializedQNameIterator hostName);
 
-    static void ResolveRetryCallback(System::Layer *, void * self);
+    CHIP_ERROR SendAllPendingQueries();
+    CHIP_ERROR ScheduleRetries();
 
-    CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
+    /// Prepare a query for the given schedule attempt
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt & attempt);
+
+    /// Prepare a query for specific resolve types
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data, bool firstSend);
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Resolve & data, bool firstSend);
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::IpResolve & data, bool firstSend);
+
+    /// Clear any incremental resolver that is not waiting for a AAAA address.
+    void ExpireIncrementalResolvers();
+    void AdvancePendingResolverStates();
+
+    static void RetryCallback(System::Layer *, void * self);
+
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
     mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
@@ -373,43 +309,116 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
-    // should this be static?
-    // original version had:    static Dnssd::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
-    DnssdCacheType sDnssdCache;
 };
 
-void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 {
-    if (mDelegate == nullptr)
+    HeapQName target(hostName);
+    if (!target.IsOk())
     {
+        ChipLogError(Discovery, "Memory allocation error for IP address resolution");
         return;
     }
+    mActiveResolves.MarkPending(ActiveResolveAttempts::ScheduledAttempt::IpResolve(std::move(target)));
+}
 
-    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data, sDnssdCache);
+void MinMdnsResolver::AdvancePendingResolverStates()
+{
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
 
-    if (!ParsePacket(data, &reporter))
-    {
-        ChipLogError(Discovery, "Failed to parse received mDNS packet");
-    }
-    else
-    {
-        reporter.OnComplete(mActiveResolves);
-        ScheduleResolveRetries();
+        IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
+
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            continue;
+        }
+
+        if (missing.HasAny())
+        {
+            // Expect either IP missing (ask for it) or done. Anything else is not handled
+            ChipLogError(Discovery, "Unexpected state: cannot advance resolver with missing information");
+            resolver->ResetToInactive();
+            continue;
+        }
+
+        // SUCCESS. Call the delegates
+        if (resolver->IsActiveCommissionParse())
+        {
+            DiscoveredNodeData nodeData;
+
+            CHIP_ERROR err = resolver->Take(nodeData);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            mActiveResolves.Complete(nodeData);
+            if (mCommissioningDelegate != nullptr)
+            {
+                mCommissioningDelegate->OnNodeDiscovered(nodeData);
+            }
+            else
+            {
+                ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+            }
+        }
+        else if (resolver->IsActiveOperationalParse())
+        {
+            ResolvedNodeData nodeData;
+
+            CHIP_ERROR err = resolver->Take(nodeData);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            mActiveResolves.Complete(nodeData.operationalData.peerId);
+            if (mOperationalDelegate != nullptr)
+            {
+                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+            }
+            else
+            {
+                ChipLogError(Discovery, "No delegate to report operational node discovery");
+            }
+        }
+        else
+        {
+            ChipLogError(Discovery, "Unexpected state: record type unknown");
+            resolver->ResetToInactive();
+        }
     }
 }
 
-CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
+void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+{
+    // Fill up any relevant data
+    mPacketParser.ParseSrvRecords(data);
+    mPacketParser.ParseNonSrvRecords(info->Interface, data);
+
+    AdvancePendingResolverStates();
+
+    ScheduleRetries();
+}
+
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
-    /// the same inetLayer and port for mDNS.
+    /// the same udpEndPointManager and port for mDNS.
+    mSystemLayer = &udpEndPointManager->SystemLayer();
+
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
 
-    mSystemLayer = inetLayer->SystemLayer();
-
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
+    return GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort);
 }
 
 void MinMdnsResolver::Shutdown()
@@ -417,24 +426,185 @@ void MinMdnsResolver::Shutdown()
     GlobalMinimalMdnsServer::Instance().ShutdownServer();
 }
 
-CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type)
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data,
+                                       bool firstSend)
 {
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    mdns::Minimal::FullQName qname;
 
-    QueryBuilder builder(std::move(buffer));
-    builder.Header().SetMessageId(0);
+    switch (data.type)
+    {
+    case DiscoveryType::kOperational:
+        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+        break;
+    case DiscoveryType::kCommissionableNode:
+        if (data.filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else if (data.filter.type == DiscoveryFilterType::kInstanceName)
+        {
+            qname = CheckAndAllocateQName(data.filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else
+        {
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), data.filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
+                                          kLocalDomain);
+        }
+        break;
+    case DiscoveryType::kCommissionerNode:
+        if (data.filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else
+        {
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), data.filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
+                                          kLocalDomain);
+        }
+        break;
+    case DiscoveryType::kUnknown:
+        break;
+    }
+
+    ReturnErrorCodeIf(!qname.nameCount, CHIP_ERROR_NO_MEMORY);
 
     mdns::Minimal::Query query(qname);
-    query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    // TODO(cecille): Not sure why unicast response isn't working - fix.
-    query.SetAnswerViaUnicast(false);
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::ANY)            //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
 
+    mdns::Minimal::Logging::LogSendingQuery(query);
     builder.AddQuery(query);
 
-    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Resolve & data,
+                                       bool firstSend)
+{
+    char nameBuffer[kMaxOperationalServiceNameSize] = "";
+
+    // Node and fabricid are encoded in server names.
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), data.peerId));
+
+    const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+    Query query(instanceQName);
+
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::ANY)            //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
+
+    mdns::Minimal::Logging::LogSendingQuery(query);
+    builder.AddQuery(query);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::IpResolve & data,
+                                       bool firstSend)
+{
+
+    Query query(data.hostName.Content());
+
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::AAAA)           //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
+
+    mdns::Minimal::Logging::LogSendingQuery(query);
+    builder.AddQuery(query);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt & attempt)
+{
+    if (attempt.IsResolve())
+    {
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.ResolveData(), attempt.firstSend));
+    }
+    else if (attempt.IsBrowse())
+    {
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.BrowseData(), attempt.firstSend));
+    }
+    else if (attempt.IsIpResolve())
+    {
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.IpResolveData(), attempt.firstSend));
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
+{
+    while (true)
+    {
+        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
+
+        if (!resolve.HasValue())
+        {
+            break;
+        }
+
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        QueryBuilder builder(std::move(buffer));
+        builder.Header().SetMessageId(0);
+
+        ReturnErrorOnFailure(BuildQuery(builder, resolve.Value()));
+
+        if (resolve.Value().firstSend)
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        }
+        else
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        }
+    }
+
+    ExpireIncrementalResolvers();
+
+    return ScheduleRetries();
+}
+
+void MinMdnsResolver::ExpireIncrementalResolvers()
+{
+    // once all queries are sent, if any SRV cannot receive AAAA addresses, expire it
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
+
+        IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            if (mActiveResolves.IsWaitingForIpResolutionFor(resolver->GetTargetHostName()))
+            {
+                continue;
+            }
+        }
+
+        // mark as expired: not waiting for anything
+        resolver->ResetToInactive();
+    }
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -447,141 +617,38 @@ CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
-// TODO(cecille): Extend filter and use this for Resolve
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
-    mDiscoveryType = type;
+    mActiveResolves.MarkPending(filter, type);
 
-    mdns::Minimal::FullQName qname;
-
-    switch (type)
-    {
-    case DiscoveryType::kOperational:
-        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-        break;
-    case DiscoveryType::kCommissionableNode:
-        if (filter.type == DiscoveryFilterType::kNone)
-        {
-            qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else if (filter.type == DiscoveryFilterType::kInstanceName)
-        {
-            qname = CheckAndAllocateQName(filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else
-        {
-            char subtypeStr[kMaxSubtypeDescSize];
-            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
-            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
-                                          kLocalDomain);
-        }
-        break;
-    case DiscoveryType::kCommissionerNode:
-        if (filter.type == DiscoveryFilterType::kNone)
-        {
-            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
-        }
-        else
-        {
-            char subtypeStr[kMaxSubtypeDescSize];
-            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
-            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
-                                          kLocalDomain);
-        }
-        break;
-    case DiscoveryType::kUnknown:
-        break;
-    }
-    if (!qname.nameCount)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return SendQuery(qname, mdns::Minimal::QType::ANY);
+    return SendAllPendingQueries();
 }
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerId);
 
-    return SendPendingResolveQueries();
+    return SendAllPendingQueries();
 }
 
-CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
+CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
+    mSystemLayer->CancelTimer(&RetryCallback, this);
 
-    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delayMs.HasValue())
+    if (!delay.HasValue())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delayMs.Value(), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delay.Value(), &RetryCallback, this);
 }
 
-void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
+void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
 {
-    reinterpret_cast<MinMdnsResolver *>(self)->SendPendingResolveQueries();
-}
-
-CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
-{
-    while (true)
-    {
-        Optional<PeerId> peerId = mActiveResolves.NextScheduledPeer();
-
-        if (!peerId.HasValue())
-        {
-            break;
-        }
-
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        QueryBuilder builder(std::move(buffer));
-        builder.Header().SetMessageId(0);
-
-        {
-            char nameBuffer[kMaxOperationalServiceNameSize] = "";
-
-            // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));
-
-            const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-            Query query(instanceQName);
-
-            query
-                .SetClass(QClass::IN)       //
-                .SetType(QType::ANY)        //
-                .SetAnswerViaUnicast(false) //
-                ;
-
-            // NOTE: type above is NOT A or AAAA because the name searched for is
-            // a SRV record. The layout is:
-            //    SRV -> hostname
-            //    Hostname -> A
-            //    Hostname -> AAAA
-            //
-            // Query is sent for ANY and expectation is to receive A/AAAA records
-            // in the additional section of the reply.
-            //
-            // Sending a A/AAAA query will return no results
-            // Sending a SRV query will return the srv only and an additional query
-            // would be needed to resolve the host name to an IP address
-
-            builder.AddQuery(query);
-        }
-
-        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
-
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
-    }
-
-    return ScheduleResolveRetries();
+    reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
 }
 
 MinMdnsResolver gResolver;
@@ -591,6 +658,42 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
+}
+
+ResolverProxy::~ResolverProxy()
+{
+    // TODO: this is a hack: resolver proxies used for commissionable discovery
+    //       and they don't interact well with each other.
+    gResolver.SetCommissioningDelegate(nullptr);
+    Shutdown();
+}
+
+// Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
+// updating the delegate that ends up being used by the server by calling 'SetOperationalDelegate'.
+// This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
+// it won't work well if requests are issued in parallel.
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
+                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+    chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 
 } // namespace Dnssd

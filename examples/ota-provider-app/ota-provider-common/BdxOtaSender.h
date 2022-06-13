@@ -25,7 +25,8 @@ class BdxOtaSender : public chip::bdx::Responder
 public:
     BdxOtaSender();
 
-    void SetFilepath(const char * path);
+    // Initializes BDX transfer-related metadata. Should always be called first.
+    CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
 private:
     // Inherited from bdx::TransferFacilitator
@@ -33,8 +34,14 @@ private:
 
     void Reset();
 
-    static constexpr size_t kFilepathMaxLength = 256;
-    char mFilepath[kFilepathMaxLength];
+    // Null-terminated string representing file designator
+    char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
 
     uint32_t mNumBytesSent = 0;
+
+    bool mInitialized = false;
+
+    chip::Optional<chip::FabricIndex> mFabricIndex;
+
+    chip::Optional<chip::NodeId> mNodeId;
 };

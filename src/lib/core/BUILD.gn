@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ buildconfig_header("chip_buildconfig") {
 
   chip_config_memory_management_malloc =
       chip_config_memory_management == "malloc"
-  chip_config_memory_management_simple =
-      chip_config_memory_management == "simple"
   chip_config_memory_management_platform =
       chip_config_memory_management == "platform"
 
@@ -46,6 +44,9 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_ERROR_LOGGING=${chip_error_logging}",
     "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
     "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
+    "CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE=${chip_log_message_max_size}",
+    "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
+    "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
@@ -54,11 +55,14 @@ buildconfig_header("chip_buildconfig") {
     "HAVE_MALLOC=${chip_config_memory_management_malloc}",
     "HAVE_FREE=${chip_config_memory_management_malloc}",
     "HAVE_NEW=false",
-    "CHIP_CONFIG_MEMORY_MGMT_SIMPLE=${chip_config_memory_management_simple}",
     "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
     "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
+    "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
+    "CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED=${chip_enable_transport_pw_trace}",
+    "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
+    "CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES=${chip_config_minmdns_max_parallel_resolves}",
   ]
 }
 
@@ -66,7 +70,6 @@ source_set("chip_config_header") {
   sources = [
     "CHIPConfig.h",
     "CHIPEventLoggingConfig.h",
-    "CHIPTimeConfig.h",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
@@ -84,6 +87,10 @@ static_library("core") {
   output_name = "libChipCore"
 
   sources = [
+    # For now cluster enum/bitmap definitions are in zzz-generated.
+    # We should consider putting them directly in this directory
+    # instead.
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "CHIPCallback.h",
     "CHIPCircularTLVBuffer.cpp",
     "CHIPCircularTLVBuffer.h",
@@ -101,8 +108,13 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "ClusterEnums.h",
+    "DataModelTypes.h",
     "GroupId.h",
     "NodeId.h",
+    "OTAImageHeader.cpp",
+    "OTAImageHeader.h",
+    "PasscodeId.h",
     "PeerId.h",
   ]
 

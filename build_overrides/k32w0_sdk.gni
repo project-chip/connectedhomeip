@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for K32W SDK build files.
-  k32w0_sdk_build_root = "//third_party/k32w_sdk/nxp/k32w/k32w0"
+  k32w0_sdk_build_root = "//third_party/nxp/k32w0_sdk"
 }

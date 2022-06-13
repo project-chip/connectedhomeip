@@ -70,7 +70,7 @@ macro(flashing_script)
   add_custom_target(flashing_script
     ALL
     COMMAND ${python}
-            "${project_path}/../../../scripts/flashing/gen_flashing_script.py" ${board_type}
+            "${project_path}/third_party/connectedhomeip/scripts/flashing/gen_flashing_script.py" ${board_type}
             --output "${build_dir}/${flashing_script}"
             --port "$ENV{ESPPORT}"
             --baud 460800
@@ -84,6 +84,7 @@ macro(flashing_script)
             --use-sdkconfig ${project_path}/sdkconfig
     WORKING_DIRECTORY ${build_dir}
     DEPENDS "${build_dir}/${board_firmware_utils}"
+            "${build_dir}/${partition_table}"
             "${build_dir}/firmware_utils.py"
             "${build_dir_deps}"
     COMMENT "To flash ${build_dir}/${CMAKE_PROJECT_NAME}.bin run ./build/${CMAKE_PROJECT_NAME}.flash.py"

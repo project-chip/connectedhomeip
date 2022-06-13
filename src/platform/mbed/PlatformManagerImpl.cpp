@@ -2,11 +2,12 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
-#include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
+#include <platform/mbed/DiagnosticDataProviderImpl.h>
+#include <platform/mbed/SystemTimeSupport.h>
 #include <rtos/ThisThread.h>
 
 #include "MbedEventTimeout.h"
@@ -91,8 +92,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+    auto err = System::Clock::InitClock_RealTime();
+    SuccessOrExit(err);
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
     mInitialized = true;
 
@@ -257,7 +264,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     return TranslateOsStatus(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
+CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 {
     // Let LayerSocketsLoop::PrepareSelect() handle timers.
     return CHIP_NO_ERROR;

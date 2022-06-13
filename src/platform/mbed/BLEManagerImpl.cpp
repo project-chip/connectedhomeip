@@ -33,6 +33,7 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 // Show BLE status with LEDs
@@ -202,7 +203,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
 
         BLEManagerImpl & ble_manager = BLEMgrImpl();
-        ble_manager.mFlags.Set(ble_manager.kFlag_Advertising);
+        ble_manager.mFlags.Clear(ble_manager.kFlag_Advertising);
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         ChipDeviceEvent chip_event;
@@ -244,7 +245,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         {
             ChipLogError(DeviceLayer, "BLE connection failed, mbed-os error: %d", mbed_err);
         }
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // The connection established event is propagated when the client has subscribed to
@@ -308,7 +309,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // Force a reconfiguration of advertising in case we switched to non-connectable mode when
@@ -420,10 +421,11 @@ struct CHIPService : public ble::GattServer::EventHandler
     {
         ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
 
-        // FIXME: ACK hack
-#if (defined(MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK) && (MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK != 0))
+        // Note: This is applicable to both notification and indication: If a
+        // notification is sent then onDataSent is called as soon as the data
+        // has been pushed into the Bluetooth controller. For indication, onDataSent
+        // is called when the confirmation has been received.
         onConfirmationReceived(params);
-#endif
     }
 
     void onDataWritten(const GattWriteCallbackParams & params) override
@@ -770,7 +772,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     if (!mFlags.Has(kFlag_UseCustomDeviceName))
     {
         uint16_t discriminator;
-        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         snprintf(mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
     }
@@ -1029,7 +1031,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ChipLogDetail(DeviceLayer,
                   "Sending indication for CHIPoBLE characteristic "
-                  "(connHandle=%d, attHandle=%d, data_len=%" PRIu16 ")",
+                  "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
     mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);

@@ -1,0 +1,74 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+#include "CHIPCallbackTypes.h"
+
+#include <controller/java/AndroidCallbacks.h>
+#include <jni.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/JniReferences.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+
+{{#chip_server_global_responses}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+class CHIP{{chipCallback.name}}AttributeCallback : public chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> {
+public:
+    CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIP{{chipCallback.name}}AttributeCallback();
+
+    static void maybeDestroy(CHIP{{chipCallback.name}}AttributeCallback * callback) {
+        if (!callback->keepAlive) {
+            callback->Cancel();
+            chip::Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, {{chipCallback.type}} value);
+    static void OnSubscriptionEstablished(void * context) {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{chipCallback.name}}AttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+{{/unless}}
+{{/chip_server_global_responses}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+{{#if_basic_global_response}}
+{{else}}
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>
+{
+public:
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback();
+
+    static void maybeDestroy(CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback * callback) {
+        if (!callback->keepAlive) {
+            callback->Cancel();
+            chip::Platform::Delete<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} {{#if isArray}}list{{else}}value{{/if}});
+    static void OnSubscriptionEstablished(void * context) {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+{{/if_basic_global_response}}
+
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{/if}}

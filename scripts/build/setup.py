@@ -24,5 +24,9 @@ setuptools.setup(
     description='Generate build commands for the CHIP SDK Examples',
     packages=setuptools.find_packages(),
     package_data={'build_examples': ['py.typed']},
+    install_requires=[
+        'click >= 6.7.0',
+        'coloredlogs >= 7.3.0'
+    ],
     zip_safe=False,
 )

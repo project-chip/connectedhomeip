@@ -1,0 +1,492 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    13.4.2. [TC-SC-4.2] Commissionable Node Discovery - Commissioner Case [DUT -
+    Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Secure Channel"
+    endpoint: 0
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
+    vendorId:
+        type: INT16U
+        defaultValue: 65521
+    productId:
+        type: INT16U
+        defaultValue: 32769
+    deviceType:
+        type: INT16U
+        defaultValue: 5
+
+tests:
+    - label: "Stop target device"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "TH is put in Commissioning Mode using Open Basic Commissioning Window
+          command and starts advertising Commissionable Node Discovery service
+          using DNS-SD"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check Instance Name"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                saveAs: deviceInstanceNameBeforeReboot1
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    #validate the service type and the service domain not implemented in CI
+
+    - label: "Check Hostname"
+      PICS: "(WIFI || ETH) && !THREAD"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 12
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Check Hostname"
+      PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    #subtype
+    - label: "Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Check Vendor ID (_V)"
+      PICS: VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label: "Check Device Type ID (_T)"
+      PICS: PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    - label: "Check Commissioning Mode (_CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: VP_KEY
+      optional: true
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
+      PICS: CRI_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
+      PICS: CRA_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label: "TXT key for commissioning mode (CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label: "Optional TXT key for device type (DT)"
+      PICS: PICS_SKIP_SAMPLE_APP && DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+                constraints:
+                    maxValue: 999
+
+    - label: "Optional TXT key for device name (DN)"
+      PICS: DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label: "Optional TXT key for rotating device identifier (RI)"
+      PICS: RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label: "Optional TXT key for pairing hint (PH)"
+      PICS: PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label: "Optional TXT key for pairing instructions (PI)"
+      PICS: PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label: "Check IPs"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    - label: "Stop target device"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check Instance Name"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+                    notValue: deviceInstanceNameBeforeReboot1
+
+    #validate the service type and the service domain not implemented in CI
+
+    - label: "Check Hostname"
+      PICS: "(WIFI || ETH) && !THREAD"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 12
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Check Hostname"
+      PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Check Vendor ID (_V)"
+      PICS: VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label: "Check Device Type ID (_T)"
+      PICS: PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    - label: "Check Commissioning Mode (_CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: VP_KEY
+      optional: true
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
+      PICS: CRI_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
+      PICS: CRA_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label: "TXT key for commissioning mode (CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label: "Optional TXT key for device type (DT)"
+      PICS: PICS_SKIP_SAMPLE_APP && DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+                constraints:
+                    maxValue: 999
+
+    - label: "Optional TXT key for device name (DN)"
+      PICS: DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label: "Optional TXT key for rotating device identifier (RI)"
+      PICS: RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label: "Optional TXT key for pairing hint (PH)"
+      PICS: PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label: "Optional TXT key for pairing instructions (PI)"
+      PICS: PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label: "Check IPs"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    #Negative scenarios not implemented in CI
+    - label: "Log commands"
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "TH adds an unknown key/value pair in the advertised data"
+
+    #Negative scenarios not implemented in CI
+    - label: "Log commands"
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value: "Scan for DNS-SD commissioner advertisements from TH"

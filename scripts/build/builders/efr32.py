@@ -21,13 +21,17 @@ from .gn import GnBuilder
 class Efr32App(Enum):
     LIGHT = auto()
     LOCK = auto()
+    SWITCH = auto()
     WINDOW_COVERING = auto()
+    UNIT_TEST = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
             return 'lighting-app'
         elif self == Efr32App.LOCK:
             return 'lock-app'
+        elif self == Efr32App.SWITCH:
+            return 'light-switch-app'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window-app'
         else:
@@ -38,8 +42,12 @@ class Efr32App(Enum):
             return 'chip-efr32-lighting-example'
         elif self == Efr32App.LOCK:
             return 'chip-efr32-lock-example'
+        elif self == Efr32App.SWITCH:
+            return 'chip-efr32-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
+        elif self == Efr32App.UNIT_TEST:
+            return 'chip-efr32-device_tests'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -48,18 +56,51 @@ class Efr32App(Enum):
             return 'lighting_app.flashbundle.txt'
         elif self == Efr32App.LOCK:
             return 'lock_app.flashbundle.txt'
+        elif self == Efr32App.SWITCH:
+            return 'light_switch_app.flashbundle.txt'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
+        elif self == Efr32App.UNIT_TEST:
+            return 'efr32_device_tests.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
+
+    def BuildRoot(self, root):
+        if self == Efr32App.UNIT_TEST:
+            return os.path.join(root, 'src', 'test_driver', 'efr32')
+        else:
+            return os.path.join(root, 'examples', self.ExampleName(), 'efr32')
 
 
 class Efr32Board(Enum):
     BRD4161A = 1
+    BRD4163A = 2
+    BRD4164A = 3
+    BRD4166A = 4
+    BRD4170A = 5
+    BRD4186A = 6
+    BRD4187A = 7
+    BRD4304A = 8
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
             return 'BRD4161A'
+        elif self == Efr32Board.BRD4163A:
+            return 'BRD4163A'
+        elif self == Efr32Board.BRD4164A:
+            return 'BRD4164A'
+        elif self == Efr32Board.BRD4166A:
+            return 'BRD4166A'
+        elif self == Efr32Board.BRD4170A:
+            return 'BRD4170A'
+        elif self == Efr32Board.BRD4186A:
+            return 'BRD4186A'
+        elif self == Efr32Board.BRD4187A:
+            return 'BRD4187A'
+        elif self == Efr32Board.BRD4304A:
+            return 'BRD4304A'
+        else:
+            raise Exception('Unknown board #: %r' % self)
 
 
 class Efr32Builder(GnBuilder):
@@ -69,29 +110,36 @@ class Efr32Builder(GnBuilder):
                  runner,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4161A,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 enable_ota_requestor: bool = False,
+                 ):
         super(Efr32Builder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'efr32'),
+            root=app.BuildRoot(root),
             runner=runner)
         self.app = app
-        self.board = board
-        self.enable_rpcs = enable_rpcs
+        self.extra_gn_options = ['efr32_board="%s"' % board.GnArgName()]
+
+        if enable_rpcs:
+            self.extra_gn_options.append('import("//with_pw_rpc.gni")')
+
+        if enable_ota_requestor:
+            self.extra_gn_options.append('chip_enable_ota_requestor=true')
 
     def GnBuildArgs(self):
-        args = ['efr32_board="%s"' % self.board.GnArgName()]
-        if self.enable_rpcs:
-            args.append('import("//with_pw_rpc.gni")')
-        return args
+        return self.extra_gn_options
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
-        }
+        items = {}
+        for extension in ["out", "out.map", "hex"]:
+            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
+            items[name] = os.path.join(self.output_dir, name)
+
+        if self.app == Efr32App.UNIT_TEST:
+            # Include test runner python wheels
+            for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
+                for file in files:
+                    items["chip_nl_test_runner_wheels/" +
+                          file] = os.path.join(root, file)
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:

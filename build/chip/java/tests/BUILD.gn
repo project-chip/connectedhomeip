@@ -54,10 +54,10 @@ java_library("grandchild_library") {
 }
 
 java_prebuilt("java_prebuilt") {
-  jar_path = "/tmp/chip_java_build_test/prebuilt_jar.jar"
+  jar_path = "prebuilt_jar.jar"
   deps = [ ":child_prebuilt" ]
 }
 
 java_prebuilt("child_prebuilt") {
-  jar_path = "/tmp/chip_java_build_test/child_jar.jar"
+  jar_path = "child_jar.jar"
 }

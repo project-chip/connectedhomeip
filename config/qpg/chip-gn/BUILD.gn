@@ -26,8 +26,6 @@ declare_args() {
 
 examples_plat_dir = "//examples/platform/qpg"
 qpg_sdk("sdk") {
-  sources = [ "//examples/platform/qpg/app/include/Service.h" ]
-
   include_dirs = [
     "//src/platform/qpg",
     "${examples_plat_dir}/project_include",
@@ -37,6 +35,7 @@ qpg_sdk("sdk") {
 static_library("qpg") {
   deps = [
     "//src/app/server",
+    "//src/controller",
     "//src/lib",
   ]
 

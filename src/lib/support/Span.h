@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <cstdlib>
 #include <string.h>
@@ -37,13 +38,16 @@ template <class T>
 class Span
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
     template <size_t N>
     constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
+    {}
+
+    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <size_t N>
@@ -68,12 +72,9 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return mDataLen; }
     constexpr bool empty() const { return size() == 0; }
-    constexpr const_pointer begin() const { return data(); }
-    constexpr const_pointer end() const { return data() + size(); }
-    constexpr pointer begin() { return data(); }
-    constexpr pointer end() { return data() + size(); }
+    constexpr pointer begin() const { return data(); }
+    constexpr pointer end() const { return data() + size(); }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
     {
@@ -89,6 +90,12 @@ public:
         return Span(mDataBuf + offset, length);
     }
 
+    Span SubSpan(size_t offset) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        return Span(mDataBuf + offset, mDataLen - offset);
+    }
+
     // Allow reducing the size of a span.
     void reduce_size(size_t new_size)
     {
@@ -96,10 +103,11 @@ public:
         mDataLen = new_size;
     }
 
-    // Allow creating ByteSpans from ZCL octet strings, so we don't have to
-    // reinvent it various places.
+    // Allow creating ByteSpans and CharSpans from ZCL octet strings, so we
+    // don't have to reinvent it various places.
     template <class U,
-              typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<uint8_t, std::remove_const_t<U>>::value>>
+              typename = std::enable_if_t<std::is_same<uint8_t, std::remove_const_t<U>>::value &&
+                                          (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
     static Span fromZclString(U * bytes)
     {
         size_t length = bytes[0];
@@ -108,8 +116,22 @@ public:
         {
             length = 0;
         }
-        return Span(&bytes[1], length);
+        // Need reinterpret_cast if we're a CharSpan.
+        return Span(reinterpret_cast<T *>(&bytes[1]), length);
     }
+
+    // Allow creating CharSpans from a character string.
+    template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
+    static Span fromCharString(U * chars)
+    {
+        return Span(chars, strlen(chars));
+    }
+
+    // operator== explicitly not implemented on Span, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
 
 private:
     pointer mDataBuf;
@@ -120,8 +142,7 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    using pointer       = T *;
-    using const_pointer = const T *;
+    using pointer = T *;
 
     constexpr FixedSpan() : mDataBuf(nullptr) {}
 
@@ -149,6 +170,10 @@ public:
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
 
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
+    {}
+
     // Allow implicit construction from a FixedSpan of sufficient size over a
     // type that matches our type, up to const-ness.
     template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -160,11 +185,8 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return N; }
     constexpr bool empty() const { return data() == nullptr; }
-
-    constexpr pointer begin() { return mDataBuf; }
-    constexpr pointer end() { return mDataBuf + N; }
-    constexpr const_pointer begin() const { return mDataBuf; }
-    constexpr const_pointer end() const { return mDataBuf + N; }
+    constexpr pointer begin() const { return mDataBuf; }
+    constexpr pointer end() const { return mDataBuf + N; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -179,6 +201,14 @@ public:
     {
         return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
     }
+
+    // operator== explicitly not implemented on FixedSpan, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
+    template <typename U, size_t M>
+    bool operator==(const FixedSpan<U, M> & other) const = delete;
 
 private:
     pointer mDataBuf;
@@ -233,6 +263,17 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 
     memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
     out_buf.reduce_size(span_to_copy.size());
+
+    return CHIP_NO_ERROR;
+}
+
+inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
+{
+    VerifyOrReturnError(IsSpanUsable(cspan_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
 }

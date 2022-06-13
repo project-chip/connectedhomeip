@@ -19,6 +19,8 @@ import("//build_overrides/ti_simplelink_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
 
+import("${chip_root}/src/platform/device.gni")
+
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
@@ -28,20 +30,13 @@ project_dir = "${chip_root}/examples/lock-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
+  public_configs = [ ":lock_app_config" ]
 }
 
 ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
-    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",
@@ -90,8 +85,13 @@ ti_simplelink_executable("lock_app") {
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${openthread_root}:libopenthread-ftd",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+  } else {
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+  }
 
   include_dirs = [
     "${project_dir}",
@@ -102,17 +102,6 @@ ti_simplelink_executable("lock_app") {
     "-Wno-implicit-fallthrough",
     "-Wno-sign-compare",
     "-Wconversion",
-  ]
-
-  ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-L${ti_simplelink_sdk_root}/source",
-    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-                root_build_dir),
-    "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
   output_dir = root_out_dir

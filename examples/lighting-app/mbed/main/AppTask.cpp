@@ -19,22 +19,18 @@
 #include "AppTask.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include <app/server/OnboardingCodesUtil.h>
 
-#ifdef CAPSENSE_ENABLED
-#include "capsense.h"
-#endif
-
-// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
-// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
-// by Mbed-OS in mbed_power_mgmt.h.
-#define sleep unistd_sleep
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <platform/CHIPDeviceLayer.h>
-#undef sleep
-
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+
+// mbed-os headers
+#include "drivers/Timeout.h"
+#include "events/EventQueue.h"
 
 // ZAP -- ZCL Advanced Platform
 #include <app-common/zap-generated/attribute-id.h>
@@ -42,14 +38,12 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
-// mbed-os headers
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#else
 #include "drivers/InterruptIn.h"
-#include "drivers/Timeout.h"
-#include "events/EventQueue.h"
 #include "platform/Callback.h"
+#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_TRIGGER_TIMEOUT)
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_CANCEL_WINDOW_TIMEOUT)
@@ -60,13 +54,15 @@
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
-static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
-static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 #ifdef CAPSENSE_ENABLED
 static mbed::CapsenseButton CapFunctionButton(Capsense::getInstance(), 0);
 static mbed::CapsenseButton CapLockButton(Capsense::getInstance(), 1);
 static mbed::CapsenseSlider CapSlider(Capsense::getInstance());
+#else
+static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
+static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 #endif
+
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
@@ -75,9 +71,9 @@ static bool sHaveBLEConnections       = false;
 
 static mbed::Timeout sFunctionTimer;
 
-// TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -85,6 +81,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
+    CHIP_ERROR error;
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -117,23 +114,29 @@ int AppTask::Init()
     LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Start BLE advertising if needed
-    if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
-    {
-        ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    }
-
-    chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    error = Server::GetInstance().Init(initParams);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    error = GetDFUManager().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }
@@ -381,7 +384,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
         ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
@@ -399,7 +402,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         // Actually trigger Factory Reset
         ChipLogProgress(NotSpecified, "Factory Reset initiated");
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -419,17 +422,29 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
         // If the button was released before factory reset got initiated, trigger a software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-            ChipLogError(NotSpecified, "Software Update not supported.");
+
+            chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ChipLogProgress(NotSpecified, "BLE advertising is already enabled");
+                return;
+            }
+
+            if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(NotSpecified, "OpenBasicCommissioningWindow() failed");
+            }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

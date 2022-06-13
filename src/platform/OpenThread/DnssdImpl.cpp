@@ -32,7 +32,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
-    char hostname[kDnssdHostNameMaxSize + 1] = "";
+    char hostname[kHostNameMaxLength + 1] = "";
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
     MakeHostName(hostname, sizeof(hostname), mac);
 
@@ -49,7 +49,7 @@ const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);

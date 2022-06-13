@@ -44,6 +44,16 @@ namespace Shell {
 
 Engine Engine::theEngineRoot;
 
+int Engine::Init()
+{
+    // Initialize the default streamer that was linked.
+    int error = streamer_init(streamer_get());
+
+    Engine::Root().RegisterDefaultCommands();
+
+    return error;
+}
+
 void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
 {
     for (unsigned i = 0; i < _commandSetCount; i++)
@@ -111,8 +121,9 @@ void Engine::RegisterDefaultCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
     RegisterNFCCommands();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     RegisterDnsCommands();
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    RegisterOtaCommands();
 #endif
 }
 

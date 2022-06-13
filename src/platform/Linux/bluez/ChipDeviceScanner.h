@@ -63,7 +63,7 @@ public:
     ~ChipDeviceScanner();
 
     /// Initiate a scan for devices, with the given timeout
-    CHIP_ERROR StartScan(unsigned timeoutMs);
+    CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();

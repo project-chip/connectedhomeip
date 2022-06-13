@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ChipIdLookup
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.DeviceIdUtil

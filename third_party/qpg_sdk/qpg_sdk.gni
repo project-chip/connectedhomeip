@@ -22,8 +22,16 @@ declare_args() {
   # Location of the QPG SDK.
   qpg_sdk_root = "${chip_root}/third_party/qpg_sdk/repo"
 
+  # subdirectory in qpg_sdk_root where the binary library builds (.a) are to be found
+  # for connectedhomeip-qpg: Binaries (default)
+  # for matter endnodes sdk: Work
+  qpg_sdk_lib_dir = "Binaries"
+
   # Target IC for QPG SDK
-  qpg_target_ic = "qpg6100"
+  qpg_target_ic = "qpg6105"
+
+  # an option to disable referencing qorvo object archive files (*.a)
+  qpg_sdk_include_platform_libs = true
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -57,21 +65,30 @@ template("qpg_sdk") {
     }
 
     include_dirs += [
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/qvCHIP/inc",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls",
+      "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch",
       "${mbedtls_root}/repo/include",
       "${openthread_root}/include",
     ]
 
     lib_dirs = []
 
-    libs += [
-      "${qpg_sdk_root}/${qpg_target_ic}/lib/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a",
-      "${qpg_sdk_root}/${qpg_target_ic}/lib/libQorvoStack_${qpg_target_ic}.a",
-      "${qpg_sdk_root}/${qpg_target_ic}/lib/libmbedtls_alt_${qpg_target_ic}.a",
+    if (qpg_sdk_include_platform_libs) {
+      libs += [
+        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/MatterQorvoGlue_${qpg_target_ic}_libbuild/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a",
+        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/QorvoStack_${qpg_target_ic}/libQorvoStack_${qpg_target_ic}.a",
+        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a",
+        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}/libBootloader_${qpg_target_ic}.a",
+      ]
+    }
+
+    ldflags = [
+      "-Wl,-u_binary_bl_userlicense_bin_start",
+      "-Wl,-u_binary_bootloader_bin_start",
     ]
 
     #MBed TLS built from third_party/mbedtls tree - OT config not used
@@ -82,7 +99,10 @@ template("qpg_sdk") {
     cflags = []
 
     # Allow warning due to mbedtls
-    cflags += [ "-Wno-maybe-uninitialized" ]
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+    ]
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -109,6 +129,7 @@ template("qpg_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
       "${chip_root}/third_party/mbedtls/repo/library/cmac.c",
+      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
       "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
       "${chip_root}/third_party/mbedtls/repo/library/debug.c",
       "${chip_root}/third_party/mbedtls/repo/library/des.c",
@@ -178,30 +199,19 @@ template("qpg_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/x509write_crt.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
       "${chip_root}/third_party/mbedtls/repo/library/xtea.c",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/FreeRTOS.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/deprecated_definitions.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/list.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/mpu_wrappers.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/portable.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/projdefs.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/queue.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/semphr.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/stack_macros.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/task.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/timers.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/FreeRTOSConfig.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/hooks.c",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/${qpg_target_ic}-mbedtls-config.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/aes_alt.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/ccm_alt.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/ecjpake_alt.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/ecp_alt.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/sha256_alt.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/trng.c",  #add this for
+      "${qpg_sdk_root}/Applications/Matter/shared/config/inc/FreeRTOSConfig.h",
+      "${qpg_sdk_root}/Applications/Matter/shared/config/src/hooks.c",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/aes_alt.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ccm_alt.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecjpake_alt.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecp_alt.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha256_alt.h",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c",
 
       # mbedtls_hardware_poll
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/qvCHIP/inc/qvCHIP.h",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc/qvIO.h",
+      "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc/qvCHIP.h",
     ]
 
     if (defined(invoker.sources)) {
@@ -209,5 +219,6 @@ template("qpg_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
+    public_deps = [ "${chip_root}/third_party/qpg_sdk:freertos" ]
   }
 }

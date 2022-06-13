@@ -2,12 +2,17 @@
 {{pad (concat "| Cluster " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
 {{pad "|" 79 '-'}}|
 {{pad "| Commands: " 70 ' '}}{{pad "| " 9 ' '}}|
-{{#chip_cluster_commands}}
+{{#zcl_commands_source_client}}
 {{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "|   " (asHex code 2)) 9 ' '}}|
-{{/chip_cluster_commands}}
+{{/zcl_commands_source_client}}
 {{pad "|" 79 '-'}}|
 {{pad "| Attributes: " 70 ' '}}{{pad "| " 9 ' '}}|
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
+{{pad "|" 79 '-'}}|
+{{pad "| Events: " 70 ' '}}{{pad "| " 9 ' '}}|
+{{#zcl_events}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/zcl_events}}
 {{pad '\*' 78 '-'}}*/

@@ -94,12 +94,13 @@ endif
 COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
                                $(REL_CHIP_ROOT)/third_party/nlassert/repo/include \
                                $(REL_OUTPUT_DIR)/gen/third_party/connectedhomeip/src/app/include \
-                               $(REL_OUTPUT_DIR)/gen/include
+                               $(REL_OUTPUT_DIR)/gen/include \
+                               $(REL_CHIP_ROOT)/zzz_generated/app-common
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
-COMPONENT_OWNBUILDTARGET 	 = 1
-COMPONENT_OWNCLEANTARGET 	 = 1
+COMPONENT_OWNBUILDTARGET 	 := chip_build
+COMPONENT_OWNCLEANTARGET 	 := chip_clean
 
 is_debug ?= true
 
@@ -135,10 +136,12 @@ ifeq ($(is_debug),false)
 endif
 	if [[ "$(CONFIG_ENABLE_PW_RPC)" = "y" ]]; then                        \
 	  echo "chip_build_pw_rpc_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
+	  echo "chip_build_pw_trace_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
 	  echo "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]" >> $(OUTPUT_DIR)/args.gn		;\
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"" >> $(OUTPUT_DIR)/args.gn      ;\
+	  echo "pw_trace_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"" >>$(OUTPUT_DIR)/args.gn         ;\
 	fi
 	if [[ "$(CONFIG_ENABLE_CHIP_SHELL)" = "y" ]]; then \
@@ -155,10 +158,10 @@ endif
 	cd $(COMPONENT_PATH); ninja $(subst 1,-v,$(filter 1,$(V))) -C $(OUTPUT_DIR) esp32
 
 
-build : install-chip
+chip_build : install-chip
 	echo "CHIP built and installed..."
 	cp -a ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
 
-clean:
+chip_clean:
 	echo "RM $(OUTPUT_DIR)"
 	rm -rf $(OUTPUT_DIR)

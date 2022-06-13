@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -26,9 +26,12 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/FailSafeContext.h>
 #include <platform/PersistedStorage.h>
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 namespace chip {
 namespace Ble {
@@ -58,70 +61,98 @@ public:
 
     enum
     {
-        kMaxSerialNumberLength     = 32,
-        kMaxFirmwareRevisionLength = 32,
+        kMaxVendorNameLength            = 32,
+        kMaxProductNameLength           = 32,
+        kMaxLocationLength              = 2,
+        kMaxHardwareVersionStringLength = 64,
+        kMaxSoftwareVersionStringLength = 64,
+        kMaxManufacturingDateLength     = 16,
+        kMaxPartNumberLength            = 32,
+        kMaxProductURLLength            = 256,
+        kMaxProductLabelLength          = 64,
+        kMaxSerialNumberLength          = 32,
+        kMaxUniqueIDLength              = 32,
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+        kMinRotatingDeviceIDUniqueIDLength = 16,
+        kRotatingDeviceIDUniqueIDLength    = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH,
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kPrimaryMACAddressLength = 8,
 #else
         kPrimaryMACAddressLength = 6,
 #endif
-        kMaxMACAddressLength = 8,
+        kMaxMACAddressLength  = 8,
+        kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize);
-    CHIP_ERROR GetVendorId(uint16_t & vendorId);
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize);
-    CHIP_ERROR GetProductId(uint16_t & productId);
-    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize);
-    CHIP_ERROR GetProductRevision(uint16_t & productRev);
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf);
-    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
-    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize);
-    CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev);
-    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
-    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
-    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
+    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                           = 0;
+    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                    = 0;
+    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                          = 0;
+    virtual CHIP_ERROR GetProductId(uint16_t & productId)                                  = 0;
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                           = 0;
+    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                             = 0;
+    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                           = 0;
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                          = 0;
+    virtual CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) = 0;
+    virtual CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)             = 0;
+    virtual CHIP_ERROR IncrementLifetimeCounter()                                 = 0;
+    virtual CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) = 0;
 #endif
-    CHIP_ERROR GetRegulatoryLocation(uint32_t & location);
-    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen);
-    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb);
-    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);
-    CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf);
-    CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
-    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
-    CHIP_ERROR StoreProductRevision(uint16_t productRev);
-    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
-    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
-    CHIP_ERROR StoreRegulatoryLocation(uint32_t location);
-    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen);
-    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb);
+    virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
+    virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
+    virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
+    virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
+    virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
+    virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
+    virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
+    virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
+    virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
+    virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
+    virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
+    virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
+    virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
+    virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
+    virtual CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)                       = 0;
+    virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
+    virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
+    virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
+    virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
+    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
+    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
-    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
+    virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
-#if !defined(NDEBUG)
-    CHIP_ERROR RunUnitTests();
+    virtual CHIP_ERROR RunUnitTests() = 0;
+
+    virtual bool IsFullyProvisioned()   = 0;
+    virtual void InitiateFactoryReset() = 0;
+
+    // Gets called when starting BLE/DNS-SD advertisement
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    virtual void NotifyOfAdvertisementStart() {}
+#else
+    void NotifyOfAdvertisementStart() {}
 #endif
 
-    bool IsFullyProvisioned();
-    void InitiateFactoryReset();
+    virtual void LogDeviceConfig() = 0;
 
-    void LogDeviceConfig();
+    virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                     = 0;
+    virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
+    virtual CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize)    = 0;
+    virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
+    virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)   = 0;
+    virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;
+    virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) = 0;
 
-    bool IsCommissionableDeviceTypeEnabled();
-    CHIP_ERROR GetDeviceType(uint16_t & deviceType);
-    bool IsCommissionableDeviceNameEnabled();
-    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
-    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint);
-    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize);
-    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint);
-    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize);
+    virtual CHIP_ERROR GetLocationCapability(uint8_t & location);
 
-private:
+protected:
     // ===== Members for internal use by the following friends.
 
     friend class ::chip::DeviceLayer::PlatformManagerImpl;
@@ -133,19 +164,14 @@ private:
     friend CHIP_ERROR(::chip::Platform::PersistedStorage::Read)(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR(::chip::Platform::PersistedStorage::Write)(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
-    using ImplClass = ::chip::DeviceLayer::ConfigurationManagerImpl;
+    virtual CHIP_ERROR Init()                                                                                   = 0;
+    virtual bool CanFactoryReset()                                                                              = 0;
+    virtual CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) = 0;
+    virtual CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)  = 0;
 
-    CHIP_ERROR Init();
-    bool CanFactoryReset();
-    CHIP_ERROR GetFailSafeArmed(bool & val);
-    CHIP_ERROR SetFailSafeArmed(bool val);
-    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
-    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
-
-protected:
     // Construction/destruction limited to subclasses.
-    ConfigurationManager()  = default;
-    ~ConfigurationManager() = default;
+    ConfigurationManager()          = default;
+    virtual ~ConfigurationManager() = default;
 
     // No copy, move or assignment.
     ConfigurationManager(const ConfigurationManager &)  = delete;
@@ -154,20 +180,25 @@ protected:
 };
 
 /**
- * Returns a reference to the public interface of the ConfigurationManager singleton object.
+ * Returns a reference to a ConfigurationManager object.
  *
- * chip application should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
+ * Applications should use this to access the features of the ConfigurationManager.
  */
 extern ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
+ * Sets a reference to a ConfigurationManager object.
  *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the selected platform.
+ * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
+ * no changes will be made.
  */
-extern ConfigurationManagerImpl & ConfigurationMgrImpl();
+extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
+
+inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
+{
+    location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    return CHIP_NO_ERROR;
+}
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -181,298 +212,3 @@ extern ConfigurationManagerImpl & ConfigurationMgrImpl();
 #define CONFIGURATIONMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConfigurationManagerImpl.h>
 #include CONFIGURATIONMANAGERIMPL_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
-
-namespace chip {
-namespace DeviceLayer {
-
-/**
- * Name of the vendor that produced the device.
- */
-inline CHIP_ERROR ConfigurationManager::GetVendorName(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetVendorName(buf, bufSize);
-}
-
-/**
- * Id of the vendor that produced the device.
- */
-inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
-{
-    return static_cast<ImplClass *>(this)->_GetVendorId(vendorId);
-}
-
-/**
- * Name of the product assigned by the vendor.
- */
-inline CHIP_ERROR ConfigurationManager::GetProductName(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetProductName(buf, bufSize);
-}
-
-/**
- * Device product id assigned by the vendor.
- */
-inline CHIP_ERROR ConfigurationManager::GetProductId(uint16_t & productId)
-{
-    return static_cast<ImplClass *>(this)->_GetProductId(productId);
-}
-
-/**
- * Product revision string assigned by the vendor.
- */
-inline CHIP_ERROR ConfigurationManager::GetProductRevisionString(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetProductRevisionString(buf, bufSize);
-}
-
-/**
- * Product revision number assigned by the vendor.
- */
-inline CHIP_ERROR ConfigurationManager::GetProductRevision(uint16_t & productRev)
-{
-    return static_cast<ImplClass *>(this)->_GetProductRevision(productRev);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
-{
-    return static_cast<ImplClass *>(this)->_GetSerialNumber(buf, bufSize, serialNumLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetPrimaryMACAddress(MutableByteSpan buf)
-{
-    return static_cast<ImplClass *>(this)->_GetPrimaryMACAddress(buf);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetPrimaryWiFiMACAddress(uint8_t * buf)
-{
-    return static_cast<ImplClass *>(this)->_GetPrimaryWiFiMACAddress(buf);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetPrimary802154MACAddress(uint8_t * buf)
-{
-    return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
-{
-    return static_cast<ImplClass *>(this)->_GetManufacturingDate(year, month, dayOfMonth);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetFirmwareRevisionString(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetFirmwareRevisionString(buf, bufSize);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(uint32_t & firmwareRev)
-{
-    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(firmwareRev);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetSetupPinCode(uint32_t & setupPinCode)
-{
-    return static_cast<ImplClass *>(this)->_GetSetupPinCode(setupPinCode);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint16_t & setupDiscriminator)
-{
-    return static_cast<ImplClass *>(this)->_GetSetupDiscriminator(setupDiscriminator);
-}
-
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & lifetimeCounter)
-{
-    return static_cast<ImplClass *>(this)->_GetLifetimeCounter(lifetimeCounter);
-}
-#endif
-
-inline CHIP_ERROR ConfigurationManager::GetRegulatoryLocation(uint32_t & location)
-{
-    return static_cast<ImplClass *>(this)->_GetRegulatoryLocation(location);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
-{
-    return static_cast<ImplClass *>(this)->_GetCountryCode(buf, bufSize, codeLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetBreadcrumb(uint64_t & breadcrumb)
-{
-    return static_cast<ImplClass *>(this)->_GetBreadcrumb(breadcrumb);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreSerialNumber(serialNum, serialNumLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StorePrimaryWiFiMACAddress(const uint8_t * buf)
-{
-    return static_cast<ImplClass *>(this)->_StorePrimaryWiFiMACAddress(buf);
-}
-
-inline CHIP_ERROR ConfigurationManager::StorePrimary802154MACAddress(const uint8_t * buf)
-{
-    return static_cast<ImplClass *>(this)->_StorePrimary802154MACAddress(buf);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreManufacturingDate(mfgDate, mfgDateLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreProductRevision(uint16_t productRev)
-{
-    return static_cast<ImplClass *>(this)->_StoreProductRevision(productRev);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreSetupPinCode(uint32_t setupPinCode)
-{
-    return static_cast<ImplClass *>(this)->_StoreSetupPinCode(setupPinCode);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreSetupDiscriminator(uint16_t setupDiscriminator)
-{
-    return static_cast<ImplClass *>(this)->_StoreSetupDiscriminator(setupDiscriminator);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreRegulatoryLocation(uint32_t location)
-{
-    return static_cast<ImplClass *>(this)->_StoreRegulatoryLocation(location);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreCountryCode(const char * code, size_t codeLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreCountryCode(code, codeLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreBreadcrumb(uint64_t breadcrumb)
-{
-    return static_cast<ImplClass *>(this)->_StoreBreadcrumb(breadcrumb);
-}
-
-inline CHIP_ERROR ConfigurationManager::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
-{
-    return static_cast<ImplClass *>(this)->_ReadPersistedStorageValue(key, value);
-}
-
-inline CHIP_ERROR ConfigurationManager::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
-{
-    return static_cast<ImplClass *>(this)->_WritePersistedStorageValue(key, value);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
-{
-    return static_cast<ImplClass *>(this)->_GetBLEDeviceIdentificationInfo(deviceIdInfo);
-}
-
-inline bool ConfigurationManager::IsFullyProvisioned()
-{
-    return static_cast<ImplClass *>(this)->_IsFullyProvisioned();
-}
-
-inline void ConfigurationManager::InitiateFactoryReset()
-{
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    static_cast<ImplClass *>(this)->_IncrementLifetimeCounter();
-#endif
-    static_cast<ImplClass *>(this)->_InitiateFactoryReset();
-}
-
-#if !defined(NDEBUG)
-inline CHIP_ERROR ConfigurationManager::RunUnitTests()
-{
-    return static_cast<ImplClass *>(this)->_RunUnitTests();
-}
-#endif
-
-inline CHIP_ERROR ConfigurationManager::Init()
-{
-    return static_cast<ImplClass *>(this)->_Init();
-}
-
-inline bool ConfigurationManager::CanFactoryReset()
-{
-    return static_cast<ImplClass *>(this)->_CanFactoryReset();
-}
-
-inline CHIP_ERROR ConfigurationManager::GetFailSafeArmed(bool & val)
-{
-    return static_cast<ImplClass *>(this)->_GetFailSafeArmed(val);
-}
-
-inline CHIP_ERROR ConfigurationManager::SetFailSafeArmed(bool val)
-{
-    return static_cast<ImplClass *>(this)->_SetFailSafeArmed(val);
-}
-
-inline void ConfigurationManager::LogDeviceConfig()
-{
-    static_cast<ImplClass *>(this)->_LogDeviceConfig();
-}
-
-/**
- * True if device type in DNS-SD advertisement is enabled
- */
-inline bool ConfigurationManager::IsCommissionableDeviceTypeEnabled()
-{
-    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
-}
-
-/**
- * Device type id.
- */
-inline CHIP_ERROR ConfigurationManager::GetDeviceType(uint16_t & deviceType)
-{
-    return static_cast<ImplClass *>(this)->_GetDeviceType(deviceType);
-}
-
-/**
- * True if device name in DNS-SD advertisement is enabled
- */
-inline bool ConfigurationManager::IsCommissionableDeviceNameEnabled()
-{
-    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
-}
-
-/**
- * Name of the device.
- */
-inline CHIP_ERROR ConfigurationManager::GetDeviceName(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetDeviceName(buf, bufSize);
-}
-
-/**
- * Initial pairing hint.
- */
-inline CHIP_ERROR ConfigurationManager::GetInitialPairingHint(uint16_t & pairingHint)
-{
-    return static_cast<ImplClass *>(this)->_GetInitialPairingHint(pairingHint);
-}
-
-/**
- * Secondary pairing hint.
- */
-inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingHint(uint16_t & pairingHint)
-{
-    return static_cast<ImplClass *>(this)->_GetSecondaryPairingHint(pairingHint);
-}
-
-/**
- * Initial pairing instruction.
- */
-inline CHIP_ERROR ConfigurationManager::GetInitialPairingInstruction(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetInitialPairingInstruction(buf, bufSize);
-}
-
-/**
- * Secondary pairing instruction.
- */
-inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetSecondaryPairingInstruction(buf, bufSize);
-}
-
-} // namespace DeviceLayer
-} // namespace chip
