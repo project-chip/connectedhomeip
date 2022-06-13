@@ -435,7 +435,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     }
 
     ReturnErrorOnFailure(GeneratePeerId(rcac, fabricId, nodeId, &nocPeerId));
-    nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
+    nocPubkey = certificates.GetLastCert()[0].mPublicKey;
 
     return CHIP_NO_ERROR;
 }
@@ -446,7 +446,7 @@ CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) con
     CHIP_ERROR err = Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKeySpan);
     if (err == CHIP_NO_ERROR)
     {
-        outPublicKey = P256PublicKey(publicKeySpan);
+        outPublicKey = publicKeySpan;
     }
 
     return err;

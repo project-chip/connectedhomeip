@@ -2008,20 +2008,20 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendTrustedRootCert: {
-        if (!params.FetchRootCert().HasValue() || !params.GetNoc().HasValue())
+        if (!params.GetRootCert().HasValue() || !params.GetNoc().HasValue())
         {
             ChipLogError(Controller, "No trusted root cert or NOC specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.FetchRootCert().Value(), timeout);
+        CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.GetRootCert().Value(), timeout);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error sending trusted root certificate: %s", err.AsString());
             CommissioningStageComplete(err);
             return;
         }
-        err = proxy->SetPeerId(params.FetchRootCert().Value(), params.GetNoc().Value());
+        err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error setting peer id: %s", err.AsString());

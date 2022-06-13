@@ -249,7 +249,6 @@ protected:
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
     bool mHasExternallyOwnedOperationalKey = false;
-    bool mHasExternallyOwnedCertificates   = false;
 
     MutableByteSpan mRootCert;
     MutableByteSpan mICACert;

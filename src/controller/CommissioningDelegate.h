@@ -143,7 +143,7 @@ public:
     // The root certificate for the operational certificate chain. In the auto commissioner, this is set by by the kGenerateNOCChain
     // stage through the OperationalCredentialsDelegate.
     // This value must be set before calling PerformCommissioningStep for the kSendTrustedRootCert step.
-    const Optional<ByteSpan> FetchRootCert() const { return mRootCert; }
+    const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
 
     // The node operational certificate for the node being commissioned. In the AutoCommissioner, this is set by by the
     // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
