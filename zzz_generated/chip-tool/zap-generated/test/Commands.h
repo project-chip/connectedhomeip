@@ -20894,7 +20894,6 @@ private:
         }
         case 6: {
             LogStep(6, "Reads the Application attribute");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::Application::Id, true, chip::NullOptional);
         }
