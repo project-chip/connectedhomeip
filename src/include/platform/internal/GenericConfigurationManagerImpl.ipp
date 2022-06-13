@@ -417,34 +417,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
         ReturnErrorOnFailure(StoreUniqueId(uniqueId, strlen(uniqueId)));
     }
 
-    bool failSafeArmed = false;
-
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
-    // which the fail-safe timer was armed.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        FabricIndex fabricIndex;
-        bool addNocCommandInvoked;
-        bool updateNocCommandInvoked;
-
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
-
-        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        if (err == CHIP_NO_ERROR)
-        {
-            DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked,
-                                                                                                 updateNocCommandInvoked);
-        }
-        else
-        {
-            // This should not happen, but we should not fail system init based on it!
-            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!",
-                         err.Format());
-            (void) SetFailSafeArmed(false);
-            err = CHIP_NO_ERROR;
-        }
-    }
-
     return err;
 }
 

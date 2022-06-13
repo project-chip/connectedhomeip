@@ -160,7 +160,9 @@ void P6WiFiDriver::OnConnectWiFiNetwork()
     if (mpConnectCallback)
     {
         CommitConfiguration();
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         mpConnectCallback = nullptr;
     }
 }
@@ -185,7 +187,9 @@ exit:
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
         mpConnectCallback = nullptr;
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         callback->OnResult(networkingStatus, CharSpan(), 0);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 }
 

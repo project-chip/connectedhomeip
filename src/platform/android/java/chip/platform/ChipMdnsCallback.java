@@ -24,9 +24,13 @@ public interface ChipMdnsCallback {
   void handleServiceResolve(
       String instanceName,
       String serviceType,
+      String hostName,
       String address,
       int port,
       Map<String, byte[]> textEntries,
       long callbackHandle,
       long contextHandle);
+
+  void handleServiceBrowse(
+      String[] instanceName, String serviceType, long callbackHandle, long contextHandle);
 }

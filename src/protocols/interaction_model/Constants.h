@@ -50,7 +50,7 @@ namespace InteractionModel {
 constexpr uint16_t kVersion = 0;
 
 /**
- * SecureChannel Protocol Message Types
+ * Interaction Model Protocol Message Types
  */
 enum class MsgType : uint8_t
 {

@@ -20,12 +20,35 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 
+#include <array>
 #include <cstring>
+#include <set>
+#include <string>
+
 #include <nlunit-test.h>
 
 using namespace chip;
 
 namespace {
+
+template <class T, size_t N>
+bool SetMatches(const std::set<T> & set, const std::array<T, N> expectedContents)
+{
+    if (set.size() != N)
+    {
+        return false;
+    }
+
+    for (auto item : expectedContents)
+    {
+        if (set.find(item) == set.cend())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 {
@@ -41,6 +64,8 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err  = storage.SyncGetKeyValue("roboto", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     NL_TEST_ASSERT(inSuite, size == sizeof(buf));
+
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 0);
 
     err = storage.SyncDeleteKeyValue("roboto");
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -74,6 +99,11 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     err = storage.SyncSetKeyValue("key3", kStringValue3, static_cast<uint16_t>(strlen(kStringValue3)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 2);
+    auto keys = storage.GetKeys();
+    std::array<std::string, 2> kExpectedKeys{ "key2", "key3" };
+    NL_TEST_ASSERT(inSuite, SetMatches(keys, kExpectedKeys) == true);
 
     // Read them back
 
@@ -194,6 +224,8 @@ void TestClearStorage(nlTestSuite * inSuite, void * inContext)
     uint16_t size = sizeof(buf);
 
     // Key not there
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 0);
+
     CHIP_ERROR err;
     memset(&buf[0], 0, sizeof(buf));
     size = sizeof(buf);
@@ -205,6 +237,7 @@ void TestClearStorage(nlTestSuite * inSuite, void * inContext)
     const char * kStringValue1 = "abcd";
     err                        = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 1);
 
     memset(&buf[0], 0, sizeof(buf));
     size = sizeof(buf);
@@ -216,6 +249,7 @@ void TestClearStorage(nlTestSuite * inSuite, void * inContext)
     // Clear storage, make sure it's gone
     storage.ClearStorage();
 
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 0);
     memset(&buf[0], 0, sizeof(buf));
     size = sizeof(buf);
     err  = storage.SyncGetKeyValue("roboto", &buf[0], size);

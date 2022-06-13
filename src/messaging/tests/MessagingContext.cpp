@@ -46,8 +46,8 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
         FabricInfo aliceFabric;
         FabricInfo bobFabric;
 
-        aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                        GetNodeA1CertAsset().mKey);
+        ReturnErrorOnFailure(aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                             GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey));
         ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(aliceFabric, &mAliceFabricIndex));
 
         bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,

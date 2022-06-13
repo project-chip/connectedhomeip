@@ -3518,8 +3518,8 @@ client cluster TestCluster = 4294048773 {
   }
 
   struct TestListStructOctet {
-    int64u fabricIndex = 0;
-    octet_string<32> operationalCert = 1;
+    int64u member1 = 0;
+    octet_string<32> member2 = 1;
   }
 
   struct NullablesAndOptionalsStruct {

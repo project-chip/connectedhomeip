@@ -19,6 +19,7 @@
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -31,6 +32,7 @@
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
+
 namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -67,7 +69,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
-        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
+        ESP_LOGI("ESP32AppServer", "Thread has been provisioned, publish the dns service now");
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif

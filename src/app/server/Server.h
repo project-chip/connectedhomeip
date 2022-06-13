@@ -30,9 +30,12 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/OperationalKeystore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
@@ -112,6 +115,44 @@ struct ServerInitParams
     // Optional. Support test event triggers when provided. Must be initialized before being
     // provided.
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
+    // Operational keystore with access to the operational keys: MUST be injected.
+    Crypto::OperationalKeystore * operationalKeystore = nullptr;
+};
+
+class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
+{
+public:
+    IgnoreCertificateValidityPolicy() {}
+
+    /**
+     * @brief
+     *
+     * This certificate validity policy does not validate NotBefore or
+     * NotAfter to accommodate platforms that may have wall clock time, but
+     * where it is unreliable.
+     *
+     * Last Known Good Time is also not considered in this policy.
+     *
+     * @param cert CHIP Certificate for which we are evaluating validity
+     * @param depth the depth of the certificate in the chain, where the leaf is at depth 0
+     * @return CHIP_NO_ERROR if CHIPCert should accept the certificate; an appropriate CHIP_ERROR if it should be rejected
+     */
+    CHIP_ERROR ApplyCertificateValidityPolicy(const Credentials::ChipCertificateData * cert, uint8_t depth,
+                                              Credentials::CertificateValidityResult result) override
+    {
+        switch (result)
+        {
+        case Credentials::CertificateValidityResult::kValid:
+        case Credentials::CertificateValidityResult::kNotYetValid:
+        case Credentials::CertificateValidityResult::kExpired:
+        case Credentials::CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+        case Credentials::CertificateValidityResult::kExpiredAtLastKnownGoodTime:
+        case Credentials::CertificateValidityResult::kTimeUnknown:
+            return CHIP_NO_ERROR;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
 };
 
 /**
@@ -161,24 +202,40 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+        static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+        static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
         static chip::app::DefaultAclStorage sAclStorage;
 
         // KVS-based persistent storage delegate injection
-        chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-        ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-        this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+        if (persistentStorageDelegate == nullptr)
+        {
+            chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
+                DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
+            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+        }
+
+        // PersistentStorageDelegate "software-based" operational key access injection
+        if (this->operationalKeystore == nullptr)
+        {
+            // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
+            //          for examples and for now.
+            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+        }
 
         // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(&sKvsPersistenStorageDelegate);
+        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(&sKvsPersistenStorageDelegate));
+        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
         this->sessionResumptionStorage = &sSessionResumptionStorage;
 #else
         this->sessionResumptionStorage = nullptr;
@@ -189,6 +246,10 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;
+
+        // Inject certificate validation policy compatible with non-wall-clock-time-synced
+        // embedded systems.
+        this->certificateValidityPolicy = &sDefaultCertValidityPolicy;
 
         return CHIP_NO_ERROR;
     }
@@ -251,6 +312,8 @@ public:
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
+    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -267,6 +330,8 @@ private:
     Server() = default;
 
     static Server sServer;
+
+    void InitFailSafe();
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -407,6 +472,7 @@ private:
     app::AclStorage * mAclStorage;
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
+    Crypto::OperationalKeystore * mOperationalKeystore;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

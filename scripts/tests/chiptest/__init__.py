@@ -30,7 +30,7 @@ def AllTests(chip_tool: str):
         if not name:
             continue
 
-        if name.startswith('TV_'):
+        if name.startswith('TV_') or name.startswith('Test_TC_MC_'):
             target = TestTarget.TV
         elif name.startswith('DL_'):
             target = TestTarget.LOCK

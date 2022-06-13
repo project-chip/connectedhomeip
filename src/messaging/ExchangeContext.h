@@ -66,7 +66,7 @@ public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                    ExchangeDelegate * delegate);
+                    ExchangeDelegate * delegate, bool isEphemeralExchange = false);
 
     ~ExchangeContext() override;
 
@@ -154,8 +154,6 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
-
     SessionHandle GetSessionHandle() const
     {
         VerifyOrDie(mSession);
@@ -238,9 +236,10 @@ private:
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
+     * response.  If aCloseIfNeeded is true, check whether the exchange needs to
+     * be closed.
      */
-    void NotifyResponseTimeout();
+    void NotifyResponseTimeout(bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 
@@ -273,6 +272,8 @@ private:
      * exchange nor other component requests the active mode.
      */
     void UpdateSEDIntervalMode(bool activeMode);
+
+    static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 };
 
 } // namespace Messaging

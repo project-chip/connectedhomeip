@@ -16,6 +16,7 @@
       app:layout_constraintTop_toTopOf="parent" />
 
   <androidx.constraintlayout.helper.widget.Flow
+      android:id="@+id/address_commissioning_fragment_flow"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       app:constraint_referenced_ids="addressLabel,addressEditText,discriminatorLabel,discriminatorEditText,pincodeLabel,pincodeEditText"
@@ -74,6 +75,28 @@
       android:inputType="number"
       android:text="@string/default_pincode" />
 
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:layout_margin="16dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow">
+
+    <Button
+        android:id="@+id/discoverBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dns_discover_btn_text"/>
+
+    <Spinner
+        android:id="@+id/discoverListSpinner"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+  </LinearLayout>
   <Button
       android:id="@+id/commissionBtn"
       android:layout_width="wrap_content"
