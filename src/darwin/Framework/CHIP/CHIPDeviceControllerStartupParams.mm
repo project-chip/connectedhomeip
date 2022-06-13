@@ -215,7 +215,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         self.nodeId = @(fabric->GetNodeId());
 
         if (self.operationalKeypair == nil) {
-            ByteSpan noc;
+            uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
+            MutableByteSpan noc(nocBuf);
             CHIP_ERROR err = fabric->GetNOCCert(noc);
             if (err != CHIP_NO_ERROR) {
                 CHIP_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
@@ -237,7 +238,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     NSData * oldIntermediateCert = nil;
     {
-        ByteSpan icaCert;
+        uint8_t icaBuf[Credentials::kMaxCHIPCertLength];
+        MutableByteSpan icaCert(icaBuf);
         CHIP_ERROR err = fabric->GetICACert(icaCert);
         if (err != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Failed to get existing intermediate certificate: %s", ErrorStr(err));
@@ -278,7 +280,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     NSData * oldRootCert;
     {
-        ByteSpan rootCert;
+        uint8_t rootBuf[Credentials::kMaxCHIPCertLength];
+        MutableByteSpan rootCert(rootBuf);
         CHIP_ERROR err = fabric->GetRootCert(rootCert);
         if (err != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Failed to get existing root certificate: %s", ErrorStr(err));

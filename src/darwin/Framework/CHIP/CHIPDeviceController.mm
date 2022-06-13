@@ -748,11 +748,11 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_NO_ERROR;
     }
 
-    chip::Credentials::P256PublicKeySpan ourRootPublicKey, otherRootPublicKey;
+    chip::Credentials::P256PublicKey ourRootPublicKey, otherRootPublicKey;
     ReturnErrorOnFailure(ourFabric->GetRootPubkey(ourRootPublicKey));
     ReturnErrorOnFailure(fabric->GetRootPubkey(otherRootPublicKey));
 
-    *isRunning = (ourRootPublicKey.data_equal(otherRootPublicKey));
+    *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
     return CHIP_NO_ERROR;
 }
 
