@@ -145,7 +145,7 @@ public class MatterServant {
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
 
-    mTvApp.postServerInit();
+    mTvApp.postServerInit(new ContentAppEndpointManagerImpl(context));
   }
 
   public void restart() {
