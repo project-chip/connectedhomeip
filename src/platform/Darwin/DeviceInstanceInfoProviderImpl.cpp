@@ -20,6 +20,7 @@
 
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceError.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/Darwin/PosixConfig.h>
 
 namespace chip {
