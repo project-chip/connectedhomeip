@@ -9,6 +9,7 @@
 22
 AAAA
 aarch
+abba
 abcdef
 abfb
 ABI
@@ -176,6 +177,7 @@ CaseAdminNode
 CatalogVendorId
 CBB
 cbd
+CBOR
 ccf
 CCMP
 CCS
@@ -272,6 +274,7 @@ ConnectivityManagerImpl
 ConnectNetwork
 ConnectNetworkRequest
 ConnectNetworkResponse
+Connect's
 connstring
 conntype
 const
@@ -458,6 +461,7 @@ emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
 EnableNetwork
 EnableWiFiNetwork
+endian
 EndpointId
 endpointName
 endsWith
@@ -886,6 +890,7 @@ npm
 nRF
 nrfconnect
 nrfdks
+nrfjprog
 nrfutil
 nrfxlib
 NTAG
@@ -1176,6 +1181,7 @@ smoketest
 SMP
 socat
 socio
+SoCs
 SodiumConcentrationMeasurement
 softap
 SoftDevice
@@ -1363,6 +1369,7 @@ utils
 UUID
 ux
 VCP
+validator
 Vectorcall
 VendorID
 VendorName
