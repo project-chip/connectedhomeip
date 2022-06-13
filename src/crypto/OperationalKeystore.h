@@ -112,7 +112,7 @@ public:
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INCORRECT_STATE if the key store is not properly initialized.
-     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no pending operational keypair for `fabricIndex`
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no operational keypair for `fabricIndex`
      * @retval CHIP_ERROR_NOT_IMPLEMENTED if only `SignWithOpKeypair` is supported
      * @retval other CHIP_ERROR value on internal storage errors
      */

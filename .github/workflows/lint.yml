@@ -85,6 +85,10 @@ jobs:
               if: always()
               run: scripts/tools/check_includes.sh
 
+            - name: Check for zcl.json and extension sync status
+              if: always()
+              run: scripts/tools/check_zcl_file_sync.py .
+
             - name: Ensure all PICS are set for tests (to true or false)
               if: always()
               run: |

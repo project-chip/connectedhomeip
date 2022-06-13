@@ -45,6 +45,9 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
+// https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
+constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
+
 namespace chip {
 namespace app {
 
@@ -167,20 +170,22 @@ public:
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
         aMinInterval = mMinIntervalFloorSeconds;
-        aMaxInterval = mMaxIntervalCeilingSeconds;
+        aMaxInterval = mMaxInterval;
     }
 
     /*
      * Set the reporting intervals for the subscription. This SHALL only be called
-     * from the OnSubscriptionRequested callback above.
+     * from the OnSubscriptionRequested callback above. The restriction is as below
+     * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
+     * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
      */
-    CHIP_ERROR SetReportingIntervals(uint16_t aMinInterval, uint16_t aMaxInterval)
+    CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(aMinInterval <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-
-        mMinIntervalFloorSeconds   = aMinInterval;
-        mMaxIntervalCeilingSeconds = aMaxInterval;
+        VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
     }
 
@@ -428,9 +433,9 @@ private:
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mSubscriptionStartGeneration = 0;
 
-    SubscriptionId mSubscriptionId      = 0;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
+    SubscriptionId mSubscriptionId    = 0;
+    uint16_t mMinIntervalFloorSeconds = 0;
+    uint16_t mMaxInterval             = 0;
 
     EventNumber mEventMin = 0;
 
