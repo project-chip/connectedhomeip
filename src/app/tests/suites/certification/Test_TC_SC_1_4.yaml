@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 14.1.4. [TC-SC-1.4] MRP message counter and duplicate messaging
 
 config:
     nodeId: 0x12344321
@@ -21,28 +21,14 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "TH sends a message to DUT with the R flag set to 1."
       verification: |
-
-      disabled: true
-
-    - label: "TH reads from the DUT the MeasuredValue attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
-
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
-          Operate at device
+          Verify DUT responds with an acknowledgement message with the A flag set and the Acknowledged Message Counter field set to the Message Counter of the received message.
       disabled: true
 
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+          "TH sends a duplicate message to the DUT, with the R flag set to 1 and
+          the same message counter as the message in step 1."
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          DUT action missing [cant verify using Raspi]
+          Verify DUT responds with an acknowledgement message with the A flag set and the Acknowledged Message Counter field set to the Message Counter of the received message. Verify that the DUT takes no further action on duplicate messages.
       disabled: true

@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name:
+    17.1.1. [TC-DA-1.1] The NOC SHALL be wiped on Factory Reset [DUT -
+    Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,28 +23,39 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission DUT to TH1s Fabric"
       verification: |
 
-      disabled: true
-
-    - label: "TH reads from the DUT the MeasuredValue attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
-
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
-          Operate at device
       disabled: true
 
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+          "TH1 reads the NOCs attribute list from DUT TH1 saves the NOCs list
+          for future usage."
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
 
-          DUT action missing [cant verify using Raspi]
+      disabled: true
+
+    - label:
+          "Factory reset DUT Perform the device discovery flow checks as covered
+          in TC-DD-2.2"
+      verification: |
+
+      disabled: true
+
+    - label: "Commission DUT to TH2s Fabric"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH2 does a non-fabric-filtered read of Fabrics attribute list from
+          DUT and saves the FabricDescriptorStruct values"
+      verification: |
+          Verify that there is only one entry in the 'Fabrics' List Verify that the FabricID is the same as the TH2 Fabric ID
+      disabled: true
+
+    - label:
+          "TH2 does a non-fabric-filtered read of NOC attribute list from DUT"
+      verification: |
+          Verify that there is only one entry in the 'NOC' List
       disabled: true

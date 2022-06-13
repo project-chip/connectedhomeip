@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.4.7. [TC-WNCV-6.1] Basic Commands Verification with client as DUT
 
@@ -29,12 +30,14 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received up-or-open for WindowCovering looks like this
 
+          ./chip-tool windowcovering up-or-open 1 1
+
           [1646243704.407225][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:10452706 on exchange 27302r
           [1646243704.407277][352796:352796] CHIP:EM: Handling via exchange: 27302r, Delegate: 0x560eb84d5500
           [1646243704.407350][352796:352796] CHIP:DMG: InvokeRequestMessage =
           [1646243704.407411][352796:352796] CHIP:DMG: {
-          [1646243704.407439][352796:352796] CHIP:DMG:         suppressResponse = false,
-          [1646243704.407503][352796:352796] CHIP:DMG:         timedRequest = false,
+          [1646243704.407439][352796:352796] CHIP:DMG:         suppressResponse = false, 
+          [1646243704.407503][352796:352796] CHIP:DMG:         timedRequest = false, 
           [1646243704.407529][352796:352796] CHIP:DMG:         InvokeRequests =
           [1646243704.407565][352796:352796] CHIP:DMG:         [
           [1646243704.407591][352796:352796] CHIP:DMG:                 CommandDataIB =
@@ -45,14 +48,14 @@ tests:
           [1646243704.407835][352796:352796] CHIP:DMG:                                 ClusterId = 0x102,
           [1646243704.407899][352796:352796] CHIP:DMG:                                 CommandId = 0x0,
           [1646243704.407926][352796:352796] CHIP:DMG:                         },
-          [1646243704.407970][352796:352796] CHIP:DMG:
-          [1646243704.407997][352796:352796] CHIP:DMG:                         CommandData =
+          [1646243704.407970][352796:352796] CHIP:DMG:                         
+          [1646243704.407997][352796:352796] CHIP:DMG:                         CommandData = 
           [1646243704.408030][352796:352796] CHIP:DMG:                         {
           [1646243704.408058][352796:352796] CHIP:DMG:                         },
           [1646243704.408100][352796:352796] CHIP:DMG:                 },
-          [1646243704.408128][352796:352796] CHIP:DMG:
+          [1646243704.408128][352796:352796] CHIP:DMG:                 
           [1646243704.408154][352796:352796] CHIP:DMG:         ],
-          [1646243704.408356][352796:352796] CHIP:DMG:
+          [1646243704.408356][352796:352796] CHIP:DMG:         
           [1646243704.408406][352796:352796] CHIP:DMG:         InteractionModelRevision = 1
           [1646243704.408447][352796:352796] CHIP:DMG: },
           [1646243704.408561][352796:352796] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
@@ -67,13 +70,14 @@ tests:
     - label: "DUT sends DownOrClose command to TH"
       verification: |
           On TestHarnes (all-cluster-app) a received down-or-close for WindowCovering looks like this
+          ./chip-tool windowcovering down-or-close 1 1
 
           [1646243773.438732][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:8564771 on exchange 6526r
           [1646243773.438764][352796:352796] CHIP:EM: Handling via exchange: 6526r, Delegate: 0x560eb84d5500
           [1646243773.438871][352796:352796] CHIP:DMG: InvokeRequestMessage =
           [1646243773.439801][352796:352796] CHIP:DMG: {
-          [1646243773.439829][352796:352796] CHIP:DMG:         suppressResponse = false,
-          [1646243773.439876][352796:352796] CHIP:DMG:         timedRequest = false,
+          [1646243773.439829][352796:352796] CHIP:DMG:         suppressResponse = false, 
+          [1646243773.439876][352796:352796] CHIP:DMG:         timedRequest = false, 
           [1646243773.439922][352796:352796] CHIP:DMG:         InvokeRequests =
           [1646243773.440036][352796:352796] CHIP:DMG:         [
           [1646243773.440077][352796:352796] CHIP:DMG:                 CommandDataIB =
@@ -84,14 +88,14 @@ tests:
           [1646243773.440351][352796:352796] CHIP:DMG:                                 ClusterId = 0x102,
           [1646243773.440385][352796:352796] CHIP:DMG:                                 CommandId = 0x1,
           [1646243773.440445][352796:352796] CHIP:DMG:                         },
-          [1646243773.440498][352796:352796] CHIP:DMG:
-          [1646243773.440560][352796:352796] CHIP:DMG:                         CommandData =
+          [1646243773.440498][352796:352796] CHIP:DMG:                         
+          [1646243773.440560][352796:352796] CHIP:DMG:                         CommandData = 
           [1646243773.440613][352796:352796] CHIP:DMG:                         {
           [1646243773.440898][352796:352796] CHIP:DMG:                         },
           [1646243773.440927][352796:352796] CHIP:DMG:                 },
-          [1646243773.440999][352796:352796] CHIP:DMG:
+          [1646243773.440999][352796:352796] CHIP:DMG:                 
           [1646243773.441032][352796:352796] CHIP:DMG:         ],
-          [1646243773.441061][352796:352796] CHIP:DMG:
+          [1646243773.441061][352796:352796] CHIP:DMG:         
           [1646243773.441132][352796:352796] CHIP:DMG:         InteractionModelRevision = 1
           [1646243773.441183][352796:352796] CHIP:DMG: },
           [1646243773.441262][352796:352796] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o
@@ -107,12 +111,14 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received stop-motion for WindowCovering looks like this
 
+          ./chip-tool windowcovering stop-motion 1 1
+
           1646243464.420695][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3710998 on exchange 7151r
           [1646243464.420725][352796:352796] CHIP:EM: Handling via exchange: 7151r, Delegate: 0x560eb84d5500
           [1646243464.420779][352796:352796] CHIP:DMG: InvokeRequestMessage =
           [1646243464.420820][352796:352796] CHIP:DMG: {
-          [1646243464.420845][352796:352796] CHIP:DMG:         suppressResponse = false,
-          [1646243464.420885][352796:352796] CHIP:DMG:         timedRequest = false,
+          [1646243464.420845][352796:352796] CHIP:DMG:         suppressResponse = false, 
+          [1646243464.420885][352796:352796] CHIP:DMG:         timedRequest = false, 
           [1646243464.420910][352796:352796] CHIP:DMG:         InvokeRequests =
           [1646243464.420952][352796:352796] CHIP:DMG:         [
           [1646243464.420991][352796:352796] CHIP:DMG:                 CommandDataIB =
@@ -123,14 +129,14 @@ tests:
           [1646243464.421214][352796:352796] CHIP:DMG:                                 ClusterId = 0x102,
           [1646243464.421256][352796:352796] CHIP:DMG:                                 CommandId = 0x2,
           [1646243464.421308][352796:352796] CHIP:DMG:                         },
-          [1646243464.421337][352796:352796] CHIP:DMG:
-          [1646243464.421368][352796:352796] CHIP:DMG:                         CommandData =
+          [1646243464.421337][352796:352796] CHIP:DMG:                         
+          [1646243464.421368][352796:352796] CHIP:DMG:                         CommandData = 
           [1646243464.421393][352796:352796] CHIP:DMG:                         {
           [1646243464.421436][352796:352796] CHIP:DMG:                         },
           [1646243464.421461][352796:352796] CHIP:DMG:                 },
-          [1646243464.421500][352796:352796] CHIP:DMG:
+          [1646243464.421500][352796:352796] CHIP:DMG:                 
           [1646243464.421540][352796:352796] CHIP:DMG:         ],
-          [1646243464.421567][352796:352796] CHIP:DMG:
+          [1646243464.421567][352796:352796] CHIP:DMG:         
           [1646243464.421609][352796:352796] CHIP:DMG:         InteractionModelRevision = 1
           [1646243464.421634][352796:352796] CHIP:DMG: },
           [1646243464.421668][352796:352796] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=o

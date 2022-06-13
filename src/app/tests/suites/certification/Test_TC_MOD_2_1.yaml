@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 78.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
+name: 79.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
 
 config:
     nodeId: 0x12344321
@@ -24,22 +24,38 @@ tests:
     - label: "TH reads the SupportedModes attribute from the DUT"
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
-          [1645776884.203383][4698:4703] CHIP:TOO:   SupportedModes: 3 entries
-          [1645776884.203448][4698:4703] CHIP:TOO:     [1]: {
-          [1645776884.203473][4698:4703] CHIP:TOO:       Label: Black
-          [1645776884.203497][4698:4703] CHIP:TOO:       Mode: 0
-          [1645776884.203520][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203544][4698:4703] CHIP:TOO:      }
-          [1645776884.203574][4698:4703] CHIP:TOO:     [2]: {
-          [1645776884.203597][4698:4703] CHIP:TOO:       Label: Cappuccino
-          [1645776884.203619][4698:4703] CHIP:TOO:       Mode: 4
-          [1645776884.203641][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203663][4698:4703] CHIP:TOO:      }
-          [1645776884.203691][4698:4703] CHIP:TOO:     [3]: {
-          [1645776884.203714][4698:4703] CHIP:TOO:       Label: Espresso
-          [1645776884.203735][4698:4703] CHIP:TOO:       Mode: 7
-          [1645776884.203757][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203779][4698:4703] CHIP:TOO:      }
+
+          [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
+          [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
+          [1654595268.854743][14400:14405] CHIP:TOO:     [1]: {
+          [1654595268.854772][14400:14405] CHIP:TOO:       Label: Black
+          [1654595268.854811][14400:14405] CHIP:TOO:       Mode: 0
+          [1654595268.854843][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.854891][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.854918][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.854945][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.854971][14400:14405] CHIP:TOO:          }
+          [1654595268.855000][14400:14405] CHIP:TOO:      }
+          [1654595268.855038][14400:14405] CHIP:TOO:     [2]: {
+          [1654595268.855064][14400:14405] CHIP:TOO:       Label: Cappuccino
+          [1654595268.855089][14400:14405] CHIP:TOO:       Mode: 4
+          [1654595268.855117][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.855149][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.855175][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.855199][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.855223][14400:14405] CHIP:TOO:          }
+          [1654595268.855249][14400:14405] CHIP:TOO:      }
+          [1654595268.855284][14400:14405] CHIP:TOO:     [3]: {
+          [1654595268.855310][14400:14405] CHIP:TOO:       Label: Espresso
+          [1654595268.855332][14400:14405] CHIP:TOO:       Mode: 7
+          [1654595268.855360][14400:14405] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595268.855390][14400:14405] CHIP:TOO:         [1]: {
+          [1654595268.855416][14400:14405] CHIP:TOO:           MfgCode: 0
+          [1654595268.855440][14400:14405] CHIP:TOO:           Value: 0
+          [1654595268.855464][14400:14405] CHIP:TOO:          }
+          [1654595268.855490][14400:14405] CHIP:TOO:      }
+          [1649677252.376226][10804:10809] CHIP:TOO:       SemanticTag: 0
+          [1649677252.376252][10804:10809] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -47,68 +63,21 @@ tests:
           list in step 1."
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
-          [1645776998.880151][4739:4744] CHIP:DMG: InvokeResponseMessage =
-          [1645776998.880182][4739:4744] CHIP:DMG: {
-          [1645776998.880233][4739:4744] CHIP:DMG:        suppressResponse = false,
-          [1645776998.880270][4739:4744] CHIP:DMG:        InvokeResponseIBs =
-          [1645776998.880309][4739:4744] CHIP:DMG:        [
-          [1645776998.880340][4739:4744] CHIP:DMG:                InvokeResponseIB =
-          [1645776998.880386][4739:4744] CHIP:DMG:                {
-          [1645776998.880418][4739:4744] CHIP:DMG:                        CommandStatusIB =
-          [1645776998.880476][4739:4744] CHIP:DMG:                        {
-          [1645776998.880529][4739:4744] CHIP:DMG:                                CommandPathIB =
-          [1645776998.880586][4739:4744] CHIP:DMG:                                {
-          [1645776998.880671][4739:4744] CHIP:DMG:                                        EndpointId = 0x1,
-          [1645776998.880734][4739:4744] CHIP:DMG:                                        ClusterId = 0x50,
-          [1645776998.880778][4739:4744] CHIP:DMG:                                        CommandId = 0x0,
-          [1645776998.880873][4739:4744] CHIP:DMG:                                },
-          [1645776998.880924][4739:4744] CHIP:DMG:
-          [1645776998.880987][4739:4744] CHIP:DMG:                                StatusIB =
-          [1645776998.881057][4739:4744] CHIP:DMG:                                {
-          [1645776998.881102][4739:4744] CHIP:DMG:                                        status = 0x0,
-          [1645776998.881168][4739:4744] CHIP:DMG:                                },
-          [1645776998.881210][4739:4744] CHIP:DMG:
-          [1645776998.881245][4739:4744] CHIP:DMG:                        },
-          [1645776998.881286][4739:4744] CHIP:DMG:
-          [1645776998.881320][4739:4744] CHIP:DMG:                },
-          [1645776998.881360][4739:4744] CHIP:DMG:
-          [1645776998.881388][4739:4744] CHIP:DMG:        ],
-          [1645776998.881425][4739:4744] CHIP:DMG:
-          [1645776998.881454][4739:4744] CHIP:DMG:        InteractionModelRevision = 1
-          [1645776998.881482][4739:4744] CHIP:DMG: },
+
+
+
+          [1649677293.280207][10810:10815] CHIP:DMG:                                 StatusIB =
+          [1649677293.280283][10810:10815] CHIP:DMG:                                 {
+          [1649677293.280358][10810:10815] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1649677293.280421][10810:10815] CHIP:DMG:                                 },
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
           ./chip-tool modeselect read current-mode 1 1
-          [1645777197.117853][4759:4764] CHIP:DMG: ReportDataMessage =
-          [1645777197.117885][4759:4764] CHIP:DMG: {
-          [1645777197.117910][4759:4764] CHIP:DMG:        AttributeReportIBs =
-          [1645777197.117943][4759:4764] CHIP:DMG:        [
-          [1645777197.117969][4759:4764] CHIP:DMG:                AttributeReportIB =
-          [1645777197.118004][4759:4764] CHIP:DMG:                {
-          [1645777197.118036][4759:4764] CHIP:DMG:                        AttributeDataIB =
-          [1645777197.118068][4759:4764] CHIP:DMG:                        {
-          [1645777197.118100][4759:4764] CHIP:DMG:                                DataVersion = 0xe164a618,
-          [1645777197.118136][4759:4764] CHIP:DMG:                                AttributePathIB =
-          [1645777197.118167][4759:4764] CHIP:DMG:                                {
-          [1645777197.118198][4759:4764] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645777197.118232][4759:4764] CHIP:DMG:                                        Cluster = 0x50,
-          [1645777197.118271][4759:4764] CHIP:DMG:                                        Attribute = 0x0000_0000,
-          [1645777197.118302][4759:4764] CHIP:DMG:                                }
-          [1645777197.118336][4759:4764] CHIP:DMG:
-          [1645777197.118369][4759:4764] CHIP:DMG:                                        Data = 4,
-          [1645777197.118406][4759:4764] CHIP:DMG:                        },
-          [1645777197.118439][4759:4764] CHIP:DMG:
-          [1645777197.118469][4759:4764] CHIP:DMG:                },
-          [1645777197.118501][4759:4764] CHIP:DMG:
-          [1645777197.118526][4759:4764] CHIP:DMG:        ],
-          [1645777197.118559][4759:4764] CHIP:DMG:
-          [1645777197.118585][4759:4764] CHIP:DMG:        SuppressResponse = true,
-          [1645777197.118618][4759:4764] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777197.118647][4759:4764] CHIP:DMG: }
-          [1645777197.118795][4759:4764] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469720
-          [1645777197.118866][4759:4764] CHIP:TOO:   CurrentMode: 4
+
+          [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+          [1649678800.298279][10854:10861] CHIP:TOO:   CurrentMode: 4
       disabled: true
 
     - label:
@@ -116,38 +85,6 @@ tests:
           not in the list in step 1."
       verification: |
           ./chip-tool modeselect change-to-mode 2 1 1
-          [1645777235.574575][4770:4775] CHIP:DMG: ICR moving to [ResponseRe]
-          [1645777235.574631][4770:4775] CHIP:DMG: InvokeResponseMessage =
-          [1645777235.574663][4770:4775] CHIP:DMG: {
-          [1645777235.574690][4770:4775] CHIP:DMG:        suppressResponse = false,
-          [1645777235.574726][4770:4775] CHIP:DMG:        InvokeResponseIBs =
-          [1645777235.574766][4770:4775] CHIP:DMG:        [
-          [1645777235.574804][4770:4775] CHIP:DMG:                InvokeResponseIB =
-          [1645777235.574844][4770:4775] CHIP:DMG:                {
-          [1645777235.574877][4770:4775] CHIP:DMG:                        CommandStatusIB =
-          [1645777235.574914][4770:4775] CHIP:DMG:                        {
-          [1645777235.574944][4770:4775] CHIP:DMG:                                CommandPathIB =
-          [1645777235.574991][4770:4775] CHIP:DMG:                                {
-          [1645777235.575031][4770:4775] CHIP:DMG:                                        EndpointId = 0x1,
-          [1645777235.575066][4770:4775] CHIP:DMG:                                        ClusterId = 0x50,
-          [1645777235.575100][4770:4775] CHIP:DMG:                                        CommandId = 0x0,
-          [1645777235.575131][4770:4775] CHIP:DMG:                                },
-          [1645777235.575174][4770:4775] CHIP:DMG:
-          [1645777235.575214][4770:4775] CHIP:DMG:                                StatusIB =
-          [1645777235.575257][4770:4775] CHIP:DMG:                                {
-          [1645777235.575301][4770:4775] CHIP:DMG:                                        status = 0x87,
-          [1645777235.575341][4770:4775] CHIP:DMG:                                },
-          [1645777235.575386][4770:4775] CHIP:DMG:
-          [1645777235.575429][4770:4775] CHIP:DMG:                        },
-          [1645777235.575472][4770:4775] CHIP:DMG:
-          [1645777235.575507][4770:4775] CHIP:DMG:                },
-          [1645777235.575549][4770:4775] CHIP:DMG:
-          [1645777235.575578][4770:4775] CHIP:DMG:        ],
-          [1645777235.575615][4770:4775] CHIP:DMG:
-          [1645777235.575644][4770:4775] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777235.575675][4770:4775] CHIP:DMG: },
-          [1645777235.575751][4770:4775] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x87
-          [1645777235.575793][4770:4775] CHIP:TOO: Error: IM Error 0x00000587: General error: 0x87
-
-          *NOTE*: Chip-tool error is currently incorrect
+          CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x85
+          CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
       disabled: true

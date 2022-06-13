@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name:
+    14.2.2. [TC-SC-2.2] Bidirectional Communication - Passcode Authenticated
+    Session Establishment (PASE)
 
 config:
     nodeId: 0x12344321
@@ -21,28 +23,27 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Initiator uses I2RKey to encrypt and send a message"
       verification: |
-
+          Responder receives the encrypted message
       disabled: true
 
-    - label: "TH reads from the DUT the MeasuredValue attribute"
+    - label: "Responder uses I2RKey to decrypt the message"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
+          Responder is able to decrypt the message
       disabled: true
 
-    - label: "Operate on device to change the pressure significantly"
+    - label: "Responder uses R2IKey to encrypt and send a message"
       verification: |
-          Operate at device
+          Initiator receives the encrypted message
       disabled: true
 
-    - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+    - label: "Initiator uses R2IKey to decrypt the message"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
+          Initiator is able to decrypt the message
+      disabled: true
 
-          DUT action missing [cant verify using Raspi]
+    - label: "An error is encountered in initiator or responder decryption"
+      verification: |
+          Session is terminated and keys are cleared from memory
       disabled: true
