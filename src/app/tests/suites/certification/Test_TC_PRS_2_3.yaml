@@ -37,7 +37,7 @@ tests:
       verification: |
           ./chip-tool pressuremeasurement read measured-value 1 1
 
-          [1646049376.457970][12096:12101] CHIP:DMG:         SuppressResponse = true, 
+          [1646049376.457970][12096:12101] CHIP:DMG:         SuppressResponse = true,
           [1646049376.458003][12096:12101] CHIP:DMG:         InteractionModelRevision = 1
           [1646049376.458033][12096:12101] CHIP:DMG: }
           [1646049376.458206][12096:12101] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000
