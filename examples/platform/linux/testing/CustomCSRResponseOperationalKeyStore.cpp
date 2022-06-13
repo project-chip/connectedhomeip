@@ -20,17 +20,10 @@
 
 namespace chip {
 
-struct CSRResponseOptions
+CHIP_ERROR CustomCSRResponseOperationalKeyStore::NewOpKeypairForFabric(FabricIndex fabricIndex,
+                                                                       MutableByteSpan & outCertificateSigningRequest)
 {
-    bool csrIncorrectType                  = false;
-    bool csrExistingKeyPair                = false;
-    bool csrNonceIncorrectType             = false;
-    bool csrNonceTooLong                   = false;
-    bool csrNonceInvalid                   = false;
-    bool nocsrElementsTooLong              = false;
-    bool attestationSignatureIncorrectType = false;
-    bool attestationSignatureInvalid       = false;
-    CustomCSRResponseOperationalKeyStore operationalKeyStore;
-};
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 } // namespace chip

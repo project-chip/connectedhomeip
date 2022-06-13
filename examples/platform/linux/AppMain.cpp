@@ -298,6 +298,9 @@ void ChipLinuxAppMainLoop()
 
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
+    LinuxDeviceOptions::GetInstance().mCSRResponseOptions.operationalKeyStore.Init(initParams.persistentStorageDelegate);
+    initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.operationalKeyStore;
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
 
