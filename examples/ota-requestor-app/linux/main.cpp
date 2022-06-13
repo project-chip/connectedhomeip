@@ -133,12 +133,12 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
 Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
                                                                              &sLinuxThreadDriver);
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
 Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
                                                                            &sLinuxWiFiDriver);
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 NetworkCommissioning::LinuxEthernetDriver sLinuxEthernetDriver;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
                                                                                &sLinuxEthernetDriver);
@@ -211,7 +211,7 @@ static void InitNetworkCommissioning(void)
         LinuxDeviceOptions::GetInstance().mThread
 #else
         false
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     };
 
     const bool kWiFiEnabled = {
@@ -219,25 +219,25 @@ static void InitNetworkCommissioning(void)
         LinuxDeviceOptions::GetInstance().mWiFi
 #else
         false
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
     };
 
     if (kThreadEnabled && kWiFiEnabled)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         sThreadNetworkCommissioningInstance.Init();
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
         sWiFiNetworkCommissioningInstance.Init();
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_WPA
-        // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+       // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
         emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
     }
     else if (kThreadEnabled)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         sThreadNetworkCommissioningInstance.Init();
-#endif  // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
     else if (kWiFiEnabled)
     {
@@ -257,7 +257,7 @@ static void InitNetworkCommissioning(void)
 #else
         // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
         sNullNetworkCommissioningInstance.Init();
-#endif  // CHIP_DEVICE_LAYER_TARGET_LINUX
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     }
 }
 
