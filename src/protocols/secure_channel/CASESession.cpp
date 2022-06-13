@@ -1065,10 +1065,10 @@ CHIP_ERROR CASESession::SendSigma3()
 
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
-    VerifyOrExit(icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
     icaCert = MutableByteSpan{ icacBuf.Get(), kMaxCHIPCertLength };
 
-    VerifyOrExit(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(nocBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
     nocCert = MutableByteSpan{ nocBuf.Get(), kMaxCHIPCertLength };
 
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
