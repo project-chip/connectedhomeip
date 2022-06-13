@@ -610,6 +610,17 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
 
+    err = VerifyAttributeDataIBs(AttributeDataIBsReader, mpExchangeCtx->IsGroupExchangeContext());
+    if (err == CHIP_IM_GLOBAL_STATUS(InvalidAction))
+    {
+        status = Status::InvalidAction;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        status = Status::Failure;
+    }
+    SuccessOrExit(err);
+
     if (mpExchangeCtx->IsGroupExchangeContext())
     {
         err = ProcessGroupAttributeDataIBs(AttributeDataIBsReader);
@@ -632,6 +643,52 @@ exit:
         ChipLogError(DataManagement, "Failed to process write request: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return status;
+}
+
+CHIP_ERROR WriteHandler::VerifyAttributeDataIBs(const TLV::TLVReader & aAttributeDataIBsReader, bool aIsGroupAction)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TLV::TLVReader dataIBsReader(aAttributeDataIBsReader);
+
+    while (CHIP_NO_ERROR == (err = dataIBsReader.Next()))
+    {
+        chip::TLV::TLVReader dataReader;
+        AttributeDataIB::Parser element;
+        AttributePathIB::Parser attributePath;
+        ConcreteDataAttributePath dataAttributePath;
+        TLV::TLVReader reader = dataIBsReader;
+
+        SuccessOrExit(err = element.Init(reader));
+        SuccessOrExit(err = element.GetPath(&attributePath));
+
+        if (!aIsGroupAction)
+        {
+            SuccessOrExit(err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId)));
+        }
+
+        SuccessOrExit(err = attributePath.GetCluster(&(dataAttributePath.mClusterId)));
+        VerifyOrExit(IsValidClusterId(dataAttributePath.mClusterId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+        SuccessOrExit(err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId)));
+        VerifyOrExit(IsValidAttributeId(dataAttributePath.mAttributeId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+        SuccessOrExit(err = attributePath.GetListIndex(dataAttributePath));
+        SuccessOrExit(err = element.GetData(&dataReader));
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)

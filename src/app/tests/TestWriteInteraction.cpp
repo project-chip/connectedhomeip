@@ -57,6 +57,7 @@ public:
     static void TestWriteClientGroup(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteInvalidPath(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
@@ -89,12 +90,17 @@ public:
         mStatus = status;
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
+    {
+        mOnErrorCalled++;
+        mError = chipError;
+    }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
+    CHIP_ERROR mError;
     StatusIB mStatus;
 };
 
@@ -551,6 +557,65 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
+void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+        NL_TEST_ASSERT(apSuite,
+                       writeClient.EncodeAttribute(AttributePathParams(1 /* endpoint id */, kInvalidClusterId, 2), (bool) true) ==
+                           CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+        err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+        NL_TEST_ASSERT(apSuite,
+                       writeClient.EncodeAttribute(AttributePathParams(1 /* endpoint id */, 2, kInvalidAttributeId), (bool) true) ==
+                           CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
+
+        err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
 } // namespace app
 } // namespace chip
 
@@ -567,6 +632,7 @@ const nlTest sTests[] =
         NL_TEST_DEF("CheckWriteClientGroup", chip::app::TestWriteInteraction::TestWriteClientGroup),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
+        NL_TEST_DEF("CheckWriteInvalidPath", chip::app::TestWriteInteraction::TestWriteInvalidPath),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
