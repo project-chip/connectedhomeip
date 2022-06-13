@@ -382,7 +382,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
         FabricId fabricId = fabricInfo->GetFabricId();
         Crypto::P256PublicKey rootPubKey;
-        ReturnErrorOnFailure(mFabricsTable->GetRootPubkey(mFabricIndex, rootPubKey));
+        ReturnErrorOnFailure(mFabricsTable->FetchRootPubkey(mFabricIndex, rootPubKey));
         Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
@@ -458,7 +458,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         FabricId fabricId = fabricInfo.GetFabricId();
         NodeId nodeId     = fabricInfo.GetNodeId();
         Crypto::P256PublicKey rootPubKey;
-        ReturnErrorOnFailure(mFabricsTable->GetRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey));
+        ReturnErrorOnFailure(mFabricsTable->FetchRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey));
         Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         // Get IPK operational group key set for current candidate fabric
@@ -675,10 +675,10 @@ CHIP_ERROR CASESession::SendSigma2()
     VerifyOrReturnError(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
 
     MutableByteSpan icaCert{ icacBuf.Get(), kMaxCHIPCertLength };
-    ReturnErrorOnFailure(mFabricsTable->GetICACert(mFabricIndex, icaCert));
+    ReturnErrorOnFailure(mFabricsTable->FetchICACert(mFabricIndex, icaCert));
 
     MutableByteSpan nocCert{ nocBuf.Get(), kMaxCHIPCertLength };
-    ReturnErrorOnFailure(mFabricsTable->GetNOCCert(mFabricIndex, nocCert));
+    ReturnErrorOnFailure(mFabricsTable->FetchNOCCert(mFabricIndex, nocCert));
 
     // Fill in the random value
     uint8_t msg_rand[kSigmaParamRandomNumberSize];
@@ -1073,8 +1073,8 @@ CHIP_ERROR CASESession::SendSigma3()
 
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = mFabricsTable->GetICACert(mFabricIndex, icaCert));
-    SuccessOrExit(err = mFabricsTable->GetNOCCert(mFabricIndex, nocCert));
+    SuccessOrExit(err = mFabricsTable->FetchICACert(mFabricIndex, icaCert));
+    SuccessOrExit(err = mFabricsTable->FetchNOCCert(mFabricIndex, nocCert));
 
     // Prepare Sigma3 TBS Data Blob
     msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);

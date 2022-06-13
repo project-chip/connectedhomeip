@@ -203,29 +203,29 @@ protected:
      */
     CHIP_ERROR SignWithOpKeypair(ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
 
-    CHIP_ERROR GetRootCert(MutableByteSpan & cert) const
+    CHIP_ERROR FetchRootCert(MutableByteSpan & outCert) const
     {
         ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
-        return CopySpanToMutableSpan(mRootCert, cert);
+        return CopySpanToMutableSpan(mRootCert, outCert);
     }
 
-    CHIP_ERROR GetICACert(MutableByteSpan & cert) const
+    CHIP_ERROR FetchICACert(MutableByteSpan & outCert) const
     {
         if (mICACert.empty())
         {
-            cert.reduce_size(0);
+            outCert.reduce_size(0);
             return CHIP_NO_ERROR;
         }
-        return CopySpanToMutableSpan(mICACert, cert);
+        return CopySpanToMutableSpan(mICACert, outCert);
     }
 
-    CHIP_ERROR GetNOCCert(MutableByteSpan & cert) const
+    CHIP_ERROR FetchNOCCert(MutableByteSpan & outCert) const
     {
         ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
-        return CopySpanToMutableSpan(mNOCCert, cert);
+        return CopySpanToMutableSpan(mNOCCert, outCert);
     }
 
-    CHIP_ERROR GetRootPubkey(Crypto::P256PublicKey & publicKey) const;
+    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
     static constexpr size_t MetadataTLVMaxSize()
     {
@@ -470,10 +470,10 @@ public:
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
-    CHIP_ERROR GetRootCert(FabricIndex fabricIndex, MutableByteSpan & cert) const;
-    CHIP_ERROR GetICACert(FabricIndex fabricIndex, MutableByteSpan & cert) const;
-    CHIP_ERROR GetNOCCert(FabricIndex fabricIndex, MutableByteSpan & cert) const;
-    CHIP_ERROR GetRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & publicKey) const;
+    CHIP_ERROR FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchNOCCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
 
     /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for

@@ -141,8 +141,8 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
             if (accessingFabricIndex == fabricIndex)
             {
 
-                ReturnErrorOnFailure(fabricTable.GetNOCCert(fabricIndex, nocSpan));
-                ReturnErrorOnFailure(fabricTable.GetICACert(fabricIndex, icacSpan));
+                ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
+                ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacSpan));
 
                 noc.noc = nocSpan;
                 if (!icacSpan.empty())
@@ -188,7 +188,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
 
             Crypto::P256PublicKey pubKey;
-            ReturnErrorOnFailure(fabricTable.GetRootPubkey(fabricIndex, pubKey));
+            ReturnErrorOnFailure(fabricTable.FetchRootPubkey(fabricIndex, pubKey));
             fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
@@ -208,7 +208,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
         {
             uint8_t certBuf[kMaxCHIPCertLength];
             MutableByteSpan cert{ certBuf };
-            ReturnErrorOnFailure(fabricTable.GetRootCert(fabricInfo.GetFabricIndex(), cert));
+            ReturnErrorOnFailure(fabricTable.FetchRootCert(fabricInfo.GetFabricIndex(), cert));
             ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
         }
 
@@ -883,7 +883,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
         uint8_t rcacBuf[kMaxCHIPCertLength];
         MutableByteSpan rcac{ rcacBuf };
 
-        err = fabricTable.GetRootCert(fabricIndex, rcac);
+        err = fabricTable.FetchRootCert(fabricIndex, rcac);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
         err = gFabricBeingCommissioned.SetRootCert(rcac);
