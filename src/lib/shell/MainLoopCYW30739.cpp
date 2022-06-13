@@ -83,7 +83,8 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
         }
     }
     // If for too many arguments, overwrite last entry with guard.
-    if (cursor >= max_tokens) {
+    if (cursor >= max_tokens)
+    {
         cursor = max_tokens - 1;
     }
 

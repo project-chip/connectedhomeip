@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TestStreamerStdio.h"
+#include <nlunit-test.h>
 
 #include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
@@ -75,14 +75,14 @@ static void TestStreamer_Output(nlTestSuite * inSuite, void * inContext)
  */
 static const nlTest sTests[] = {
 
-    NL_TEST_DEF("Test Streamer: TestStreamer_Output", TestStreamer_Output),
+    NL_TEST_DEF("Test Shell: TestStreamer_Output", TestStreamer_Output),
 
     NL_TEST_SENTINEL()
 };
 
 int TestStreamerStdio(void)
 {
-    nlTestSuite theSuite = { "CHIP Streamer tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "Test Shell: Streamer", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
