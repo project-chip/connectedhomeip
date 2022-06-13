@@ -839,10 +839,6 @@ static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, vo
 
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
-    ReliableMessageProtocolConfig verySleepyAccessoryRmpConfig(System::Clock::Milliseconds32(360000),
-                                                               System::Clock::Milliseconds32(100000));
-    ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(System::Clock::Milliseconds32(5000),
-                                                                 System::Clock::Milliseconds32(300));
 
     auto & loopback            = ctx.GetLoopback();
     loopback.mSentMessageCount = 0;
@@ -858,8 +854,7 @@ static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, vo
     pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
-                                                                   &delegateAccessory, ScopedNodeId(),
-                                                                   MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
+                                                                   &delegateAccessory, ScopedNodeId()) == CHIP_NO_ERROR);
 
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
     ctx.DrainAndServiceIO();
@@ -868,8 +863,7 @@ static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                        nullptr, nullptr, &delegateCommissioner,
-                                                        MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
+                                                        nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
@@ -891,11 +885,6 @@ static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, vo
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
-    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(300));
-    //    NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout ==
-    //    System::Clock::Milliseconds32(360000)); NL_TEST_ASSERT(inSuite,
-    //                   pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(100000));
 }
 
 // Test Suite
