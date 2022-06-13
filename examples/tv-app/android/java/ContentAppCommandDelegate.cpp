@@ -67,7 +67,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
     if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT) {
         TLV::TLVReader readerForJson;
         readerForJson.Init(handlerContext.mPayload);
-        
+
         CHIP_ERROR err = CHIP_NO_ERROR;
         Json::Value json;
         err = TlvToJson(readerForJson, json);
@@ -81,7 +81,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         UtfString jsonString(env, JsonToString(json).c_str());
 
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s", JsonToString(json).c_str());
-        
+
         jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
                                                     static_cast<jint>(handlerContext.mRequestPath.mClusterId),
                                                     static_cast<jint>(handlerContext.mRequestPath.mCommandId),
