@@ -61,6 +61,7 @@ using namespace ::chip::Transport;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
+using namespace chip::Credentials;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -125,22 +126,28 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
     auto accessingFabricIndex = aEncoder.AccessingFabricIndex();
 
     return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+        for (auto & fabricInfo : fabricTable)
         {
             Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
+            uint8_t nocBuf[kMaxCHIPCertLength];
+            uint8_t icacBuf[kMaxCHIPCertLength];
+            MutableByteSpan nocSpan{ nocBuf };
+            MutableByteSpan icacSpan{ icacBuf };
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
-            noc.fabricIndex = fabricInfo.GetFabricIndex();
+            noc.fabricIndex = fabricIndex;
 
-            if (accessingFabricIndex == fabricInfo.GetFabricIndex())
+            if (accessingFabricIndex == fabricIndex)
             {
-                ByteSpan icac;
 
-                ReturnErrorOnFailure(fabricInfo.GetNOCCert(noc.noc));
-                ReturnErrorOnFailure(fabricInfo.GetICACert(icac));
+                ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
+                ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacSpan));
 
-                if (!icac.empty())
+                noc.noc = nocSpan;
+                if (!icacSpan.empty())
                 {
-                    noc.icac.SetNonNull(icac);
+                    noc.icac.SetNonNull(icacSpan);
                 }
             }
 
@@ -166,20 +173,23 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+        for (auto & fabricInfo : fabricTable)
         {
             Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
-            fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
+            fabricDescriptor.fabricIndex = fabricIndex;
             fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
             fabricDescriptor.vendorId    = static_cast<chip::VendorId>(fabricInfo.GetVendorId());
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
 
-            Credentials::P256PublicKeySpan pubKey;
-            ReturnErrorOnFailure(fabricInfo.GetRootPubkey(pubKey));
-            fabricDescriptor.rootPublicKey = pubKey;
+            Crypto::P256PublicKey pubKey;
+            ReturnErrorOnFailure(fabricTable.FetchRootPubkey(fabricIndex, pubKey));
+            fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
         }
@@ -192,11 +202,14 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
 {
     // It is OK to have duplicates.
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+        for (auto & fabricInfo : fabricTable)
         {
-            ByteSpan cert;
-            ReturnErrorOnFailure(fabricInfo.GetRootCert(cert));
-            ReturnErrorOnFailure(encoder.Encode(cert));
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            ReturnErrorOnFailure(fabricTable.FetchRootCert(fabricInfo.GetFabricIndex(), cert));
+            ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
         }
 
         return CHIP_NO_ERROR;
@@ -842,8 +855,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     auto & fabricTable                = Server::GetInstance().GetFabricTable();
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    FabricInfo * fabric               = RetrieveCurrentFabric(commandObj);
-    ByteSpan rcac;
+    FabricInfo * fabricInfo           = RetrieveCurrentFabric(commandObj);
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
@@ -858,8 +870,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(failSafeContext.IsCsrRequestForUpdateNoc(), nonDefaultStatus = Status::ConstraintError);
 
     // If current fabric is not available, command was invoked over PASE which is not legal
-    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
-    fabricIndex = fabric->GetFabricIndex();
+    VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
+    fabricIndex = fabricInfo->GetFabricIndex();
 
     // Initialize fields of gFabricBeingCommissioned:
     //  - the root certificate, fabric label, and vendor id are copied from the existing fabric record
@@ -868,16 +880,19 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // The remaining operation id and fabric id fields will be extracted from the new operational
     // credentials and set by following SetFabricInfo() call.
     {
-        err = fabric->GetRootCert(rcac);
+        uint8_t rcacBuf[kMaxCHIPCertLength];
+        MutableByteSpan rcac{ rcacBuf };
+
+        err = fabricTable.FetchRootCert(fabricIndex, rcac);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
         err = gFabricBeingCommissioned.SetRootCert(rcac);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-        err = gFabricBeingCommissioned.SetFabricLabel(fabric->GetFabricLabel());
+        err = gFabricBeingCommissioned.SetFabricLabel(fabricInfo->GetFabricLabel());
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-        gFabricBeingCommissioned.SetVendorId(fabric->GetVendorId());
+        gFabricBeingCommissioned.SetVendorId(fabricInfo->GetVendorId());
 
         err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));

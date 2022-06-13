@@ -448,7 +448,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
         }
     }
 
-    *fabric = fabricTable.FindFabric(Credentials::P256PublicKeySpan(pubKey.ConstBytes()), params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
     return YES;
 }
 
