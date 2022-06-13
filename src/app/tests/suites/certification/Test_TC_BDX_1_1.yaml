@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 29.1.1. [TC-BDX-1.1] Sender Initiated BDX Transfer session
 
 config:
     nodeId: 0x12344321
@@ -21,28 +21,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "DUT sends a SendInit message to TH"
       verification: |
-
-      disabled: true
-
-    - label: "TH reads from the DUT the MeasuredValue attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
-
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
-          Operate at device
-      disabled: true
-
-    - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          DUT action missing [cant verify using Raspi]
+          Verify that the SendInit message has the following mandatory fields Proposed Transfer Control - At least one of the PTC[RECEIVER_DRIVE] or PTC[SENDER_DRIVE] field bits shall be set. Range Control Proposed Max Block Size Start Offset - Optional Proposed Max Length - Optional File Designator Length File Designator Metadata - Optional
       disabled: true

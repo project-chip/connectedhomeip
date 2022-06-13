@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 14.2.4. [TC-SC-2.4] PASE Error Handling [DUT - Initiator/Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -21,28 +21,29 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "DUT generates and sends PBKDFParamRequest"
       verification: |
-
+          Verify TH receives the PBKDFParamRequest message.
       disabled: true
 
-    - label: "TH reads from the DUT the MeasuredValue attribute"
+    - label: "TH generates and sends PBKDFParamResponse"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
+          Verify DUT receives the PBKDFParamResponse message.
       disabled: true
 
-    - label: "Operate on device to change the pressure significantly"
+    - label: "DUT generates and sends Pake1"
       verification: |
-          Operate at device
+          Verify TH receives the Pake1 message.
       disabled: true
 
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+          "TH generates and sends Pake2 with an invalid key confirmation message
+          (cB)"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
+          Verify DUT receives the Pake2 message.
+      disabled: true
 
-          DUT action missing [cant verify using Raspi]
+    - label: "DUT verifies Pake2.cB."
+      verification: |
+          Verify that the DUT fails verification and sends a status report to the TH with a FAILURE general code (value 1), protocol ID of SECURE_CHANNEL (0x0000), and Protocol code of INVALID_PARAMETER (0X0002). Verify that the DUT performs no further processing after sending the status report.
       disabled: true

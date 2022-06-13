@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 29.2.5. [TC-BDX-2.5] Asynchronous file receiving
 
 config:
     nodeId: 0x12344321
@@ -21,28 +21,16 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label:
+          "DUT sends a ReceiveInit message to TH + TH sends a ReceiveAccept
+          message back to DUT + TH sends a Block message to DUT"
       verification: |
-
-      disabled: true
-
-    - label: "TH reads from the DUT the MeasuredValue attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
-
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
-          Operate at device
+          Verify that the ReceiveInit message has the following fields Proposed Transfer Control - PTC[ASYNC] field bit shall be set.
       disabled: true
 
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+          "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
+          back to TH"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          DUT action missing [cant verify using Raspi]
+          Verify that the BlockAckEOF message has the following mandatory fields Block Counter - Must correspond to the Block Counter which was embedded in the BlockEOF being acknowledged.
       disabled: true

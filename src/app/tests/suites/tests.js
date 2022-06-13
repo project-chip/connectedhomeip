@@ -76,10 +76,17 @@ function getManualTests() {
   ];
 
   const BulkDataExchangeProtocol = [
+    'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
+    'Test_TC_BDX_1_3',
     'Test_TC_BDX_1_4',
+    'Test_TC_BDX_1_5',
+    'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
     'Test_TC_BDX_2_2',
+    'Test_TC_BDX_2_3',
+    'Test_TC_BDX_2_4',
+    'Test_TC_BDX_2_5',
   ];
 
   const bridge = [
@@ -95,7 +102,12 @@ function getManualTests() {
   ];
 
   const DeviceAttestation = [
+    'Test_TC_DA_1_1',
+    'Test_TC_DA_1_2',
     'Test_TC_DA_1_3',
+    'Test_TC_DA_1_4',
+    'Test_TC_DA_1_5',
+    'Test_TC_DA_1_6',
   ];
 
   const DeviceManagement = [
@@ -189,6 +201,7 @@ function getManualTests() {
     'Test_TC_IDM_6_3',
     'Test_TC_IDM_6_4',
     'Test_TC_IDM_7_1',
+    'Test_TC_IDM_8_1',
   ];
 
   const MediaControl = [
@@ -279,6 +292,18 @@ function getManualTests() {
   ];
 
   const SecureChannel = [
+    'Test_TC_SC_1_1',
+    'Test_TC_SC_1_2',
+    'Test_TC_SC_1_3',
+    'Test_TC_SC_1_4',
+    'Test_TC_SC_2_1',
+    'Test_TC_SC_2_2',
+    'Test_TC_SC_2_3',
+    'Test_TC_SC_2_4',
+    'Test_TC_SC_3_1',
+    'Test_TC_SC_3_2',
+    'Test_TC_SC_3_3',
+    'Test_TC_SC_3_4',
     'Test_TC_SC_4_1',
     'Test_TC_SC_4_3',
     'Test_TC_SC_4_4',
@@ -426,6 +451,14 @@ function getManualTests() {
     'Test_TC_UL_2_2',
   ];
 
+  const Scenes = [
+    'Test_TC_S_1_1',
+    'Test_TC_S_2_1',
+    'Test_TC_S_2_2',
+    'Test_TC_S_2_3',
+    'Test_TC_S_3_1',
+  ];
+
   const tests = [
     DeviceDiscovery,
     Groups,
@@ -471,6 +504,7 @@ function getManualTests() {
     Actions,
     TimeFormatLocalization,
     UnitLocalization,
+    Scenes,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
