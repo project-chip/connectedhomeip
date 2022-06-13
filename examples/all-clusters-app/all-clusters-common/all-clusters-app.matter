@@ -2170,6 +2170,7 @@ server cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -4328,6 +4329,7 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
+    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {

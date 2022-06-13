@@ -255,6 +255,7 @@ SECTIONS
     KEEP(*(.simee*))
   } > FLASH
 
+  /* Last page of flash is reserved for the manufacturing token space */
   linker_nvm_end = __main_flash_end__ - 2048;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
