@@ -71,5 +71,8 @@ tests:
       command: "readAttribute"
       attribute: "BasicCommissioningInfo"
       response:
-          value: { FailSafeExpiryLengthSeconds: 60,
-                   MaxCumulativeFailsafeSeconds: 900 }
+          value:
+              {
+                  FailSafeExpiryLengthSeconds: 60,
+                  MaxCumulativeFailsafeSeconds: 900,
+              }
