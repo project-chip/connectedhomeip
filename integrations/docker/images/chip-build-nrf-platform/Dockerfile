@@ -2,7 +2,7 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION} as build
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=5ea8f7fa91d7315fcc6cd9eb3aa74f9640d0abac
+ARG NCS_REVISION=fd5905aa6b04febd99d00dba6c482ac25eb15222
 
 RUN set -x \
     && apt-get update \

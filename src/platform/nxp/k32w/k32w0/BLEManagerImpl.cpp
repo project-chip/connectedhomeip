@@ -184,7 +184,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(bleAppCreated == pdPASS, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE Radio Init */
-    XCVR_TemperatureUpdate(BOARD_GetTemperature());
     VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create BLE Controller Task */
@@ -243,6 +242,11 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
+}
+
+bool BLEManagerImpl::_IsAdvertising(void)
+{
+    return mFlags.Has(Flags::kAdvertising);
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
@@ -1010,7 +1014,7 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
 
             if (msg->type == BLE_KW_MSG_ERROR)
             {
-                ChipLogProgress(DeviceLayer, "BLE Fatal Error: %d.\n", msg->data.u8);
+                ChipLogProgress(DeviceLayer, "BLE Error: %d.\n", msg->data.u8);
             }
             else if (msg->type == BLE_KW_MSG_CONNECTED)
             {
@@ -1276,6 +1280,11 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
+        ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
+
+        (void) Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c, gConnPhyUpdateReqRxPhySettings_c,
+                            (uint16_t) gConnPhyUpdateReqPhyOptions_c);
+
         /* Notify App Task that the BLE is connected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_CONNECTED, (uint8_t) deviceId);
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)

@@ -46,46 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
-@interface CHIPIdentifyClusterIdentifyQueryResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull timeout;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPIdentifyClusterIdentifyQueryParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
 @interface CHIPIdentifyClusterTriggerEffectParams : NSObject
 
 @property (strong, nonatomic) NSNumber * _Nonnull effectIdentifier;
@@ -1116,6 +1076,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 @interface CHIPLevelControlClusterStopWithOnOffParams : NSObject
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPLevelControlClusterMoveToClosestFrequencyParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull frequency;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2918,6 +2899,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
+@interface CHIPGeneralDiagnosticsClusterTestEventTriggerParams : NSObject
+
+@property (strong, nonatomic) NSData * _Nonnull enableKey;
+
+@property (strong, nonatomic) NSNumber * _Nonnull eventTrigger;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
 @interface CHIPSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3152,6 +3156,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterCSRRequestParams : NSObject
 
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
+
+@property (strong, nonatomic) NSNumber * _Nullable isForUpdateNOC;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3201,7 +3207,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull ipkValue;
 
-@property (strong, nonatomic) NSNumber * _Nonnull caseAdminNode;
+@property (strong, nonatomic) NSNumber * _Nonnull caseAdminSubject;
 
 @property (strong, nonatomic) NSNumber * _Nonnull adminVendorId;
 /**
@@ -3315,27 +3321,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject
 
 @property (strong, nonatomic) NSData * _Nonnull rootCertificate;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams : NSObject
-
-@property (strong, nonatomic) NSData * _Nonnull trustedRootIdentifier;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3548,242 +3533,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull timeout;
 
 @property (strong, nonatomic) NSData * _Nullable pinCode;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetLogRecordParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull logIndex;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetLogRecordResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull logEntryId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull timestamp;
-
-@property (strong, nonatomic) NSNumber * _Nonnull eventType;
-
-@property (strong, nonatomic) NSNumber * _Nonnull source;
-
-@property (strong, nonatomic) NSNumber * _Nonnull eventIdOrAlarmCode;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSData * _Nonnull pin;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterSetPINCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
-
-@property (strong, nonatomic) NSNumber * _Nullable userType;
-
-@property (strong, nonatomic) NSData * _Nonnull pin;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetPINCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetPINCodeResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
-
-@property (strong, nonatomic) NSNumber * _Nullable userType;
-
-@property (strong, nonatomic) NSData * _Nullable pin;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterClearPINCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull pinSlotIndex;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterClearAllPINCodesParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterSetUserStatusParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetUserStatusParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetUserStatusResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4116,188 +3865,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
-@interface CHIPDoorLockClusterSetUserTypeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userType;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetUserTypeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetUserTypeResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userType;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterSetRFIDCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
-
-@property (strong, nonatomic) NSNumber * _Nullable userType;
-
-@property (strong, nonatomic) NSData * _Nonnull rfidCode;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetRFIDCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterGetRFIDCodeResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
-
-@property (strong, nonatomic) NSNumber * _Nullable userType;
-
-@property (strong, nonatomic) NSData * _Nullable rfidCode;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterClearRFIDCodeParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull rfidSlotIndex;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterClearAllRFIDCodesParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
 @interface CHIPDoorLockClusterSetUserParams : NSObject
 
 @property (strong, nonatomic) NSNumber * _Nonnull operationType;
@@ -4394,72 +3961,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDoorLockClusterClearUserParams : NSObject
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterOperatingEventNotificationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull operationEventSource;
-
-@property (strong, nonatomic) NSNumber * _Nonnull operationEventCode;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSData * _Nonnull pin;
-
-@property (strong, nonatomic) NSNumber * _Nonnull localTime;
-
-@property (strong, nonatomic) NSString * _Nullable data;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPDoorLockClusterProgrammingEventNotificationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull programEventSource;
-
-@property (strong, nonatomic) NSNumber * _Nonnull programEventCode;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-
-@property (strong, nonatomic) NSData * _Nonnull pin;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userType;
-
-@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
-
-@property (strong, nonatomic) NSNumber * _Nonnull localTime;
-
-@property (strong, nonatomic) NSString * _Nullable data;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4863,37 +4364,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
-@interface CHIPThermostatClusterGetRelayStatusLogResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull timeOfDay;
-
-@property (strong, nonatomic) NSNumber * _Nonnull relayStatus;
-
-@property (strong, nonatomic) NSNumber * _Nonnull localTemperature;
-
-@property (strong, nonatomic) NSNumber * _Nonnull humidityInPercentage;
-
-@property (strong, nonatomic) NSNumber * _Nonnull setpoint;
-
-@property (strong, nonatomic) NSNumber * _Nonnull unreadEntries;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
 @interface CHIPThermostatClusterGetWeeklyScheduleParams : NSObject
 
 @property (strong, nonatomic) NSNumber * _Nonnull daysToReturn;
@@ -4918,25 +4388,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 @interface CHIPThermostatClusterClearWeeklyScheduleParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPThermostatClusterGetRelayStatusLogParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6966,6 +6417,509 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 @end
+@interface CHIPMessagingClusterDisplayMessageParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
+
+@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull durationInMinutes;
+
+@property (strong, nonatomic) NSString * _Nonnull message;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterGetLastMessageParams : NSObject
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterCancelMessageParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterMessageConfirmationParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull confirmationTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageConfirmationControl;
+
+@property (strong, nonatomic) NSData * _Nonnull messageResponse;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterDisplayProtectedMessageParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
+
+@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull durationInMinutes;
+
+@property (strong, nonatomic) NSString * _Nonnull message;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterGetMessageCancellationParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull earliestImplementationTime;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPMessagingClusterCancelAllMessagesParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull implementationDateTime;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceEventsAndAlertClusterGetAlertsParams : NSObject
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull alertsCount;
+
+@property (strong, nonatomic) NSArray * _Nonnull alertStructures;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceEventsAndAlertClusterAlertsNotificationParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull alertsCount;
+
+@property (strong, nonatomic) NSArray * _Nonnull alertStructures;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceEventsAndAlertClusterEventsNotificationParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull eventHeader;
+
+@property (strong, nonatomic) NSNumber * _Nonnull eventId;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterLogNotificationParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
+
+@property (strong, nonatomic) NSNumber * _Nonnull logId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull logLength;
+
+@property (strong, nonatomic) NSArray * _Nonnull logPayload;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterLogRequestParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull logId;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterLogResponseParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
+
+@property (strong, nonatomic) NSNumber * _Nonnull logId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull logLength;
+
+@property (strong, nonatomic) NSArray * _Nonnull logPayload;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterLogQueueRequestParams : NSObject
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterLogQueueResponseParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull logQueueSize;
+
+@property (strong, nonatomic) NSArray * _Nonnull logIds;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPApplianceStatisticsClusterStatisticsAvailableParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull logQueueSize;
+
+@property (strong, nonatomic) NSArray * _Nonnull logIds;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull profileCount;
+
+@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
+
+@property (strong, nonatomic) NSNumber * _Nonnull maxNumberOfIntervals;
+
+@property (strong, nonatomic) NSArray * _Nonnull listOfAttributes;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull status;
+
+@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
+
+@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervalsDelivered;
+
+@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
+
+@property (strong, nonatomic) NSArray * _Nonnull intervals;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
+@interface CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
+
+@property (strong, nonatomic) NSNumber * _Nonnull startTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervals;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+
+- (instancetype)init;
+@end
 @interface CHIPTestClusterClusterTestParams : NSObject
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -7764,509 +7718,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterDisplayMessageParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
-
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
-
-@property (strong, nonatomic) NSNumber * _Nonnull durationInMinutes;
-
-@property (strong, nonatomic) NSString * _Nonnull message;
-
-@property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterGetLastMessageParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterCancelMessageParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterMessageConfirmationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull confirmationTime;
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageConfirmationControl;
-
-@property (strong, nonatomic) NSData * _Nonnull messageResponse;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterDisplayProtectedMessageParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull messageControl;
-
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
-
-@property (strong, nonatomic) NSNumber * _Nonnull durationInMinutes;
-
-@property (strong, nonatomic) NSString * _Nonnull message;
-
-@property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterGetMessageCancellationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull earliestImplementationTime;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPMessagingClusterCancelAllMessagesParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull implementationDateTime;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceEventsAndAlertClusterGetAlertsParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull alertsCount;
-
-@property (strong, nonatomic) NSArray * _Nonnull alertStructures;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceEventsAndAlertClusterAlertsNotificationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull alertsCount;
-
-@property (strong, nonatomic) NSArray * _Nonnull alertStructures;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceEventsAndAlertClusterEventsNotificationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull eventHeader;
-
-@property (strong, nonatomic) NSNumber * _Nonnull eventId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterLogNotificationParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
-
-@property (strong, nonatomic) NSNumber * _Nonnull logId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull logLength;
-
-@property (strong, nonatomic) NSArray * _Nonnull logPayload;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterLogRequestParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull logId;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterLogResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
-
-@property (strong, nonatomic) NSNumber * _Nonnull logId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull logLength;
-
-@property (strong, nonatomic) NSArray * _Nonnull logPayload;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterLogQueueRequestParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterLogQueueResponseParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull logQueueSize;
-
-@property (strong, nonatomic) NSArray * _Nonnull logIds;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPApplianceStatisticsClusterStatisticsAvailableParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull logQueueSize;
-
-@property (strong, nonatomic) NSArray * _Nonnull logIds;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull profileCount;
-
-@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
-
-@property (strong, nonatomic) NSNumber * _Nonnull maxNumberOfIntervals;
-
-@property (strong, nonatomic) NSArray * _Nonnull listOfAttributes;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
-
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-
-@property (strong, nonatomic) NSNumber * _Nonnull profileIntervalPeriod;
-
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervalsDelivered;
-
-@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
-
-@property (strong, nonatomic) NSArray * _Nonnull intervals;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-@end
-@interface CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject
-
-@property (strong, nonatomic) NSNumber * _Nonnull attributeId;
-
-@property (strong, nonatomic) NSNumber * _Nonnull startTime;
-
-@property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervals;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

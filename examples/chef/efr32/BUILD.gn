@@ -197,6 +197,7 @@ efr32_executable("chef_app") {
   deps = [
     ":chef-common",
     ":sdk",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

@@ -14,6 +14,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <EditText
+        android:id="@+id/timeoutEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:hint="@string/enter_commissioning_timeout_hint_text"/>
+
     <Button
         android:id="@+id/basicCommissioningMethodBtn"
         android:layout_width="0dp"
@@ -22,7 +34,7 @@
         android:text="@string/basic_commissioning_method_btn_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment"/>
+        app:layout_constraintTop_toBottomOf="@id/timeoutEd"/>
 
     <EditText
         android:id="@+id/discriminatorEd"

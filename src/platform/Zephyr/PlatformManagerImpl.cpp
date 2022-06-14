@@ -47,7 +47,7 @@ static k_timer sOperationalHoursSavingTimer;
 #if !CONFIG_NORDIC_SECURITY_BACKEND
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    const struct device * entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
+    const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
     int ret                       = entropy_get_entropy(entropy, output, len);
 
     if (ret == 0)

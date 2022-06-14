@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/p6.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${p6_sdk_build_root}/p6_executable.gni")
 import("${p6_sdk_build_root}/p6_sdk.gni")
 
@@ -31,8 +32,51 @@ declare_args() {
 
   # PIN code for PASE session establishment.
   setup_pin_code = 20202021
+
+  # Build update app
+  build_update_image = false
 }
 
+config("p6_ota_config") {
+  ldflags = [ "-T/" + rebase_path(
+                  "${chip_root}/third_party/p6/p6_sdk/ota/cy8c6xxa_cm4_dual_ota_int.ld",
+                  "/",
+                  "${p6_project_dir}") ]
+
+  ldflags += [ "-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000" ]
+
+  defines = [
+    "P6_OTA",
+    "OTA_SUPPORT ",
+    "OTA_USE_EXTERNAL_FLASH",
+    "CY_BOOT_USE_EXTERNAL_FLASH",
+    "MCUBOOT_HEADER_SIZE=0x400",
+    "MCUBOOT_MAX_IMG_SECTORS=3584",
+    "CY_BOOT_SCRATCH_SIZE=0x00004000",
+    "MCUBOOT_BOOTLOADER_SIZE=0x00018000",
+    "CY_BOOT_BOOTLOADER_SIZE=0x00018000",
+    "CY_BOOT_PRIMARY_1_START=0x00018000",
+    "CY_BOOT_PRIMARY_1_SIZE=0x1C0000",
+    "CY_BOOT_SECONDARY_1_START=0x00000000",
+    "CY_BOOT_SECONDARY_1_SIZE=0x001C0000",
+    "CY_FLASH_ERASE_VALUE=0xFF",
+    "MCUBOOT_IMAGE_NUMBER=1",
+    "MCUBOOT_SLOT_SIZE=0x1C0000",
+    "MCUBOOT_SCRATCH_SIZE=0x4000",
+    "MCUBOOT_SECTOR_SIZE = 512",
+    "APP_VERSION_MAJOR=1",
+    "APP_VERSION_MINOR=0",
+    "APP_VERSION_BUILD=0",
+    "MCUBOOT_OVERWRITE_ONLY",
+    "CY_ENABLE_XIP_PROGRAM",
+  ]
+
+  if (build_update_image) {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=2" ]
+  } else {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=1" ]
+  }
+}
 p6_sdk_sources("lock_app_sdk_sources") {
   include_dirs = [
     "${chip_root}/src/platform/P6",
@@ -49,6 +93,27 @@ p6_sdk_sources("lock_app_sdk_sources") {
   sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
 
   public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
+    ]
+    include_dirs += [
+      "${chip_root}/third_party/p6/p6_sdk/ota/config",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/flash_map_backend/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/sysflash/",
+      "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/include",
+    ]
+    public_configs += [ ":p6_ota_config" ]
+  }
 }
 
 p6_executable("lock_app") {

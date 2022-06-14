@@ -755,6 +755,12 @@ using RadioFaultType                  = EmberAfRadioFaultType;
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
+
+// Bitmap for SoftwareDiagnosticsFeature
+enum class SoftwareDiagnosticsFeature : uint32_t
+{
+    kWaterMarks = 0x1,
+};
 } // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {
@@ -925,6 +931,7 @@ enum class OperationalCertStatus : uint8_t
     kInvalidNOC            = 0x03,
     kMissingCsr            = 0x04,
     kTableFull             = 0x05,
+    kInvalidAdminSubject   = 0x06,
     kInsufficientPrivilege = 0x08,
     kFabricConflict        = 0x09,
     kLabelConflict         = 0x0A,
@@ -1201,18 +1208,6 @@ enum class DoorLockUserType : uint8_t
     kMasterUser          = 0x03,
     kNonAccessUser       = 0x04,
     kNotSupported        = 0xFF,
-};
-
-// Bitmap for DlAlarmMask
-enum class DlAlarmMask : uint16_t
-{
-    kLockingMechanismJammed                 = 0x1,
-    kLockResetToFactoryDefaults             = 0x2,
-    kReserved                               = 0x4,
-    kRFModulePowerCycled                    = 0x8,
-    kWrongCodeEntryLimit                    = 0x10,
-    kFrontEscutcheonRemovedFromMain         = 0x20,
-    kForcedDoorOpenUnderDoorLockedCondition = 0x40,
 };
 
 // Bitmap for DlCredentialRuleMask
@@ -2430,62 +2425,6 @@ enum class ApplicationStatusEnum : uint8_t
 namespace AccountLogin {
 } // namespace AccountLogin
 
-namespace TestCluster {
-
-// Enum for SimpleEnum
-enum class SimpleEnum : uint8_t
-{
-    kUnspecified = 0x00,
-    kValueA      = 0x01,
-    kValueB      = 0x02,
-    kValueC      = 0x03,
-};
-
-// Bitmap for Bitmap16MaskMap
-enum class Bitmap16MaskMap : uint16_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x4000,
-};
-
-// Bitmap for Bitmap32MaskMap
-enum class Bitmap32MaskMap : uint32_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x40000000,
-};
-
-// Bitmap for Bitmap64MaskMap
-enum class Bitmap64MaskMap : uint64_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x4000000000000000,
-};
-
-// Bitmap for Bitmap8MaskMap
-enum class Bitmap8MaskMap : uint8_t
-{
-    kMaskVal1 = 0x1,
-    kMaskVal2 = 0x2,
-    kMaskVal3 = 0x4,
-    kMaskVal4 = 0x40,
-};
-
-// Bitmap for SimpleBitmap
-enum class SimpleBitmap : uint8_t
-{
-    kValueA = 0x1,
-    kValueB = 0x2,
-    kValueC = 0x4,
-};
-} // namespace TestCluster
-
 namespace Messaging {
 
 // Enum for EventId
@@ -2668,6 +2607,62 @@ namespace ApplianceStatistics {
 
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
+
+namespace TestCluster {
+
+// Enum for SimpleEnum
+enum class SimpleEnum : uint8_t
+{
+    kUnspecified = 0x00,
+    kValueA      = 0x01,
+    kValueB      = 0x02,
+    kValueC      = 0x03,
+};
+
+// Bitmap for Bitmap16MaskMap
+enum class Bitmap16MaskMap : uint16_t
+{
+    kMaskVal1 = 0x1,
+    kMaskVal2 = 0x2,
+    kMaskVal3 = 0x4,
+    kMaskVal4 = 0x4000,
+};
+
+// Bitmap for Bitmap32MaskMap
+enum class Bitmap32MaskMap : uint32_t
+{
+    kMaskVal1 = 0x1,
+    kMaskVal2 = 0x2,
+    kMaskVal3 = 0x4,
+    kMaskVal4 = 0x40000000,
+};
+
+// Bitmap for Bitmap64MaskMap
+enum class Bitmap64MaskMap : uint64_t
+{
+    kMaskVal1 = 0x1,
+    kMaskVal2 = 0x2,
+    kMaskVal3 = 0x4,
+    kMaskVal4 = 0x4000000000000000,
+};
+
+// Bitmap for Bitmap8MaskMap
+enum class Bitmap8MaskMap : uint8_t
+{
+    kMaskVal1 = 0x1,
+    kMaskVal2 = 0x2,
+    kMaskVal3 = 0x4,
+    kMaskVal4 = 0x40,
+};
+
+// Bitmap for SimpleBitmap
+enum class SimpleBitmap : uint8_t
+{
+    kValueA = 0x1,
+    kValueB = 0x2,
+    kValueC = 0x4,
+};
+} // namespace TestCluster
 
 } // namespace Clusters
 } // namespace app

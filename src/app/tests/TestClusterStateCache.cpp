@@ -235,7 +235,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
 
                 for (auto & i : buf)
                 {
-                    i.fabricIndex = instruction.mInstructionId;
+                    i.member1 = instruction.mInstructionId;
                 }
 
                 Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -384,7 +384,7 @@ private:
                 auto listIter = v.begin();
                 while (listIter.Next())
                 {
-                    NL_TEST_ASSERT(gSuite, listIter.GetValue().fabricIndex == instruction.mInstructionId);
+                    NL_TEST_ASSERT(gSuite, listIter.GetValue().member1 == instruction.mInstructionId);
                 }
 
                 NL_TEST_ASSERT(gSuite, listIter.GetStatus() == CHIP_NO_ERROR);
@@ -438,7 +438,7 @@ private:
                 auto listIter = clusterValue.listStructOctetString.begin();
                 while (listIter.Next())
                 {
-                    NL_TEST_ASSERT(gSuite, listIter.GetValue().fabricIndex == instruction.mInstructionId);
+                    NL_TEST_ASSERT(gSuite, listIter.GetValue().member1 == instruction.mInstructionId);
                 }
 
                 NL_TEST_ASSERT(gSuite, listIter.GetStatus() == CHIP_NO_ERROR);

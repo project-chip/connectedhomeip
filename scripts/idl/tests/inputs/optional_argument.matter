@@ -1,0 +1,7 @@
+client cluster MyCluster = 1 {
+  request struct FooRequest {
+    optional OCTET_STRING argument = 0;
+  }
+
+  command Foo(FooRequest): DefaultSuccess = 0;
+}

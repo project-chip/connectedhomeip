@@ -373,7 +373,7 @@ CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
                 auto * addr = ctx->mResult->addr;
                 while (addr)
                 {
-                    GetIPAddress(ctx->mAddressCount[addressIndex], addr);
+                    GetIPAddress(ctx->mAddresses[addressIndex], addr);
                     addressIndex++;
                     addr = addr->next;
                 }

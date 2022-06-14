@@ -2830,6 +2830,14 @@ class ChipClusters:
             "clusterName": "GeneralDiagnostics",
             "clusterId": 0x00000033,
             "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "TestEventTrigger",
+                    "args": {
+                        "enableKey": "bytes",
+                        "eventTrigger": "int",
+                    },
+                },
             },
             "attributes": {
                 0x00000000: {
@@ -2878,6 +2886,12 @@ class ChipClusters:
                     "attributeName": "ActiveNetworkFaults",
                     "attributeId": 0x00000007,
                     "type": "int",
+                    "reportable": True,
+                },
+                0x00000008: {
+                    "attributeName": "TestEventTriggersEnabled",
+                    "attributeId": 0x00000008,
+                    "type": "bool",
                     "reportable": True,
                 },
                 0x0000FFF8: {
@@ -3106,12 +3120,6 @@ class ChipClusters:
                     "commandName": "Identify",
                     "args": {
                         "identifyTime": "int",
-                    },
-                },
-            0x00000001: {
-                    "commandId": 0x00000001,
-                    "commandName": "IdentifyQuery",
-                    "args": {
                     },
                 },
             0x00000040: {
@@ -4358,7 +4366,7 @@ class ChipClusters:
                         "NOCValue": "bytes",
                         "ICACValue": "bytes",
                         "IPKValue": "bytes",
-                        "caseAdminNode": "int",
+                        "caseAdminSubject": "int",
                         "adminVendorId": "int",
                     },
                 },
@@ -4381,6 +4389,7 @@ class ChipClusters:
                     "commandName": "CSRRequest",
                     "args": {
                         "CSRNonce": "bytes",
+                        "isForUpdateNOC": "bool",
                     },
                 },
             0x00000002: {
@@ -4395,13 +4404,6 @@ class ChipClusters:
                     "commandName": "RemoveFabric",
                     "args": {
                         "fabricIndex": "int",
-                    },
-                },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "RemoveTrustedRootCertificate",
-                    "args": {
-                        "trustedRootIdentifier": "bytes",
                     },
                 },
             0x00000009: {
@@ -5440,7 +5442,7 @@ class ChipClusters:
     }
     _TEST_CLUSTER_CLUSTER_INFO = {
             "clusterName": "TestCluster",
-            "clusterId": 0x0000050F,
+            "clusterId": 0xFFF1FC05,
             "commands": {
             0x00000011: {
                     "commandId": 0x00000011,
@@ -6210,12 +6212,6 @@ class ChipClusters:
             0x00000003: {
                     "commandId": 0x00000003,
                     "commandName": "ClearWeeklySchedule",
-                    "args": {
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "GetRelayStatusLog",
                     "args": {
                     },
                 },
@@ -7209,6 +7205,18 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000001: {
+                    "attributeName": "PhysicalClosedLimitLift",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "PhysicalClosedLimitTilt",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000003: {
                     "attributeName": "CurrentPositionLift",
                     "attributeId": 0x00000003,
@@ -7218,6 +7226,18 @@ class ChipClusters:
                 0x00000004: {
                     "attributeName": "CurrentPositionTilt",
                     "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000005: {
+                    "attributeName": "NumberOfActuationsLift",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000006: {
+                    "attributeName": "NumberOfActuationsTilt",
+                    "attributeId": 0x00000006,
                     "type": "int",
                     "reportable": True,
                 },
@@ -7400,7 +7420,7 @@ class ChipClusters:
     0x0000003B: _SWITCH_CLUSTER_INFO,
     0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
     0x00000402: _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
-    0x0000050F: _TEST_CLUSTER_CLUSTER_INFO,
+    0xFFF1FC05: _TEST_CLUSTER_CLUSTER_INFO,
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,

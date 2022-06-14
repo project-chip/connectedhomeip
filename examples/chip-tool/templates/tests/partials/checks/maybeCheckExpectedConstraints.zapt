@@ -1,6 +1,9 @@
 {{#if hasExpectedConstraints}}
-    {{#if isOptional}}
-        VerifyOrReturn(CheckValuePresent("{{asPropertyValue dontUnwrapValue=true}}", {{asPropertyValue dontUnwrapValue=true}}));
+    {{~#if isOptional}}
+        {{~#if (hasProperty expectedConstraints "hasValue")}}VerifyOrReturn(CheckConstraintHasValue("{{asPropertyValue dontUnwrapValue=true}}", {{asPropertyValue dontUnwrapValue=true}}, {{expectedConstraints.hasValue}}));
+        {{else}}
+        if ({{asPropertyValue dontUnwrapValue=true}}.HasValue()) {
+        {{/if}}
     {{/if}}
 
     {{~#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{asPropertyValue}}", "", "{{expectedConstraints.type}}"));{{/if}}
@@ -25,12 +28,29 @@
 
     {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
 
+    {{~#if (hasProperty expectedConstraints "contains")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.contains}}
+    VerifyOrReturn(CheckConstraintContains("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
+    {{~#if (hasProperty expectedConstraints "excludes")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.excludes}}
+    VerifyOrReturn(CheckConstraintExcludes("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
     {{~#if (hasProperty expectedConstraints "notValue")}}
         {{#if (isLiteralNull expectedConstraints.notValue)}}
             VerifyOrReturn(CheckValueNonNull("{{asPropertyValue}}", {{asPropertyValue}}));
         {{else}}
             VerifyOrReturn(CheckConstraintNotValue("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));
         {{/if}}
+    {{/if}}
+    {{~#if isOptional}}
+        {{~#unless (hasProperty expectedConstraints "hasValue")}}
+        }
+        {{/unless}}
     {{/if}}
 {{/if}}
 

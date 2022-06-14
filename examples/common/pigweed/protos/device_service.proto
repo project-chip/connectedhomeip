@@ -11,6 +11,12 @@ message PairingInfo {
   string qr_code_url = 4;
 }
 
+message SpakeInfo {
+  optional bytes verifier = 1;
+  optional bytes salt = 2;
+  optional uint32 iteration_count = 3;
+}
+
 // type lengths defined in chip spec 8.2.3.1
 message DeviceInfo {
   uint32 vendor_id = 1;
@@ -43,4 +49,6 @@ service Device {
   rpc SetPairingState(PairingState) returns (pw.protobuf.Empty){}
   rpc GetPairingState(pw.protobuf.Empty) returns (PairingState){}
   rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
+  rpc GetSpakeInfo(pw.protobuf.Empty) returns (SpakeInfo){}
+  rpc SetSpakeInfo(SpakeInfo) returns (pw.protobuf.Empty){}
 }

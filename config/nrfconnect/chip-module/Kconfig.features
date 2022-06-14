@@ -93,10 +93,6 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 
 if SOC_SERIES_NRF53X
 
-config UPDATEABLE_IMAGE_NUMBER
-	int
-	default 2
-
 # FLASH nop device is enabled to prevent bus faults when mcumgr tries to access
 # simulated partition with network core image data.
 config FLASH_NOP_DEVICE

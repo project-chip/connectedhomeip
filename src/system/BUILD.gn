@@ -145,6 +145,9 @@ source_set("system_config_header") {
       if (chip_device_platform == "qpg") {
         public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
       }
+      if (chip_device_platform == "k32w0") {
+        public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+      }
 
       # Add platform here as needed.
     }
@@ -202,9 +205,6 @@ static_library("system") {
 
   if (chip_system_config_use_sockets) {
     sources += [ "SocketEvents.h" ]
-    if (chip_system_config_event_loop == "Libevent") {
-      libs = [ "event" ]
-    }
   }
 
   if (chip_with_nlfaultinjection) {

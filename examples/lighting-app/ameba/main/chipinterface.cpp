@@ -22,6 +22,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include <DeviceInfoProviderImpl.h>
 
 #include "chip_porting.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -41,16 +42,6 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <lwip_netconf.h>
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
-#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <platform/Ameba/AmebaOTAImageProcessor.h>
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -84,55 +75,7 @@ void NetWorkCommissioningInstInit()
 #endif
 
 static DeviceCallbacks EchoCallbacks;
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-ExtendedOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-AmebaOTAImageProcessor gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
-#endif
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void amebaQueryImageCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
-}
-
-extern "C" void amebaApplyUpdateCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
-}
-
-static void InitOTARequestor(void)
-{
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-
-    // Set server instance used for session establishment
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
-}
-#endif // CONFIG_ENABLE_OTA_REQUESTOR
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void OnIdentifyStart(Identify *)
 {
@@ -176,14 +119,12 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {

@@ -70,6 +70,8 @@ exclude:
     - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
     - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
     - "scripts/idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "examples/chef/sample_app_util/test_files/*.yaml"
+    - "examples/chef/zzz_generated/**/*"
 
 
 changed_paths:

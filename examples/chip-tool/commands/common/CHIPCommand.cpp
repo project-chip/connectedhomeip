@@ -27,6 +27,7 @@
 #include <lib/support/TestGroupData.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
@@ -70,10 +71,12 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 #endif
 
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
+    ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
+    factoryInitParams.operationalKeystore      = &mOperationalKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -206,11 +209,21 @@ void CHIPCommand::StartTracing()
 
     if (mTraceFile.HasValue())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
     else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamLog());
+    }
+
+    if (mTraceDecode.HasValue() && mTraceDecode.Value())
+    {
+        chip::trace::TraceDecoderOptions options;
+        // The interaction model protocol is already logged, so just disable logging those.
+        options.mEnableProtocolInteractionModelResponse = false;
+        chip::trace::TraceDecoder * decoder             = new chip::trace::TraceDecoder();
+        decoder->SetOptions(options);
+        chip::trace::AddTraceStream(decoder);
     }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }

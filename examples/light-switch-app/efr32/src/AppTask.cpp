@@ -240,7 +240,7 @@ CHIP_ERROR AppTask::Init()
     }
 
 // Print setup info on LCD if available
-#ifdef DISPLAY_ENABLED
+#ifdef QR_CODE_ENABLED
     // Create buffer for QR code that can fit max size and null terminator.
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
@@ -255,7 +255,7 @@ CHIP_ERROR AppTask::Init()
     }
 #else
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif
+#endif // QR_CODE_ENABLED
 
     return err;
 }

@@ -30,9 +30,11 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -72,13 +74,19 @@ public:
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabrics                       Table of fabrics that are currently configured on the device
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
+     * @param previouslyEstablishedPeer     If a session had previously been established successfully to a peer, this should
+     *                                      be set to its scoped node-id. Else, this should be initialized to a
+     *                                      default-constructed ScopedNodeId().
+     * @param mrpConfig                     MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(
+    CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
-        SessionEstablishmentDelegate * delegate,
+        Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+        ScopedNodeId previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -86,17 +94,18 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabric                        The fabric that should be used for connecting with the peer
-     * @param peerNodeId                    Node id of the peer node
+     * @param fabricTable                   The fabric table that contains a fabric in common with the peer
+     * @param peerScopedNodeId              Node to which we want to establish a session
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
+     * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
+    EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                     SessionEstablishmentDelegate * delegate,
+                     Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -157,7 +166,7 @@ public:
     //// SessionDelegate ////
     void OnSessionReleased() override;
 
-    FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -177,7 +186,17 @@ private:
         kFinishedViaResume = 7,
     };
 
-    CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
+    /*
+     * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be
+     * notified of any further progress on this session.
+     *
+     * If we're either establishing or finished establishing a session to a peer in either initiator or responder
+     * roles, the node id of that peer should be provided in sessionEvictionHint. Else, it should be initialized
+     * to a default-constructed ScopedNodeId().
+     *
+     */
+    CHIP_ERROR Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                    SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint);
 
     // On success, sets mIpk to the correct value for outgoing Sigma1 based on internal state
     CHIP_ERROR RecoverInitiatorIpk();
@@ -241,10 +260,10 @@ private:
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
-    FabricTable * mFabricsTable    = nullptr;
-    const FabricInfo * mFabricInfo = nullptr;
-    NodeId mPeerNodeId             = kUndefinedNodeId;
-    NodeId mLocalNodeId            = kUndefinedNodeId;
+    FabricTable * mFabricsTable = nullptr;
+    FabricIndex mFabricIndex    = kUndefinedFabricIndex;
+    NodeId mPeerNodeId          = kUndefinedNodeId;
+    NodeId mLocalNodeId         = kUndefinedNodeId;
     CATValues mPeerCATs;
 
     SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session

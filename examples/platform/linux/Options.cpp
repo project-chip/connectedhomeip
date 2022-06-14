@@ -61,6 +61,7 @@ enum
     kDeviceOption_Spake2pIterations         = 0x1013,
     kDeviceOption_TraceFile                 = 0x1014,
     kDeviceOption_TraceLog                  = 0x1015,
+    kDeviceOption_TraceDecode               = 0x1016,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -95,6 +96,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
+    { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     {}
 };
@@ -178,6 +180,8 @@ const char * sDeviceOptionHelp =
     "       Output trace data to the provided file.\n"
     "  --trace_log <1/0>\n"
     "       A value of 1 enables traces to go to the log, 0 disables this (default 0).\n"
+    "  --trace_decode <1/0>\n"
+    "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n";
 
@@ -372,6 +376,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         if (atoi(aValue) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
+        }
+        break;
+    case kDeviceOption_TraceDecode:
+        if (atoi(aValue) != 0)
+        {
+            LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled = true;
         }
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED

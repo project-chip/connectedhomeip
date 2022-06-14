@@ -70,6 +70,8 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
                                          uint8_t timestampType, uint8_t * data, uint32_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
+using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, uint32_t aTerminationCause,
+                                                   uint32_t aNextResubscribeIntervalMsec);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
@@ -78,6 +80,7 @@ using OnReportEndCallback               = void (*)(PyObject * appContext);
 OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
 OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
 OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback = nullptr;
+OnResubscriptionAttemptedCallback gOnResubscriptionAttemptedCallback = nullptr;
 OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
@@ -139,6 +142,11 @@ public:
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
+    }
+
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    {
+        gOnResubscriptionAttemptedCallback(mAppContext, aTerminationCause.AsInteger(), aNextResubscribeIntervalMsec);
     }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
@@ -296,12 +304,14 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
 void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
                                      OnReadEventDataCallback onReadEventDataCallback,
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
+                                     OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
                                      OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
                                      OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
 {
     gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
     gOnReadEventDataCallback           = onReadEventDataCallback;
     gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
+    gOnResubscriptionAttemptedCallback = onResubscriptionAttemptedCallback;
     gOnReadErrorCallback               = onReadErrorCallback;
     gOnReadDoneCallback                = onReadDoneCallback;
     gOnReportBeginCallback             = onReportBeginCallback;

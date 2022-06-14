@@ -80,25 +80,20 @@ CHIP_ERROR DataVersionFilterIB::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
+        default:
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const int RequiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kDataVersion));
-
-        if ((tagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB;
-        }
+        const int requiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kDataVersion));
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

@@ -18,8 +18,10 @@
 
 #include "InteractiveCommands.h"
 
+#include <iomanip>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <sstream>
 
 char kInteractiveModeName[]                            = "";
 constexpr const char * kInteractiveModePrompt          = ">>> ";
@@ -102,9 +104,10 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     char * args[kInteractiveModeArgumentsMaxLength];
     args[0]       = kInteractiveModeName;
     int argsCount = 1;
+    std::string arg;
 
-    char * token = strtok(command, " ");
-    while (token != nullptr)
+    std::stringstream ss(command);
+    while (ss >> std::quoted(arg))
     {
         if (argsCount == kInteractiveModeArgumentsMaxLength)
         {
@@ -114,14 +117,19 @@ bool InteractiveStartCommand::ParseCommand(char * command)
             return true;
         }
 
-        args[argsCount++] = token;
-        token             = strtok(nullptr, " ");
+        char * carg = new char[arg.size() + 1];
+        strcpy(carg, arg.c_str());
+        args[argsCount++] = carg;
     }
 
     ClearLine();
     gIsCommandRunning = true;
     mHandler->RunInteractive(argsCount, args);
     gIsCommandRunning = false;
+
+    // Do not delete arg[0]
+    while (--argsCount)
+        delete[] args[argsCount];
 
     return true;
 }

@@ -189,7 +189,7 @@ protected:
         return true;
     }
 
-    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMinValue(const char * itemName, T current, U expected)
     {
         if (current < expected)
@@ -201,13 +201,13 @@ protected:
         return true;
     }
 
-    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMinValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMinValue(itemName, chip::to_underlying(current), expected);
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMinValue(const char * itemName, chip::BitFlags<T> current, U expected)
     {
         if (current.Raw() < expected)
@@ -219,7 +219,19 @@ protected:
         return true;
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * itemName, chip::BitMask<T> current, U expected)
+    {
+        if (current.Raw() < expected)
+        {
+            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current.Raw()) + " < " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -240,7 +252,7 @@ protected:
         return CheckConstraintMinValue(itemName, current, expected.Value());
     }
 
-    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         if (current > expected)
@@ -252,13 +264,13 @@ protected:
         return true;
     }
 
-    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value && !std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMaxValue(itemName, chip::to_underlying(current), expected);
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, chip::BitFlags<T> current, U expected)
     {
         if (current.Raw() > expected)
@@ -270,7 +282,19 @@ protected:
         return true;
     }
 
-    template <typename T, typename U>
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * itemName, chip::BitMask<T> current, U expected)
+    {
+        if (current.Raw() > expected)
+        {
+            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current.Raw()) + " > " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -345,8 +369,33 @@ protected:
         return true;
     }
 
+    template <typename T>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitMask<T> current, chip::BitMask<T> expected)
+    {
+        if (current == expected)
+        {
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
+            return false;
+        }
+
+        return true;
+    }
+
     template <typename T, typename U>
     bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() == expected)
+        {
+
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitMask<T> current, U expected)
     {
         if (current.Raw() == expected)
         {
@@ -399,5 +448,66 @@ protected:
             return false;
         }
         return CheckConstraintNotValue(itemName, current, expected.Value());
+    }
+
+    template <typename T>
+    bool CheckConstraintHasValue(const char * itemName, const chip::Optional<T> & current, bool expected)
+    {
+        if (current.HasValue() == expected)
+        {
+            return true;
+        }
+
+        if (current.HasValue())
+        {
+            Exit(std::string(itemName) + " not expected to have a value but does");
+        }
+        else
+        {
+            Exit(std::string(itemName) + " expected to have a value but doesn't");
+        }
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintContains(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, const U & expected)
+    {
+        auto iterValue = current.begin();
+        while (iterValue.Next())
+        {
+            auto currentValue = iterValue.GetValue();
+            if (currentValue == expected)
+            {
+                return true;
+            }
+        }
+
+        Exit(std::string(itemName) + " expect the value " + std::to_string(expected) + " but the list does not contains it.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintExcludes(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, const U & expected)
+    {
+        auto iterValue = current.begin();
+        while (iterValue.Next())
+        {
+            auto currentValue = iterValue.GetValue();
+            if (currentValue == expected)
+            {
+                Exit(std::string(itemName) + " does not expect the value " + std::to_string(expected) +
+                     " but the list contains it.");
+                return false;
+            }
+        }
+
+        CHIP_ERROR err = iterValue.GetStatus();
+        if (CHIP_NO_ERROR != err)
+        {
+            Exit(std::string(chip::ErrorStr(err)));
+            return false;
+        }
+
+        return true;
     }
 };

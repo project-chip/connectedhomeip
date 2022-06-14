@@ -27,7 +27,6 @@ static_library("transport") {
     "GroupPeerMessageCounter.cpp",
     "GroupPeerMessageCounter.h",
     "GroupSession.h",
-    "MessageCounter.cpp",
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",
     "PeerMessageCounter.h",

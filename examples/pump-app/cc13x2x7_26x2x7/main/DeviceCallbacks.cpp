@@ -73,8 +73,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kCommissioningComplete:
-        PLAT_LOG("Commissioning complete (%x,%d)", event->CommissioningComplete.PeerNodeId,
-                 event->CommissioningComplete.PeerFabricIndex);
+        PLAT_LOG("Commissioning complete for fabric 0x%x", event->CommissioningComplete.fabricIndex);
         break;
 
     case DeviceEventType::kOperationalNetworkEnabled:
@@ -106,8 +105,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
 chip::Protocols::InteractionModel::Status DeviceCallbacks::PreAttributeChangeCallback(chip::EndpointId endpointId,
                                                                                       chip::ClusterId clusterId,
-                                                                                      chip::AttributeId attributeId, uint8_t mask,
-                                                                                      uint8_t type, uint16_t size, uint8_t * value)
+                                                                                      chip::AttributeId attributeId, uint8_t type,
+                                                                                      uint16_t size, uint8_t * value)
 {
     PLAT_LOG("PreAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -131,8 +130,8 @@ chip::Protocols::InteractionModel::Status DeviceCallbacks::PreAttributeChangeCal
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                                  uint16_t size, uint8_t * value)
 {
     PLAT_LOG("PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);

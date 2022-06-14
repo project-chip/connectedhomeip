@@ -74,7 +74,7 @@ SessionHolder & SessionHolder::operator=(SessionHolder && that)
     return *this;
 }
 
-bool SessionHolder::GrabPairing(const SessionHandle & session)
+bool SessionHolder::GrabPairingSession(const SessionHandle & session)
 {
     Release();
 

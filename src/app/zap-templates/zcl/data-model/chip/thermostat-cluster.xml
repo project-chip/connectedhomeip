@@ -89,7 +89,6 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001D" define="THERMOSTAT_ALARM_MASK" type="BITMAP8" min="0x00" max="0x07" writable="false" default="0x00" optional="true">AlarmMask</attribute>
     <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true">ThermostatRunningMode</attribute>
     <attribute side="server" code="0x0020" define="START_OF_WEEK" type="ENUM8" min="0x00" max="0x06" writable="false" optional="true">StartOfWeek</attribute>
     <attribute side="server" code="0x0021" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">NumberOfWeeklyTransitions</attribute>
@@ -198,11 +197,6 @@ limitations under the License.
       </description>
       <access op="invoke" privilege="manage"/>
     </command>
-    <command source="client" code="0x04" name="GetRelayStatusLog" response="GetRelayStatusLogResponse" optional="true">
-      <description>
-        The Get Relay Status Log command is used to query the thermostat internal relay status log.
-      </description>
-    </command>
     <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true">
       <description>
         The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
@@ -211,17 +205,6 @@ limitations under the License.
       <arg name="DayOfWeekForSequence" type="DayOfWeek"/>
       <arg name="ModeForSequence" type="ModeForSequence"/>
       <arg name="Transitions" type="ThermostatScheduleTransition" array="true"/>
-    </command>
-    <command source="server" code="0x01" name="GetRelayStatusLogResponse" optional="true">
-      <description>
-        This command is sent from the thermostat cluster server in response to the Get Relay Status Log.
-      </description>
-      <arg name="TimeOfDay" type="INT16U"/>
-      <arg name="RelayStatus" type="BITMAP8"/>
-      <arg name="LocalTemperature" type="INT16S"/>
-      <arg name="HumidityInPercentage" type="INT8U"/>
-      <arg name="Setpoint" type="INT16S"/>
-      <arg name="UnreadEntries" type="INT16U"/>
     </command>
   </cluster>
 

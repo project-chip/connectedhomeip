@@ -19,10 +19,10 @@ limitations under the License.
   <struct name="ThreadMetrics">
     <cluster code="0x0034"/>
     <item name="Id" type="INT64U"/>
-    <item name="Name" type="CHAR_STRING" length="8"/>
-    <item name="StackFreeCurrent" type="INT32U"/>
-    <item name="StackFreeMinimum" type="INT32U"/>
-    <item name="StackSize" type="INT32U"/>
+    <item name="Name" type="CHAR_STRING" length="8" optional="true"/>
+    <item name="StackFreeCurrent" type="INT32U" optional="true"/>
+    <item name="StackFreeMinimum" type="INT32U" optional="true"/>
+    <item name="StackSize" type="INT32U" optional="true"/>
   </struct>
   <struct name="SoftwareFaultStruct">
     <cluster code="0x0034"/>
@@ -40,7 +40,7 @@ limitations under the License.
     <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
     <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
     <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapHighWatermark</attribute>
-    <command source="client" code="0x00" name="ResetWatermarks" optional="false" cli="chip software_diagnostics resetwatermarks">
+    <command source="client" code="0x00" name="ResetWatermarks" optional="true" cli="chip software_diagnostics resetwatermarks">
       <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute.</description>
     </command>
     <event side="server" code="0x00" name="SoftwareFault" priority="info" optional="true">
@@ -49,6 +49,7 @@ limitations under the License.
     </event>    
   </cluster>
   <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
+    <cluster code="0x0034"/>
     <field name="WaterMarks" mask="0x1"/>
   </bitmap>   
 </configurator>

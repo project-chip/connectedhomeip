@@ -28,5 +28,6 @@ pw_build_LINK_DEPS = [
 ]
 
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
 chip_enable_pw_rpc = true

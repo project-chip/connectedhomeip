@@ -21,7 +21,7 @@
 
 #include <lib/core/ClusterEnums.h>
 
-#include <zephyr.h>
+#include <zephyr/zephyr.h>
 
 #include <cstdint>
 

@@ -187,7 +187,7 @@ public final class ChipIdLookup {
     if (clusterId == 1026L) {
       return "TemperatureMeasurement";
     }
-    if (clusterId == 1295L) {
+    if (clusterId == 4294048773L) {
       return "TestCluster";
     }
     if (clusterId == 513L) {
@@ -1282,6 +1282,9 @@ public final class ChipIdLookup {
       if (attributeId == 7L) {
         return "ActiveNetworkFaults";
       }
+      if (attributeId == 8L) {
+        return "TestEventTriggersEnabled";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -2244,7 +2247,7 @@ public final class ChipIdLookup {
       }
       return "";
     }
-    if (clusterId == 1295L) {
+    if (clusterId == 4294048773L) {
       if (attributeId == 0L) {
         return "Boolean";
       }
@@ -2941,11 +2944,23 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Type";
       }
+      if (attributeId == 1L) {
+        return "PhysicalClosedLimitLift";
+      }
+      if (attributeId == 2L) {
+        return "PhysicalClosedLimitTilt";
+      }
       if (attributeId == 3L) {
         return "CurrentPositionLift";
       }
       if (attributeId == 4L) {
         return "CurrentPositionTilt";
+      }
+      if (attributeId == 5L) {
+        return "NumberOfActuationsLift";
+      }
+      if (attributeId == 6L) {
+        return "NumberOfActuationsTilt";
       }
       if (attributeId == 7L) {
         return "ConfigStatus";

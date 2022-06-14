@@ -29,8 +29,11 @@ chip_build_tests = false
 chip_mdns = "platform"
 
 # Trying to fit into the available flash by disabling optional logging for now
-chip_detail_logging = false
+chip_detail_logging = true
 chip_progress_logging = true
+
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
 
 mbedtls_target = "${chip_root}/third_party/nxp/k32w0_sdk:mbedtls"
 openthread_external_mbedtls = mbedtls_target

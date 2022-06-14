@@ -41,11 +41,11 @@ void CHIPCommand::StartTracing()
 
     if (mTraceFile.HasValue())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
     else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamLog());
     }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }

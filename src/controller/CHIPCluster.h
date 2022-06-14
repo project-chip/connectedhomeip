@@ -48,7 +48,9 @@ using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
+using ReadDoneCallback                = void (*)(void * context);
 using SubscriptionEstablishedCallback = void (*)(void * context);
+using ResubscriptionAttemptCallback   = void (*)(void * context, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec);
 
 class DLL_EXPORT ClusterBase
 {
@@ -222,18 +224,16 @@ public:
      */
     template <typename AttributeInfo>
     CHIP_ERROR ReadAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
-                             ReadResponseFailureCallback failureCb, bool aIsFabricFiltered = true,
-                             const Optional<DataVersion> & aDataVersion = NullOptional)
+                             ReadResponseFailureCallback failureCb, bool aIsFabricFiltered = true)
     {
         return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aIsFabricFiltered,
-            aDataVersion);
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aIsFabricFiltered);
     }
 
     template <typename DecodableType, typename DecodableArgType>
     CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
                              ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb,
-                             bool aIsFabricFiltered = true, const Optional<DataVersion> & aDataVersion = NullOptional)
+                             bool aIsFabricFiltered = true)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -253,7 +253,7 @@ public:
 
         return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
                                                         mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb,
-                                                        aIsFabricFiltered, aDataVersion);
+                                                        aIsFabricFiltered);
     }
 
     /**
@@ -264,12 +264,14 @@ public:
     CHIP_ERROR
     SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
                        ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                       SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr, bool aIsFabricFiltered = true,
+                       SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                       ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
                        bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb, aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
+            aKeepPreviousSubscriptions, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -277,7 +279,8 @@ public:
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                                  bool aIsFabricFiltered = true, bool aKeepPreviousSubscriptions = false,
+                                  ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
+                                  bool aKeepPreviousSubscriptions            = false,
                                   const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -303,18 +306,31 @@ public:
             }
         };
 
+        auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                            uint32_t aNextResubscribeIntervalMsec) {
+            if (resubscriptionAttemptCb != nullptr)
+            {
+                resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
+            }
+        };
+
         return Controller::SubscribeAttribute<DecodableType>(
             mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, onReportCb,
-            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, aIsFabricFiltered,
-            aKeepPreviousSubscriptions, aDataVersion);
+            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
+            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
     }
 
     /**
      * Read an event and get a type-safe callback with the event data.
+     *
+     * @param[in] successCb Used to deliver event data received through the Read interactions
+     * @param[in] failureCb failureCb will be called when an error occurs *after* a successful call to ReadEvent.
+     * @param[in] doneCb    OnDone will be called when ReadClient has finished all work for event retrieval, it is possible that
+     * there is no event.
      */
     template <typename DecodableType>
     CHIP_ERROR ReadEvent(void * context, ReadResponseSuccessCallback<DecodableType> successCb,
-                         ReadResponseFailureCallback failureCb)
+                         ReadResponseFailureCallback failureCb, ReadDoneCallback doneCb)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -332,8 +348,14 @@ public:
             }
         };
 
+        auto onDoneCb = [context, doneCb](app::ReadClient * apReadClient) {
+            if (doneCb != nullptr)
+            {
+                doneCb(context);
+            }
+        };
         return Controller::ReadEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                                    onSuccessCb, onFailureCb);
+                                                    onSuccessCb, onFailureCb, onDoneCb);
     }
 
     template <typename DecodableType>
@@ -341,6 +363,7 @@ public:
                               ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                               uint16_t maxIntervalCeilingSeconds,
                               SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                              ResubscriptionAttemptCallback resubscriptionAttemptCb     = nullptr,
                               bool aKeepPreviousSubscriptions = false, bool aIsUrgentEvent = false)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -366,10 +389,18 @@ public:
             }
         };
 
+        auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                            uint32_t aNextResubscribeIntervalMsec) {
+            if (resubscriptionAttemptCb != nullptr)
+            {
+                resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
+            }
+        };
+
         return Controller::SubscribeEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
                                                          mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
                                                          maxIntervalCeilingSeconds, onSubscriptionEstablishedCb,
-                                                         aKeepPreviousSubscriptions, aIsUrgentEvent);
+                                                         onResubscriptionAttemptCb, aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
 
 protected:

@@ -48,6 +48,12 @@ using namespace chip::Protocols;
 
 namespace {
 
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestPaseMessageCount = 8;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestPaseMessageCount = 5;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
 // Test Set #01 of Spake2p Parameters (PIN Code, Iteration Count, Salt, and matching Verifier):
 constexpr uint32_t sTestSpake2p01_PinCode        = 20202021;
 constexpr uint32_t sTestSpake2p01_IterationCount = 1000;
@@ -171,12 +177,11 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
                                 &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 1);
+    // There should have been two messages sent: PBKDFParamRequest and an ack.
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
 
-    // Clear pending packet in CRMP
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = context->GetReliableMessageContext();
-    rm->ClearRetransTable(rc);
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     loopback.Reset();
     loopback.mSentMessageCount = 0;
@@ -250,7 +255,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // via piggybacked acks. So we cannot check for a specific value of mSentMessageCount.
     // Let's make sure atleast number is >= than the minimum messages required to complete the
     // handshake.
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount >= 5);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount >= sTestPaseMessageCount);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 

@@ -60,12 +60,6 @@ limitations under the License.
       <arg name="identifyTime" type="INT16U"/>
       <access op="invoke" privilege="manage"/>
     </command>
-    <command source="client" code="0x01" name="IdentifyQuery" response="IdentifyQueryResponse" optional="false">
-      <description>
-        Command description for IdentifyQuery
-      </description>
-      <access op="invoke" privilege="manage"/>
-    </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">
       <description>
         Command description for TriggerEffect
@@ -73,12 +67,6 @@ limitations under the License.
       <arg name="effectIdentifier" type="IdentifyEffectIdentifier"/>
       <arg name="effectVariant" type="IdentifyEffectVariant"/>
       <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="server" code="0x00" name="IdentifyQueryResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for IdentifyQueryResponse
-      </description>
-      <arg name="timeout" type="INT16U"/>
     </command>
   </cluster>
 </configurator>

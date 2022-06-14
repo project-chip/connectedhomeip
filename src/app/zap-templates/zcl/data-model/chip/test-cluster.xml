@@ -17,13 +17,13 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <struct name="TestListStructOctet">
-    <cluster code="0x050F"/>
-    <item name="fabricIndex" type="INT64U"/>
-    <item name="operationalCert" type="OCTET_STRING" length="32"/>
+    <cluster code="0xFFF1FC05"/>
+    <item name="member1" type="INT64U"/>
+    <item name="member2" type="OCTET_STRING" length="32"/>
   </struct>
 
   <struct name="TestFabricScoped">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item fieldId="1" name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
     <item fieldId="2" name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
     <item fieldId="3" name="nullableFabricSensitiveInt8u" type="INT8U" isNullable="true" isFabricSensitive="true"/>
@@ -35,7 +35,7 @@ limitations under the License.
   </struct>
 
   <enum name="SimpleEnum" type="ENUM8">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="Unspecified" value="0x00"/>
     <item name="ValueA" value="0x01"/>
     <item name="ValueB" value="0x02"/>
@@ -43,14 +43,14 @@ limitations under the License.
   </enum>
 
   <bitmap name="SimpleBitmap" type="BITMAP8">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <field name="ValueA" mask="0x1"/>
     <field name="ValueB" mask="0x2"/>
     <field name="ValueC" mask="0x4"/>
   </bitmap>
 
   <struct name="SimpleStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleEnum" optional="false"/>
@@ -62,14 +62,14 @@ limitations under the License.
   </struct>
 
   <struct name="NestedStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleStruct" optional="false"/>
   </struct>
 
   <struct name="NestedStructList">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="INT8U" optional="false"/>
     <item name="b" type="BOOLEAN" optional="false"/>
     <item name="c" type="SimpleStruct" optional="false"/>
@@ -80,13 +80,13 @@ limitations under the License.
   </struct>
 
   <struct name="DoubleNestedStructList">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="a" type="NestedStructList" array="true" optional="false"/>
   </struct>
 
 
   <struct name="NullablesAndOptionalsStruct">
-    <cluster code="0x050F"/>
+    <cluster code="0xFFF1FC05"/>
     <item name="NullableInt" type="INT16U" isNullable="true"/>
     <item name="OptionalInt" type="INT16U" optional="true"/>
     <item name="NullableOptionalInt" type="INT16U" isNullable="true"
@@ -106,7 +106,7 @@ limitations under the License.
   </struct>
 
     <bitmap name="Bitmap8MaskMap" type="BITMAP8">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -114,7 +114,7 @@ limitations under the License.
     </bitmap>
 
     <bitmap name="Bitmap16MaskMap" type="BITMAP16">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -122,7 +122,7 @@ limitations under the License.
     </bitmap>
 
     <bitmap name="Bitmap32MaskMap" type="BITMAP32">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -130,7 +130,7 @@ limitations under the License.
     </bitmap>
     
     <bitmap name="Bitmap64MaskMap" type="BITMAP64">
-        <cluster code="0x050F" />
+        <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
         <field mask="0x04" name="MaskVal3" />
@@ -140,7 +140,7 @@ limitations under the License.
   <cluster>
     <domain>CHIP</domain>
     <name>Test Cluster</name>
-    <code>0x050F</code>
+    <code>0xFFF1FC05</code>
     <define>TEST_CLUSTER</define>
     <description>The Test Cluster is meant to validate the generated code</description>
     <!-- Base data types -->
@@ -234,7 +234,7 @@ limitations under the License.
     <attribute side="server" code="0x4029" define="NULLABLE_RANGE_RESTRICTED_INT16S" type="int16s" min="-150" max="200" writable="true" isNullable="true" optional="false" default="-5">nullable_range_restricted_int16s</attribute>
 
     <!-- This attribute should not be enabled on the server side -->
-    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
+    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="true">unsupported</attribute>
 
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
@@ -261,7 +261,7 @@ limitations under the License.
       </description>
     </command>
 
-    <command source="client" code="0x04" name="TestAddArguments" response="TestAddArgumentsResponse" optional="false">
+    <command source="client" code="0x04" name="TestAddArguments" response="TestAddArgumentsResponse" optional="true">
       <description>
         Command that takes two arguments and returns their sum.
       </description>
@@ -269,14 +269,14 @@ limitations under the License.
       <arg name="arg2" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x05" name="TestSimpleArgumentRequest" response="TestSimpleArgumentResponse" optional="false">
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" response="TestSimpleArgumentResponse" optional="true">
       <description>
         Command that takes an argument which is bool
       </description>
       <arg name="arg1" type="BOOLEAN"/>
     </command>
 
-    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" response="TestStructArrayArgumentResponse" optional="false">
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" response="TestStructArrayArgumentResponse" optional="true">
       <description>
         Command that takes various arguments that are arrays, including an array of structs which have a list member.
       </description>
@@ -289,7 +289,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x07" name="TestStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+             response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is struct.  The response echoes the
         'b' field of the single arg.
@@ -298,7 +298,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x08" name="TestNestedStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+             response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is nested struct.  The response
         echoes the 'b' field of ar1.c.
@@ -306,7 +306,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStruct"/>
     </command>
 
-    <command source="client" code="0x09" name="TestListStructArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x09" name="TestListStructArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of structs.  The response
         returns false if there is some struct in the list whose 'b' field is
@@ -315,7 +315,7 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct" array="true"/>
     </command>
 
-    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of INT8U.  The response
         returns false if the list contains a 0 in it, true otherwise (including
@@ -324,7 +324,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a Nested Struct List.  The
         response returns false if there is some struct in arg1 (either directly
@@ -334,7 +334,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList"/>
     </command>
 
-    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="true">
       <description>
         Command that takes an argument which is a list of Nested Struct List.
         The response returns false if there is some struct in arg1 (either
@@ -344,7 +344,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList" array="true"/>
     </command>
 
-    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" response="TestListInt8UReverseResponse" optional="false">
+    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" response="TestListInt8UReverseResponse" optional="true">
       <description>
         Command that takes an argument which is a list of INT8U and expects a
         response that reverses the list.
@@ -352,7 +352,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="client" code="0x0E" name="TestEnumsRequest" response="TestEnumsResponse" optional="false">
+    <command source="client" code="0x0E" name="TestEnumsRequest" response="TestEnumsResponse" optional="true">
       <description>
         Command that sends a vendor id and an enum.  The server is expected to
         echo them back.
@@ -362,7 +362,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x0F" name="TestNullableOptionalRequest"
-             optional="false" response="TestNullableOptionalResponse">
+             optional="true" response="TestNullableOptionalResponse">
       <description>
         Command that takes an argument which is nullable and optional.  The
         response returns a boolean indicating whether the argument was present,
@@ -373,7 +373,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x10" name="TestComplexNullableOptionalRequest"
-             optional="false" response="TestComplexNullableOptionalResponse">
+             optional="true" response="TestComplexNullableOptionalResponse">
       <description>
         Command that takes various arguments which can be nullable and/or optional.  The
         response returns information about which things were received and what
@@ -398,7 +398,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x11" name="SimpleStructEchoRequest"
-             response="SimpleStructResponse" optional="false">
+             response="SimpleStructResponse" optional="true">
       <description>
         Command that takes an argument which is a struct.  The response echoes
         the struct back.
@@ -407,14 +407,14 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x12" name="TimedInvokeRequest"
-             mustUseTimedInvoke="true" optional="false">
+             mustUseTimedInvoke="true" optional="true">
       <description>
         Command that just responds with a success status if the timed invoke
         conditions are met.
       </description>
     </command>
 
-    <command source="client" code="0x13" name="TestSimpleOptionalArgumentRequest" optional="false">
+    <command source="client" code="0x13" name="TestSimpleOptionalArgumentRequest" optional="true">
       <description>
         Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value.
       </description>
@@ -422,7 +422,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x14" name="TestEmitTestEventRequest"
-             optional="false" response="TestEmitTestEventResponse">
+             optional="true" response="TestEmitTestEventResponse">
       <description>
         Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response.
       </description>
@@ -432,35 +432,35 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x15" name="TestEmitTestFabricScopedEventRequest"
-             optional="false" response="TestEmitTestFabricScopedEventResponse">
+             optional="true" response="TestEmitTestFabricScopedEventResponse">
       <description>
         Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response.
       </description>
       <arg name="arg1" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x00" name="TestSpecificResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response for TestAddArguments that returns the sum.
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
-    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestSimpleArgumentRequest with a simple return value
       </description>
       <arg name="returnValue" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response for TestStructArrayArgumentRequest with complicated return arguments
       </description>
@@ -472,14 +472,14 @@ limitations under the License.
       <arg name="arg6" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response that delivers the reversed list of uint8.
       </description>
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="server" code="0x05" name="TestEnumsResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x05" name="TestEnumsResponse" optional="true" disableDefaultResponse="true">
       <description>
         Response that delivers a vendor id and an enum..
       </description>
@@ -487,7 +487,7 @@ limitations under the License.
       <arg name="arg2" type="SimpleEnum"/>
     </command>
 
-    <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers information about the argument TestNullableOptionalRequest had,
         and the original value if there was one.
@@ -498,7 +498,7 @@ limitations under the License.
       <arg name="originalValue" type="INT8U" optional="true" isNullable="true"/>
     </command>
 
-    <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers information about the arguments TestComplexNullableOptionalRequest had.
       </description>
@@ -535,7 +535,7 @@ limitations under the License.
            optional="true"/>
     </command>
 
-    <command source="server" code="0x08" name="BooleanResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x08" name="BooleanResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers a single boolean argument. What the argument means depends on
         what we're responding to.
@@ -543,7 +543,7 @@ limitations under the License.
       <arg name="value" type="BOOLEAN"/>
     </command>
 
-    <command source="server" code="0x09" name="SimpleStructResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x09" name="SimpleStructResponse" optional="true" disableDefaultResponse="true">
       <description>
         Command that returns a single argument which is a struct.  The contents
         of the struct depend on what we are responding to.
@@ -551,14 +551,14 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct"/>
     </command>
 
-    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers the ID of an event in response to test command emitting fabric scoped events.
       </description>
       <arg name="value" type="INT64U"/>
     </command>
 
-    <command source="server" code="0x0B" name="TestEmitTestFabricScopedEventResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0B" name="TestEmitTestFabricScopedEventResponse" optional="true" disableDefaultResponse="true">
       <description>
         Delivers the ID of an event in response to test command emitting fabric scope events.
       </description>

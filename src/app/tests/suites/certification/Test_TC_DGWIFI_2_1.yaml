@@ -1,0 +1,133 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 51.2.1. [TC-DGWIFI-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Reads NetworkInterface structure attribute from DUT"
+      cluster: "General Diagnostics"
+      command: "readAttribute"
+      attribute: "NetworkInterfaces"
+      response:
+          constraints:
+              type: list
+
+    #issue #13645
+    - label: "Reads SecurityType attribute constraints"
+      command: "readAttribute"
+      attribute: "SecurityType"
+      response:
+          constraints:
+              type: enum
+
+    - label: "Reads WiFiVersion attribute constraints"
+      command: "readAttribute"
+      attribute: "WiFiVersion"
+      response:
+          constraints:
+              type: enum
+              minValue: 0
+              maxValue: 5
+
+    - label: "Reads ChannelNumber attribute constraints"
+      command: "readAttribute"
+      attribute: "ChannelNumber"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Reads RSSI attribute constraints"
+      command: "readAttribute"
+      attribute: "RSSI"
+      response:
+          constraints:
+              type: int8
+              minValue: -120
+              maxValue: 0
+
+    - label: "Reads BeaconLostCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "BeaconLostCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads BeaconRxCount attribute constraints"
+      command: "readAttribute"
+      attribute: "BeaconRxCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads PacketMulticastRxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketMulticastRxCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads PacketMulticastTxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketMulticastTxCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads PacketUnicastRxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketUnicastRxCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads PacketUnicastTxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "PacketUnicastTxCount"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reads CurrentMaxRate attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "CurrentMaxRate"
+      response:
+          constraints:
+              type: uint64
+
+    - label: "Reads OverrunCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          constraints:
+              type: uint64

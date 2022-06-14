@@ -294,8 +294,8 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
 void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
 {
     Cover * cover = GetCover(endpoint);
-    chip::BitFlags<Mode> mode;
-    chip::BitFlags<ConfigStatus> configStatus;
+    chip::BitMask<Mode> mode;
+    chip::BitMask<ConfigStatus> configStatus;
 
     if (nullptr == cover)
     {
@@ -426,7 +426,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
 
     // Attribute: Id  7 ConfigStatus
-    chip::BitFlags<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+    chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
     configStatus.Set(ConfigStatus::kLiftEncoderControlled);
     configStatus.Set(ConfigStatus::kTiltEncoderControlled);
     configStatus.Set(ConfigStatus::kOnlineReserved);
@@ -438,7 +438,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);
 
     // Attribute: Id 24 Mode
-    chip::BitFlags<Mode> mode;
+    chip::BitMask<Mode> mode;
     mode.Clear(Mode::kMotorDirectionReversed);
     mode.Clear(Mode::kMaintenanceMode);
     mode.Clear(Mode::kCalibrationMode);

@@ -54,6 +54,9 @@ public:
     const char * FailSafeContextKey() { return Format("g/fs/c"); }
     static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
+    // LastKnownGoodTime
+    const char * LastKnownGoodTimeKey() { return Format("g/lkgt"); }
+
     // Session resumption
     const char * FabricSession(FabricIndex fabric, NodeId nodeId)
     {

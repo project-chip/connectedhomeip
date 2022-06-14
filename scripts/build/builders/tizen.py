@@ -105,7 +105,7 @@ class TizenBuilder(GnBuilder):
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.TargetCpuName(),
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
-            'sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
+            'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
 
     def _generate_flashbundle(self):

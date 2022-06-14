@@ -56,13 +56,12 @@ std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(ChipDeviceScannerDe
     return std::make_unique<ChipDeviceScanner>(delegate);
 }
 
-static void __CleanupServiceData(bt_adapter_le_service_data_s * dataList, int count)
+static void __CleanupServiceData(bt_adapter_le_service_data_s * dataList, size_t count)
 {
-    int i;
-    if (!dataList || count == 0)
-        return;
+    VerifyOrReturn(dataList != nullptr);
+    VerifyOrReturn(count != 0);
 
-    for (i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
         g_free(dataList[i].service_uuid);
         g_free(dataList[i].service_data);
@@ -70,44 +69,34 @@ static void __CleanupServiceData(bt_adapter_le_service_data_s * dataList, int co
     g_free(dataList);
 }
 
-static void __PrintLEScanData(bt_adapter_le_service_data_s * dataList, int idx)
+static void __PrintLEScanData(bt_adapter_le_service_data_s * dataList, size_t idx)
 {
-    int i = 0;
-    if (!dataList)
-        return;
+    VerifyOrReturn(dataList != nullptr);
 
     // Print Service UUID in the Service Data
-    ChipLogProgress(DeviceLayer, "======Service UUID========\n");
-    ChipLogProgress(DeviceLayer, "        UUID[%s]\n", dataList[idx].service_uuid);
-
-    ChipLogProgress(DeviceLayer, "Service Data Length::[%d]\n", dataList[idx].service_data_len);
+    ChipLogDetail(DeviceLayer, "======Service UUID========");
+    ChipLogDetail(DeviceLayer, "Service UUID::[%s]", dataList[idx].service_uuid);
 
     // Print Service Data
-    if (dataList[idx].service_data_len > 0)
-        ChipLogProgress(DeviceLayer, "=====Service Data====\n");
-
-    for (i = 0; i < dataList[idx].service_data_len; i++)
-    {
-        ChipLogProgress(DeviceLayer, "Service Data[%d] = [0x%x]\n", i, dataList[idx].service_data[i]);
-    }
+    ChipLogDetail(DeviceLayer, "======Service Data========");
+    ChipLogDetail(DeviceLayer, "Service Data Length::[%d]", dataList[idx].service_data_len);
+    ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<uint8_t *>(dataList[idx].service_data), dataList[idx].service_data_len));
 }
 
 static bool __IsChipThingDevice(bt_adapter_le_device_scan_result_info_s * info,
                                 chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
+    VerifyOrReturnError(info != nullptr, false);
+
     int count                               = 0;
     bt_adapter_le_service_data_s * dataList = nullptr;
     bool isChipDevice                       = false;
 
-    if (!info)
-        return false;
-
-    ChipLogError(DeviceLayer, "Is [%s] ChipThingDevice ?: Check now", info->remote_address);
+    ChipLogProgress(DeviceLayer, "Is [%s] ChipThingDevice ?: Check now", info->remote_address);
 
     if (bt_adapter_le_get_scan_result_service_data_list(info, BT_ADAPTER_LE_PACKET_ADVERTISING, &dataList, &count) == BT_ERROR_NONE)
     {
-        int i;
-        for (i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             if (g_strcmp0(dataList[i].service_uuid, chip_service_uuid) == 0 ||
                 g_strcmp0(dataList[i].service_uuid, chip_service_uuid_short) == 0)
@@ -127,11 +116,10 @@ static bool __IsChipThingDevice(bt_adapter_le_device_scan_result_info_s * info,
 
 void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
-    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+    VerifyOrReturn(info != nullptr);
 
-    if (!info)
-        return;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
 
     ChipLogProgress(DeviceLayer, "LE Device Reported!! remote addr [%s]", info->remote_address);
 
@@ -148,7 +136,7 @@ void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_res
 
 gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
     ChipLogProgress(DeviceLayer, "Scan Timer expired!!");
     self->StopChipScan();
     return G_SOURCE_REMOVE;
@@ -156,8 +144,8 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
 
 gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
 {
-    ChipDeviceScanner * self = (ChipDeviceScanner *) userData;
-    int ret                  = BT_ERROR_NONE;
+    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
+    int ret   = BT_ERROR_NONE;
     GSource * idleSource;
 
     self->mAsyncLoop = mainLoop;
@@ -239,7 +227,10 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     ret = bt_adapter_le_stop_scan();
-    ChipLogError(DeviceLayer, "bt_adapter_le_stop_scan() ret: %d", ret);
+    if (ret != BT_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "bt_adapter_le_stop_scan() failed. ret: %d", ret);
+    }
 
     g_main_loop_quit(mAsyncLoop);
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");

@@ -195,7 +195,6 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 {
     PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
     if (platformManagerDelegate != nullptr)
     {
@@ -203,14 +202,6 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 
         if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
             platformManagerDelegate->OnStartUp(softwareVersion);
-    }
-
-    if (generalDiagnosticsDelegate != nullptr)
-    {
-        BootReasonType bootReason;
-
-        if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
-            generalDiagnosticsDelegate->OnDeviceRebooted(bootReason);
     }
 }
 

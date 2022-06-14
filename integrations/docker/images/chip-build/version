@@ -1,1 +1,1 @@
-0.5.76 Version bump reason: [Ameba] Save wifi information in persistent storage for autoconnect
+0.5.79 Version bump reason: [Ameba] Update ameba SDK to expose xPortResetHeapMinimumEverFreeHeapSize API

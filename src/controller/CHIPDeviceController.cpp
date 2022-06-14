@@ -149,14 +149,21 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-    Credentials::P256PublicKeySpan rootPublicKey;
+    Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
 
+    // There are three possibilities here in terms of what happens with our
+    // operational key:
+    // 1) We have an externally owned operational keypair.
+    // 2) We have an operational keypair that the fabric table should clone via
+    //    serialize/deserialize.
+    // 3) We have no keypair at all, and the fabric table has been initialized
+    //    with a key store.
     if (params.hasExternallyOwnedOperationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
     }
-    else
+    else if (params.operationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
     }
@@ -168,6 +175,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(chipCertSpan, rootPublicKeySpan));
+    Crypto::P256PublicKey rootPublicKey{ rootPublicKeySpan };
 
     if (params.controllerICAC.empty())
     {
@@ -187,14 +196,10 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     ReturnErrorOnFailure(ExtractFabricIdFromCert(chipCertSpan, &fabricId));
 
-    ReturnErrorOnFailure(newFabric.GetRootPubkey(rootPublicKey));
     mFabricInfo = params.systemState->Fabrics()->FindFabric(rootPublicKey, fabricId);
     if (mFabricInfo != nullptr)
     {
-        ReturnErrorOnFailure(mFabricInfo->SetFabricInfo(newFabric));
-        // Store the new fabric info, since we might now have new certificates
-        // and whatnot.
-        ReturnErrorOnFailure(params.systemState->Fabrics()->Store(mFabricInfo->GetFabricIndex()));
+        ReturnErrorOnFailure(params.systemState->Fabrics()->UpdateFabric(mFabricInfo->GetFabricIndex(), newFabric));
     }
     else
     {
@@ -282,44 +287,6 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
-{
-    if (session->GetSessionType() != Session::SessionType::kSecure)
-    {
-        // Definitely not a CASE session.
-        return;
-    }
-
-    auto * secureSession = session->AsSecureSession();
-    if (secureSession->GetSecureSessionType() != SecureSession::Type::kCASE)
-    {
-        // Still not CASE.
-        return;
-    }
-
-    FabricIndex ourIndex = kUndefinedFabricIndex;
-    CHIP_ERROR err       = GetFabricIndex(&ourIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        // We can't really do CASE, now can we?
-        return;
-    }
-
-    if (ourIndex != session->GetFabricIndex())
-    {
-        // Not one of our sessions.
-        return;
-    }
-
-    err = UpdateDevice(secureSession->GetPeerNodeId());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller,
-                     "OnFirstMessageDeliveryFailed was called, but UpdateDevice did not succeed (%" CHIP_ERROR_FORMAT ")",
-                     err.Format());
-    }
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -359,8 +326,6 @@ DeviceCommissioner::DeviceCommissioner() :
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(params));
-
-    params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     mPairingDelegate = params.pairingDelegate;
 
@@ -433,8 +398,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
         OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
     }
     // TODO: If we have a commissioning step in progress, is there a way to cancel that callback?
-
-    mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
@@ -598,24 +561,31 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     current = FindCommissioneeDevice(peerAddress);
     if (current != nullptr)
     {
-
-        if (current->IsSecureConnected())
+        if (current->GetDeviceId() == remoteDeviceId)
         {
-            if (mPairingDelegate)
+            // We might be able to just reuse its connection if it has one or is
+            // working on one.
+            if (current->IsSecureConnected())
             {
-                // We already have an open secure session to this device, call the callback immediately and early return.
-                mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+                if (mPairingDelegate)
+                {
+                    // We already have an open secure session to this device, call the callback immediately and early return.
+                    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+                }
+                return CHIP_NO_ERROR;
             }
-            return CHIP_NO_ERROR;
-        }
-        if (current->IsSessionSetupInProgress())
-        {
-            // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when
-            // connection completes
-            return CHIP_NO_ERROR;
+            if (current->IsSessionSetupInProgress())
+            {
+                // We're not connected yet, but we're in the process of connecting. Pairing delegate will get a callback when
+                // connection completes
+                return CHIP_NO_ERROR;
+            }
         }
 
-        // Something has gone strange. Delete the old device, try again.
+        // Either the consumer wants to assign a different device id to this
+        // peer address now (so we can't reuse the commissionee device we have
+        // already) or something has gone strange. Delete the old device, try
+        // again.
         ChipLogError(Controller, "Found unconnected device, removing");
         ReleaseCommissioneeDevice(current);
     }
@@ -778,19 +748,6 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
-{
-    Optional<SessionHandle> secureSessionHandle;
-
-    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    secureSessionHandle = mDeviceBeingCommissioned->GetSecureSession();
-    VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
-    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -867,7 +824,8 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
 }
 
 CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * device,
-                                                                  Credentials::CertificateType certificateType)
+                                                                  Credentials::CertificateType certificateType,
+                                                                  Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendCertificateChainRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending Certificate Chain request to %p device", device);
@@ -876,7 +834,7 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
     request.certificateType = certificateType;
     return SendCommand<OperationalCredentialsCluster>(device, request, OnCertificateChainResponse,
-                                                      OnCertificateChainFailureResponse);
+                                                      OnCertificateChainFailureResponse, timeout);
 
     return CHIP_NO_ERROR;
 }
@@ -902,7 +860,8 @@ void DeviceCommissioner::OnCertificateChainResponse(
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
-CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce)
+CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce,
+                                                             Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendAttestationRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
@@ -912,7 +871,7 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
     request.attestationNonce = attestationNonce;
 
     ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnAttestationResponse, OnAttestationFailureResponse));
+        SendCommand<OperationalCredentialsCluster>(device, request, OnAttestationResponse, OnAttestationFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
     return CHIP_NO_ERROR;
 }
@@ -1034,8 +993,11 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
         request.expiryLengthSeconds = expiryLengthSeconds.Value();
         request.breadcrumb          = mCommissioningStage;
         ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", request.expiryLengthSeconds);
+        // Per spec, anything we do with the fail-safe armed must not time out
+        // in less than kMinimumCommissioningStepTimeout.
         SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForFailedDeviceAttestation,
-                                                 OnFailedToExtendedArmFailSafeFailedDeviceAttestation);
+                                                 OnFailedToExtendedArmFailSafeFailedDeviceAttestation,
+                                                 MakeOptional(kMinimumCommissioningStepTimeout));
     }
     else
     {
@@ -1078,7 +1040,8 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
                                                                            AttestationSignature, dacPubkey, csrNonce);
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce,
+                                                                               Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificateSigningRequestCommand", "DeviceCommissioner");
     ChipLogDetail(Controller, "Sending CSR request to %p device", device);
@@ -1087,8 +1050,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     OperationalCredentials::Commands::CSRRequest::Type request;
     request.CSRNonce = csrNonce;
 
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest, OnCSRFailureResponse));
+    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest,
+                                                                    OnCSRFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent CSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1175,20 +1138,21 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
                                                           const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
-                                                          const NodeId adminSubject)
+                                                          const NodeId adminSubject, Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
+
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::AddNOC::Type request;
-    request.NOCValue      = nocCertBuf;
-    request.ICACValue     = icaCertBuf;
-    request.IPKValue      = ipk;
-    request.caseAdminNode = adminSubject;
-    request.adminVendorId = mVendorId;
+    request.NOCValue         = nocCertBuf;
+    request.ICACValue        = icaCertBuf;
+    request.IPKValue         = ipk;
+    request.caseAdminSubject = adminSubject;
+    request.adminVendorId    = mVendorId;
 
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
+    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse,
+                                                                    OnAddNOCFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1212,9 +1176,12 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
+    case OperationalCertStatus::kInvalidAdminSubject:
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
     case OperationalCertStatus::kInsufficientPrivilege:
+        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
@@ -1258,7 +1225,8 @@ exit:
     }
 }
 
-CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac)
+CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac,
+                                                          Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendTrustedRootCertificate", "DeviceCommissioner");
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1268,7 +1236,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
     OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
     request.rootCertificate = rcac;
     ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse));
+        SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1434,7 +1402,8 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
         mDeviceBeingCommissioned = proxy;
         // We actually want to do the same thing on success or failure because we're already in a failure state
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure);
+        SendCommand<GeneralCommissioningCluster>(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
+                                                 /* timeout = */ NullOptional);
     }
 }
 
@@ -1950,11 +1919,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kSendPAICertificateRequest:
         ChipLogProgress(Controller, "Sending request for PAI certificate");
-        SendCertificateChainRequestCommand(proxy, CertificateType::kPAI);
+        SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout);
         break;
     case CommissioningStage::kSendDACCertificateRequest:
         ChipLogProgress(Controller, "Sending request for DAC certificate");
-        SendCertificateChainRequestCommand(proxy, CertificateType::kDAC);
+        SendCertificateChainRequestCommand(proxy, CertificateType::kDAC, timeout);
         break;
     case CommissioningStage::kSendAttestationRequest:
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
@@ -1964,7 +1933,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value());
+        SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value(), timeout);
         break;
     case CommissioningStage::kAttestationVerification: {
         ChipLogProgress(Controller, "Verifying attestation");
@@ -1998,7 +1967,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
+        SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value(), timeout);
         break;
     case CommissioningStage::kValidateCSR: {
         if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
@@ -2045,7 +2014,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.GetRootCert().Value());
+        CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.GetRootCert().Value(), timeout);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error sending trusted root certificate: %s", err.AsString());
@@ -2075,7 +2044,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
-                                   params.GetAdminSubject().Value());
+                                   params.GetAdminSubject().Value(), timeout);
         break;
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.GetWiFiCredentials().HasValue())
