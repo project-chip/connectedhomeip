@@ -12,16 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-config("mbedtls_config") {
-  include_dirs = [ "${chip_root}/config/openiotsdk/mbedtls" ]
-  defines = [
-      "MBEDTLS_CONFIG_FILE=<mbedtls_config.h>"
-  ]
-}
-
-# Open IoT SDK has its own mbedtls library, just provide a target and configuraiton
+# Open IoT SDK has its own mbedtls library, just provide empty target
 group("mbedtls") {
-    public_configs = [ ":mbedtls_config" ]
 }
