@@ -79,6 +79,7 @@ public:
                                                         chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
                                                         chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                         AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+                                                        uint16_t listenPort,
                                                         CHIP_ERROR * errInfoOnFailure);
 
 private:
