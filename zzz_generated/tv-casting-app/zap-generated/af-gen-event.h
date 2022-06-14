@@ -63,13 +63,13 @@
     {                                                                                                                              \
         clusterTickWrapper(&emberAfBarrierControlClusterServerTickCallbackControl1,                                                \
                            emberAfBarrierControlClusterServerTickCallback, 1);                                                     \
-    }                                                                                                                              \
+    }
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
     { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
         { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
-          emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },                                                        \
+          emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
     "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1",                                                    \
@@ -83,6 +83,6 @@
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
     { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },          \
-        { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },  \
+        { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },
 
 #endif // __AF_GEN_EVENT__
