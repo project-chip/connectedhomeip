@@ -31,7 +31,7 @@ fi
 env
 
 entries="$(echo "$(ls "$IMX_SDK_ROOT")" | tr -s '\n' ',')"
-IFS=',' read -ra entry_array <<< "$entries"
+IFS=',' read -ra entry_array <<<"$entries"
 for entry in "${entry_array[@]}"; do
     if [ "$(echo "$entry" | grep -E "^environment-setup-")" != "" ]; then
         env_setup_script=$entry
