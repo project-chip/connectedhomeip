@@ -59,7 +59,6 @@ namespace {
 
 constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr int kExtDiscoveryTimeoutSecs         = 20;
 constexpr int kAppEventQueueSize               = 10;
 constexpr uint8_t kButtonPushEvent             = 1;
 constexpr uint8_t kButtonReleaseEvent          = 0;
@@ -170,7 +169,6 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
