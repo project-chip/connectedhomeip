@@ -21,17 +21,20 @@ assert(chip_build_tools)
 
 action("chip-bridge-codegen") {
   script = "${chip_root}/scripts/codegen.py"
-  sources = [ "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter" ]
+  sources =
+      [ "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter" ]
   outputs = [ "$target_gen_dir/cpp/BridgeClustersImpl.h" ]
 
   args = [
-    "--generator", "cpp",
-    "--output-dir", rebase_path(target_gen_dir, root_build_dir),
-    rebase_path("${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter", root_build_dir)
+    "--generator",
+    "cpp",
+    "--output-dir",
+    rebase_path(target_gen_dir, root_build_dir),
+    rebase_path(
+        "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter",
+        root_build_dir),
   ]
-  deps = [
-    "${chip_root}/scripts/idl",
-  ]
+  deps = [ "${chip_root}/scripts/idl" ]
 }
 
 executable("chip-bridge-app") {
@@ -55,7 +58,10 @@ executable("chip-bridge-app") {
 
   cflags = [ "-Wconversion" ]
 
-  include_dirs = [ "include", target_gen_dir ]
+  include_dirs = [
+    "include",
+    target_gen_dir,
+  ]
 
   output_dir = root_out_dir
 }
