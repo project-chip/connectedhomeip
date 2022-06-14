@@ -22,6 +22,7 @@
 #include <cstring>
 #include <net/if.h>
 #include <sstream>
+#include <utility>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -79,7 +80,7 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
     ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, port: %u, interfaceId: %u", __func__, rCtx->mName, rCtx->mType,
                   rCtx->mPort, rCtx->mInterfaceId);
 
-    g_main_loop_quit(rCtx->mMainLoop);
+    rCtx->MainLoopQuit();
 
     if (result != DNSSD_ERROR_NONE)
     {
@@ -143,7 +144,7 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     int ret;
 
     // Always stop browsing
-    g_main_loop_quit(bCtx->mMainLoop);
+    bCtx->MainLoopQuit();
 
     char * type          = nullptr;
     char * name          = nullptr;
@@ -172,12 +173,9 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
         OnBrowseRemove(bCtx, type, name, interfaceId);
     }
 
-    dnssd_destroy_remote_service(service);
-
     // For now, there is no way to wait for multiple services to be found.
     // Darwin implementation just checks if kDNSServiceFlagsMoreComing is set or not,
     // but it doesn't ensure that multiple services can be found.
-    // (In many cases, kDNSServiceFlagsMoreComing is not set)
     bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
 
 exit:
@@ -189,6 +187,8 @@ exit:
 
     // After this point, the context might be no longer valid
     bCtx->mInstance->RemoveContext(bCtx);
+
+    dnssd_destroy_remote_service(service);
 
     g_free(type);
     g_free(name);
@@ -288,7 +288,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     // In fact, if cancel resolve fails, we can not do anything about it
     int ret = dnssd_cancel_resolve_service(service);
 
-    g_main_loop_quit(rCtx->mMainLoop);
+    rCtx->MainLoopQuit();
 
     ret = result;
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret));
@@ -338,7 +338,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 
     dnssdService.mPort          = static_cast<uint16_t>(port);
     dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
-    dnssdService.mTextEntrySize = textEntries.empty() ? 0 : textEntries.size();
+    dnssdService.mTextEntrySize = textEntries.size();
 
     rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
     rCtx->mInstance->RemoveContext(rCtx);
@@ -370,6 +370,12 @@ namespace chip {
 namespace Dnssd {
 
 DnssdTizen DnssdTizen::sInstance;
+
+void GenericContext::MainLoopQuit()
+{
+    VerifyOrReturn(mMainLoop != nullptr, );
+    g_main_loop_quit(std::exchange(mMainLoop, nullptr));
+}
 
 RegisterContext::RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service,
                                  DnssdPublishCallback callback, void * context) :
