@@ -1,7 +1,5 @@
 package chip.devicecontroller;
 
-import java.util.Arrays;
-import java.util.Objects;
 
 /** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {
