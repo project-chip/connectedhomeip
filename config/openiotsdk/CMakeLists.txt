@@ -227,11 +227,12 @@ ExternalProject_Add(
 )
 
 # ==============================================================================
-# Define 'chip' target that exposes CHIP headers & libraries to the application
+# Define 'openiotsdk-chip' target that exposes CHIP and Open IoT SDK 
+# headers & libraries to the application
 # ==============================================================================
-add_library(chip INTERFACE)
-target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
-target_include_directories(chip INTERFACE
+add_library(openiotsdk-chip INTERFACE)
+target_compile_definitions(openiotsdk-chip INTERFACE CHIP_HAVE_CONFIG_H)
+target_include_directories(openiotsdk-chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
@@ -240,9 +241,18 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
-target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
-target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
-add_dependencies(chip chip-gn)
+target_link_directories(openiotsdk-chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+target_link_libraries(openiotsdk-chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
+target_link_libraries(openiotsdk-chip INTERFACE
+    $<$<TARGET_EXISTS:mcu-driver-hal>:mcu-driver-hal>
+    $<$<TARGET_EXISTS:mcu-driver-bootstrap>:mcu-driver-bootstrap>
+    $<$<TARGET_EXISTS:mdh-reference-platforms-for-arm>:mdh-reference-platforms-for-arm>
+    $<$<TARGET_EXISTS:mbedtls>:mbedtls>
+    $<$<TARGET_EXISTS:lwipcore>:lwipcore>
+    $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
+    $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>
+)
+add_dependencies(openiotsdk-chip chip-gn)
 
 # ==============================================================================
 # Parent target configuration according to CHIP component usage

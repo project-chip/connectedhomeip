@@ -32,28 +32,13 @@ include(${OPENIOTSDK_COMMON}/cmake/chip.cmake)
 
 target_include_directories(${APP_TARGET} PRIVATE
                            main/include
-                           freertos-config
 )
 
 target_sources(${APP_TARGET} PRIVATE
                 main/main.cpp
 )
 
-target_link_libraries(${APP_TARGET}
-    mcu-driver-hal
-    mcu-driver-bootstrap
-    mdh-reference-platforms-for-arm
-
-    iotsdk-serial-retarget
-    freertos-cmsis-rtos
-    freertos-kernel-heap-3
-
-    iotsdk-ip-network-api
-    lwipcore
-    mbedtls
-    
-    chip
-)
+target_link_libraries(${APP_TARGET} openiotsdk-chip)
 
 # Link the *whole-archives* to keep the static test objects.
 target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/libCHIP_tests_custom.a" -Wl,--no-whole-archive)

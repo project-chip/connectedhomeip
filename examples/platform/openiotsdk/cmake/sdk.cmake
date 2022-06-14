@@ -110,6 +110,28 @@ if(TARGET mbedtls-config)
     )
 endif()
 
+# Declare RTOS interface target
+add_library(cmsis-rtos-implementation INTERFACE)
+
+if(TARGET freertos-kernel)
+    target_link_libraries(cmsis-rtos-implementation
+        INTERFACE
+            freertos-cmsis-rtos
+            freertos-kernel-heap-3
+    )
+    target_include_directories(cmsis-rtos-implementation 
+        INTERFACE
+            ${CMAKE_CURRENT_SOURCE_DIR}/freertos-config
+    )
+elseif(TARGET cmsis-rtx)
+    target_link_libraries(cmsis-rtos-implementation
+        INTERFACE
+            cmsis-rtx
+            cmsis-rtos-api
+            cmsis-rtx-freertos-alloc-wrapper
+    )
+endif()
+
 # Add Open IoT SDK storage source
 add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
 list(APPEND SDK_SOURCES_BINARY_DIRS ${CMAKE_CURRENT_BINARY_DIR}/sdk_storage_build)

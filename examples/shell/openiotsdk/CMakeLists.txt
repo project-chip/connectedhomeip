@@ -34,27 +34,15 @@ include(${OPENIOTSDK_COMMON}/cmake/chip.cmake)
 target_include_directories(${APP_TARGET} PRIVATE
                            main/include
                            ${SHELL_COMMON}/include
-                           freertos-config
 )
 
 target_sources(${APP_TARGET} PRIVATE
                 main/main.cpp
 )
 
-target_link_libraries(${APP_TARGET}
-    mcu-driver-hal
-    mcu-driver-bootstrap
-    mdh-reference-platforms-for-arm
-
-    iotsdk-serial-retarget
-    freertos-cmsis-rtos
-    freertos-kernel-heap-3
-
-    iotsdk-ip-network-api
-    lwipcore
-    mbedtls
-    
-    chip
+target_link_libraries(${APP_TARGET} 
+    cmsis-rtos-implementation
+    openiotsdk-chip
 )
 
 include(${OPENIOTSDK_COMMON}/cmake/linker.cmake)
