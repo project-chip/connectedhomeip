@@ -89,7 +89,6 @@ endmacro()
 # ==============================================================================
 # Prepare CHIP configuration based on the project configuration
 # ==============================================================================
-
 # Set paths
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../.. REALPATH)
