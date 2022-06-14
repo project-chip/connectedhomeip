@@ -28,7 +28,6 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/Darwin/DeviceInstanceInfoProviderImpl.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
@@ -154,14 +153,9 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
 #if CHIP_DISABLE_PLATFORM_KVS
     return CHIP_NO_ERROR;
-#else // CHIP_DISABLE_PLATFORM_KVS
+#else  // CHIP_DISABLE_PLATFORM_KVS
     // Initialize the generic implementation base class.
     ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
-
-#if !CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
-    static DeviceInstanceInfoProviderImpl sDeviceInstanceInfoProvider;
-    SetDeviceInstanceInfoProvider(&sDeviceInstanceInfoProvider);
-#endif
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
     {

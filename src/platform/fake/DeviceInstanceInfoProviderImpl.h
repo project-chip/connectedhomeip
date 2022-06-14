@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-class DeviceInstanceInfoProviderImpl : public chip::DeviceLayer::DeviceInstanceInfoProvider
+class DeviceInstanceInfoProviderImpl : public Internal::GenericDeviceInstanceInfoProvider<>
 {
 public:
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

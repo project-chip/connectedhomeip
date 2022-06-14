@@ -30,7 +30,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 #include <platform/Tizen/PosixConfig.h>
 #include <platform/Tizen/WiFiManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
@@ -52,11 +51,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init(void)
 
     error = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(error);
-
-#if !CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
-    static DeviceInstanceInfoProviderImpl sDeviceInstanceInfoProvider;
-    SetDeviceInstanceInfoProvider(&sDeviceInstanceInfoProvider);
-#endif
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
     {

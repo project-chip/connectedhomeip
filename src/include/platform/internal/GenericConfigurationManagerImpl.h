@@ -40,10 +40,8 @@ class ProvisioningDataSet;
 
 namespace Internal {
 
-#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
 template <class ConfigClass>
-class LegacyDeviceInstanceInfoProvider;
-#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+class GenericDeviceInstanceInfoProvider;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 template <class ConfigClass>
@@ -125,9 +123,7 @@ protected:
     uint8_t mRotatingDeviceIdUniqueId[kRotatingDeviceIDUniqueIDLength] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 #endif
 
-#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
-    friend LegacyDeviceInstanceInfoProvider<ConfigClass>;
-#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    friend GenericDeviceInstanceInfoProvider<ConfigClass>;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;
