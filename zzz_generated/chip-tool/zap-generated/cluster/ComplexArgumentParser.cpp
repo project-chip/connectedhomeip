@@ -249,11 +249,18 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BasicCommissioningInfo.failSafeExpiryLengthSeconds",
                                                                   "failSafeExpiryLengthSeconds",
                                                                   value.isMember("failSafeExpiryLengthSeconds")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BasicCommissioningInfo.maxCumulativeFailsafeSeconds",
+                                                                  "maxCumulativeFailsafeSeconds",
+                                                                  value.isMember("maxCumulativeFailsafeSeconds")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "failSafeExpiryLengthSeconds");
     ReturnErrorOnFailure(
         ComplexArgumentParser::Setup(labelWithMember, request.failSafeExpiryLengthSeconds, value["failSafeExpiryLengthSeconds"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxCumulativeFailsafeSeconds");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.maxCumulativeFailsafeSeconds, value["maxCumulativeFailsafeSeconds"]));
 
     return CHIP_NO_ERROR;
 }
@@ -261,6 +268,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request)
 {
     ComplexArgumentParser::Finalize(request.failSafeExpiryLengthSeconds);
+    ComplexArgumentParser::Finalize(request.maxCumulativeFailsafeSeconds);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,

@@ -210,6 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
+@property (strong, nonatomic) NSNumber * _Nonnull maxCumulativeFailsafeSeconds;
 - (instancetype)init;
 @end
 

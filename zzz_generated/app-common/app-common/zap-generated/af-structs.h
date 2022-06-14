@@ -230,6 +230,7 @@ typedef struct _ApplicationBasicApplication
 typedef struct _BasicCommissioningInfo
 {
     uint16_t FailSafeExpiryLengthSeconds;
+    uint16_t MaxCumulativeFailsafeSeconds;
 } BasicCommissioningInfo;
 
 // Struct for BatChargeFaultChangeType

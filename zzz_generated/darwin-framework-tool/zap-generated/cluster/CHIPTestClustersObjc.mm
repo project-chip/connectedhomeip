@@ -9257,6 +9257,7 @@ using namespace chip::app::Clusters;
             using TypeInfo = GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue.failSafeExpiryLengthSeconds = value.failSafeExpiryLengthSeconds.unsignedShortValue;
+            cppValue.maxCumulativeFailsafeSeconds = value.maxCumulativeFailsafeSeconds.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

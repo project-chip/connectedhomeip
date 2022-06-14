@@ -9596,13 +9596,15 @@ namespace Structs {
 namespace BasicCommissioningInfo {
 enum class Fields
 {
-    kFailSafeExpiryLengthSeconds = 0,
+    kFailSafeExpiryLengthSeconds  = 0,
+    kMaxCumulativeFailsafeSeconds = 1,
 };
 
 struct Type
 {
 public:
-    uint16_t failSafeExpiryLengthSeconds = static_cast<uint16_t>(0);
+    uint16_t failSafeExpiryLengthSeconds  = static_cast<uint16_t>(0);
+    uint16_t maxCumulativeFailsafeSeconds = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

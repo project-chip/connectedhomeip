@@ -227,6 +227,7 @@ server cluster GeneralCommissioning = 48 {
 
   struct BasicCommissioningInfo {
     int16u failSafeExpiryLengthSeconds = 0;
+    int16u maxCumulativeFailsafeSeconds = 1;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;

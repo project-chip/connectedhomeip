@@ -41,6 +41,12 @@ void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppS
     failSafeContext->FailSafeTimerExpired();
 }
 
+void FailSafeContext::HandleMaxCumulativeFailSafeTimer(System::Layer * layer, void * aAppState)
+{
+    FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(aAppState);
+    failSafeContext->FailSafeTimerExpired();
+}
+
 void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
     FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(arg);
@@ -85,6 +91,13 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
+    auto currentMonotonicTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
+    if (!mFailSafeArmed)
+    {
+        System::Clock::Timeout maxCumulativeTimeout = System::Clock::Milliseconds64(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC * 1000);
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
+    }
+
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
@@ -98,6 +111,7 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 void FailSafeContext::DisarmFailSafe()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
 
     ResetState();
 
@@ -200,6 +214,7 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
 
     // Cancel the timer since we force its action
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
 
     FailSafeTimerExpired();
 }

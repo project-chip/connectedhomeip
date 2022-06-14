@@ -1561,6 +1561,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                     this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo>(
                         path, basicInfo));
                 info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
+                // TODO do I need to do something with MaxCumulativeFailsafeSeconds.
             }
             break;
             case app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id: {
