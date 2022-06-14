@@ -22,6 +22,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include <DeviceInfoProviderImpl.h>
 
 #include "chip_porting.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -74,6 +75,7 @@ void NetWorkCommissioningInstInit()
 #endif
 
 static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void OnIdentifyStart(Identify *)
 {
@@ -117,6 +119,8 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
