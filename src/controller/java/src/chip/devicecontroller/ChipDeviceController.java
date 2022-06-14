@@ -358,13 +358,26 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given event path. */
-  public void subscribeToEventPath(
+    public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval) {
+    subscribeToEventPath(subscriptionEstablishedCallback, reportCallback, devicePtr, eventPaths,
+        minInterval, maxInterval, false, true);
+  }
+
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
     subscribeToEventPath(
@@ -373,7 +386,9 @@ public class ChipDeviceController {
         devicePtr,
         eventPaths,
         minInterval,
-        maxInterval);
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered);
   }
 
   /** Read the given event path. */
@@ -431,7 +446,9 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
-      int maxInterval);
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered);
 
   public native void readEventPath(
       long deviceControllerPtr,

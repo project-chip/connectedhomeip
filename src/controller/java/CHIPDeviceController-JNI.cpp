@@ -856,7 +856,7 @@ JNI_METHOD(void, readPath)
 
 JNI_METHOD(void, subscribeToEventPath)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject eventPathList, jint minInterval,
- jint maxInterval)
+ jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -877,6 +877,8 @@ JNI_METHOD(void, subscribeToEventPath)
     params.mMaxIntervalCeilingSeconds = maxInterval;
     params.mpEventPathParamsList      = eventPathParamsList.data();
     params.mEventPathParamsListSize   = eventPathParamsList.size();
+    params.mKeepSubscriptions         = static_cast<bool>(keepSubscriptions != JNI_FALSE);
+    params.mIsFabricFiltered          = static_cast<bool>(isFabricFiltered != JNI_FALSE);
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
@@ -884,7 +886,7 @@ JNI_METHOD(void, subscribeToEventPath)
         Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                        callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Subscribe);
 
-    err = readClient->SendRequest(params);
+    err = readClient->SendAutoResubscribeRequest(std::move(params));
     if (err != CHIP_NO_ERROR)
     {
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
@@ -924,7 +926,7 @@ JNI_METHOD(void, readEventPath)
     app::ReadClient * readClient =
         Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                        callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Read);
-
+    if (params)
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
     {
