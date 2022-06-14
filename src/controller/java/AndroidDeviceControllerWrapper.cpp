@@ -62,11 +62,15 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 AndroidDeviceControllerWrapper *
-AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                            const chip::CATValues & cats, chip::System::Layer * systemLayer,
+AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
+                                            chip::NodeId nodeId,
+                                            const chip::CATValues & cats,
+                                            chip::System::Layer * systemLayer,
                                             chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
                                             chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
-                                            AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
+                                            AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+                                            uint16_t listenPort,
+                                            CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -124,7 +128,7 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
 #if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
-    initParams.listenPort                      = CHIP_PORT + 1;
+    initParams.listenPort                      = listenPort;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     initParams.fabricIndependentStorage        = wrapper.get();

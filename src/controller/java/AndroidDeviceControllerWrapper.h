@@ -72,8 +72,10 @@ public:
 
     using AndroidOperationalCredentialsIssuerPtr = std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer>;
 
-    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        const chip::CATValues & cats, chip::System::Layer * systemLayer,
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj,
+                                                        chip::NodeId nodeId,
+                                                        const chip::CATValues & cats,
+                                                        chip::System::Layer * systemLayer,
                                                         chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
                                                         chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                         AndroidOperationalCredentialsIssuerPtr opCredsIssuer,

@@ -39,8 +39,8 @@ public class ChipDeviceController {
     return;
   }
 
-  public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+  public ChipDeviceController(ControllerParams params) {
+    deviceControllerPtr = newDeviceController(params);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -398,7 +398,7 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths);
 
-  private native long newDeviceController();
+  private native long newDeviceController(ControllerParams params);
 
   private native void pairDevice(
       long deviceControllerPtr,
