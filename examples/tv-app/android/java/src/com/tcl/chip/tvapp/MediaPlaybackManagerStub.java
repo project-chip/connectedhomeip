@@ -123,7 +123,8 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
           return RESPONSE_STATUS_SPEED_OUT_OF_RANGE;
         }
         playbackState = PLAYBACK_STATE_PLAYING;
-        playbackSpeed = (playbackSpeed >= 0 ? -1 : Math.min(playbackSpeed * 2, playbackMaxRewindSpeed));
+        playbackSpeed =
+            (playbackSpeed >= 0 ? -1 : Math.min(playbackSpeed * 2, playbackMaxRewindSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
@@ -133,7 +134,8 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
           return RESPONSE_STATUS_SPEED_OUT_OF_RANGE;
         }
         playbackState = PLAYBACK_STATE_PLAYING;
-        playbackSpeed = (playbackSpeed <= 0 ? 1 : Math.max(playbackSpeed * 2, playbackMaxForwardSpeed));
+        playbackSpeed =
+            (playbackSpeed <= 0 ? 1 : Math.max(playbackSpeed * 2, playbackMaxForwardSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
