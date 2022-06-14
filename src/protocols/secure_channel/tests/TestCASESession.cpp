@@ -348,11 +348,26 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(300));
     NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(360000));
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(100000));
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    // Confirming that FabricTable sending a notification that fabric was updated doesn't affect
+    // already established connections.
+    //
+    // This is compiled for host tests which is enough test coverage
+    gCommissionerFabrics.SendUpdateFabricNotificationForTest(gCommissionerFabricIndex);
+    gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 }
 
 void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
@@ -828,7 +843,8 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
     }
 }
 
-static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, void * inContext)
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
@@ -886,6 +902,7 @@ static void CASE_InvalidatePendingSessionEstablishment(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
 }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
 // Test Suite
 
@@ -902,7 +919,11 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
     NL_TEST_DEF("DestinationId", CASE_DestinationIdTest),
     NL_TEST_DEF("SessionResumptionStorage", CASE_SessionResumptionStorage),
-    NL_TEST_DEF("InvalidatePendingSessionEstablishment", CASE_InvalidatePendingSessionEstablishment),
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    // This is compiled for host tests which is enough test coverage to ensure updating NOC invalidates
+    // CASESession that are in the process of establishing.
+    NL_TEST_DEF("InvalidatePendingSessionEstablishment", CASE_SimulateUpdateNOCInvalidatePendingEstablishment),
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
     NL_TEST_SENTINEL()
 };
