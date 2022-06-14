@@ -358,15 +358,22 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given event path. */
-    public void subscribeToEventPath(
+  public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval) {
-    subscribeToEventPath(subscriptionEstablishedCallback, reportCallback, devicePtr, eventPaths,
-        minInterval, maxInterval, false, true);
+    subscribeToEventPath(
+        subscriptionEstablishedCallback,
+        reportCallback,
+        devicePtr,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        false,
+        true);
   }
 
   public void subscribeToEventPath(
