@@ -30,6 +30,7 @@ config("config") {
   ]
 
   defines = [
+    "CONFIG_USE_LOCAL_STORAGE=${config_use_local_storage}",
     "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
