@@ -92,13 +92,13 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool maxCumulativeTimeoutArmedNow = false;
+    bool cancelTimersIfError = false;
     auto currentMonotonicTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
     if (!mFailSafeArmed)
     {
         System::Clock::Timeout maxCumulativeTimeout = System::Clock::Milliseconds64(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC * 1000);
         SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
-        maxCumulativeTimeoutArmedNow = true;
+        cancelTimersIfError = true;
     }
 
     mFailSafeArmed = true;
@@ -110,8 +110,9 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
 exit:
 
-    if (err != CHIP_NO_ERROR && maxCumulativeTimeoutArmedNow)
+    if (err != CHIP_NO_ERROR && cancelTimersIfError)
     {
+        DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
         DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
     }
     return err;
