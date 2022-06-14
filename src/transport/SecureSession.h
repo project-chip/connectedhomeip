@@ -100,31 +100,8 @@ public:
      *   discovered during session establishment.
      */
     void Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs, uint16_t peerSessionId,
-                  const ReliableMessageProtocolConfig & config)
-    {
-        VerifyOrDie(mState == State::kPairing);
-        VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
+                  const ReliableMessageProtocolConfig & config);
 
-        // PASE sessions must always start unassociated with a Fabric!
-        VerifyOrDie(!((mSecureSessionType == Type::kPASE) && (peerNode.GetFabricIndex() != kUndefinedFabricIndex)));
-        // CASE sessions must always start "associated" a given Fabric!
-        VerifyOrDie(!((mSecureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
-        // CASE sessions can only be activated against operational node IDs!
-        VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
-                      (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
-
-        mPeerNodeId    = peerNode.GetNodeId();
-        mLocalNodeId   = localNode.GetNodeId();
-        mPeerCATs      = peerCATs;
-        mPeerSessionId = peerSessionId;
-        mMRPConfig     = config;
-        SetFabricIndex(peerNode.GetFabricIndex());
-
-        Retain(); // This ref is released inside MarkForRemoval
-        mState = State::kActive;
-        ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-                      mLocalSessionId);
-    }
     ~SecureSession() override
     {
         ChipLogDetail(Inet, "SecureSession[%p]: Released - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
@@ -231,8 +208,8 @@ public:
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
-    // This should be a private API, only meant to be called by SessionManager
-    void TryShiftToSession(const SessionHandle & session);
+    // This should be a private API, only meant to be called by SecureSessionTable
+    void NewerSessionAvailable(const SessionHandle & session);
 
 private:
     enum class State : uint8_t

@@ -216,6 +216,7 @@ public:
     void FabricRemoved(FabricIndex fabricIndex);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
+    Transport::SecureSessionTable & GetSecureSessions() { return mSecureSessions; }
 
     /**
      * @brief
@@ -237,9 +238,6 @@ public:
         } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
-
-    // Update existing SessionHolders to shift to the given session.
-    void ShiftToSession(const SessionHandle & handle);
 
     //
     // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.

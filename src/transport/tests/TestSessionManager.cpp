@@ -905,7 +905,7 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     // 1. alice -> bob: stickyAliceToBobSession
     // 2. alice <- bob: bobToAliceSession
     // 3. alice -> bob: aliceToBobSession, newAliceToBobSession
-    sessionManager.ShiftToSession(newAliceToBobSession.Get().Value());
+    sessionManager.GetSecureSessions().NewerSessionAvailable(newAliceToBobSession.Get().Value()->AsSecureSession());
 
     NL_TEST_ASSERT(inSuite, aliceToBobSession);
     NL_TEST_ASSERT(inSuite, stickyAliceToBobSession);

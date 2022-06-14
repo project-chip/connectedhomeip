@@ -26,6 +26,36 @@ void SecureSessionDeleter::Release(SecureSession * entry)
     entry->mTable.ReleaseSession(entry);
 }
 
+void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
+                             uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
+{
+    VerifyOrDie(mState == State::kPairing);
+    VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
+
+    // PASE sessions must always start unassociated with a Fabric!
+    VerifyOrDie(!((mSecureSessionType == Type::kPASE) && (peerNode.GetFabricIndex() != kUndefinedFabricIndex)));
+    // CASE sessions must always start "associated" a given Fabric!
+    VerifyOrDie(!((mSecureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
+    // CASE sessions can only be activated against operational node IDs!
+    VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
+                  (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
+
+    mPeerNodeId    = peerNode.GetNodeId();
+    mLocalNodeId   = localNode.GetNodeId();
+    mPeerCATs      = peerCATs;
+    mPeerSessionId = peerSessionId;
+    mMRPConfig     = config;
+    SetFabricIndex(peerNode.GetFabricIndex());
+
+    Retain(); // This ref is released inside MarkForRemoval
+    mState = State::kActive;
+
+    if (mSecureSessionType == Type::kCASE)
+        mTable.NewerSessionAvailable(this);
+
+    ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+}
+
 void SecureSession::MarkForRemoval()
 {
     ChipLogDetail(Inet, "SecureSession[%p]: MarkForRemoval Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
@@ -117,12 +147,19 @@ void SecureSession::Release()
     ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release();
 }
 
-void SecureSession::TryShiftToSession(const SessionHandle & session)
+void SecureSession::NewerSessionAvailable(const SessionHandle & session)
 {
-    if (GetSecureSessionType() == SecureSession::Type::kCASE && GetPeer() == session->GetPeer() &&
-        GetPeerCATs() == session->AsSecureSession()->GetPeerCATs())
+    // Shift to the new session, checks are performed by the subclass implementation which is the caller.
+    IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
+    while (iter != mHolders.end())
     {
-        Session::DoShiftToSession(session);
+        // The iterator can be invalid once it is migrated to another session. So we store its next before it is happening.
+        IntrusiveList<SessionHolder>::Iterator next = iter;
+        ++next;
+
+        iter->ShiftToSession(session);
+
+        iter = next;
     }
 }
 

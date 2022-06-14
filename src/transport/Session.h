@@ -120,10 +120,9 @@ protected:
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
-    void DoShiftToSession(const SessionHandle & session);
+    IntrusiveList<SessionHolder> mHolders;
 
 private:
-    IntrusiveList<SessionHolder> mHolders;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 

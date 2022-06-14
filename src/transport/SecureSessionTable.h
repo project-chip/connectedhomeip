@@ -147,6 +147,31 @@ public:
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
+    // Select SessionHolders which are pointing a session with the same peer as the given session. Shift them the the given session.
+    // This is an internal API, using raw pointer to a session is allowed here.
+    void NewerSessionAvailable(SecureSession * session)
+    {
+        VerifyOrDie(session->GetSecureSessionType() == SecureSession::Type::kCASE);
+        mEntries.ForEachActiveObject([&](SecureSession * oldSession) {
+            if (session == oldSession)
+                return Loop::Continue;
+
+            SessionHandle ref(*oldSession);
+
+            // This will update all SessionHolder pointing to oldSession, to the provided session.
+            //
+            // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable
+            // it for specific SessionHolder in specific scenario.
+            if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
+                oldSession->GetPeerCATs() == session->GetPeerCATs())
+            {
+                oldSession->NewerSessionAvailable(SessionHandle(*session));
+            }
+
+            return Loop::Continue;
+        });
+    }
+
 private:
     /**
      * Find an available session ID that is unused in the secure session table.
