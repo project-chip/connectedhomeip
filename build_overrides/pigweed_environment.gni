@@ -4,5 +4,6 @@ declare_args() {
   dir_cipd_arm = "/usr/local/google/home/coppock/connectedhomeip/.environment/cipd/packages/arm"
   dir_cipd_pigweed = "/usr/local/google/home/coppock/connectedhomeip/.environment/cipd/packages/pigweed"
   dir_cipd_python = "/usr/local/google/home/coppock/connectedhomeip/.environment/cipd/packages/python"
-  dir_virtual_env = "/usr/local/google/home/coppock/connectedhomeip/.environment/pigweed-venv"
+  dir_virtual_env =
+      "/usr/local/google/home/coppock/connectedhomeip/.environment/pigweed-venv"
 }
