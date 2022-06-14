@@ -137,7 +137,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
     LOCK_TCPIP_CORE();
     Impl()->LockThreadStack();
 
-    // Determine whether the device is attached to a Thread network.
+    // Determine whether the device Thread interface is up..
     isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
 
     // If needed, adjust the link state of the LwIP netif to reflect the state of the OpenThread stack.
@@ -153,19 +153,6 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
         else
         {
             netif_set_link_down(mNetIf);
-        }
-
-        // Post an event signaling the change in Thread interface connectivity state.
-        {
-            ChipDeviceEvent event;
-            event.Clear();
-            event.Type                            = DeviceEventType::kThreadConnectivityChange;
-            event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-            CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
-            if (status != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
-            }
         }
 
         // Presume the interface addresses are also changing.

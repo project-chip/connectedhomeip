@@ -74,7 +74,6 @@ protected:
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
     void _ProcessThreadActivity() {}
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
     //} // namespace Internal
 
@@ -87,8 +86,6 @@ private:
     static ThreadStackManagerImpl sInstance;
 
     // ===== Private members for use by this class only.
-
-    bool mIsAttached = false;
 };
 
 /**
