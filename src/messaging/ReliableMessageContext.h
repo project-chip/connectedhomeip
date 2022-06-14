@@ -121,7 +121,6 @@ public:
     /// Determine whether this exchange is requesting Sleepy End Device active mode
     bool IsRequestingActiveMode() const;
 
-
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
 
@@ -166,7 +165,6 @@ protected:
 
         /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
         kFlagActiveMode = (1u << 8),
-
 
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
         kFlagEphemeralExchange = (1u << 9),
