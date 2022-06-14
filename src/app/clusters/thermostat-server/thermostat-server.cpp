@@ -127,9 +127,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         CoolSupported = true;
 
     if (OurFeatureMap & 1 << 2)
-    {
-        OccupancySupported = true;
-    }
+        OccupancySupported = true
 
     if (AutoSupported)
     {
