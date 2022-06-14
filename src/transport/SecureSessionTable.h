@@ -160,8 +160,8 @@ public:
 
             // This will update all SessionHolder pointing to oldSession, to the provided session.
             //
-            // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable it
-            // for specific SessionHolder in specific scenario.
+            // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable
+            // it for specific SessionHolder in specific scenario.
             if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
                 oldSession->GetPeerCATs() == session->GetPeerCATs())
             {

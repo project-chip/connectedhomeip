@@ -26,8 +26,8 @@ void SecureSessionDeleter::Release(SecureSession * entry)
     entry->mTable.ReleaseSession(entry);
 }
 
-void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs, uint16_t peerSessionId,
-    const ReliableMessageProtocolConfig & config)
+void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
+                             uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
 {
     VerifyOrDie(mState == State::kPairing);
     VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
@@ -38,7 +38,7 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     VerifyOrDie(!((mSecureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
     // CASE sessions can only be activated against operational node IDs!
     VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
-            (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
+                  (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
 
     mPeerNodeId    = peerNode.GetNodeId();
     mLocalNodeId   = localNode.GetNodeId();
@@ -53,8 +53,7 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     if (mSecureSessionType == Type::kCASE)
         mTable.NewerSessionAvailable(this);
 
-    ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-        mLocalSessionId);
+    ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
 }
 
 void SecureSession::MarkForRemoval()
