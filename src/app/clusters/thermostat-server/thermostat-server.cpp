@@ -129,14 +129,14 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     if (OurFeatureMap & 1 << 2)
         OccupancySupported = true
 
-    if (AutoSupported)
-    {
-        if (MinSetpointDeadBand::Get(endpoint, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
+            if (AutoSupported)
         {
-            DeadBand = kDefaultDeadBand;
+            if (MinSetpointDeadBand::Get(endpoint, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                DeadBand = kDefaultDeadBand;
+            }
+            DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
         }
-        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
-    }
 
     if (AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
         AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
