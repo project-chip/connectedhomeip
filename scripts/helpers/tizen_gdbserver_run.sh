@@ -82,10 +82,10 @@ fi
 
 if [ -z "$TARGET_DEVICE" ]; then
     sdb -s "$TARGET_DEVICE" root on
-    GDBSERVER_FOUND=$(sdb shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo \"gdb not found\"" | tr -d '\r')
+    GDBSERVER_FOUND=$(sdb shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo -n \"gdb not found\"")
 else
     sdb -s "$TARGET_DEVICE" root on
-    GDBSERVER_FOUND=$(sdb -s "$TARGET_DEVICE" shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo \"gdb not found\"" | tr -d '\r')
+    GDBSERVER_FOUND=$(sdb -s "$TARGET_DEVICE" shell "[ -e \"$GDBSERVER_TARGET_PATH/gdbserver\" ] || echo -n \"gdb not found\"")
 fi
 
 if [ "$GDBSERVER_FOUND" == "gdb not found" ]; then
