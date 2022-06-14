@@ -387,7 +387,7 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-void SessionManager::ReleaseSessionForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & exception)
+void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred)
 {
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer().GetFabricIndex() == fabricIndex)
