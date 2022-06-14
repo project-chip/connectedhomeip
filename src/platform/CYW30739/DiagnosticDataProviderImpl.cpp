@@ -81,6 +81,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
     return err;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+    CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     NetworkInterface * ifp = Platform::New<NetworkInterface>();

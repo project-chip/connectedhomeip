@@ -435,9 +435,21 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     }
 
     ReturnErrorOnFailure(GeneratePeerId(rcac, fabricId, nodeId, &nocPeerId));
-    nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
+    nocPubkey = certificates.GetLastCert()[0].mPublicKey;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const
+{
+    P256PublicKeySpan publicKeySpan;
+    CHIP_ERROR err = Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKeySpan);
+    if (err == CHIP_NO_ERROR)
+    {
+        outPublicKey = publicKeySpan;
+    }
+
+    return err;
 }
 
 FabricTable::~FabricTable()
@@ -452,7 +464,7 @@ FabricTable::~FabricTable()
     }
 }
 
-FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
+FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId)
 {
     for (auto & fabric : mStates)
     {
@@ -460,16 +472,17 @@ FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabr
         {
             continue;
         }
-        P256PublicKeySpan candidatePubKey;
-        if (fabric.GetRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
+        P256PublicKey candidatePubKey;
+        if (fabric.FetchRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
         {
             continue;
         }
-        if (rootPubKey.data_equal(candidatePubKey) && fabricId == fabric.GetFabricId())
+        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId())
         {
             return &fabric;
         }
     }
+
     return nullptr;
 }
 
@@ -524,6 +537,34 @@ FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId
         }
     }
     return nullptr;
+}
+
+CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->FetchRootCert(outCert);
+}
+
+CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->FetchICACert(outCert);
+}
+
+CHIP_ERROR FabricTable::FetchNOCCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->FetchNOCCert(outCert);
+}
+
+CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->FetchRootPubkey(outPublicKey);
 }
 
 CHIP_ERROR FabricTable::Store(FabricIndex fabricIndex)
@@ -658,19 +699,22 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     // comparison.
     FabricId fabricId;
     {
-        ByteSpan noc;
-        ReturnErrorOnFailure(newFabric.GetNOCCert(noc));
+        uint8_t nocBuf[kMaxCHIPCertLength];
+        MutableByteSpan nocSpan{ nocBuf };
+        ReturnErrorOnFailure(newFabric.FetchNOCCert(nocSpan));
         NodeId unused;
-        ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(noc, &unused, &fabricId));
+        ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &unused, &fabricId));
     }
+
     for (auto & existingFabric : *this)
     {
         if (existingFabric.GetFabricId() == fabricId)
         {
-            P256PublicKeySpan existingRootKey, newRootKey;
-            ReturnErrorOnFailure(existingFabric.GetRootPubkey(existingRootKey));
-            ReturnErrorOnFailure(newFabric.GetRootPubkey(newRootKey));
-            if (existingRootKey.data_equal(newRootKey))
+            P256PublicKey existingRootKey, newRootKey;
+            ReturnErrorOnFailure(existingFabric.FetchRootPubkey(existingRootKey));
+            ReturnErrorOnFailure(newFabric.FetchRootPubkey(newRootKey));
+
+            if (existingRootKey.Matches(newRootKey))
             {
                 return CHIP_ERROR_FABRIC_EXISTS;
             }
@@ -973,27 +1017,30 @@ CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 l
             continue;
         }
         {
-            ByteSpan rcac;
-            SuccessOrExit(err = fabric.GetRootCert(rcac));
+            uint8_t rcacBuf[kMaxCHIPCertLength];
+            MutableByteSpan rcacSpan{ rcacBuf };
+            SuccessOrExit(err = fabric.FetchRootCert(rcacSpan));
             chip::System::Clock::Seconds32 rcacNotBefore;
-            SuccessOrExit(err = Credentials::ExtractNotBeforeFromChipCert(rcac, rcacNotBefore));
+            SuccessOrExit(err = Credentials::ExtractNotBeforeFromChipCert(rcacSpan, rcacNotBefore));
             latestNotBefore = rcacNotBefore > latestNotBefore ? rcacNotBefore : latestNotBefore;
         }
         {
-            ByteSpan icac;
-            SuccessOrExit(err = fabric.GetICACert(icac));
-            if (!icac.empty())
+            uint8_t icacBuf[kMaxCHIPCertLength];
+            MutableByteSpan icacSpan{ icacBuf };
+            SuccessOrExit(err = fabric.FetchICACert(icacSpan));
+            if (!icacSpan.empty())
             {
                 chip::System::Clock::Seconds32 icacNotBefore;
-                ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(icac, icacNotBefore));
+                ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(icacSpan, icacNotBefore));
                 latestNotBefore = icacNotBefore > latestNotBefore ? icacNotBefore : latestNotBefore;
             }
         }
         {
-            ByteSpan noc;
-            SuccessOrExit(err = fabric.GetNOCCert(noc));
+            uint8_t nocBuf[kMaxCHIPCertLength];
+            MutableByteSpan nocSpan{ nocBuf };
+            SuccessOrExit(err = fabric.FetchNOCCert(nocSpan));
             chip::System::Clock::Seconds32 nocNotBefore;
-            ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(noc, nocNotBefore));
+            ReturnErrorOnFailure(Credentials::ExtractNotBeforeFromChipCert(nocSpan, nocNotBefore));
             latestNotBefore = nocNotBefore > latestNotBefore ? nocNotBefore : latestNotBefore;
         }
     }

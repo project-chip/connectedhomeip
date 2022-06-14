@@ -23,12 +23,16 @@ public class MatterCommandReceiver extends BroadcastReceiver {
       case MatterIntentConstants.ACTION_MATTER_COMMAND:
         byte[] commandPayload =
             intent.getByteArrayExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD);
+        int commandId = intent.getIntExtra(MatterIntentConstants.EXTRA_COMMAND_ID, -1);
+        int clusterId = intent.getIntExtra(MatterIntentConstants.EXTRA_CLUSTER_ID, -1);
         Log.d(
             TAG,
             new StringBuilder()
-                .append("Received matter command: ")
-                .append(intent.getAction())
-                .append(". Payload : ")
+                .append("Received matter command ")
+                .append(commandId)
+                .append(" on cluster ")
+                .append(clusterId)
+                .append(" with payload : ")
                 .append(new String(commandPayload))
                 .toString());
 
@@ -38,7 +42,10 @@ public class MatterCommandReceiver extends BroadcastReceiver {
         if (pendingIntent != null) {
           final Intent responseIntent =
               new Intent()
-                  .putExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD, "Success".getBytes());
+                  .putExtra(
+                      MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD,
+                      "{\"value\":{\"0\":1, \"1\":\"custom response from content app\"}}"
+                          .getBytes());
           try {
             pendingIntent.send(context, 0, responseIntent);
           } catch (final PendingIntent.CanceledException ex) {
