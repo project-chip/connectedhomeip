@@ -581,12 +581,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull zoneId;
-@property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;
-- (instancetype)init;
-@end
-
 @interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;

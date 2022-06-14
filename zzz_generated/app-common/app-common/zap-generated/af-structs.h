@@ -334,13 +334,6 @@ typedef struct _GroupKeySetStruct
     uint64_t EpochStartTime2;
 } GroupKeySetStruct;
 
-// Struct for IasAceZoneStatusResult
-typedef struct _IasAceZoneStatusResult
-{
-    uint8_t zoneId;
-    uint16_t zoneStatus;
-} IasAceZoneStatusResult;
-
 // Struct for InputInfo
 typedef struct _InputInfo
 {

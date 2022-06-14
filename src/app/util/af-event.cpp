@@ -66,10 +66,6 @@ struct EmberEventData
 // Globals
 
 #ifdef EMBER_AF_GENERATED_EVENT_CODE
-// Stubs for IAS Zone Client Cluster issue #2057
-EmberEventControl emberAfPluginIasZoneClientStateMachineEventControl;
-void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
-
 EMBER_AF_GENERATED_EVENT_CODE
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 

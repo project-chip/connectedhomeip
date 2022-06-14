@@ -2103,27 +2103,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation CHIPIasAceClusterIasAceZoneStatusResult
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-
-        _zoneStatus = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: zoneId:%@; zoneStatus:%@; >", NSStringFromClass([self class]), _zoneId, _zoneStatus];
-    return descriptionString;
-}
-
-@end
-
 @implementation CHIPChannelClusterChannelInfo
 - (instancetype)init
 {

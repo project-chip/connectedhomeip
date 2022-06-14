@@ -68,7 +68,6 @@
 
 #include <app/util/af-types.h>
 
-#include <app/util/client-api.h>
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
