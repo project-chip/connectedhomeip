@@ -34,10 +34,12 @@ otInstance * globalOtInstance;
 
 namespace {
 // We want to reserve space for an IPPacketInfo in our buffer, but it needs to
-// be suitably aligned. That might move it backward by up to
-// kPacketInfoAlignmentBytes, so we need to make sure we allocate enough
-// reserved space that this will still be within our buffer.
-constexpr uint16_t kPacketInfoAlignmentBytes = alignof(IPPacketInfo) - 1;
+// be 4-byte aligned.  We ensure the alignment by masking off the low bits of
+// the pointer that we get by doing `Start() - sizeof(IPPacketInfo)`.  That
+// might move it backward by up to kPacketInfoAlignmentBytes, so we need to make
+// sure we allocate enough reserved space that this will still be within our
+// buffer.
+constexpr uint16_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
 constexpr uint16_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
 } // namespace
 
@@ -291,7 +293,16 @@ CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInter
 
 IPPacketInfo * UDPEndPointImplOT::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
-    return aBuffer->GetReserve<IPPacketInfo>();
+    if (!aBuffer->EnsureReservedSize(kPacketInfoReservedSize))
+    {
+        return nullptr;
+    }
+
+    uintptr_t lStart           = (uintptr_t) aBuffer->Start();
+    uintptr_t lPacketInfoStart = lStart - sizeof(IPPacketInfo);
+
+    // Align to a 4-byte boundary
+    return reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~kPacketInfoAlignmentBytes);
 }
 
 } // namespace Inet

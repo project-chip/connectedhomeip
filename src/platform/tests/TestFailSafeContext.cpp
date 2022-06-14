@@ -67,8 +67,7 @@ static void TestFailSafeContext_ArmFailSafe(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed(kTestAccessingFabricIndex1) == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed(kTestAccessingFabricIndex2) == false);
 
-    err = failSafeContext.DisarmFailSafe();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    failSafeContext.DisarmFailSafe();
     NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed() == false);
 }
 
@@ -93,8 +92,7 @@ static void TestFailSafeContext_NocCommandInvoked(nlTestSuite * inSuite, void * 
     NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
 
-    err = failSafeContext.DisarmFailSafe();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    failSafeContext.DisarmFailSafe();
 }
 
 static void TestFailSafeContext_CommitToStorage(nlTestSuite * inSuite, void * inContext)
@@ -125,8 +123,7 @@ static void TestFailSafeContext_CommitToStorage(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, addNocCommandInvoked == true);
     NL_TEST_ASSERT(inSuite, updateNocCommandInvoked == true);
 
-    err = failSafeContext.DisarmFailSafe();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    failSafeContext.DisarmFailSafe();
 }
 
 /**

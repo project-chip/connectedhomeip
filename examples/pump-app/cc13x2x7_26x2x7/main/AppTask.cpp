@@ -379,8 +379,10 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            // Post event for demonstration purposes
-            sAppTask.PostEvents();
+            // Post event for demonstration purposes, we must ensure that the
+            // LogEvent is called in the right context which is the Matter mainloop
+            // thru ScheduleWork()
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(sAppTask.PostEvents, reinterpret_cast<intptr_t>(nullptr));
 
             // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
@@ -608,7 +610,7 @@ void AppTask::UpdateCluster(intptr_t context)
     }
 }
 
-void AppTask::PostEvents()
+void AppTask::PostEvents(intptr_t context)
 {
     // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
     for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))

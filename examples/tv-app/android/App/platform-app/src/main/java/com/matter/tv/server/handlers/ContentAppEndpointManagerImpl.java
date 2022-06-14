@@ -16,14 +16,15 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     this.context = context;
   }
 
-  public String sendCommand(int endpointId, String commandPayload) {
+  public String sendCommand(int endpointId, int clusterId, int commandId, String commandPayload) {
     Log.d(TAG, "Received a command for endpointId " + endpointId + ". Message " + commandPayload);
     for (ContentApp app :
         ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
       if (app.getEndpointId() == endpointId) {
         Log.d(
             TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
-        ContentAppAgentService.sendCommand(context, app.getAppName(), commandPayload);
+        return ContentAppAgentService.sendCommand(
+            context, app.getAppName(), clusterId, commandId, commandPayload);
       }
     }
     return "Success";

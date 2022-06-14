@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidCallbacks.h"
+#include "AndroidCommissioningWindowOpener.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -574,6 +575,55 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     }
 }
 
+JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    chip::Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
+
+    CHIP_ERROR err = wrapper->Controller()->DiscoverCommissionableNodes(filter);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to discoverCommissionableNodes");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handle, jint idx)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    const Dnssd::DiscoveredNodeData * data   = wrapper->Controller()->GetDiscoveredDevice(idx);
+
+    if (data == nullptr)
+    {
+        return nullptr;
+    }
+
+    jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/DiscoveredDevice");
+    jmethodID constructor      = env->GetMethodID(discoveredDeviceCls, "<init>", "()V");
+
+    jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
+    jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+
+    jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
+
+    env->SetLongField(discoveredObj, discrminatorID, data->commissionData.longDiscriminator);
+
+    char ipAddress[100];
+    data->resolutionData.ipAddress[0].ToString(ipAddress, 100);
+    jstring jniipAdress = env->NewStringUTF(ipAddress);
+    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
+
+    if (data == nullptr)
+    {
+        ChipLogError(Controller, "GetDiscoveredDevice - not found");
+    }
+    return discoveredObj;
+}
+
 JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration)
 {
     chip::DeviceLayer::StackLock lock;
@@ -619,6 +669,63 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
         MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, openPairingWindowCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jobject jcallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    err = AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
+                                                                         System::Clock::Seconds16(duration), jcallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
+ jobject jcallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    chip::SetupPayload setupPayload;
+    err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
+        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {

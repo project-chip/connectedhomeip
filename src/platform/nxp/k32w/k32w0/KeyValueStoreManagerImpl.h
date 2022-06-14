@@ -47,6 +47,11 @@ private:
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
 
+    // Reading config values uses the K32WConfig API, which returns CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND
+    // error if a key was not found. Convert this error to the correct error KeyValueStoreManagerImpl
+    // should return: CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+    void ConvertError(CHIP_ERROR & err);
+
     static KeyValueStoreManagerImpl sInstance;
 };
 

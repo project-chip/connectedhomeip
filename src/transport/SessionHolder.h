@@ -28,7 +28,7 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
+class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}
@@ -47,7 +47,7 @@ public:
         return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
     }
 
-    bool GrabPairing(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
+    bool GrabPairingSession(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
     bool Grab(const SessionHandle & session);
     void Release();
 

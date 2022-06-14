@@ -91,7 +91,16 @@ public:
     /**
      * @brief
      *   This function is the protocol callback to invoke when the associated
-     *   exchange context is being closed
+     *   exchange context is being closed.
+     *
+     *   If the exchange was in a state where it was expecting a message to be
+     *   sent due to an earlier WillSendMessage call or because the exchange has
+     *   just been created as an initiator, the consumer is holding a reference
+     *   to the exchange and it's the consumer's responsibility to call
+     *   Release() on the exchange at some point.  The usual way this happens is
+     *   that the consumer tries to send its message, that fails, and the
+     *   consumer calls Close() on the exchange.  Calling Close() after an
+     *   OnExchangeClosing() notification is allowed in this situation.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */

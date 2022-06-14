@@ -141,6 +141,12 @@ CHIP_ERROR AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
+#ifdef CONFIG_MCUMGR_SMP_BT
+    /* Initialize DFU over SMP */
+    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().ConfirmNewImage();
+#endif
+
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
@@ -224,6 +230,16 @@ void AppTask::ButtonEventHandler(uint32_t aButtonState, uint32_t aHasChanged)
     }
 }
 
+#ifdef CONFIG_MCUMGR_SMP_BT
+void AppTask::RequestSMPAdvertisingStart(void)
+{
+    AppEvent event;
+    event.Type    = AppEvent::Type::StartSMPAdvertising;
+    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
+    PostEvent(&event);
+}
+#endif
+
 void AppTask::FunctionTimerTimeoutCallback(k_timer * aTimer)
 {
     if (!aTimer)
@@ -295,7 +311,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             UpdateStatusLED();
             CancelTimer();
-
+#ifdef CONFIG_MCUMGR_SMP_BT
+            GetDFUOverSMP().StartServer();
+#else
+            LOG_INF("Software update is disabled");
+#endif
             // Change the function to none selected since factory reset has been canceled.
             Instance().mMode = OperatingMode::Normal;
 

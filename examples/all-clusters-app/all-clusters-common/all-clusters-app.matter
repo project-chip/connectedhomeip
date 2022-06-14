@@ -2102,6 +2102,7 @@ server cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -2973,7 +2974,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster TestCluster = 1295 {
+server cluster TestCluster = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -3016,8 +3017,8 @@ server cluster TestCluster = 1295 {
   }
 
   struct TestListStructOctet {
-    int64u fabricIndex = 0;
-    octet_string<32> operationalCert = 1;
+    int64u member1 = 0;
+    octet_string<32> member2 = 1;
   }
 
   struct NullablesAndOptionalsStruct {
@@ -3363,11 +3364,15 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
   readonly attribute enum8 thermostatRunningMode = 30;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetpointRaiseLowerRequest {
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
+  }
+
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
 server cluster ThermostatUserInterfaceConfiguration = 516 {
@@ -4160,7 +4165,7 @@ endpoint 1 {
   server cluster LevelControl {
     persist  attribute currentLevel default = 0xFE;
     ram      attribute remainingTime;
-    ram      attribute minLevel;
+    ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute currentFrequency;
     ram      attribute minFrequency;
@@ -4222,7 +4227,7 @@ endpoint 1 {
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute multiPressMax default = 2;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4256,6 +4261,7 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
+    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {
@@ -4295,7 +4301,7 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type;
+    ram      attribute type default = 0x08;
     ram      attribute physicalClosedLimitLift default = 0xFFFF;
     ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift default = 0x7FFF;
@@ -4377,10 +4383,7 @@ endpoint 1 {
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     ram      attribute thermostatRunningMode;
-    ram      attribute startOfWeek;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x002b;
+    ram      attribute featureMap default = 0x0023;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -4602,6 +4605,22 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster ElectricalMeasurement {
+    ram      attribute measurementType;
+    ram      attribute totalActivePower;
+    ram      attribute rmsVoltage default = 0xffff;
+    ram      attribute rmsVoltageMin default = 0x8000;
+    ram      attribute rmsVoltageMax default = 0x8000;
+    ram      attribute rmsCurrent default = 0xffff;
+    ram      attribute rmsCurrentMin default = 0xffff;
+    ram      attribute rmsCurrentMax default = 0xffff;
+    ram      attribute activePower default = 0xffff;
+    ram      attribute activePowerMin default = 0xffff;
+    ram      attribute activePowerMax default = 0xffff;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
   server cluster TestCluster {
     ram      attribute boolean;
     ram      attribute bitmap8;
@@ -4685,22 +4704,6 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt16s default = -100;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster ElectricalMeasurement {
-    ram      attribute measurementType;
-    ram      attribute totalActivePower;
-    ram      attribute rmsVoltage default = 0xffff;
-    ram      attribute rmsVoltageMin default = 0x8000;
-    ram      attribute rmsVoltageMax default = 0x8000;
-    ram      attribute rmsCurrent default = 0xffff;
-    ram      attribute rmsCurrentMin default = 0xffff;
-    ram      attribute rmsCurrentMax default = 0xffff;
-    ram      attribute activePower default = 0xffff;
-    ram      attribute activePowerMin default = 0xffff;
-    ram      attribute activePowerMax default = 0xffff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
   }
 }
 endpoint 2 {

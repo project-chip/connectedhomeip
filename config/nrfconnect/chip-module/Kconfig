@@ -72,3 +72,155 @@ config CHIP_DEBUG_SYMBOLS
 	default y
 	help
 	  Build the application with debug symbols.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Enable Factory Data build"
+	default n
+	help
+	  Enables generation of factory data during the building.
+	  It requires factory_data partition to exist in the partition manager 
+	  configuration file pm_static.yml.
+	  As a result a new output file factory_data.hex will be created.
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_MERGE_FACTORY_DATA_WITH_FIRMWARE
+	bool "Enable merging generated factory data with the build target .hex file"
+	default y
+	help
+	  Enables merging generated factory data with the build target merged.hex file.
+	  As a result, a new output file merged.hex will consist of all partitions including 
+	  factory data.
+
+# Use default certificates without generating or providing them
+config CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS
+	bool "Use default certificates located in Matter repository"
+	default y
+	help
+	  Pre-generated certificates can be used for development purpose.
+	  This config includes default pre-generated certificates 
+	  which are located in credentials/development/attestation/ directory 
+	  instead of generating new ones.
+	  If this config is set to `n` new certificates will be generated.
+
+# Configs for SPAKE2 generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Enable spake2 verifier generation"
+	help
+	  Enables generation of spake2 verifier according to 
+	  given iteration counter, salt and passcode.
+	  To generate Spake2 verifier a spake2p executable must be available 
+	  from system variables environment.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Enable generation of a new Rotating device id unique id"
+	default y
+	help
+	  Enables generation of a new Rotating device id unique id.
+
+endif #CHIP_FACTORY_DATA_BUILD
+
+# Factory data parameters
+config CHIP_DEVICE_SERIAL_NUMBER
+	string "Serial number of device"
+	default "11223344556677889900"
+	help
+	  A serial number parameter defines an unique number of manufactured device.
+	  Maximum length of serial number is 32 characters.
+
+config CHIP_DEVICE_VENDOR_NAME
+	string "Human-readable vendor name"
+	default "Nordic Semiconductor ASA"
+	help
+	  A human-readable vendor name which provides a simple string 
+	  containing identification of device's vendor for the Content APP.
+	  This information should be included in the Matter Basic Cluster.
+
+config CHIP_DEVICE_PRODUCT_NAME
+	string "Human-readable product name"
+	default "not-specified"
+	help
+	  A human-readable product name which provides a simple string 
+	  containing identification of the product for the Content APP.
+
+config CHIP_DEVICE_MANUFACTURING_DATE
+	string "Manufacturing date in ISO 8601"
+	default "2022-01-01"
+	help
+	  A manufacturing date specifies the date that the device was manufactured.
+	  The format used for providing a manufacturing date is ISO 8601 e.g. YYYY-MM-DD.
+	
+config CHIP_DEVICE_HARDWARE_VERSION
+	int "Integer representation of hardware version"
+	default 0
+	help
+	  A hardware version number specifies the version number
+	  of the hardware of the device. The meaning of its value, 
+	  and the versioning scheme, are vendor defined.
+
+config CHIP_DEVICE_HARDWARE_VERSION_STRING
+	string "user-friendly string representation of hardware version"
+	default "prerelease"
+	help
+	  A hardware version string parameter specifies the version
+	  of the hardware of the device as a more user-friendly value
+	  than that represented by the hardware version integer value.
+	  The meaning of its value, and the versioning scheme, are
+	  vendor defined.
+
+config CHIP_DEVICE_DISCRIMINATOR
+	hex "Device pairing discriminator"
+	default 0xF00
+	help
+	  A 12-bit value matching the field of the same name in
+	  the setup code. Discriminator is used during
+	  a discovery process.
+
+config CHIP_DEVICE_SPAKE2_PASSCODE 
+	int "Spake2+ passcode"
+	default 20202021
+	range 1 99999998
+	help
+	  A pairing passcode is a 27-bit unsigned integer which serves
+	  as a proof of possession during commissioning. 
+	  Its value shall be restricted to the values 0x0000001 to 0x5F5E0FE
+	  (00000001 to 99999998 in decimal), excluding the invalid Passcode values:
+	  - 00000000, 11111111, 22222222, 33333333, 44444444, 55555555, 
+	  66666666, 77777777, 88888888, 99999999, 12345678, 87654321.
+
+config CHIP_DEVICE_SPAKE2_IT
+	int "Spake2+ iteration count"
+	default 1000
+	help
+	  The Spake2 iteration count is associated with the ephemeral
+	  PAKE passcode verifier to be used for the commissioning.
+	  The iteration count is used as a crypto parameter to process
+	  spake2 verifier.
+
+config CHIP_DEVICE_SPAKE2_SALT
+	string "Spake2+ salt in string format"
+	default "U1BBS0UyUCBLZXkgU2FsdA=="
+	help
+	  The spake2 salt is random data that is used as an additional input 
+	  to a one-way function that “hashes” data. 
+	  A new salt should be randomly generated for each password.
+	  The minimum length of spake2 salt is 16 Bytes.
+	  The maximum length of spake2 salt is 32 Bytes.
+
+config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
+	string "Testing spake2+ verifier"
+	default "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=="
+	help
+	  The spake 2 verifier generated using default SPAKE2 salt, 
+	  iteration count and passcode. This value can be used for development
+	  or testing purposes.
+	  Generated with: 
+	  spake2p gen-verifier -o - -i 1000 -s "U1BBS0UyUCBLZXkgU2FsdA==" -p 20202021
+
+config CHIP_DEVICE_ROTATING_DEVICE_UID
+	string  "A rotating device id unique id"
+	default "91a9c12a7c80700a31ddcfa7fce63e44"
+	help
+	  A device rotating id unique id which will be generated if
+	  this config is not set in prj.conf file.

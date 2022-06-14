@@ -1786,7 +1786,7 @@ client cluster TargetNavigator = 1285 {
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
-server cluster TestCluster = 1295 {
+server cluster TestCluster = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -1829,8 +1829,8 @@ server cluster TestCluster = 1295 {
   }
 
   struct TestListStructOctet {
-    int64u fabricIndex = 0;
-    octet_string<32> operationalCert = 1;
+    int64u member1 = 0;
+    octet_string<32> member2 = 1;
   }
 
   info event TestEvent = 1 {

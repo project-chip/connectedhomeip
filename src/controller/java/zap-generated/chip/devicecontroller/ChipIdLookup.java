@@ -187,7 +187,7 @@ public final class ChipIdLookup {
     if (clusterId == 1026L) {
       return "TemperatureMeasurement";
     }
-    if (clusterId == 1295L) {
+    if (clusterId == 4294048773L) {
       return "TestCluster";
     }
     if (clusterId == 513L) {
@@ -2247,7 +2247,7 @@ public final class ChipIdLookup {
       }
       return "";
     }
-    if (clusterId == 1295L) {
+    if (clusterId == 4294048773L) {
       if (attributeId == 0L) {
         return "Boolean";
       }

@@ -63,57 +63,6 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 };
 
 /**
- * Defines the General Diagnostics Delegate class to notify platform events.
- */
-class GeneralDiagnosticsDelegate
-{
-public:
-    virtual ~GeneralDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called after the current device is rebooted.
-     */
-    virtual void OnDeviceRebooted(BootReasonType bootReason) {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a hardware fault has been raised.
-     */
-    virtual void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
-    {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a radio fault has been raised.
-     */
-    virtual void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a network fault has been raised.
-     */
-    virtual void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) {}
-};
-
-/**
- * Defines the Software Diagnostics Delegate class to notify software events.
- */
-class SoftwareDiagnosticsDelegate
-{
-public:
-    virtual ~SoftwareDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a software fault that has taken place on the Node.
-     */
-    virtual void
-    OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
-    {}
-};
-
-/**
  * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
  */
 class WiFiDiagnosticsDelegate
@@ -146,12 +95,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
-    GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
-
-    void SetSoftwareDiagnosticsDelegate(SoftwareDiagnosticsDelegate * delegate) { mSoftwareDiagnosticsDelegate = delegate; }
-    SoftwareDiagnosticsDelegate * GetSoftwareDiagnosticsDelegate() const { return mSoftwareDiagnosticsDelegate; }
-
     void SetWiFiDiagnosticsDelegate(WiFiDiagnosticsDelegate * delegate) { mWiFiDiagnosticsDelegate = delegate; }
     WiFiDiagnosticsDelegate * GetWiFiDiagnosticsDelegate() const { return mWiFiDiagnosticsDelegate; }
 
@@ -232,9 +175,7 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    GeneralDiagnosticsDelegate * mGeneralDiagnosticsDelegate   = nullptr;
-    SoftwareDiagnosticsDelegate * mSoftwareDiagnosticsDelegate = nullptr;
-    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate         = nullptr;
+    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
     DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;

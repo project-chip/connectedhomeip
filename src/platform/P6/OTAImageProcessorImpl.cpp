@@ -47,6 +47,40 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    // Only modify the ByteSpan if the OTAImageHeaderParser is currently initialized.
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+
+        // AccumulateAndDecode will cause the OTAImageHeader bytes to be stored
+        // in header. We don't do anything with header, however, the other
+        // consequence of this call is to advance the data pointer in block. In
+        // this or subsequent calls to this API, block will end up pointing at
+        // the first byte after OTAImageHeader.
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // If we have not received all the bytes of the OTAImageHeader yet, that is OK.
+        // Return CHIP_NO_ERROR and expect that future blocks will contain the rest.
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+
+        // If there is some error other than "too small", return that so future
+        // processing will be aborted.
+        ReturnErrorOnFailure(error);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+
+        // If we are here, then we have received all the OTAImageHeader bytes.
+        // Calling Clear() here results in the parser state being set to
+        // uninitialized. This means future calls to ProcessHeader will not
+        // modify block and those future bytes will be written to the device.
+        mHeaderParser.Clear();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
@@ -93,6 +127,10 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
     }
+
+    // init the OTAImageHeaderParser instance to indicate that we haven't yet
+    // parsed the header out of the incoming image.
+    imageProcessor->mHeaderParser.Init();
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
@@ -145,15 +183,32 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    int rc = flash_area_write(imageProcessor->mFlashArea, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
-                              imageProcessor->mBlock.size());
+    // The call to ProcessHeader will result in the modification of the block ByteSpan data
+    // pointer if the OTAImageHeader is present in the image. The result is that only
+    // the new application bytes will be written to the device in the flash_area_write calls,
+    // as all bytes for the header are skipped.
+    ByteSpan block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to process OTA image header");
+        imageProcessor->mDownloader->EndDownload(error);
+        return;
+    }
+
+    // send down only the post-processed bytes from block to this call, rather than sending down
+    // the original bytes from imageProcessor. The bytes in imageProcessor may include date
+    // from the OTAImageHeader, which we don't want.
+    int rc = flash_area_write(imageProcessor->mFlashArea, imageProcessor->mParams.downloadedBytes, block.data(), block.size());
     if (rc != 0)
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    // increment the total downloaded bytes by the potentially modified block ByteSpan size
+    imageProcessor->mParams.downloadedBytes += block.size();
     imageProcessor->mDownloader->FetchNextData();
 }
 
