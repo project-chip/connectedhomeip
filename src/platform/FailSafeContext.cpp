@@ -91,21 +91,30 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool maxCumulativeTimeoutArmedNow = false;
     auto currentMonotonicTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
     if (!mFailSafeArmed)
     {
         System::Clock::Timeout maxCumulativeTimeout = System::Clock::Milliseconds64(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC * 1000);
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
+        SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
+        maxCumulativeTimeoutArmedNow = true;
     }
 
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
-    ReturnErrorOnFailure(CommitToStorage());
-    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
+    SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
+    SuccessOrExit(err = CommitToStorage());
+    SuccessOrExit(err = ConfigurationMgr().SetFailSafeArmed(true));
 
-    return CHIP_NO_ERROR;
+exit:
+
+    if (err != CHIP_NO_ERROR && maxCumulativeTimeoutArmedNow)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
+    }
+    return err;
 }
 
 void FailSafeContext::DisarmFailSafe()

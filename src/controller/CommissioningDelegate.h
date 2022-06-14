@@ -441,7 +441,6 @@ struct GeneralCommissioningInfo
 {
     uint64_t breadcrumb          = 0;
     uint16_t recommendedFailsafe = 0;
-    //TODO should I be adding something in here?
     app::Clusters::GeneralCommissioning::RegulatoryLocationType currentRegulatoryLocation =
         app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
     app::Clusters::GeneralCommissioning::RegulatoryLocationType locationCapability =
