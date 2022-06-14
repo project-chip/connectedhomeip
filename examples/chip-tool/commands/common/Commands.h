@@ -18,7 +18,10 @@
 
 #pragma once
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
 #include "../../config/PersistentStorage.h"
+#endif // CONFIG_USE_LOCAL_STORAGE
+
 #include "Command.h"
 #include <map>
 
@@ -48,5 +51,7 @@ private:
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;
+#ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
+#endif // CONFIG_USE_LOCAL_STORAGE
 };
