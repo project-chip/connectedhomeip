@@ -927,7 +927,7 @@ JNI_METHOD(void, readEventPath)
         Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                        callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Read);
     if (params)
-    err = readClient->SendRequest(params);
+        err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
     {
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
