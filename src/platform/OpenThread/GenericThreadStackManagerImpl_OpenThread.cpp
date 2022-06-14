@@ -2581,6 +2581,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
             // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
             // allocate on
             // stack.
+            // FIXME (a.bokowy): Can we call callback multiple number of times?
             static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);

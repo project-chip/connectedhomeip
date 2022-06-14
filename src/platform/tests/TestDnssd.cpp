@@ -36,7 +36,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     exit(0);
 }
 
-static void HandleBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
+static void HandleBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);
 
