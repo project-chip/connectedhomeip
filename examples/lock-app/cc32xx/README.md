@@ -45,8 +45,8 @@ door lock and to control the state. The user LEDs on the LaunchPad are set on
 when the lock is locked, and are set off when unlocked. The LEDs will flash when
 in the transition state between locked and unlocked. The user buttons are used
 for requesting lock and unlock of the door lock. The left button (`BTN-1`) is
-used to enable provisioning (provisioning is enabled as "oneshot" by default. The
-right button (`BTN-2`) us used to toggle the "Lock" state.
+used to enable provisioning (provisioning is enabled as "oneshot" by default.
+The right button (`BTN-2`) us used to toggle the "Lock" state.
 
 ## Building
 
