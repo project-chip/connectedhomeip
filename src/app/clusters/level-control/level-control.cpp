@@ -131,12 +131,11 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint)
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-void emberAfLevelControlClusterServerTickCallback(intptr_t endpointPtr);
+void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint);
 
 static void timerCallback(System::Layer *, void * callbackContext)
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(emberAfLevelControlClusterServerTickCallback,
-                                            reinterpret_cast<intptr_t>(callbackContext));
+    emberAfLevelControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
@@ -177,10 +176,8 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-void emberAfLevelControlClusterServerTickCallback(intptr_t callbackContext)
+void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
-    auto endpoint = static_cast<EndpointId>(callbackContext);
-
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
