@@ -66,10 +66,10 @@ static_library("Darwin") {
 
   if (chip_disable_platform_kvs == false) {
     sources += [
-      "KeyValueStoreManagerImpl.h",
-      "KeyValueStoreManagerImpl.mm",
       "DeviceInstanceInfoProviderImpl.cpp",
       "DeviceInstanceInfoProviderImpl.h",
+      "KeyValueStoreManagerImpl.h",
+      "KeyValueStoreManagerImpl.mm",
     ]
   }
 
