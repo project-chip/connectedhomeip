@@ -745,23 +745,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     }
 }
 
-void SessionManager::ShiftToSession(const SessionHandle & handle)
-{
-    VerifyOrDie(handle->IsSecureSession());
-    VerifyOrDie(handle->AsSecureSession()->GetSecureSessionType() == SecureSession::Type::kCASE);
-    mSecureSessions.ForEachSession([&](SecureSession * oldSession) {
-        if (handle->AsSecureSession() == oldSession)
-            return Loop::Continue;
-
-        // This will update all SessionHolder pointing to oldSession, to the provided handle.
-        //
-        // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable it
-        // for specific SessionHolder in specific scenario.
-        oldSession->TryShiftToSession(handle);
-        return Loop::Continue;
-    });
-}
-
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,
                                                                  const Optional<Transport::SecureSession::Type> & type)
 {
