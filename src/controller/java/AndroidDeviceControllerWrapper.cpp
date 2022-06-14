@@ -61,16 +61,11 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
-AndroidDeviceControllerWrapper *
-AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                            chip::NodeId nodeId,
-                                            const chip::CATValues & cats,
-                                            chip::System::Layer * systemLayer,
-                                            chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-                                            chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
-                                            AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
-                                            uint16_t listenPort,
-                                            CHIP_ERROR * errInfoOnFailure)
+AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
+    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, const chip::CATValues & cats, chip::System::Layer * systemLayer,
+    chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+    uint16_t listenPort, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {

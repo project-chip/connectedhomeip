@@ -161,28 +161,20 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-
     // Retrieve initialization params.
     jmethodID getUdpListenPort;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort",
-                                                        "()Lchip/devicecontroller/ControllerParams;",
-                                                        &getUdpListenPort);
+                                                        "()Lchip/devicecontroller/ControllerParams;", &getUdpListenPort);
     SuccessOrExit(err);
     {
-      uint16_t listenPort = env->CallIntMethod(controllerParams, getUdpListenPort);
+        uint16_t listenPort = env->CallIntMethod(controllerParams, getUdpListenPort);
 
-      std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
-          new chip::Controller::AndroidOperationalCredentialsIssuer());
-      wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM,
-                                                            self,
-                                                            kLocalDeviceId,chip::kUndefinedCATs,
-                                                            &DeviceLayer::SystemLayer(),
-                                                            DeviceLayer::TCPEndPointManager(),
-                                                            DeviceLayer::UDPEndPointManager(),
-                                                            std::move(opCredsIssuer),
-                                                            listenPort,
-                                                            &err);
-      SuccessOrExit(err);
+        std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
+            new chip::Controller::AndroidOperationalCredentialsIssuer());
+        wrapper = AndroidDeviceControllerWrapper::AllocateNew(
+            sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
+            DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), listenPort, &err);
+        SuccessOrExit(err);
     }
 
     // Create and start the IO thread. Must be called after Controller()->Init
