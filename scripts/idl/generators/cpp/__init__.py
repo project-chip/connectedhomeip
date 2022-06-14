@@ -23,6 +23,7 @@ import enum
 import logging
 import re
 
+
 def CamelToConst(Str):
     return re.sub("([a-z])([A-Z])", lambda y: y.group(1) + "_" + y.group(2), Str).upper()
 
@@ -36,6 +37,7 @@ def CreateLookupContext(idl: Idl, cluster: Cluster) -> TypeLookupContext:
     not contain a definition, we loop at global namespacing.
     """
     return TypeLookupContext(idl, cluster)
+
 
 def GetFieldInfo(definition: Field, cluster: Cluster, idl: Idl, list):
     context = CreateLookupContext(idl, cluster)
@@ -72,9 +74,11 @@ def GetFieldInfo(definition: Field, cluster: Cluster, idl: Idl, list):
         return 'StructType', actual.idl_name, 'sizeof(%s)' % actual.idl_name, 'ZCL_STRUCT_ATTRIBUTE_TYPE'
     logging.warn('Unknown type: %r' % actual)
 
+
 def GetRawSizeAndType(attr: Attribute, cluster: Cluster, idl: Idl, list=False):
     container, cType, size, matterType = GetFieldInfo(attr.definition, cluster, idl, list)
     return '{}, {}'.format(matterType, size)
+
 
 def GetFieldType(definition: Field, cluster: Cluster, idl: Idl, list=False):
     container, cType, size, matterType = GetFieldInfo(definition, cluster, idl, list)
@@ -84,13 +88,16 @@ def GetFieldType(definition: Field, cluster: Cluster, idl: Idl, list=False):
         return '{}<{}, {}>'.format(container, size, matterType)
     return '{}<{}, {}, {}>'.format(container, cType, size, matterType)
 
+
 def GetAttrType(attr: Attribute, cluster: Cluster, idl: Idl):
     return GetFieldType(attr.definition, cluster, idl, attr.definition.is_list)
+
 
 def GetAttrInit(attr: Attribute, cluster: Cluster, idl: Idl):
     if attr.definition.name == 'clusterRevision':
         return ' = ZCL_' + CamelToConst(cluster.name) + '_CLUSTER_REVISION'
     return ''
+
 
 def GetAttrMask(attr: Attribute, cluster: Cluster, idl: Idl):
     masks = []
@@ -100,16 +107,19 @@ def GetAttrMask(attr: Attribute, cluster: Cluster, idl: Idl):
         return ' | '.join(masks)
     return '0'
 
+
 def GetDynamicEndpoint(idl: Idl):
     for ep in idl.endpoints:
         if ep.number == 1:
             return ep
+
 
 def IsDynamicCluster(cluster: Cluster, idl: Idl):
     for c in GetDynamicEndpoint(idl).server_clusters:
         if cluster.name == c.name:
             return True
     return False
+
 
 class CppGenerator(CodeGenerator):
     """
