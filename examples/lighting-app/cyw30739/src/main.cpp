@@ -21,6 +21,7 @@
 #include <AppShellCommands.h>
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
+#include <DeviceInfoProviderImpl.h>
 #include <LightingManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <OTAConfig.h>
@@ -42,6 +43,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
@@ -153,6 +155,8 @@ void InitApp(intptr_t args)
     chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     LightMgr().Init();
     LightMgr().SetCallbacks(LightManagerCallback, NULL);
