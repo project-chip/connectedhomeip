@@ -47,8 +47,6 @@ static_library("Darwin") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceInstanceInfoProviderImpl.cpp",
-    "DeviceInstanceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
@@ -70,6 +68,8 @@ static_library("Darwin") {
     sources += [
       "KeyValueStoreManagerImpl.h",
       "KeyValueStoreManagerImpl.mm",
+      "DeviceInstanceInfoProviderImpl.cpp",
+      "DeviceInstanceInfoProviderImpl.h",
     ]
   }
 
