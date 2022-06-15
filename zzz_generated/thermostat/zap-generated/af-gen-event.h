@@ -53,11 +53,6 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-    void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
-                           1);                                                                                                     \
-    }                                                                                                                              \
     void emberAfBarrierControlClusterServerTickCallbackWrapperFunction1(void)                                                      \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfBarrierControlClusterServerTickCallbackControl1,                                                \
