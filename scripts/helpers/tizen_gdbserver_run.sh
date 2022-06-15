@@ -5,23 +5,25 @@ set -e
 GDBSERVER_DEFAULT_PORT=9999
 GDBSERVER_TARGET_PATH="/opt/usr/home/owner/share/tmp/sdk_tools/gdbserver"
 RESULT_MODE="debug"
+USAGE_INFO_MSG="See: $0 --help"
 
 function help() {
 
     cat <<EOF
 Usage:
-$0 --app-name APP_NAME [--gdbserver-port PORT] [--target TARGET_DEVICE] [-- APP_ARGUMENTS]
+$0 --app-name APP_NAME [--help] [--gdbserver-port PORT] [--target TARGET_DEVICE] [-- APP_ARGUMENTS]
 
 Options:
     --app-name APP_NAME - name of app to debug
     --gdbserver-port PORT - gdbserver port, if not specified, defaults to $GDBSERVER_DEFAULT_PORT
     --target DEVICE - device to debug app, if not specified and one device are conneted it will be used
+    --help - print help
     APP_ARGUMENTS - arguments to pass to debugged app
 
 Requirements:
     gdbserver has to be installed on the target device in the $GDBSERVER_TARGET_PATH path.
     If it is installed on device by rpm it is necessary to create link by:
-    'ln -sf /usr/bin/gdbserver $GDBSERVER_TARGET_PATH/gdbserver'.
+    'mkdir -p $GDBSERVER_TARGET_PATH && ln -sf /usr/bin/gdbserver $GDBSERVER_TARGET_PATH/gdbserver'.
 EOF
 }
 
@@ -50,16 +52,16 @@ while [[ $# -gt 0 ]]; do
             break
             ;;
         *)
-            echo "Unknown option $1"
-            help
+            echo "ERROR: Unknown option $1"
+            echo "$USAGE_INFO_MSG"
             exit 1
             ;;
     esac
 done
 
 if [ -z "$APP_NAME" ]; then
-    echo "Missing app name"
-    help
+    echo "ERROR Missing app name"
+    echo "$USAGE_INFO_MSG"
     exit 1
 fi
 
@@ -75,7 +77,7 @@ if [ "$SDB_DEVICES" -eq 0 ]; then
 elif [ "$SDB_DEVICES" -gt 1 ]; then
     if [ -z "$TARGET_DEVICE" ]; then
         echo "More than one device connected, please specify target device."
-        help
+        echo "$USAGE_INFO_MSG"
         exit 1
     fi
 fi
@@ -90,7 +92,7 @@ fi
 
 if [ "$GDBSERVER_FOUND" == "gdb not found" ]; then
     echo "Gdbserver not found on target device in path $GDBSERVER_TARGET_PATH"
-    help
+    echo "$USAGE_INFO_MSG"
     exit 1
 fi
 
