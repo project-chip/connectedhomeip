@@ -4,23 +4,23 @@
 
     // List of extensions which should be recommended for users of this workspace.
     "recommendations": [
-        "ms-azuretools.vscode-docker",
-        "xaver.clang-format",
-        "github.vscode-pull-request-github",
-        "maelvalais.autoconf",
-        "yzhang.markdown-all-in-one",
-        "eamodio.gitlens",
-        "yuichinukiyama.vscode-preview-server",
         "aaron-bond.better-comments",
-        "foxundermoon.shell-format",
+        "christian-kohler.path-intellisense",
+        "eamodio.gitlens",
         "editorconfig.editorconfig",
         "esbenp.prettier-vscode",
-        "redhat.vscode-yaml",
-        "christian-kohler.path-intellisense",
+        "foxundermoon.shell-format",
+        "github.vscode-pull-request-github",
         "knisterpeter.vscode-github",
-        "npclaudiu.vscode-gn",
+        "maelvalais.autoconf",
         "marus25.cortex-debug",
-        "msedge-dev.gnls"
+        "ms-azuretools.vscode-docker",
+        "msedge-dev.gnls",
+        "npclaudiu.vscode-gn",
+        "redhat.vscode-yaml",
+        "xaver.clang-format",
+        "yuichinukiyama.vscode-preview-server",
+        "yzhang.markdown-all-in-one"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []
