@@ -15,18 +15,18 @@
  *    limitations under the License.
  */
 
-import SwiftUI
+#import <Foundation/Foundation.h>
 
-struct ContentView: View {
-    var body: some View {
-        NavigationView {
-                CommissionerDiscoveryView()
-        }
-    }
-}
+#import "DiscoveredNodeData.h"
+#include <lib/dnssd/Resolver.h>
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+#ifndef DiscoveredNodeDataConverter_h
+#define DiscoveredNodeDataConverter_h
+
+@interface DiscoveredNodeDataConverter : NSObject
+
++ (DiscoveredNodeData *)convertToObjC:(const chip::Dnssd::DiscoveredNodeData *)chipDiscoveredNodedata;
+
+@end
+
+#endif /* DiscoveredNodeDataConverter_h */
