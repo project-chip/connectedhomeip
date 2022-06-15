@@ -96,17 +96,17 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
     if (!mFailSafeArmed)
     {
         System::Clock::Timeout maxCumulativeTimeout =
-            System::Clock::Milliseconds64(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC * 1000);
+            System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
         SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
         cancelTimersIfError = true;
     }
 
-    mFailSafeArmed = true;
-    mFabricIndex   = accessingFabricIndex;
-
     SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
     SuccessOrExit(err = CommitToStorage());
     SuccessOrExit(err = ConfigurationMgr().SetFailSafeArmed(true));
+
+    mFailSafeArmed = true;
+    mFabricIndex   = accessingFabricIndex;
 
 exit:
 
