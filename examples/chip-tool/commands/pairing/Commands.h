@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "CloseSessionCommand.h"
 #include "CommissionedListCommand.h"
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommand.h"
@@ -218,6 +219,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
+        make_unique<CloseSessionCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
