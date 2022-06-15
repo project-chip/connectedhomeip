@@ -14,4 +14,10 @@
 
 declare_args() {
   chip_malloc_sys_heap = false
+
+  # Enable factory data support
+  chip_enable_factory_data = false
+
+  # Enable user custom backend for factory data
+  chip_enable_factory_data_custom_backend = false
 }
