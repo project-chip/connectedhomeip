@@ -33,19 +33,19 @@ using CertChainElement = OperationalCertificateStore::CertChainElement;
 
 namespace {
 
-constexpr FabricIndex kFabricIndex1   = 1;
-constexpr FabricIndex kFabricIndex2   = 2;
+constexpr FabricIndex kFabricIndex1     = 1;
+constexpr FabricIndex kFabricIndex2     = 2;
 constexpr FabricIndex kOtherFabricIndex = static_cast<FabricIndex>(kFabricIndex1 + 10u);
 
 // The PersistentStorageOpCertStore does not validate cert contents, so we can use simple constants
-const uint8_t kTestRcacBuf[] = {'r', 'c', 'a', 'c'};
-const ByteSpan kTestRcacSpan{kTestRcacBuf};
+const uint8_t kTestRcacBuf[] = { 'r', 'c', 'a', 'c' };
+const ByteSpan kTestRcacSpan{ kTestRcacBuf };
 
-const uint8_t kTestIcacBuf[] = {'i', 'c', 'a', 'c'};
-const ByteSpan kTestIcacSpan{kTestIcacBuf};
+const uint8_t kTestIcacBuf[] = { 'i', 'c', 'a', 'c' };
+const ByteSpan kTestIcacSpan{ kTestIcacBuf };
 
-const uint8_t kTestNocBuf[] = {'n', 'o', 'c'};
-const ByteSpan kTestNocSpan{kTestNocBuf};
+const uint8_t kTestNocBuf[] = { 'n', 'o', 'c' };
+const ByteSpan kTestNocSpan{ kTestNocBuf };
 
 void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
 {
@@ -64,27 +64,28 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
 
     // Manually add existing root for the FabricIndex, should fail AddNewTrustedRootCertForFabric for
     // same fabric but succeed GetCertificate.
-    const uint8_t kTestRcacBufExists[] = {'r', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
+    const uint8_t kTestRcacBufExists[] = { 'r', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
 
     err = storageDelegate.SyncSetKeyValue(keyAllocator.FabricRCAC(kFabricIndex1), kTestRcacBufExists, sizeof(kTestRcacBufExists));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
-    NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac) == true); //< From manual add
+    NL_TEST_ASSERT(inSuite,
+                   opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac) == true); //< From manual add
 
     err = opCertStore.AddNewTrustedRootCertForFabric(kFabricIndex1, kTestRcacSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     uint8_t largeBuf[400];
-    MutableByteSpan largeSpan{largeBuf};
+    MutableByteSpan largeSpan{ largeBuf };
 
     err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 
-    largeSpan = MutableByteSpan{largeBuf};
+    largeSpan = MutableByteSpan{ largeBuf };
 
     err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacBufExists}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacBufExists }));
 
     // Adding root for another FabricIndex should work
     err = opCertStore.AddNewTrustedRootCertForFabric(kUndefinedFabricIndex, kTestRcacSpan);
@@ -97,10 +98,10 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
 
     // Should be able to read pending RCAC right away
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
     // Trying to commit with pending RCAC but no NOC should fail but leave everything as-is
     err = opCertStore.CommitOpCertsForFabric(kFabricIndex2);
@@ -119,8 +120,8 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
 
     // Trying to do AddNewOpCertsForFabric for same fabric as that with pending RCAC should fail
     // if there are already existing NOC chain elements for the given fabric.
-    const uint8_t kTestIcacBufExists[] = {'i', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
-    const uint8_t kTestNocBufExists[] = {'n', 'o', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
+    const uint8_t kTestIcacBufExists[] = { 'i', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
+    const uint8_t kTestNocBufExists[]  = { 'n', 'o', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
 
     err = storageDelegate.SyncSetKeyValue(keyAllocator.FabricICAC(kFabricIndex2), kTestIcacBufExists, sizeof(kTestIcacBufExists));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -130,7 +131,8 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 2);
 
-    NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex2, CertChainElement::kIcac) == true); //< From manual add
+    NL_TEST_ASSERT(inSuite,
+                   opCertStore.HasCertificateForFabric(kFabricIndex2, CertChainElement::kIcac) == true);         //< From manual add
     NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex2, CertChainElement::kNoc) == true); //< From manual add
 
     err = opCertStore.AddNewOpCertsForFabric(kFabricIndex2, kTestNocSpan, kTestIcacSpan);
@@ -150,15 +152,15 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
 
     // Should be able to get the pending cert even if not in persisted storage
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
 
     // Trying to do AddNewOpCertsForFabric a second time after success before commit should fail,
     // but leave state as-is
@@ -168,15 +170,15 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
 
     // Should be able to get the pending cert even if not in persisted storage, after an API error
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
 
     // Trying to commit with wrong FabricIndex should fail
     err = opCertStore.CommitOpCertsForFabric(kOtherFabricIndex);
@@ -193,20 +195,20 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3); //< All certs now committed
 
     // Should be able to get the committed certs
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex2, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
 
     opCertStore.Finish();
 }
@@ -246,44 +248,49 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
 
     // Manually add root, ICAC and NOC to validate update since existing chain required
-    const uint8_t kTestRcacBufExists[] = {'r', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
-    const uint8_t kTestIcacBufExists[] = {'i', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
-    const uint8_t kTestNocBufExists[] = {'n', 'o', 'c', ' ', 'e', 'x', 'i', 's', 't', 's'};
+    const uint8_t kTestRcacBufExists[] = { 'r', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
+    const uint8_t kTestIcacBufExists[] = { 'i', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
+    const uint8_t kTestNocBufExists[]  = { 'n', 'o', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
 
     uint8_t largeBuf[400];
-    MutableByteSpan largeSpan{largeBuf};
+    MutableByteSpan largeSpan{ largeBuf };
 
     {
-        err = storageDelegate.SyncSetKeyValue(keyAllocator.FabricRCAC(kFabricIndex1), kTestRcacBufExists, sizeof(kTestRcacBufExists));
+        err =
+            storageDelegate.SyncSetKeyValue(keyAllocator.FabricRCAC(kFabricIndex1), kTestRcacBufExists, sizeof(kTestRcacBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
-        NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac) == true); //< From manual add
+        NL_TEST_ASSERT(inSuite,
+                       opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac) == true); //< From manual add
 
-        err = storageDelegate.SyncSetKeyValue(keyAllocator.FabricICAC(kFabricIndex1), kTestIcacBufExists, sizeof(kTestIcacBufExists));
+        err =
+            storageDelegate.SyncSetKeyValue(keyAllocator.FabricICAC(kFabricIndex1), kTestIcacBufExists, sizeof(kTestIcacBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 2);
-        NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kIcac) == true); //< From manual add
+        NL_TEST_ASSERT(inSuite,
+                       opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kIcac) == true); //< From manual add
 
         err = storageDelegate.SyncSetKeyValue(keyAllocator.FabricNOC(kFabricIndex1), kTestNocBufExists, sizeof(kTestNocBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3);
-        NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kNoc) == true); //< From manual add
+        NL_TEST_ASSERT(inSuite,
+                       opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kNoc) == true); //< From manual add
 
         // Test that we can manually stored certs
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacBufExists}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacBufExists }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacBufExists}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacBufExists }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocBufExists}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocBufExists }));
     }
 
     // Update fails on fabric with wrong FabricIndex
@@ -300,21 +307,21 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3);
 
     // Can read back existing root unchanged
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacBufExists}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacBufExists }));
 
     // NOC chain elements see the pending updated certs
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacBuf}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacBuf }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocBuf}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocBuf }));
 
     // Trying update again fails
     err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, kTestNocSpan, kTestIcacSpan);
@@ -340,7 +347,7 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     // Committing writes the new values (we even "background-remove" the old ICAC/NOC before commit)
     storageDelegate.SyncDeleteKeyValue(keyAllocator.FabricICAC(kFabricIndex1));
     storageDelegate.SyncDeleteKeyValue(keyAllocator.FabricNOC(kFabricIndex1));
-    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);  //< Root remains
+    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1); //< Root remains
 
     err = opCertStore.CommitOpCertsForFabric(kFabricIndex1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -349,40 +356,40 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3); //< All certs now committed
 
     // Should be able to get the committed cert even if not in persisted storage, after an API error
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacBufExists}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacBufExists }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
 
     // Calling revert doesn't undo the work we just did
     opCertStore.RevertPendingOpCerts();
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3); //< All certs now committed
 
     // Verify the revert after commit left all data alone
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacBufExists}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacBufExists }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+    NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
 
     // Verify that RemoveOpCertsForFabric fails on fabric with no data
     err = opCertStore.RemoveOpCertsForFabric(kFabricIndex2);
@@ -414,7 +421,7 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Add a new pending trusted root
     uint8_t largeBuf[400];
-    MutableByteSpan largeSpan{largeBuf};
+    MutableByteSpan largeSpan{ largeBuf };
 
     err = opCertStore.AddNewTrustedRootCertForFabric(kFabricIndex1, kTestRcacSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -423,8 +430,8 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
 
     // Verify we can see the new trusted root
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestRcacSpan));
 
@@ -433,8 +440,8 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingRootCert());
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
 
-    largeSpan = MutableByteSpan{largeBuf};
-    err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+    largeSpan = MutableByteSpan{ largeBuf };
+    err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 
     {
@@ -455,18 +462,18 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Make sure we can see all pending certs before revert
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestRcacSpan));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestIcacSpan));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestNocSpan));
     }
@@ -479,16 +486,16 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Verify that after revert, we can't see the root or chain anymore
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
     }
 
@@ -519,26 +526,26 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Should be able to get the committed certs
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
     }
 
-    const uint8_t kNewNoc[] = {'n', 'o', 'c', ' ', 'n', 'e', 'w'};
+    const uint8_t kNewNoc[] = { 'n', 'o', 'c', ' ', 'n', 'e', 'w' };
 
     // Updating certs should work (NO ICAC)
-    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{kNewNoc}, ByteSpan{});
+    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{ kNewNoc }, ByteSpan{});
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingRootCert());
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingNocChain());
@@ -546,20 +553,20 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Should see committed root, pending NOC, absent ICAC
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
         NL_TEST_ASSERT(inSuite, !opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kIcac));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewNoc}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewNoc }));
     }
 
     // Revert, should be back at previous state
@@ -570,24 +577,24 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Should be able to get the previously committed certs
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestIcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestIcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestNocSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestNocSpan }));
     }
 
     // Try again to update with missing ICAC and commit
-    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{kNewNoc}, ByteSpan{});
+    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{ kNewNoc }, ByteSpan{});
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingRootCert());
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingNocChain());
@@ -601,21 +608,21 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 
     // Should see committed root, new NOC, absent ICAC
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
         NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
         NL_TEST_ASSERT(inSuite, !opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kIcac));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewNoc}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewNoc }));
         NL_TEST_ASSERT(inSuite, opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kNoc));
     }
 
@@ -634,7 +641,7 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 
     // Add a new pending trusted root
     uint8_t largeBuf[400];
-    MutableByteSpan largeSpan{largeBuf};
+    MutableByteSpan largeSpan{ largeBuf };
 
     {
         // Add new root
@@ -654,17 +661,17 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 
     // Make sure we get expected pending state before revert
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestRcacSpan));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestNocSpan));
     }
@@ -699,11 +706,11 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
     }
 
     // Update to add an ICAC
-    const uint8_t kNewIcac[] = {'i', 'c', 'a', 'c', ' ', 'n', 'e', 'w'};
-    const uint8_t kNewNoc[] = {'n', 'o', 'c', ' ', 'n', 'e', 'w'};
+    const uint8_t kNewIcac[] = { 'i', 'c', 'a', 'c', ' ', 'n', 'e', 'w' };
+    const uint8_t kNewNoc[]  = { 'n', 'o', 'c', ' ', 'n', 'e', 'w' };
 
     // Updating certs should work (NO ICAC)
-    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{kNewNoc}, ByteSpan{kNewIcac});
+    err = opCertStore.UpdateOpCertsForFabric(kFabricIndex1, ByteSpan{ kNewNoc }, ByteSpan{ kNewIcac });
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingRootCert());
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingNocChain());
@@ -711,20 +718,20 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 
     // Should see committed root, pending NOC, pending ICAC
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewIcac}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewIcac }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewNoc}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewNoc }));
     }
 
     // Commit, should see the new ICAC appear.
@@ -736,20 +743,20 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 
     // Should see committed root, new NOC, new ICAC
     {
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kTestRcacSpan}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kTestRcacSpan }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewIcac}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewIcac }));
 
-        largeSpan = MutableByteSpan{largeBuf};
-        err = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{kNewNoc}));
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(ByteSpan{ kNewNoc }));
     }
 
     opCertStore.Finish();
@@ -758,11 +765,12 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF("Test AddNOC-like flows PersistentStorageOpCertStore", TestAddNocFlow),
-                                 NL_TEST_DEF("Test UpdateNOC-like flows PersistentStorageOpCertStore", TestUpdateNocFlow),
-                                 NL_TEST_DEF("Test revert operations of PersistentStorageOpCertStore", TestReverts),
-                                 NL_TEST_DEF("Test revert operations with AddNOC of PersistentStorageOpCertStore", TestRevertAddNoc),
-                                 NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF("Test AddNOC-like flows PersistentStorageOpCertStore", TestAddNocFlow),
+    NL_TEST_DEF("Test UpdateNOC-like flows PersistentStorageOpCertStore", TestUpdateNocFlow),
+    NL_TEST_DEF("Test revert operations of PersistentStorageOpCertStore", TestReverts),
+    NL_TEST_DEF("Test revert operations with AddNOC of PersistentStorageOpCertStore", TestRevertAddNoc), NL_TEST_SENTINEL()
+};
 
 /**
  *  Set up the test suite.

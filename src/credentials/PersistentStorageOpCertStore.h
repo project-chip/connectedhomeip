@@ -88,7 +88,7 @@ public:
 
         mPendingRcacSize = 0;
         mPendingIcacSize = 0;
-        mPendingNocSize = 0;
+        mPendingNocSize  = 0;
 
         mPendingFabricIndex = kUndefinedFabricIndex;
         mStateFlags.ClearAll();
@@ -100,9 +100,9 @@ protected:
     enum class StateFlags : uint8_t
     {
         // Below are flags to assist interlock logic
-        kAddNewOpCertsCalled = (1u << 0),
+        kAddNewOpCertsCalled     = (1u << 0),
         kAddNewTrustedRootCalled = (1u << 1),
-        kUpdateOpCertsCalled = (1u << 2),
+        kUpdateOpCertsCalled     = (1u << 2),
     };
 
     // Returns CHIP_ERROR_NOT_FOUND if a pending certificate couldn't be found, otherwise status of pending copy
@@ -122,7 +122,7 @@ protected:
 
     uint16_t mPendingRcacSize = 0;
     uint16_t mPendingIcacSize = 0;
-    uint16_t mPendingNocSize = 0;
+    uint16_t mPendingNocSize  = 0;
 
     BitFlags<StateFlags> mStateFlags;
 };

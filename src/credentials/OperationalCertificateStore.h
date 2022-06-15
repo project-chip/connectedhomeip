@@ -31,7 +31,7 @@ public:
     {
         kRcac = 0,
         kIcac = 1,
-        kNoc = 2
+        kNoc  = 2
     };
 
     virtual ~OperationalCertificateStore() {}
@@ -240,7 +240,8 @@ public:
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the fabricIndex is invalid.
      * @retval other CHIP_ERROR value on internal storage errors.
      */
-    virtual CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element, MutableByteSpan & outCertificate) const = 0;
+    virtual CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element,
+                                      MutableByteSpan & outCertificate) const = 0;
 };
 
 } // namespace Credentials
