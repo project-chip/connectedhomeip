@@ -389,6 +389,7 @@ function getManualTests() {
   ];
 
   const OnOff = [
+    'Test_TC_OO_2_3',
     'Test_TC_OO_3_1',
     'Test_TC_OO_3_2',
   ];
@@ -690,7 +691,6 @@ function getTests() {
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
-    'Test_TC_OO_2_3',
     'Test_TC_OO_2_4',
   ];
 
