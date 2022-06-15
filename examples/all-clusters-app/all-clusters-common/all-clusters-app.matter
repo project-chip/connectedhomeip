@@ -3711,14 +3711,7 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
-  bitmap Mode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
-  }
-
-  bitmap WcFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLift = 0x1;
     kTilt = 0x2;
     kPositionAwareLift = 0x4;
@@ -3726,13 +3719,20 @@ server cluster WindowCovering = 258 {
     kPositionAwareTilt = 0x10;
   }
 
-  bitmap WcOperationalStatus : BITMAP8 {
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
+  }
+
+  bitmap OperationalStatus : BITMAP8 {
     kGlobal = 0x3;
     kLift = 0xC;
     kTilt = 0x30;
   }
 
-  bitmap WcSafetyStatus : BITMAP16 {
+  bitmap SafetyStatus : BITMAP16 {
     kRemoteLockout = 0x1;
     kTamperDetection = 0x2;
     kFailedCommunication = 0x4;
@@ -3757,7 +3757,7 @@ server cluster WindowCovering = 258 {
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
-  readonly attribute bitmap8 operationalStatus = 10;
+  readonly attribute OperationalStatus operationalStatus = 10;
   readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
   readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute EndProductType endProductType = 13;
@@ -3768,7 +3768,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
-  readonly attribute bitmap16 safetyStatus = 26;
+  readonly attribute SafetyStatus safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

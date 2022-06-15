@@ -18205,9 +18205,9 @@ struct TypeInfo
 namespace OperationalStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
@@ -18337,9 +18337,9 @@ struct TypeInfo
 namespace SafetyStatus {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
@@ -18396,7 +18396,8 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>(0);
         Attributes::CurrentPositionLiftPercentage::TypeInfo::DecodableType currentPositionLiftPercentage;
         Attributes::CurrentPositionTiltPercentage::TypeInfo::DecodableType currentPositionTiltPercentage;
-        Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus = static_cast<uint8_t>(0);
+        Attributes::OperationalStatus::TypeInfo::DecodableType operationalStatus =
+            static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>>(0);
         Attributes::TargetPositionLiftPercent100ths::TypeInfo::DecodableType targetPositionLiftPercent100ths;
         Attributes::TargetPositionTiltPercent100ths::TypeInfo::DecodableType targetPositionTiltPercent100ths;
         Attributes::EndProductType::TypeInfo::DecodableType endProductType =
@@ -18408,7 +18409,8 @@ struct TypeInfo
         Attributes::InstalledOpenLimitTilt::TypeInfo::DecodableType installedOpenLimitTilt     = static_cast<uint16_t>(0);
         Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
-        Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus = static_cast<uint16_t>(0);
+        Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus =
+            static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

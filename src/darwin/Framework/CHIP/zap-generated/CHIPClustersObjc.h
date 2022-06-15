@@ -22100,6 +22100,14 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringConfigStatus) {
     CHIPWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringFeature) {
+    CHIPWindowCoveringFeatureLift = 0x1,
+    CHIPWindowCoveringFeatureTilt = 0x2,
+    CHIPWindowCoveringFeaturePositionAwareLift = 0x4,
+    CHIPWindowCoveringFeatureAbsolutePosition = 0x8,
+    CHIPWindowCoveringFeaturePositionAwareTilt = 0x10,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeMotorDirectionReversed = 0x1,
     CHIPWindowCoveringModeCalibrationMode = 0x2,
@@ -22107,33 +22115,25 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeLedFeedback = 0x8,
 };
 
-typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
-    CHIPWindowCoveringWcFeatureLift = 0x1,
-    CHIPWindowCoveringWcFeatureTilt = 0x2,
-    CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
-    CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
-    CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringOperationalStatus) {
+    CHIPWindowCoveringOperationalStatusGlobal = 0x3,
+    CHIPWindowCoveringOperationalStatusLift = 0xC,
+    CHIPWindowCoveringOperationalStatusTilt = 0x30,
 };
 
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
-    CHIPWindowCoveringWcOperationalStatusGlobal = 0x3,
-    CHIPWindowCoveringWcOperationalStatusLift = 0xC,
-    CHIPWindowCoveringWcOperationalStatusTilt = 0x30,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPWindowCoveringWcSafetyStatus) {
-    CHIPWindowCoveringWcSafetyStatusRemoteLockout = 0x1,
-    CHIPWindowCoveringWcSafetyStatusTamperDetection = 0x2,
-    CHIPWindowCoveringWcSafetyStatusFailedCommunication = 0x4,
-    CHIPWindowCoveringWcSafetyStatusPositionFailure = 0x8,
-    CHIPWindowCoveringWcSafetyStatusThermalProtection = 0x10,
-    CHIPWindowCoveringWcSafetyStatusObstacleDetected = 0x20,
-    CHIPWindowCoveringWcSafetyStatusPower = 0x40,
-    CHIPWindowCoveringWcSafetyStatusStopInput = 0x80,
-    CHIPWindowCoveringWcSafetyStatusMotorJammed = 0x100,
-    CHIPWindowCoveringWcSafetyStatusHardwareFailure = 0x200,
-    CHIPWindowCoveringWcSafetyStatusManualOperation = 0x400,
-    CHIPWindowCoveringWcSafetyStatusProtection = 0x800,
+typedef NS_OPTIONS(uint16_t, CHIPWindowCoveringSafetyStatus) {
+    CHIPWindowCoveringSafetyStatusRemoteLockout = 0x1,
+    CHIPWindowCoveringSafetyStatusTamperDetection = 0x2,
+    CHIPWindowCoveringSafetyStatusFailedCommunication = 0x4,
+    CHIPWindowCoveringSafetyStatusPositionFailure = 0x8,
+    CHIPWindowCoveringSafetyStatusThermalProtection = 0x10,
+    CHIPWindowCoveringSafetyStatusObstacleDetected = 0x20,
+    CHIPWindowCoveringSafetyStatusPower = 0x40,
+    CHIPWindowCoveringSafetyStatusStopInput = 0x80,
+    CHIPWindowCoveringSafetyStatusMotorJammed = 0x100,
+    CHIPWindowCoveringSafetyStatusHardwareFailure = 0x200,
+    CHIPWindowCoveringSafetyStatusManualOperation = 0x400,
+    CHIPWindowCoveringSafetyStatusProtection = 0x800,
 };
 
 typedef NS_ENUM(uint8_t, CHIPPumpConfigurationAndControlPumpControlMode) {
