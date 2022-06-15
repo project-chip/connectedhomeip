@@ -90,7 +90,6 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
         mTable(table), mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
-        MoveToState(State::kEstablishing);
         ChipLogDetail(Inet, "SecureSession[%p]: Allocated Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
     }
@@ -277,8 +276,8 @@ private:
         kEstablishing = 1,
 
         //
-        // The session is active, ready for use. When transitioning to this state, the
-        // reference count is incremented by 1 in Activate, and will subsequently be decremented
+        // The session is active, ready for use. When transitioning to this state via Activate, the
+        // reference count is incremented by 1, and will subsequently be decremented
         // by 1 when MarkForEviction is called. This ensures the session remains resident
         // and active for future use even if there currently are no references to it.
         //
@@ -292,10 +291,13 @@ private:
         //
         // Transitioning to this state does not detach any existing SessionHolders.
         //
+        // In addition to any existing SessionHolders holding a reference to this session, the SessionManager
+        // maintains a reference as well to the session that will only be relinquished when MarkForEviction is called.
+        //
         kDefunct = 4,
 
         //
-        // The session has been marked for eviction and is pending  deallocation. All SessionHolders would have already
+        // The session has been marked for eviction and is pending deallocation. All SessionHolders would have already
         // been detached in a previous call to MarkForEviction. Future SessionHolders will not be able to attach to
         // this session.
         //

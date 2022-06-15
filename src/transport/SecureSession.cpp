@@ -74,7 +74,7 @@ void SecureSession::MarkAsDefunct()
         //
         // A session can only be marked as defunct from the state of Active.
         //
-        VerifyOrDie(true);
+        VerifyOrDie(false);
         return;
 
     case State::kActive:
@@ -91,7 +91,7 @@ void SecureSession::MarkAsDefunct()
         //
         // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
         //
-        VerifyOrDie(true);
+        VerifyOrDie(false);
         return;
     }
 }

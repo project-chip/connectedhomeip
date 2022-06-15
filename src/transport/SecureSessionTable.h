@@ -167,11 +167,12 @@ private:
      *
      * This implements the following eviction policy:
      *
-     *  - Sessions sorted by activity time, with older ones placed ahead of newer ones. This ensures
+     *  - Sessions are sorted with their state as the primary sort key and activity time as the secondary
+     *    sort key.
+     *  - The primary sort key places defunct sessions ahead of active ones, ahead of anything else.
+     *  - The secondary sort key places older sessions ahead of newer sessions. This ensures
      *    we're prioritizing reaping less active sessions over more recently active sessions (activity
      *    in either TX or RX).
-     *  - Then, sessions sorted by their state - defunct ones ahead of active, ahead
-     *    of anything else.
      *
      */
     void DefaultEvictionPolicy(EvictionPolicyContext & evictionContext);

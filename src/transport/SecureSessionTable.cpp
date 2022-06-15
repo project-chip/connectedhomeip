@@ -18,6 +18,7 @@
 #include "lib/support/CodeUtils.h"
 #include "lib/support/ScopedBuffer.h"
 #include <access/AuthMode.h>
+#include <lib/support/Defer.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
 
@@ -63,7 +64,7 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession
     SecureSession * allocated  = nullptr;
 
     auto sessionId = FindUnusedSessionId();
-    VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
+    VerifyOrReturnValue(sessionId.HasValue(), Optional<SessionHandle>::Missing());
 
     //
     // We allocate a new session out of the pool if we have space in it. If we don't, we need
@@ -73,18 +74,18 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession
     if (mEntries.Allocated() < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE)
     {
         allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
-        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
     }
     else
     {
         allocated = EvictAndAllocate(sessionId.Value(), secureSessionType, sessionEvictionHint);
     }
 
+    VerifyOrReturnValue(allocated != nullptr, Optional<SessionHandle>::Missing());
+
     rv             = MakeOptional<SessionHandle>(*allocated);
     mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
                                                         : static_cast<uint16_t>(sessionId.Value() + 1);
 
-exit:
     return rv;
 }
 
@@ -93,7 +94,10 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
 {
     VerifyOrDieWithMsg(!mRunningEvictionLogic, SecureChannel,
                        "EvictAndAllocate isn't re-entrant, yet someone called us while we're already running");
+
     mRunningEvictionLogic = true;
+
+    auto cleanup = MakeDefer([this]() { mRunningEvictionLogic = false; });
 
     ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId,
                     (uint8_t) secureSessionType);
@@ -109,7 +113,7 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     sortableSessions.Calloc(mEntries.Allocated());
     if (!sortableSessions)
     {
-        VerifyOrDieWithMsg(true, SecureChannel, "We couldn't allocate a session!");
+        VerifyOrDieWithMsg(false, SecureChannel, "We couldn't allocate a session!");
         return nullptr;
     }
 
@@ -130,11 +134,10 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
 
 #if CHIP_DETAIL_LOGGING
     ChipLogDetail(SecureChannel, "Sorted Eviction Candidates (ranked from best candidate to worst):");
-    auto i = 0;
-    for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++, i++)
+    for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++)
     {
-        ChipLogDetail(SecureChannel, "\t%d: [%p] -- State: '%s', ActivityTime: %lu", i, session->mSession,
-                      session->mSession->GetStateStr(),
+        ChipLogDetail(SecureChannel, "\t%ld: [%p] -- State: '%s', ActivityTime: %lu", (session - sortableSessions.Get()),
+                      session->mSession, session->mSession->GetStateStr(),
                       static_cast<unsigned long>(session->mSession->GetLastActivityTime().count()));
     }
 #endif
@@ -168,15 +171,13 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
         if (newCount < prevCount)
         {
             ChipLogProgress(SecureChannel, "Successfully evicted a session!");
-            mRunningEvictionLogic = false;
-            auto * retSession     = mEntries.CreateObject(*this, secureSessionType, localSessionId);
+            auto * retSession = mEntries.CreateObject(*this, secureSessionType, localSessionId);
             VerifyOrDie(session != nullptr);
             return retSession;
         }
     }
 
-    mRunningEvictionLogic = false;
-    VerifyOrDieWithMsg(true, SecureChannel, "We couldn't find any session to evict at all, something's wrong!");
+    VerifyOrDieWithMsg(false, SecureChannel, "We couldn't find any session to evict at all, something's wrong!");
     return nullptr;
 }
 

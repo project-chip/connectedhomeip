@@ -514,6 +514,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     }
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
+
+    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession())
+    {
+        ChipLogError(Inet, "Secure transport received message on a session in an invalid state (state = '%s')",
+                     secureSession->GetStateStr());
+        return;
+    }
+
     // Decrypt and verify the message before message counter verification or any further processing.
     CryptoContext::NonceStorage nonce;
     // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
@@ -710,13 +718,20 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
                                                                  const Optional<Transport::SecureSession::Type> & type)
 {
     SecureSession * found = nullptr;
+
     mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
         if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-            found = session;
-            return Loop::Break;
+            //
+            // Select the active session with the most recent activity to return back to the caller.
+            //
+            if ((found && (found->GetLastActivityTime() > session->GetLastActivityTime())) || !found)
+            {
+                found = session;
+            }
         }
+
         return Loop::Continue;
     });
 

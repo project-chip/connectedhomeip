@@ -118,8 +118,15 @@ CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value,
 
 CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
 {
-    ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", key);
+    uint8_t val[1];
+    uint16_t size  = 0;
+    CHIP_ERROR err = SyncGetKeyValue(key, val, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return err;
+    }
 
+    ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", key);
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
 }

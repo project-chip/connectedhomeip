@@ -1185,7 +1185,7 @@ uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
         return kMinSupportedSubscriptionsPerFabric;
     }
 
-    size_t perFabricSubscriptionCapacity = static_cast<size_t>(readHandlerPoolCapacity - kReservedHandlersForReads) / fabricCount;
+    size_t perFabricSubscriptionCapacity = static_cast<size_t>(readHandlerPoolCapacity - kReservedPathsForReads) / fabricCount;
 
     return static_cast<uint16_t>(perFabricSubscriptionCapacity);
 }

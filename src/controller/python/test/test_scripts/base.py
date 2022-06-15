@@ -365,7 +365,7 @@ class BaseTestHelper:
         minimumSupportedFabrics = 16
 
         #
-        # This test exercises the ability to allocate more sessions that is supported in the
+        # This test exercises the ability to allocate more sessions than are supported in the
         # pool configuration. By going beyond (minimumSupportedFabrics * minimumCASESessionsPerFabric),
         # it starts to test out the eviction logic. This specific test does not validate the specifics
         # of eviction, just that allocation and CASE session establishment proceeds successfully on both
