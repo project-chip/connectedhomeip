@@ -13258,6 +13258,8 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(
                     CheckValue("basicCommissioningInfo.failSafeExpiryLengthSeconds", value.failSafeExpiryLengthSeconds, 60U));
+                VerifyOrReturn(
+                    CheckValue("basicCommissioningInfo.maxCumulativeFailsafeSeconds", value.maxCumulativeFailsafeSeconds, 900U));
             }
             break;
         default:

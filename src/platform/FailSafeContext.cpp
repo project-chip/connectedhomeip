@@ -91,8 +91,8 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    bool cancelTimersIfError    = false;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool cancelTimersIfError = false;
     if (!mFailSafeArmed)
     {
         System::Clock::Timeout maxCumulativeTimeout =
