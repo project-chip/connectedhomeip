@@ -35,7 +35,13 @@ tests:
       command: "writeAttribute"
       attribute: "label list"
       arguments:
-          value: [{ label: "room", value: "17_bytesIsTooLongforuserlabelnotexpected" }]
+          value:
+              [
+                  {
+                      label: "room",
+                      value: "17_bytesIsTooLongforuserlabelnotexpected",
+                  },
+              ]
       response:
           error: FAILURE
 
@@ -43,6 +49,12 @@ tests:
       command: "writeAttribute"
       attribute: "label list"
       arguments:
-          value: [{ label: "17_bytesIsTooLongforuserlabelnotexpected", value: "foobar" }]
+          value:
+              [
+                  {
+                      label: "17_bytesIsTooLongforuserlabelnotexpected",
+                      value: "foobar",
+                  },
+              ]
       response:
           error: FAILURE
