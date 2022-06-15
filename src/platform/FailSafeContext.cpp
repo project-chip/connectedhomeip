@@ -95,8 +95,7 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
     bool cancelTimersIfError = false;
     if (!mFailSafeArmed)
     {
-        System::Clock::Timeout maxCumulativeTimeout =
-            System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
+        System::Clock::Timeout maxCumulativeTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
         SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
         cancelTimersIfError = true;
     }
