@@ -140,7 +140,6 @@ function getManualTests() {
   ];
 
   const Descriptor = [
-    'Test_TC_DESC_1_1',
     'Test_TC_DESC_2_1',
     'Test_TC_DESC_2_2',
   ];
@@ -158,13 +157,10 @@ function getManualTests() {
   ];
 
   const GeneralDiagnostics = [
-    'Test_TC_GENDIAG_1_1',
     'Test_TC_GENDIAG_1_2',
-    'Test_TC_GENDIAG_2_1',
   ];
 
   const Identify = [
-    'Test_TC_I_2_2',
     'Test_TC_I_3_1',
     'Test_TC_I_3_2',
   ];
@@ -545,6 +541,11 @@ function getTests() {
     'Test_TC_DM_2_1',
   ];
 
+  const Descriptor = [
+    'Test_TC_DESC_1_1',
+  ];
+
+
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
@@ -564,9 +565,15 @@ function getTests() {
     'Test_TC_CGEN_2_1',
   ];
 
+  const GeneralDiagnostics = [
+    'Test_TC_DGGEN_1_1',
+    'Test_TC_DGGEN_2_1',
+  ];
+
   const Identify = [
     'Test_TC_I_1_1',
     'Test_TC_I_2_1',
+    'Test_TC_I_2_2',
     'Test_TC_I_2_3',
   ];
 
@@ -593,6 +600,7 @@ function getTests() {
   const UserLabel = [
     'Test_TC_ULABEL_1_1',
     'Test_TC_ULABEL_2_2',
+    'Test_TC_ULABEL_2_3',
   ];
 
   const MediaControl = [
@@ -818,10 +826,12 @@ function getTests() {
     BridgedActions,
     ColorControl,
     DeviceManagement,
+    Descriptor,
     ElectricalMeasurement,
     EthernetNetworkDiagnostics,
     FlowMeasurement,
     GeneralCommissioning,
+    GeneralDiagnostics,
     Identify,
     IlluminanceMeasurement,
     LevelControl,
