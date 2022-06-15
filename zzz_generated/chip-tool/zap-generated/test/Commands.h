@@ -66621,7 +66621,7 @@ class TestGroupKeyManagementClusterSuite : public TestCommand
 {
 public:
     TestGroupKeyManagementClusterSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestGroupKeyManagementCluster", 20, credsIssuerConfig)
+        TestCommand("TestGroupKeyManagementCluster", 21, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66834,8 +66834,21 @@ private:
             break;
         case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
+                    value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("groupTable", iter_0, 0));
+                }
+            }
             break;
         case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
             break;
         default:
@@ -67077,7 +67090,12 @@ private:
             );
         }
         case 18: {
-            LogStep(18, "KeySet Remove 2");
+            LogStep(18, "Read GroupTable 3");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
+                                 GroupKeyManagement::Attributes::GroupTable::Id, true, chip::NullOptional);
+        }
+        case 19: {
+            LogStep(19, "KeySet Remove 2");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type value;
             value.groupKeySetID = 418U;
@@ -67086,8 +67104,8 @@ private:
 
             );
         }
-        case 19: {
-            LogStep(19, "KeySet Read (also removed)");
+        case 20: {
+            LogStep(20, "KeySet Read (also removed)");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 418U;
