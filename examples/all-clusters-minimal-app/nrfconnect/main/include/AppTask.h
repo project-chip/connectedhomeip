@@ -19,6 +19,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nrfconnect/FactoryDataProvider.h>
+#endif
+
 struct k_timer;
 class AppEvent;
 class LEDWidget;
@@ -63,4 +67,8 @@ private:
     bool mIsThreadProvisioned{ false };
     bool mIsThreadEnabled{ false };
     bool mHaveBLEConnections{ false };
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
+#endif
 };

@@ -73,6 +73,22 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Build the application with debug symbols.
 
+config CHIP_FACTORY_DATA
+	bool "Enable Factory Data support"
+	select ZCBOR
+	help
+	  Enables support for reading factory data from flash memory partition.
+	  It requires factory_data partition to exist in the partition manager 
+	  configuration file pm_static.yml.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Enable Factory Data custom backend"
+	depends on !CHIP_FACTORY_DATA
+	help
+	  Enables user custom factory data implementation. It cannot be used
+	  with the CHIP_FACTORY_DATA that enabled default nRF Connect factory data
+	  implementation.
+
 config CHIP_FACTORY_DATA_BUILD
 	bool "Enable Factory Data build"
 	default n
