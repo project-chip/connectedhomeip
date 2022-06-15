@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 29.1.3. [TC-BDX-1.3] Response to Sender Initiated BDX Transfer session
 
 config:
     nodeId: 0x12344321
@@ -21,28 +21,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "TH reads from the DUT the MeasuredValue attribute"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          CHIP:TOO:   MeasuredValue: 0
-      disabled: true
-
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
-          Operate at device
-      disabled: true
-
     - label:
-          "After a few seconds, TH reads from the DUT the MeasuredValue
-          attribute"
+          "TH sends a SendInit message to DUT + DUT sends a SendAccept message
+          back to TH"
       verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-
-          DUT action missing [cant verify using Raspi]
+          Verify that the SendAccept message has the following mandatory fields Transfer Control - Exactly one mode shall be chosen out of the original proposed transfer methods sent by the Initiator and version shall be the newest version supported by Responder that is not newer than the proposed version sent by the Initiator. Max Block Size - Must be less than or equal to the proposed max block size. Metadata - Optional
       disabled: true
