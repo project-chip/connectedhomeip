@@ -52,7 +52,7 @@
 
 #include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/DeviceControlServer.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
