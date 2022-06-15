@@ -452,8 +452,8 @@
             "type": "command",
             "command": "shellCommand.execute",
             "args": {
-                "command": "sdb devices | grep -v \"List of devices attached\" | cut -f1",
-                "fieldSeparator": "\n",
+                "command": "sdb devices | grep -v 'List of devices attached' |awk '{print $1 \"|\" $1, $3, \"(\" $2 \")\"}'",
+                "fieldSeparator": "|",
                 "description": "Select target device"
             }
         }
