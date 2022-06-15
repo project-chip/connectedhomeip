@@ -16,16 +16,15 @@ include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
-pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.ameba)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
-add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/all-clusters-app/ameba/out/pigweed)
-add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/all-clusters-app/ameba/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/ameba/pw_sys_io ${chip_dir}/examples/all-clusters-app/ameba/out/pw_sys_io)
+add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/pigweed)
+add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/nanopb)
+add_subdirectory(${chip_dir}/examples/platform/ameba/pw_sys_io ${chip_dir}/examples/all-clusters-minimal-app/ameba/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -129,18 +128,18 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
+    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated/callback-stub.cpp
+    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
 
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
-    ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/DsoHack.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/Globals.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DsoHack.cpp
 )
 
 add_library(
@@ -151,7 +150,7 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../all-clusters-common/all-clusters-app.zap
+    ZAP_FILE ${matter_example_path}/../all-clusters-common/all-clusters-minimal-app.zap
 )
 
 if (matter_enable_rpc)
@@ -174,12 +173,12 @@ target_include_directories(
     ${chip_main}
     PUBLIC
     ${inc_path}
-    ${chip_dir}/zzz_generated/all-clusters-app
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated
+    ${chip_dir}/zzz_generated/all-clusters-minimal-app
+    ${chip_dir}/zzz_generated/all-clusters-minimal-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
-    ${chip_dir}/examples/all-clusters-app/ameba/main/include
+    ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/include
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
