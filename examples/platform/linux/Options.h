@@ -35,6 +35,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <testing/CustomCSRResponse.h>
 
 struct LinuxDeviceOptions
 {
@@ -53,9 +54,11 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
+    bool traceStreamDecodeEnabled       = false;
     bool traceStreamToLogEnabled        = false;
     chip::Optional<std::string> traceStreamFilename;
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
+    chip::CSRResponseOptions mCSRResponseOptions;
 
     static LinuxDeviceOptions & GetInstance();
 };

@@ -64,7 +64,7 @@ private:
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);
     static void TimerEventHandler(void * p_context);
-    static void PostEvents();
+    static void PostEvents(intptr_t context);
 
     enum Function_t
     {

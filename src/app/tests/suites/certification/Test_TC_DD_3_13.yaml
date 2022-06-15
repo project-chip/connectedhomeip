@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.3.13.[TC-DD-3.13] Commissioning Flow - Manual Pairing Code [DUT -
+    3.3.13. [TC-DD-3.13] Commissioning Flow = 2 (Custom Flow) - QR Code [DUT -
     Commissioner]
 
 config:
@@ -24,217 +24,146 @@ config:
 
 tests:
     - label:
-          "If (PICS_11_MANUAL_PC), VERSION: Use an 11 digit Manual pairing code
-          from a commissionee that has their Manual pairing code VERSION bit
-          string set to 0"
+          "If (PICS_DT_BLE), Custom Commissioning Flow: Use a Commissionee with
+          a QR code that has the Custom Flow field set to 2 and supports BLE for
+          its Discovery Capability. Commissionee is NOT in commissioning mode.
+          Ensure the Version bit string follows the current Matter spec.
+          documentation."
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --custom-flow 2 --capabilities 2
 
-          ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          [1651103874.314141][26507:26507] CHIP:DL: Device Configuration:
+          [1651103874.314196][26507:26507] CHIP:DL:   Serial Number: TEST_SN
+          [1651103874.314264][26507:26507] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651103874.314305][26507:26507] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651103874.314337][26507:26507] CHIP:DL:   Hardware Version: 0
+          [1651103874.314362][26507:26507] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651103874.314383][26507:26507] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651103874.314412][26507:26507] CHIP:DL:   Manufacturing Date: (not set)
+          [1651103874.314434][26507:26507] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651103874.314502][26507:26507] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT.
-          Follow any steps needed for the Commissioner/Commissionee to complete
-          the commissioning process."
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
-          ...
-          [1646267353060] [53689:29437234] CHIP: [TOO] Device commissioning completed with success
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1646267353.273560][28656:28656] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646267353.273586][28656:28656] CHIP:SVR: Commissioning completed successfully
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), VERSION: Use a 21 digit Manual pairing code
-          from a commissionee that has their Manual pairing code VERSION bit
-          string set to 0"
+          "If (PICS_DT_BLE), DUT parses QR code and DUT presents User with a URL
+          in the pairing hint."
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          1. Follow the steps given in the TH's URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT.
-          Follow any steps needed for the Commissioner/Commissionee to complete
-          the commissioning process."
+          "If (PICS_DT_BLE), Follow any steps from the URL provided by the
+          pairing hint for putting the TH Commissionee into commissioning mode,
+          for triggering the DUT Commissioner for commissioning, and for
+          completing the commissioning process using BLE."
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
-          ...
-          [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
+          TH all-clusters-app:
+          [1651104141.533461][26507:26507] CHIP:SVR: Commissioning completed successfully
+          [1651104141.533498][26507:26507] CHIP:DIS: Updating services using commissioning mode 0
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1646267665.929519][28709:28709] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646267665.929545][28709:28709] CHIP:SVR: Commissioning completed successfully
+          DUT chip-tool: $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J0YXE00KA0648G00
+
+          [1651104141454] [94607:65586111] CHIP: [CTL] Received CommissioningComplete response
+          [1651104141454] [94607:65586111] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651104141454] [94607:65586111] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651104141454] [94607:65586111] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651104141454] [94607:65586111] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651104141454] [94607:65586111] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), VID_PID_PRESENT: Use an 11 digit Manual
-          pairing code from a commissionee that has their VID_PID_PRESENT bit
-          string set to 0"
+          "If (PICS_DT_IP), Custom Commissioning Flow: Use a Commissionee with a
+          QR code that has the Custom Flow field set to 2 and supports IP
+          Network for its Discovery Capability. Commissionee is NOT in
+          commissioning mode. Ensure the Version bit string follows the current
+          Matter spec. documentation."
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
+          $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 2 --capabilities 4
 
-          ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          [1651103447.175705][8940:8940] CHIP:DL: Device Configuration:
+          [1651103447.175762][8940:8940] CHIP:DL:   Serial Number: TEST_SN
+          [1651103447.175804][8940:8940] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651103447.175846][8940:8940] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651103447.175883][8940:8940] CHIP:DL:   Hardware Version: 0
+          [1651103447.175911][8940:8940] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651103447.175937][8940:8940] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651103447.175971][8940:8940] CHIP:DL:   Manufacturing Date: (not set)
+          [1651103447.175998][8940:8940] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651103447.176023][8940:8940] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651103447.176084][8940:8940] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT.
-          Follow any steps needed for the Commissioner/Commissionee to complete
-          the commissioning process."
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
-          ...
-          [1646267353060] [53689:29437234] CHIP: [TOO] Device commissioning completed with success
-
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1646267353.273560][28656:28656] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646267353.273586][28656:28656] CHIP:SVR: Commissioning completed successfully
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), VID_PID_PRESENT: Use a 21 digit Manual
-          pairing code from a commissionee that has their VID_PID_PRESENT bit
-          string set to 1"
+          "If (PICS_DT_IP), DUT parses QR code and DUT presents User with a URL
+          in the pairing hint."
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          1. Follow the steps given in the TH's URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT.
-          Follow any steps needed for the Commissioner/Commissionee to complete
-          the commissioning process."
+          "If (PICS_DT_IP), Follow any steps from the URL provided by the
+          pairing hint for putting the TH Commissionee into commissioning mode,
+          for triggering the DUT Commissioner for commissioning, and for
+          completing the commissioning process using IP Network."
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
-          ...
-          [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
+          TH all-clusters-app:
+          [1651103591.176135][8940:8940] CHIP:SVR: Commissioning completed successfully
+          [1651103591.176179][8940:8940] CHIP:DIS: Updating services using commissioning mode 0
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1646267665.929519][28709:28709] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646267665.929545][28709:28709] CHIP:SVR: Commissioning completed successfully
+          DUT chip-tool:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J029Q00KA0648G00
+
+          [1651103591085] [94586:65580481] CHIP: [CTL] Received CommissioningComplete response
+          [1651103591085] [94586:65580481] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651103591085] [94586:65580481] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651103591085] [94586:65580481] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651103591085] [94586:65580481] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651103591085] [94586:65580481] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), VENDOR_ID and PRODUCT_ID: Use a 21 digit
-          Manual pairing code from a commissionee that has a valid VENDOR_ID (as
-          defined in section 2.5.2. 'Vendor Identifier') and PRODUCT_ID (as
-          defined in section 2.5.3. 'Product Identifier')"
+          "If (PICS_DT_SOFTAP), Custom Commissioning Flow: Use a Commissionee
+          with a QR code that has the Custom Flow field set to 2 and supports
+          SoftAP for its Discovery Capability. Commissionee is NOT in
+          commissioning mode. Ensure the Version bit string follows the current
+          Matter spec. documentation."
       verification: |
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-
-          ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL:   Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL:   Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL:   Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1645845935.799008][8925:8925] CHIP:DL:   Manufacturing Date: (not set)
-          [1645845935.799038][8925:8925] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1645845935.799135][8925:8925] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code: [34970112332]
-          [1645845935.799236][8925:8925] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+          BLOCKED: SoftAP commissioning not currently supported
       disabled: true
 
     - label:
-          "Provide the manual pairing code, generated in the previous step, to
-          the DUT in any format supported by the DUT. Follow any steps needed
-          for the Commissioner/Commissionee to complete the commissioning
-          process."
+          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
+          the DUT."
       verification: |
-          DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
-          ...
-          [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
 
-          Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app
-          ...
-          [1646267665.929519][28709:28709] CHIP:DL: HandlePlatformSpecificBLEEvent 32784
-          [1646267665.929545][28709:28709] CHIP:SVR: Commissioning completed successfully
+    - label:
+          "If (PICS_DT_SOFTAP), DUT parses QR code and DUT presents User with a
+          URL in the pairing hint."
+      verification: |
+          1. Follow the steps given in the TH's URL to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+      disabled: true
+
+    - label:
+          "If (PICS_DT_SOFTAP), Follow any steps from the URL provided by the
+          pairing hint for putting the TH Commissionee into commissioning mode,
+          for triggering the DUT Commissioner for commissioning, and for
+          completing the commissioning process using SoftAP."
+      verification: |
+          BLOCKED: SoftAP commissioning not currently supported
       disabled: true

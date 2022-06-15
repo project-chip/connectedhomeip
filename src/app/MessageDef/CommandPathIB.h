@@ -33,11 +33,11 @@
 namespace chip {
 namespace app {
 namespace CommandPathIB {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_EndpointId = 0,
-    kCsTag_ClusterId  = 1,
-    kCsTag_CommandId  = 2,
+    kEndpointId = 0,
+    kClusterId  = 1,
+    kCommandId  = 2,
 };
 
 class Parser : public ListParser

@@ -350,11 +350,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddCommonArguments();
         SubscribeCommand::AddArguments();
     }
 
@@ -362,11 +358,7 @@ public:
         SubscribeCommand("subscribe-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddCommonArguments();
         SubscribeCommand::AddArguments();
     }
 
@@ -376,6 +368,12 @@ public:
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName, "Event name.");
+        AddCommonArguments();
+        SubscribeCommand::AddArguments();
+    }
+
+    void AddCommonArguments()
+    {
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
                     "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
@@ -384,7 +382,14 @@ public:
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
-        SubscribeCommand::AddArguments();
+        AddArgument(
+            "is-urgent", 0, 1, &mIsUrgents,
+            "Sets isUrgent in the Subscribe Request.\n"
+            "  The queueing of any urgent event SHALL force an immediate generation of reports containing all events queued "
+            "leading up to (and including) the urgent event in question.\n"
+            "  This argument takes a comma separated list of true/false values.\n"
+            "  If the number of paths exceeds the number of entries provided to is-urgent, then isUrgent will be false for the "
+            "extra paths.");
     }
 
     ~SubscribeEvent() {}
@@ -392,7 +397,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
-                                                mFabricFiltered, mEventNumber, mKeepSubscriptions);
+                                                mFabricFiltered, mEventNumber, mKeepSubscriptions, mIsUrgents);
     }
 
 private:
@@ -404,4 +409,5 @@ private:
     chip::Optional<bool> mFabricFiltered;
     chip::Optional<chip::EventNumber> mEventNumber;
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<std::vector<bool>> mIsUrgents;
 };

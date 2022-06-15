@@ -28,6 +28,36 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    # Tests for List of INT8U attribute
+    - label: "Write attribute LIST With List of INT8U"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [1, 2, 3, 4]
+
+    - label:
+          "Read attribute LIST With Partial List of INT8U that should be in it"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              contains: [2, 3, 4]
+
+    - label:
+          "Read attribute LIST With Partial List of INT8U that should not be
+          included"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              excludes: [0, 5]
+
+    - label: "Write attribute LIST Back to Default Value"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: []
+
     # Tests for INT32U attribute
 
     - label: "Write attribute INT32U Value"

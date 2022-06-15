@@ -507,7 +507,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient->IsSubscriptionIdle())
+        if (!readClient->IsSubscriptionActive())
         {
             continue;
         }

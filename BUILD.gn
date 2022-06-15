@@ -135,6 +135,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/setup_payload/java",
       ]
     }
+
+    if (build_tv_casting_common_a) {
+      deps += [ "${chip_root}/examples/tv-casting-app/tv-casting-common:tvCastingCommon" ]
+    }
   }
 
   if (chip_build_tools) {
@@ -162,6 +166,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_link_tests) {
       deps = [
         "//:fake_platform_tests",
+        "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/idl:idl.tests",
         "//src:tests_run",
@@ -177,6 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Enable building for Android.
     enable_android_builds = false
+
+    # Enable building for Tizen.
+    enable_tizen_builds = false
 
     # Set this to true to enable TI builds by default.
     enable_ti_simplelink_builds = false
@@ -215,7 +223,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_standalone_chip_tool_build =
         enable_default_builds && host_os != "win"
 
-    # Build the chip-tool-darwin example.
+    # Build the darwin-framework-tool example.
     enable_standalone_chip_tool_darwin_build =
         enable_default_builds && host_os == "mac"
 
@@ -284,6 +292,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_bl602_lighting_app_build = enable_bl602_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
+
+    enable_tizen_lighting_app = enable_tizen_builds
   }
 
   if (enable_host_clang_build) {
@@ -345,8 +355,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_standalone_chip_tool_darwin_build) {
     group("standalone_chip_tool_darwin") {
-      deps =
-          [ "${chip_root}/examples/chip-tool-darwin(${standalone_toolchain})" ]
+      deps = [
+        "${chip_root}/examples/darwin-framework-tool(${standalone_toolchain})",
+      ]
     }
   }
 
@@ -467,6 +478,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_tizen_lighting_app) {
+    group("tizen_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
+    }
+  }
+
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -485,6 +502,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":android_x64",
         ":android_x86",
       ]
+    }
+    if (enable_tizen_builds) {
+      deps += [ ":tizen_lighting_app" ]
     }
     if (enable_standalone_chip_cert_build) {
       deps += [ ":standalone_chip_cert" ]

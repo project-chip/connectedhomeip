@@ -54,14 +54,14 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         {{/zcl_events}}
 
         default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
           break;
         }
         break;
     }
     {{/chip_client_clusters}}
     default: {
-      *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
+      *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
       break;
     }
     }

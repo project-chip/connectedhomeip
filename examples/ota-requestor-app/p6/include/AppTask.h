@@ -47,6 +47,7 @@ public:
     void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+    void InitOTARequestor();
 
 private:
     friend AppTask & GetAppTask(void);

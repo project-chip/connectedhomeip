@@ -20,12 +20,14 @@
 #include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
+#include "DeviceCallbacks.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
@@ -47,6 +49,7 @@ using namespace chip::Credentials;
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
 
 TvAppJNI TvAppJNI::sInstance;
+JNIMyUserPrompter * userPrompter = nullptr;
 
 void TvAppJNI::InitializeWithObjects(jobject app)
 {
@@ -132,6 +135,11 @@ JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject ma
     ChannelManager::NewManager(endpoint, manager);
 }
 
+JNI_METHOD(void, setUserPrompter)(JNIEnv *, jobject, jobject prompter)
+{
+    userPrompter = new JNIMyUserPrompter(prompter);
+}
+
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
@@ -149,12 +157,12 @@ JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
     PreServerInit();
 }
 
-JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app)
+JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::postServerInit");
 
-    InitVideoPlayerPlatform();
+    InitVideoPlayerPlatform(userPrompter, contentAppEndpointManager);
 }
 
 JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
@@ -175,6 +183,11 @@ JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject mana
 JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
 {
     return LevelManager::SetLevel(endpoint, value);
+}
+
+JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider)
+{
+    DeviceCallbacks::NewManager(provider);
 }
 
 JNI_METHOD(jint, addContentApp)

@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <memory>
+#include <thread>
+
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -32,33 +35,35 @@ typedef void (*timeoutFn_t)(gpointer userData);
 class LoopData
 {
 public:
-    LoopData() : mMainContext(NULL), mMainLoop(NULL), mThread(NULL), mTimeoutFn(NULL), mTimeoutUserData(NULL) {}
+    LoopData();
+    ~LoopData();
 
-    GMainContext * mMainContext;
-    GMainLoop * mMainLoop;
-    GThread * mThread;
-    timeoutFn_t mTimeoutFn;
-    gpointer mTimeoutUserData;
+    // Thread which governs glib main event loop
+    std::thread mThread;
+    // Objects for running glib main event loop
+    GMainContext * mMainContext = nullptr;
+    GMainLoop * mMainLoop       = nullptr;
+    // Optional timeout function
+    timeoutFn_t mTimeoutFn    = nullptr;
+    gpointer mTimeoutUserData = nullptr;
 };
 
 class MainLoop
 {
 public:
-    bool Init(initFn_t initFn, gpointer userData = NULL);
+    bool Init(initFn_t initFn, gpointer userData = nullptr);
     void Deinit(void);
-    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = NULL, guint interval = 0, timeoutFn_t timeoutFn = NULL,
-                      gpointer timeoutUserData = NULL);
+    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr, guint timeoutInterval = 0,
+                      timeoutFn_t timeoutFn = nullptr, gpointer timeoutUserData = nullptr);
     static MainLoop & Instance(void);
 
 private:
-    MainLoop() {}
-    void DeleteData(LoopData * loopData);
-    static gboolean ThreadTimeout(gpointer userData);
-    void SetThreadTimeout(LoopData * loopData, guint interval);
-    static gpointer ThreadMainHandler(gpointer data);
-    static gpointer ThreadAsyncHandler(gpointer data);
+    MainLoop() = default;
 
-    std::vector<LoopData *> mLoopData;
+    static gboolean ThreadTimeout(gpointer userData);
+    static void ThreadHandler(std::shared_ptr<LoopData> loopData);
+
+    std::vector<std::shared_ptr<LoopData>> mLoopData;
 };
 
 } // namespace Internal

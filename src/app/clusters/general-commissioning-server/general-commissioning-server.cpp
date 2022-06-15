@@ -155,6 +155,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
+
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
      * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
@@ -214,7 +217,10 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    const auto & failSafe        = server->GetFailSafeContext();
+    auto & failSafe              = server->GetFailSafeContext();
+    auto & fabricTable           = Server::GetInstance().GetFabricTable();
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
     if (!failSafe.IsFailSafeArmed())
@@ -231,16 +237,34 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
         {
             response.errorCode = CommissioningError::kInvalidAuthentication;
+            ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
         }
         else
         {
+            if (failSafe.NocCommandHasBeenInvoked())
+            {
+                CHIP_ERROR err = fabricTable.CommitPendingFabricData();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+                else
+                {
+                    ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully commited pending fabric data");
+                }
+                CheckSuccess(err, Failure);
+            }
+
             /*
              * Pass fabric of commissioner to DeviceControlSvr.
              * This allows device to send messages back to commissioner.
              * Once bindings are implemented, this may no longer be needed.
              */
-            CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
-                         Failure);
+            failSafe.DisarmFailSafe();
+            CheckSuccess(
+                server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningError::kOk;

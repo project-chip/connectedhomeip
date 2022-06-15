@@ -57,7 +57,6 @@ var endpointClusterWithInit = [
   'Basic',
   'Color Control',
   'Groups',
-  'IAS Zone',
   'Identify',
   'Level Control',
   'Localization Configuration',
@@ -78,7 +77,6 @@ var endpointClusterWithAttributeChanged = [
   'Fan Control',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone',
   'Door Lock',
   'Pump Configuration and Control',
   'Thermostat User Interface Configuration',
@@ -86,8 +84,8 @@ var endpointClusterWithPreAttribute = [
   'Localization Configuration',
   'Mode Select',
   'Fan Control',
+  'Thermostat',
 ];
-var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
 /**
  * Populate the GENERATED_FUNCTIONS field
@@ -115,12 +113,6 @@ function chip_endpoint_generated_functions()
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
         hasFunctionArray = true
       }
 
@@ -206,11 +198,6 @@ function chip_endpoint_cluster_list()
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         c.mask.push('PRE_ATTRIBUTE_CHANGED_FUNCTION')
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        c.mask.push('MESSAGE_SENT_FUNCTION')
         hasFunctionArray = true
       }
 
@@ -403,6 +390,17 @@ function asUpperCamelCase(label)
   return str.replace(/[^A-Za-z0-9_]/g, '');
 }
 
+function chip_friendly_endpoint_type_name(options)
+{
+  var name = this.endpointTypeName;
+  if (name.startsWith("MA-")) {
+    // prefix likely for "Matter" and is redundant
+    name = name.substring(3);
+  }
+
+  return asLowerCamelCase(name);
+}
+
 function asMEI(prefix, suffix)
 {
   return cHelper.asHex((prefix << 16) + suffix, 8);
@@ -479,7 +477,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
       if (s) {
         return 'uint' + s[1] + '_t';
       }
-      return 'chip::BitFlags<' + ns + type + '>';
+      return 'chip::BitMask<' + ns + type + '>';
     }
 
     if (types.isStruct) {
@@ -729,9 +727,6 @@ function isWeaklyTypedEnum(label)
     "HueDirection",
     "HueMoveMode",
     "HueStepMode",
-    "IasEnrollResponseCode",
-    "IasZoneState",
-    "IasZoneType",
     "IdentifyEffectIdentifier",
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",
@@ -864,6 +859,7 @@ exports.asTypedExpression                     = asTypedExpression;
 exports.asTypedLiteral                        = asTypedLiteral;
 exports.asLowerCamelCase                      = asLowerCamelCase;
 exports.asUpperCamelCase                      = asUpperCamelCase;
+exports.chip_friendly_endpoint_type_name      = chip_friendly_endpoint_type_name;
 exports.hasProperty                           = hasProperty;
 exports.hasSpecificAttributes                 = hasSpecificAttributes;
 exports.asMEI                                 = asMEI;

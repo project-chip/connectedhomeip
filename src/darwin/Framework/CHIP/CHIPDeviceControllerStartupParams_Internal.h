@@ -20,10 +20,16 @@
 #import <Foundation/Foundation.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
-class FabricInfo;
-}
+class FabricTable;
+
+namespace Crypto {
+    class OperationalKeystore;
+} // namespace Crypto
+} // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,27 +44,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDeviceControllerStartupParamsInternal : CHIPDeviceControllerStartupParams
 
-/**
- * We may have an operational keypair either provided externally, via
- * operationalKeypair, or internally (from the fabric table) via
- * serializedOperationalKeypair.
- *
- * If operationalKeypair is nil and serializedOperationalKeypair is nullptr, a
- * new random operational keypair will be generated.
- *
- * If operationalCertificate is not nil, either operationalKeypair must be not
- * nil or serializedOperationalKeypair must be not nullptr.
- *
- * If operationalCertificate is nil, operationalKeypair may be not nil or
- * serializedOperationalKeypair may be not nullptr; that corresponds to needing
- * to create a new NOC (e.g. if our signing certificate changed) without
- * changing our operational identity.
- *
- * Meant to be set by MatterControllerFactory.
- *
- * Assumed to be allocated via C++ new and will be deleted via C++ delete.
- */
-@property (nonatomic, nullable, readonly) chip::Crypto::P256SerializedKeypair * serializedOperationalKeypair;
+// Fabric table we can use to do things like allocate operational keys.
+@property (nonatomic, readonly) chip::FabricTable * fabricTable;
+
+// Fabric index we're starting on.  Only has a value when starting on an
+// existing fabric.
+@property (nonatomic, readonly) chip::Optional<chip::FabricIndex> fabricIndex;
+
+// Key store we're using with our fabric table, for sanity checks.
+@property (nonatomic, readonly) chip::Crypto::OperationalKeystore * keystore;
 
 /**
  * Helper method that checks that our keypairs match our certificates.
@@ -77,12 +71,17 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initialize for controller bringup on a new fabric.
  */
-- (instancetype)initForNewFabric:(CHIPDeviceControllerStartupParams *)params;
+- (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
+                        keystore:(chip::Crypto::OperationalKeystore *)keystore
+                          params:(CHIPDeviceControllerStartupParams *)params;
 
 /**
  * Initialize for controller bringup on an existing fabric.
  */
-- (instancetype)initForExistingFabric:(chip::FabricInfo *)fabric params:(CHIPDeviceControllerStartupParams *)params;
+- (instancetype)initForExistingFabric:(chip::FabricTable *)fabricTable
+                          fabricIndex:(chip::FabricIndex)fabricIndex
+                             keystore:(chip::Crypto::OperationalKeystore *)keystore
+                               params:(CHIPDeviceControllerStartupParams *)params;
 
 - (instancetype)initWithSigningKeypair:(id<CHIPKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk NS_UNAVAILABLE;
 - (instancetype)initWithOperationalKeypair:(id<CHIPKeypair>)operationalKeypair

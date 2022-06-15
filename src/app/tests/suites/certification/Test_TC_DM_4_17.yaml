@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    10.4.17. [TC-DM-4.17][WiFi] Verification for attributes check
+    10.4.17. [TC-DM-4.17] [WiFi] Verification for attributes check
     [DUT-Commissioner]
 
 config:
@@ -25,7 +25,7 @@ config:
 tests:
     - label: "DUT reads the MaxNetworks attribute from the TH"
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool networkcommissioning read max-networks 1 0
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
 
           [1646216356.472036][7021:7026] CHIP:DMG:        SuppressResponse = true,
           [1646216356.472088][7021:7026] CHIP:DMG:        InteractionModelRevision = 1
@@ -77,7 +77,7 @@ tests:
           [1649250241.092852][30726:30731] CHIP:EM: Sending Standalone Ack for MessageCounter:3120276 on exchange 4316i
       disabled: true
 
-    - label: "DUT reads LastNetowrkingStatus attribute from the TH"
+    - label: "DUT reads LastNetworkingStatus attribute from the TH"
       verification: |
           ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-networking-status 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
 

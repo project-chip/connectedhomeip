@@ -66,7 +66,7 @@ public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                    ExchangeDelegate * delegate);
+                    ExchangeDelegate * delegate, bool isEphemeralExchange = false);
 
     ~ExchangeContext() override;
 
@@ -154,8 +154,6 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
-
     SessionHandle GetSessionHandle() const
     {
         VerifyOrDie(mSession);
@@ -175,6 +173,15 @@ public:
     void Close();
     void Abort();
 
+    // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
+    // the next message to the exchange. The exchange context must have a valid session when calling this function.
+    //
+    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout))
+    void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
+
+    // Set the response timeout for the exchange context, regardless of the underlying session type. Using
+    // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
+    // using this function is recommended.
     void SetResponseTimeout(Timeout timeout);
 
 private:
@@ -229,9 +236,10 @@ private:
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
+     * response.  If aCloseIfNeeded is true, check whether the exchange needs to
+     * be closed.
      */
-    void NotifyResponseTimeout();
+    void NotifyResponseTimeout(bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 
@@ -264,6 +272,8 @@ private:
      * exchange nor other component requests the active mode.
      */
     void UpdateSEDIntervalMode(bool activeMode);
+
+    static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 };
 
 } // namespace Messaging

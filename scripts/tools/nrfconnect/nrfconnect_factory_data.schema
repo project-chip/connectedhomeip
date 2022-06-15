@@ -5,17 +5,20 @@
     "type": "object",
     "required": [
         "sn",
+        "vendor_id",
+        "product_id",
+        "vendor_name",
+        "product_name",
         "date",
         "hw_ver",
         "hw_ver_str",
-        "rd_uid",
         "dac_cert",
         "dac_key",
         "pai_cert",
-        "cd",
         "spake2_it",
         "spake2_salt",
-        "spake2_verifier"
+        "spake2_verifier",
+        "discriminator"
     ],
     "properties": {
         "sn": {
@@ -23,12 +26,32 @@
             "type": "string",
             "maxLength": 32
         },
-        "date": {
-            "description": "Manufacturing date according to ISO 8601 in notation YYYYMMDD",
+        "vendor_id": {
+            "description": "Vendor Identifier",
+            "type": "integer",
+            "minimum": 0,
+            "maximum":  65524
+        },
+        "product_id": {
+            "description": "Product Identifier",
+            "type": "integer",
+            "minimum": 1, 
+            "maximum":  65535
+        },
+        "vendor_name": {
+            "description": "human-readable vendor name",
             "type": "string",
-            "minLength": 8,
-            "maxLength": 8,
-            "pattern": "[0-9]{4}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}"
+            "maxLength": 32
+        },
+        "product_name": {
+            "description": "human-readable product name",
+            "type": "string",
+            "maxLength": 32
+        },
+        "date": {
+            "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
+            "type": "string",
+            "format": "date"
         },
         "hw_ver": {
             "description": "Hardware version - integer",
@@ -50,19 +73,19 @@
         },
         "dac_cert": {
             "description": "DAC certificate in hex-string format",
-            "type": "string"
+            "type": "string",
+            "maxLength": 1204
         },
         "dac_key": {
             "description": "DAC Private Key in hex-string format",
-            "type": "string"
+            "type": "string",
+            "minLength": 68,
+            "maxLength": 68
         },
         "pai_cert": {
             "description": "PAI certificate in hex-string format",
-            "type": "string"
-        },
-        "cd": {
-            "description": "Certificate Declaration in hex-string format",
-            "type": "string"
+            "type": "string",
+            "maxLength": 1204
         },
         "passcode": {
             "description": "A default PASE session passcode",
@@ -79,8 +102,8 @@
         "spake2_salt": {
             "description": "A key-derivation function for the Symmetric Password-Authenticated Key Exchange.",
             "type": "string",
-            "minLength": 16,
-            "maxLength": 32
+            "minLength": 36,
+            "maxLength": 68
         },
         "spake2_verifier": {
             "description": "A verifier for the Symmetric Password-Authenticated Key Exchange",
@@ -92,10 +115,6 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 4095
-        },
-        "fw_info": {
-            "description": "Information about programmed firmware in TLV format",
-            "type": "string"
         },
         "user": {
             "description": "A user-specific additional data which should be added to factory data. This should be a Json format.",

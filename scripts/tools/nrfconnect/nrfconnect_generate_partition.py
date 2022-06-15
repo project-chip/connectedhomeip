@@ -58,8 +58,6 @@ class PartitionCreator:
         if self.__data_to_save:
             # prepare raw data from Json
             cbor_data = cbor.dumps(self.__data_to_save)
-            with open(self._output + "/output.cbor", "w+b") as cbor_output:
-                cbor.dump(cbor.loads(cbor_data), cbor_output)
             return cbor_data
 
     def create_hex(self, data: bytes):
@@ -71,7 +69,7 @@ class PartitionCreator:
         if len(data) > self._length:
             raise ValueError("generated CBOR file exceeds declared maximum partition size! {} > {}".format(len(data), self._length))
         self._ih.putsz(self._offset, data)
-        self._ih.write_hex_file(self._output + "/output.hex", True)
+        self._ih.write_hex_file(self._output + ".hex", True)
         self._data_ready = True
         return True
 
@@ -83,7 +81,7 @@ class PartitionCreator:
         if not self._data_ready:
             log.error("Please create hex file first!")
             return False
-        self._ih.tobinfile(self._output + "/output.bin")
+        self._ih.tobinfile(self._output + ".bin")
         return True
 
     @staticmethod
@@ -144,25 +142,32 @@ def main():
     parser.add_argument("-i", "--input", type=str, required=True,
                         help="Path to input .json file")
     parser.add_argument("-o", "--output", type=str, required=True,
-                        help="Path to DIRECTORY, where .hex, .cbor and .bin files will be stored")
+                        help="Prefix for output file paths, e.g. setting dir/output causes creation of the following files: dir/output.hex, and dir/output.bin")
     parser.add_argument("--offset", type=allow_any_int, required=True,
-                        help="Partiton offset - a place in device's flash memory, where factory data will be stored")
+                        help="Partition offset - an address in device's NVM memory, where factory data will be stored")
     parser.add_argument("--size", type=allow_any_int, required=True,
                         help="The maximum partition size")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Run this script with DEBUG logging level")
+    parser.add_argument("-r", "--raw", action="store_true",
+                        help="Do not print flashing help and other logs, only generate a .hex file. It can be useful when the script is used by other script.")
     args = parser.parse_args()
 
     if args.verbose:
         log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)
+    elif args.raw:
+        log.basicConfig(format='%(message)s', level=log.ERROR)
     else:
         log.basicConfig(format='[%(asctime)s] %(message)s', level=log.INFO)
 
     partition_creator = PartitionCreator(args.offset, args.size, args.input, args.output)
     cbor_data = partition_creator.generate_cbor()
     try:
+        if not args.raw:
+            print("Generating .hex file: {}.hex with offset: {} and size: {}".format(args.output, hex(args.offset), hex(args.size)))
         if partition_creator.create_hex(cbor_data) and partition_creator.create_bin():
-            print_flashing_help()
+            if not args.raw:
+                print_flashing_help()
     except ValueError as e:
         log.error(e)
         sys.exit(-1)

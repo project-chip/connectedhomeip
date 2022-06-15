@@ -32,11 +32,18 @@ tests:
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
+          saveAs: ValueBeforeChange
           constraints:
               type: uint16
 
     - label: "operate on DUT to change the flow significantly"
-      disabled: true
+      PICS: MANUAL_FLOW_CHANGE
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operate on device to change the flow significantly"
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
@@ -44,3 +51,4 @@ tests:
       response:
           constraints:
               type: uint16
+              notValue: ValueBeforeChange

@@ -29,6 +29,10 @@
 #include <hal/wiced_memory.h>
 #include <malloc.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/OpenThread/OpenThreadUtils.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -64,6 +68,63 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+    if (err == CHIP_NO_ERROR)
+    {
+        // If the value overflows, return UINT16 max value to provide best-effort number.
+        rebootCount = static_cast<uint16_t>(count <= UINT16_MAX ? count : UINT16_MAX);
+    }
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+    CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    auto ifp = Platform::New<ThreadNetworkInterface>();
+    VerifyOrReturnError(ifp != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->hardwareAddress = ByteSpan(ifp->macBuffer);
+    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    ConfigurationMgr().GetPrimary802154MACAddress(ifp->macBuffer);
+
+    *netifpp = ifp;
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        Platform::Delete(del);
+    }
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 } // namespace DeviceLayer
 } // namespace chip

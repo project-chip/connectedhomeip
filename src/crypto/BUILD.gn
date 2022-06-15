@@ -62,6 +62,9 @@ static_library("crypto") {
   sources = [
     "CHIPCryptoPAL.cpp",
     "CHIPCryptoPAL.h",
+    "OperationalKeystore.h",
+    "PersistentStorageOperationalKeystore.cpp",
+    "PersistentStorageOperationalKeystore.h",
     "RandUtils.cpp",
     "RandUtils.h",
   ]
@@ -72,6 +75,7 @@ static_library("crypto") {
     ":crypto_buildconfig",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
 

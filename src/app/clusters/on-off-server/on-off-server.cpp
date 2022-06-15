@@ -383,13 +383,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 #endif // EMBER_AF_PLUGIN_SCENES
 
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
-
-            status = setOnOffValue(endpoint, Commands::Off::Id, false);
             Attributes::OnTime::Set(endpoint, 0);
-        }
-        else
-        {
-            status = setOnOffValue(endpoint, Commands::Off::Id, false);
         }
 
         // Only apply effect if OnOff is on
@@ -405,6 +399,8 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
                 effect->mOffWithEffectTrigger(effect);
             }
         }
+
+        status = setOnOffValue(endpoint, Commands::Off::Id, false);
     }
     else
     {

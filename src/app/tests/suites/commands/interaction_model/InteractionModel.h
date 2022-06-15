@@ -76,10 +76,11 @@ protected:
                               uint16_t minInterval = 0, uint16_t maxInterval = 0,
                               const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
                               const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional)
+                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
+                              const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional)
     {
         return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions);
+                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions, isUrgents);
     }
 
     CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
@@ -87,7 +88,8 @@ protected:
                            chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
                            uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
                            const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
+                           const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
+                           const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional);
 
     void Shutdown() { mReadClients.clear(); }
 
@@ -174,30 +176,43 @@ protected:
                               chip::AttributeId attributeId, const T & value,
                               const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
                               const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
-                              const chip::Optional<chip::DataVersion> & dataVersion      = chip::NullOptional)
+                              const chip::Optional<chip::DataVersion> & dataVersion      = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatCount               = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatDelayInMs           = chip::NullOptional)
     {
-        chip::app::AttributePathParams attributePathParams;
-        if (endpointId != chip::kInvalidEndpointId)
+        uint16_t repeat = repeatCount.ValueOr(1);
+        while (repeat--)
         {
-            attributePathParams.mEndpointId = endpointId;
+            chip::app::AttributePathParams attributePathParams;
+            if (endpointId != chip::kInvalidEndpointId)
+            {
+                attributePathParams.mEndpointId = endpointId;
+            }
+
+            if (clusterId != chip::kInvalidClusterId)
+            {
+                attributePathParams.mClusterId = clusterId;
+            }
+
+            if (attributeId != chip::kInvalidAttributeId)
+            {
+                attributePathParams.mAttributeId = attributeId;
+            }
+
+            mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
+                                                                    timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
+            VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, dataVersion));
+            ReturnErrorOnFailure(mWriteClient->SendWriteRequest(device->GetSecureSession().Value()));
+
+            if (repeatDelayInMs.HasValue())
+            {
+                chip::test_utils::SleepMillis(repeatDelayInMs.Value());
+            }
         }
 
-        if (clusterId != chip::kInvalidClusterId)
-        {
-            attributePathParams.mClusterId = clusterId;
-        }
-
-        if (attributeId != chip::kInvalidAttributeId)
-        {
-            attributePathParams.mAttributeId = attributeId;
-        }
-
-        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
-                                                                timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
-        VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, dataVersion));
-        return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
+        return CHIP_NO_ERROR;
     }
 
     template <class T>
@@ -326,7 +341,7 @@ public:
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * aReadClient) override;
     void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
-
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override;
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,
                     chip::app::StatusIB status) override;

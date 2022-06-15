@@ -16,16 +16,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <platform/CHIPDeviceLayer.h>
+
 #include <AppShellCommands.h>
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
+#include <DeviceInfoProviderImpl.h>
 #include <LightingManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <OTAConfig.h>
+#endif
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -37,6 +43,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
@@ -45,6 +52,13 @@ static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager
 static wiced_led_config_t chip_lighting_led_config = {
     .led    = PLATFORM_LED_1,
     .bright = 50,
+};
+
+static Identify gIdentify = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
 };
 
 APPLICATION_START()
@@ -141,9 +155,16 @@ void InitApp(intptr_t args)
     chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     LightMgr().Init();
     LightMgr().SetCallbacks(LightManagerCallback, NULL);
+    LightMgr().WriteClusterLevel(254);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OTAConfig::Init();
+#endif
 }
 
 void EventHandler(const ChipDeviceEvent * event, intptr_t arg)

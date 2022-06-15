@@ -16,6 +16,7 @@
 #
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -66,9 +67,28 @@ def runArgumentsParser():
     return zap_file
 
 
+def detectZclFile(zapFile):
+    print(f"Searching for zcl file from {zapFile}")
+
+    path = 'src/app/zap-templates/zcl/zcl.json'
+
+    data = json.load(open(zapFile))
+    for package in data["package"]:
+        if package["type"] != "zcl-properties":
+            continue
+
+        # found the right path, try to figure out the actual path
+        if package["pathRelativity"] == "relativeToZap":
+            path = os.path.abspath(os.path.join(os.path.dirname(zapFile), package["path"]))
+        else:
+            path = package["path"]
+
+    return getFilePath(path)
+
+
 def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
-    zcl_file = getFilePath('src/app/zap-templates/zcl/zcl.json')
+    zcl_file = detectZclFile(zap_file)
 
     generator_dir = getDirPath('third_party/zap/repo')
     os.chdir(generator_dir)

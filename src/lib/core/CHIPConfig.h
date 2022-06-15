@@ -644,34 +644,32 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+ * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
  *
- * @brief Define the size of the pool used for tracking CHIP
- * Peer connections. This defines maximum number of concurrent
- * device connections across all supported transports.
+ * @brief Defines the size of the pool used for tracking the state of
+ * secure sessions. This controls the maximum number of concurrent
+ * established secure sessions across all supported transports.
+ *
+ * This is sized to cover the sum of the following:
+ *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
+ *  - 1 reserved slot for CASEServer as a responder.
+ *  - 1 reserved slot for PASE.
+ *
  */
-#ifndef CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE 16
-#endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
+#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 
 /**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_MS
+ * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
  *
- * @brief After what period of inactivity is a peer connection considered
- * expired.
- */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_MS 120000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_MS
-
-/**
- * @def CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+ * @brief This enables logging of changes to the underlying reference count of
+ * SecureSession objects.
  *
- * @brief How frequent are peer connections checked for timeouts.
  */
-#ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
-#define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS 5000
-#endif // CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+#ifndef CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+#define CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING 0
+#endif
 
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS
@@ -706,6 +704,17 @@
 #ifndef CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
 #define CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS 2
 #endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
+
+/**
+ *  @def CHIP_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER
@@ -1098,17 +1107,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
 #error                                                                                                                             \
     "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
- *
- * @brief Defines the max number of SessionRecoveryDelegate
- *
- * // TODO: Explain what this is for.
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
 #endif
 
 /**

@@ -88,7 +88,6 @@
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
-	branch = cyw30739
 	platforms = cyw30739
 [submodule "third_party/mbed-os/repo"]
 	path = third_party/mbed-os/repo
@@ -203,7 +202,7 @@
 	url = https://github.com/open-source-parsers/jsoncpp.git
 [submodule "cyw30739_sdk/30739A0"]
 	path = third_party/cyw30739_sdk/repos/30739A0
-	url = https://github.com/Infineon/30739A0.git
+	url = https://github.com/Infineon/OT-Matter-30739A0.git
 	platforms = cyw30739
 [submodule "cyw30739_sdk/include"]
 	path = third_party/cyw30739_sdk/repos/btsdk-include
@@ -211,7 +210,7 @@
 	platforms = cyw30739
 [submodule "cyw30739_sdk/target"]
 	path = third_party/cyw30739_sdk/repos/CYW930739M2EVB-01
-	url = https://github.com/Infineon/TARGET_CYW930739M2EVB-01.git
+	url = https://github.com/Infineon/OT-Matter-TARGET_CYW930739M2EVB-01.git
 	platforms = cyw30739
 [submodule "cyw30739_sdk/tools"]
 	path = third_party/cyw30739_sdk/repos/btsdk-tools
@@ -247,3 +246,8 @@
 	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
 	branch = bl602_release
 	platforms = bl602
+[submodule "third_party/nxp/libs/mbedtls/repo"]
+	path = third_party/nxp/libs/mbedtls/repo
+	url = https://github.com/NXPmicro/mbedtls.git
+	branch = tinycrypt-mbedtls-2.28
+	platforms = k32w0

@@ -26,7 +26,7 @@
 #include "pw_sys_io_nrfconnect/init.h"
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 

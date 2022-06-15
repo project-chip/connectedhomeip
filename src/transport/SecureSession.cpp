@@ -28,7 +28,7 @@ void SecureSessionDeleter::Release(SecureSession * entry)
 
 void SecureSession::MarkForRemoval()
 {
-    ChipLogDetail(Inet, "SecureSession MarkForRemoval %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+    ChipLogDetail(Inet, "SecureSession[%p]: MarkForRemoval Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                   mLocalSessionId);
     ReferenceCountedHandle<Transport::Session> ref(*this);
     switch (mState)
@@ -75,6 +75,24 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
         VerifyOrDie(false);
     }
     return subjectDescriptor;
+}
+
+void SecureSession::Retain()
+{
+#if CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+    ChipLogProgress(SecureChannel, "SecureSession[%p]: ++ %d -> %d", this, GetReferenceCount(), GetReferenceCount() + 1);
+#endif
+
+    ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Retain();
+}
+
+void SecureSession::Release()
+{
+#if CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+    ChipLogProgress(SecureChannel, "SecureSession[%p]: -- %d -> %d", this, GetReferenceCount(), GetReferenceCount() - 1);
+#endif
+
+    ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release();
 }
 
 } // namespace Transport

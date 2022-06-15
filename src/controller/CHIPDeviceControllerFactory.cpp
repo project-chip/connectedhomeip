@@ -60,6 +60,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     // created-but-shut-down system state.
     mListenPort               = params.listenPort;
     mFabricIndependentStorage = params.fabricIndependentStorage;
+    mOperationalKeystore      = params.operationalKeystore;
     mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -83,6 +84,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.enableServerInteractions = mEnableServerInteractions;
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
         params.fabricTable              = mSystemState->Fabrics();
+        params.operationalKeystore      = mOperationalKeystore;
     }
 
     return InitSystemState(params);
@@ -151,6 +153,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
+    stateParams.certificateValidityPolicy                     = params.certificateValidityPolicy;
     stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
@@ -161,7 +164,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     if (stateParams.fabricTable == nullptr)
     {
         stateParams.fabricTable = tempFabricTable = chip::Platform::New<FabricTable>();
-        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage, params.operationalKeystore));
     }
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
@@ -190,7 +193,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage,
-            stateParams.groupDataProvider));
+            stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
@@ -317,6 +320,7 @@ void DeviceControllerFactory::Shutdown()
         mSystemState = nullptr;
     }
     mFabricIndependentStorage = nullptr;
+    mOperationalKeystore      = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
@@ -338,6 +342,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     if (mCASEServer != nullptr)
     {
+        mCASEServer->Shutdown();
         chip::Platform::Delete(mCASEServer);
         mCASEServer = nullptr;
     }

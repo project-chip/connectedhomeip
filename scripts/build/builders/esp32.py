@@ -29,17 +29,21 @@ class Esp32Board(Enum):
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
     TESTS = auto()
+    OTA_REQUESTOR = auto()
 
     @property
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+            return 'examples/all-clusters-minimal-app'
         elif self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         elif self == Esp32App.LOCK:
@@ -50,6 +54,8 @@ class Esp32App(Enum):
             return 'examples/bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'examples/temperature-measurement-app'
+        elif self == Esp32App.OTA_REQUESTOR:
+            return 'examples/ota-requestor-app'
         elif self == Esp32App.TESTS:
             return 'src/test_driver'
         else:
@@ -59,6 +65,8 @@ class Esp32App(Enum):
     def AppNamePrefix(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'chip-all-clusters-app'
+        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+            return 'chip-all-clusters-minimal-app'
         elif self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         elif self == Esp32App.LOCK:
@@ -69,6 +77,8 @@ class Esp32App(Enum):
             return 'chip-bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'chip-temperature-measurement-app'
+        elif self == Esp32App.OTA_REQUESTOR:
+            return 'chip-ota-requestor-app'
         elif self == Esp32App.TESTS:
             return None
         else:
@@ -85,17 +95,21 @@ class Esp32App(Enum):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
         elif board == Esp32Board.M5Stack:
-            return self == Esp32App.ALL_CLUSTERS
+            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         elif board == Esp32Board.C3DevKit:
-            return self == Esp32App.ALL_CLUSTERS
+            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         else:
             return (board == Esp32Board.DevKitC) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
+    rpc_enabled_apps = [Esp32App.ALL_CLUSTERS,
+                        Esp32App.ALL_CLUSTERS_MINIMAL,
+                        Esp32App.OTA_REQUESTOR,
+                        Esp32App.TEMPERATURE_MEASUREMENT]
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    elif app != Esp32App.ALL_CLUSTERS and app != Esp32App.TEMPERATURE_MEASUREMENT:
+    elif app not in rpc_enabled_apps:
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""

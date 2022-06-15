@@ -46,4 +46,15 @@ CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<S
     return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
 }
 
+CHIP_ERROR DeviceProxy::GetAttestationChallenge(ByteSpan & attestationChallenge)
+{
+    Optional<SessionHandle> secureSessionHandle;
+
+    secureSessionHandle = GetSecureSession();
+    VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

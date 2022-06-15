@@ -1,0 +1,129 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.20. [TC-DD-3.20] Commissioning Flow - Commission, Unpair and
+    Re-commission Device [DUT - Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Place TH into commissioning mode using the TH manufacturers means to
+          be discovered by the DUT Commissioner"
+      verification: |
+          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
+
+          [1651109580.413197][31207:31207] CHIP:DL: Device Configuration:
+          [1651109580.413259][31207:31207] CHIP:DL:   Serial Number: TEST_SN
+          [1651109580.413294][31207:31207] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651109580.413327][31207:31207] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651109580.413358][31207:31207] CHIP:DL:   Hardware Version: 0
+          [1651109580.413380][31207:31207] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651109580.413401][31207:31207] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651109580.413428][31207:31207] CHIP:DL:   Manufacturing Date: (not set)
+          [1651109580.413450][31207:31207] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651109580.413470][31207:31207] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651109580.413525][31207:31207] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_QR_CODE), Scan THs QR code using the DUT Commissioner."
+      verification: |
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
+
+    - label:
+          "DUT parses THs QR code. Follow any steps needed for the
+          Commissioner/Commissionee to complete the commissioning process over
+          the TH Commissionees method of device discovery"
+      verification: |
+          TH Commissionee:
+          [1651109784.452770][31207:31207] CHIP:SVR: Commissioning completed successfully
+          [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
+
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+
+          [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response
+          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651109784376] [95553:65657838] CHIP: [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Using DUT Commissioner, unpair the TH Commissionee from the Matter
+          network."
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          CHIP:TOO:   NOCResponse: {
+          CHIP:TOO:     statusCode: 0
+          CHIP:TOO:     fabricIndex: 2
+          CHIP:TOO:    }
+          CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Place TH Commissionee back into commissioning mode using the TH
+          manufacturers means to be discovered by the DUT Commissioner"
+      verification: |
+          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
+
+          [1651110721.112368][31791:31791] CHIP:DL: Device Configuration:
+          [1651110721.112448][31791:31791] CHIP:DL:   Serial Number: TEST_SN
+          [1651110721.112501][31791:31791] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651110721.112552][31791:31791] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651110721.112597][31791:31791] CHIP:DL:   Hardware Version: 0
+          [1651110721.112630][31791:31791] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651110721.112662][31791:31791] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651110721.112703][31791:31791] CHIP:DL:   Manufacturing Date: (not set)
+          [1651110721.112737][31791:31791] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651110721.112767][31791:31791] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651110721.112838][31791:31791] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+      disabled: true
+
+    - label:
+          "If (PICS_SCAN_QR_CODE), Scan THs QR code using the DUT Commissioner."
+      verification: |
+          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+      disabled: true
+
+    - label:
+          "DUT parses THs QR code. Follow any steps needed for the
+          Commissioner/Commissionee to complete the commissioning process over
+          the TH Commissionees method of device discovery"
+      verification: |
+          TH Commissionee:
+          [1651110724.759825][31791:31791] CHIP:SVR: Commissioning completed successfully
+          [1651110724.759869][31791:31791] CHIP:DIS: Updating services using commissioning mode 0
+
+          DUT Commissioner:
+          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+
+          [1651110724689] [95810:65669790] CHIP: [CTL] Received CommissioningComplete response
+          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1651110724689] [95810:65669790] CHIP: [TOO] Device commissioning completed with success
+      disabled: true

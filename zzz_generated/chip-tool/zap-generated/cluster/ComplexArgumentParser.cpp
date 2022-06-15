@@ -831,32 +831,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::St
     ComplexArgumentParser::Finalize(request.epochKey2);
     ComplexArgumentParser::Finalize(request.epochStartTime2);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("IasAceZoneStatusResult.zoneId", "zoneId", value.isMember("zoneId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("IasAceZoneStatusResult.zoneStatus", "zoneStatus", value.isMember("zoneStatus")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "zoneId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneId, value["zoneId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "zoneStatus");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneStatus, value["zoneStatus"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.zoneId);
-    ComplexArgumentParser::Finalize(request.zoneStatus);
-}
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request,
                                         Json::Value & value)
 {
@@ -2063,24 +2037,24 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.operationalCert", "operationalCert",
-                                                                  value.isMember("operationalCert")));
+        ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.member1", "member1", value.isMember("member1")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TestListStructOctet.member2", "member2", value.isMember("member2")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "member1");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.member1, value["member1"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operationalCert");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.operationalCert, value["operationalCert"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "member2");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.member2, value["member2"]));
 
     return CHIP_NO_ERROR;
 }
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.fabricIndex);
-    ComplexArgumentParser::Finalize(request.operationalCert);
+    ComplexArgumentParser::Finalize(request.member1);
+    ComplexArgumentParser::Finalize(request.member2);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request,
@@ -2183,29 +2157,34 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.id", "id", value.isMember("id")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackFreeCurrent", "stackFreeCurrent",
-                                                                  value.isMember("stackFreeCurrent")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackFreeMinimum", "stackFreeMinimum",
-                                                                  value.isMember("stackFreeMinimum")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.stackSize", "stackSize", value.isMember("stackSize")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.id, value["id"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeCurrent");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeCurrent, value["stackFreeCurrent"]));
+    if (value.isMember("stackFreeCurrent"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeCurrent");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeCurrent, value["stackFreeCurrent"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeMinimum");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeMinimum, value["stackFreeMinimum"]));
+    if (value.isMember("stackFreeMinimum"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackFreeMinimum");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackFreeMinimum, value["stackFreeMinimum"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackSize");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackSize, value["stackSize"]));
+    if (value.isMember("stackSize"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "stackSize");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.stackSize, value["stackSize"]));
+    }
 
     return CHIP_NO_ERROR;
 }

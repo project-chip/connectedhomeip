@@ -62,6 +62,10 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
 {
+    // TODO(19081): This platform does not properly error out if wall clock has
+    //              not been set.  For now, short circuit this.
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#if 0
     time_t seconds;
     struct rtkTimeVal tv;
 
@@ -75,33 +79,21 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    curTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
+    curTime = Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
 
     return CHIP_NO_ERROR;
+#endif
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 {
-    time_t seconds;
-    struct rtkTimeVal tv;
-
-    seconds = rtc_read();
-
-    tv.tv_sec  = (uint32_t) seconds;
-    tv.tv_usec = 0;
-
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    curTime =
-        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
-
-    return CHIP_NO_ERROR;
+    Microseconds64 curTimeUs;
+    auto err = GetClock_RealTime(curTimeUs);
+    aCurTime = std::chrono::duration_cast<Milliseconds64>(curTimeUs);
+    return err;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     struct rtkTimeVal tv;
     tv.tv_sec  = static_cast<uint32_t>(aNewCurTime.count() / UINT64_C(1000000));
@@ -118,6 +110,9 @@ CHIP_ERROR InitClock_RealTime()
         Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
     // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
     // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    //
+    // TODO(19081): This is broken because it causes the platform to report
+    //              that it does have wall clock time when it actually doesn't.
     return System::SystemClock().SetClock_RealTime(curTime);
 }
 
