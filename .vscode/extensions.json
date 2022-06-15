@@ -5,6 +5,7 @@
     // List of extensions which should be recommended for users of this workspace.
     "recommendations": [
         "aaron-bond.better-comments",
+        "augustocdias.tasks-shell-input",
         "christian-kohler.path-intellisense",
         "eamodio.gitlens",
         "editorconfig.editorconfig",
