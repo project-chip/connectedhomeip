@@ -253,8 +253,11 @@ public:
     bool TrimFabricForSubscriptions(FabricIndex aFabricIndex, bool aForceEvict);
 
     /**
-     * Select the oldest (and the one that exceeds the per read resource minimum if there are any) read handler on the fabric with
-     * the given fabric index.
+     * Select a read handler and abort the read transaction if the fabric is using more resources (number of paths or number of read
+     * handlers) then we guaranteed.
+     *
+     * - The youngest oversized read handlers will be chosen first.
+     * - If there are no oversized read handlers, the youngest read handlers will be chosen.
      *
      * @retval Whether we have evicted a read transaction.
      */
@@ -470,20 +473,20 @@ private:
      * - If the existing resources can serve this read transaction, this function will return Status::Success.
      * - or if the resources used by read transactions in the fabric index meets the per fabric resource limit (i.e. 9 paths & 1
      * read) after accepting this read request, this function will always return Status::Success by evicting existing read
-     * transactions which uses more resources than kMinSupportedPathsPerReadRequest from the oldest to the newest.
+     * transactions from other fabrics which are using more than the guaranteed minimum number of read.
      * - or if the resources used by read transactions in the fabric index will exceed the per fabric resource limit (i.e. 9 paths &
-     * 1 read) after accepting this read request, this function will return false without evicting any existing transaction.
+     * 1 read) after accepting this read request, this function will return a failure status without evicting any existing
+     * transaction.
      * - However, read transactions on PASE sessions won't evict any existing read transactions when we have already commissioned
      * CHIP_CONFIG_MAX_FABRICS fabrics on the device.
      *
      * @retval Status::Success: The read transaction can be accepted.
-     * @retval Status::Busy: The read handler pool is exhausted. But the client are expected to retry later.
-     * @retval Status::ResourceExhausted: The read handler pool is exhausted. But the client are not expected to retry later (PASE
-     * session with a full fabric table).
-     * @retval Status::PathsExhausted: The attribute / event path pool is exhausted.
+     * @retval Status::Busy: The remaining resource is insufficient to handle this read request, and the accessing fabric for this
+     * read request will use more resources than we guaranteed, the client is expected to retry later.
+     * @retval Status::PathsExhausted: The attribute / event path pool is exhausted, and the read request is requesting more
+     * resources than we guaranteed.
      */
-    Protocols::InteractionModel::Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
-                                                              size_t aRequestedEventPathCount);
+    Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount, size_t aRequestedEventPathCount);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);

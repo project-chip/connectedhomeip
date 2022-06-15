@@ -3637,7 +3637,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
         });
 
     // Case 6: The device's fabric table is full, PASE sessions won't be counted as a valid fabric and cannot evict existing read
-    // transactions -> If we don't have enough resources, it will receive ResourceExhausted.
+    // transactions. It will be rejected with Busy status code.
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
@@ -3681,7 +3681,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             // The new read request should be rejected.
             NL_TEST_ASSERT(apSuite, readCallback.mOnError == 1);
-            NL_TEST_ASSERT(apSuite, readCallback.mLastError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+            NL_TEST_ASSERT(apSuite, readCallback.mLastError == CHIP_IM_GLOBAL_STATUS(Busy));
             // Should evict one read request from Bob fabric for enough resources.
             NL_TEST_ASSERT(apSuite,
                            app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(

@@ -271,12 +271,12 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     if (commandHandler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
-        aStatus = Protocols::InteractionModel::Status::Busy;
+        aStatus = Status::Busy;
         return CHIP_ERROR_NO_MEMORY;
     }
     ReturnErrorOnFailure(
         commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke));
-    aStatus = Protocols::InteractionModel::Status::Success;
+    aStatus = Status::Success;
     return CHIP_NO_ERROR;
 }
 
@@ -390,7 +390,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         reader.Init(aPayload.Retain());
 
         ReadRequestMessage::Parser readRequestParser;
-        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
+        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::Failure);
 
         {
             size_t requestedAttributePathCount = 0;
@@ -402,11 +402,11 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 TLV::TLVReader pathReader;
                 attributePathListParser.GetReader(&pathReader);
                 ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
-                                  Protocols::InteractionModel::Status::Failure);
+                                  Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
-                return Protocols::InteractionModel::Status::InvalidAction;
+                return Status::InvalidAction;
             }
             EventPathIBs::Parser eventpathListParser;
             err = readRequestParser.GetEventRequests(&eventpathListParser);
@@ -415,17 +415,17 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 TLV::TLVReader pathReader;
                 eventpathListParser.GetReader(&pathReader);
                 ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
-                                  Protocols::InteractionModel::Status::Failure);
+                                  Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
-                return Protocols::InteractionModel::Status::InvalidAction;
+                return Status::InvalidAction;
             }
 
             // The following cast is safe, since we can only hold a few tens of paths in one request.
             Protocols::InteractionModel::Status checkResult = EnsureResourceForRead(
                 apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount, requestedEventPathCount);
-            if (checkResult != Protocols::InteractionModel::Status::Success)
+            if (checkResult != Status::Success)
             {
                 return checkResult;
             }
@@ -480,13 +480,13 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Timed interaction");
-        aStatus = Protocols::InteractionModel::Status::Busy;
+        aStatus = Status::Busy;
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // The timed handler takes over handling of this exchange and will do its
     // own status reporting as needed.
-    aStatus = Protocols::InteractionModel::Status::Success;
+    aStatus = Status::Success;
     apExchangeContext->SetDelegate(handler);
     return handler->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
 }
@@ -537,7 +537,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 {
     using namespace Protocols::InteractionModel;
 
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+    Protocols::InteractionModel::Status status = Status::Failure;
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&
@@ -568,7 +568,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         ReturnErrorOnFailure(OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload)));
-        status = Protocols::InteractionModel::Status::Success;
+        status = Status::Success;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
@@ -579,7 +579,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         ChipLogProgress(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     }
 
-    if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
@@ -614,6 +614,8 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
         return false;
     }
 
+    // Note: This is OK only when we have assumed the fabricCount is not zero. Should be revised when adding support to
+    // subscriptions on PASE sessions.
     size_t perFabricPathCapacity         = pathPoolCapacity / static_cast<size_t>(fabricCount);
     size_t perFabricSubscriptionCapacity = readHandlerPoolCapacity / static_cast<size_t>(fabricCount);
 
@@ -821,7 +823,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
         {
             candidate = handler;
         }
-        // This handler is younger than the one we picked before, should evict the younger one.
+        // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
         else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
@@ -873,6 +875,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     const size_t readHandlerCap   = allowUnlimited ? SIZE_MAX : GetReadHandlerPoolCapacityForReads();
 
     const size_t guaranteedReadRequestsPerFabric = GetGuaranteedReadRequestsPerFabric();
+    const size_t guaranteedPathsPerFabric        = kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric;
 
     size_t usedAttributePaths = 0;
     size_t usedEventPaths     = 0;
@@ -894,13 +897,17 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         });
     };
 
+    auto haveEnoughResourcesForTheRequest = [&]() {
+        return usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
+            usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap;
+    };
+
     countResourceUsage();
 
-    if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
-        usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
+    if (haveEnoughResourcesForTheRequest())
     {
         // We have enough resources, then we serve the requests in a best-effort manner.
-        return Protocols::InteractionModel::Status::Success;
+        return Status::Success;
     }
 
     if ((aRequestedAttributePathCount > kMinSupportedPathsPerReadRequest &&
@@ -908,14 +915,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         (aRequestedEventPathCount > kMinSupportedPathsPerReadRequest && usedEventPaths + aRequestedEventPathCount > eventPathCap))
     {
         // We cannot offer enough resources, and the read transaction is requesting more than the spec limit.
-        return Protocols::InteractionModel::Status::PathsExhausted;
+        return Status::PathsExhausted;
     }
 
-    // If we have commissioned CHIP_CONFIG_MAX_FABRICS already, and this transaction don't have an associated fabric index, reject
+    // If we have commissioned CHIP_CONFIG_MAX_FABRICS already, and this transaction doesn't have an associated fabric index, reject
     // the request if we don't have sufficient resources for this request.
     if (mpFabricTable->FabricCount() == GetConfigMaxFabrics() && aFabricIndex == kUndefinedFabricIndex)
     {
-        return Protocols::InteractionModel::Status::ResourceExhausted;
+        return Status::Busy;
     }
 
     size_t usedAttributePathsInFabric = 0;
@@ -932,13 +939,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         return Loop::Continue;
     });
 
-    // Busy, since there is already some read requests ongoing on this fabric, please retry later.
-    if (usedAttributePathsInFabric + aRequestedAttributePathCount >
-            kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
-        usedEventPathsInFabric + aRequestedEventPathCount > kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric ||
+    // Busy, since there are already some read requests ongoing on this fabric, please retry later.
+    if (usedAttributePathsInFabric + aRequestedAttributePathCount > guaranteedPathsPerFabric ||
+        usedEventPathsInFabric + aRequestedEventPathCount > guaranteedPathsPerFabric ||
         usedReadHandlersInFabric >= guaranteedReadRequestsPerFabric)
     {
-        return Protocols::InteractionModel::Status::Busy;
+        return Status::Busy;
     }
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex) {
@@ -957,8 +963,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
     {
         didEvictHandler = false;
         didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(kUndefinedFabricIndex);
-        if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
-            usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
+        if (haveEnoughResourcesForTheRequest())
         {
             break;
         }
@@ -970,29 +975,20 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         }
         for (const auto & fabric : *mpFabricTable)
         {
+            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex());
             // The resources are enough to serve this request, do not evict anything.
-            if (usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
-                usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap)
+            if (haveEnoughResourcesForTheRequest())
             {
                 break;
             }
-            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex());
         }
     }
 
-    // The read requests that are not using exceeded resources will be first-come-first-served, since the read transactions will be
-    // relatively short, the client is expected to retry later if the server is busy now.
-    if (usedAttributePaths + aRequestedAttributePathCount > attributePathCap ||
-        usedEventPaths + aRequestedEventPathCount > eventPathCap)
-    {
-        return Protocols::InteractionModel::Status::Busy;
-    }
-    if (usedReadHandlers >= readHandlerCap)
-    {
-        return Protocols::InteractionModel::Status::Busy;
-    }
+    // Now all fabrics are not oversized (since we have trimmed the oversized fabrics in the loop above), and the read handler is
+    // also not oversized, we should be able to handle this read transaction.
+    VerifyOrDie(haveEnoughResourcesForTheRequest());
 
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)

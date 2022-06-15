@@ -821,12 +821,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
  *
- * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
- *
- * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
- * paths for each fabric.
+ * @brief The maximum number of path objects for subscriptions, limits the number of attributes being subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
 // #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
@@ -837,10 +834,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
  *
- * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
- *
- * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
- * paths for each fabric.
+ * @brief Defines the maximum number of path objects for read requests.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
 #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS (CHIP_IM_MAX_NUM_READS * 9)
