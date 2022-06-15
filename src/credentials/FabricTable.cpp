@@ -538,6 +538,32 @@ const FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId co
     return nullptr;
 }
 
+FabricInfo * FabricTable::FindFabricWithRootPubKeyFabricId(const Crypto::P256PublicKey & rootPubKey, const FabricId & fabricId)
+{
+    for (auto & fabric : mStates)
+    {
+        if (!fabric.IsInitialized())
+        {
+            continue;
+        }
+        if (fabricId != fabric.GetFabricId())
+        {
+            continue;
+        }
+        Crypto::P256PublicKey candidateKey;
+        if (fabric.FetchRootPubkey(candidateKey) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (memcmp(rootPubKey.ConstBytes(), candidateKey.ConstBytes(), candidateKey.Length()) != 0)
+        {
+            continue;
+        }
+        return &fabric;
+    }
+    return nullptr;
+}
+
 CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -574,6 +600,15 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     return fabricInfo->FetchRootPubkey(outPublicKey);
+}
+
+CHIP_ERROR FabricTable::FetchCats(const FabricIndex fabricIndex, CATValues & cats) const
+{
+    uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
+    MutableByteSpan nocSpan{ nocBuf };
+    ReturnErrorOnFailure(FetchNOCCert(fabricIndex, nocSpan));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(nocSpan, cats));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FabricTable::StoreFabricMetadata(const FabricInfo * fabricInfo) const

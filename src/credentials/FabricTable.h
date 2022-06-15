@@ -402,6 +402,7 @@ public:
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
+    FabricInfo * FindFabricWithRootPubKeyFabricId(const Crypto::P256PublicKey & rootPubKey, const FabricId & fabricId);
 
     CHIP_ERROR Init(const FabricTable::InitParams & initParams);
     void Shutdown();
@@ -560,6 +561,17 @@ public:
      * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
      */
     CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
+
+    /**
+     * @brief Get the CASE Authenticated Tags from the NOC for the given `fabricIndex`.
+     *
+     * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
+     * @param outCats - CATValues struct to write the NOC CATs for the given fabric index
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if not found/available, or `fabricIndex` has a bad value
+     * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
+     */
+    CHIP_ERROR FetchCats(const FabricIndex fabricIndex, CATValues & outCats) const;
 
     /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for
