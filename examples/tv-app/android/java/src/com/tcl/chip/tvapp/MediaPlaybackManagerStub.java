@@ -32,6 +32,9 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   private long playbackDuration = 5 * 60 * 1000;
   private long startTime = 100;
 
+  private static int playbackMaxForwardSpeed = 10;
+  private static int playbackMaxRewindSpeed = -10;
+
   public MediaPlaybackManagerStub(int endpoint) {
     this.endpoint = endpoint;
   }
@@ -116,15 +119,23 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
 
       case REQUEST_REWIND:
         Log.d(TAG, "request rewind at " + endpoint);
+        if (playbackSpeed == playbackMaxRewindSpeed) {
+          return RESPONSE_STATUS_SPEED_OUT_OF_RANGE;
+        }
         playbackState = PLAYBACK_STATE_PLAYING;
-        playbackSpeed = (playbackSpeed >= 0 ? -1 : playbackSpeed * 2);
+        playbackSpeed =
+            (playbackSpeed >= 0 ? -1 : Math.min(playbackSpeed * 2, playbackMaxRewindSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_FAST_FORWARD:
         Log.d(TAG, "request fast forward at " + endpoint);
+        if (playbackSpeed == playbackMaxForwardSpeed) {
+          return RESPONSE_STATUS_SPEED_OUT_OF_RANGE;
+        }
         playbackState = PLAYBACK_STATE_PLAYING;
-        playbackSpeed = (playbackSpeed <= 0 ? 1 : playbackSpeed * 2);
+        playbackSpeed =
+            (playbackSpeed <= 0 ? 1 : Math.max(playbackSpeed * 2, playbackMaxForwardSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
