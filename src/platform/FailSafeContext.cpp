@@ -93,7 +93,6 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     bool cancelTimersIfError    = false;
-    auto currentMonotonicTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
     if (!mFailSafeArmed)
     {
         System::Clock::Timeout maxCumulativeTimeout =
