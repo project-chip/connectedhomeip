@@ -3,7 +3,25 @@
     // Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
 
     // List of extensions which should be recommended for users of this workspace.
-    "recommendations": ["marus25.cortex-debug"],
+    "recommendations": [
+        "ms-azuretools.vscode-docker",
+        "xaver.clang-format",
+        "github.vscode-pull-request-github",
+        "maelvalais.autoconf",
+        "yzhang.markdown-all-in-one",
+        "eamodio.gitlens",
+        "yuichinukiyama.vscode-preview-server",
+        "aaron-bond.better-comments",
+        "foxundermoon.shell-format",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "redhat.vscode-yaml",
+        "christian-kohler.path-intellisense",
+        "knisterpeter.vscode-github",
+        "npclaudiu.vscode-gn",
+        "marus25.cortex-debug",
+        "msedge-dev.gnls"
+    ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []
 }
