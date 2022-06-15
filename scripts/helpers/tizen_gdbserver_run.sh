@@ -16,13 +16,13 @@ $0 --app-name APP_NAME [--help] [--gdbserver-port PORT] [--target TARGET_DEVICE]
 Options:
     --app-name APP_NAME - name of app to debug
     --gdbserver-port PORT - gdbserver port, if not specified, defaults to $GDBSERVER_DEFAULT_PORT
-    --target DEVICE - device to debug app, if not specified and one device are conneted it will be used
+    --target DEVICE - device to debug the app, if not specified and one device is connected, it will be used
     --help - print help
     APP_ARGUMENTS - arguments to pass to debugged app
 
 Requirements:
     gdbserver has to be installed on the target device in the $GDBSERVER_TARGET_PATH path.
-    If it is installed on device by rpm it is necessary to create link by:
+    If it is installed on the device by RPM it is necessary to create a link by:
     'mkdir -p $GDBSERVER_TARGET_PATH && ln -sf /usr/bin/gdbserver $GDBSERVER_TARGET_PATH/gdbserver'.
 EOF
 }
@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$APP_NAME" ]; then
-    echo "ERROR Missing app name"
+    echo "ERROR: Missing app name"
     echo "$USAGE_INFO_MSG"
     exit 1
 fi
@@ -72,11 +72,11 @@ fi
 SDB_DEVICES=$(sdb devices | grep -cv 'List of devices attached')
 
 if [ "$SDB_DEVICES" -eq 0 ]; then
-    echo "No device connected"
+    echo "ERROR: No device connected"
     exit 1
 elif [ "$SDB_DEVICES" -gt 1 ]; then
     if [ -z "$TARGET_DEVICE" ]; then
-        echo "More than one device connected, please specify target device."
+        echo "ERROR: More than one device connected, please specify target device."
         echo "$USAGE_INFO_MSG"
         exit 1
     fi
@@ -91,7 +91,7 @@ else
 fi
 
 if [ "$GDBSERVER_FOUND" == "gdb not found" ]; then
-    echo "Gdbserver not found on target device in path $GDBSERVER_TARGET_PATH"
+    echo "ERROR: Gdbserver not found on the target device in path $GDBSERVER_TARGET_PATH"
     echo "$USAGE_INFO_MSG"
     exit 1
 fi
