@@ -1115,7 +1115,6 @@ bool Cmd_GenCD(int argc, char * argv[])
         fprintf(stderr, "Please specify the file name for the signed Certification Declaration using the --out option.\n");
         return false;
     }
-    fprintf(stderr, "gSignedCDFileName = %s\n", gSignedCDFileName);
 
     if (strcmp(gSignedCDFileName, "-") != 0 && access(gSignedCDFileName, R_OK) == 0)
     {
