@@ -240,20 +240,20 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     // In normal operation scope of FabricTable outlives CASESession. Without this scoping we hit
     // ASAN test issue since FabricTable is not normally on the stack.
     {
-        CASESession pairing;
+        CASESession caseSession;
 
-        NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
+        NL_TEST_ASSERT(inSuite, caseSession.GetSecureSessionType() == SecureSession::Type::kCASE);
 
-        pairing.SetGroupDataProvider(&gDeviceGroupDataProvider);
+        caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
         NL_TEST_ASSERT(inSuite,
-                       pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId()) ==
-                           CHIP_ERROR_INVALID_ARGUMENT);
+                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr,
+                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
-                       pairing.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate,
-                                                              ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
+                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate,
+                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
-                       pairing.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate,
-                                                              ScopedNodeId()) == CHIP_NO_ERROR);
+                       caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate,
+                                                                  ScopedNodeId()) == CHIP_NO_ERROR);
     }
 }
 

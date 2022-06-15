@@ -409,8 +409,10 @@ public:
      */
     CHIP_ERROR UpdateFabric(FabricIndex fabricIndex, FabricInfo & fabricInfo);
 
+    // TODO this #if CONFIG_IM_BUILD_FOR_UNIT_TEST is temporary. There is a change incoming soon
+    // that will allow triggering NOC update directly.
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { SendFabricUpdateNOC(fabricIndex); }
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyNOCUpdatedOnFabric(fabricIndex); }
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
     FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId);
@@ -603,7 +605,7 @@ private:
 
     CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    CHIP_ERROR SendFabricUpdateNOC(FabricIndex fabricIndex);
+    CHIP_ERROR NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage               = nullptr;

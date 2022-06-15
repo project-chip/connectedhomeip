@@ -754,7 +754,7 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
-CHIP_ERROR FabricTable::SendFabricUpdateNOC(FabricIndex fabricIndex)
+CHIP_ERROR FabricTable::NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex)
 {
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
@@ -781,7 +781,7 @@ CHIP_ERROR FabricTable::UpdateFabric(FabricIndex fabricIndex, FabricInfo & newFa
     // validity policy will see this condition and can act appropriately.
     mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
 
-    SendFabricUpdateNOC(fabricIndex);
+    NotifyNOCUpdatedOnFabric(fabricIndex);
 
     return CHIP_NO_ERROR;
 }
