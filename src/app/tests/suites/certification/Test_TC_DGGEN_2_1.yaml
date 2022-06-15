@@ -98,7 +98,7 @@ tests:
     #issue #13029
     - label: "TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
-          ./chip-tool generaldiagnostics read active-hardware-faults 1 0 
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
           [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
           [1654682785.894846][33006:33011] CHIP:TOO:   ActiveHardwareFaults: 0 entries
           [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
@@ -152,7 +152,7 @@ tests:
 
     - label: "TH reads ActiveNetworkFaults attribute value from DUT."
       verification: |
-          ./chip-tool generaldiagnostics read active-network-faults 1 0 
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
 
           [1654683004.591353][33044:33049] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
           [1654683004.591438][33044:33049] CHIP:TOO:   ActiveNetworkFaults: 0 entries
