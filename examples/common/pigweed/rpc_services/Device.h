@@ -282,7 +282,7 @@ public:
     {
 
         uint16_t vendor_id;
-        if (DeviceLayer::ConfigurationMgr().GetVendorId(vendor_id) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendor_id) == CHIP_NO_ERROR)
         {
             response.vendor_id = static_cast<uint32_t>(vendor_id);
         }
@@ -292,7 +292,7 @@ public:
         }
 
         uint16_t product_id;
-        if (DeviceLayer::ConfigurationMgr().GetProductId(product_id) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(product_id) == CHIP_NO_ERROR)
         {
             response.product_id = static_cast<uint32_t>(product_id);
         }
