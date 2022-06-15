@@ -55,10 +55,10 @@ static_library("nrfconnect") {
 
   if (chip_enable_factory_data && !chip_enable_factory_data_custom_backend) {
     sources += [
-       "FactoryDataProvider.cpp",
-       "FactoryDataProvider.h",
-       "FactoryDataParser.c",
-       "FactoryDataParser.h",
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
     ]
   }
 
