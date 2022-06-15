@@ -209,7 +209,7 @@
             "label": "Connect to device (Tizen)",
             "type": "shell",
             "command": "sdb",
-            "args": ["connect", "${input:tizenTargetDeviceAddress}:26101"],
+            "args": ["connect", "${input:tizenTargetDeviceAddress}"],
             "problemMatcher": [],
             "runOptions": {
                 "reevaluateOnRerun": false
@@ -239,9 +239,7 @@
                 "--app-name",
                 "org.tizen.matter.example.lighting",
                 "--target",
-                "${input:tizenTargetDeviceAddressSdb}",
-                "--",
-                "vendor-id 65521 product-id 32769 discriminator 42 passcode 1234"
+                "${input:tizenTargetDeviceAddressSdb}"
             ],
             "problemMatcher": [],
             "runOptions": {
@@ -445,7 +443,7 @@
         {
             "type": "promptString",
             "id": "tizenTargetDeviceAddress",
-            "description": "Enter the target device address"
+            "description": "Enter the target device address and port in format <address>:<port>"
         },
         {
             "id": "tizenTargetDeviceAddressSdb",
