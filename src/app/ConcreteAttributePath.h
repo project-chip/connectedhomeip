@@ -127,6 +127,13 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
         mListIndex = aListIndex;
     }
 
+    bool IsValid() const
+    {
+        return IsValidEndpointId(mEndpointId) && IsValidClusterId(mClusterId) && IsValidAttributeId(mAttributeId);
+    }
+
+    bool IsValidForGroupWrites() const { return IsValidClusterId(mClusterId) && IsValidAttributeId(mAttributeId); }
+
     bool IsListOperation() const { return mListOp != ListOperation::NotList; }
     bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
 

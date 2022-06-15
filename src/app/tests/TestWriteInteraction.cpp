@@ -572,21 +572,15 @@ void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     {
-        TestWriteClientCallback callback;
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        NL_TEST_ASSERT(apSuite, ConcreteDataAttributePath(0, 1, 2).IsValid());
+        NL_TEST_ASSERT(apSuite, !ConcreteDataAttributePath(kInvalidEndpointId, 1, 2).IsValid());
+        NL_TEST_ASSERT(apSuite, !ConcreteDataAttributePath(0, kInvalidClusterId, 2).IsValid());
+        NL_TEST_ASSERT(apSuite, !ConcreteDataAttributePath(0, 1, kInvalidAttributeId).IsValid());
 
-        NL_TEST_ASSERT(apSuite,
-                       writeClient.EncodeAttribute(AttributePathParams(kInvalidEndpointId, 1, 2), (bool) true) == CHIP_NO_ERROR);
-
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
-
-        err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        ctx.DrainAndServiceIO();
-
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
-        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, ConcreteDataAttributePath(0, 1, 2).IsValidForGroupWrites());
+        NL_TEST_ASSERT(apSuite, ConcreteDataAttributePath(kInvalidEndpointId, 1, 2).IsValidForGroupWrites());
+        NL_TEST_ASSERT(apSuite, !ConcreteDataAttributePath(0, kInvalidClusterId, 2).IsValidForGroupWrites());
+        NL_TEST_ASSERT(apSuite, !ConcreteDataAttributePath(0, 1, kInvalidAttributeId).IsValidForGroupWrites());
     }
 
     {
@@ -604,8 +598,8 @@ void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * ap
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
-        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mStatus.mStatus == Protocols::InteractionModel::Status::InvalidAction);
     }
 
     {
@@ -623,8 +617,8 @@ void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * ap
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
-        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mStatus.mStatus == Protocols::InteractionModel::Status::InvalidAction);
     }
 
     // By now we should have closed all exchanges and sent all pending acks, so

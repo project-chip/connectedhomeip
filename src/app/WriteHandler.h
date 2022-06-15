@@ -157,7 +157,6 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
-    Protocols::InteractionModel::Status VerifyAttributeDataIBs(const TLV::TLVReader & aAttributeDataIBsReader, bool aIsGroupAction);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;

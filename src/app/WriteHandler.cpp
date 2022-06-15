@@ -321,6 +321,13 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
+        if (!dataAttributePath.IsValid())
+        {
+            err = AddStatus(dataAttributePath, StatusIB(Status::InvalidAction));
+            SuccessOrExit(err);
+            continue;
+        }
+
         const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
         bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
 
@@ -432,6 +439,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
+
+        if (!dataAttributePath.IsValidForGroupWrites())
+        {
+            continue;
+        }
 
         if (!dataAttributePath.IsListOperation() && dataReader.GetType() == TLV::TLVType::kTLVType_Array)
         {
@@ -610,11 +622,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
 
-    // Spec 8.7.3.2: If the attribute path is invalid, the processing should be terminated and a StatusIB should be generated. In
-    // this case, we have to verify the attribute data IBs before actually processing them.
-    status = VerifyAttributeDataIBs(AttributeDataIBsReader, mpExchangeCtx->IsGroupExchangeContext());
-    VerifyOrExit(Status::Success == status, err = CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE);
-
     if (mpExchangeCtx->IsGroupExchangeContext())
     {
         err = ProcessGroupAttributeDataIBs(AttributeDataIBsReader);
@@ -637,46 +644,6 @@ exit:
         ChipLogError(DataManagement, "Failed to process write request: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return status;
-}
-
-Status WriteHandler::VerifyAttributeDataIBs(const TLV::TLVReader & aAttributeDataIBsReader, bool aIsGroupAction)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVReader dataIBsReader(aAttributeDataIBsReader);
-
-    while (CHIP_NO_ERROR == (err = dataIBsReader.Next()))
-    {
-        chip::TLV::TLVReader dataReader;
-        AttributeDataIB::Parser element;
-        AttributePathIB::Parser attributePath;
-        ConcreteDataAttributePath dataAttributePath;
-        TLV::TLVReader reader = dataIBsReader;
-
-        VerifyOrReturnError(CHIP_NO_ERROR == element.Init(reader), Status::InvalidAction);
-        VerifyOrReturnError(CHIP_NO_ERROR == element.GetPath(&attributePath), Status::InvalidAction);
-
-        if (!aIsGroupAction)
-        {
-            VerifyOrReturnError(CHIP_NO_ERROR == attributePath.GetEndpoint(&(dataAttributePath.mEndpointId)),
-                                Status::InvalidAction);
-            VerifyOrReturnError(IsValidEndpointId(dataAttributePath.mEndpointId), Status::InvalidAction);
-        }
-
-        VerifyOrReturnError(CHIP_NO_ERROR == attributePath.GetCluster(&(dataAttributePath.mClusterId)), Status::InvalidAction);
-        VerifyOrReturnError(IsValidClusterId(dataAttributePath.mClusterId), Status::InvalidAction);
-
-        VerifyOrReturnError(CHIP_NO_ERROR == attributePath.GetAttribute(&(dataAttributePath.mAttributeId)), Status::InvalidAction);
-        VerifyOrReturnError(IsValidAttributeId(dataAttributePath.mAttributeId), Status::InvalidAction);
-
-        VerifyOrReturnError(CHIP_NO_ERROR == attributePath.GetListIndex(dataAttributePath), Status::InvalidAction);
-        VerifyOrReturnError(CHIP_NO_ERROR == element.GetData(&dataReader), Status::InvalidAction);
-    }
-
-    if (CHIP_END_OF_TLV != err)
-    {
-        return Status::InvalidAction;
-    }
-    return Status::Success;
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
