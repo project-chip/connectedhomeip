@@ -7536,6 +7536,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFailSafeExpiryLengthSeconds)),
                                            failSafeExpiryLengthSeconds));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMaxCumulativeFailsafeSeconds)),
+                                           maxCumulativeFailsafeSeconds));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7557,6 +7559,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
         case to_underlying(Fields::kFailSafeExpiryLengthSeconds):
             ReturnErrorOnFailure(DataModel::Decode(reader, failSafeExpiryLengthSeconds));
+            break;
+        case to_underlying(Fields::kMaxCumulativeFailsafeSeconds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, maxCumulativeFailsafeSeconds));
             break;
         default:
             break;

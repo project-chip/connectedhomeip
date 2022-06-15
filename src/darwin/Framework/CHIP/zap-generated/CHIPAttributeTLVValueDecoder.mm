@@ -6815,6 +6815,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull value;
             value = [CHIPGeneralCommissioningClusterBasicCommissioningInfo new];
             value.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:cppValue.failSafeExpiryLengthSeconds];
+            value.maxCumulativeFailsafeSeconds = [NSNumber numberWithUnsignedShort:cppValue.maxCumulativeFailsafeSeconds];
             return value;
         }
         case Attributes::RegulatoryConfig::Id: {

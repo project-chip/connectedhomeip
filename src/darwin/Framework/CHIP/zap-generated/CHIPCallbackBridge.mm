@@ -4569,6 +4569,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
     CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull objCValue;
     objCValue = [CHIPGeneralCommissioningClusterBasicCommissioningInfo new];
     objCValue.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:value.failSafeExpiryLengthSeconds];
+    objCValue.maxCumulativeFailsafeSeconds = [NSNumber numberWithUnsignedShort:value.maxCumulativeFailsafeSeconds];
     DispatchSuccess(context, objCValue);
 };
 
