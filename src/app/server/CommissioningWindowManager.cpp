@@ -56,6 +56,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+        // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
@@ -63,6 +64,10 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         ChipLogError(AppServer, "Failsafe timer expired");
+        if (mPASESession)
+        {
+            mPASESession->AsSecureSession()->MarkForRemoval();
+        }
         HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
@@ -98,11 +103,7 @@ void CommissioningWindowManager::ResetState()
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    if (failSafeContext.IsFailSafeArmed())
-    {
-        failSafeContext.ForceFailSafeTimerExpiry();
-    }
+    ExpireFailSafeIfArmed();
 
     ResetState();
 }
@@ -164,20 +165,31 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
     // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (failSafeContext.IsFailSafeArmed())
     {
         ChipLogError(AppServer, "Error - arm failsafe is already armed on PASE session establishment completion");
     }
     else
     {
-        CHIP_ERROR err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
+            // Don't allow a PASE session to hang around without a fail-safe.
+            session->AsSecureSession()->MarkForRemoval();
+            HandleFailedAttempt(err);
         }
     }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
+
+    if (err == CHIP_NO_ERROR)
+    {
+        // When the now-armed fail-safe is disarmed or expires it will handle
+        // clearing out mPASESession.
+        mPASESession.Grab(session);
+    }
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
@@ -443,6 +455,31 @@ void CommissioningWindowManager::HandleCommissioningWindowTimeout(chip::System::
     auto * commissionMgr                           = static_cast<CommissioningWindowManager *>(aAppState);
     commissionMgr->mCommissioningTimeoutTimerArmed = false;
     commissionMgr->CloseCommissioningWindow();
+}
+
+void CommissioningWindowManager::OnSessionReleased()
+{
+    // The PASE session has died, probably due to CloseSession.  Immediately
+    // expire the fail-safe, if it's still armed (which it might not be if the
+    // PASE session is being released due to the fail-safe expiring or being
+    // disarmed).
+    //
+    // Expiring the fail-safe will make us start listening for new PASE sessions
+    // as needed.
+    //
+    // Note that at this point the fail-safe _must_ be associated with our PASE
+    // session, since we arm it when the PASE session is set up, and anything
+    // that disarms the fail-safe would also tear down the PASE session.
+    ExpireFailSafeIfArmed();
+}
+
+void CommissioningWindowManager::ExpireFailSafeIfArmed()
+{
+    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    if (failSafeContext.IsFailSafeArmed())
+    {
+        failSafeContext.ForceFailSafeTimerExpiry();
+    }
 }
 
 } // namespace chip
