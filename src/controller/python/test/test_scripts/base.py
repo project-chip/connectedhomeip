@@ -178,8 +178,6 @@ class BaseTestHelper:
         self.logger = logger
         self.paaTrustStorePath = paaTrustStorePath
 
-        logging.getLogger().setLevel(logging.DEBUG)
-
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
         strlen = 100
