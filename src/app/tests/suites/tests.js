@@ -462,7 +462,7 @@ function getManualTests() {
     'Test_TC_BIND_1_1',
     'Test_TC_BIND_2_1',
   ];
-  
+
   const Scenes = [
     'Test_TC_S_1_1',
     'Test_TC_S_2_1',

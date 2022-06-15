@@ -40,10 +40,10 @@ tests:
           [1650881032.387690][2715:2715] CHIP:DMG:                         Cluster = 0x2e,
           [1650881032.387722][2715:2715] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1650881032.387750][2715:2715] CHIP:DMG:                 }
-          [1650881032.387781][2715:2715] CHIP:DMG:                         
+          [1650881032.387781][2715:2715] CHIP:DMG:
           [1650881032.387807][2715:2715] CHIP:DMG:         ],
-          [1650881032.387836][2715:2715] CHIP:DMG:                 
-          [1650881032.387862][2715:2715] CHIP:DMG:         isFabricFiltered = true, 
+          [1650881032.387836][2715:2715] CHIP:DMG:
+          [1650881032.387862][2715:2715] CHIP:DMG:         isFabricFiltered = true,
           [1650881032.387887][2715:2715] CHIP:DMG:         InteractionModelRevision = 1
           [1650881032.387910][2715:2715] CHIP:DMG: },
           [1650881032.387979][2715:2715] CHIP:DMG: IM RH moving to [GeneratingReports]
