@@ -408,7 +408,6 @@ void TestReverts(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate storageDelegate;
     PersistentStorageOpCertStore opCertStore;
-    DefaultStorageKeyAllocator keyAllocator;
 
     // Failure before Init
     CHIP_ERROR err = opCertStore.RemoveOpCertsForFabric(kFabricIndex1);
@@ -633,7 +632,6 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate storageDelegate;
     PersistentStorageOpCertStore opCertStore;
-    DefaultStorageKeyAllocator keyAllocator;
 
     // Init succeeds
     CHIP_ERROR err = opCertStore.Init(&storageDelegate);
