@@ -177,14 +177,6 @@ config CHIP_NFC_COMMISSIONING
     bool
     default y
 
-config CHIP_FACTORY_DATA
-    bool
-    default y
-
-config CHIP_FACTORY_DATA_BUILD
-    bool
-    default y
-
 config CHIP_OTA_REQUESTOR
     bool
     default y

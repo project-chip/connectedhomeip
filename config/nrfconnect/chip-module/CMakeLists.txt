@@ -225,7 +225,6 @@ if (CONFIG_CHIP_FACTORY_DATA)
     chip_gn_arg_bool  ("chip_enable_factory_data"                            "true")
 elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
-    chip_gn_arg_bool  ("chip_enable_factory_data_custom_backend"             "true")
 endif()
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
