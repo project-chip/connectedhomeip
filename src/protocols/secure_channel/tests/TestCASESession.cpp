@@ -246,14 +246,14 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
         caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
         NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId()) ==
-                           CHIP_ERROR_INVALID_ARGUMENT);
+                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr,
+                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
                        caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate,
-                                                              ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
+                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
                        caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate,
-                                                              ScopedNodeId()) == CHIP_NO_ERROR);
+                                                                  ScopedNodeId()) == CHIP_NO_ERROR);
     }
 }
 
