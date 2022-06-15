@@ -387,6 +387,41 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Debug Open IoT SDK example application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "load ./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK Application",
+            "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Debug Open IoT SDK unit-tests application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
+            "executable": "./build/chip-openiotsdk-unit-tests.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "load ./build/chip-openiotsdk-unit-tests.elf"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK Application",
+            "showDevDebugOutput": "parsed"
         }
     ],
     "inputs": [
@@ -424,6 +459,13 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkApp",
+            "description": "What Open IoT SDK example do you want to use?",
+            "options": ["shell"],
+            "default": "shell"
         }
     ]
 }

@@ -194,11 +194,11 @@
             }
         },
         {
-            "label": "Run Open IoT SDK Application",
+            "label": "Build Open IoT SDK Application",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
             "args": [
-                "-C${input:openiotsdkCommand}",
+                "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
                 "${input:openiotsdkApp}"
             ],
@@ -209,6 +209,42 @@
                     "file": 1,
                     "line": 2,
                     "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK Application",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Crun", "${input:openiotsdkApp}"],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK Application",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Crun", "-dtrue", "${input:openiotsdkApp}"],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Listening for serial connection*",
+                    "endsPattern": "^.*GDBServer: Listening*"
                 }
             }
         }
@@ -255,13 +291,6 @@
             "description": "What mbed application type do you want to use?",
             "options": ["simple", "boot", "upgrade"],
             "default": "simple"
-        },
-        {
-            "type": "pickString",
-            "id": "openiotsdkCommand",
-            "description": "What do you want to do?",
-            "options": ["build", "run", "build-run"],
-            "default": "build"
         },
         {
             "type": "pickString",
