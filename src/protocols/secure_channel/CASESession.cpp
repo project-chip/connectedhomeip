@@ -146,7 +146,7 @@ void CASESession::Clear()
 
     if (mFabricsTable)
     {
-        mFabricsTable->RemoveFabricDelegate(&mFabricDelegate);
+        mFabricsTable->RemoveFabricDelegate(this);
     }
 
     mLocalNodeId  = kUndefinedNodeId;
@@ -196,11 +196,13 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
                                             SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
+    // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
+    // Init has been successfully called.
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(sessionManager, policy, delegate, previouslyEstablishedPeer));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = fabricTable->AddFabricDelegate(&mFabricDelegate));
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
 
     mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
@@ -248,7 +250,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
-    SuccessOrExit(err = fabricTable->AddFabricDelegate(&mFabricDelegate));
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
 
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
@@ -279,7 +281,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
-    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
     AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
@@ -1734,7 +1736,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         // pending state. In order to keep this side open we have to tell the exchange context that we will send an
         // async message.
         //
-        // Should you need to resume the CASESession you could theortically pass along msg to a callback that gets
+        // Should you need to resume the CASESession, you could theoretically pass along the msg to a callback that gets
         // registered when setting mStopHandshakeAtState.
         mExchangeCtxt->WillSendMessage();
         return CHIP_NO_ERROR;
@@ -1837,7 +1839,7 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        // Discard the exchange so that Clear() doesn't try closing it.  The
+        // Discard the exchange so that Clear() doesn't try aborting it.  The
         // exchange will handle that.
         DiscardExchange();
         AbortPendingEstablish(err);

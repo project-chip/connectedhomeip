@@ -843,8 +843,18 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
     }
 }
 
+// TODO, move all tests above into this class
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
+namespace chip {
+// TODO rename CASESessionForTest to TestCASESession. Not doing that immediately since that requires
+// removing a lot of the `using namesapce` above which is a larger cleanup.
+class CASESessionForTest
+{
+public:
+    static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
+};
+
+void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
@@ -863,6 +873,8 @@ static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * i
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
                                                                                      &pairingAccessory) == CHIP_NO_ERROR);
 
+    // In order for all the test iterations below, we need to stop the CASE sigma handshake in the middle such
+    // that the CASE session is in the process of being established.
     pairingCommissioner.SetStopSigmaHandshakeAt(MakeOptional(CASESession::State::kSentSigma1));
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
@@ -882,26 +894,32 @@ static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * i
                                                         nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
+    // At this point the CASESession is in the process of establishing. Confirm that there are no errors and there are session
+    // has not been established.
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
 
+    // Simulating an update to the Fabric NOC for gCommissionerFabrics fabric table.
+    // Confirm that CASESession on commisioner side has reported an error.
     gCommissionerFabrics.SendUpdateFabricNotificationForTest(gCommissionerFabricIndex);
     ctx.DrainAndServiceIO();
-
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
 
+    // Simulating an update to the Fabric NOC for gDeviceFabrics fabric table.
+    // Confirm that CASESession on accessory side has reported an error.
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
     ctx.DrainAndServiceIO();
-
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
 
+    // Sanity check that pairing did not complete.
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
 }
+} // namespace chip
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
 // Test Suite
@@ -922,7 +940,7 @@ static const nlTest sTests[] =
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     // This is compiled for host tests which is enough test coverage to ensure updating NOC invalidates
     // CASESession that are in the process of establishing.
-    NL_TEST_DEF("InvalidatePendingSessionEstablishment", CASE_SimulateUpdateNOCInvalidatePendingEstablishment),
+    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment),
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
     NL_TEST_SENTINEL()

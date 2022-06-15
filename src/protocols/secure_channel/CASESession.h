@@ -58,22 +58,10 @@ namespace chip {
 // when implementing concurrent CASE session.
 class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               public FabricTable::Delegate,
                                public PairingSession
 {
 public:
-    // Public so it is accessible to unit test
-    enum class State : uint8_t
-    {
-        kInitialized       = 0,
-        kSentSigma1        = 1,
-        kSentSigma2        = 2,
-        kSentSigma3        = 3,
-        kSentSigma1Resume  = 4,
-        kSentSigma2Resume  = 5,
-        kFinished          = 6,
-        kFinishedViaResume = 7,
-    };
-
     ~CASESession() override;
 
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
@@ -179,6 +167,28 @@ public:
     //// SessionDelegate ////
     void OnSessionReleased() override;
 
+    //// FabricTable::Delegate Implementation ////
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
+    }
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
+    }
+
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
@@ -186,44 +196,18 @@ public:
      **/
     void Clear();
 
-    void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
-
 private:
-    class CASESessionFabricDelegate final : public chip::FabricTable::Delegate
+    friend class CASESessionForTest;
+    enum class State : uint8_t
     {
-    public:
-        CASESessionFabricDelegate(CASESession * caseSession) : mCASESession(caseSession) {}
-
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            mCASESession->InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
-        }
-
-        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            mCASESession->InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
-        }
-
-    private:
-        CASESession * mCASESession;
+        kInitialized       = 0,
+        kSentSigma1        = 1,
+        kSentSigma2        = 2,
+        kSentSigma3        = 3,
+        kSentSigma1Resume  = 4,
+        kSentSigma2Resume  = 5,
+        kFinished          = 6,
+        kFinishedViaResume = 7,
     };
 
     /*
@@ -286,6 +270,12 @@ private:
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
 
+    void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
 #ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
@@ -313,7 +303,6 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
-    CASESessionFabricDelegate mFabricDelegate{ this };
     State mState;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
