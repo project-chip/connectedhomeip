@@ -16,7 +16,7 @@
  *
  */
 
-#include "CHIPCommand.h"
+#include <commands/common/CHIPCommand.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>

@@ -18,16 +18,18 @@
 
 #pragma once
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
 #include "../../config/PersistentStorage.h"
+#endif // CONFIG_USE_LOCAL_STORAGE
+
 #include "Command.h"
+
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 
 #pragma once
-
-class PersistentStorage;
 
 constexpr const char kIdentityAlpha[] = "alpha";
 constexpr const char kIdentityBeta[]  = "beta";
@@ -114,8 +116,10 @@ protected:
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     void ExecuteDeferredCleanups();
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
+#endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
 
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
