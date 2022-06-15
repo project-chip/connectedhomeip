@@ -41,7 +41,6 @@
 
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
-    EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     EmberEventControl emberAfBarrierControlClusterServerTickCallbackControl1;                                                      \
     extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
     extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
@@ -67,12 +66,11 @@
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
         { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
           emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
-    "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1",                                                    \
+    "Barrier Control Cluster Server EP 1",                                                    \
         "Color Control Cluster Server Plugin HueSatTransition", "Color Control Cluster Server Plugin TempTransition",              \
         "Color Control Cluster Server Plugin XyTransition", "Door Lock Server Cluster Plugin Lockout",                             \
         "Door Lock Server Cluster Plugin Relock", "IAS Zone Server Plugin ManageQueue",
@@ -82,7 +80,5 @@
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },          \
         { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },
-
 #endif // __AF_GEN_EVENT__
